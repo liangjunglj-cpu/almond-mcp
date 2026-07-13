@@ -7,45 +7,108 @@ furniture/drawing/diagram libraries with spatial contracts, audited Karamba
 capsules, structured retrieval (SQLite FTS5 + R-tree scene ledger), script
 execution over a TCP bridge, and publishing into Chestnut.
 
+## What Almond is
+
+Most Rhino MCP servers give the model a single power: *run a script*. That
+demos well, but generation is blind — the model has no memory of what is
+already in the scene, no real-world dimensions, no constraints, and no way
+to check its own work. The result is geometry that looks plausible and
+measures wrong.
+
+Almond is a **semantic layer around Rhino**, built so a language model can
+design with spatial awareness and produce high-detail, high-fidelity output:
+
+- **A persistent scene ledger** (SQLite) — scenes, rooms, placed instances,
+  delta-based revisions. The model *queries* the current state instead of
+  guessing it.
+- **Curated asset libraries with spatial contracts** — every furniture and
+  drawing asset carries its real catalogue dimensions plus an authored
+  contract: anchor point, floor footprint, functional clearances (e.g.
+  900 mm in front of a bookcase), collision shape, placement priority.
+  Placement respects ergonomics, not just bounding boxes.
+- **Structured retrieval** — FTS5 natural-language search and R-tree spatial
+  indexes, isolated per library, returning compact asset cards sized for a
+  model's context window.
+- **Layout validation** — an R-tree broad-phase overlap and room-containment
+  check the model can run *before* committing a layout.
+- **Audited Karamba capsules** — typed input/output contracts
+  (`ALMOND_IN_*`/`ALMOND_OUT_*`) over structural Grasshopper definitions, so
+  generated structures get real displacement/utilization feedback.
+- **Drawing recipes** — layer hierarchies, plot weights, and linetype
+  standards applied as one command, so output reads as an architectural
+  drawing rather than raw curves.
+- **Script execution and GLB publishing** — the raw `execute_rhino_script`
+  power is still there, plus one-call publishing of selected geometry into
+  Chestnut with physics metadata.
+
+The design goal: the model composes from **verified parts and validated
+layouts** instead of hallucinating geometry.
+
 Two pieces work together:
 
 - **`almond-mcp`** (this Python package, on PyPI) — the MCP server Claude
-  talks to.
-- **`RhinoAlmondBridge`** (a Rhino 8 plugin, via the Rhino Package Manager) —
-  listens on `127.0.0.1:5000` inside Rhino and executes what the server sends.
+  talks to. Holds the semantic layer; needs no Rhino SDK.
+- **`almondbridge`** (a Rhino 8 plugin, on the Rhino Package Manager) —
+  listens on `127.0.0.1:5000` (local only) inside Rhino and executes what
+  the server sends. Starts automatically with Rhino.
 
-## Install
+## Setup, step by step
 
-1. **Bridge** — in Rhino 8 run `_PackageManager`, search for
-   `AlmondBridge`, install, restart Rhino. (Or build it yourself:
-   `RhinoAlmondBridge/BUILD.md`.)
-2. **Server** — with [uv](https://docs.astral.sh/uv/) installed, add to your
-   Claude Desktop / Claude Code MCP config:
+Fresh machine to working in about five minutes. You need Rhino 8 on Windows
+and a Claude that supports MCP (Claude Desktop or Claude Code).
 
-   ```json
-   {
-     "mcpServers": {
-       "Almond": {
-         "command": "uvx",
-         "args": ["almond-mcp"]
-       }
-     }
-   }
+1. **Install the bridge.** In Rhino 8 run `_PackageManager`, search
+   `almondbridge`, install, restart Rhino. You should see
+   `RhinoAlmondBridge: TCP listener started on port 5000` in the command
+   history — no command needed. (`AlmondMCPStatus` checks it any time.)
+2. **Install [uv](https://docs.astral.sh/uv/)** (Python not required —
+   uv manages everything):
+
+   ```powershell
+   winget install astral-sh.uv
    ```
 
-3. **Assets** — first run creates `%LOCALAPPDATA%\Almond` with the library
-   manifests. The model files themselves are 3D Warehouse content that cannot
-   be redistributed (see `THIRD-PARTY-NOTICES.md`), so fetch them yourself:
+3. **Register the server with Claude.**
+   - *Claude Desktop:* edit `%APPDATA%\Claude\claude_desktop_config.json`:
+
+     ```json
+     {
+       "mcpServers": {
+         "Almond": {
+           "command": "uvx",
+           "args": ["almond-mcp"]
+         }
+       }
+     }
+     ```
+
+   - *Claude Code:* `claude mcp add Almond -- uvx almond-mcp`
+4. **Restart Claude.** The Almond tools (`execute_rhino_script`,
+   `search_ikea_furniture`, `create_design_scene`, …) appear in the tool
+   list. First run creates `%LOCALAPPDATA%\Almond` with the library
+   manifests and the scene database.
+5. **Check the plumbing** (Rhino open):
+
+   ```powershell
+   uvx almond-mcp doctor
+   ```
+
+6. **Populate the asset libraries** (optional — everything except model
+   *placement* works without it). The manifests ship with the package, but
+   the model files are 3D Warehouse content that cannot legally be
+   redistributed (see `THIRD-PARTY-NOTICES.md`), so each user downloads
+   them from the original source pages:
 
    ```powershell
    uvx almond-mcp fetch-assets --open   # opens each missing model's source page
    uvx almond-mcp fetch-assets          # re-run to verify sha256 checksums
-   uvx almond-mcp doctor                # end-to-end health check
    ```
 
-Karamba3D 3.1 (for `validate_structure`) and your own Grasshopper definition
-library (`RHINO_MCP_LIBRARY_DIR`) are optional — everything else works
-without them.
+   Save each download into the library's `models/` folder under the exact
+   file name shown; the command verifies every checksum.
+7. **Optional extras:** Karamba3D 3.1 enables `validate_structure` (found at
+   runtime — never bundled); point `RHINO_MCP_LIBRARY_DIR` at your own
+   Grasshopper definition library to expose it via `list_library`.
 
 ## CLI
 
