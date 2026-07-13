@@ -1,21 +1,40 @@
 name: almondbridge
-version: 0.2.0
+version: 0.2.1
 authors:
   - LiangJung
 description: >
-  Rhino-side TCP bridge for the Almond MCP server (almond-mcp on PyPI).
-  Listens on 127.0.0.1:5000 and executes C# RhinoCommon scripts, runs
-  Grasshopper definitions, imports curated furniture/drawing assets as
-  blocks, applies drawing styles, exports GLB for Chestnut publishing, and
-  runs Karamba3D structural checks when Karamba 3.1 is installed (bound at
-  runtime via reflection - Karamba is never bundled). Install the Python
-  side with: uvx almond-mcp
+  Rhino-side bridge for Almond, an MCP server that lets Claude (or any MCP
+  client) drive Rhino 8. This plugin listens on 127.0.0.1:5000 (local only)
+  and starts automatically with Rhino; commands AlmondMCPStart / AlmondMCPStop
+  / AlmondMCPStatus control it manually.
+
+  Capabilities: compiles and runs C# RhinoCommon scripts sent by the server;
+  runs Grasshopper definitions headlessly; imports curated furniture and
+  drawing assets as block instances; applies drawing-style layer recipes
+  (plot weights, linetypes); exports selected objects as GLB; runs Karamba3D
+  structural checks when Karamba 3.1 is installed (bound at runtime via
+  reflection - Karamba is never bundled).
+
+  This package contains NO 3D models. The Almond furniture and drawing
+  libraries ship as metadata manifests only (product dimensions, spatial
+  contracts, source URLs, checksums); each user downloads the model files
+  from their original 3D Warehouse pages with "almond-mcp fetch-assets",
+  which verifies checksums. Not affiliated with Inter IKEA Systems,
+  Trimble, or Karamba3D GmbH.
+
+  REQUIRED SETUP beyond this plugin: install uv (docs.astral.sh/uv), add
+  {"command": "uvx", "args": ["almond-mcp"]} as an MCP server in your Claude
+  Desktop or Claude Code config, restart Claude, then optionally run
+  "uvx almond-mcp fetch-assets --open" for the asset libraries and
+  "uvx almond-mcp doctor" to verify. Full guide in the repository README.
 url: https://github.com/liangjunglj-cpu/almond-mcp
 icon: icon.png
 keywords:
   - mcp
   - claude
+  - ai
   - almond
   - bridge
   - karamba
+  - grasshopper
   - automation

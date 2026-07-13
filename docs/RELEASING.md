@@ -3,6 +3,9 @@
 Two artifacts ship per release: the Python package (PyPI) and the bridge
 (Yak). Keep their versions in lockstep — `pyproject.toml`,
 `almond_mcp/__init__.py.__version__`, and `RhinoAlmondBridge/yak/manifest.yml`.
+Exception: Yak listings are immutable, so a metadata-only fix (description,
+keywords, icon) is re-pushed as a bridge-only patch bump without a PyPI
+release (e.g. bridge 0.2.1 over python 0.2.0).
 
 ## Pre-flight
 
