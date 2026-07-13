@@ -22,10 +22,17 @@
       "brand": "Generic",
       "source_class": "drawing_asset",
       "catalogue_status": "community_drawing_asset",
-      "drawing_roles": ["section", "elevation"],
+      "drawing_roles": [
+        "section",
+        "elevation"
+      ],
       "geometry_mode": "2d_diagram",
       "lod": "low",
-      "recommended_scales": ["1:50", "1:100", "1:200"],
+      "recommended_scales": [
+        "1:50",
+        "1:100",
+        "1:200"
+      ],
       "default_line_class": "entourage",
       "hidden_line_policy": "silhouette_only",
       "category": "human_figure",
@@ -43,8 +50,14 @@
       "match_status": "generic_context_asset_scale_estimated",
       "warehouse_url": "",
       "file": "models/DIAGRAM_person_standing.svg",
-      "sha256": "placeholder",
-      "tags": ["person", "human", "silhouette", "line_art", "standing"],
+      "sha256": "268BFAC367B160CDE23C36C6D0271C7C8ABEDC12041F2B112CDE14AF710FCF10",
+      "tags": [
+        "person",
+        "human",
+        "silhouette",
+        "line_art",
+        "standing"
+      ],
       "geometry_source": {
         "type": "downloaded_asset",
         "format": "svg",
@@ -59,14 +72,34 @@
         "bounds_source": "warehouse_model_estimate",
         "geometry_bounds_status": "pending_rhino_measurement",
         "local_aabb": {
-          "min": [-300, -5, 0],
-          "max": [300, 5, 1800]
+          "min": [
+            -300,
+            -5,
+            0
+          ],
+          "max": [
+            300,
+            5,
+            1800
+          ]
         },
         "footprint": [
-          [-300, -5],
-          [300, -5],
-          [300, 5],
-          [-300, 5]
+          [
+            -300,
+            -5
+          ],
+          [
+            300,
+            -5
+          ],
+          [
+            300,
+            5
+          ],
+          [
+            -300,
+            5
+          ]
         ],
         "clearance_mm": {
           "front": 0,
@@ -83,10 +116,17 @@
       "brand": "Generic",
       "source_class": "drawing_asset",
       "catalogue_status": "community_drawing_asset",
-      "drawing_roles": ["section", "elevation"],
+      "drawing_roles": [
+        "section",
+        "elevation"
+      ],
       "geometry_mode": "2d_diagram",
       "lod": "low",
-      "recommended_scales": ["1:100", "1:200", "1:500"],
+      "recommended_scales": [
+        "1:100",
+        "1:200",
+        "1:500"
+      ],
       "default_line_class": "entourage",
       "hidden_line_policy": "silhouette_only",
       "category": "vegetation",
@@ -104,8 +144,15 @@
       "match_status": "generic_context_asset_scale_estimated",
       "warehouse_url": "",
       "file": "models/DIAGRAM_tree_deciduous.svg",
-      "sha256": "placeholder",
-      "tags": ["tree", "vegetation", "plant", "line_art", "deciduous", "stylized"],
+      "sha256": "64ADC415F13E86319784E9CA745E232DF23464ACC10285CB0BBA6DF5D166C564",
+      "tags": [
+        "tree",
+        "vegetation",
+        "plant",
+        "line_art",
+        "deciduous",
+        "stylized"
+      ],
       "geometry_source": {
         "type": "downloaded_asset",
         "format": "svg",
@@ -120,14 +167,34 @@
         "bounds_source": "warehouse_model_estimate",
         "geometry_bounds_status": "pending_rhino_measurement",
         "local_aabb": {
-          "min": [-2000, -5, 0],
-          "max": [2000, 5, 5000]
+          "min": [
+            -2000,
+            -5,
+            0
+          ],
+          "max": [
+            2000,
+            5,
+            5000
+          ]
         },
         "footprint": [
-          [-2000, -5],
-          [2000, -5],
-          [2000, 5],
-          [-2000, 5]
+          [
+            -2000,
+            -5
+          ],
+          [
+            2000,
+            -5
+          ],
+          [
+            2000,
+            5
+          ],
+          [
+            -2000,
+            5
+          ]
         ],
         "clearance_mm": {
           "front": 0,

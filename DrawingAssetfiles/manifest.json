@@ -418,10 +418,17 @@
       "brand": "Generic",
       "source_class": "drawing_asset",
       "catalogue_status": "community_drawing_asset",
-      "drawing_roles": ["section", "elevation"],
+      "drawing_roles": [
+        "section",
+        "elevation"
+      ],
       "geometry_mode": "2d_diagram",
       "lod": "low",
-      "recommended_scales": ["1:50", "1:100", "1:200"],
+      "recommended_scales": [
+        "1:50",
+        "1:100",
+        "1:200"
+      ],
       "default_line_class": "entourage",
       "hidden_line_policy": "silhouette_only",
       "category": "human_figure",
@@ -439,8 +446,14 @@
       "match_status": "generic_context_asset_scale_estimated",
       "warehouse_url": "",
       "file": "models/2D_human_standing.svg",
-      "sha256": "placeholder",
-      "tags": ["person", "human", "silhouette", "line_art", "standing"],
+      "sha256": "1DB45D9B5483647EC33D6DD943B7CD3406CDFDF7C78D1CDA557FD11BA0E72386",
+      "tags": [
+        "person",
+        "human",
+        "silhouette",
+        "line_art",
+        "standing"
+      ],
       "geometry_source": {
         "type": "downloaded_asset",
         "format": "svg",
@@ -455,11 +468,41 @@
         "bounds_source": "warehouse_model_estimate",
         "geometry_bounds_status": "pending_rhino_measurement",
         "local_aabb": {
-          "min": [-300, -5, 0],
-          "max": [300, 5, 1800]
+          "min": [
+            -300,
+            -5,
+            0
+          ],
+          "max": [
+            300,
+            5,
+            1800
+          ]
         },
-        "footprint": [[-300, -5], [300, -5], [300, 5], [-300, 5]],
-        "clearance_mm": {"front": 0, "back": 0, "left": 0, "right": 0},
+        "footprint": [
+          [
+            -300,
+            -5
+          ],
+          [
+            300,
+            -5
+          ],
+          [
+            300,
+            5
+          ],
+          [
+            -300,
+            5
+          ]
+        ],
+        "clearance_mm": {
+          "front": 0,
+          "back": 0,
+          "left": 0,
+          "right": 0
+        },
         "collision_shape": "oriented_box",
         "placement_priority": "accessory"
       }
@@ -469,10 +512,17 @@
       "brand": "Generic",
       "source_class": "drawing_asset",
       "catalogue_status": "community_drawing_asset",
-      "drawing_roles": ["section", "elevation"],
+      "drawing_roles": [
+        "section",
+        "elevation"
+      ],
       "geometry_mode": "2d_diagram",
       "lod": "low",
-      "recommended_scales": ["1:100", "1:200", "1:500"],
+      "recommended_scales": [
+        "1:100",
+        "1:200",
+        "1:500"
+      ],
       "default_line_class": "entourage",
       "hidden_line_policy": "silhouette_only",
       "category": "vegetation",
@@ -490,8 +540,15 @@
       "match_status": "generic_context_asset_scale_estimated",
       "warehouse_url": "",
       "file": "models/2D_plant_silhouette.svg",
-      "sha256": "placeholder",
-      "tags": ["tree", "vegetation", "plant", "line_art", "deciduous", "stylized"],
+      "sha256": "2190CDC66D20ACB9348EACD52838293B421B2F802066AB55816D68B1FDA86BA2",
+      "tags": [
+        "tree",
+        "vegetation",
+        "plant",
+        "line_art",
+        "deciduous",
+        "stylized"
+      ],
       "geometry_source": {
         "type": "downloaded_asset",
         "format": "svg",
@@ -506,11 +563,41 @@
         "bounds_source": "warehouse_model_estimate",
         "geometry_bounds_status": "pending_rhino_measurement",
         "local_aabb": {
-          "min": [-2000, -5, 0],
-          "max": [2000, 5, 5000]
+          "min": [
+            -2000,
+            -5,
+            0
+          ],
+          "max": [
+            2000,
+            5,
+            5000
+          ]
         },
-        "footprint": [[-2000, -5], [2000, -5], [2000, 5], [-2000, 5]],
-        "clearance_mm": {"front": 0, "back": 0, "left": 0, "right": 0},
+        "footprint": [
+          [
+            -2000,
+            -5
+          ],
+          [
+            2000,
+            -5
+          ],
+          [
+            2000,
+            5
+          ],
+          [
+            -2000,
+            5
+          ]
+        ],
+        "clearance_mm": {
+          "front": 0,
+          "back": 0,
+          "left": 0,
+          "right": 0
+        },
         "collision_shape": "oriented_box",
         "placement_priority": "fixed"
       }
@@ -520,10 +607,17 @@
       "brand": "Generic",
       "source_class": "drawing_asset",
       "catalogue_status": "community_drawing_asset",
-      "drawing_roles": ["section", "elevation", "plan"],
+      "drawing_roles": [
+        "section",
+        "elevation",
+        "plan"
+      ],
       "geometry_mode": "2d_diagram",
       "lod": "low",
-      "recommended_scales": ["1:20", "1:50"],
+      "recommended_scales": [
+        "1:20",
+        "1:50"
+      ],
       "default_line_class": "texture",
       "hidden_line_policy": "visible_only",
       "category": "texture",
@@ -541,8 +635,13 @@
       "match_status": "generic_context_asset_scale_estimated",
       "warehouse_url": "",
       "file": "models/2D_brick_texture.svg",
-      "sha256": "placeholder",
-      "tags": ["texture", "brick", "pattern", "wall"],
+      "sha256": "CD49D160B67E8A8F71CCC9F2343ED5A452560DD6948155C9045EA5956E9C3E03",
+      "tags": [
+        "texture",
+        "brick",
+        "pattern",
+        "wall"
+      ],
       "geometry_source": {
         "type": "downloaded_asset",
         "format": "svg",
@@ -557,11 +656,41 @@
         "bounds_source": "warehouse_model_estimate",
         "geometry_bounds_status": "pending_rhino_measurement",
         "local_aabb": {
-          "min": [-500, -5, 0],
-          "max": [500, 5, 1000]
+          "min": [
+            -500,
+            -5,
+            0
+          ],
+          "max": [
+            500,
+            5,
+            1000
+          ]
         },
-        "footprint": [[-500, -5], [500, -5], [500, 5], [-500, 5]],
-        "clearance_mm": {"front": 0, "back": 0, "left": 0, "right": 0},
+        "footprint": [
+          [
+            -500,
+            -5
+          ],
+          [
+            500,
+            -5
+          ],
+          [
+            500,
+            5
+          ],
+          [
+            -500,
+            5
+          ]
+        ],
+        "clearance_mm": {
+          "front": 0,
+          "back": 0,
+          "left": 0,
+          "right": 0
+        },
         "collision_shape": "oriented_box",
         "placement_priority": "accessory"
       }

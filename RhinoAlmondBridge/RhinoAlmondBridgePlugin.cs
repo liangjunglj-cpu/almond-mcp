@@ -19,6 +19,11 @@ namespace RhinoAlmondBridge
             Instance = this;
         }
 
+        // Load at startup so the TCP listener is available without the user
+        // running any command first (Rhino's default is load-when-needed,
+        // which would leave a fresh install silent until AlmondMCPStart).
+        public override PlugInLoadTime LoadTime => PlugInLoadTime.AtStartup;
+
         protected override LoadReturnCode OnLoad(ref string errorMessage)
         {
             RhinoApp.WriteLine("RhinoAlmondBridge: Loading MCP Bridge plugin...");

@@ -24,3 +24,8 @@ Grasshopperfiles/
 # OneDrive/FUSE litter
 .fuse_hidden*
 *.bak
+
+# .NET build output
+bin/
+obj/
+

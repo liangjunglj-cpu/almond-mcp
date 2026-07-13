@@ -10,7 +10,7 @@ description: >
   runs Karamba3D structural checks when Karamba 3.1 is installed (bound at
   runtime via reflection - Karamba is never bundled). Install the Python
   side with: uvx almond-mcp
-url: https://github.com/liangjung/almond-mcp
+url: https://github.com/liangjunglj-cpu/almond-mcp
 icon: icon.png
 keywords:
   - mcp

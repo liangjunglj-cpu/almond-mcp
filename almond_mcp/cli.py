@@ -54,7 +54,9 @@ def _asset_status(library_dir: Path, asset: dict) -> tuple[str, str]:
     if not target.is_file():
         return "missing", str(target)
     expected = (asset.get("sha256") or "").upper()
-    if expected and _sha256(target) != expected:
+    # Some entries carry non-hash markers like "placeholder"; only a real
+    # 64-hex digest is verifiable.
+    if len(expected) == 64 and _sha256(target) != expected:
         return "hash-mismatch", str(target)
     return "ok", str(target)
 
