@@ -1,0 +1,21 @@
+name: almondbridge
+version: 0.2.0
+authors:
+  - LiangJung
+description: >
+  Rhino-side TCP bridge for the Almond MCP server (almond-mcp on PyPI).
+  Listens on 127.0.0.1:5000 and executes C# RhinoCommon scripts, runs
+  Grasshopper definitions, imports curated furniture/drawing assets as
+  blocks, applies drawing styles, exports GLB for Chestnut publishing, and
+  runs Karamba3D structural checks when Karamba 3.1 is installed (bound at
+  runtime via reflection - Karamba is never bundled). Install the Python
+  side with: uvx almond-mcp
+url: https://github.com/liangjung/almond-mcp
+icon: icon.png
+keywords:
+  - mcp
+  - claude
+  - almond
+  - bridge
+  - karamba
+  - automation

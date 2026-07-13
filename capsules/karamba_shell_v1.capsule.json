@@ -1,0 +1,30 @@
+{
+  "capsule_id": "karamba_shell_v1",
+  "version": 1,
+  "capability": "analyze",
+  "structure_type": "shell",
+  "plugin_dependencies": [{"name": "Karamba3D", "min_version": "3.1"}],
+  "definition_file": "02_SimpleShell.ghx",
+  "title": "Simple shell analysis from a mesh",
+  "description_for_llm": "Linear elastic (Theory I) analysis of a thin shell built from a mesh. Use for continuous surface structures such as slabs, vaults, and simple shells where membrane and bending action share the load. Assumptions: input is a clean, welded triangular or quad mesh in metres, constant shell thickness, supports along the template's fixed edges or corners, static gravity plus an area load. Limits: results are mesh dependent, so a coarse mesh underestimates stress concentrations; no buckling check, no cracking or reinforcement design for concrete; openings and stiffeners are not modelled. NOT YET AUDITED: the GHX has no ALMOND_IN_*/ALMOND_OUT_* harness params, so run_definition will refuse it. Retrieval context only until harnessed.",
+  "inputs": [
+    {"name": "ALMOND_IN_MESH", "type": "mesh", "units": "m", "required": true,
+     "description": "Welded analysis mesh of the shell surface."},
+    {"name": "ALMOND_IN_LOAD_KNM2", "type": "number", "units": "kN/m2", "required": false, "default": 1.0,
+     "description": "Uniform downward area load on the shell in addition to self weight."}
+  ],
+  "outputs": [
+    {"name": "ALMOND_OUT_DISP_MM", "type": "number", "units": "mm",
+     "semantics": "max_nodal_displacement",
+     "description": "Largest nodal displacement in the model."},
+    {"name": "ALMOND_OUT_UTIL", "type": "number[]",
+     "semantics": "per_element_utilization",
+     "description": "Utilization ratio per shell element, 1.0 means at capacity."},
+    {"name": "ALMOND_OUT_MASS_KG", "type": "number", "units": "kg",
+     "semantics": "total_mass",
+     "description": "Total structural mass of the model."}
+  ],
+  "binding": "reserved_nicknames",
+  "confidence": "template",
+  "audited": false
+}

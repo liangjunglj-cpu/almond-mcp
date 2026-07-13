@@ -1,0 +1,36 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Almond MCP icon: warm almond on a cream tile -->
+  <defs>
+    <linearGradient id="shell" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#C97E45"/>
+      <stop offset="1" stop-color="#9C5A2E"/>
+    </linearGradient>
+  </defs>
+  <rect x="16" y="16" width="480" height="480" rx="104" fill="#FFF3E4"/>
+  <rect x="16" y="16" width="480" height="480" rx="104" fill="none" stroke="#E8CDA8" stroke-width="8"/>
+  <!-- almond body -->
+  <path d="M256 64
+           C 344 172, 398 258, 398 332
+           C 398 412, 334 456, 256 456
+           C 178 456, 114 412, 114 332
+           C 114 258, 168 172, 256 64 Z"
+        fill="url(#shell)"/>
+  <!-- rim light -->
+  <path d="M256 64
+           C 344 172, 398 258, 398 332
+           C 398 412, 334 456, 256 456
+           C 178 456, 114 412, 114 332
+           C 114 258, 168 172, 256 64 Z"
+        fill="none" stroke="#7A431F" stroke-width="10"/>
+  <!-- inner highlight -->
+  <path d="M256 128
+           C 316 212, 352 274, 352 328
+           C 352 386, 308 420, 256 420
+           C 232 420, 210 413, 193 400
+           C 232 396, 286 372, 300 316
+           C 313 264, 285 190, 256 128 Z"
+        fill="#E0A468" opacity="0.85"/>
+  <!-- seed line -->
+  <path d="M256 96 C 240 200, 240 340, 256 432"
+        fill="none" stroke="#7A431F" stroke-width="9" stroke-linecap="round" opacity="0.55"/>
+</svg>

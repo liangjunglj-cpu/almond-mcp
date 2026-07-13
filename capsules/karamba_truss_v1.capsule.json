@@ -1,0 +1,30 @@
+{
+  "capsule_id": "karamba_truss_v1",
+  "version": 1,
+  "capability": "analyze",
+  "structure_type": "truss",
+  "plugin_dependencies": [{"name": "Karamba3D", "min_version": "3.1"}],
+  "definition_file": "01_ParametricTruss.ghx",
+  "title": "Parametric planar truss analysis",
+  "description_for_llm": "Linear elastic (Theory I) analysis of a triangulated truss built from axis lines. Use for planar or near planar trusses where members carry mostly axial force. Assumptions: members are straight lines in metres meeting at shared nodes, connections behave as intended by the template (bending stiffness may still be active because members are modelled as beams, not ideal pin ended bars), supports at the bottom chord ends, one steel section for all members, static vertical loads. Limits: the template generates its own truss geometry from sliders, so external geometry only works after harnessing; no buckling verification of slender compression members; no joint or connection design. NOT YET AUDITED: no ALMOND_IN_*/ALMOND_OUT_* harness params exist in the GHX, so run_definition will refuse it. Retrieval context only until harnessed.",
+  "inputs": [
+    {"name": "ALMOND_IN_LINES", "type": "curve[]", "units": "m", "required": true,
+     "description": "Truss member axis lines, node-merged at shared endpoints."},
+    {"name": "ALMOND_IN_LOAD_KN", "type": "number", "units": "kN", "required": false, "default": 10.0,
+     "description": "Total vertical load distributed over the top chord nodes."}
+  ],
+  "outputs": [
+    {"name": "ALMOND_OUT_DISP_MM", "type": "number", "units": "mm",
+     "semantics": "max_nodal_displacement",
+     "description": "Largest nodal displacement in the model."},
+    {"name": "ALMOND_OUT_UTIL", "type": "number[]",
+     "semantics": "per_element_utilization",
+     "description": "Utilization ratio per element, 1.0 means at capacity."},
+    {"name": "ALMOND_OUT_MASS_KG", "type": "number", "units": "kg",
+     "semantics": "total_mass",
+     "description": "Total structural mass of the model."}
+  ],
+  "binding": "reserved_nicknames",
+  "confidence": "template",
+  "audited": false
+}

@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net48</TargetFramework>
+    <Title>RhinoAlmondBridge</Title>
+    <Description>MCP Bridge plugin for Rhino - receives and executes C# RhinoCommon scripts from AI agents</Description>
+    <Version>1.0.0</Version>
+    <LangVersion>latest</LangVersion>
+    <OutputType>Library</OutputType>
+    <RootNamespace>RhinoAlmondBridge</RootNamespace>
+    <AssemblyName>RhinoAlmondBridge</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Drawing" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="RhinoCommon" Version="8.*" />
+    <PackageReference Include="Grasshopper" Version="8.*" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+</Project>

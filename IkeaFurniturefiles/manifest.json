@@ -1,0 +1,1325 @@
+{
+  "library_id": "ikea",
+  "library_name": "IKEA Singapore Product Library",
+  "catalogue_region": "IKEA Singapore",
+  "catalogue_checked": "2026-07-04",
+  "schema_version": "2.0",
+  "spatial_contract": {
+    "units": "millimeters",
+    "coordinate_system": "asset_local_z_up",
+    "default_anchor": "bottom_center",
+    "nominal_bounds_require_runtime_measurement": true
+  },
+  "assets": [
+    {
+      "asset_id": "ikea-sg-kallax-70351886",
+      "category": "storage",
+      "series": "KALLAX",
+      "product": "Shelving unit",
+      "variant": "white",
+      "dimensions_mm": {
+        "width": 770,
+        "depth": 390,
+        "height": 770
+      },
+      "ikea_product_id": "70351886",
+      "ikea_url": "https://www.ikea.com/sg/en/p/kallax-shelving-unit-white-70351886/",
+      "warehouse_title": "IKEA KALLAX Shelving unit, white, 77x77 cm",
+      "warehouse_publisher": "the89katt",
+      "warehouse_status": "community",
+      "match_status": "exact_dimensions",
+      "warehouse_url": "https://3dwarehouse.sketchup.com/model/u094bc070-f242-48cd-85ee-6ed060c10f17/IKEA-KALLAX-Shelving-unit-white-77x77-cm",
+      "file": "models/KALLAX_shelving_unit_white_77x77cm.skp",
+      "sha256": "D5ABC4D088AE6F17332C512BEA93BAE43641B2B19A561868227F49E460EFD849",
+      "tags": [
+        "shelf",
+        "bookcase",
+        "cube storage",
+        "living room",
+        "bedroom"
+      ],
+      "geometry_source": {
+        "type": "downloaded_asset",
+        "format": "skp",
+        "generator": null,
+        "parameters": null
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "ikea_catalogue_nominal",
+        "geometry_bounds_status": "pending_rhino_measurement",
+        "local_aabb": {
+          "min": [
+            -385,
+            -195,
+            0
+          ],
+          "max": [
+            385,
+            195,
+            770
+          ]
+        },
+        "footprint": [
+          [
+            -385,
+            -195
+          ],
+          [
+            385,
+            -195
+          ],
+          [
+            385,
+            195
+          ],
+          [
+            -385,
+            195
+          ]
+        ],
+        "clearance_mm": {
+          "front": 900,
+          "back": 50,
+          "left": 50,
+          "right": 50
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "movable"
+      },
+      "library_id": "ikea"
+    },
+    {
+      "asset_id": "ikea-sg-poang-s19240788",
+      "category": "chair",
+      "series": "POÄNG",
+      "product": "Armchair",
+      "variant": "birch veneer/Knisa light beige",
+      "dimensions_mm": {
+        "width": 680,
+        "depth": 830,
+        "height": 1000
+      },
+      "ikea_product_id": "S19240788",
+      "ikea_url": "https://www.ikea.com/sg/en/p/poaeng-armchair-birch-veneer-knisa-light-beige-s19240788/",
+      "warehouse_title": "Ikea POÄNG Armchair",
+      "warehouse_publisher": "Omar Z.",
+      "warehouse_status": "community",
+      "match_status": "series_geometry_variant_differs",
+      "warehouse_url": "https://3dwarehouse.sketchup.com/model/b42953e6e55ba5d4d2bc32977ed52527/Ikea-PO%C3%84NG-Armchair",
+      "file": "models/POANG_armchair.skp",
+      "sha256": "4F670F800EB9DD2182B87E6CCE1F45BD2BCBC1EADE810DC24E0520EF9C8E4AD2",
+      "tags": [
+        "chair",
+        "armchair",
+        "lounge chair",
+        "living room",
+        "reading"
+      ],
+      "geometry_source": {
+        "type": "downloaded_asset",
+        "format": "skp",
+        "generator": null,
+        "parameters": null
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "ikea_catalogue_nominal",
+        "geometry_bounds_status": "pending_rhino_measurement",
+        "local_aabb": {
+          "min": [
+            -340,
+            -415,
+            0
+          ],
+          "max": [
+            340,
+            415,
+            1000
+          ]
+        },
+        "footprint": [
+          [
+            -340,
+            -415
+          ],
+          [
+            340,
+            -415
+          ],
+          [
+            340,
+            415
+          ],
+          [
+            -340,
+            415
+          ]
+        ],
+        "clearance_mm": {
+          "front": 750,
+          "back": 150,
+          "left": 250,
+          "right": 250
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "movable"
+      },
+      "library_id": "ikea"
+    },
+    {
+      "asset_id": "ikea-sg-strandmon-30359827",
+      "category": "chair",
+      "series": "STRANDMON",
+      "product": "Wing chair",
+      "variant": "Nordvalla dark grey",
+      "dimensions_mm": {
+        "width": 820,
+        "depth": 960,
+        "height": 1010
+      },
+      "ikea_product_id": "30359827",
+      "ikea_url": "https://www.ikea.com/sg/en/p/strandmon-wing-chair-nordvalla-dark-grey-30359827/",
+      "warehouse_title": "strandmon",
+      "warehouse_publisher": "Ruddin R.",
+      "warehouse_status": "community",
+      "match_status": "exact_dimensions",
+      "warehouse_url": "https://3dwarehouse.sketchup.com/model/06941542-3c40-471b-87ca-868fb265fa12/strandmon",
+      "file": "models/STRANDMON_wing_chair.skp",
+      "sha256": "D2AF78B5A0FD01CEE8563839057FA8B292040F9ED8C4B1D998751D402EBE689E",
+      "tags": [
+        "chair",
+        "wing chair",
+        "armchair",
+        "living room",
+        "reading"
+      ],
+      "geometry_source": {
+        "type": "downloaded_asset",
+        "format": "skp",
+        "generator": null,
+        "parameters": null
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "ikea_catalogue_nominal",
+        "geometry_bounds_status": "pending_rhino_measurement",
+        "local_aabb": {
+          "min": [
+            -410,
+            -480,
+            0
+          ],
+          "max": [
+            410,
+            480,
+            1010
+          ]
+        },
+        "footprint": [
+          [
+            -410,
+            -480
+          ],
+          [
+            410,
+            -480
+          ],
+          [
+            410,
+            480
+          ],
+          [
+            -410,
+            480
+          ]
+        ],
+        "clearance_mm": {
+          "front": 750,
+          "back": 150,
+          "left": 250,
+          "right": 250
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "movable"
+      },
+      "library_id": "ikea"
+    },
+    {
+      "asset_id": "ikea-sg-klippan-s49010615",
+      "category": "sofa",
+      "series": "KLIPPAN",
+      "product": "2-seat sofa",
+      "variant": "Vissle grey",
+      "dimensions_mm": {
+        "width": 1800,
+        "depth": 880,
+        "height": 660
+      },
+      "ikea_product_id": "S49010615",
+      "ikea_url": "https://www.ikea.com/sg/en/p/klippan-2-seat-sofa-vissle-grey-s49010615/",
+      "warehouse_title": "Ikea Klippan 2-seat sofa",
+      "warehouse_publisher": "Yacobwood",
+      "warehouse_status": "community",
+      "match_status": "exact_dimensions",
+      "warehouse_url": "https://3dwarehouse.sketchup.com/model/ab64f6d3-3911-49c4-b6fa-4d9332b1a379/Ikea-Klippan-2-seat-sofa",
+      "file": "models/KLIPPAN_2_seat_sofa.skp",
+      "sha256": "CF0E2F5404147CFD14075640B9DA5B6F2F731312F91760A6A5C870020AEE143F",
+      "tags": [
+        "sofa",
+        "couch",
+        "two seat",
+        "living room",
+        "compact"
+      ],
+      "geometry_source": {
+        "type": "downloaded_asset",
+        "format": "skp",
+        "generator": null,
+        "parameters": null
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "ikea_catalogue_nominal",
+        "geometry_bounds_status": "pending_rhino_measurement",
+        "local_aabb": {
+          "min": [
+            -900,
+            -440,
+            0
+          ],
+          "max": [
+            900,
+            440,
+            660
+          ]
+        },
+        "footprint": [
+          [
+            -900,
+            -440
+          ],
+          [
+            900,
+            -440
+          ],
+          [
+            900,
+            440
+          ],
+          [
+            -900,
+            440
+          ]
+        ],
+        "clearance_mm": {
+          "front": 900,
+          "back": 100,
+          "left": 250,
+          "right": 250
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "movable"
+      },
+      "library_id": "ikea"
+    },
+    {
+      "asset_id": "ikea-sg-kivik-s59440592",
+      "category": "sofa",
+      "series": "KIVIK",
+      "product": "3-seat sofa",
+      "variant": "Tibbleby beige/grey",
+      "dimensions_mm": {
+        "width": 2280,
+        "depth": 950,
+        "height": 830
+      },
+      "ikea_product_id": "S59440592",
+      "ikea_url": "https://www.ikea.com/sg/en/p/kivik-3-seat-sofa-tibbleby-beige-grey-s59440592/",
+      "warehouse_title": "kivik",
+      "warehouse_publisher": "Rubén C.",
+      "warehouse_status": "community",
+      "match_status": "series_match_unverified_dimensions",
+      "warehouse_url": "https://3dwarehouse.sketchup.com/model/4ea9817e-eb9b-4ef6-8541-fbec73c4c77c/kivik",
+      "file": "models/KIVIK_3_seat_sofa.skp",
+      "sha256": "14284629F7400F9C0166730D11E871D6252826286C90C901FF3A04D26A056835",
+      "tags": [
+        "sofa",
+        "couch",
+        "three seat",
+        "living room",
+        "large"
+      ],
+      "geometry_source": {
+        "type": "downloaded_asset",
+        "format": "skp",
+        "generator": null,
+        "parameters": null
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "ikea_catalogue_nominal",
+        "geometry_bounds_status": "pending_rhino_measurement",
+        "local_aabb": {
+          "min": [
+            -1140,
+            -475,
+            0
+          ],
+          "max": [
+            1140,
+            475,
+            830
+          ]
+        },
+        "footprint": [
+          [
+            -1140,
+            -475
+          ],
+          [
+            1140,
+            -475
+          ],
+          [
+            1140,
+            475
+          ],
+          [
+            -1140,
+            475
+          ]
+        ],
+        "clearance_mm": {
+          "front": 900,
+          "back": 100,
+          "left": 250,
+          "right": 250
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "movable"
+      },
+      "library_id": "ikea"
+    },
+    {
+      "asset_id": "ikea-sg-billy-00522047",
+      "category": "storage",
+      "series": "BILLY",
+      "product": "Bookcase",
+      "variant": "white",
+      "dimensions_mm": {
+        "width": 800,
+        "depth": 280,
+        "height": 2020
+      },
+      "ikea_product_id": "00522047",
+      "ikea_url": "https://www.ikea.com/sg/en/p/billy-bookcase-white-00522047/",
+      "warehouse_title": "IKEA Billy 80x28x202",
+      "warehouse_publisher": "jung-ho K.",
+      "warehouse_status": "community",
+      "match_status": "exact_dimensions",
+      "warehouse_url": "https://3dwarehouse.sketchup.com/model/07129256-7652-4819-93aa-b71191a4c204/IKEA-Billy-80x28x202",
+      "file": "models/BILLY_bookcase_white_80x28x202cm.skp",
+      "sha256": "C507CA9CEFA8B16A55FB2000C27CB184A17F90A5D44D2DEED4894084EC653322",
+      "tags": [
+        "bookcase",
+        "shelf",
+        "storage",
+        "living room",
+        "home office"
+      ],
+      "geometry_source": {
+        "type": "downloaded_asset",
+        "format": "skp",
+        "generator": null,
+        "parameters": null
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "ikea_catalogue_nominal",
+        "geometry_bounds_status": "pending_rhino_measurement",
+        "local_aabb": {
+          "min": [
+            -400,
+            -140,
+            0
+          ],
+          "max": [
+            400,
+            140,
+            2020
+          ]
+        },
+        "footprint": [
+          [
+            -400,
+            -140
+          ],
+          [
+            400,
+            -140
+          ],
+          [
+            400,
+            140
+          ],
+          [
+            -400,
+            140
+          ]
+        ],
+        "clearance_mm": {
+          "front": 900,
+          "back": 50,
+          "left": 50,
+          "right": 50
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "movable"
+      },
+      "library_id": "ikea"
+    },
+    {
+      "asset_id": "ikea-sg-micke-80354276",
+      "category": "desk",
+      "series": "MICKE",
+      "product": "Desk",
+      "variant": "white",
+      "dimensions_mm": {
+        "width": 1050,
+        "depth": 500,
+        "height": 750
+      },
+      "ikea_product_id": "80354276",
+      "ikea_url": "https://www.ikea.com/sg/en/p/micke-desk-white-80354276/",
+      "warehouse_title": "IKEA MICKE Desk 105x50",
+      "warehouse_publisher": "yuxing H.",
+      "warehouse_status": "community",
+      "match_status": "exact_dimensions",
+      "warehouse_url": "https://3dwarehouse.sketchup.com/model/5ff65120-1064-475f-b061-70e90fd4ce15/IKEA-MICKE-Desk-105x50",
+      "file": "models/MICKE_desk_white_105x50cm.skp",
+      "sha256": "9AFD04A954E6962DFC892ECAA48A0B045B2FA20CF8E1BECC8BE6FDA0752F709E",
+      "tags": [
+        "desk",
+        "workstation",
+        "home office",
+        "study",
+        "drawer"
+      ],
+      "geometry_source": {
+        "type": "downloaded_asset",
+        "format": "skp",
+        "generator": null,
+        "parameters": null
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "ikea_catalogue_nominal",
+        "geometry_bounds_status": "pending_rhino_measurement",
+        "local_aabb": {
+          "min": [
+            -525,
+            -250,
+            0
+          ],
+          "max": [
+            525,
+            250,
+            750
+          ]
+        },
+        "footprint": [
+          [
+            -525,
+            -250
+          ],
+          [
+            525,
+            -250
+          ],
+          [
+            525,
+            250
+          ],
+          [
+            -525,
+            250
+          ]
+        ],
+        "clearance_mm": {
+          "front": 900,
+          "back": 100,
+          "left": 300,
+          "right": 300
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "movable"
+      },
+      "library_id": "ikea"
+    },
+    {
+      "asset_id": "ikea-sg-lack-20352987",
+      "category": "table",
+      "series": "LACK",
+      "product": "Coffee table",
+      "variant": "black-brown",
+      "dimensions_mm": {
+        "width": 900,
+        "depth": 550,
+        "height": 450
+      },
+      "ikea_product_id": "20352987",
+      "ikea_url": "https://www.ikea.com/sg/en/p/lack-coffee-table-black-brown-20352987/",
+      "warehouse_title": "table IKEA LACK 90x55 coffee table",
+      "warehouse_publisher": "Gi X",
+      "warehouse_status": "community",
+      "match_status": "exact_dimensions_colour_unverified",
+      "warehouse_url": "https://3dwarehouse.sketchup.com/model/cca2179d-6eb9-4fa3-ab58-082cc6d4b8c5/table-IKEA-LACK-90x55-coffee-table",
+      "file": "models/LACK_coffee_table_90x55cm.skp",
+      "sha256": "091CBF260976DBC94EF1718300B313DABD6B9E92DC6F2109EC374F36E65A2CDF",
+      "tags": [
+        "coffee table",
+        "table",
+        "living room",
+        "low table"
+      ],
+      "geometry_source": {
+        "type": "downloaded_asset",
+        "format": "skp",
+        "generator": null,
+        "parameters": null
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "ikea_catalogue_nominal",
+        "geometry_bounds_status": "pending_rhino_measurement",
+        "local_aabb": {
+          "min": [
+            -450,
+            -275,
+            0
+          ],
+          "max": [
+            450,
+            275,
+            450
+          ]
+        },
+        "footprint": [
+          [
+            -450,
+            -275
+          ],
+          [
+            450,
+            -275
+          ],
+          [
+            450,
+            275
+          ],
+          [
+            -450,
+            275
+          ]
+        ],
+        "clearance_mm": {
+          "front": 500,
+          "back": 500,
+          "left": 500,
+          "right": 500
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "movable"
+      },
+      "library_id": "ikea"
+    },
+    {
+      "asset_id": "ikea-sg-stefan-40512089",
+      "category": "chair",
+      "series": "STEFAN",
+      "product": "Chair",
+      "variant": "brown-black/Knisa grey-beige",
+      "dimensions_mm": {
+        "width": 420,
+        "depth": 490,
+        "height": 900
+      },
+      "ikea_product_id": "40512089",
+      "ikea_url": "https://www.ikea.com/sg/en/p/stefan-chair-brown-black-knisa-grey-beige-40512089/",
+      "warehouse_title": "Ikea chair Stefan",
+      "warehouse_publisher": "Stanisław S.",
+      "warehouse_status": "community",
+      "match_status": "series_geometry_variant_differs",
+      "warehouse_url": "https://3dwarehouse.sketchup.com/model/a216f9b7e1b632b42808fa16c469cb1f/Ikea-chair-Stefan",
+      "file": "models/STEFAN_dining_chair.skp",
+      "sha256": "E8D94531641DABA1F951221A750D9CD70FE0D1BF642848562CFE612B6AC48965",
+      "tags": [
+        "chair",
+        "dining chair",
+        "dining room",
+        "kitchen"
+      ],
+      "geometry_source": {
+        "type": "downloaded_asset",
+        "format": "skp",
+        "generator": null,
+        "parameters": null
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "ikea_catalogue_nominal",
+        "geometry_bounds_status": "pending_rhino_measurement",
+        "local_aabb": {
+          "min": [
+            -210,
+            -245,
+            0
+          ],
+          "max": [
+            210,
+            245,
+            900
+          ]
+        },
+        "footprint": [
+          [
+            -210,
+            -245
+          ],
+          [
+            210,
+            -245
+          ],
+          [
+            210,
+            245
+          ],
+          [
+            -210,
+            245
+          ]
+        ],
+        "clearance_mm": {
+          "front": 750,
+          "back": 150,
+          "left": 250,
+          "right": 250
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "movable"
+      },
+      "library_id": "ikea"
+    },
+    {
+      "asset_id": "ikea-sg-pax-10355118",
+      "category": "storage",
+      "series": "PAX",
+      "product": "Wardrobe frame",
+      "variant": "white",
+      "dimensions_mm": {
+        "width": 1000,
+        "depth": 580,
+        "height": 2360
+      },
+      "ikea_product_id": "10355118",
+      "ikea_url": "https://www.ikea.com/sg/en/p/pax-wardrobe-frame-white-10355118/",
+      "warehouse_title": "IKEA PAX Wardrobe frame, white, 100x58x236 cm",
+      "warehouse_publisher": "Gerard L.",
+      "warehouse_status": "community",
+      "match_status": "exact_dimensions",
+      "warehouse_url": "https://3dwarehouse.sketchup.com/model/57ae2480-8c4c-47b4-8401-6688c940e314/IKEA-PAX-Wardrobe-frame-white-100x58x236-cm",
+      "file": "models/PAX_wardrobe_frame_white_100x58x236cm.skp",
+      "sha256": "1DD8D934C6B617E9A285069F2DB99C44A69E4C21123CEFBE5E6AEB0EBC24359C",
+      "tags": [
+        "wardrobe",
+        "closet",
+        "storage",
+        "bedroom",
+        "clothes"
+      ],
+      "geometry_source": {
+        "type": "downloaded_asset",
+        "format": "skp",
+        "generator": null,
+        "parameters": null
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "ikea_catalogue_nominal",
+        "geometry_bounds_status": "pending_rhino_measurement",
+        "local_aabb": {
+          "min": [
+            -500,
+            -290,
+            0
+          ],
+          "max": [
+            500,
+            290,
+            2360
+          ]
+        },
+        "footprint": [
+          [
+            -500,
+            -290
+          ],
+          [
+            500,
+            -290
+          ],
+          [
+            500,
+            290
+          ],
+          [
+            -500,
+            290
+          ]
+        ],
+        "clearance_mm": {
+          "front": 1000,
+          "back": 50,
+          "left": 50,
+          "right": 50
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "movable"
+      },
+      "library_id": "ikea"
+    },
+    {
+      "asset_id": "ikea-sg-lisabo-80365717",
+      "category": "table",
+      "series": "LISABO",
+      "product": "Table",
+      "variant": "ash veneer",
+      "dimensions_mm": {
+        "width": 1400,
+        "depth": 780,
+        "height": 740
+      },
+      "ikea_product_id": "80365717",
+      "ikea_url": "https://www.ikea.com/sg/en/p/lisabo-table-ash-veneer-80365717/",
+      "warehouse_title": "LISABO IKEA TABLE",
+      "warehouse_publisher": "Housemarket S.A. - SO IT Department",
+      "warehouse_status": "community",
+      "match_status": "series_match_catalogue_dimensions_assumed",
+      "warehouse_url": "https://3dwarehouse.sketchup.com/model/87254c5b-0fc7-4418-bdb6-ca9b01bfbec0/LISABO-IKEA-TABLE",
+      "file": "models/LISABO_table_ash_140x78cm.skp",
+      "sha256": "BF3DF6D252353D57D5657210032C2D21178325D93CA2C8E1B79324AF566CCBB4",
+      "tags": [
+        "table",
+        "dining table",
+        "dining room",
+        "four seat"
+      ],
+      "geometry_source": {
+        "type": "downloaded_asset",
+        "format": "skp",
+        "generator": null,
+        "parameters": null
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "ikea_catalogue_nominal",
+        "geometry_bounds_status": "pending_rhino_measurement",
+        "local_aabb": {
+          "min": [
+            -700,
+            -390,
+            0
+          ],
+          "max": [
+            700,
+            390,
+            740
+          ]
+        },
+        "footprint": [
+          [
+            -700,
+            -390
+          ],
+          [
+            700,
+            -390
+          ],
+          [
+            700,
+            390
+          ],
+          [
+            -700,
+            390
+          ]
+        ],
+        "clearance_mm": {
+          "front": 900,
+          "back": 900,
+          "left": 900,
+          "right": 900
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "movable"
+      },
+      "library_id": "ikea"
+    },
+    {
+      "asset_id": "ikea-sg-malm-s79200968",
+      "category": "bed",
+      "series": "MALM",
+      "product": "Bed frame, high, with 2 storage boxes",
+      "variant": "white stained oak veneer/Luröy, 150x200 cm",
+      "dimensions_mm": {
+        "width": 1660,
+        "depth": 2090,
+        "height": 1000
+      },
+      "ikea_product_id": "S79200968",
+      "ikea_url": "https://www.ikea.com/sg/en/p/malm-bed-frame-high-w-2-storage-boxes-white-stained-oak-veneer-luroey-s79200968/",
+      "warehouse_title": "Malm Bed_IKEA",
+      "warehouse_publisher": "Bang Jali",
+      "warehouse_status": "community",
+      "match_status": "series_geometry_variant_and_dimensions_unverified",
+      "warehouse_url": "https://3dwarehouse.sketchup.com/model/d2d8b8ff-1a52-4d62-bd04-cda8424f4561/Malm-BedIKEA",
+      "file": "models/MALM_bed_frame_150x200cm.skp",
+      "sha256": "65432C24F9A15DB582C0524E3AA55354F7475F402A42F7BED1CF73D7516FA39E",
+      "tags": [
+        "bed",
+        "double bed",
+        "queen bed",
+        "bedroom",
+        "storage bed"
+      ],
+      "geometry_source": {
+        "type": "downloaded_asset",
+        "format": "skp",
+        "generator": null,
+        "parameters": null
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "ikea_catalogue_nominal",
+        "geometry_bounds_status": "pending_rhino_measurement",
+        "local_aabb": {
+          "min": [
+            -830,
+            -1045,
+            0
+          ],
+          "max": [
+            830,
+            1045,
+            1000
+          ]
+        },
+        "footprint": [
+          [
+            -830,
+            -1045
+          ],
+          [
+            830,
+            -1045
+          ],
+          [
+            830,
+            1045
+          ],
+          [
+            -830,
+            1045
+          ]
+        ],
+        "clearance_mm": {
+          "front": 900,
+          "back": 100,
+          "left": 750,
+          "right": 750
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "movable"
+      },
+      "library_id": "ikea"
+    },
+    {
+      "asset_id": "ikea-sg-fejka-20610608",
+      "brand": "IKEA",
+      "source_class": "ikea_catalogue",
+      "catalogue_status": "current_ikea_singapore",
+      "category": "plant",
+      "series": "FEJKA",
+      "product": "Artificial potted plant",
+      "variant": "in/outdoor bamboo, 21 cm pot",
+      "dimensions_mm": {
+        "width": 600,
+        "depth": 600,
+        "height": 1200
+      },
+      "ikea_product_id": "20610608",
+      "ikea_url": "https://www.ikea.com/sg/en/p/fejka-artificial-potted-plant-in-outdoor-bamboo-20610608/",
+      "warehouse_title": "IKEA FEJKA (BAMBOO)",
+      "warehouse_publisher": "Vandream M.",
+      "warehouse_status": "community",
+      "match_status": "series_match_catalogue_pot_size_height_estimated",
+      "warehouse_url": "https://3dwarehouse.sketchup.com/model/901ad1fe-9889-4670-a75d-46ead0ce6b7b/IKEA-FEJKA-BAMBOO",
+      "file": "models/FEJKA_bamboo_plant.skp",
+      "sha256": "325782A46A344525C3735001453FBB1C7BC29AE66FAB36A8BDF08AAB38698E81",
+      "tags": [
+        "plant",
+        "bamboo",
+        "artificial plant",
+        "plant pot",
+        "decor",
+        "indoor",
+        "outdoor"
+      ],
+      "geometry_source": {
+        "type": "downloaded_asset",
+        "format": "skp",
+        "generator": null,
+        "parameters": null
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "ikea_catalogue_pot_size_and_model_estimate",
+        "geometry_bounds_status": "pending_rhino_measurement",
+        "local_aabb": {
+          "min": [
+            -300,
+            -300,
+            0
+          ],
+          "max": [
+            300,
+            300,
+            1200
+          ]
+        },
+        "footprint": [
+          [
+            -300,
+            -300
+          ],
+          [
+            300,
+            -300
+          ],
+          [
+            300,
+            300
+          ],
+          [
+            -300,
+            300
+          ]
+        ],
+        "clearance_mm": {
+          "front": 150,
+          "back": 100,
+          "left": 100,
+          "right": 100
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "accessory"
+      },
+      "library_id": "ikea"
+    },
+    {
+      "asset_id": "ikea-sg-tertial-50355395",
+      "brand": "IKEA",
+      "source_class": "ikea_catalogue",
+      "catalogue_status": "current_ikea_singapore",
+      "category": "lighting",
+      "series": "TERTIAL",
+      "product": "Work lamp",
+      "variant": "dark grey catalogue item; white community geometry",
+      "dimensions_mm": {
+        "width": 170,
+        "depth": 700,
+        "height": 650
+      },
+      "ikea_product_id": "50355395",
+      "ikea_url": "https://www.ikea.com/sg/en/p/tertial-work-lamp-dark-grey-50355395/",
+      "warehouse_title": "TERTIAL Work lamp, white",
+      "warehouse_publisher": "YC T.",
+      "warehouse_status": "community",
+      "match_status": "series_geometry_colour_differs_adjustable_bounds_estimated",
+      "warehouse_url": "https://3dwarehouse.sketchup.com/model/514859bc-9df6-4944-a7a4-135fff512794/TERTIAL-Work-lamp-white",
+      "file": "models/TERTIAL_work_lamp.skp",
+      "sha256": "CC3EC679C5781F169F6037AC9A2ABE1580E3F9BE2CDECE084BE3CFF7F0E47E7D",
+      "tags": [
+        "lamp",
+        "work lamp",
+        "task light",
+        "desk",
+        "workstation",
+        "home office"
+      ],
+      "geometry_source": {
+        "type": "downloaded_asset",
+        "format": "skp",
+        "generator": null,
+        "parameters": null
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "work_surface",
+        "bounds_source": "model_estimate_adjustable_configuration",
+        "geometry_bounds_status": "pending_rhino_measurement",
+        "local_aabb": {
+          "min": [
+            -85,
+            -350,
+            0
+          ],
+          "max": [
+            85,
+            350,
+            650
+          ]
+        },
+        "footprint": [
+          [
+            -85,
+            -350
+          ],
+          [
+            85,
+            -350
+          ],
+          [
+            85,
+            350
+          ],
+          [
+            -85,
+            350
+          ]
+        ],
+        "clearance_mm": {
+          "front": 100,
+          "back": 50,
+          "left": 50,
+          "right": 50
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "accessory"
+      },
+      "library_id": "ikea"
+    },
+    {
+      "asset_id": "ikea-sg-skadis-90321619",
+      "brand": "IKEA",
+      "source_class": "ikea_catalogue",
+      "catalogue_status": "current_ikea_singapore",
+      "category": "workstation_accessory",
+      "series": "SKÅDIS",
+      "product": "Pegboard organizer",
+      "variant": "white, 76x56 cm",
+      "dimensions_mm": {
+        "width": 760,
+        "depth": 250,
+        "height": 560
+      },
+      "ikea_product_id": "90321619",
+      "ikea_url": "https://www.ikea.com/sg/en/p/skadis-pegboard-white-90321619/",
+      "warehouse_title": "IKEA SKÅDIS",
+      "warehouse_publisher": "Say My Name!!!",
+      "warehouse_status": "community",
+      "match_status": "series_match_board_dimensions_accessory_depth_estimated",
+      "warehouse_url": "https://3dwarehouse.sketchup.com/model/45be6fc6-e335-44e2-8573-3677b0a8781b/IKEA-SK%C3%85DIS",
+      "file": "models/SKADIS_pegboard_organizer.skp",
+      "sha256": "5A631B7692F97AD06DFBCB873F5053307687DF19B31ECBCC858A48C51E385C6D",
+      "tags": [
+        "pegboard",
+        "organizer",
+        "wall storage",
+        "tools",
+        "workstation",
+        "home office"
+      ],
+      "geometry_source": {
+        "type": "downloaded_asset",
+        "format": "skp",
+        "generator": null,
+        "parameters": null
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "wall",
+        "bounds_source": "ikea_catalogue_face_dimensions_and_model_depth_estimate",
+        "geometry_bounds_status": "pending_rhino_measurement",
+        "local_aabb": {
+          "min": [
+            -380,
+            -125,
+            0
+          ],
+          "max": [
+            380,
+            125,
+            560
+          ]
+        },
+        "footprint": [
+          [
+            -380,
+            -125
+          ],
+          [
+            380,
+            -125
+          ],
+          [
+            380,
+            125
+          ],
+          [
+            -380,
+            125
+          ]
+        ],
+        "clearance_mm": {
+          "front": 300,
+          "back": 0,
+          "left": 50,
+          "right": 50
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "fixed"
+      },
+      "library_id": "ikea"
+    },
+    {
+      "asset_id": "ikea-sg-raskog-20637207",
+      "brand": "IKEA",
+      "source_class": "ikea_catalogue",
+      "catalogue_status": "current_ikea_singapore",
+      "category": "utility_storage",
+      "series": "RÅSKOG",
+      "product": "Trolley",
+      "variant": "red-brown, 35x45x77 cm",
+      "dimensions_mm": {
+        "width": 350,
+        "depth": 450,
+        "height": 770
+      },
+      "ikea_product_id": "20637207",
+      "ikea_url": "https://www.ikea.com/sg/en/p/raskog-trolley-red-brown-20637207/",
+      "warehouse_title": "IKEA RÅSKOG",
+      "warehouse_publisher": "Andrijana K.",
+      "warehouse_status": "community",
+      "match_status": "series_match_catalogue_dimensions",
+      "warehouse_url": "https://3dwarehouse.sketchup.com/model/701922c2-ab64-4cdc-bb03-5ddd36c04f0a/IKEA-R%C3%85SKOG",
+      "file": "models/RASKOG_utility_trolley.skp",
+      "sha256": "B0FF8C1F77174ED03AE4D8ABB5A9102551B94DC911AF188E5237024C9DAE7465",
+      "tags": [
+        "trolley",
+        "cart",
+        "mobile storage",
+        "kitchen",
+        "workstation",
+        "utility"
+      ],
+      "geometry_source": {
+        "type": "downloaded_asset",
+        "format": "skp",
+        "generator": null,
+        "parameters": null
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "ikea_catalogue_nominal",
+        "geometry_bounds_status": "pending_rhino_measurement",
+        "local_aabb": {
+          "min": [
+            -175,
+            -225,
+            0
+          ],
+          "max": [
+            175,
+            225,
+            770
+          ]
+        },
+        "footprint": [
+          [
+            -175,
+            -225
+          ],
+          [
+            175,
+            -225
+          ],
+          [
+            175,
+            225
+          ],
+          [
+            -175,
+            225
+          ]
+        ],
+        "clearance_mm": {
+          "front": 500,
+          "back": 100,
+          "left": 100,
+          "right": 100
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "movable"
+      },
+      "library_id": "ikea"
+    }
+  ]
+}

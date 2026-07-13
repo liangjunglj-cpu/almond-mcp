@@ -1,0 +1,65 @@
+[project]
+name = "almond-mcp"
+version = "0.2.0"
+description = "Almond - MCP server for Rhino 8 with a semantic scene layer: curated furniture/drawing/diagram libraries, audited Karamba capsules, structured retrieval (SQLite FTS5 + R-tree scene ledger), and a TCP bridge into Rhino (RhinoAlmondBridge, port 5000)"
+readme = "README.md"
+requires-python = ">=3.12"
+license = "MIT"
+license-files = ["LICENSE", "THIRD-PARTY-NOTICES.md"]
+authors = [{ name = "LiangJung" }]
+keywords = ["mcp", "rhino", "grasshopper", "karamba", "architecture", "claude"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Other Audience",
+    "Programming Language :: Python :: 3.12",
+    "Topic :: Multimedia :: Graphics :: 3D Modeling",
+]
+dependencies = [
+    "fastmcp>=3.0.2",
+    "lxml>=6.0.2",
+    "mcp>=1.26.0",
+    "pydantic>=2.12.5",
+]
+
+[project.scripts]
+almond-mcp = "almond_mcp.cli:main"
+
+[dependency-groups]
+dev = [
+    "pytest>=8.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["almond_mcp"]
+
+# Manifests and audited JSON ship inside the wheel as almond_mcp/data/ so a
+# fresh install can scaffold the user data directory. Model files (.skp etc.)
+# are downloaded 3D Warehouse content and are NEVER included - see
+# THIRD-PARTY-NOTICES.md and docs/licensing-audit.md.
+[tool.hatch.build.targets.wheel.force-include]
+"IkeaFurniturefiles/manifest.json" = "almond_mcp/data/IkeaFurniturefiles/manifest.json"
+"IkeaFurniturefiles/SPATIAL_GENERATION_PLAN.md" = "almond_mcp/data/IkeaFurniturefiles/SPATIAL_GENERATION_PLAN.md"
+"DrawingAssetfiles/manifest.json" = "almond_mcp/data/DrawingAssetfiles/manifest.json"
+"DiagramAssetfiles/manifest.json" = "almond_mcp/data/DiagramAssetfiles/manifest.json"
+"DrawingRecipes" = "almond_mcp/data/DrawingRecipes"
+"capsules" = "almond_mcp/data/capsules"
+
+[tool.hatch.build.targets.sdist]
+# Belt and braces on top of .gitignore: downloaded model files and compiled
+# bridge binaries must never reach a distribution artifact.
+exclude = [
+    "IkeaFurniturefiles/models",
+    "DrawingAssetfiles/models",
+    "DiagramAssetfiles/models",
+    "Grasshopperfiles",
+    "dist",
+    "RhinoAlmondBridge",
+    "*.sqlite3",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]

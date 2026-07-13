@@ -1,0 +1,30 @@
+{
+  "capsule_id": "karamba_gridshell_v1",
+  "version": 1,
+  "capability": "analyze",
+  "structure_type": "gridshell",
+  "plugin_dependencies": [{"name": "Karamba3D", "min_version": "3.1"}],
+  "definition_file": "04_LargeDeformationTriangularGridshell.ghx",
+  "title": "Triangular gridshell via large deformation form finding",
+  "description_for_llm": "Form finds a triangular gridshell by pushing a flat grid of beam members through Karamba's large deformation (Theory III increment) analysis, then reports the deformed state. Use when the goal is an actively bent or form found gridshell shape from a flat layout. Assumptions: input grid lies flat in metres and is triangulated, members are slender enough to bend into shape, supports at the boundary per the template, the applied displacement or load drives the form. Limits: this is a form finding pipeline, not a code check of the final shell under service loads; a separate Theory I analysis of the found geometry is still needed; results are sensitive to grid density and load stepping; no member breakage or joint slip is modelled. NOT YET AUDITED: the GHX has no ALMOND_IN_*/ALMOND_OUT_* harness params, so run_definition will refuse it. Retrieval context only until harnessed.",
+  "inputs": [
+    {"name": "ALMOND_IN_LINES", "type": "curve[]", "units": "m", "required": true,
+     "description": "Flat triangulated grid member lines, node-merged at shared endpoints."},
+    {"name": "ALMOND_IN_LOAD_KN", "type": "number", "units": "kN", "required": false, "default": 1.0,
+     "description": "Forming load magnitude driving the large deformation increments."}
+  ],
+  "outputs": [
+    {"name": "ALMOND_OUT_DISP_MM", "type": "number", "units": "mm",
+     "semantics": "max_nodal_displacement",
+     "description": "Largest nodal displacement of the found shape relative to the flat grid."},
+    {"name": "ALMOND_OUT_UTIL", "type": "number[]",
+     "semantics": "per_element_utilization",
+     "description": "Utilization ratio per element in the deformed state."},
+    {"name": "ALMOND_OUT_MASS_KG", "type": "number", "units": "kg",
+     "semantics": "total_mass",
+     "description": "Total structural mass of the model."}
+  ],
+  "binding": "reserved_nicknames",
+  "confidence": "template",
+  "audited": false
+}

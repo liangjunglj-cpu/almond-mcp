@@ -1,0 +1,30 @@
+{
+  "capsule_id": "karamba_canopy_v1",
+  "version": 1,
+  "capability": "analyze",
+  "structure_type": "canopy",
+  "plugin_dependencies": [{"name": "Karamba3D", "min_version": "3.1"}],
+  "definition_file": "01_SimpleCanopy.ghx",
+  "title": "Simple cantilevering canopy analysis",
+  "description_for_llm": "Linear elastic (Theory I) analysis of a cantilevering canopy of beam members supported on columns along one edge. Use for bus stop, entrance, or roof overhang type structures where members cantilever from a supported line. Assumptions: member axes are straight curves in metres, supports at column bases only, moment carrying joints, one steel section for all members, static vertical loads plus self weight. Limits: cantilevers are deflection critical, and the template checks displacement but not vibration or ponding; no uplift or wind suction case, which often governs real canopies; no second order effects. NOT YET AUDITED: the GHX has no ALMOND_IN_*/ALMOND_OUT_* harness params, so run_definition will refuse it. Retrieval context only until harnessed.",
+  "inputs": [
+    {"name": "ALMOND_IN_LINES", "type": "curve[]", "units": "m", "required": true,
+     "description": "Canopy member axis curves (columns and cantilever beams), node-merged at joints."},
+    {"name": "ALMOND_IN_LOAD_KN", "type": "number", "units": "kN", "required": false, "default": 5.0,
+     "description": "Vertical load applied at the canopy tip nodes."}
+  ],
+  "outputs": [
+    {"name": "ALMOND_OUT_DISP_MM", "type": "number", "units": "mm",
+     "semantics": "max_nodal_displacement",
+     "description": "Largest nodal displacement, normally at the cantilever tip."},
+    {"name": "ALMOND_OUT_UTIL", "type": "number[]",
+     "semantics": "per_element_utilization",
+     "description": "Utilization ratio per element, 1.0 means at capacity."},
+    {"name": "ALMOND_OUT_MASS_KG", "type": "number", "units": "kg",
+     "semantics": "total_mass",
+     "description": "Total structural mass of the model."}
+  ],
+  "binding": "reserved_nicknames",
+  "confidence": "template",
+  "audited": false
+}

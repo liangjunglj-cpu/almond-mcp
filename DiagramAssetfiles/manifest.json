@@ -1,0 +1,143 @@
+{
+  "library_id": "diagram_assets",
+  "library_name": "Architectural Diagram Asset Library",
+  "catalogue_region": "Community Diagram Assets",
+  "catalogue_checked": "2026-07-06",
+  "schema_version": "2.0",
+  "purpose": "2D vector line-art and CAD blocks for architectural diagrams and sections.",
+  "placement_policy": {
+    "participates_in_room_furniture_search": false,
+    "participates_in_room_collision_by_default": false,
+    "default_rhino_layer": "ALMOND-DRAW::DIAGRAMS"
+  },
+  "spatial_contract": {
+    "units": "millimeters",
+    "coordinate_system": "asset_local_z_up",
+    "default_anchor": "bottom_center",
+    "nominal_bounds_require_runtime_measurement": true
+  },
+  "assets": [
+    {
+      "asset_id": "diagram-person-standing-1",
+      "brand": "Generic",
+      "source_class": "drawing_asset",
+      "catalogue_status": "community_drawing_asset",
+      "drawing_roles": ["section", "elevation"],
+      "geometry_mode": "2d_diagram",
+      "lod": "low",
+      "recommended_scales": ["1:50", "1:100", "1:200"],
+      "default_line_class": "entourage",
+      "hidden_line_policy": "silhouette_only",
+      "category": "human_figure",
+      "series": "GENERIC",
+      "product": "Person Standing",
+      "variant": "line_art",
+      "dimensions_mm": {
+        "width": 600,
+        "depth": 10,
+        "height": 1800
+      },
+      "warehouse_title": "Person Standing Line Art",
+      "warehouse_publisher": "DiagramGen",
+      "warehouse_status": "community",
+      "match_status": "generic_context_asset_scale_estimated",
+      "warehouse_url": "",
+      "file": "models/DIAGRAM_person_standing.svg",
+      "sha256": "placeholder",
+      "tags": ["person", "human", "silhouette", "line_art", "standing"],
+      "geometry_source": {
+        "type": "downloaded_asset",
+        "format": "svg",
+        "generator": null,
+        "parameters": null
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "warehouse_model_estimate",
+        "geometry_bounds_status": "pending_rhino_measurement",
+        "local_aabb": {
+          "min": [-300, -5, 0],
+          "max": [300, 5, 1800]
+        },
+        "footprint": [
+          [-300, -5],
+          [300, -5],
+          [300, 5],
+          [-300, 5]
+        ],
+        "clearance_mm": {
+          "front": 0,
+          "back": 0,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "accessory"
+      }
+    },
+    {
+      "asset_id": "diagram-tree-deciduous-1",
+      "brand": "Generic",
+      "source_class": "drawing_asset",
+      "catalogue_status": "community_drawing_asset",
+      "drawing_roles": ["section", "elevation"],
+      "geometry_mode": "2d_diagram",
+      "lod": "low",
+      "recommended_scales": ["1:100", "1:200", "1:500"],
+      "default_line_class": "entourage",
+      "hidden_line_policy": "silhouette_only",
+      "category": "vegetation",
+      "series": "GENERIC",
+      "product": "Deciduous Tree",
+      "variant": "line_art",
+      "dimensions_mm": {
+        "width": 4000,
+        "depth": 10,
+        "height": 5000
+      },
+      "warehouse_title": "Stylized Diagram Tree",
+      "warehouse_publisher": "DiagramGen",
+      "warehouse_status": "community",
+      "match_status": "generic_context_asset_scale_estimated",
+      "warehouse_url": "",
+      "file": "models/DIAGRAM_tree_deciduous.svg",
+      "sha256": "placeholder",
+      "tags": ["tree", "vegetation", "plant", "line_art", "deciduous", "stylized"],
+      "geometry_source": {
+        "type": "downloaded_asset",
+        "format": "svg",
+        "generator": null,
+        "parameters": null
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "ground",
+        "bounds_source": "warehouse_model_estimate",
+        "geometry_bounds_status": "pending_rhino_measurement",
+        "local_aabb": {
+          "min": [-2000, -5, 0],
+          "max": [2000, 5, 5000]
+        },
+        "footprint": [
+          [-2000, -5],
+          [2000, -5],
+          [2000, 5],
+          [-2000, 5]
+        ],
+        "clearance_mm": {
+          "front": 0,
+          "back": 0,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "fixed"
+      }
+    }
+  ]
+}

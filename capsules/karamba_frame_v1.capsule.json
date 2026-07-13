@@ -1,0 +1,30 @@
+{
+  "capsule_id": "karamba_frame_v1",
+  "version": 1,
+  "capability": "analyze",
+  "structure_type": "frame",
+  "plugin_dependencies": [{"name": "Karamba3D", "min_version": "3.1"}],
+  "definition_file": "01_SimpleFrame.ghx",
+  "title": "Simple portal frame analysis",
+  "description_for_llm": "Linear elastic (Theory I) analysis of a portal style frame of columns and beams with moment carrying joints. Use for one or few storey rigid frames built from straight line members. Assumptions: member axes are straight curves in metres, column bases fixed or pinned per the template, rigid beam to column connections, one steel section for all members, static vertical loads plus self weight. Limits: no second order (P-Delta) effects, so slender sway frames are underchecked; no wind or seismic load case; no connection design. NOT YET AUDITED: the GHX has no ALMOND_IN_*/ALMOND_OUT_* harness params, so run_definition will refuse it. Retrieval context only until harnessed.",
+  "inputs": [
+    {"name": "ALMOND_IN_LINES", "type": "curve[]", "units": "m", "required": true,
+     "description": "Frame member axis curves (columns and beams), node-merged at joints."},
+    {"name": "ALMOND_IN_LOAD_KN", "type": "number", "units": "kN", "required": false, "default": 10.0,
+     "description": "Vertical load applied at the beam level per the template layout."}
+  ],
+  "outputs": [
+    {"name": "ALMOND_OUT_DISP_MM", "type": "number", "units": "mm",
+     "semantics": "max_nodal_displacement",
+     "description": "Largest nodal displacement in the model."},
+    {"name": "ALMOND_OUT_UTIL", "type": "number[]",
+     "semantics": "per_element_utilization",
+     "description": "Utilization ratio per element, 1.0 means at capacity."},
+    {"name": "ALMOND_OUT_MASS_KG", "type": "number", "units": "kg",
+     "semantics": "total_mass",
+     "description": "Total structural mass of the model."}
+  ],
+  "binding": "reserved_nicknames",
+  "confidence": "template",
+  "audited": false
+}

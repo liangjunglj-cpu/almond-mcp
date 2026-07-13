@@ -1,0 +1,91 @@
+{
+  "recipe_id": "technical_axon_v1",
+  "name": "Technical Axonometric",
+  "description": "Black-and-white architectural axonometric with hierarchical line weights.",
+  "projection": {
+    "type": "parallel",
+    "camera": "southwest_isometric",
+    "include_hidden": true
+  },
+  "recommended_scales": ["1:50", "1:100", "1:200"],
+  "layers": [
+    {
+      "path": "ALMOND-DRAW::SECTION-CUT",
+      "role": "section_cut",
+      "color": [0, 0, 0],
+      "plot_color": [0, 0, 0],
+      "plot_weight_mm": 0.7,
+      "linetype": "Continuous"
+    },
+    {
+      "path": "ALMOND-DRAW::PROFILE",
+      "role": "silhouette",
+      "color": [0, 0, 0],
+      "plot_color": [0, 0, 0],
+      "plot_weight_mm": 0.5,
+      "linetype": "Continuous"
+    },
+    {
+      "path": "ALMOND-DRAW::VISIBLE",
+      "role": "visible",
+      "color": [35, 35, 35],
+      "plot_color": [0, 0, 0],
+      "plot_weight_mm": 0.25,
+      "linetype": "Continuous"
+    },
+    {
+      "path": "ALMOND-DRAW::DETAIL",
+      "role": "detail",
+      "color": [70, 70, 70],
+      "plot_color": [0, 0, 0],
+      "plot_weight_mm": 0.18,
+      "linetype": "Continuous"
+    },
+    {
+      "path": "ALMOND-DRAW::HIDDEN",
+      "role": "hidden",
+      "color": [120, 120, 120],
+      "plot_color": [90, 90, 90],
+      "plot_weight_mm": 0.13,
+      "linetype": "ALMOND Hidden"
+    },
+    {
+      "path": "ALMOND-DRAW::OVERHEAD",
+      "role": "overhead",
+      "color": [130, 130, 130],
+      "plot_color": [100, 100, 100],
+      "plot_weight_mm": 0.13,
+      "linetype": "ALMOND DashDot"
+    },
+    {
+      "path": "ALMOND-DRAW::ENTOURAGE",
+      "role": "entourage",
+      "color": [85, 85, 85],
+      "plot_color": [50, 50, 50],
+      "plot_weight_mm": 0.18,
+      "linetype": "Continuous"
+    },
+    {
+      "path": "ALMOND-DRAW::HATCH",
+      "role": "hatch",
+      "color": [150, 150, 150],
+      "plot_color": [120, 120, 120],
+      "plot_weight_mm": 0.1,
+      "linetype": "Continuous"
+    },
+    {
+      "path": "ALMOND-DRAW::ANNOTATION",
+      "role": "annotation",
+      "color": [0, 0, 0],
+      "plot_color": [0, 0, 0],
+      "plot_weight_mm": 0.18,
+      "linetype": "Continuous"
+    }
+  ],
+  "output": {
+    "paper": "A3",
+    "orientation": "landscape",
+    "dpi": 300,
+    "vector_preferred": true
+  }
+}

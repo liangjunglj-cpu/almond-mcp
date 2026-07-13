@@ -1,0 +1,30 @@
+{
+  "capsule_id": "karamba_beam_v1",
+  "version": 1,
+  "capability": "analyze",
+  "structure_type": "beam",
+  "plugin_dependencies": [{"name": "Karamba3D", "min_version": "3.1"}],
+  "definition_file": "01_SimpleBeam.ghx",
+  "title": "Simple beam bending and deflection",
+  "description_for_llm": "Linear elastic (Theory I) analysis of one or more straight beams under a point load plus self weight. Use for single span or cantilever line elements where bending and deflection dominate. Assumptions: beam axes are straight curves in metres, supports at curve ends, one steel cross section for all members, loads are static and vertical. Limits: no buckling check, no dynamic or wind load, no material nonlinearity, curved members are not handled. NOT YET AUDITED: the shipped GHX carries its own internal sliders and has no ALMOND_IN_*/ALMOND_OUT_* harness params, so run_definition will refuse it. Until harnessed it is retrieval context only, useful for reading how a Karamba beam model is assembled.",
+  "inputs": [
+    {"name": "ALMOND_IN_LINES", "type": "curve[]", "units": "m", "required": true,
+     "description": "Beam axis curves, node-merged at shared endpoints."},
+    {"name": "ALMOND_IN_LOAD_KN", "type": "number", "units": "kN", "required": false, "default": 10.0,
+     "description": "Downward point load applied at midspan or the free end."}
+  ],
+  "outputs": [
+    {"name": "ALMOND_OUT_DISP_MM", "type": "number", "units": "mm",
+     "semantics": "max_nodal_displacement",
+     "description": "Largest nodal displacement in the model."},
+    {"name": "ALMOND_OUT_UTIL", "type": "number[]",
+     "semantics": "per_element_utilization",
+     "description": "Utilization ratio per element, 1.0 means at capacity."},
+    {"name": "ALMOND_OUT_MASS_KG", "type": "number", "units": "kg",
+     "semantics": "total_mass",
+     "description": "Total structural mass of the model."}
+  ],
+  "binding": "reserved_nicknames",
+  "confidence": "template",
+  "audited": false
+}

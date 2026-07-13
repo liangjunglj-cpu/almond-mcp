@@ -1,0 +1,148 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://almondmcp.local/schemas/capsule.schema.json",
+  "title": "Almond Capsule Manifest",
+  "description": "Sidecar manifest (<name>.capsule.json) that turns a Grasshopper definition into a capsule: a file plus a typed input/output contract. Binding is exact NickName match on reserved ALMOND_IN_* / ALMOND_OUT_* parameter names inside the GHX. Manifests with audited=false are retrieval context only; run_definition refuses them.",
+  "type": "object",
+  "required": [
+    "capsule_id",
+    "capability",
+    "definition_file",
+    "inputs",
+    "outputs",
+    "audited"
+  ],
+  "properties": {
+    "capsule_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9_]{1,63}$",
+      "description": "Stable unique identifier, e.g. karamba_beam_v1."
+    },
+    "version": {
+      "type": "integer",
+      "minimum": 1,
+      "default": 1,
+      "description": "Manifest revision. Bump when the contract changes."
+    },
+    "capability": {
+      "type": "string",
+      "enum": ["analyze", "generate", "form_find", "aggregate"],
+      "description": "What the capsule does when run."
+    },
+    "structure_type": {
+      "type": "string",
+      "description": "Optional archetype key used by validate_structure, e.g. beam, truss, shell."
+    },
+    "plugin_dependencies": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["name", "min_version"],
+        "properties": {
+          "name": {"type": "string", "minLength": 1},
+          "min_version": {"type": "string", "minLength": 1}
+        },
+        "additionalProperties": false
+      },
+      "description": "Grasshopper plugins the definition needs, with minimum versions."
+    },
+    "definition_file": {
+      "type": "string",
+      "pattern": "\\.(gh|ghx)$",
+      "description": "Filename of the Grasshopper definition this manifest describes. Filename only, no directory."
+    },
+    "title": {
+      "type": "string",
+      "description": "Short human readable title."
+    },
+    "description_for_llm": {
+      "type": "string",
+      "description": "When to use this capsule, its assumptions, and its limits. Written for an LLM choosing between capsules. Be honest."
+    },
+    "inputs": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/input_port"},
+      "description": "Typed input contract. Each entry maps to a GH param whose NickName equals the reserved name exactly."
+    },
+    "outputs": {
+      "type": "array",
+      "items": {"$ref": "#/$defs/output_port"},
+      "description": "Typed output contract. Each entry maps to a GH param whose NickName equals the reserved name exactly."
+    },
+    "binding": {
+      "type": "string",
+      "enum": ["reserved_nicknames"],
+      "default": "reserved_nicknames",
+      "description": "Binding strategy. Only exact reserved NickName matching is supported."
+    },
+    "confidence": {
+      "type": "string",
+      "enum": ["api", "template", "rule_based"],
+      "description": "Analysis pathway quality this capsule represents. api > template > rule_based."
+    },
+    "audited": {
+      "type": "boolean",
+      "description": "True only after harness params with the reserved NickNames exist in the GHX and the contract was verified by a human run. False means retrieval context only; run_definition refuses the capsule."
+    }
+  },
+  "$defs": {
+    "value_type": {
+      "type": "string",
+      "enum": [
+        "number", "number[]",
+        "integer", "integer[]",
+        "string", "string[]",
+        "bool",
+        "point", "point[]",
+        "curve", "curve[]",
+        "mesh", "mesh[]",
+        "brep", "brep[]"
+      ],
+      "description": "Wire type at the boundary. [] means a flat list."
+    },
+    "input_port": {
+      "type": "object",
+      "required": ["name", "type"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^ALMOND_IN_[A-Z0-9_]+$",
+          "description": "Reserved NickName the GH param must carry, e.g. ALMOND_IN_LINES."
+        },
+        "type": {"$ref": "#/$defs/value_type"},
+        "units": {
+          "type": "string",
+          "description": "Declared units, e.g. m, mm, kN, kN/m2. Units are declared, never guessed; the bridge converts explicitly at the boundary."
+        },
+        "required": {"type": "boolean", "default": true},
+        "default": {
+          "description": "Default value used when a non required input is not supplied."
+        },
+        "description": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "output_port": {
+      "type": "object",
+      "required": ["name", "type"],
+      "properties": {
+        "name": {
+          "type": "string",
+          "pattern": "^ALMOND_OUT_[A-Z0-9_]+$",
+          "description": "Reserved NickName the GH param must carry, e.g. ALMOND_OUT_DISP_MM."
+        },
+        "type": {"$ref": "#/$defs/value_type"},
+        "units": {
+          "type": "string",
+          "description": "Declared units of the emitted value."
+        },
+        "semantics": {
+          "type": "string",
+          "description": "Machine readable meaning, e.g. max_nodal_displacement, per_element_utilization, total_mass."
+        },
+        "description": {"type": "string"}
+      },
+      "additionalProperties": false
+    }
+  }
+}
