@@ -75,76 +75,42 @@ namespace RhinoAlmondBridge
             _listenerThread.Start();
         }
 
-        private string FindLibraryDirectory()
+        // Resolve a library dir the same way the Python server does:
+        // env var (handled by callers) -> dev checkout near the assembly ->
+        // per-user data dir (%LOCALAPPDATA%\Almond\<name>, scaffolded by
+        // `almond-mcp` on first run) -> legacy pre-0.2 location.
+        private string FindDataDirectory(string name, string legacySubdir)
         {
             string directory = Path.GetDirectoryName(typeof(BridgeServer).Assembly.Location);
             for (int i = 0; i < 6 && directory != null; i++)
             {
-                string candidate = Path.Combine(directory, "Grasshopperfiles");
+                string candidate = Path.Combine(directory, name);
                 if (Directory.Exists(candidate)) return candidate;
                 directory = Path.GetDirectoryName(directory);
             }
 
-            return Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+            string userData = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
                 "Almond",
-                "Grasshopperfiles"
+                name
             );
-        }
-
-        private string FindFurnitureDirectory()
-        {
-            string directory = Path.GetDirectoryName(typeof(BridgeServer).Assembly.Location);
-            for (int i = 0; i < 6 && directory != null; i++)
-            {
-                string candidate = Path.Combine(directory, "IkeaFurniturefiles");
-                if (Directory.Exists(candidate)) return candidate;
-                directory = Path.GetDirectoryName(directory);
-            }
+            if (Directory.Exists(userData)) return userData;
 
             return Path.Combine(
                 Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
                 "Almond",
-                "mcp-rhino-plugin",
-                "IkeaFurniturefiles"
+                legacySubdir,
+                name
             );
         }
 
-        private string FindCapsuleDirectory()
-        {
-            string directory = Path.GetDirectoryName(typeof(BridgeServer).Assembly.Location);
-            for (int i = 0; i < 6 && directory != null; i++)
-            {
-                string candidate = Path.Combine(directory, "capsules");
-                if (Directory.Exists(candidate)) return candidate;
-                directory = Path.GetDirectoryName(directory);
-            }
+        private string FindLibraryDirectory() => FindDataDirectory("Grasshopperfiles", "");
 
-            return Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                "Almond",
-                "mcp-rhino-plugin",
-                "capsules"
-            );
-        }
+        private string FindFurnitureDirectory() => FindDataDirectory("IkeaFurniturefiles", "mcp-rhino-plugin");
 
-        private string FindDrawingAssetDirectory()
-        {
-            string directory = Path.GetDirectoryName(typeof(BridgeServer).Assembly.Location);
-            for (int i = 0; i < 6 && directory != null; i++)
-            {
-                string candidate = Path.Combine(directory, "DrawingAssetfiles");
-                if (Directory.Exists(candidate)) return candidate;
-                directory = Path.GetDirectoryName(directory);
-            }
+        private string FindCapsuleDirectory() => FindDataDirectory("capsules", "mcp-rhino-plugin");
 
-            return Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-                "Almond",
-                "mcp-rhino-plugin",
-                "DrawingAssetfiles"
-            );
-        }
+        private string FindDrawingAssetDirectory() => FindDataDirectory("DrawingAssetfiles", "mcp-rhino-plugin");
 
         public void Stop()
         {
