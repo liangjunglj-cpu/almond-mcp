@@ -1,5 +1,36 @@
 # Food4Rhino listing — ready-to-paste fields
 
+## Exact "Create App" form fields (matched to the live form, 2026-07-14)
+
+| Form field | Value |
+| --- | --- |
+| **Title** | `Almond MCP` |
+| **Short Description** (max 255 chars) | `Connect Rhino 8 to Claude AI via MCP: semantic scene ledger, curated asset libraries with real dimensions, layout validation, Karamba3D-backed structural checks with exportable reports, drawing recipes, and C# scripting. Free & open source (MIT).` |
+| **Body** | use the long **Description** section below |
+| **Category** (max 3, CTRL-click) | `Machine Learning (ML)`, `Architecture`, `Development` (pick nearest names offered) |
+| **GUID** | `c337dbb8-394a-4593-9c2b-a3d7cfc91893` (the plugin's permanent ID — lets Rhino link the installed plugin to this listing) |
+| **License** | `MIT` (or Other License → https://github.com/liangjunglj-cpu/almond-mcp/blob/master/LICENSE) |
+| **Support Email** | `liangjung.lj@gmail.com` |
+| **Support Forum URL** | `https://github.com/liangjunglj-cpu/almond-mcp/issues` |
+| **Web URL** | `https://github.com/liangjunglj-cpu/almond-mcp` |
+| **Project Icon** | `assets\almond-icon-512.png` (square PNG, well under size limits) |
+| **Platform** | check **Rhino \| Windows \| Version 8** only (the form itself warns not to also mark Grasshopper unless GH-only) |
+| **Trial/Commercial App** | leave **unchecked** (fully free) |
+
+**Downloads section** (Add new file):
+
+| Sub-field | Value |
+| --- | --- |
+| File Title | `almondbridge 0.2.3 — Rhino 8 bridge plugin (Windows)` |
+| Description | `Rhino-side bridge for the Almond MCP server. Easiest install: Rhino 8 _PackageManager, search "almondbridge". This download is the same package for offline install (drag onto Rhino). The AI-side server installs with: uvx almond-mcp (PyPI).` |
+| Downloads Type | the Windows/file option offered |
+| File | `dist\yak\almondbridge-0.2.3-rh8_32-any.yak` — if `.yak` is not an accepted extension, zip it first (`almondbridge-0.2.3.zip`) and say so in the description |
+
+Add 2–4 screenshots from `assets\screenshots\` after the app is created
+(F4R lets you attach images/media on the app page).
+
+---
+
 Submit at https://www.food4rhino.com → sign in with your Rhino account
 (same one used for `yak login`) → My apps → **Add App**. Paste the fields
 below. Keep the app name and icon stable across updates.
