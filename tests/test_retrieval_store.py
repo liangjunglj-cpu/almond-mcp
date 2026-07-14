@@ -243,5 +243,54 @@ class SceneLedgerFixesTests(RetrievalStoreTests):
         self.assertTrue(keep["instance_id"])
 
 
+class ValidationHistoryTests(unittest.TestCase):
+    def setUp(self):
+        self.temp_dir = tempfile.TemporaryDirectory()
+        self.store = AlmondStore(Path(self.temp_dir.name) / "state.sqlite3")
+
+    def tearDown(self):
+        self.temp_dir.cleanup()
+
+    def test_record_and_list_validation_runs(self):
+        request = {"structure_type": "truss", "load_kn": 25.0, "material": "S355"}
+        result = {
+            "status": "pass",
+            "passed": True,
+            "confidence": "high",
+            "verdict": "[KARAMBA 3.1 API, HIGH CONFIDENCE] PASSED",
+            "warnings": ["No anchor points declared; supporting 3 lowest-Z node(s)."],
+            "results": {
+                "analysis_method": "api",
+                "span_m": 6.0,
+                "max_deflection_mm": 0.4,
+                "deflection_limit_mm": 24.0,
+                "utilization_ratio": 0.01,
+                "max_stress_mpa": 7.5,
+                "yield_stress_mpa": 355.0,
+                "reactions_kn": 25.002,
+            },
+        }
+        run_id = self.store.record_validation_run(request, result, ["guid-a", "guid-b"])
+        self.assertGreater(run_id, 0)
+
+        runs = self.store.list_validation_runs()
+        self.assertEqual(len(runs), 1)
+        run = runs[0]
+        self.assertEqual(run["structure_type"], "truss")
+        self.assertEqual(run["material"], "S355")
+        self.assertEqual(run["analysis_method"], "api")
+        self.assertEqual(run["confidence"], "high")
+        self.assertTrue(run["passed"])
+        self.assertEqual(run["member_count"], 2)
+        self.assertAlmostEqual(run["reactions_kn"], 25.002)
+        self.assertEqual(len(run["warnings"]), 1)
+        self.assertEqual(run["guids"], ["guid-a", "guid-b"])
+
+        # newest first
+        self.store.record_validation_run(request, result, ["guid-c"])
+        runs = self.store.list_validation_runs()
+        self.assertEqual(runs[0]["member_count"], 1)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -1358,22 +1358,147 @@ def validate_structure(
         a list of {source_guids, utilization} entries (utilization 1.0 = at
         capacity) keyed back to the Rhino objects that produced each element.
     """
-    payload = json.dumps({
+    request = {
         "type": "validate",
         "guids": guids,
         "structure_type": structure_type,
         "load_kn": load_kn,
         "material": material,
-    }).encode('utf-8')
+    }
+    payload = json.dumps(request).encode('utf-8')
 
     try:
-        return _send_and_receive(payload, timeout=60.0)
+        response = _send_and_receive(payload, timeout=60.0)
     except socket.timeout:
         return json.dumps({"status": "error", "message": "Structural validation timed out (>60s)."})
     except ConnectionRefusedError:
         return json.dumps({"status": "error", "message": "Connection refused. Is the RhinoAlmondBridge plugin loaded in Rhino?"})
     except Exception as e:
         return json.dumps({"status": "error", "message": f"Bridge error: {e}"})
+
+    # Persist the run in the state DB so export_structural_report can render
+    # an auditable history. Recording must never break validation itself.
+    try:
+        result = json.loads(response)
+        if isinstance(result, dict) and result.get("status") in ("pass", "fail"):
+            retrieval_store.record_validation_run(request, result, guids)
+    except Exception:
+        pass
+    return response
+
+
+def _render_validation_report(runs: list[dict]) -> str:
+    """Markdown report of persisted validate_structure runs, newest first."""
+    from datetime import datetime, timezone
+
+    lines = [
+        "# Structural validation report",
+        "",
+        f"Generated {datetime.now(timezone.utc).strftime('%Y-%m-%d %H:%M UTC')} "
+        f"by almond-mcp. {len(runs)} run(s), newest first.",
+        "",
+        "## How a run works",
+        "",
+        "`validate_structure(guids, structure_type, load_kn, material)` sends the",
+        "referenced Rhino geometry to the bridge, which extracts member axes and",
+        "tries three analysis pathways in strict order of confidence:",
+        "",
+        "1. **api** — direct Karamba 3.1 solve (real FEA), confidence *high*;",
+        "2. **template** — audited capsule GHX definition, confidence *medium*;",
+        "3. **rule_based** — span/slenderness heuristics (UDL `w = load/span`,",
+        "   `5wL^4/384EI`), confidence *low*. An estimate, not FEA.",
+        "",
+        "Pass criteria: max deflection within **L/250** of the detected span, and",
+        "material utilization below yield (default S235 steel, fy = 235 MPa).",
+        "The applied load defaults to **10 kN** unless load_kn is given.",
+        "",
+        "## Runs",
+        "",
+        "| # | when (UTC) | type | method | confidence | span m | defl mm | limit mm | util | reactions kN | members | result |",
+        "| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |",
+    ]
+    for run in runs:
+        lines.append(
+            f"| {run['id']} | {run['ran_at'][:16].replace('T', ' ')} "
+            f"| {run['structure_type']} | {run['analysis_method']} "
+            f"| {run['confidence']} | {run['span_m']:.1f} "
+            f"| {run['max_deflection_mm']:.2f} | {run['deflection_limit_mm']:.1f} "
+            f"| {run['utilization_ratio']:.2f} | {run['reactions_kn']:.2f} "
+            f"| {run['member_count']} | {'PASS' if run['passed'] else 'FAIL'} |"
+        )
+    lines.append("")
+    lines.append("## Run details")
+    for run in runs:
+        lines += [
+            "",
+            f"### Run {run['id']} — {run['structure_type']}, "
+            f"{run['analysis_method']} ({'PASS' if run['passed'] else 'FAIL'})",
+            "",
+            f"- input: {run['member_count']} object(s), load {run['load_kn']:.1f} kN, "
+            f"material {run['material']}",
+            f"- verdict: {run['verdict']}",
+        ]
+        if run["warnings"]:
+            lines.append("- warnings:")
+            lines += [f"  - {w}" for w in run["warnings"]]
+    lines += [
+        "",
+        "## Reading the numbers",
+        "",
+        "- Only **api** runs are finite element analysis; reactions_kn is",
+        "  populated on the api path only and should equal the applied load",
+        "  plus self-weight (equilibrium).",
+        "- Known gaps in karambaCommon 3.1.60519 (issue #6): api-mode",
+        "  max_deflection and per-element utilization may read 0.0 due to",
+        "  signature drift — trust reactions and stability diagnostics;",
+        "  cross-check deflection against the rule_based estimate.",
+        "- rule_based results are labeled LOW CONFIDENCE for a reason: treat",
+        "  them as sanity checks, not engineering.",
+        "",
+    ]
+    return "\n".join(lines)
+
+
+@mcp.tool()
+def export_structural_report(path: str = "", limit: int = 50) -> str:
+    """
+    Renders the persisted validate_structure history to a Markdown report.
+
+    Every successful validate_structure call is recorded in the local state
+    database (inputs, analysis method, confidence, numbers, warnings). This
+    tool writes them to a .md file, newest first, with an explanation of the
+    analysis pathways and pass criteria.
+
+    Args:
+        path: Output file path. Default:
+            <user data dir>/reports/structural-validation-<timestamp>.md
+        limit: Maximum number of runs to include (default 50, max 500).
+    Returns:
+        JSON with the report path and run count.
+    """
+    from datetime import datetime, timezone
+
+    try:
+        runs = retrieval_store.list_validation_runs(limit=limit)
+        if not runs:
+            return json.dumps({
+                "status": "error",
+                "message": "No validation runs recorded yet - call validate_structure first.",
+            })
+        target = Path(path) if path else (
+            paths.user_data_dir() / "reports" /
+            f"structural-validation-{datetime.now(timezone.utc).strftime('%Y%m%d-%H%M%S')}.md"
+        )
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(_render_validation_report(runs), encoding="utf-8")
+        return json.dumps({
+            "status": "success",
+            "path": str(target),
+            "runs": len(runs),
+            "latest_method": runs[0]["analysis_method"],
+        })
+    except Exception as exc:
+        return json.dumps({"status": "error", "message": str(exc)})
 
 
 @mcp.tool()
