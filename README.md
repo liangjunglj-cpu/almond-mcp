@@ -237,6 +237,18 @@ create_generation_plan(
 )
 ```
 
+## Structural validation with reports
+
+`validate_structure(guids, structure_type, load_kn, material)` checks
+generated geometry through three pathways in strict order of confidence —
+real **Karamba 3.1 FEA** (api, high), audited capsule templates (medium),
+or span-rule heuristics (rule_based, low) — and always labels which one
+ran. Pass criteria: deflection ≤ span/250 and utilization below yield.
+Every run is recorded in the local state database;
+`export_structural_report()` renders the history to a Markdown report
+(inputs, pathway, span/deflection/utilization/reactions, warnings,
+PASS/FAIL). Details: `docs/structural-validation.md`.
+
 ## Karamba capsules
 
 Audited capsule manifests (`capsules/*.capsule.json`) declare typed
