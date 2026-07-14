@@ -424,6 +424,18 @@ namespace RhinoAlmondBridge
             return n;
         }
 
+        // Parameter-name drift observed across karambaCommon builds: 3.1.60519
+        // (yak) names LineToBeam/MeshToShell parameters "curves"/"identifiers"
+        // where earlier builds used "lines"/"ids". Keys are normalized names.
+        private static readonly Dictionary<string, string[]> ParamSynonyms =
+            new Dictionary<string, string[]>
+            {
+                { "curves", new[] { "lines" } },
+                { "lines", new[] { "curves" } },
+                { "identifiers", new[] { "ids" } },
+                { "ids", new[] { "identifiers" } },
+            };
+
         private static bool TryMatchArg(string paramName, Dictionary<string, object> namedArgs,
             out object value)
         {
@@ -431,11 +443,22 @@ namespace RhinoAlmondBridge
             if (namedArgs == null) return false;
             string np = NormalizeName(paramName);
 
-            // Exact normalized match first, then containment either way
-            // (e.g. key "width" matches params "lo_width"/"up_width").
+            // Exact normalized match first, then known synonyms, then
+            // containment either way (e.g. key "width" matches params
+            // "lo_width"/"up_width").
             foreach (var kv in namedArgs)
             {
                 if (NormalizeName(kv.Key) == np) { value = kv.Value; return true; }
+            }
+            string[] synonyms;
+            if (ParamSynonyms.TryGetValue(np, out synonyms))
+            {
+                foreach (var kv in namedArgs)
+                {
+                    string nk = NormalizeName(kv.Key);
+                    foreach (var syn in synonyms)
+                        if (nk == syn) { value = kv.Value; return true; }
+                }
             }
             foreach (var kv in namedArgs)
             {
