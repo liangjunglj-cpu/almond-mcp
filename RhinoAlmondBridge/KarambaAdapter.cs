@@ -149,6 +149,9 @@ namespace RhinoAlmondBridge
         private static readonly object LoadLock = new object();
         private static bool _loadAttempted;
         private static string _loadFailure;
+        [System.Runtime.InteropServices.DllImport("kernel32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode, SetLastError = true)]
+        private static extern bool SetDllDirectory(string lpPathName);
+
         private static Assembly _karambaCommonAsm;   // karambaCommon.dll
         private static Assembly _karambaAsm;         // Karamba.dll (optional)
         private static string _resolvedDir;
@@ -249,6 +252,17 @@ namespace RhinoAlmondBridge
                     _resolvedDir = dllDir;
                     // Serve Karamba's own dependency loads from the same folder.
                     AppDomain.CurrentDomain.AssemblyResolve += ResolveFromKarambaDir;
+
+                    // Karamba's FE core (karambafeb) is native code behind
+                    // P/Invoke; side-loading the managed assemblies is not
+                    // enough because Windows won't search this folder for the
+                    // native DLLs. Put it on both native search paths before
+                    // anything touches feb.karambafebPINVOKE - a failed type
+                    // initializer is poisoned for the rest of the session.
+                    SetDllDirectory(dllDir);
+                    string path = Environment.GetEnvironmentVariable("PATH") ?? "";
+                    if (path.IndexOf(dllDir, StringComparison.OrdinalIgnoreCase) < 0)
+                        Environment.SetEnvironmentVariable("PATH", dllDir + ";" + path);
 
                     _karambaCommonAsm = Assembly.LoadFrom(Path.Combine(dllDir, "karambaCommon.dll"));
 
