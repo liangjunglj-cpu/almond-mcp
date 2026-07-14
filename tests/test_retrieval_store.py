@@ -168,5 +168,80 @@ class RetrievalStoreTests(unittest.TestCase):
         )
 
 
+class SceneLedgerFixesTests(RetrievalStoreTests):
+    """Regressions from the 2026-07-14 stress test (issues #3 and #4)."""
+
+    def test_upsert_room_by_name_updates_instead_of_duplicating(self):
+        scene = self.store.create_scene("Upsert test")
+        first = self.store.upsert_room(
+            scene["scene_id"], "L1 Office", [0, 0, 18000, 6000, 4000, 21000]
+        )
+        second = self.store.upsert_room(
+            scene["scene_id"], "L1 Office", [0, 0, 0, 6000, 4000, 3000]
+        )
+        self.assertEqual(first["room_id"], second["room_id"])
+        self.assertEqual(self.store.get_scene(scene["scene_id"])["rooms"], 1)
+
+    def test_instance_z_defaults_to_room_floor(self):
+        scene = self.store.create_scene("Storey test")
+        room = self.store.upsert_room(
+            scene["scene_id"], "L1", [0, 0, 18000, 10000, 6000, 21000]
+        )
+        instance = self.store.upsert_instance(
+            scene["scene_id"],
+            "ikea-sg-klippan-s49010615",
+            x_mm=3000,
+            y_mm=2000,
+            room_id=room["room_id"],
+        )
+        report = self.store.validate_scene(scene["scene_id"])
+        self.assertEqual(report["outside_room_count"], 0, report)
+        # explicit z still wins
+        grounded = self.store.upsert_instance(
+            scene["scene_id"],
+            "ikea-sg-klippan-s49010615",
+            x_mm=3000,
+            y_mm=2000,
+            z_mm=0,
+            room_id=room["room_id"],
+            instance_id=instance["instance_id"],
+        )
+        report = self.store.validate_scene(scene["scene_id"])
+        self.assertEqual(report["outside_room_count"], 1)
+        self.assertEqual(report["outside_room"][0]["failing_axes"], ["z"])
+
+    def test_remove_instance_and_room(self):
+        scene = self.store.create_scene("Removal test")
+        room = self.store.upsert_room(
+            scene["scene_id"], "L1", [0, 0, 0, 10000, 6000, 3000]
+        )
+        instance = self.store.upsert_instance(
+            scene["scene_id"],
+            "ikea-sg-klippan-s49010615",
+            x_mm=3000,
+            y_mm=2000,
+            room_id=room["room_id"],
+        )
+        keep = self.store.upsert_instance(
+            scene["scene_id"],
+            "ikea-sg-kallax-70351886",
+            x_mm=6000,
+            y_mm=2000,
+            room_id=room["room_id"],
+        )
+        removed = self.store.remove_instance(scene["scene_id"], instance["instance_id"])
+        self.assertGreater(removed["revision"], 0)
+        self.assertEqual(self.store.get_scene(scene["scene_id"])["instances"], 1)
+        with self.assertRaises(KeyError):
+            self.store.remove_instance(scene["scene_id"], instance["instance_id"])
+
+        room_removed = self.store.remove_room(scene["scene_id"], room["room_id"])
+        self.assertEqual(room_removed["orphaned_instances"], 1)
+        self.assertEqual(self.store.get_scene(scene["scene_id"])["rooms"], 0)
+        # orphaned instance survives
+        self.assertEqual(self.store.get_scene(scene["scene_id"])["instances"], 1)
+        self.assertTrue(keep["instance_id"])
+
+
 if __name__ == "__main__":
     unittest.main()

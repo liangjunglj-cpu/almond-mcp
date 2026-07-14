@@ -4,7 +4,7 @@
     <TargetFramework>net48</TargetFramework>
     <Title>RhinoAlmondBridge</Title>
     <Description>MCP Bridge plugin for Rhino - receives and executes C# RhinoCommon scripts from AI agents</Description>
-    <Version>0.2.1</Version>
+    <Version>0.2.2</Version>
     <!-- Keep the informational version equal to Version so yak's manifest
          check doesn't see the +gitsha suffix SourceLink appends. -->
     <IncludeSourceRevisionInInformationalVersion>false</IncludeSourceRevisionInInformationalVersion>

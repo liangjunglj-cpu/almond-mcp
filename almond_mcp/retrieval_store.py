@@ -706,7 +706,16 @@ class AlmondStore:
             raise ValueError("Room bounds must have positive volume.")
         if not self.get_scene(scene_id):
             raise KeyError(f"Unknown scene_id: {scene_id}")
-        room_id = room_id.strip() or f"room_{uuid.uuid4().hex[:12]}"
+        room_id = room_id.strip()
+        if not room_id:
+            # True upsert semantics: an omitted room_id matches an existing
+            # room of the same name instead of minting a duplicate.
+            with self._connect() as connection:
+                existing = connection.execute(
+                    "SELECT room_id FROM rooms WHERE scene_id = ? AND name = ?",
+                    (scene_id, name.strip() or ""),
+                ).fetchone()
+            room_id = existing["room_id"] if existing else f"room_{uuid.uuid4().hex[:12]}"
         now = _utc_now()
         patch = {
             "room_id": room_id,
@@ -749,7 +758,7 @@ class AlmondStore:
         asset_id: str,
         x_mm: float,
         y_mm: float,
-        z_mm: float = 0,
+        z_mm: float | None = None,
         rotation_degrees: float = 0,
         scale: float = 1,
         room_id: str = "",
@@ -763,19 +772,25 @@ class AlmondStore:
         asset = self.get_asset(asset_id)
         if not asset:
             raise KeyError(f"Unknown asset_id: {asset_id}")
+        room_floor_z = 0.0
+        if room_id:
+            with self._connect() as connection:
+                room = connection.execute(
+                    "SELECT scene_id, min_z FROM rooms WHERE room_id = ?",
+                    (room_id,),
+                ).fetchone()
+            if not room or room["scene_id"] != scene_id:
+                raise KeyError("room_id does not belong to the scene.")
+            room_floor_z = float(room["min_z"])
+        # An omitted z means "standing on the floor of its room" - rooms may
+        # sit at storey elevation (e.g. an office floor at z=18000).
+        if z_mm is None:
+            z_mm = room_floor_z
         numeric = [x_mm, y_mm, z_mm, rotation_degrees, scale]
         if not all(math.isfinite(float(value)) for value in numeric):
             raise ValueError("Instance transform values must be finite.")
         if scale <= 0:
             raise ValueError("scale must be greater than zero.")
-        if room_id:
-            with self._connect() as connection:
-                room = connection.execute(
-                    "SELECT scene_id FROM rooms WHERE room_id = ?",
-                    (room_id,),
-                ).fetchone()
-            if not room or room["scene_id"] != scene_id:
-                raise KeyError("room_id does not belong to the scene.")
 
         instance_id = instance_id.strip() or f"instance_{uuid.uuid4().hex[:12]}"
         bounds = self._world_aabb(
@@ -897,6 +912,47 @@ class AlmondStore:
             z + float(maximum[2]) * scale,
         )
 
+    def remove_instance(self, scene_id: str, instance_id: str) -> dict[str, Any]:
+        if not self.get_scene(scene_id):
+            raise KeyError(f"Unknown scene_id: {scene_id}")
+        with self._connect() as connection:
+            cursor = connection.execute(
+                "DELETE FROM instances WHERE scene_id = ? AND instance_id = ?",
+                (scene_id, instance_id),
+            )
+            if cursor.rowcount == 0:
+                raise KeyError(f"Unknown instance_id: {instance_id}")
+            revision = self._record_revision(
+                connection, scene_id, "remove_instance", {"instance_id": instance_id}
+            )
+        return {"instance_id": instance_id, "scene_id": scene_id, "revision": revision}
+
+    def remove_room(self, scene_id: str, room_id: str) -> dict[str, Any]:
+        """Deletes a room; its instances stay in the scene, orphaned."""
+        if not self.get_scene(scene_id):
+            raise KeyError(f"Unknown scene_id: {scene_id}")
+        with self._connect() as connection:
+            orphaned = connection.execute(
+                "UPDATE instances SET room_id = NULL WHERE scene_id = ? AND room_id = ?",
+                (scene_id, room_id),
+            ).rowcount
+            cursor = connection.execute(
+                "DELETE FROM rooms WHERE scene_id = ? AND room_id = ?",
+                (scene_id, room_id),
+            )
+            if cursor.rowcount == 0:
+                raise KeyError(f"Unknown room_id: {room_id}")
+            revision = self._record_revision(
+                connection, scene_id, "remove_room",
+                {"room_id": room_id, "orphaned_instances": orphaned},
+            )
+        return {
+            "room_id": room_id,
+            "scene_id": scene_id,
+            "orphaned_instances": orphaned,
+            "revision": revision,
+        }
+
     def validate_scene(self, scene_id: str, limit: int = 100) -> dict[str, Any]:
         if not self.get_scene(scene_id):
             raise KeyError(f"Unknown scene_id: {scene_id}")
@@ -924,7 +980,10 @@ class AlmondStore:
             ).fetchall()
             outside_rows = connection.execute(
                 """
-                SELECT i.instance_id, i.room_id
+                SELECT i.instance_id, i.room_id,
+                    i.min_x < r.min_x OR i.max_x > r.max_x AS out_x,
+                    i.min_y < r.min_y OR i.max_y > r.max_y AS out_y,
+                    i.min_z < r.min_z OR i.max_z > r.max_z AS out_z
                 FROM instances i
                 JOIN rooms r ON r.room_id = i.room_id
                 WHERE i.scene_id = ?
@@ -947,7 +1006,15 @@ class AlmondStore:
             for row in collision_rows
         ]
         outside = [
-            {"instance_id": row["instance_id"], "room_id": row["room_id"]}
+            {
+                "instance_id": row["instance_id"],
+                "room_id": row["room_id"],
+                "failing_axes": [
+                    axis for axis, flag in
+                    (("x", row["out_x"]), ("y", row["out_y"]), ("z", row["out_z"]))
+                    if flag
+                ],
+            }
             for row in outside_rows
         ]
         return {

@@ -1,6 +1,6 @@
 [project]
 name = "almond-mcp"
-version = "0.2.0"
+version = "0.3.0"
 description = "Almond - MCP server for Rhino 8 with a semantic scene layer: curated furniture/drawing/diagram libraries, audited Karamba capsules, structured retrieval (SQLite FTS5 + R-tree scene ledger), and a TCP bridge into Rhino (RhinoAlmondBridge, port 5000)"
 readme = "README.md"
 requires-python = ">=3.12"

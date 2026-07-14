@@ -702,7 +702,9 @@ def upsert_design_room(
 ) -> str:
     """
     Creates or updates a room in the local scene ledger.
-    bounds_mm is [min_x, min_y, min_z, max_x, max_y, max_z].
+    bounds_mm is [min_x, min_y, min_z, max_x, max_y, max_z]. When room_id is
+    omitted, an existing room with the same name in the scene is updated
+    instead of creating a duplicate.
     """
     try:
         result = retrieval_store.upsert_room(
@@ -722,7 +724,7 @@ def register_scene_instance(
     asset_id: str,
     x_mm: float,
     y_mm: float,
-    z_mm: float = 0,
+    z_mm: float | None = None,
     rotation_degrees: float = 0,
     scale: float = 1,
     room_id: str = "",
@@ -733,6 +735,8 @@ def register_scene_instance(
     """
     Registers or moves an asset instance in millimetres without retransmitting
     its full metadata. Returns a stable instance handle and scene revision.
+    When z_mm is omitted the instance stands on its room's floor (the room's
+    min_z), so rooms at storey elevation validate correctly.
     """
     try:
         result = retrieval_store.upsert_instance(
@@ -748,6 +752,32 @@ def register_scene_instance(
             locked=locked,
             rhino_guid=rhino_guid,
         )
+        return json.dumps({"status": "success", **result})
+    except Exception as exc:
+        return json.dumps({"status": "error", "message": str(exc)})
+
+
+@mcp.tool()
+def remove_scene_instance(scene_id: str, instance_id: str) -> str:
+    """
+    Removes an instance from the scene ledger (recorded as a revision delta).
+    The Rhino geometry, if any, is not touched.
+    """
+    try:
+        result = retrieval_store.remove_instance(scene_id, instance_id)
+        return json.dumps({"status": "success", **result})
+    except Exception as exc:
+        return json.dumps({"status": "error", "message": str(exc)})
+
+
+@mcp.tool()
+def remove_design_room(scene_id: str, room_id: str) -> str:
+    """
+    Removes a room from the scene ledger. Instances that referenced it stay
+    in the scene, orphaned (re-home them with register_scene_instance).
+    """
+    try:
+        result = retrieval_store.remove_room(scene_id, room_id)
         return json.dumps({"status": "success", **result})
     except Exception as exc:
         return json.dumps({"status": "error", "message": str(exc)})
@@ -850,6 +880,12 @@ def place_ikea_furniture(
         return json.dumps({"status": "error", "message": f"Unknown furniture asset_id: {asset_id}"})
     if not asset.get("file_available"):
         return json.dumps({"status": "error", "message": f"Furniture file is missing for {asset_id}."})
+    if asset.get("geometry_status") == "defective":
+        return json.dumps({
+            "status": "error",
+            "message": f"{asset_id} has known-defective source geometry and is "
+                       f"excluded from placement: {asset.get('geometry_note', 'see manifest')}",
+        })
 
     numeric_values = [x, y, z, rotation_degrees, scale]
     if not all(isinstance(value, (int, float)) and abs(value) != float("inf") and value == value for value in numeric_values):
@@ -880,13 +916,104 @@ def place_ikea_furniture(
     }).encode("utf-8")
 
     try:
-        return _send_and_receive(payload, timeout=90.0)
+        response = _send_and_receive(payload, timeout=90.0)
     except socket.timeout:
         return json.dumps({"status": "error", "message": "Rhino furniture import timed out."})
     except ConnectionRefusedError:
         return json.dumps({"status": "error", "message": "Rhino bridge is unavailable. Start RhinoAlmondBridge first."})
     except Exception as exc:
         return json.dumps({"status": "error", "message": f"Furniture placement failed: {exc}"})
+
+    # Post-import QA: compare the real placed bounds against the catalogue
+    # dimensions, and apply any manifest-declared geometry correction.
+    try:
+        result = json.loads(response)
+    except (TypeError, ValueError):
+        return response
+    if not isinstance(result, dict) or result.get("status") != "success":
+        return response
+    check = _dimension_check(asset, result.get("bounds"), scale)
+    if check:
+        result["dimension_check"] = check
+    correction = asset.get("import_correction") or {}
+    rotate_x = float(correction.get("rotate_x_degrees", 0) or 0)
+    if rotate_x and result.get("object_guid"):
+        result["import_correction_applied"] = _apply_import_correction(
+            result["object_guid"], rotate_x, z
+        )
+    return json.dumps(result)
+
+
+def _dimension_check(asset: dict, bounds: dict | None, scale: float) -> dict | None:
+    """Flags gross mismatches between placed AABB and catalogue dimensions.
+
+    Sorted-extent comparison so plan rotations don't false-positive. Only
+    returns a payload on failure; a clean placement stays silent.
+    """
+    dims = asset.get("dimensions_mm") or {}
+    expected = [dims.get("width"), dims.get("depth"), dims.get("height")]
+    if not bounds or not all(isinstance(v, (int, float)) and v > 0 for v in expected):
+        return None
+    try:
+        placed = sorted(
+            abs(float(bounds["max"][i]) - float(bounds["min"][i])) for i in range(3)
+        )
+    except (KeyError, IndexError, TypeError, ValueError):
+        return None
+    expected_sorted = sorted(float(v) * scale for v in expected)
+    tolerance = 0.15
+    mismatched = [
+        axis for axis, (p, e) in enumerate(zip(placed, expected_sorted))
+        if e > 0 and abs(p - e) / e > tolerance
+    ]
+    if not mismatched:
+        return None
+    return {
+        "status": "mismatch",
+        "expected_sorted_mm": [round(v, 1) for v in expected_sorted],
+        "placed_sorted_mm": [round(v, 1) for v in placed],
+        "tolerance": tolerance,
+        "note": "Placed geometry deviates from catalogue dimensions beyond "
+                "tolerance; inspect the source model (see manifest match note).",
+    }
+
+
+def _apply_import_correction(object_guid: str, rotate_x_degrees: float, target_z: float) -> bool:
+    """Re-orients a placed instance whose source geometry is mis-oriented
+    (manifest import_correction), then re-seats it on the placement plane."""
+    script = f"""
+using System;
+using System.Collections.Generic;
+using Rhino;
+using Rhino.Geometry;
+
+public class Script
+{{
+    public static List<Guid> Run(RhinoDoc doc)
+    {{
+        var id = new Guid("{object_guid}");
+        var obj = doc.Objects.FindId(id);
+        if (obj == null) return new List<Guid>();
+        var bb = obj.Geometry.GetBoundingBox(true);
+        var rot = Transform.Rotation(RhinoMath.ToRadians({rotate_x_degrees}), Vector3d.XAxis, bb.Center);
+        doc.Objects.Transform(id, rot, true);
+        var obj2 = doc.Objects.FindId(id);
+        if (obj2 != null)
+        {{
+            var bb2 = obj2.Geometry.GetBoundingBox(true);
+            doc.Objects.Transform(id, Transform.Translation(0, 0, {target_z} - bb2.Min.Z), true);
+        }}
+        doc.Views.Redraw();
+        return new List<Guid>();
+    }}
+}}
+"""
+    payload = json.dumps({"type": "execute", "script": script}).encode("utf-8")
+    try:
+        response = json.loads(_send_and_receive(payload, timeout=30.0))
+        return response.get("status") == "success"
+    except Exception:
+        return False
 
 
 @mcp.tool()

@@ -736,7 +736,11 @@
         "collision_shape": "oriented_box",
         "placement_priority": "movable"
       },
-      "library_id": "ikea"
+      "library_id": "ikea",
+      "import_correction": {
+        "rotate_x_degrees": 180,
+        "note": "Source geometry is upside-down relative to the bottom_center anchor / floor support plane (observed 2026-07-14)."
+      }
     },
     {
       "asset_id": "ikea-sg-pax-10355118",
@@ -1149,7 +1153,9 @@
         "collision_shape": "oriented_box",
         "placement_priority": "accessory"
       },
-      "library_id": "ikea"
+      "library_id": "ikea",
+      "geometry_status": "defective",
+      "geometry_note": "Community geometry is grossly mis-scaled (placed AABB ~4683x171x1743mm vs catalogue 170x700x650mm, 2026-07-14). Replace the source model, then remove this flag."
     },
     {
       "asset_id": "ikea-sg-skadis-90321619",

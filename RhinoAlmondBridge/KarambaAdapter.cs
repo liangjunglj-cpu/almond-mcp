@@ -209,6 +209,15 @@ namespace RhinoAlmondBridge
                     }
                 }
 
+                // Karamba 3.1 yak packages nest assemblies per target framework
+                // (<version>\net48\KarambaCommon.dll); probe those alongside
+                // each candidate directory itself.
+                foreach (var dir in candidates.ToArray())
+                {
+                    if (string.IsNullOrEmpty(dir)) continue;
+                    candidates.Add(Path.Combine(dir, "net48"));
+                }
+
                 string dllDir = null;
                 foreach (var dir in candidates)
                 {
@@ -226,6 +235,10 @@ namespace RhinoAlmondBridge
 
                 if (dllDir == null)
                 {
+                    // Do not latch the failure: Karamba may be installed (or
+                    // ALMOND_KARAMBA_DIR set) later in the session, so the
+                    // next analysis call should probe again.
+                    _loadAttempted = false;
                     _loadFailure = "api_unavailable: karambaCommon.dll not found. Probed: " +
                         string.Join("; ", candidates.Where(c => !string.IsNullOrEmpty(c)));
                     return;
@@ -246,6 +259,7 @@ namespace RhinoAlmondBridge
                 catch (Exception ex)
                 {
                     _karambaCommonAsm = null;
+                    _loadAttempted = false; // allow a re-probe next call
                     _loadFailure = "api_unavailable: failed to load Karamba assemblies from " +
                         dllDir + ": " + ex.Message;
                 }
