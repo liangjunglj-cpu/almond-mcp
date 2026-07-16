@@ -64,17 +64,41 @@ namespace RhinoAlmondBridge
                     obj.Select(true);
                 doc.Views.Redraw();
 
-                var options = new FileGltfWriteOptions
+                // FileGltfWriteOptions is not in the Rhino 8.0 GA SDK we
+                // compile against (keeps the yak package rh8_0, installable on
+                // every Rhino 8 service release), so bind it via reflection.
+                // On Rhinos that lack the type, ExportSelected falls back to
+                // the exporter defaults (glTF is Y-up by convention there).
+                bool commandSucceeded;
+                object optionsDict = null;
+                var gltfType = typeof(RhinoDoc).Assembly.GetType("Rhino.FileIO.FileGltfWriteOptions");
+                if (gltfType != null)
                 {
-                    MapZToY = true,
-                    ExportMaterials = true,
-                    ExportTextureCoordinates = true,
-                    ExportVertexNormals = true,
-                    ExportVertexColors = true,
-                    ExportOpenMeshes = true,
-                    UseDisplayColorForUnsetMaterials = true
-                };
-                bool commandSucceeded = doc.ExportSelected(outputPath, options.ToDictionary());
+                    var opts = Activator.CreateInstance(gltfType);
+                    foreach (var name in new[]
+                    {
+                        "MapZToY", "ExportMaterials", "ExportTextureCoordinates",
+                        "ExportVertexNormals", "ExportVertexColors",
+                        "ExportOpenMeshes", "UseDisplayColorForUnsetMaterials"
+                    })
+                    {
+                        var prop = gltfType.GetProperty(name);
+                        if (prop != null && prop.CanWrite) prop.SetValue(opts, true);
+                    }
+                    optionsDict = gltfType.GetMethod("ToDictionary")?.Invoke(opts, null);
+                }
+                if (optionsDict != null)
+                {
+                    var export = typeof(RhinoDoc).GetMethod(
+                        "ExportSelected", new[] { typeof(string), optionsDict.GetType() });
+                    commandSucceeded = export != null
+                        ? (bool)export.Invoke(doc, new object[] { outputPath, optionsDict })
+                        : doc.ExportSelected(outputPath);
+                }
+                else
+                {
+                    commandSucceeded = doc.ExportSelected(outputPath);
+                }
                 if (!commandSucceeded || !File.Exists(outputPath))
                     return Error("Rhino GLB export failed. Confirm that Rhino 8's glTF exporter is available.");
 
