@@ -52,6 +52,20 @@ Two pieces work together:
   listens on `127.0.0.1:5000` (local only) inside Rhino and executes what
   the server sends. Starts automatically with Rhino.
 
+## Setting up with an AI assistant?
+
+Paste this to your assistant (Claude, Codex, etc.) — it prevents the two
+most common failure modes (installing a different "Rhino MCP" product, and
+needlessly upgrading Rhino):
+
+> Install **Almond MCP** from https://github.com/liangjunglj-cpu/almond-mcp
+> by following that repo's `AGENTS.md` exactly. The Rhino plugin is
+> **almondbridge** on the Rhino 8 Package Manager
+> (`& "C:\Program Files\Rhino 8\System\Yak.exe" install almondbridge`);
+> the server is **almond-mcp** on PyPI, registered as `uvx almond-mcp`.
+> Do not install any other "Rhino MCP" implementation, and do not upgrade
+> Rhino — every Rhino 8 service release is supported.
+
 ## Setup, step by step
 
 Fresh machine to working in about five minutes. You need Rhino 8 on Windows
