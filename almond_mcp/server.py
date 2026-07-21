@@ -32,6 +32,7 @@ DRAWING_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_DRAWING_ASSET_DIR")
 DIAGRAM_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_DIAGRAM_ASSET_DIR")
 DRAWING_RECIPE_DIR = paths.resolve_dir("RHINO_MCP_DRAWING_RECIPE_DIR")
 CAPSULE_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_CAPSULE_DIR")
+MATERIAL_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_MATERIAL_DIR")
 STATE_DB_PATH = paths.resolve_state_db()
 BRIDGE_HOST = '127.0.0.1'
 BRIDGE_PORT = 5000
@@ -221,6 +222,54 @@ diagram_asset_indexer = AssetLibraryIndexer(
     label="diagram",
 )
 drawing_recipe_indexer = DrawingRecipeIndexer(DRAWING_RECIPE_DIR)
+
+
+class MaterialLibrary:
+    """Curated PBR material definitions (Materialfiles/manifest.json)."""
+
+    REQUIRED = ("material_id", "name", "category", "base_color",
+                "metallic", "roughness", "opacity", "ue_material_slot")
+
+    def __init__(self, directory: str):
+        self.directory = Path(directory)
+        self.materials: dict[str, dict] = {}
+        manifest_path = self.directory / "manifest.json"
+        if not manifest_path.is_file():
+            print(f"Material manifest missing: {manifest_path}", file=sys.stderr)
+            return
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as exc:
+            print(f"Material manifest unreadable: {exc}", file=sys.stderr)
+            return
+        for material in manifest.get("materials", []):
+            if not all(key in material for key in self.REQUIRED):
+                continue
+            self.materials[material["material_id"]] = material
+        print(f"Indexed {len(self.materials)} PBR materials.", file=sys.stderr)
+
+    def get(self, material_id: str) -> dict | None:
+        return self.materials.get(material_id)
+
+    def list(self, category: str = "", query: str = "") -> list[dict]:
+        needle = query.strip().lower()
+        results = []
+        for material in self.materials.values():
+            if category and material["category"] != category:
+                continue
+            if needle:
+                haystack = " ".join([
+                    material["material_id"], material["name"],
+                    material.get("description", ""),
+                    " ".join(material.get("tags", [])),
+                ]).lower()
+                if needle not in haystack:
+                    continue
+            results.append(material)
+        return results
+
+
+material_library = MaterialLibrary(MATERIAL_LIBRARY_DIR)
 retrieval_store = AlmondStore(STATE_DB_PATH)
 retrieval_store.sync_assets(
     list(drawing_asset_indexer.assets.values()),
@@ -1014,6 +1063,171 @@ public class Script
         return response.get("status") == "success"
     except Exception:
         return False
+
+
+def _material_script(material: dict, guid_list: list[str],
+                     apply_render_material: bool, attach_metadata: bool) -> str:
+    """C# for the bridge: create/reuse a PBR doc material, assign it to the
+    objects, and write almond:* user strings (Datasmith metadata in Unreal)."""
+    r, g, b = (int(v) for v in material["base_color"])
+    metallic = float(material["metallic"])
+    roughness = float(material["roughness"])
+    opacity = float(material["opacity"])
+    mat_name = "ALMOND::" + material["material_id"]
+    guid_array = ", ".join(f'"{value}"' for value in guid_list)
+    user_strings = {
+        "almond:material_id": material["material_id"],
+        "almond:material_name": material["name"],
+        "almond:material_category": material["category"],
+        "almond:ue_material_slot": material["ue_material_slot"],
+        "almond:base_color": f"{r},{g},{b}",
+        "almond:metallic": f"{metallic:g}",
+        "almond:roughness": f"{roughness:g}",
+        "almond:opacity": f"{opacity:g}",
+    }
+    set_strings = "\n                ".join(
+        f'obj.Attributes.SetUserString("{key}", "{value.replace(chr(34), "")}");'
+        for key, value in user_strings.items()
+    ) if attach_metadata else "// metadata disabled"
+    assign_material = """
+                var att = obj.Attributes;
+                att.MaterialIndex = matIndex;
+                att.MaterialSource = Rhino.DocObjects.ObjectMaterialSource.MaterialFromObject;
+""" if apply_render_material else "\n                // render material disabled\n"
+    return f"""
+using System;
+using System.Collections.Generic;
+using Rhino;
+
+public class Script
+{{
+    public static List<Guid> Run(RhinoDoc doc)
+    {{
+        int matIndex = -1;
+        string matName = "{mat_name}";
+        for (int i = 0; i < doc.Materials.Count; i++)
+        {{
+            var existing = doc.Materials[i];
+            if (existing != null && !existing.IsDeleted && existing.Name == matName)
+            {{ matIndex = i; break; }}
+        }}
+        if (matIndex < 0)
+        {{
+            var mat = new Rhino.DocObjects.Material();
+            mat.Name = matName;
+            mat.DiffuseColor = System.Drawing.Color.FromArgb({r}, {g}, {b});
+            mat.Transparency = {1.0 - opacity:g};
+            mat.ToPhysicallyBased();
+            var pb = mat.PhysicallyBased;
+            if (pb != null)
+            {{
+                pb.BaseColor = new Rhino.Display.Color4f({r}f / 255f, {g}f / 255f, {b}f / 255f, 1f);
+                pb.Metallic = {metallic:g};
+                pb.Roughness = {roughness:g};
+                pb.Opacity = {opacity:g};
+            }}
+            matIndex = doc.Materials.Add(mat);
+        }}
+
+        var done = new List<Guid>();
+        foreach (string s in new[] {{ {guid_array} }})
+        {{
+            var obj = doc.Objects.FindId(new Guid(s));
+            if (obj == null) continue;{assign_material}                {set_strings}
+            obj.CommitChanges();
+            done.Add(obj.Id);
+        }}
+        doc.Views.Redraw();
+        RhinoApp.WriteLine("Almond material '" + matName + "' applied to " + done.Count + " object(s).");
+        return done;
+    }}
+}}
+"""
+
+
+@mcp.tool()
+def list_materials(category: str = "", query: str = "") -> str:
+    """
+    Lists the curated PBR material library used by assign_material.
+
+    Each entry carries metallic/roughness PBR channels, an Unreal material
+    slot name (ue_material_slot) for deterministic remapping after import,
+    and tags. Categories: metal, plastic, glass, wood, mineral, polymer.
+    """
+    materials = material_library.list(category=category, query=query)
+    return json.dumps({
+        "total": len(materials),
+        "materials": materials,
+        "library_dir": str(material_library.directory),
+    })
+
+
+@mcp.tool()
+def assign_material(
+    guids: list[str],
+    material_id: str,
+    apply_render_material: bool = True,
+    attach_metadata: bool = True,
+) -> str:
+    """
+    Assigns a curated PBR material to Rhino objects and stamps them with
+    machine-readable material metadata for downstream pipelines (Unreal).
+
+    Two effects, independently switchable:
+    - apply_render_material: creates/reuses a physically-based Rhino
+      material (ALMOND::<material_id>) and assigns it per object, so GLB
+      export (publish_to_chestnut) and Datasmith carry real PBR channels.
+    - attach_metadata: writes almond:* user-text keys (material_id, name,
+      category, ue_material_slot, base_color, metallic, roughness, opacity)
+      on each object - Datasmith imports these as asset metadata in Unreal,
+      so materials can be remapped by ue_material_slot deterministically.
+
+    Works on breps, meshes, and block instances (an instance's material
+    applies to definition geometry set to 'by parent'; the metadata is
+    always attached to the instance itself). Call list_materials first to
+    discover material_ids.
+    """
+    material = material_library.get(material_id)
+    if not material:
+        known = ", ".join(sorted(material_library.materials)) or "none loaded"
+        return json.dumps({
+            "status": "error",
+            "message": f"Unknown material_id: {material_id}. Known: {known}",
+        })
+    guid_list = []
+    for value in guids:
+        try:
+            guid_list.append(str(uuid.UUID(str(value))))
+        except ValueError:
+            return json.dumps({
+                "status": "error",
+                "message": f"Invalid Rhino object GUID: {value}",
+            })
+    if not guid_list:
+        return json.dumps({"status": "error", "message": "guids must not be empty."})
+
+    script = _material_script(material, guid_list, apply_render_material, attach_metadata)
+    payload = json.dumps({"type": "execute", "script": script}).encode("utf-8")
+    try:
+        response = json.loads(_send_and_receive(payload, timeout=60.0))
+    except ConnectionRefusedError:
+        return json.dumps({"status": "error", "message": "Rhino bridge is unavailable. Start RhinoAlmondBridge first."})
+    except Exception as exc:
+        return json.dumps({"status": "error", "message": f"Material assignment failed: {exc}"})
+    if response.get("status") != "success":
+        return json.dumps(response)
+    applied = response.get("guids") or []
+    return json.dumps({
+        "status": "success",
+        "material_id": material_id,
+        "rhino_material_name": "ALMOND::" + material_id,
+        "ue_material_slot": material["ue_material_slot"],
+        "applied_count": len(applied),
+        "requested_count": len(guid_list),
+        "applied_guids": applied,
+        "metadata_attached": attach_metadata,
+        "render_material_applied": apply_render_material,
+    })
 
 
 @mcp.tool()

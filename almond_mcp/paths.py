@@ -32,6 +32,7 @@ LIBRARY_DIRS = {
     "RHINO_MCP_DIAGRAM_ASSET_DIR": "DiagramAssetfiles",
     "RHINO_MCP_DRAWING_RECIPE_DIR": "DrawingRecipes",
     "RHINO_MCP_CAPSULE_DIR": "capsules",
+    "RHINO_MCP_MATERIAL_DIR": "Materialfiles",
 }
 
 STATE_DB_ENV = "RHINO_MCP_STATE_DB"

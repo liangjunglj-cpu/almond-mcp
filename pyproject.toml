@@ -1,6 +1,6 @@
 [project]
 name = "almond-mcp"
-version = "0.3.0"
+version = "0.4.0"
 description = "Almond - MCP server for Rhino 8 with a semantic scene layer: curated furniture/drawing/diagram libraries, audited Karamba capsules, structured retrieval (SQLite FTS5 + R-tree scene ledger), and a TCP bridge into Rhino (RhinoAlmondBridge, port 5000)"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -47,6 +47,7 @@ packages = ["almond_mcp"]
 "DiagramAssetfiles/manifest.json" = "almond_mcp/data/DiagramAssetfiles/manifest.json"
 "DrawingRecipes" = "almond_mcp/data/DrawingRecipes"
 "capsules" = "almond_mcp/data/capsules"
+"Materialfiles/manifest.json" = "almond_mcp/data/Materialfiles/manifest.json"
 
 [tool.hatch.build.targets.sdist]
 # Belt and braces on top of .gitignore: downloaded model files and compiled
