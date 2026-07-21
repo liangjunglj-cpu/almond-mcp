@@ -21,7 +21,7 @@ from pathlib import Path
 from fastmcp import FastMCP
 from almond_mcp.ghx_parser import GHParser, validate_capsule_manifest
 from almond_mcp.retrieval_store import AlmondStore
-from almond_mcp import paths
+from almond_mcp import exchange, paths
 
 # ── Constants ────────────────────────────────────────────────────────────────
 
@@ -1713,6 +1713,445 @@ def export_structural_report(path: str = "", limit: int = 50) -> str:
         })
     except Exception as exc:
         return json.dumps({"status": "error", "message": str(exc)})
+
+
+def _restore_and_place_script(contract: dict, materials: dict[str, dict],
+                              x_mm: float, y_mm: float, z_mm: float,
+                              rotation_degrees: float, layer: str) -> str:
+    """C# run after a GLB import: restore metadata, correct the colour drift,
+    collapse duplicate materials, then place per the contract anchor."""
+    lib_rows = []
+    for material_id, material in materials.items():
+        r, g, b = (int(v) for v in material["base_color"])
+        lib_rows.append(
+            '{{ "%s", new object[] {{ "%s", "%s", "%s", "%s", %d, %d, %d, %s, %s, %s }} }}'
+            % (exchange.material_name(material_id), material_id, material["name"],
+               material["category"], material["ue_material_slot"], r, g, b,
+               repr(float(material["metallic"])), repr(float(material["roughness"])),
+               repr(float(material["opacity"])))
+        )
+    anchor = contract["spatial"].get("anchor", "bottom_center")
+    return f"""
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Rhino;
+using Rhino.Geometry;
+using Rhino.DocObjects;
+using Rhino.Display;
+
+public class Script
+{{
+    // material name -> {{ id, name, category, ue_slot, r, g, b, metallic, roughness, opacity }}
+    static readonly Dictionary<string, object[]> Lib = new Dictionary<string, object[]>
+    {{
+        {",\n        ".join(lib_rows) if lib_rows else ""}
+    }};
+
+    public static List<Guid> Run(RhinoDoc doc)
+    {{
+        var imported = new List<RhinoObject>();
+        foreach (string s in new[] {{ {", ".join('"%s"' % g for g in contract["_imported_guids"])} }})
+        {{
+            var o = doc.Objects.FindId(new Guid(s));
+            if (o != null) imported.Add(o);
+        }}
+        if (imported.Count == 0) return new List<Guid>();
+
+        // 1. collapse duplicate materials: glTF import creates one per mesh
+        var canonical = new Dictionary<string, int>();
+        int deduped = 0;
+        for (int i = 0; i < doc.Materials.Count; i++)
+        {{
+            var m = doc.Materials[i];
+            if (m == null || m.IsDeleted || !Lib.ContainsKey(m.Name)) continue;
+            if (!canonical.ContainsKey(m.Name)) canonical[m.Name] = i;
+        }}
+        // 2. restore canonical PBR values (glTF round trip shifts base colour)
+        foreach (var kv in canonical)
+        {{
+            var spec = Lib[kv.Key];
+            var mat = doc.Materials[kv.Value];
+            mat.Name = kv.Key;
+            mat.DiffuseColor = System.Drawing.Color.FromArgb((int)spec[4], (int)spec[5], (int)spec[6]);
+            mat.Transparency = 1.0 - Convert.ToDouble(spec[9]);
+            mat.ToPhysicallyBased();
+            var pb = mat.PhysicallyBased;
+            if (pb != null)
+            {{
+                pb.BaseColor = new Color4f((int)spec[4] / 255f, (int)spec[5] / 255f, (int)spec[6] / 255f, 1f);
+                pb.Metallic = Convert.ToDouble(spec[7]);
+                pb.Roughness = Convert.ToDouble(spec[8]);
+                pb.Opacity = Convert.ToDouble(spec[9]);
+            }}
+            mat.CommitChanges();
+        }}
+
+        int layerIndex = doc.Layers.FindByFullPath("{layer}", -1);
+        if (layerIndex < 0)
+        {{
+            var l = new Layer {{ Name = "{layer}" }};
+            layerIndex = doc.Layers.Add(l);
+        }}
+
+        // 3. re-attach the metadata glTF dropped, keyed off the surviving name
+        int stamped = 0;
+        foreach (var obj in imported)
+        {{
+            var mat = doc.Materials[obj.Attributes.MaterialIndex];
+            string matName = mat != null ? mat.Name : "";
+            if (matName.Length > 0 && Lib.ContainsKey(matName))
+            {{
+                if (canonical.ContainsKey(matName) && obj.Attributes.MaterialIndex != canonical[matName])
+                {{
+                    obj.Attributes.MaterialIndex = canonical[matName];
+                    deduped++;
+                }}
+                obj.Attributes.MaterialSource = ObjectMaterialSource.MaterialFromObject;
+                var spec = Lib[matName];
+                obj.Attributes.SetUserString("almond:material_id", (string)spec[0]);
+                obj.Attributes.SetUserString("almond:material_name", (string)spec[1]);
+                obj.Attributes.SetUserString("almond:material_category", (string)spec[2]);
+                obj.Attributes.SetUserString("almond:ue_material_slot", (string)spec[3]);
+                obj.Attributes.SetUserString("almond:base_color", spec[4] + "," + spec[5] + "," + spec[6]);
+                obj.Attributes.SetUserString("almond:metallic", Convert.ToString(spec[7]));
+                obj.Attributes.SetUserString("almond:roughness", Convert.ToString(spec[8]));
+                obj.Attributes.SetUserString("almond:opacity", Convert.ToString(spec[9]));
+                obj.Attributes.ObjectColor = System.Drawing.Color.FromArgb((int)spec[4], (int)spec[5], (int)spec[6]);
+                obj.Attributes.ColorSource = ObjectColorSource.ColorFromObject;
+                stamped++;
+            }}
+            obj.Attributes.SetUserString("almond:asset_id", "{contract['asset_id']}");
+            obj.Attributes.SetUserString("almond:source_app", "{contract.get('source_app', 'unknown')}");
+            obj.Attributes.LayerIndex = layerIndex;
+            obj.CommitChanges();
+        }}
+
+        // 4. place per the contract anchor, in this document's units
+        double toDoc = RhinoMath.UnitScale(UnitSystem.Millimeters, doc.ModelUnitSystem);
+        var bb = BoundingBox.Empty;
+        foreach (var o in imported) bb.Union(o.Geometry.GetBoundingBox(true));
+        var anchorPt = new Point3d((bb.Min.X + bb.Max.X) / 2, (bb.Min.Y + bb.Max.Y) / 2,
+            "{anchor}" == "center" ? (bb.Min.Z + bb.Max.Z) / 2 : bb.Min.Z);
+        var target = new Point3d({x_mm} * toDoc, {y_mm} * toDoc, {z_mm} * toDoc);
+        var xform = Transform.Translation(target - anchorPt);
+        if (Math.Abs({rotation_degrees}) > 1e-9)
+            xform = xform * Transform.Rotation(RhinoMath.ToRadians({rotation_degrees}), Vector3d.ZAxis, anchorPt);
+        foreach (var o in imported) doc.Objects.Transform(o.Id, xform, true);
+
+        // 5. measure what actually landed, for the contract dimension check
+        var after = BoundingBox.Empty;
+        foreach (var o in imported)
+        {{
+            var refreshed = doc.Objects.FindId(o.Id);
+            if (refreshed != null) after.Union(refreshed.Geometry.GetBoundingBox(true));
+        }}
+        double toMM = RhinoMath.UnitScale(doc.ModelUnitSystem, UnitSystem.Millimeters);
+        RhinoApp.WriteLine(string.Format(
+            "ALMOND_IMPORT stamped={{0}} deduped={{1}} w={{2:F1}} d={{3:F1}} h={{4:F1}}",
+            stamped, deduped,
+            (after.Max.X - after.Min.X) * toMM,
+            (after.Max.Y - after.Min.Y) * toMM,
+            (after.Max.Z - after.Min.Z) * toMM));
+        System.IO.File.WriteAllText(
+            System.IO.Path.Combine(System.IO.Path.GetTempPath(), "almond_import_report.json"),
+            "{{\\"stamped\\":" + stamped + ",\\"deduped\\":" + deduped
+            + ",\\"width\\":" + ((after.Max.X - after.Min.X) * toMM).ToString("F1")
+            + ",\\"depth\\":" + ((after.Max.Y - after.Min.Y) * toMM).ToString("F1")
+            + ",\\"height\\":" + ((after.Max.Z - after.Min.Z) * toMM).ToString("F1") + "}}");
+        doc.Views.Redraw();
+        return imported.Select(o => o.Id).ToList();
+    }}
+}}
+"""
+
+
+@mcp.tool()
+def export_asset_contract(
+    guids: list[str],
+    asset_id: str,
+    name: str = "",
+    output_dir: str = "",
+) -> str:
+    """
+    Exports Rhino objects as a portable Almond asset: a GLB plus an asset
+    contract (.almond.json) carrying what the file cannot.
+
+    The contract records real dimensions in mm, the anchor and support plane,
+    clearances, and the Almond material_id of every object - so another
+    application (Blender, Unreal, another Rhino) can restore full meaning
+    even though glTF drops per-object metadata. Pair with
+    import_asset_contract on the receiving side.
+
+    Args:
+        guids: Rhino object GUIDs to export (from execute_rhino_script).
+        asset_id: Stable id, e.g. "canopy-pavilion-01" (letters, digits, . _ -).
+        name: Human-readable name; defaults to asset_id.
+        output_dir: Destination folder. Default: <user data dir>/exchange.
+    Returns:
+        JSON with the glb path, contract path, and recorded dimensions.
+    """
+    if not guids:
+        return json.dumps({"status": "error", "message": "At least one GUID is required."})
+    try:
+        target_dir = Path(output_dir) if output_dir else paths.user_data_dir() / "exchange"
+        glb_path, contract_path = exchange.contract_paths(target_dir, asset_id)
+    except Exception as exc:
+        return json.dumps({"status": "error", "message": str(exc)})
+
+    payload = json.dumps({
+        "type": "export_glb",
+        "guids": guids,
+        "output_path": str(glb_path),
+    }).encode("utf-8")
+    try:
+        result = json.loads(_send_and_receive(payload, timeout=90.0))
+    except ConnectionRefusedError:
+        return json.dumps({"status": "error", "message": "Rhino bridge is unavailable."})
+    except Exception as exc:
+        return json.dumps({"status": "error", "message": f"GLB export failed: {exc}"})
+    if result.get("status") != "success":
+        return json.dumps(result)
+
+    bounds = result.get("bounds") or {}
+    if not bounds:
+        return json.dumps({"status": "error", "message": "Export returned no bounds."})
+    # export_glb reports bounds in document units
+    unit_scale = {"Millimeters": 1.0, "Centimeters": 10.0, "Meters": 1000.0,
+                  "Inches": 25.4, "Feet": 304.8}.get(result.get("units", "Millimeters"), 1.0)
+    bounds_mm = {
+        "min": [float(v) * unit_scale for v in bounds["min"]],
+        "max": [float(v) * unit_scale for v in bounds["max"]],
+    }
+    material_groups = _material_groups(guids)
+    try:
+        contract = exchange.build_contract(
+            asset_id=asset_id,
+            name=name or asset_id,
+            glb_filename=glb_path.name,
+            bounds_mm=bounds_mm,
+            materials=material_groups,
+            source_app="rhino",
+            object_count=len(result.get("object_guids", guids)),
+        )
+    except ValueError as exc:
+        return json.dumps({"status": "error", "message": str(exc)})
+    contract_path.write_text(json.dumps(contract, indent=2), encoding="utf-8")
+    return json.dumps({
+        "status": "success",
+        "asset_id": asset_id,
+        "glb_path": str(glb_path),
+        "contract_path": str(contract_path),
+        "dimensions_mm": contract["dimensions_mm"],
+        "materials": material_groups,
+        "next_step": "Open this contract elsewhere with import_asset_contract, or "
+                     "run get_blender_helper_script('import') to load it in Blender.",
+    })
+
+
+def _material_groups(guids: list[str]) -> list[dict]:
+    """Ask Rhino which Almond material each object carries."""
+    script = """
+using System;
+using System.Collections.Generic;
+using System.IO;
+using Rhino;
+
+public class Script
+{
+    public static List<Guid> Run(RhinoDoc doc)
+    {
+        var rows = new List<string>();
+        foreach (string s in new[] { %s })
+        {
+            var obj = doc.Objects.FindId(new Guid(s));
+            if (obj == null) continue;
+            string mid = obj.Attributes.GetUserString("almond:material_id");
+            if (string.IsNullOrEmpty(mid))
+            {
+                var mat = doc.Materials[obj.Attributes.MaterialIndex];
+                if (mat != null && mat.Name != null && mat.Name.StartsWith("ALMOND::"))
+                    mid = mat.Name.Substring(8);
+            }
+            if (!string.IsNullOrEmpty(mid)) rows.Add(mid + "|" + s);
+        }
+        File.WriteAllLines(Path.Combine(Path.GetTempPath(), "almond_matgroups.txt"), rows);
+        return new List<Guid>();
+    }
+}
+""" % ", ".join('"%s"' % g for g in guids)
+    try:
+        _send_and_receive(json.dumps({"type": "execute", "script": script}).encode("utf-8"),
+                          timeout=45.0)
+        report = Path(tempfile.gettempdir()) / "almond_matgroups.txt"
+        groups: dict[str, list[str]] = {}
+        if report.is_file():
+            for line in report.read_text(encoding="utf-8").splitlines():
+                if "|" in line:
+                    material_id, guid = line.split("|", 1)
+                    groups.setdefault(material_id, []).append(guid)
+        return [{"material_id": k, "objects": v} for k, v in sorted(groups.items())]
+    except Exception:
+        return []
+
+
+@mcp.tool()
+def import_asset_contract(
+    contract_path: str,
+    x_mm: float = 0,
+    y_mm: float = 0,
+    z_mm: float = 0,
+    rotation_degrees: float = 0,
+    layer: str = "ALMOND-EXCHANGE",
+) -> str:
+    """
+    Imports an Almond asset contract (from Blender, Unreal, or another Rhino)
+    into the open Rhino document, restoring everything the file format drops.
+
+    Runs the full receive sequence: import the GLB, collapse the duplicate
+    materials glTF creates, restore canonical PBR values from the Almond
+    material library (glTF round trips shift base colours), re-attach the
+    almond:* metadata keyed off the surviving material name, place the asset
+    at the requested point using the contract's anchor, and verify the
+    measured size against the contract's recorded dimensions.
+
+    Args:
+        contract_path: Path to a .almond.json contract file.
+        x_mm, y_mm, z_mm: Placement point in millimetres (contract anchor).
+        rotation_degrees: Rotation about world Z.
+        layer: Destination layer, created if absent.
+    Returns:
+        JSON with counts restored/deduplicated and a dimension_check comparing
+        what landed against the contract.
+    """
+    try:
+        contract = exchange.load_contract(contract_path)
+    except Exception as exc:
+        return json.dumps({"status": "error", "message": str(exc)})
+
+    import_script = """
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Rhino;
+
+public class Script
+{
+    public static List<Guid> Run(RhinoDoc doc)
+    {
+        var before = new HashSet<Guid>(doc.Objects.Select(o => o.Id));
+        RhinoApp.RunScript("_-Import \\"%s\\" _Enter", false);
+        var added = doc.Objects.Where(o => !before.Contains(o.Id)).Select(o => o.Id).ToList();
+        File.WriteAllLines(Path.Combine(Path.GetTempPath(), "almond_imported.txt"),
+            added.Select(g => g.ToString()));
+        return added;
+    }
+}
+""" % contract["_resolved_file"].replace("\\", "\\\\")
+    try:
+        result = json.loads(_send_and_receive(
+            json.dumps({"type": "execute", "script": import_script}).encode("utf-8"),
+            timeout=120.0))
+    except ConnectionRefusedError:
+        return json.dumps({"status": "error", "message": "Rhino bridge is unavailable."})
+    except Exception as exc:
+        return json.dumps({"status": "error", "message": f"Import failed: {exc}"})
+    if result.get("status") != "success":
+        return json.dumps(result)
+    imported = result.get("guids") or []
+    if not imported:
+        return json.dumps({"status": "error",
+                           "message": "Rhino imported no objects from the GLB."})
+
+    contract["_imported_guids"] = imported
+    needed = {row["material_id"] for row in contract.get("materials", [])}
+    library = {mid: material_library.get(mid) for mid in needed}
+    known = {mid: spec for mid, spec in library.items() if spec}
+    unknown = sorted(mid for mid, spec in library.items() if not spec)
+
+    script = _restore_and_place_script(contract, known, x_mm, y_mm, z_mm,
+                                       rotation_degrees, layer)
+    try:
+        restore = json.loads(_send_and_receive(
+            json.dumps({"type": "execute", "script": script}).encode("utf-8"),
+            timeout=120.0))
+    except Exception as exc:
+        return json.dumps({"status": "error",
+                           "message": f"Imported, but restore/place failed: {exc}",
+                           "imported_guids": imported})
+    if restore.get("status") != "success":
+        return json.dumps({"status": "error", "message": restore.get("message", "restore failed"),
+                           "imported_guids": imported})
+
+    report_path = Path(tempfile.gettempdir()) / "almond_import_report.json"
+    report = {}
+    if report_path.is_file():
+        try:
+            report = json.loads(report_path.read_text(encoding="utf-8"))
+        except ValueError:
+            report = {}
+    check = exchange.dimension_report(contract, report) if report else {"status": "unknown"}
+    return json.dumps({
+        "status": "success",
+        "asset_id": contract["asset_id"],
+        "source_app": contract.get("source_app", "unknown"),
+        "imported_count": len(imported),
+        "metadata_restored": report.get("stamped", 0),
+        "materials_deduplicated": report.get("deduped", 0),
+        "unknown_material_ids": unknown,
+        "dimension_check": check,
+        "layer": layer,
+        "imported_guids": imported,
+    })
+
+
+@mcp.tool()
+def get_blender_helper_script(action: str, asset_id: str = "", name: str = "",
+                              output_dir: str = "", material_id: str = "",
+                              object_names: list[str] | None = None) -> str:
+    """
+    Returns Python to run inside Blender (via blender-mcp's execute_code) so
+    Blender participates in the Almond workflow without a dedicated bridge.
+
+    Actions:
+        "export"    - export the current Blender selection as an Almond asset
+                      contract + GLB (measured from evaluated mesh data,
+                      because Blender inflates curve bounding boxes).
+        "materials" - create Almond library materials in Blender (sRGB values
+                      converted to linear) and assign them to named objects,
+                      tagging both with almond:* properties.
+
+    Args:
+        action: "export" or "materials".
+        asset_id, name, output_dir: for "export" (output_dir defaults to the
+            Almond exchange folder).
+        material_id, object_names: for "materials".
+    Returns:
+        JSON with a "script" field to pass to Blender's execute_code.
+    """
+    action = action.strip().lower()
+    if action == "export":
+        if not asset_id:
+            return json.dumps({"status": "error", "message": "asset_id is required for export."})
+        target = output_dir or str(paths.user_data_dir() / "exchange")
+        return json.dumps({
+            "status": "success",
+            "action": "export",
+            "script": exchange.blender_export_script(asset_id, name or asset_id, target),
+            "note": "Run in Blender, then call import_asset_contract with the printed path.",
+        })
+    if action == "materials":
+        material = material_library.get(material_id)
+        if not material:
+            return json.dumps({"status": "error",
+                               "message": f"Unknown material_id: {material_id}. Call list_materials."})
+        if not object_names:
+            return json.dumps({"status": "error", "message": "object_names is required."})
+        script = exchange.blender_material_script(
+            [material], [{"material_id": material_id, "objects": object_names}])
+        return json.dumps({"status": "success", "action": "materials", "script": script})
+    return json.dumps({"status": "error", "message": 'action must be "export" or "materials".'})
 
 
 @mcp.tool()

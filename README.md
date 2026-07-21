@@ -263,6 +263,34 @@ Every run is recorded in the local state database;
 (inputs, pathway, span/deflection/utilization/reactions, warnings,
 PASS/FAIL). Details: `docs/structural-validation.md`.
 
+## Materials and cross-application exchange
+
+Almond carries a curated PBR material library (`list_materials`) and stamps
+geometry with machine-readable material metadata (`assign_material`): a
+physically-based Rhino material plus `almond:*` user text (material_id,
+`ue_material_slot`, base colour, metallic, roughness, opacity). GLB export
+then carries real PBR channels, and Datasmith imports the user text as
+Unreal asset metadata — so imports remap to your master materials by slot
+name instead of being guessed from display colours.
+
+The same metadata makes assets portable between applications:
+
+```text
+export_asset_contract(guids=[...], asset_id="canopy-01")   # GLB + .almond.json
+import_asset_contract(contract_path="...", x_mm=0, y_mm=0) # into any Rhino doc
+get_blender_helper_script(action="export", asset_id="bench-01")
+```
+
+An *asset contract* travels beside the GLB carrying what the file format
+drops — real dimensions, anchor, clearances, and each object's Almond
+`material_id`. On import Almond collapses the duplicate materials glTF
+creates, restores canonical colours (glTF round trips shift them), re-attaches
+the metadata, places the asset by its anchor, and verifies the measured size
+against the contract. `get_blender_helper_script` returns Python to run in
+Blender (through blender-mcp) so Blender joins the workflow without a
+dedicated bridge. Background and measurements:
+`docs/cross-app-blender.md`.
+
 ## Karamba capsules
 
 Audited capsule manifests (`capsules/*.capsule.json`) declare typed
