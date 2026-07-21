@@ -1,5 +1,55 @@
 # Food4Rhino listing — ready-to-paste fields
 
+## Updating an existing listing (current release: bridge 0.2.4 / server 0.5.0)
+
+Steps: sign in at food4rhino.com with your Rhino account → click your
+username (top right) → **My apps** (or **Content**) → **Almond MCP** →
+**Edit**. Change the fields below, then **Save** at the bottom.
+
+**1. Short Description** — replace with:
+
+```
+Connect Rhino 8 to Claude AI via MCP: semantic scene ledger, curated asset and PBR material libraries, layout validation, Karamba3D-backed structural checks with exportable reports, and portable asset contracts for Blender/Unreal. Free & open source (MIT).
+```
+
+**2. Body** — replace the two feature paragraphs with the *Description*
+section below (it now leads with materials and cross-app exchange).
+
+**3. Version / release notes** — set to:
+
+```
+almondbridge 0.2.4 / almond-mcp 0.5.0
+
+- Installs on EVERY Rhino 8 service release (8.0+). Earlier builds were
+  tagged rh8_32 and were invisible in the Package Manager to users below
+  8.32 - if you could not find the package before, you can now.
+- Curated PBR material library: assign_material writes a physically-based
+  Rhino material plus machine-readable metadata, so GLB and Datasmith
+  carry real materials into Unreal instead of guessed display colours.
+- Cross-application asset exchange: export_asset_contract /
+  import_asset_contract move assets between Rhino, Blender and Unreal with
+  dimensions, anchors and material identity preserved; Almond restores the
+  metadata and colours that glTF drops, and collapses duplicate materials.
+- Structural validation runs are recorded and exportable as Markdown
+  reports; Karamba3D 3.1 binds correctly when installed via the Package
+  Manager.
+```
+
+**4. Downloads** — edit the existing file entry (or add a new one and
+delete the old):
+
+| Sub-field | Value |
+| --- | --- |
+| File Title | `almondbridge 0.2.4 — Rhino 8 bridge plugin (Windows)` |
+| Description | `Rhino-side bridge for the Almond MCP server. Easiest install: Rhino 8 _PackageManager, search "almondbridge" (works on any Rhino 8 release). This download is the same package for offline install. The AI-side server installs with: uvx almond-mcp (PyPI).` |
+| File | `dist\yak\almondbridge-0.2.4-rh8_0-any.yak` |
+
+Everything else — Title, GUID, License, URLs, icon, Platform — stays as
+it is. Re-saving may put the app back into moderation for a short time;
+that is normal and the existing page stays live meanwhile.
+
+---
+
 ## Exact "Create App" form fields (matched to the live form, 2026-07-14)
 
 | Form field | Value |
@@ -67,6 +117,15 @@ AI, MCP, Claude, automation, LLM, Karamba, structural analysis, furniture, scene
 Almond connects Rhino 8 to Claude (or any MCP client) through a semantic
 design layer, so a language model can build with spatial awareness instead
 of guessing:
+
+- PBR materials with meaning: a curated material library assigns real
+  physically-based Rhino materials and writes machine-readable metadata
+  onto each object, so GLB export and Datasmith carry true materials into
+  Unreal and remap to your master materials by slot name.
+- Cross-application asset exchange: assets move between Rhino, Blender and
+  Unreal with dimensions, anchors, clearances and material identity intact.
+  Almond restores the metadata and colours that glTF silently drops, and
+  collapses the duplicate materials importers create.
 
 - A persistent scene ledger (SQLite): scenes, rooms, placed instances,
   revision history. The model queries the current state instead of
