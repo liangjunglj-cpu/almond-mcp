@@ -7,6 +7,13 @@ Exception: Yak listings are immutable, so a metadata-only fix (description,
 keywords, icon) is re-pushed as a bridge-only patch bump without a PyPI
 release (e.g. bridge 0.2.1 over python 0.2.0).
 
+**Realign after any drift.** The bridge accumulated its own patch cadence
+during 0.2.x while the server reached 0.5.0, and two different numbers for
+one product confuses users ("I have 0.2.4 - is that current?"). Both were
+realigned at 0.5.0 (bridge republished with identical code, version bump
+only). When a bridge-only hotfix is needed, prefer jumping straight to the
+server's next version rather than incrementing the bridge independently.
+
 ## Pre-flight
 
 ```powershell

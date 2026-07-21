@@ -1,6 +1,6 @@
 # Food4Rhino listing — ready-to-paste fields
 
-## Updating an existing listing (current release: bridge 0.2.4 / server 0.5.0)
+## Updating an existing listing (current release: 0.5.0, both halves aligned)
 
 Steps: sign in at food4rhino.com with your Rhino account → click your
 username (top right) → **My apps** (or **Content**) → **Almond MCP** →
@@ -18,7 +18,7 @@ section below (it now leads with materials and cross-app exchange).
 **3. Version / release notes** — set to:
 
 ```
-almondbridge 0.2.4 / almond-mcp 0.5.0
+almondbridge 0.5.0 / almond-mcp 0.5.0
 
 - Installs on EVERY Rhino 8 service release (8.0+). Earlier builds were
   tagged rh8_32 and were invisible in the Package Manager to users below
@@ -40,9 +40,9 @@ delete the old):
 
 | Sub-field | Value |
 | --- | --- |
-| File Title | `almondbridge 0.2.4 — Rhino 8 bridge plugin (Windows)` |
+| File Title | `almondbridge 0.5.0 — Rhino 8 bridge plugin (Windows)` |
 | Description | `Rhino-side bridge for the Almond MCP server. Easiest install: Rhino 8 _PackageManager, search "almondbridge" (works on any Rhino 8 release). This download is the same package for offline install. The AI-side server installs with: uvx almond-mcp (PyPI).` |
-| File | `dist\yak\almondbridge-0.2.4-rh8_0-any.yak` |
+| File | `dist\yak\almondbridge-0.5.0-rh8_0-any.yak` |
 
 Everything else — Title, GUID, License, URLs, icon, Platform — stays as
 it is. Re-saving may put the app back into moderation for a short time;
