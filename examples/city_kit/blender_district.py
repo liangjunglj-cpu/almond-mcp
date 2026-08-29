@@ -116,15 +116,15 @@ wnodes, wlinks = world.node_tree.nodes, world.node_tree.links
 sky = wnodes.new("ShaderNodeTexSky")
 try:
     sky.sky_type = "NISHITA"
-    sky.sun_elevation = math.radians(21)
-    sky.sun_rotation = math.radians(215)
+    sky.sun_elevation = math.radians(32)
+    sky.sun_rotation = math.radians(155)
     sky.sun_intensity = 1.0
     sky.altitude = 30
 except Exception:
     pass
 bg = wnodes.get("Background")
 wlinks.new(sky.outputs["Color"], bg.inputs["Color"])
-bg.inputs["Strength"].default_value = 1.0
+bg.inputs["Strength"].default_value = 0.55
 
 # ── cameras (track-to empties) ─────────────────────────────────────────────
 def make_camera(name, loc, target, lens=35):
@@ -143,7 +143,7 @@ def make_camera(name, loc, target, lens=35):
     return cam
 
 cam_aerial = make_camera("aerial", (215, -75, 115), (66, 52, 6), lens=42)
-cam_street = make_camera("street", (69.0, 44.5, 1.7), (92, 70, 14), lens=28)
+cam_street = make_camera("street", (66.0, 38.0, 1.7), (95, 68, 12), lens=32)
 
 # ── render settings ────────────────────────────────────────────────────────
 scene.render.engine = "CYCLES"
@@ -168,6 +168,7 @@ except Exception:
 scene.render.resolution_x = 1600
 scene.render.resolution_y = 1000
 scene.view_settings.view_transform = "AgX"
+scene.view_settings.exposure = -0.9
 scene.view_settings.look = "AgX - Medium High Contrast"
 
 for cam, out in ((cam_aerial, "blender_aerial.png"), (cam_street, "blender_street.png")):
