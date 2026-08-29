@@ -77,6 +77,25 @@ solver returns Karamba's own topology-specific diagnostics (rigid-body
 modes); a defective model makes the native engine throw rather than answer;
 and the two pathways give different numbers for identical geometry.
 
+## Verified template pathway (2026-08-29, live, bridge 0.5.3)
+
+| Test geometry | Members | Pathway | Result | Key output |
+| --- | --- | --- | --- | --- |
+| Portal frame 8x4 m, 2 base points, via run_gh_definition | 3 | **capsule direct** | ok | disp 2.34 mm, mass 1413 kg, no rigid-body modes |
+| Connected 2-story 2-bay frame | 10 | **api** | PASS | connected frames solve on the api path (high confidence) |
+| Frame slice with offset girder axes (members not touching) | 14 | **template** | FAIL (honest) | api threw; capsule solved and reported 16 rigid-body modes — real Karamba diagnostics instead of a rule-based guess |
+| Connected 3-story 3-bay frame | 21 | rule_based | fallback | both paths hit Karamba's TRIAL limit; the template surfaced it explicitly (see below) |
+
+**Root cause of historical "AnalyzeThI failed" events:** the Karamba
+**trial version caps models at 20 beam elements**. The api path throws an
+opaque reflection error at the cap; the template path surfaces Karamba's
+own message ("The maximum number of beam elements in the trial-version of
+Karamba3D is 20"). Disconnected member axes (e.g. girder centerlines that
+don't touch column axes) are the other historical thrower — the template
+diagnoses those too, as rigid-body-mode warnings. With a licensed Karamba,
+both pathways scale past 20 elements. Practical rule: validate per span
+group / frame line and keep sets ≤ 20 elements on a trial license.
+
 ## Known gaps (issue #6)
 
 In karambaCommon 3.1.60519, two result extractions have signature drift:
