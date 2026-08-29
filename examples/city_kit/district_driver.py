@@ -18,6 +18,7 @@ Run phases from the repo root against a running Rhino (mm document):
   uv run --no-sync python examples/city_kit/district_driver.py A   # north blocks
   uv run --no-sync python examples/city_kit/district_driver.py B   # south blocks + urban
   uv run --no-sync python examples/city_kit/district_driver.py C   # checks + dossier + captures
+  uv run --no-sync python examples/city_kit/district_driver.py D   # kit extension: arcades, bay windows, roof gardens
 
 State: GUIDs in <scratch>/district_guids.json; dossier + captures land in
 the same scratch directory (set ALMOND_DISTRICT_SCRATCH to override).
@@ -249,6 +250,54 @@ def street_lamp(posts, heads, x, y):
 def tree(trunks, crowns, x, y):
     trunks.append([x, y, 0, 0, 0, 1, 2800, 150])
     crowns.append([x-1700, y-1700, 2800, x+1700, y+1700, 5800])
+
+
+def arcade(cols, lintels, slabs, x0, x1, y_face, south=True, depth=3000, bay=6000, h=4200):
+    """Colonnade along a face: round columns + continuous lintel + canopy slab."""
+    d = -1 if south else 1
+    y_out = y_face + d * depth
+    n = int((x1 - x0) / bay)
+    for i in range(n + 1):
+        cols.append([x0 + i * bay, y_out, 0, 0, 0, 1, h, 140])
+    lintels.append([x0 - 150, min(y_out, y_out - d * 300), h,
+                    x1 + 150, max(y_out, y_out - d * 300), h + 450])
+    slabs.append([x0 - 150, min(y_face, y_out), h + 450, x1 + 150, max(y_face, y_out), h + 600])
+
+def bay_window(frames, glass, x, y_face, zb, w=2400, d=800, south=True):
+    """Projecting bay window: side cheeks + front frame + three glass panes."""
+    dd = -1 if south else 1
+    yf = y_face + dd * d
+    z0, z1 = zb + 450, zb + 2600
+    frames.append([x, min(y_face, yf), z0 - 120, x + 90, max(y_face, yf), z1 + 120])
+    frames.append([x + w - 90, min(y_face, yf), z0 - 120, x + w, max(y_face, yf), z1 + 120])
+    frames.append([x, yf, z0 - 120, x + w, yf + dd * 60, z0])           # front sill
+    frames.append([x, yf, z1, x + w, yf + dd * 60, z1 + 120])           # front head
+    frames.append([x, min(y_face, yf), zb + 300, x + w, max(y_face, yf), z0 - 120])  # apron
+    glass.append([x + 110, yf, z0, x + w - 110, yf + dd * 30, z1])
+    glass.append([x + 20, min(y_face, yf) + 150, z0, x + 70, max(y_face, yf) - 60, z1])
+    glass.append([x + w - 70, min(y_face, yf) + 150, z0, x + w - 20, max(y_face, yf) - 60, z1])
+
+def roof_garden(decks, planters, hedges, posts, slats, x0, y0, x1, y1, z):
+    """Roof garden: perimeter planters + hedges, deck field, pergola strip."""
+    t, hh = 500.0, 550.0
+    decks.append([x0 + t, y0 + t, z, x1 - t, y1 - t, z + 80])
+    planters += [[x0, y0, z, x1, y0 + t, z + hh], [x0, y1 - t, z, x1, y1, z + hh],
+                 [x0, y0 + t, z, x0 + t, y1 - t, z + hh], [x1 - t, y0 + t, z, x1, y1 - t, z + hh]]
+    hedges += [[x0 + 60, y0 + 60, z + hh, x1 - 60, y0 + t - 60, z + hh + 700],
+               [x0 + 60, y1 - t + 60, z + hh, x1 - 60, y1 - 60, z + hh + 700],
+               [x0 + 60, y0 + t, z + hh, x0 + t - 60, y1 - t, z + hh + 700],
+               [x1 - t + 60, y0 + t, z + hh, x1 - 60, y1 - t, z + hh + 700]]
+    px0, px1 = x0 + (x1 - x0) * 0.55, x1 - t - 800
+    py0, py1 = y0 + t + 800, y1 - t - 800
+    if px1 - px0 > 3000 and py1 - py0 > 3000:
+        for (px, py) in ((px0, py0), (px1, py0), (px1, py1), (px0, py1)):
+            posts.append([px - 60, py - 60, z, px + 60, py + 60, z + 2600])
+        for i in range(int((px1 - px0) / 600)):
+            slats.append([px0 + i * 600, py0 - 120, z + 2600, px0 + i * 600 + 120, py1 + 120, z + 2750])
+        for (bx0, by0, bx1, by1) in ((px0 + 600, py0 + 600, px0 + 2400, py0 + 1200),
+                                     (px0 + 600, py1 - 1200, px0 + 2400, py1 - 600)):
+            planters.append([bx0, by0, z, bx1, by1, z + 450])
+            hedges.append([bx0 + 50, by0 + 50, z + 450, bx1 - 50, by1 - 50, z + 1000])
 
 # ══════════════ district geometry ══════════════
 H_RES, H_TWR, H_POD = 3000.0, 3200.0, 4500.0
@@ -509,6 +558,64 @@ if PHASE == "B":
               open(os.path.join(SCRATCH, "sw_se_meta.json"), "w"))
     json.dump(G, open(GUIDS_PATH, "w"))
     log(f"PHASE B DONE: {sum(len(v) for v in G.values())} objects")
+    sys.exit(0)
+
+
+if PHASE == "D":
+    log("=== DISTRICT PHASE D: kit extension - arcades, bay windows, roof gardens ===")
+    ax, ay = BLK["NW"]; bx, by = BLK["NE"]
+    sx, sy = BLK["SW"]; cx, cy = BLK["SE"]
+
+    # arcades: podium south face over the sidewalk; library west face onto the plaza
+    ac, al, asl = [], [], []
+    arcade(ac, al, asl, bx + 2000, bx + 62000, by, south=True)
+    arcade(ac, al, asl, cx + 34000, cx + 58000, cy + 2000, south=True)
+    add_cylinders("x_arc_cols", "District::Kit::Arcades", ac)
+    add_boxes("x_arc_lintels", "District::Kit::Arcades", al)
+    add_boxes("x_arc_slabs", "District::Kit::Arcades", asl)
+
+    # bay windows: perimeter housing north street face (floors 2-5, every other
+    # module) and one per terrace unit at ground
+    bf, bg = [], []
+    for s in range(1, 6):
+        for i in range(0, 20, 2):
+            bay_window(bf, bg, ax + 2400 + i * MODULE, ay + 44000, s * H_RES, south=False)
+    for (ry, run) in ((2000.0, 4), (24000.0, 4)):
+        for u in range(run):
+            bay_window(bf, bg, sx + 2000 + u * 6000 + 1800, sy + ry, 0, south=True)
+    add_boxes("x_bay_frames", "District::Kit::BayWindows", bf)
+    add_boxes("x_bay_glass", "District::Kit::BayWindows", bg)
+
+    # roof gardens: podium roof (south of the towers), perimeter north wing, timber mid-rise
+    gd, gp, gh, gpost, gslat = [], [], [], [], []
+    roof_garden(gd, gp, gh, gpost, gslat, bx + 4000, by + 1000, bx + 60000, by + 8200, 2 * H_POD)
+    roof_garden(gd, gp, gh, gpost, gslat, ax + 16000, ay + 32000, ax + 48000, ay + 43000, 6 * H_RES)
+    roof_garden(gd, gp, gh, gpost, gslat, sx + 36000, sy + 2000, sx + 60000, sy + 18000, 5 * H_RES)
+    add_boxes("x_rg_decks", "District::Kit::RoofGardens", gd)
+    add_boxes("x_rg_planters", "District::Kit::RoofGardens", gp)
+    add_boxes("x_rg_hedges", "District::Kit::RoofGardens", gh)
+    add_boxes("x_rg_posts", "District::Kit::RoofGardens", gpost)
+    add_boxes("x_rg_slats", "District::Kit::RoofGardens", gslat)
+
+    for batch, mat, role in [
+        ("x_arc_cols", "concrete-smooth", "arcade_column"),
+        ("x_arc_lintels", "concrete-smooth", "arcade_lintel"),
+        ("x_arc_slabs", "concrete-smooth", "arcade_canopy"),
+        ("x_bay_frames", "wood-oak", "bay_window_frame"),
+        ("x_bay_glass", "glass-clear", "bay_window"),
+        ("x_rg_decks", "wood-birch-ply", "roof_deck_boards"),
+        ("x_rg_planters", "concrete-boardformed", "planter"),
+        ("x_rg_hedges", "steel-painted-sage", "hedge"),
+        ("x_rg_posts", "wood-walnut", "pergola_post"),
+        ("x_rg_slats", "wood-walnut", "pergola_slat"),
+    ]:
+        ids = G.get(batch, [])
+        if ids:
+            json.loads(assign(ids, mat, structural_role=role))
+    log(f"kit extension: {len(ac)} arcade columns, {len(bf)//5} bay windows, "
+        f"3 roof gardens ({len(gp)} planters)")
+    json.dump(G, open(GUIDS_PATH, "w"))
+    log(f"PHASE D DONE: {sum(len(v) for v in G.values())} district objects")
     sys.exit(0)
 
 # ══════════════ PHASE C: materials, checks, narration, dossier ══════════════

@@ -65,5 +65,29 @@ captures) lands in `%TEMP%/almond_district` or `$ALMOND_DISTRICT_SCRATCH`.
    `C:\Users\liang\OneDrive\Documents\almond-mcp`.
 2. Session memory (`construction-knowledge-layer` memory file) carries the
    state; this README carries the workflow.
-3. Extend by adding kit functions (roof gardens, arcades, bay windows...)
-   or new blocks - keep the phase pattern and the per-system validation.
+3. Extend by adding kit functions or new blocks - keep the phase pattern
+   and the per-system validation.
+
+## Phase D + Blender replication (added 2026-08-30)
+
+Phase D extends the kit with **arcades** (colonnade + lintel + canopy over
+the podium sidewalk and the plaza edge), **bay windows** (58 projecting
+units on the housing street faces and terraces), and **roof gardens**
+(perimeter planters + hedges, deck, pergola on three roofs).
+
+`blender_district.py` replicates the district in Blender with real
+material and lighting quality: export one GLB per Almond material via
+`export_asset_contract` (the .almond.json contract's material_id ->
+object-guid map is what makes the deterministic per-material split
+possible, since glTF flattens per-object identity), split foliage and
+lamp heads into their own files, then run
+
+```bash
+blender -b -P examples/city_kit/blender_district.py
+```
+
+which imports every GLB, builds a Cycles Principled material per
+material_id (glass with transmission, metals metallic, concrete/brick
+with noise bump, foliage green, lamp heads emissive), auto-rescales
+mm->m, adds a Nishita sun/sky and ground, and renders an aerial and a
+street view (AgX, denoised).
