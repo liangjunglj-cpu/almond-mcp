@@ -62,6 +62,14 @@ def test_manifest_is_valid():
     reference = manifest["reference"]
     assert reference["live_loads_kpa"]["office"] > 0
     assert reference["material_densities_kg_m3"]["steel_rolled"] > 7000
+    egress = reference["egress_rules"]
+    assert egress["occupant_load_m2_per_person"]["business"] == 9.3
+    assert egress["exit_separation_fraction_of_diagonal"]["sprinklered"] < 0.5
+    assert egress["stair_rules_mm"]["max_riser"] == 180
+    assert egress["min_widths_mm"]["exit_stair"] == 1120
+    tiers = egress["exits_required_by_occupant_load"]
+    assert tiers[0]["exits"] == 1 and tiers[-1]["max_occupants"] is None
+    assert egress["fire_resistance"]["solid_reinforced_concrete_wall_mm"]["2hr"] == 125
 
 
 def test_library_loads_and_filters():

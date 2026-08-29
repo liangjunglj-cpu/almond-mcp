@@ -594,6 +594,46 @@
       "water": 1000,
       "snow_fresh": 130
     },
+    "egress_rules": {
+      "source_note": "Egress framework from BCI A.10-A.11 and stair rules from BCI 9.03-9.05. Numeric occupant-load factors, travel distances and separation fractions are TYPICAL IBC values (BCI defers these to the governing code) - always verify against the code in force.",
+      "components": "A means of egress has three parts: exit access (the path to an exit), the exit itself (enclosed, fire-rated, self-closing doors swinging in the direction of travel), and exit discharge (to an exit court or public way).",
+      "occupant_load_m2_per_person": {
+        "business": 9.3,
+        "assembly_unconcentrated": 1.4,
+        "classroom": 1.9,
+        "residential": 18.6,
+        "mercantile": 5.6,
+        "storage": 46.5
+      },
+      "exits_required_by_occupant_load": [
+        {"max_occupants": 49, "exits": 1, "note": "single exit only for small, low buildings; multi-story business generally needs two"},
+        {"max_occupants": 500, "exits": 2},
+        {"max_occupants": 1000, "exits": 3},
+        {"max_occupants": null, "exits": 4}
+      ],
+      "exit_separation_fraction_of_diagonal": {"unsprinklered": 0.5, "sprinklered": 0.3333},
+      "max_travel_distance_m": {"business_sprinklered": 91.4, "business_unsprinklered": 61.0},
+      "max_dead_end_corridor_m": {"default": 6.1, "sprinklered_business": 15.2},
+      "egress_width_mm_per_occupant": {"stairs": 7.6, "doors_corridors": 5.1},
+      "min_widths_mm": {
+        "exit_stair": 1120, "stair_serving_under_50": 915,
+        "corridor": 1120, "door_clear": 810
+      },
+      "stair_rules_mm": {
+        "max_riser": 180, "min_tread": 280, "max_rise_between_landings": 3660,
+        "min_headroom": 2030, "max_riser_variation": 9.5,
+        "landing_min_depth": "at least the stair width",
+        "comfort_formula": "tread + 2 x riser = 610-635 mm"
+      },
+      "signage_and_lighting": "Exits identified by illuminated signs; egress paths lit by emergency lighting on power failure; exit doors swing in the direction of exit travel with panic hardware (BCI A.10-A.11).",
+      "fire_resistance": {
+        "solid_reinforced_concrete_wall_mm": {"1hr": 90, "2hr": 125, "3hr": 150, "4hr": 165},
+        "solid_brick_wall_mm": {"1hr": 100, "2hr": 150, "4hr": 205},
+        "cmu_wall_mm": {"1hr": 100, "1.5hr": 150, "2hr_to_4hr": 205},
+        "shaft_enclosure_note": "Exit stair and shaft enclosures: typically 2-hr when connecting 4 or more stories, 1-hr otherwise (IBC-typical; verify). Structural steel requires applied protection - spray fireproofing, gypsum encasement, or concrete cover - to achieve a rating (BCI A.12).",
+        "bci_ref": ["A.12-A.13"]
+      }
+    },
     "notes": "Live loads are minimum uniformly distributed design loads by occupancy (converted from psf, 1 psf = 47.88 Pa); always verify against the governing code. Densities converted from pcf (1 pcf = 16.018 kg/m3). Source: BCI appendix A.06-A.07."
   }
 }
