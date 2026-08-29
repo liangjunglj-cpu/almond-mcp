@@ -53,6 +53,10 @@ The manifest also ships `reference` tables: occupancy live loads (kPa) and
 material densities (kg/m³) from BCI appendix A.06–A.07, for choosing
 `load_kn` inputs honestly.
 
+Every parameter is itemized with its exact BCI section title and page in
+the generated **[construction spec register](construction-spec-register.md)**
+(`tools/build_spec_register.py` regenerates it from the manifest).
+
 ## The workflow
 
 ```
