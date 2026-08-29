@@ -33,6 +33,7 @@ DIAGRAM_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_DIAGRAM_ASSET_DIR")
 DRAWING_RECIPE_DIR = paths.resolve_dir("RHINO_MCP_DRAWING_RECIPE_DIR")
 CAPSULE_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_CAPSULE_DIR")
 MATERIAL_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_MATERIAL_DIR")
+CONSTRUCTION_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_CONSTRUCTION_DIR")
 STATE_DB_PATH = paths.resolve_state_db()
 BRIDGE_HOST = '127.0.0.1'
 BRIDGE_PORT = 5000
@@ -269,7 +270,140 @@ class MaterialLibrary:
         return results
 
 
+class ConstructionLibrary:
+    """Curated construction-system guidance (Constructionfiles/manifest.json).
+
+    Parameters distilled from Ching, Building Construction Illustrated
+    (4th ed.): span ranges, depth rules of thumb, member spacing, and
+    assembly notes per construction system, keyed to validate_structure's
+    structure_type/material vocabulary and to Materialfiles material_ids."""
+
+    REQUIRED = ("system_id", "name", "category", "structural_material",
+                "structure_types", "span_range_m")
+
+    # validate_structure accepts S355 as a steel grade; guidance treats it as Steel.
+    MATERIAL_ALIASES = {"s355": "Steel", "steel": "Steel", "concrete": "Concrete",
+                        "wood": "Wood", "timber": "Wood", "aluminium": "Aluminium",
+                        "aluminum": "Aluminium"}
+
+    def __init__(self, directory: str):
+        self.directory = Path(directory)
+        self.systems: dict[str, dict] = {}
+        self.reference: dict = {}
+        self.source = ""
+        manifest_path = self.directory / "manifest.json"
+        if not manifest_path.is_file():
+            print(f"Construction manifest missing: {manifest_path}", file=sys.stderr)
+            return
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as exc:
+            print(f"Construction manifest unreadable: {exc}", file=sys.stderr)
+            return
+        self.reference = manifest.get("reference", {})
+        self.source = manifest.get("source", "")
+        for system in manifest.get("systems", []):
+            if not all(key in system for key in self.REQUIRED):
+                continue
+            self.systems[system["system_id"]] = system
+        print(f"Indexed {len(self.systems)} construction systems.", file=sys.stderr)
+
+    def get(self, system_id: str) -> dict | None:
+        return self.systems.get(system_id)
+
+    def normalize_material(self, material: str) -> str:
+        return self.MATERIAL_ALIASES.get(material.strip().lower(), material.strip())
+
+    def list(self, category: str = "", query: str = "", material: str = "",
+             structure_type: str = "") -> list[dict]:
+        needle = query.strip().lower()
+        wanted_material = self.normalize_material(material) if material else ""
+        wanted_type = structure_type.strip().lower()
+        results = []
+        for system in self.systems.values():
+            if category and system["category"] != category:
+                continue
+            if wanted_material and system["structural_material"] != wanted_material:
+                continue
+            if wanted_type and wanted_type not in system["structure_types"]:
+                continue
+            if needle:
+                haystack = " ".join([
+                    system["system_id"], system["name"], system["category"],
+                    system.get("structural_material", ""),
+                    " ".join(system.get("tags", [])),
+                    " ".join(note for note in system.get("construction_notes", [])),
+                    " ".join(element.get("role", "") + " " + element.get("note", "")
+                             for element in system.get("elements", [])),
+                ]).lower()
+                if needle not in haystack:
+                    continue
+            results.append(system)
+        return results
+
+    def assess_span(self, structure_type: str, material: str,
+                    span_m: float | None) -> dict:
+        """Constructibility cross-check for a validate_structure run: which
+        curated systems cover this structure_type/material, does the span sit
+        inside a real system's range, and what member depth would it imply."""
+        wanted_material = self.normalize_material(material)
+        wanted_type = structure_type.strip().lower()
+        candidates = [s for s in self.systems.values()
+                      if wanted_type in s["structure_types"]
+                      and s["structural_material"] == wanted_material]
+        check: dict = {
+            "source": "Ching, Building Construction Illustrated (4th ed.) - preliminary sizing guidance",
+            "matching_systems": [],
+            "warnings": [],
+        }
+        if not candidates:
+            check["warnings"].append(
+                f"No curated construction system covers structure_type "
+                f"'{structure_type}' in {wanted_material}; span plausibility "
+                f"not assessed.")
+            return check
+        span_known = span_m is not None and span_m > 0
+        fitting = []
+        for system in candidates:
+            lo, hi = system["span_range_m"]
+            entry = {
+                "system_id": system["system_id"],
+                "name": system["name"],
+                "span_range_m": [lo, hi],
+                "bci_ref": system.get("bci_ref", []),
+            }
+            if span_known and hi > 0:
+                entry["fits_span"] = bool(lo <= span_m <= hi)
+                depths = []
+                for rule in system.get("depth_rules", []):
+                    ratio = rule.get("span_ratio", 0)
+                    if ratio:
+                        depths.append({
+                            "element": rule["element"],
+                            "suggested_depth_mm": round(span_m * 1000 / ratio),
+                            "rule": f"span/{ratio}",
+                        })
+                if depths:
+                    entry["depth_guidance"] = depths
+                if entry["fits_span"]:
+                    fitting.append(system)
+            check["matching_systems"].append(entry)
+        if span_known and not fitting:
+            spans = ", ".join(
+                f"{s['system_id']} ({s['span_range_m'][0]}-{s['span_range_m'][1]} m)"
+                for s in candidates if s["span_range_m"][1] > 0)
+            check["warnings"].append(
+                f"Span {span_m:g} m is outside the typical range of every "
+                f"curated {wanted_material} system for '{structure_type}': "
+                f"{spans}. The structure may still solve numerically, but as "
+                f"drawn it does not correspond to a standard construction "
+                f"system - consider a different system, material, or "
+                f"intermediate supports.")
+        return check
+
+
 material_library = MaterialLibrary(MATERIAL_LIBRARY_DIR)
+construction_library = ConstructionLibrary(CONSTRUCTION_LIBRARY_DIR)
 retrieval_store = AlmondStore(STATE_DB_PATH)
 retrieval_store.sync_assets(
     list(drawing_asset_indexer.assets.values()),
@@ -1066,7 +1200,8 @@ public class Script
 
 
 def _material_script(material: dict, guid_list: list[str],
-                     apply_render_material: bool, attach_metadata: bool) -> str:
+                     apply_render_material: bool, attach_metadata: bool,
+                     extra_strings: dict[str, str] | None = None) -> str:
     """C# for the bridge: create/reuse a PBR doc material, assign it to the
     objects, and write almond:* user strings (Datasmith metadata in Unreal)."""
     r, g, b = (int(v) for v in material["base_color"])
@@ -1085,6 +1220,8 @@ def _material_script(material: dict, guid_list: list[str],
         "almond:roughness": f"{roughness:g}",
         "almond:opacity": f"{opacity:g}",
     }
+    if extra_strings:
+        user_strings.update(extra_strings)
     set_strings = "\n                ".join(
         f'obj.Attributes.SetUserString("{key}", "{value.replace(chr(34), "")}");'
         for key, value in user_strings.items()
@@ -1163,15 +1300,96 @@ def list_materials(category: str = "", query: str = "") -> str:
 
 
 @mcp.tool()
+def get_construction_guidance(
+    query: str = "",
+    category: str = "",
+    material: str = "",
+    structure_type: str = "",
+    span_m: float = 0.0,
+    include_reference_data: bool = False,
+) -> str:
+    """
+    Curated construction-system guidance for generating structures that are
+    built the way real buildings are built - not arbitrary members in space.
+    Parameters are distilled from Ching's Building Construction Illustrated
+    (4th ed.): per-system span ranges, depth rules of thumb (depth = span/N),
+    member spacing, element roles, and assembly notes.
+
+    Call this BEFORE generating structural geometry: pick a system, size and
+    space members from its rules, then generate and run validate_structure
+    (which cross-checks the result against this same library). Each system
+    names its structural_material (validate_structure vocabulary) and
+    render_material_ids (assign_material vocabulary), so the declared
+    construction material flows through analysis AND appears on the Rhino
+    objects.
+
+    Args:
+        query: Free-text filter (e.g. "glulam", "longspan", "bearing wall").
+        category: "floor", "wall", "roof", "foundation" (empty = all).
+        material: "Wood", "Steel", "Concrete" - validate_structure names.
+        structure_type: validate_structure type ("beam", "truss", "shell",
+            "frame", "canopy", "gridshell", "membrane", "highrise").
+        span_m: If > 0, each returned system reports fits_span and
+            suggested member depths from its span-ratio rules.
+        include_reference_data: Also return occupancy live loads (kPa) and
+            material densities (kg/m3) for choosing load_kn inputs.
+    Returns:
+        JSON: {total, systems: [...], reference?} - for wall systems
+        span_range_m is the unsupported height range (span_axis "vertical").
+    """
+    systems = construction_library.list(
+        category=category, query=query, material=material,
+        structure_type=structure_type)
+    payload: dict = {
+        "total": len(systems),
+        "source": construction_library.source,
+        "systems": [],
+    }
+    for system in systems:
+        card = dict(system)
+        if span_m > 0:
+            lo, hi = system["span_range_m"]
+            if hi > 0:
+                card["fits_span"] = bool(lo <= span_m <= hi)
+                depths = [
+                    {"element": rule["element"],
+                     "suggested_depth_mm": round(span_m * 1000 / rule["span_ratio"]),
+                     "rule": f"span/{rule['span_ratio']}"}
+                    for rule in system.get("depth_rules", [])
+                    if rule.get("span_ratio")
+                ]
+                if depths:
+                    card["depth_guidance"] = depths
+        payload["systems"].append(card)
+    if include_reference_data:
+        payload["reference"] = construction_library.reference
+    if not systems:
+        payload["hint"] = ("No system matched. Loosen the filters, or call "
+                          "with no arguments to list all systems.")
+    return json.dumps(payload)
+
+
+@mcp.tool()
 def assign_material(
     guids: list[str],
     material_id: str,
     apply_render_material: bool = True,
     attach_metadata: bool = True,
+    structural_role: str = "",
+    construction_system: str = "",
 ) -> str:
     """
     Assigns a curated PBR material to Rhino objects and stamps them with
     machine-readable material metadata for downstream pipelines (Unreal).
+
+    For structural members, also declare what the object IS in construction
+    terms: structural_role (e.g. "joist", "girder", "stud", "truss_chord")
+    and construction_system (a system_id from get_construction_guidance).
+    These are written as almond:structural_role / almond:construction_system
+    user text on the objects, so the stated construction intent lives on the
+    Rhino geometry itself and survives export. If the chosen material_id is
+    not a typical finish for the declared system, the response carries a
+    warning (it still applies).
 
     Two effects, independently switchable:
     - apply_render_material: creates/reuses a physically-based Rhino
@@ -1206,7 +1424,30 @@ def assign_material(
     if not guid_list:
         return json.dumps({"status": "error", "message": "guids must not be empty."})
 
-    script = _material_script(material, guid_list, apply_render_material, attach_metadata)
+    warnings = []
+    extra_strings: dict[str, str] = {}
+    if structural_role:
+        extra_strings["almond:structural_role"] = structural_role
+    if construction_system:
+        system = construction_library.get(construction_system)
+        if system is None:
+            known = ", ".join(sorted(construction_library.systems)) or "none loaded"
+            return json.dumps({
+                "status": "error",
+                "message": f"Unknown construction_system: {construction_system}. "
+                           f"Known: {known}",
+            })
+        extra_strings["almond:construction_system"] = construction_system
+        extra_strings["almond:structural_material"] = system["structural_material"]
+        typical = system.get("render_material_ids", [])
+        if typical and material_id not in typical:
+            warnings.append(
+                f"Material '{material_id}' is not a typical finish for "
+                f"{construction_system} (typical: {', '.join(typical)}). "
+                f"Applied anyway.")
+
+    script = _material_script(material, guid_list, apply_render_material,
+                              attach_metadata, extra_strings)
     payload = json.dumps({"type": "execute", "script": script}).encode("utf-8")
     try:
         response = json.loads(_send_and_receive(payload, timeout=60.0))
@@ -1217,7 +1458,7 @@ def assign_material(
     if response.get("status") != "success":
         return json.dumps(response)
     applied = response.get("guids") or []
-    return json.dumps({
+    result = {
         "status": "success",
         "material_id": material_id,
         "rhino_material_name": "ALMOND::" + material_id,
@@ -1227,7 +1468,14 @@ def assign_material(
         "applied_guids": applied,
         "metadata_attached": attach_metadata,
         "render_material_applied": apply_render_material,
-    })
+    }
+    if structural_role:
+        result["structural_role"] = structural_role
+    if construction_system:
+        result["construction_system"] = construction_system
+    if warnings:
+        result["warnings"] = warnings
+    return json.dumps(result)
 
 
 @mcp.tool()
@@ -1560,8 +1808,15 @@ def validate_structure(
             "highrise"   — high-rise structural systems
         load_kn: Applied load in kN (default 10.0).
         material: Material type: "Steel", "S355", "Concrete", "Wood", "Aluminium" (default "Steel").
+    Prefer calling get_construction_guidance BEFORE generating the geometry:
+    pick a real construction system and size members from its depth/spacing
+    rules. This tool cross-checks the analyzed span against that same library
+    and appends a "construction_check" object (matching_systems with
+    fits_span and suggested member depths, plus warnings when the span falls
+    outside every curated system's range for this structure_type/material).
+
     Returns:
-        JSON passed through untouched from the bridge. Top-level fields: status
+        JSON from the bridge plus the construction_check. Top-level fields: status
         ("pass"|"fail"|"error"), passed (bool), verdict (text), suggestions,
         confidence ("high"|"medium"|"low"), warnings, and worst_member_guids
         (up to 5 Rhino GUIDs of the most over-utilized members — edit those
@@ -1590,12 +1845,28 @@ def validate_structure(
     except Exception as e:
         return json.dumps({"status": "error", "message": f"Bridge error: {e}"})
 
-    # Persist the run in the state DB so export_structural_report can render
-    # an auditable history. Recording must never break validation itself.
+    # Attach the constructibility cross-check (curated construction-system
+    # span/depth guidance), then persist the run in the state DB so
+    # export_structural_report can render an auditable history. Neither step
+    # may ever break validation itself.
     try:
         result = json.loads(response)
         if isinstance(result, dict) and result.get("status") in ("pass", "fail"):
+            span_m = None
+            results_block = result.get("results")
+            if isinstance(results_block, dict):
+                span_m = results_block.get("span_m")
+            try:
+                check = construction_library.assess_span(
+                    structure_type, material, span_m)
+                result["construction_check"] = check
+                if check.get("warnings"):
+                    result.setdefault("warnings", [])
+                    result["warnings"].extend(check["warnings"])
+            except Exception:
+                pass
             retrieval_store.record_validation_run(request, result, guids)
+            return json.dumps(result)
     except Exception:
         pass
     return response

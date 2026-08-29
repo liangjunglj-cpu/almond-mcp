@@ -263,12 +263,27 @@ Every run is recorded in the local state database;
 (inputs, pathway, span/deflection/utilization/reactions, warnings,
 PASS/FAIL). Details: `docs/structural-validation.md`.
 
+On top of the solver, a **construction knowledge layer**
+(`get_construction_guidance`, `Constructionfiles/manifest.json`) grounds
+generated structures in real building assemblies: 23 curated systems (wood
+joist floors to precast tees, platform framing to steel rigid frames) with
+span ranges, depth rules of thumb, member spacings, and element roles
+distilled from Ching's *Building Construction Illustrated* (4th ed.). Call
+it before generating to pick a system and size members like a builder
+would; `validate_structure` then appends a `construction_check` that flags
+spans no real system covers — so geometry that merely solves numerically
+but could not be constructed as drawn is caught too. Details:
+`docs/construction-guidance.md`.
+
 ## Materials and cross-application exchange
 
 Almond carries a curated PBR material library (`list_materials`) and stamps
 geometry with machine-readable material metadata (`assign_material`): a
 physically-based Rhino material plus `almond:*` user text (material_id,
-`ue_material_slot`, base colour, metallic, roughness, opacity). GLB export
+`ue_material_slot`, base colour, metallic, roughness, opacity — and, for
+structural members, `structural_role` / `construction_system` /
+`structural_material`, declaring in construction terms what each object
+is). GLB export
 then carries real PBR channels, and Datasmith imports the user text as
 Unreal asset metadata — so imports remap to your master materials by slot
 name instead of being guessed from display colours.

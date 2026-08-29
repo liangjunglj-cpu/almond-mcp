@@ -1,0 +1,354 @@
+Building Construction Illustrated  ->  pdf page 3
+CONTENTS  ->  pdf page 7
+PREFACE  ->  pdf page 9
+1 THE BUILDING SITE  ->  pdf page 11
+  1.02 BUILDING IN CONTEXT  ->  pdf page 12
+  1.03 SUSTAINABILITY   ->  pdf page 13
+  1.04 GREEN BUILDING  ->  pdf page 14
+  1.05 LEED® GREEN BUILDING RATING SYSTEM  ->  pdf page 15
+  1.06 THE 2030 CHALLENGE  ->  pdf page 16
+  1.07 SITE ANALYSIS   ->  pdf page 17
+  1.08 SOILS  ->  pdf page 18
+  1.09 SOIL MECHANICS  ->  pdf page 19
+  1.10 TOPOGRAPHY  ->  pdf page 20
+  1.12 PLANT MATERIALS  ->  pdf page 22
+  1.13 TREES   ->  pdf page 23
+  1.14 SOLAR RADIATION  ->  pdf page 24
+  1.16 PASSIVE SOLAR DESIGN  ->  pdf page 26
+  1.18 SOLAR SHADING  ->  pdf page 28
+  1.19 DAYLIGHTING   ->  pdf page 29
+  1.20 PRECIPITATION  ->  pdf page 30
+  1.21 SITE DRAINAGE   ->  pdf page 31
+  1.22 WIND  ->  pdf page 32
+  1.23 SOUND & VIEWS   ->  pdf page 33
+  1.24 REGULATORY FACTORS  ->  pdf page 34
+  1.25 ZONING ORDINANCES   ->  pdf page 35
+  1.26 SITE ACCESS & CIRCULATION  ->  pdf page 36
+  1.27 PEDESTRIAN CIRCULATION  ->  pdf page 37
+  1.28 VEHICULAR CIRCULATION  ->  pdf page 38
+  1.29 VEHICULAR PARKING  ->  pdf page 39
+  1.30 SLOPE PROTECTION  ->  pdf page 40
+  1.31 RETAINING WALLS  ->  pdf page 41
+  1.34 PAVING  ->  pdf page 44
+  1.36 THE SITE PLAN  ->  pdf page 46
+  1.38 SITE DESCRIPTION  ->  pdf page 48
+2 THE BUILDING  ->  pdf page 49
+  2.02 THE BUILDING  ->  pdf page 50
+  2.03 BUILDING SYSTEMS   ->  pdf page 51
+  2.05 BUILDING CODES   ->  pdf page 53
+  2.06 TYPES OF CONSTRUCTION  ->  pdf page 54
+  2.07 OCCUPANCY CLASSIFICATION   ->  pdf page 55
+  2.08 LOADS ON BUILDINGS  ->  pdf page 56
+  2.09 WIND LOADS  ->  pdf page 57
+  2.10 EARTHQUAKE LOADS  ->  pdf page 58
+  2.11 STRUCTURAL FORCES   ->  pdf page 59
+  2.12 STRUCTURAL EQUILIBRIUM  ->  pdf page 60
+  2.13 COLUMNS  ->  pdf page 61
+  2.14 BEAMS  ->  pdf page 62
+  2.15 BEAM SPANS  ->  pdf page 63
+  2.16 TRUSSES  ->  pdf page 64
+  2.17 FRAMES & WALLS  ->  pdf page 65
+  2.18 PLATE STRUCTURES  ->  pdf page 66
+  2.19 STRUCTURAL UNITS  ->  pdf page 67
+  2.20 STRUCTURAL SPANS  ->  pdf page 68
+  2.21 STRUCTURAL PATTERNS  ->  pdf page 69
+  2.22 LATERAL STABILITY  ->  pdf page 70
+  2.24 HIGH-RISE STRUCTURES  ->  pdf page 72
+  2.25 ARCHES & VAULTS  ->  pdf page 73
+  2.26 DOMES  ->  pdf page 74
+  2.27 SHELL STRUCTURES   ->  pdf page 75
+  2.28 CABLE STRUCTURES  ->  pdf page 76
+  2.29 MEMBRANE STRUCTURES  ->  pdf page 77
+  2.30 JOINTS & CONNECTIONS  ->  pdf page 78
+3 FOUNDATION SYSTEMS  ->  pdf page 79
+  3.02 FOUNDATION SYSTEMS  ->  pdf page 80
+  3.04 TYPES OF FOUNDATION SYSTEMS  ->  pdf page 82
+  3.06 UNDERPINNING  ->  pdf page 84
+  3.07 EXCAVATION SUPPORT SYSTEMS   ->  pdf page 85
+  3.08 SHALLOW FOUNDATIONS  ->  pdf page 86
+  3.09 SPREAD FOOTINGS   ->  pdf page 87
+  3.10 FOUNDATION WALLS  ->  pdf page 88
+  3.16 COLUMN FOOTINGS  ->  pdf page 94
+  3.17 FOUNDATIONS ON SLOPING GROUND   ->  pdf page 95
+  3.18 CONCRETE SLABS ON GRADE  ->  pdf page 96
+  3.22 POLE FOUNDATIONS  ->  pdf page 100
+  3.24 DEEP FOUNDATIONS  ->  pdf page 102
+  3.25 PILE FOUNDATIONS   ->  pdf page 103
+  3.26 CAISSON FOUNDATIONS  ->  pdf page 104
+4 FLOOR SYSTEMS  ->  pdf page 105
+  4.02 FLOOR SYSTEMS  ->  pdf page 106
+  4.04 CONCRETE BEAMS  ->  pdf page 108
+  4.05 CONCRETE SLABS   ->  pdf page 109
+  4.08 PRESTRESSED CONCRETE  ->  pdf page 112
+  4.10 CONCRETE FORMWORK & SHORING  ->  pdf page 114
+  4.11 PRECAST CONCRETE FLOOR SYSTEMS   ->  pdf page 115
+  4.12 PRECAST CONCRETE UNITS  ->  pdf page 116
+  4.13 PRECAST CONCRETE CONNECTIONS   ->  pdf page 117
+  4.14 STRUCTURAL STEEL FRAMING  ->  pdf page 118
+  4.16 STEEL BEAMS  ->  pdf page 120
+  4.17 STEEL BEAM CONNECTIONS   ->  pdf page 121
+  4.19 OPEN-WEB STEEL JOISTS   ->  pdf page 123
+  4.20 OPEN-WEB JOIST FRAMING  ->  pdf page 124
+  4.22 METAL DECKING  ->  pdf page 126
+  4.23 LIGHT-GAUGE STEEL JOISTS   ->  pdf page 127
+  4.24 LIGHT-GAUGE JOIST FRAMING  ->  pdf page 128
+  4.26 WOOD JOISTS  ->  pdf page 130
+  4.28 WOOD JOIST FRAMING  ->  pdf page 132
+  4.32 WOOD SUBFLOORING  ->  pdf page 136
+  4.33 PREFABRICATED JOISTS & TRUSSES   ->  pdf page 137
+  4.35 WOOD BEAMS   ->  pdf page 139
+  4.36 WOOD BEAM SUPPORTS  ->  pdf page 140
+  4.37 WOOD POST-BEAM CONNECTIONS   ->  pdf page 141
+  4.38 WOOD PLANK-AND-BEAM FRAMING  ->  pdf page 142
+  4.40 WOOD DECKING  ->  pdf page 144
+5 WALL SYSTEMS  ->  pdf page 145
+  5.02 WALL SYSTEMS  ->  pdf page 146
+  5.04 CONCRETE COLUMNS  ->  pdf page 148
+  5.06 CONCRETE WALLS  ->  pdf page 150
+  5.07 CONCRETE FORMWORK   ->  pdf page 151
+  5.09 CONCRETE SURFACING   ->  pdf page 153
+  5.10 PRECAST CONCRETE WALLS  ->  pdf page 154
+  5.11 PRECAST CONCRETE WALL PANELS & COLUMNS   ->  pdf page 155
+  5.12 PRECAST CONCRETE CONNECTIONS  ->  pdf page 156
+  5.13 TILT-UP CONSTRUCTION   ->  pdf page 157
+  5.14 MASONRY WALLS  ->  pdf page 158
+  5.16 UNREINFORCED MASONRY WALLS  ->  pdf page 160
+  5.18 REINFORCED MASONRY WALLS  ->  pdf page 162
+  5.19 MASONRY COLUMNS & PILASTERS   ->  pdf page 163
+  5.20 MASONRY ARCHES  ->  pdf page 164
+  5.21 MASONRY LINTELS   ->  pdf page 165
+  5.22 EXPANSION & CONTROL JOINTS  ->  pdf page 166
+  5.23 MASONRY WALL SECTIONS   ->  pdf page 167
+  5.26 MASONRY BONDING  ->  pdf page 170
+  5.28 STRUCTURAL CLAY TILE  ->  pdf page 172
+  5.29 GLASS BLOCK   ->  pdf page 173
+  5.31 ADOBE CONSTRUCTION   ->  pdf page 175
+  5.32 RAMMED-EARTH CONSTRUCTION  ->  pdf page 176
+  5.33 STONE MASONRY   ->  pdf page 177
+  5.35 STRUCTURAL STEEL FRAMING   ->  pdf page 179
+  5.37 STEEL COLUMNS   ->  pdf page 181
+  5.39 LIGHT-GAUGE STEEL STUDS   ->  pdf page 183
+  5.40 LIGHT-GAUGE STUD FRAMING  ->  pdf page 184
+  5.41 BALLOON FRAMING   ->  pdf page 185
+  5.42 PLATFORM FRAMING  ->  pdf page 186
+  5.43 WOOD STUD FRAMING   ->  pdf page 187
+  5.46 STUD WALL SHEATHING  ->  pdf page 190
+  5.47 WOOD COLUMNS   ->  pdf page 191
+  5.48 WOOD POST-AND-BEAM FRAMING  ->  pdf page 192
+  5.49 WOOD POST-BEAM CONNECTIONS   ->  pdf page 193
+6 ROOF SYSTEMS  ->  pdf page 195
+  6.02 ROOF SYSTEMS  ->  pdf page 196
+  6.03 ROOF SLOPES   ->  pdf page 197
+  6.04 REINFORCED CONCRETE ROOF SLABS  ->  pdf page 198
+  6.05 PRECAST CONCRETE ROOF SYSTEMS   ->  pdf page 199
+  6.06 STRUCTURAL STEEL ROOF FRAMING  ->  pdf page 200
+  6.07 STEEL RIGID FRAMES   ->  pdf page 201
+  6.08 STEEL TRUSSES  ->  pdf page 202
+  6.09 TRUSS TYPES   ->  pdf page 203
+  6.10 SPACE FRAMES  ->  pdf page 204
+  6.12 OPEN-WEB STEEL JOISTS  ->  pdf page 206
+  6.13 OPEN-WEB JOIST FRAMING   ->  pdf page 207
+  6.14 METAL ROOF DECKING  ->  pdf page 208
+  6.15 CEMENTITIOUS ROOF PLANKS   ->  pdf page 209
+  6.16 RAFTER FRAMING  ->  pdf page 210
+  6.18 LIGHT-GAUGE ROOF FRAMING  ->  pdf page 212
+  6.19 WOOD RAFTERS   ->  pdf page 213
+  6.20 WOOD RAFTER FRAMING  ->  pdf page 214
+  6.23 ROOF SHEATHING   ->  pdf page 217
+  6.24 WOOD PLANK-AND-BEAM FRAMING  ->  pdf page 218
+  6.26 WOOD POST-BEAM CONNECTIONS  ->  pdf page 220
+  6.28 WOOD TRUSSES  ->  pdf page 222
+  6.30 WOOD TRUSSED RAFTERS  ->  pdf page 224
+7 MOISTURE & THERMAL PROTECTION  ->  pdf page 225
+  7.02 MOISTURE & THERMAL PROTECTION  ->  pdf page 226
+  7.03 UNDERLAYMENT FOR SHINGLE ROOFING   ->  pdf page 227
+  7.04 WOOD SHINGLES  ->  pdf page 228
+  7.05 WOOD SHAKES   ->  pdf page 229
+  7.06 COMPOSITION SHINGLES  ->  pdf page 230
+  7.07 SLATE SHINGLES   ->  pdf page 231
+  7.08 TILE ROOFING  ->  pdf page 232
+  7.09 VEGETATED ROOFING   ->  pdf page 233
+  7.10 CORRUGATED METAL ROOFING  ->  pdf page 234
+  7.11 SHEET METAL ROOFING   ->  pdf page 235
+  7.12 FLAT ROOF ASSEMBLIES  ->  pdf page 236
+  7.14 BUILT-UP ROOFING SYSTEMS  ->  pdf page 238
+  7.15 SINGLE-PLY ROOFING SYSTEMS   ->  pdf page 239
+  7.17 ROOF DRAINAGE   ->  pdf page 241
+  7.18 FLASHING  ->  pdf page 242
+  7.19 ROOF FLASHING   ->  pdf page 243
+  7.21 FLASHING ROOF PENETRATIONS   ->  pdf page 245
+  7.22 WALL FLASHING  ->  pdf page 246
+  7.23 RAINSCREEN WALL SYSTEMS   ->  pdf page 247
+  7.24 CURTAIN WALLS  ->  pdf page 248
+  7.27 PRECAST CONCRETE PANELS   ->  pdf page 251
+  7.28 MASONRY VENEER  ->  pdf page 252
+  7.30 STONE VENEER  ->  pdf page 254
+  7.31 METAL CLADDING   ->  pdf page 255
+  7.32 PLYWOOD SIDING  ->  pdf page 256
+  7.33 WOOD SHINGLE SIDING   ->  pdf page 257
+  7.34 HORIZONTAL BOARD SIDING  ->  pdf page 258
+  7.35 VERTICAL BOARD SIDING   ->  pdf page 259
+  7.36 STUCCO  ->  pdf page 260
+  7.37 STUCCO DETAILS   ->  pdf page 261
+  7.38 EXTERIOR INSULATION & FINISH SYSTEMS  ->  pdf page 262
+  7.39 THERMAL INSULATION   ->  pdf page 263
+  7.40 THERMAL RESISTANCE OF BUILDING MATERIALS  ->  pdf page 264
+  7.41 INSULATING MATERIALS   ->  pdf page 265
+  7.43 INSULATING ROOFS & FLOORS   ->  pdf page 267
+  7.44 INSULATING WALLS  ->  pdf page 268
+  7.45 MOISTURE CONTROL   ->  pdf page 269
+  7.46 VAPOR RETARDERS  ->  pdf page 270
+  7.47 VENTILATION   ->  pdf page 271
+  7.48 MOVEMENT JOINTS  ->  pdf page 272
+  7.50 JOINT SEALANTS  ->  pdf page 274
+8 DOORS & WINDOWS  ->  pdf page 275
+  8.02 DOORS & WINDOWS  ->  pdf page 276
+  8.03 DOORS & DOORWAYS   ->  pdf page 277
+  8.04 DOOR OPERATION  ->  pdf page 278
+  8.05 HOLLOW METAL DOORS   ->  pdf page 279
+  8.06 HOLLOW METAL DOORFRAMES  ->  pdf page 280
+  8.08 WOOD FLUSH DOORS  ->  pdf page 282
+  8.09 WOOD RAIL & STILE DOORS   ->  pdf page 283
+  8.10 WOOD DOORFRAMES  ->  pdf page 284
+  8.11 SLIDING GLASS DOORS   ->  pdf page 285
+  8.12 FOLDING & POCKET SLIDING DOORS  ->  pdf page 286
+  8.13 OVERHEAD & COILING DOORS   ->  pdf page 287
+  8.14 GLASS ENTRANCE DOORS  ->  pdf page 288
+  8.15 STOREFRONTS   ->  pdf page 289
+  8.16 REVOLVING DOORS  ->  pdf page 290
+  8.17 DOOR HARDWARE   ->  pdf page 291
+  8.18 DOOR HINGES  ->  pdf page 292
+  8.19 DOOR LOCKSETS   ->  pdf page 293
+  8.20 PANIC HARDWARE & CLOSERS  ->  pdf page 294
+  8.21 WEATHERSTRIPPING & THRESHOLDS   ->  pdf page 295
+  8.22 WINDOW ELEMENTS  ->  pdf page 296
+  8.23 WINDOW OPERATION   ->  pdf page 297
+  8.24 METAL WINDOWS  ->  pdf page 298
+  8.26 WOOD WINDOWS  ->  pdf page 300
+  8.28 GLAZING SYSTEMS  ->  pdf page 302
+  8.30 INSULATING GLASS  ->  pdf page 304
+  8.31 GLAZED CURTAIN WALLS   ->  pdf page 305
+  8.35 DOUBLE-SKIN FACADES   ->  pdf page 309
+  8.36 SKYLIGHTS  ->  pdf page 310
+  8.37 SKYLIGHT DETAILS   ->  pdf page 311
+  8.38 SUNSPACES  ->  pdf page 312
+9 SPECIAL CONSTRUCTION  ->  pdf page 313
+  9.02 SPECIAL CONSTRUCTION  ->  pdf page 314
+  9.03 STAIR DESIGN   ->  pdf page 315
+  9.04 STAIR REQUIREMENTS  ->  pdf page 316
+  9.06 STAIR PLANS  ->  pdf page 318
+  9.08 WOOD STAIRS  ->  pdf page 320
+  9.10 CONCRETE STAIRS  ->  pdf page 322
+  9.11 STEEL STAIRS   ->  pdf page 323
+  9.12 SPIRAL STAIRS  ->  pdf page 324
+  9.13 LADDERS   ->  pdf page 325
+  9.14 ELEVATORS  ->  pdf page 326
+  9.17 ESCALATORS   ->  pdf page 329
+  9.18 FIREPLACES  ->  pdf page 330
+  9.19 FIREPLACE REQUIREMENTS   ->  pdf page 331
+  9.20 MASONRY CHIMNEYS  ->  pdf page 332
+  9.21 PREFABRICATED FIREPLACES & STOVES   ->  pdf page 333
+  9.22 KITCHEN LAYOUTS  ->  pdf page 334
+  9.23 KITCHEN DIMENSIONS   ->  pdf page 335
+  9.24 KITCHEN CABINETS  ->  pdf page 336
+  9.25 THE KITCHEN SPACE   ->  pdf page 337
+  9.26 BATHROOM LAYOUTS  ->  pdf page 338
+  9.27 PLUMBING FIXTURES   ->  pdf page 339
+  9.28 ACCESSIBLE FIXTURES  ->  pdf page 340
+  9.30 THE BATHROOM SPACE  ->  pdf page 342
+10 FINISH WORK  ->  pdf page 343
+  10.02 FINISH WORK  ->  pdf page 344
+  10.03 PLASTER   ->  pdf page 345
+  10.04 PLASTER LATH & ACCESSORIES  ->  pdf page 346
+  10.05 PLASTER PARTITION SYSTEMS   ->  pdf page 347
+  10.06 PLASTER DETAILS  ->  pdf page 348
+  10.07 PLASTER OVER MASONRY   ->  pdf page 349
+  10.08 PLASTER CEILINGS  ->  pdf page 350
+  10.09 GYPSUM BOARD   ->  pdf page 351
+  10.10 GYPSUM BOARD APPLICATION  ->  pdf page 352
+  10.11 GYPSUM BOARD DETAILS   ->  pdf page 353
+  10.12 CERAMIC TILE  ->  pdf page 354
+  10.13 CERAMIC TILE APPLICATION   ->  pdf page 355
+  10.14 CERAMIC TILE DETAILS  ->  pdf page 356
+  10.15 TERRAZZO FLOORING   ->  pdf page 357
+  10.16 WOOD FLOORING  ->  pdf page 358
+  10.17 WOOD FLOORING INSTALLATION   ->  pdf page 359
+  10.18 STONE FLOORING  ->  pdf page 360
+  10.19 RESILIENT FLOORING   ->  pdf page 361
+  10.20 CARPETING  ->  pdf page 362
+  10.22 ACOUSTICAL CEILING TILES  ->  pdf page 364
+  10.23 SUSPENDED ACOUSTICAL CEILINGS   ->  pdf page 365
+  10.24 WOOD JOINTS  ->  pdf page 366
+  10.26 WOOD MOLDINGS & TRIM  ->  pdf page 368
+  10.28 WOOD PANELING  ->  pdf page 370
+  10.29 PLYWOOD VENEER   ->  pdf page 371
+  10.30 PLASTIC LAMINATE  ->  pdf page 372
+11 MECHANICAL &ELECTRICAL SYSTEMS  ->  pdf page 373
+  11.02 MECHANICAL & ELECTRICAL SYSTEMS  ->  pdf page 374
+  11.03 THERMAL COMFORT   ->  pdf page 375
+  11.04 COMFORT ZONE  ->  pdf page 376
+  11.05 PSYCHROMETRIC CHARTS   ->  pdf page 377
+  11.06 HEATING & COOLING SYSTEMS  ->  pdf page 378
+   11.07 ALTERNATIVE ENERGY SOURCES  ->  pdf page 379
+  11.09 HEATING & COOLING LOADS   ->  pdf page 381
+  11.10 FORCED-AIR HEATING  ->  pdf page 382
+  11.11 HOT-WATER HEATING   ->  pdf page 383
+  11.12 ELECTRIC HEATING  ->  pdf page 384
+  11.13 RADIANT HEATING   ->  pdf page 385
+  11.15 ACTIVE SOLAR ENERGY SYSTEMS   ->  pdf page 387
+  11.16 COOLING SYSTEMS  ->  pdf page 388
+  11.17 HVAC SYSTEMS   ->  pdf page 389
+  11.21 AIR DISTRIBUTION OUTLETS   ->  pdf page 393
+  11.22 WATER SUPPLY  ->  pdf page 394
+  11.23 WATER SUPPLY SYSTEMS   ->  pdf page 395
+  11.25 FIRE PROTECTION SYSTEMS   ->  pdf page 397
+  11.26 PLUMBING FIXTURES  ->  pdf page 398
+  11.27 SANITARY DRAINAGE SYSTEMS   ->  pdf page 399
+  11.29 SEWAGE DISPOSAL SYSTEMS   ->  pdf page 401
+  11.30 ELECTRIC POWER  ->  pdf page 402
+  11.31 ELECTRICAL SERVICE   ->  pdf page 403
+  11.33 ELECTRICAL CIRCUITS   ->  pdf page 405
+  11.34 ELECTRICAL WIRING  ->  pdf page 406
+  11.35 ACCESS FLOORING SYSTEMS   ->  pdf page 407
+  11.36 ELECTRICAL OUTLETS  ->  pdf page 408
+  11.37 LIGHT   ->  pdf page 409
+  11.38 LIGHT & VISION  ->  pdf page 410
+  11.39 LIGHT SOURCES   ->  pdf page 411
+  11.43 LUMINAIRES   ->  pdf page 415
+  11.44 LIGHTING  ->  pdf page 416
+12 NOTES ON MATERIALS  ->  pdf page 419
+  12.02 BUILDING MATERIALS  ->  pdf page 420
+  12.04 CONCRETE  ->  pdf page 422
+  12.06 MASONRY  ->  pdf page 424
+  12.08 STEEL  ->  pdf page 426
+  12.09 NONFERROUS METALS   ->  pdf page 427
+  12.10 STONE  ->  pdf page 428
+  12.11 WOOD   ->  pdf page 429
+  12.13 LUMBER   ->  pdf page 431
+  12.14 WOOD PANEL PRODUCTS  ->  pdf page 432
+  12.15 PLASTICS   ->  pdf page 433
+  12.16 GLASS  ->  pdf page 434
+  12.17 GLASS PRODUCTS   ->  pdf page 435
+  12.18 NAILS  ->  pdf page 436
+  12.19 SCREWS & BOLTS   ->  pdf page 437
+  12.20 MISCELLANEOUS FASTENINGS  ->  pdf page 438
+  12.21 PAINTS & COATINGS   ->  pdf page 439
+APPENDIX A  ->  pdf page 441
+  A.02 HUMAN DIMENSIONS  ->  pdf page 442
+  A.03 ADA ACCESSIBILITY GUIDELINES   ->  pdf page 443
+  A.04 FURNITURE DIMENSIONS  ->  pdf page 444
+  A.06 BUILDING LIVE LOADS  ->  pdf page 446
+  A.07 WEIGHTS OF MATERIALS   ->  pdf page 447
+  A.08 METRIC CONVERSION FACTORS  ->  pdf page 448
+  A.10 MEANS OF EGRESS  ->  pdf page 450
+  A.12 FIRE-RATED CONSTRUCTION  ->  pdf page 452
+  A.14 ACOUSTICS  ->  pdf page 454
+  A.16 SOUND CONTROL  ->  pdf page 456
+  A.18 GRAPHIC MATERIAL SYMBOLS  ->  pdf page 458
+  A.19 CSI MASTERFORMAT   ->  pdf page 459
+  A.23 UNIFORMAT II   ->  pdf page 463
+  A.26 LEED GREEN BUILDING RATING SYSTEM  ->  pdf page 466
+  A.27 PROFESSIONAL & TRADE ASSOCIATIONS   ->  pdf page 467
+BIBLIOGRAPHY  ->  pdf page 471
+INDEX  ->  pdf page 473
+  Uploaded by [StormRG]  ->  pdf page 482
