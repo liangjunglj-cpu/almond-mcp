@@ -23,7 +23,9 @@ RhinoAlmondBridge.StructuralValidator
   3. choose an analysis pathway, in strict order of confidence:
        api        → Karamba 3.1 solve via KarambaAdapter (real FEA)   confidence: high
        template   → audited capsule .ghx (karamba_*_v1)               confidence: medium
-                    karamba_frame_v1 is harnessed and audited (2026-08-29):
+                    karamba_frame_v1 and karamba_truss_v1 are harnessed and
+                    audited (2026-08-29; the truss capsule runs
+                    01_InputCurvesAsTruss.ghx, which node-merges input lines):
                     frames that make the native solver throw now get a real
                     Karamba solve through the template instead of falling to
                     rule_based. Bridge >= 0.5.3 unit-scales bound geometry to
@@ -85,6 +87,8 @@ and the two pathways give different numbers for identical geometry.
 | Connected 2-story 2-bay frame | 10 | **api** | PASS | connected frames solve on the api path (high confidence) |
 | Frame slice with offset girder axes (members not touching) | 14 | **template** | FAIL (honest) | api threw; capsule solved and reported 16 rigid-body modes — real Karamba diagnostics instead of a rule-based guess |
 | Connected 3-story 3-bay frame | 21 | rule_based | fallback | both paths hit Karamba's TRIAL limit; the template surfaced it explicitly (see below) |
+| Warren truss 6x0.9 m, 25 kN/node, via run_gh_definition (truss capsule) | 7 | **capsule direct** | ok | disp 5.0 mm (~L/1200), mass 310 kg; geometry auto-scaled mm→m by bridge 0.5.3; planar-truss rigid-mode warning matches the api diagnosis |
+| Same Warren truss via validate_structure | 7 | **api** | PASS | span 6.0 (extent basis), reactions 25.0 kN balancing the applied load |
 
 **Root cause of historical "AnalyzeThI failed" events:** the Karamba
 **trial version caps models at 20 beam elements**. The api path throws an
