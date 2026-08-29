@@ -402,8 +402,68 @@ class ConstructionLibrary:
         return check
 
 
+class HistoryLibrary:
+    """Curated architectural typology narratives (Historyfiles/manifest.json).
+
+    Distilled from Ching, Jarzombek & Prakash, A Global History of
+    Architecture. NARRATION ONLY: entries feed project storytelling and
+    typology context; they never drive geometry, sizing, or structural
+    decisions - those belong to the construction library."""
+
+    REQUIRED = ("typology_id", "name", "era", "narrative", "gha_ref")
+
+    def __init__(self, directory: str):
+        self.directory = Path(directory)
+        self.entries: dict[str, dict] = {}
+        self.source = ""
+        manifest_path = self.directory / "manifest.json"
+        if not manifest_path.is_file():
+            print(f"History manifest missing: {manifest_path}", file=sys.stderr)
+            return
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as exc:
+            print(f"History manifest unreadable: {exc}", file=sys.stderr)
+            return
+        self.source = manifest.get("source", "")
+        for entry in manifest.get("entries", []):
+            if not all(key in entry for key in self.REQUIRED):
+                continue
+            self.entries[entry["typology_id"]] = entry
+        print(f"Indexed {len(self.entries)} typology narratives.", file=sys.stderr)
+
+    def get(self, typology_id: str) -> dict | None:
+        return self.entries.get(typology_id)
+
+    def list(self, query: str = "", construction_system: str = "",
+             structure_type: str = "") -> list[dict]:
+        needle = query.strip().lower()
+        wanted_type = structure_type.strip().lower()
+        results = []
+        for entry in self.entries.values():
+            if construction_system and construction_system not in \
+                    entry.get("related_construction_systems", []):
+                continue
+            if wanted_type and wanted_type not in entry.get("structure_types", []):
+                continue
+            if needle:
+                haystack = " ".join([
+                    entry["typology_id"], entry["name"], entry["era"],
+                    entry.get("region", ""), entry["narrative"],
+                    entry.get("urban_role", ""),
+                    " ".join(entry.get("tags", [])),
+                    " ".join(p.get("name", "") + " " + p.get("place", "")
+                             for p in entry.get("precedents", [])),
+                ]).lower()
+                if needle not in haystack:
+                    continue
+            results.append(entry)
+        return results
+
+
 material_library = MaterialLibrary(MATERIAL_LIBRARY_DIR)
 construction_library = ConstructionLibrary(CONSTRUCTION_LIBRARY_DIR)
+history_library = HistoryLibrary(paths.resolve_dir("RHINO_MCP_HISTORY_DIR"))
 retrieval_store = AlmondStore(STATE_DB_PATH)
 retrieval_store.sync_assets(
     list(drawing_asset_indexer.assets.values()),
@@ -1367,6 +1427,48 @@ def get_construction_guidance(
         payload["hint"] = ("No system matched. Loosen the filters, or call "
                           "with no arguments to list all systems.")
     return json.dumps(payload)
+
+
+@mcp.tool()
+def get_typology_narrative(
+    query: str = "",
+    construction_system: str = "",
+    structure_type: str = "",
+    limit: int = 5,
+) -> str:
+    """
+    Architectural typology narratives for project storytelling - precedents,
+    eras, and urban roles distilled from Ching, Jarzombek & Prakash's
+    A Global History of Architecture, with page references (gha_ref).
+
+    NARRATION ONLY: use these entries to caption, contextualize and narrate
+    a design (which tradition a courtyard block belongs to, what a truss
+    hall's civic ancestors are). They must NEVER drive geometry, member
+    sizing, or structural decisions - that is get_construction_guidance's
+    job. A natural pairing: after building with a construction system, call
+    this with construction_system=<that system_id> to fetch the lineage for
+    the project description.
+
+    Args:
+        query: Free text (e.g. "courtyard", "skyscraper", "timber hall").
+        construction_system: Filter to entries related to a construction
+            library system_id (e.g. "steel-column-frame").
+        structure_type: Filter by validate_structure type ("shell",
+            "truss", "frame", "membrane", ...).
+        limit: Maximum entries returned (default 5).
+    Returns:
+        JSON: {total, entries: [{typology_id, name, era, region, narrative,
+        precedents, related_construction_systems, urban_role, gha_ref,
+        tags}], source}.
+    """
+    entries = history_library.list(query=query,
+                                   construction_system=construction_system,
+                                   structure_type=structure_type)
+    return json.dumps({
+        "total": len(entries),
+        "entries": entries[:max(1, limit)],
+        "source": history_library.source,
+    })
 
 
 @mcp.tool()

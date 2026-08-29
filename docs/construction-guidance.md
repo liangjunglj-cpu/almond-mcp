@@ -123,11 +123,14 @@ warning — stating materials clearly beats silently accepting a mismatch.
   validity, material-id cross-links to Materialfiles, filtering, span
   assessment, and metadata script generation).
 
-## Companion reference (prong 2, pending)
+## Companion narration layer (prong 2, built 2026-08-30)
 
-[reference/bci_toc.txt](reference/bci_toc.txt) and
-[reference/gha_toc.txt](reference/gha_toc.txt) are page-indexed tables of
-contents of the two source volumes (the second: Ching/Jarzombek/Prakash,
-*A Global History of Architecture*), kept for on-demand deep reading. The
-history volume is reserved for typology/narration context and deliberately
-feeds no geometry decisions.
+`Historyfiles/manifest.json` + `get_typology_narrative`: 18 typology
+narratives distilled from Ching/Jarzombek/Prakash, *A Global History of
+Architecture* — precedents, eras and urban roles, cross-linked to
+construction-system ids and page-referenced (`gha_ref`, matching
+[reference/gha_toc.txt](reference/gha_toc.txt)). NARRATION ONLY by
+contract: entries caption and contextualize designs (the perimeter block's
+Hof lineage, the ger behind every membrane roof); they never drive
+geometry — that is the construction library's job. Page-indexed TOCs of
+both volumes remain in [reference/](reference/) for deep reading.

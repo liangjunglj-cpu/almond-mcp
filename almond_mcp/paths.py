@@ -34,6 +34,7 @@ LIBRARY_DIRS = {
     "RHINO_MCP_CAPSULE_DIR": "capsules",
     "RHINO_MCP_MATERIAL_DIR": "Materialfiles",
     "RHINO_MCP_CONSTRUCTION_DIR": "Constructionfiles",
+    "RHINO_MCP_HISTORY_DIR": "Historyfiles",
 }
 
 STATE_DB_ENV = "RHINO_MCP_STATE_DB"

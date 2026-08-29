@@ -49,6 +49,7 @@ packages = ["almond_mcp"]
 "capsules" = "almond_mcp/data/capsules"
 "Materialfiles/manifest.json" = "almond_mcp/data/Materialfiles/manifest.json"
 "Constructionfiles/manifest.json" = "almond_mcp/data/Constructionfiles/manifest.json"
+"Historyfiles/manifest.json" = "almond_mcp/data/Historyfiles/manifest.json"
 
 [tool.hatch.build.targets.sdist]
 # Belt and braces on top of .gitignore: downloaded model files and compiled

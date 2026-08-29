@@ -220,3 +220,45 @@ def test_material_script_carries_construction_metadata():
     # default path unchanged
     plain = server._material_script(material, [guid], True, True)
     assert "structural_role" not in plain
+
+
+HISTORY_MANIFEST = PROJECT_ROOT / "Historyfiles" / "manifest.json"
+
+
+def test_history_manifest_is_valid():
+    manifest = json.loads(HISTORY_MANIFEST.read_text(encoding="utf-8"))
+    entries = manifest["entries"]
+    assert len(entries) >= 12
+    construction = json.loads(MANIFEST.read_text(encoding="utf-8"))
+    system_ids = {s["system_id"] for s in construction["systems"]}
+    seen = set()
+    for entry in entries:
+        for key in ("typology_id", "name", "era", "narrative", "gha_ref"):
+            assert key in entry, f"{entry.get('typology_id')} missing {key}"
+        assert entry["typology_id"] not in seen
+        seen.add(entry["typology_id"])
+        assert len(entry["narrative"]) > 80
+        assert all(isinstance(p, int) for p in entry["gha_ref"])
+        # every cross-link must resolve to a real construction system
+        for sid in entry.get("related_construction_systems", []):
+            assert sid in system_ids, f"{entry['typology_id']} -> {sid}"
+        assert set(entry.get("structure_types", [])) <= VALID_STRUCTURE_TYPES
+    assert "NARRATION ONLY" in manifest["source"]
+
+
+def test_history_library_filters():
+    server = load_server()
+    lib = server.history_library
+    assert len(lib.entries) >= 12
+    towers = lib.list(construction_system="steel-column-frame")
+    assert towers and all("steel-column-frame" in e["related_construction_systems"]
+                          for e in towers)
+    membranes = lib.list(structure_type="membrane")
+    assert any(e["typology_id"] == "nomadic-lattice-tent" for e in membranes)
+    hits = lib.list(query="courtyard")
+    assert len(hits) >= 2
+    tool = server.get_typology_narrative
+    fn = getattr(tool, "fn", tool)
+    result = json.loads(fn(query="skyscraper", limit=2))
+    assert result["total"] >= 1 and len(result["entries"]) <= 2
+    assert "NARRATION ONLY" in result["source"]
