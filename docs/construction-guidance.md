@@ -82,6 +82,17 @@ validate_structure(guids, "beam", load_kn, "Wood")
 `warnings`, so an implausible-as-drawn structure is flagged even when the
 solver passes it.
 
+## Egress checking
+
+`check_egress` turns the manifest's egress rules into one verdict pass:
+occupant load from plate area and occupancy, required exit count (tiers +
+the multi-story minimum of two), exit separation against the plate
+diagonal, total and per-exit egress widths, and optional measured travel
+distances and dead-end lengths. Each check names its requirement, the
+provided value, and its basis, so a failing layout says what to fix (add
+an exit, move a core, widen a stair). IBC-typical numeric factors are
+labeled as such and the response repeats the verify-governing-code note.
+
 ## Rhino-side metadata
 
 `assign_material` with the new optional parameters writes, alongside the

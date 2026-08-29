@@ -5,6 +5,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Rhino;
+using Rhino.Geometry;
 
 namespace RhinoAlmondBridge
 {
@@ -99,7 +100,7 @@ namespace RhinoAlmondBridge
 
             // 3. Pathway B: audited template capsule.
             if (!solved)
-                solved = TryTemplatePath(request, result);
+                solved = TryTemplatePath(request, conditioned, result);
 
             // 4. Pathway C: rule-based estimate. Never silent about it.
             if (!solved)
@@ -232,7 +233,47 @@ namespace RhinoAlmondBridge
 
         // ── Pathway B: audited capsule template ─────────────────────────────
 
-        private bool TryTemplatePath(ValidationRequest request, ValidationResult result)
+        /// <summary>Support node positions in document units: declared anchor
+        /// points when present, else the lowest-Z member endpoints (the same
+        /// convention the api pathway uses for auto-pinning).</summary>
+        private static List<Point3d> CollectSupportPoints(ConditionedModel conditioned)
+        {
+            if (conditioned.AnchorPoints.Count > 0)
+                return new List<Point3d>(conditioned.AnchorPoints);
+
+            var pts = new List<Point3d>();
+            foreach (var b in conditioned.Beams)
+            {
+                pts.Add(b.Axis.PointAtStart);
+                pts.Add(b.Axis.PointAtEnd);
+            }
+            if (pts.Count == 0) return pts;
+
+            double minZ = pts.Min(p => p.Z);
+            double tol = Math.Max(conditioned.Tolerance * 10.0, 1e-6);
+            var basePts = new List<Point3d>();
+            foreach (var p in pts.Where(p => p.Z - minZ <= tol))
+            {
+                if (!basePts.Any(q => q.DistanceTo(p) <= tol))
+                    basePts.Add(p);
+            }
+            return basePts;
+        }
+
+        /// <summary>Doc-units → port-units factor for the template inputs.</summary>
+        private static double SupportUnitScale(ConditionedModel conditioned, string units)
+        {
+            switch ((units ?? "m").Trim().ToLowerInvariant())
+            {
+                case "m": return conditioned.UnitScaleToMeters;
+                case "cm": return conditioned.UnitScaleToMeters * 100.0;
+                case "mm": return conditioned.UnitScaleToMeters * 1000.0;
+                default: return conditioned.UnitScaleToMeters;
+            }
+        }
+
+        private bool TryTemplatePath(ValidationRequest request,
+            ConditionedModel conditioned, ValidationResult result)
         {
             var runner = new GhDefinitionRunner(_templateDir, _capsuleDir);
 
@@ -267,7 +308,17 @@ namespace RhinoAlmondBridge
                 string baseType = (port.Type ?? "").Replace("[]", "");
                 string nameUpper = (port.Name ?? "").ToUpperInvariant();
 
-                if (baseType == "curve" || baseType == "mesh" ||
+                if (baseType == "point" &&
+                    (nameUpper.Contains("SUPPORT") || nameUpper.Contains("ANCHOR")))
+                {
+                    // Feed the conditioned support nodes (declared anchors, or
+                    // the auto-pinned lowest-Z nodes) in the port's units.
+                    double s = SupportUnitScale(conditioned, port.Units);
+                    var basePts = CollectSupportPoints(conditioned);
+                    inputs[port.Name] = new JArray(basePts.Select(p =>
+                        new JArray(p.X * s, p.Y * s, p.Z * s)));
+                }
+                else if (baseType == "curve" || baseType == "mesh" ||
                     baseType == "brep" || baseType == "point")
                 {
                     inputs[port.Name] = new JObject

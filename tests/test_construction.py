@@ -124,6 +124,87 @@ def test_assess_span_no_candidates_warns():
     assert check["matching_systems"] == []
 
 
+def _check_egress(server, **kwargs):
+    tool = server.check_egress
+    fn = getattr(tool, "fn", tool)
+    return json.loads(fn(**kwargs))
+
+
+def test_check_egress_single_exit_fails():
+    server = load_server()
+    # the 24x16 m 3-story office from the live test, before remediation
+    result = _check_egress(
+        server,
+        plate_bounds_mm=[0, 0, 24000, 16000],
+        exits=[{"name": "stair 1", "x_mm": 9770, "y_mm": 8200, "width_mm": 1120}],
+        occupancy="business", stories=3, sprinklered=True)
+    assert result["occupant_load"] == 42
+    assert result["passed"] is False
+    exit_check = next(c for c in result["checks"] if c["check"] == "exit_count")
+    assert exit_check["required"] == 2 and exit_check["provided"] == 1
+    assert not exit_check["passed"]
+
+
+def test_check_egress_two_core_tower_passes():
+    server = load_server()
+    # the 40x24 m tower: two stairs 19.3 m apart, measured travel distances
+    result = _check_egress(
+        server,
+        plate_bounds_mm=[0, 0, 40000, 24000],
+        exits=[{"name": "stair A", "x_mm": 11420, "y_mm": 12600, "width_mm": 1120},
+               {"name": "stair B", "x_mm": 30700, "y_mm": 12600, "width_mm": 1120}],
+        occupancy="business", stories=6, sprinklered=True,
+        travel_distances_m=[21.2, 15.1], dead_end_m=11.4)
+    assert result["occupant_load"] == 104
+    assert result["passed"] is True
+    sep = next(c for c in result["checks"] if c["check"] == "exit_separation_m")
+    assert sep["passed"] and sep["provided"] > sep["required"]
+    assert len(result["checks"]) == 6  # count, separation, 2x width, travel, dead-end
+
+
+def test_check_egress_separation_and_width_failures():
+    server = load_server()
+    # two exits too close together, one door below stair minimum
+    result = _check_egress(
+        server,
+        plate_bounds_mm=[0, 0, 40000, 24000],
+        exits=[{"name": "a", "x_mm": 10000, "y_mm": 12000, "width_mm": 1120},
+               {"name": "b", "x_mm": 14000, "y_mm": 12000, "width_mm": 900}],
+        occupancy="business", stories=6, sprinklered=True)
+    assert result["passed"] is False
+    sep = next(c for c in result["checks"] if c["check"] == "exit_separation_m")
+    assert not sep["passed"]
+    minw = next(c for c in result["checks"] if c["check"] == "min_exit_width_mm")
+    assert not minw["passed"]
+    assert any("below minimum width" in w for w in result["warnings"])
+
+
+def test_check_egress_unsprinklered_tightens_limits():
+    server = load_server()
+    kwargs = dict(
+        plate_bounds_mm=[0, 0, 24000, 16000],
+        exits=[{"name": "s1", "x_mm": 2000, "y_mm": 8000, "width_mm": 1120},
+               {"name": "s2", "x_mm": 22000, "y_mm": 8000, "width_mm": 1120}],
+        occupancy="business", stories=2, dead_end_m=9.3)
+    ok = _check_egress(server, sprinklered=True, **kwargs)
+    bad = _check_egress(server, sprinklered=False, **kwargs)
+    dead_ok = next(c for c in ok["checks"] if c["check"] == "max_dead_end_m")
+    dead_bad = next(c for c in bad["checks"] if c["check"] == "max_dead_end_m")
+    assert dead_ok["passed"] and not dead_bad["passed"]
+
+
+def test_check_egress_input_errors():
+    server = load_server()
+    r = _check_egress(server, plate_bounds_mm=[0, 0, 1000], exits=[{"name": "x"}])
+    assert r["status"] == "error"
+    r = _check_egress(server, plate_bounds_mm=[0, 0, 10000, 10000], exits=[])
+    assert r["status"] == "error"
+    r = _check_egress(server, plate_bounds_mm=[0, 0, 10000, 10000],
+                      exits=[{"name": "x", "x_mm": 0, "y_mm": 0, "width_mm": 1120}],
+                      occupancy="spaceship")
+    assert r["status"] == "error" and "spaceship" in r["message"]
+
+
 def test_material_script_carries_construction_metadata():
     server = load_server()
     material = server.material_library.get("steel-painted-sage")

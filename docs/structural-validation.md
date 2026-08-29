@@ -23,6 +23,13 @@ RhinoAlmondBridge.StructuralValidator
   3. choose an analysis pathway, in strict order of confidence:
        api        → Karamba 3.1 solve via KarambaAdapter (real FEA)   confidence: high
        template   → audited capsule .ghx (karamba_*_v1)               confidence: medium
+                    karamba_frame_v1 is harnessed and audited (2026-08-29):
+                    frames that make the native solver throw now get a real
+                    Karamba solve through the template instead of falling to
+                    rule_based. Bridge >= 0.5.3 unit-scales bound geometry to
+                    the port's declared units and feeds the conditioned
+                    support nodes (declared anchors, else lowest-Z) into
+                    ALMOND_IN_SUPPORTS-style point ports.
        rule_based → heuristic UDL formulas                            confidence: low
   4. pass/fail checks (same criteria for every pathway)
   5. record the run in the state DB → export_structural_report renders Markdown
