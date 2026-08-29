@@ -89,5 +89,25 @@ blender -b -P examples/city_kit/blender_district.py
 which imports every GLB, builds a Cycles Principled material per
 material_id (glass with transmission, metals metallic, concrete/brick
 with noise bump, foliage green, lamp heads emissive), auto-rescales
-mm->m, adds a Nishita sun/sky and ground, and renders an aerial and a
-street view (AgX, denoised).
+mm->m, adds a Nishita sun/sky and ground, renders an aerial and a
+street view (AgX, denoised, GPU via OptiX when available), and saves an
+openable scene to `~/Documents/almond_district.blend` (override with
+`ALMOND_BLEND_PATH`; `ALMOND_SKIP_RENDER=1` skips the stills). Open the
+.blend in a normal Blender session to inspect - a headless run never
+touches an already-open window. Reference output from the 2026-08-30
+run is committed in `renders/` (Blender aerial + street, Rhino axon
+for comparison).
+
+## Session state (end of 2026-08-30)
+
+- District standing in the user's Rhino doc: 4,353 objects, phases
+  A-D applied (kit incl. arcades, bay windows, roof gardens).
+- Per-material GLB exports + contracts in the session scratch
+  (`district_glb_mat/`); regenerate any time with the export snippet in
+  the driver history - the .almond.json material_id->guid maps are the
+  bridge between Rhino identity and any DCC.
+- `almond_district.blend` saved in ~/Documents (2.4 MB), cameras and
+  materials ready.
+- Almond repo state: 7/8 capsules audited (gridshell harnessed,
+  blocked on trial license), narration layer live, check_egress live,
+  spec register generated, bridge 0.5.3 deployed.
