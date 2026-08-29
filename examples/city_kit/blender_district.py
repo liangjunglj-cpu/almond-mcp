@@ -171,9 +171,16 @@ scene.view_settings.view_transform = "AgX"
 scene.view_settings.exposure = -0.9
 scene.view_settings.look = "AgX - Medium High Contrast"
 
-for cam, out in ((cam_aerial, "blender_aerial.png"), (cam_street, "blender_street.png")):
-    scene.camera = cam
-    scene.render.filepath = os.path.join(OUT_DIR, out)
-    bpy.ops.render.render(write_still=True)
-    print(f"rendered {out}")
+if not os.environ.get("ALMOND_SKIP_RENDER"):
+    for cam, out in ((cam_aerial, "blender_aerial.png"), (cam_street, "blender_street.png")):
+        scene.camera = cam
+        scene.render.filepath = os.path.join(OUT_DIR, out)
+        bpy.ops.render.render(write_still=True)
+        print(f"rendered {out}")
+scene.camera = cam_aerial
+blend_path = os.environ.get(
+    "ALMOND_BLEND_PATH",
+    os.path.join(os.path.expanduser("~"), "Documents", "almond_district.blend"))
+bpy.ops.wm.save_as_mainfile(filepath=blend_path)
+print(f"saved {blend_path}")
 print("DONE")
