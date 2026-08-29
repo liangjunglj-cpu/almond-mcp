@@ -1,30 +1,57 @@
 {
-  "capsule_id": "karamba_membrane_v1",
-  "version": 1,
-  "capability": "analyze",
-  "structure_type": "membrane",
-  "plugin_dependencies": [{"name": "Karamba3D", "min_version": "3.1"}],
-  "definition_file": "04_MembraneFormFinding.ghx",
-  "title": "Membrane form finding",
-  "description_for_llm": "Form finds a tensioned membrane surface from an initial mesh using Karamba's large deformation pipeline with a soft membrane material, then reports the equilibrium shape. Use for tent, sail, or fabric roof studies where the shape must be found from prestress and boundary conditions, not drawn. Assumptions: input mesh in metres with anchored corner or edge points per the template, membrane carries tension only through its prestress, self weight is small relative to prestress. Limits: this is shape finding, not a full membrane engineering check; wind, snow, and ponding on the found shape are not analyzed; wrinkling and compression zones are not flagged reliably; patterning and seam layout are out of scope. NOT YET AUDITED: the GHX has no ALMOND_IN_*/ALMOND_OUT_* harness params, so run_definition will refuse it. Retrieval context only until harnessed.",
-  "inputs": [
-    {"name": "ALMOND_IN_MESH", "type": "mesh", "units": "m", "required": true,
-     "description": "Initial membrane mesh with boundary vertices at the anchor points."},
-    {"name": "ALMOND_IN_PRESTRESS_KNM", "type": "number", "units": "kN/m", "required": false, "default": 2.0,
-     "description": "Isotropic membrane prestress driving the form finding."}
-  ],
-  "outputs": [
-    {"name": "ALMOND_OUT_DISP_MM", "type": "number", "units": "mm",
-     "semantics": "max_nodal_displacement",
-     "description": "Largest vertex movement from the initial mesh to the found shape."},
-    {"name": "ALMOND_OUT_UTIL", "type": "number[]",
-     "semantics": "per_element_utilization",
-     "description": "Utilization ratio per membrane element in the found state."},
-    {"name": "ALMOND_OUT_MASS_KG", "type": "number", "units": "kg",
-     "semantics": "total_mass",
-     "description": "Total membrane mass of the model."}
-  ],
-  "binding": "reserved_nicknames",
-  "confidence": "template",
-  "audited": false
+ "capsule_id": "karamba_membrane_v1",
+ "version": 1,
+ "capability": "analyze",
+ "structure_type": "membrane",
+ "plugin_dependencies": [
+  {
+   "name": "Karamba3D",
+   "min_version": "3.1"
+  }
+ ],
+ "definition_file": "04_MembraneFormFinding.ghx",
+ "title": "Membrane form-finding from an input mesh (Theory II)",
+ "description_for_llm": "Second-order (AnalyseThII) solve of a prestressed membrane built from an input mesh with a soft membrane material - reports the equilibrium (form-found) state. Use for tent / sail / canopy membranes anchored at points. ALMOND_IN_PRESTRAIN is the Eps0 pre-strain fed to the template's prestress load (dimensionless; the original slider used ~0.005-0.01); vertex loads from the template's VertexLoads cluster now act on the INPUT mesh. The displacement output is the form-finding movement of the membrane, NOT a serviceability deflection - validate_structure's L/250 check is not meaningful for this capsule; read the numbers directly via run_gh_definition. HARNESSED 2026-08-30 from 04_MembraneFormFinding.ghx. VERIFIED 2026-08-30: 9x9 m hypar mesh (4x4 faces), 4 corner anchors, prestrain 0.005 -> form-finding movement 3.49 m, mass 76 kg.",
+ "inputs": [
+  {
+   "name": "ALMOND_IN_MESH",
+   "type": "mesh",
+   "units": "m",
+   "required": true,
+   "description": "Initial membrane mesh in metres (breps are meshed by the runner). Keep under the Karamba trial's shell-element cap (about 5x5 faces) on a trial license."
+  },
+  {
+   "name": "ALMOND_IN_PRESTRAIN",
+   "type": "number",
+   "required": false,
+   "default": 0.005,
+   "description": "Pre-strain (Eps0) for the membrane prestress load; dimensionless."
+  },
+  {
+   "name": "ALMOND_IN_SUPPORTS",
+   "type": "point[]",
+   "units": "m",
+   "required": false,
+   "description": "Support node positions. When omitted the validator supplies the lowest-Z nodes of the input members automatically."
+  }
+ ],
+ "outputs": [
+  {
+   "name": "ALMOND_OUT_DISP_MM",
+   "type": "number",
+   "units": "cm",
+   "semantics": "max_nodal_displacement",
+   "description": "Largest nodal displacement; Karamba emits centimetres, converted downstream per these units."
+  },
+  {
+   "name": "ALMOND_OUT_MASS_KG",
+   "type": "number",
+   "units": "kg",
+   "semantics": "total_mass",
+   "description": "Total structural mass of the model."
+  }
+ ],
+ "binding": "reserved_nicknames",
+ "confidence": "template",
+ "audited": true
 }
