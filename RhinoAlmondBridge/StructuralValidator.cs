@@ -77,8 +77,22 @@ namespace RhinoAlmondBridge
                 return result;
             }
 
+            // Beam and frame members each run support to support, so their
+            // structural span is the longest single member - a multi-bay set
+            // must not read as one building-length span. Trusses, shells and
+            // the other assembly types genuinely span their overall extent
+            // (their segments are shorter than the span they form).
             double spanM = conditioned.MaxSpan * conditioned.UnitScaleToMeters;
-            if (spanM < 0.001) spanM = 5.0; // default 5 m when undeterminable
+            string spanBasis = "extent";
+            bool perMemberSpan =
+                string.Equals(request.StructureType, "beam", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(request.StructureType, "frame", StringComparison.OrdinalIgnoreCase);
+            if (perMemberSpan && conditioned.MaxMemberSpan > 0.001)
+            {
+                spanM = conditioned.MaxMemberSpan * conditioned.UnitScaleToMeters;
+                spanBasis = "member";
+            }
+            if (spanM < 0.001) { spanM = 5.0; spanBasis = "default"; } // 5 m when undeterminable
 
             // 2. Pathway A: direct Karamba 3.1 API.
             bool solved = TryApiPath(request, conditioned, result);
@@ -105,6 +119,7 @@ namespace RhinoAlmondBridge
             result.Results.DeflectionLimitMM = deflectionLimit;
             result.Results.YieldStressMPa = yieldStress;
             result.Results.SpanM = spanM;
+            result.Results.SpanBasis = spanBasis;
 
             var failures = new List<string>();
             var suggestions = new List<string>();
@@ -539,6 +554,12 @@ namespace RhinoAlmondBridge
 
         [JsonProperty("span_m")]
         public double SpanM { get; set; }
+
+        /// <summary>How span_m was determined: "member" (longest single
+        /// member; beam/frame), "extent" (overall bounding extent; truss,
+        /// shell and other assembly types), or "default" (5 m fallback).</summary>
+        [JsonProperty("span_basis")]
+        public string SpanBasis { get; set; } = "extent";
 
         [JsonProperty("analysis_method")]
         public string AnalysisMethod { get; set; } = "rule_based";

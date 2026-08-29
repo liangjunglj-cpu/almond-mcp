@@ -12,7 +12,14 @@ validate_structure(guids, structure_type, load_kn, material)
         ▼
 RhinoAlmondBridge.StructuralValidator
   1. resolve the Rhino objects, extract member axis segments (unit-scaled to meters)
-  2. detect span (max extent; defaults to 5.0 m when undeterminable)
+  2. detect span, type-aware (bridge >= 0.5.2; results carry span_basis):
+       beam/frame → longest single member ("member") — members run support
+                    to support, so a multi-bay set reads its bay span, not
+                    the building length
+       truss/shell/canopy/gridshell/membrane/highrise → overall bounding
+                    extent ("extent") — segments are shorter than the span
+                    they form
+       undeterminable → 5.0 m ("default")
   3. choose an analysis pathway, in strict order of confidence:
        api        → Karamba 3.1 solve via KarambaAdapter (real FEA)   confidence: high
        template   → audited capsule .ghx (karamba_*_v1)               confidence: medium
