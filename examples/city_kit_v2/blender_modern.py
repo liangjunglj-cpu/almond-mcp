@@ -19,8 +19,16 @@ import glob
 import json
 import math
 import os
+import sys
 
 from mathutils import Vector
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+try:
+    from blender_modern_mats import build_rich_material
+except Exception as exc:
+    print(f"rich materials unavailable ({exc}); using flat recipes")
+    build_rich_material = None
 
 SCRATCH = os.environ.get(
     "ALMOND_MODERN_SCRATCH",
@@ -105,7 +113,9 @@ for glb in sorted(glob.glob(os.path.join(GLB_DIR, "*.glb"))):
     new_objs = [o for o in bpy.data.objects if o not in before and o.type == "MESH"]
     imported_total += len(new_objs)
     if recipe:
-        mat = build_material(f"ALMOND {key}", recipe)
+        frag = next((f for f in RECIPES if key == f or key.startswith(f)), key)
+        mat = (build_rich_material(f"ALMOND {frag}", frag) if build_rich_material
+               else build_material(f"ALMOND {key}", recipe))
         for o in new_objs:
             o.data.materials.clear()
             o.data.materials.append(mat)
@@ -125,7 +135,8 @@ if extent > 2000:
 # ── ground plane (site slab is exported; this catches the horizon) ─────────
 bpy.ops.mesh.primitive_plane_add(size=2400, location=(75, 54, -0.42))
 ground = bpy.context.active_object
-gmat = build_material("ALMOND ground", dict(base=(0.52, 0.52, 0.50), rough=0.9))
+gmat = (build_rich_material("ALMOND ground", "ground") if build_rich_material
+        else build_material("ALMOND ground", dict(base=(0.52, 0.52, 0.50), rough=0.9)))
 ground.data.materials.append(gmat)
 
 # ── lighting: exact Rhino sun vector + Nishita ambience ────────────────────

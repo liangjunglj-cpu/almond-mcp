@@ -26,8 +26,16 @@ import glob
 import json
 import math
 import os
+import sys
 
 from mathutils import Vector
+
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+try:
+    from blender_modern_mats import build_rich_material
+except Exception as exc:
+    print(f"rich materials unavailable ({exc}); using flat recipes")
+    build_rich_material = None
 
 SCRATCH = os.environ.get(
     "ALMOND_MODERN_SCRATCH",
@@ -106,7 +114,9 @@ for glb in sorted(glob.glob(os.path.join(GLB_DIR, "*.glb"))):
     bpy.ops.import_scene.gltf(filepath=glb)
     new_objs = [o for o in bpy.data.objects if o not in before and o.type == "MESH"]
     if recipe:
-        mat = build_material(f"ALMOND {key}", recipe)
+        frag = next((f for f in RECIPES if key == f or key.startswith(f)), key)
+        mat = (build_rich_material(f"ALMOND {frag}", frag) if build_rich_material
+               else build_material(f"ALMOND {key}", recipe))
         for o in new_objs:
             o.data.materials.clear()
             o.data.materials.append(mat)
@@ -167,15 +177,15 @@ for g, items in GROUPS.items():
 FPS = 24
 SHOTS = [
     # (group, start, end, cam0, cam1, tgt0, tgt1, lens)
-    ("spine", 1,   96,  (185, -45, 72), (128, 6, 26),  (75, 54, 4),  (75, 54, 8),  35),
-    ("A",     97,  192, (118, 38, 34),  (72, 58, 16),  (36, 88, 12), (34, 88, 16), 35),
-    ("B",     193, 288, (152, 36, 26),  (122, 58, 22), (113, 92, 8), (110, 90, 12), 35),
-    ("C",     289, 384, (192, -55, 8),  (172, -18, 58), (117, 25, 10), (117, 25, 38), 35),
-    ("D",     385, 480, (92, -28, 28),  (60, -8, 11),  (34, 18, 8),  (46, 30, 9),  35),
-    ("urban", 481, 672, (28, -65, 45),  (114, -65, 45), (28, 50, 8), (114, 50, 8), 32),
+    ("spine", 1,    192,  (185, -45, 72), (128, 6, 26),  (75, 54, 4),  (75, 54, 8),  35),
+    ("A",     193,  384,  (118, 38, 34),  (72, 58, 16),  (36, 88, 12), (34, 88, 16), 35),
+    ("B",     385,  576,  (152, 36, 26),  (122, 58, 22), (113, 92, 8), (110, 90, 12), 35),
+    ("C",     577,  768,  (192, -55, 8),  (172, -18, 58), (117, 25, 10), (117, 25, 38), 35),
+    ("D",     769,  960,  (92, -28, 28),  (60, -8, 11),  (34, 18, 8),  (46, 30, 9),  35),
+    ("urban", 961,  1344, (28, -65, 45),  (114, -65, 45), (28, 50, 8), (114, 50, 8), 32),
 ]
 
-def stagger(group, s0, s1, spread_frac=0.72, grow=20, sort_mode="z"):
+def stagger(group, s0, s1, spread_frac=0.72, grow=40, sort_mode="z"):
     """Staggered delta_scale 0 -> 1 for every object in the group."""
     items = GROUPS[group]
     if sort_mode == "x":
@@ -195,7 +205,7 @@ def stagger(group, s0, s1, spread_frac=0.72, grow=20, sort_mode="z"):
 
 for (group, s0, s1, *_rest) in SHOTS:
     if group == "urban":
-        stagger(group, s0, s0 + int((s1 - s0) * 0.62), grow=16, sort_mode="x")
+        stagger(group, s0, s0 + int((s1 - s0) * 0.62), grow=28, sort_mode="x")
     else:
         stagger(group, s0, s1)
 for (o, c, z) in GROUPS["base"]:
@@ -204,7 +214,9 @@ for (o, c, z) in GROUPS["base"]:
 # ── ground / sun / sky (same as the stills script) ─────────────────────────
 bpy.ops.mesh.primitive_plane_add(size=2400, location=(75, 54, -0.42))
 ground = bpy.context.active_object
-ground.data.materials.append(build_material("ALMOND ground", dict(base=(0.52, 0.52, 0.50), rough=0.9)))
+ground.data.materials.append(
+    build_rich_material("ALMOND ground", "ground") if build_rich_material
+    else build_material("ALMOND ground", dict(base=(0.52, 0.52, 0.50), rough=0.9)))
 
 d = Vector(sun_state["vector"]).normalized()
 sun_data = bpy.data.lights.new("RhinoSun", type="SUN")
