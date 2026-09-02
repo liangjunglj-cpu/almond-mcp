@@ -655,8 +655,28 @@ def mod_room(ix, iy, iz, nx, ny, rng):
         b = "agg_scr_c" if rng.random() < 0.55 else "agg_scr_o"
         obl(b, L_SCR, [cx + ex * (L / 2 + 70), cy + ey * (W / 2 + 70),
                        zb + H * 0.28, run * 0.55, 120, H * 0.42, ang, 0])
+    # micro-panels: faces carry small layered plates / vents
+    for _ in range(rng.randint(2, 4)):
+        face = rng.randint(0, 3)
+        ex, ey, ang = ((0, 1, 0), (0, -1, 0), (1, 0, 90), (-1, 0, 90))[face]
+        run = L if ey else W
+        u = (rng.random() - 0.5) * run * 0.6
+        px = cx + ex * (L / 2 + 130) + (u if ey else 0)
+        py = cy + ey * (W / 2 + 130) + (0 if ey else u)
+        b = rng.choice(("det_plate", "p_light", "p_dark", "p_verm"))
+        obl(b, L_DET, [px, py, zb + H * rng.uniform(0.1, 0.5),
+                       run * rng.uniform(0.12, 0.24), 130,
+                       H * rng.uniform(0.14, 0.3), ang, 0])
     for s in (-1, 1):
         obl("agg_frame", L_AGG, [cx + s * L / 2, cy + s * W / 2, zb, 170, 170, H, 0, 0])
+    if rng.random() < 0.45:
+        obl("det_equip", L_DET, [cx + (rng.random() - 0.5) * L * 0.4,
+                                 cy + (rng.random() - 0.5) * W * 0.4,
+                                 zb + H + 240, 900, 700, 520, rng.choice((0, 90)), 0])
+    if rng.random() < 0.25:
+        sx, sy = rng.choice(((1, 1), (1, -1), (-1, 1), (-1, -1)))
+        cyl("pipes", L_DET, [cx + sx * L * 0.42, cy + sy * W * 0.42, zb - CELL * 0.5,
+                             0, 0, 1, H + CELL * 0.5, 90])
     if rng.random() < 0.12:
         cyl("det_ant", L_DET, [cx, cy, zb + H + 240, 0, 0, 1, 2600, 130])
 
@@ -673,6 +693,17 @@ def mod_corridor(ix, iy, iz, nx, ny, rng):
     obl("agg_win", L_SCR, [cx, cy + (W / 2 + 60) * (1 if rng.random() < 0.5 else -1),
                            zb + H * 0.5, (L if along_x else 340) * 0.72,
                            (90 if along_x else 90), 480, 0 if along_x else 90, 0])
+    # underside ribs + roof conduit
+    span = L if along_x else W
+    n_rib = max(int(span / (CELL * 1.1)), 2)
+    for k in range(n_rib):
+        u = (k + 0.5) * span / n_rib - span / 2
+        rx = cx + (u if along_x else 0)
+        ry = cy + (0 if along_x else u)
+        obl("agg_frame", L_AGG, [rx, ry, zb - 200, (300 if along_x else W * 1.05),
+                                 (W * 1.05 if along_x else 300), 220, 0, 0])
+    obl("det_cond", L_DET, [cx, cy, zb + H + 30, (span * 0.85 if along_x else 170),
+                            (170 if along_x else span * 0.85), 150, 0, 0])
     if rng.random() < 0.3:
         obl("glow", L_GLOW, [cx, cy, zb - 140, L * 0.8, 140, 130, 0 if along_x else 90, 0])
 
@@ -681,6 +712,8 @@ def mod_shaft(ix, iy, iz, nz, rng):
     W, H = CELL * 0.78, nz * CELL * 0.98
     obl("agg_body", L_AGG, [cx, cy, zb, W, W, H, 0, 0])
     obl("agg_cap", L_AGG, [cx, cy, zb + H, W * 1.12, W * 1.12, 260, 0, 0])
+    for k in range(1, nz):
+        obl("agg_frame", L_AGG, [cx, cy, zb + k * CELL - 130, W * 1.1, W * 1.1, 260, 0, 0])
     ang = rng.choice((0, 90, 180, 270))
     ex, ey = rot2(1, 0, ang)
     obl("glow", L_GLOW, [cx + ex * (W / 2 + 60), cy + ey * (W / 2 + 60),
@@ -700,6 +733,15 @@ def mod_bridge(ix, iy, iz, nx, ny, rng):
                                  (150 if along_x else W * 0.98), 620, 0, 0])
     obl("agg_win", L_SCR, [cx, cy, zb + CELL * 0.66, (L if along_x else 170) * 0.9,
                            (170 if along_x else W * 0.9), 120, 0, 0])
+    # railing posts
+    span = L if along_x else W
+    n_post = max(int(span / (CELL * 0.9)), 3)
+    for k in range(n_post):
+        u = (k + 0.5) * span / n_post - span / 2
+        for s in (-1, 1):
+            px = cx + (u if along_x else s * (W / 2 - 90))
+            py = cy + (s * (W / 2 - 90) if along_x else u)
+            obl("agg_frame", L_AGG, [px, py, zb + 260, 110, 110, 640, 0, 0])
 
 def mod_tessa(ix, iy, iz, rng):
     """Tesseract frame cell: open 2x2x2 frame with a glowing inner cube."""
@@ -847,6 +889,33 @@ def phase_det():
             py = y0 + dy * t - nyo * 1400
             obl("det_equip", L_DET, [px, py, 3900, 2000, 1000, 1500, yaw, 0])
             obl("det_cond", L_DET, [px, py, 5600, 3400, 200, 200, yaw, 0])
+    # eave battens: rows of short strips under every tenshu eave edge
+    z2, L2, W2 = 14000.0, 24500.0, 20500.0
+    for i in range(6):
+        h2 = 6500 * (0.88 ** i)
+        sc2 = max(L2 / 24500, 0.42)
+        ov2 = max(2600 * sc2, 900)
+        ze = z2 + h2 - max(170 * sc2, 80) - 320
+        for ex, ey, ang in ((0, 1, 0), (0, -1, 0), (1, 0, 90), (-1, 0, 90)):
+            run = (L2 if ey else W2) + 2 * ov2
+            dep = (W2 if ey else L2)
+            nb = max(int(run / 3800), 4)
+            for k in range(nb):
+                u = (k + 0.5) * run / nb - run / 2
+                px = ex * (dep / 2 + ov2 * 0.55) + (u if ey else 0)
+                py = ey * (dep / 2 + ov2 * 0.55) + (0 if ey else u)
+                obl("det_batten", L_DET, [px, py, ze, (run / nb) * 0.5 if ey else 260,
+                                          260 if ey else (run / nb) * 0.5, 150, 0, 0])
+        z2 += h2 + 3 * max(560 * sc2, 220)
+        L2, W2 = L2 * 0.84, W2 * 0.84
+    # horizontal reveal strips on the bailey wall bodies
+    for (x0, y0, x1, y1) in RUNS:
+        dxr, dyr = x1 - x0, y1 - y0
+        lnr = math.hypot(dxr, dyr)
+        yawr = math.degrees(math.atan2(dyr, dxr))
+        for zz in (5200, 6800):
+            obl("det_batten", L_DET, [(x0 + x1) / 2, (y0 + y1) / 2, zz,
+                                      lnr * 0.98, 1850, 90, yawr, 0])
     # big interface screens on outer walls + the tenshu base
     spots = [(-30000, -88500, 0, 9500, 5600), (34000, -88500, 0, 12000, 6800),
              (-98500, -20000, 90, 9500, 5600), (98500, 24000, 90, 9500, 5600),
@@ -868,6 +937,38 @@ def phase_det():
     save()
     log(f"DET DONE: {n} objects")
 
+REDO_BATCHES = ["agg_body", "agg_cap", "agg_frame", "agg_scr_c", "agg_scr_o",
+                "agg_win", "det_plate", "det_batten", "det_ant", "det_equip",
+                "det_cond", "scr_frame", "scr_c", "scr_o", "holo", "pipes"]
+
+def phase_redo():
+    """Delete the aggregation + detail batches and re-grow them with the
+    enhanced (higher-LOD) module emitters."""
+    log("=== REDO: re-grow aggregation + detail at higher LOD ===")
+    BASE_GLOW = 190          # glow entries from SUN+T1..T4 (dry-run verified);
+    ids = [g for b in REDO_BATCHES for g in G.get(b, [])]
+    ids += G.get("glow", [])[BASE_GLOW:]          # strips the old AGG neon
+    G["glow"] = G.get("glow", [])[:BASE_GLOW]
+    if ids and not DRY:
+        for i in range(0, len(ids), 300):
+            arr = ", ".join(f'"{g}"' for g in ids[i:i + 300])
+            run_script(CS_HEAD + """
+  public static List<Guid> Run(RhinoDoc doc) {
+    foreach (string s in new[] { ARR }) {
+      var obj = doc.Objects.FindId(new Guid(s));
+      if (obj != null) doc.Objects.Delete(obj.Id, true);
+    }
+    doc.Views.Redraw();
+    return new List<Guid>();
+  }
+}""".replace("ARR", arr))
+    for b in REDO_BATCHES:
+        G[b] = []
+    # NOTE: "glow" strips emitted by earlier AGG modules are left in place;
+    # they sit inside the same envelope and simply enrich the re-grown mass.
+    phase_agg()
+    phase_det()
+
 # ══════════════ MAT ══════════════
 MAT = [
     ("g_ground",  "concrete-smooth",        "site_ground"),
@@ -885,6 +986,7 @@ MAT = [
     ("agg_scr_o", "brick-red",              "interface_screen"),
     ("agg_win",   "polycarbonate-opal",     "window_strip"),
     ("det_plate", "steel-painted-charcoal", "facade_plate"),
+    ("det_batten", "steel-painted-charcoal", "eave_batten"),
     ("det_ant",   "steel-galvanized",       "antenna"),
     ("det_equip", "steel-painted-charcoal", "equipment"),
     ("det_cond",  "steel-galvanized",       "conduit"),
@@ -987,7 +1089,7 @@ def phase_save3dm():
 
 PHASES = {"CLEAR": phase_clear, "SUN": phase_sun, "T1": phase_t1, "T2": phase_t2,
           "T3": phase_t3, "T4": phase_t4, "AGG": phase_agg, "DET": phase_det,
-          "MAT": phase_mat, "FIX1": phase_fix1,
+          "MAT": phase_mat, "FIX1": phase_fix1, "REDO": phase_redo,
           "EXPORT": phase_export, "SAVE3DM": phase_save3dm}
 
 if PHASE == "ALL":

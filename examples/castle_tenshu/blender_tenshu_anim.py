@@ -70,26 +70,65 @@ def _bsdf(mat):
 
 
 def build_charcoal(name):
+    """Panel steel: seam grid bump, mottled albedo, varied roughness."""
     mat = bpy.data.materials.new(name)
     bsdf, tree = _bsdf(mat)
-    bsdf.inputs["Base Color"].default_value = (0.045, 0.050, 0.056, 1.0)
-    bsdf.inputs["Metallic"].default_value = 0.75
-    bsdf.inputs["Roughness"].default_value = 0.42
-    noise = tree.nodes.new("ShaderNodeTexNoise")
-    noise.inputs["Scale"].default_value = 120.0
+    bsdf.inputs["Metallic"].default_value = 0.65
+    tc = tree.nodes.new("ShaderNodeTexCoord")
+    # albedo mottling
+    n1 = tree.nodes.new("ShaderNodeTexNoise")
+    n1.inputs["Scale"].default_value = 14.0
+    mix = tree.nodes.new("ShaderNodeMix")
+    mix.data_type = "RGBA"
+    mix.inputs["Factor"].default_value = 0.5
+    mix.inputs[6].default_value = (0.040, 0.045, 0.052, 1.0)
+    mix.inputs[7].default_value = (0.060, 0.066, 0.074, 1.0)
+    tree.links.new(tc.outputs["Object"], n1.inputs["Vector"])
+    tree.links.new(n1.outputs["Fac"], mix.inputs["Factor"])
+    tree.links.new(mix.outputs[2], bsdf.inputs["Base Color"])
+    # roughness variation
+    n2 = tree.nodes.new("ShaderNodeTexNoise")
+    n2.inputs["Scale"].default_value = 42.0
+    mr = tree.nodes.new("ShaderNodeMapRange")
+    mr.inputs["To Min"].default_value = 0.30
+    mr.inputs["To Max"].default_value = 0.56
+    tree.links.new(tc.outputs["Object"], n2.inputs["Vector"])
+    tree.links.new(n2.outputs["Fac"], mr.inputs["Value"])
+    tree.links.new(mr.outputs["Result"], bsdf.inputs["Roughness"])
+    # panel-seam bump
+    brick = tree.nodes.new("ShaderNodeTexBrick")
+    brick.inputs["Scale"].default_value = 5.0
+    brick.inputs["Mortar Size"].default_value = 0.012
+    brick.inputs["Color1"].default_value = (1, 1, 1, 1)
+    brick.inputs["Color2"].default_value = (0.92, 0.92, 0.92, 1)
+    brick.inputs["Mortar"].default_value = (0, 0, 0, 1)
     bump = tree.nodes.new("ShaderNodeBump")
-    bump.inputs["Strength"].default_value = 0.06
-    tree.links.new(noise.outputs["Fac"], bump.inputs["Height"])
+    bump.inputs["Strength"].default_value = 0.14
+    tree.links.new(tc.outputs["Object"], brick.inputs["Vector"])
+    tree.links.new(brick.outputs["Color"], bump.inputs["Height"])
     tree.links.new(bump.outputs["Normal"], bsdf.inputs["Normal"])
     return mat
 
 
 def build_vermilion(name):
+    """Worn painted steel: varied roughness + fine grain."""
     mat = bpy.data.materials.new(name)
-    bsdf, _ = _bsdf(mat)
-    bsdf.inputs["Base Color"].default_value = (0.72, 0.165, 0.035, 1.0)
-    bsdf.inputs["Metallic"].default_value = 0.25
-    bsdf.inputs["Roughness"].default_value = 0.45
+    bsdf, tree = _bsdf(mat)
+    bsdf.inputs["Base Color"].default_value = (0.70, 0.16, 0.035, 1.0)
+    bsdf.inputs["Metallic"].default_value = 0.15
+    tc = tree.nodes.new("ShaderNodeTexCoord")
+    n2 = tree.nodes.new("ShaderNodeTexNoise")
+    n2.inputs["Scale"].default_value = 60.0
+    mr = tree.nodes.new("ShaderNodeMapRange")
+    mr.inputs["To Min"].default_value = 0.35
+    mr.inputs["To Max"].default_value = 0.62
+    tree.links.new(tc.outputs["Object"], n2.inputs["Vector"])
+    tree.links.new(n2.outputs["Fac"], mr.inputs["Value"])
+    tree.links.new(mr.outputs["Result"], bsdf.inputs["Roughness"])
+    bump = tree.nodes.new("ShaderNodeBump")
+    bump.inputs["Strength"].default_value = 0.05
+    tree.links.new(n2.outputs["Fac"], bump.inputs["Height"])
+    tree.links.new(bump.outputs["Normal"], bsdf.inputs["Normal"])
     return mat
 
 
@@ -156,13 +195,13 @@ def material_for(key):
     elif key == "steel-painted-vermilion":
         mat = build_vermilion("ALMOND vermilion")
     elif key == "glow":
-        mat = build_glow("ALMOND neon white", (0.95, 0.97, 1.0), 6.5)
+        mat = build_glow("ALMOND neon white", (0.95, 0.97, 1.0), 2.6)
     elif key == "gloworange":
-        mat = build_glow("ALMOND neon orange", (1.0, 0.36, 0.07), 7.0)
+        mat = build_glow("ALMOND neon orange", (1.0, 0.36, 0.07), 3.0)
     elif key == "glowcyan":
-        mat = build_screen("ALMOND screen cyan", (0.25, 0.85, 1.0), 6.0, flicker=True)
+        mat = build_screen("ALMOND screen cyan", (0.25, 0.85, 1.0), 2.4, flicker=True)
     elif key == "glowwarm":
-        mat = build_glow("ALMOND window warm", (1.0, 0.62, 0.25), 3.5)
+        mat = build_glow("ALMOND window warm", (1.0, 0.62, 0.25), 1.8)
     elif build_rich_material:
         mat = build_rich_material(f"ALMOND {key}", key)
     else:
@@ -279,17 +318,35 @@ if ASM.get("lanterns"):
     print({k: len(v) for k, v in sorted(clusters.items())})
 
 # ── ground / sun / sky ─────────────────────────────────────────────────────
-# wet-asphalt ground: near-black and glossy so every light reflects
+# wet-asphalt ground: puddle-patched roughness so lights reflect unevenly
 bpy.ops.mesh.primitive_plane_add(size=60000, location=(0, 0, -0.42))
 ground = bpy.context.active_object
-gmat = build_flat("ALMOND ground wet", (0.018, 0.021, 0.027), rough=0.14)
+gmat = bpy.data.materials.new("ALMOND ground wet")
+gb, gtree = _bsdf(gmat)
+gb.inputs["Base Color"].default_value = (0.016, 0.019, 0.024, 1.0)
+gtc = gtree.nodes.new("ShaderNodeTexCoord")
+gn = gtree.nodes.new("ShaderNodeTexNoise")
+gn.inputs["Scale"].default_value = 2.4
+gmr = gtree.nodes.new("ShaderNodeMapRange")
+gmr.inputs["To Min"].default_value = 0.07
+gmr.inputs["To Max"].default_value = 0.45
+gtree.links.new(gtc.outputs["Object"], gn.inputs["Vector"])
+gtree.links.new(gn.outputs["Fac"], gmr.inputs["Value"])
+gtree.links.new(gmr.outputs["Result"], gb.inputs["Roughness"])
+gn2 = gtree.nodes.new("ShaderNodeTexNoise")
+gn2.inputs["Scale"].default_value = 400.0
+gbmp = gtree.nodes.new("ShaderNodeBump")
+gbmp.inputs["Strength"].default_value = 0.03
+gtree.links.new(gtc.outputs["Object"], gn2.inputs["Vector"])
+gtree.links.new(gn2.outputs["Fac"], gbmp.inputs["Height"])
+gtree.links.new(gbmp.outputs["Normal"], gb.inputs["Normal"])
 ground.data.materials.append(gmat)
 
 # night: a dim cool moon along the Rhino sun vector keeps the massing
 # legible; the neon, screens and windows carry the scene
 d = Vector(sun_state["vector"]).normalized()
 sun_data = bpy.data.lights.new("Moon", type="SUN")
-sun_data.energy = 0.30
+sun_data.energy = 1.35
 sun_data.color = (0.55, 0.66, 1.0)
 sun_data.angle = math.radians(0.53)
 sun = bpy.data.objects.new("Moon", sun_data)
@@ -303,7 +360,7 @@ scene.world = world
 world.use_nodes = True
 wnodes = world.node_tree.nodes
 bg = wnodes.get("Background")
-bg.inputs["Color"].default_value = (0.0035, 0.0055, 0.012, 1.0)
+bg.inputs["Color"].default_value = (0.006, 0.009, 0.018, 1.0)
 bg.inputs["Strength"].default_value = 1.0
 
 # ── camera: three slow shots ───────────────────────────────────────────────
@@ -378,7 +435,7 @@ scene.render.resolution_x = 1280
 scene.render.resolution_y = 720
 scene.render.fps = FPS
 scene.view_settings.view_transform = "AgX"
-scene.view_settings.exposure = -0.3          # night: emissives carry the scene
+scene.view_settings.exposure = -0.15         # night: emissives carry the scene
 scene.view_settings.look = "AgX - Medium High Contrast"
 
 # bloom so the neon and screens visibly luminesce (Blender 5.x compositor
@@ -396,7 +453,7 @@ try:
             break
         except Exception:
             continue
-    for name, v in (("Threshold", 1.0), ("Strength", 0.5), ("Size", 0.55),
+    for name, v in (("Threshold", 1.0), ("Strength", 0.3), ("Size", 0.5),
                     ("Quality", "HIGH"), ("Saturation", 1.0)):
         try:
             glare.inputs[name].default_value = v
