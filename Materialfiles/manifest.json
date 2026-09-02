@@ -380,6 +380,88 @@
         "panel"
       ],
       "description": "Dark gunmetal panel steel, satin finish."
+    },
+    {
+      "material_id": "stone-granite-paving",
+      "name": "Granite paving",
+      "category": "mineral",
+      "base_color": [
+        168,
+        168,
+        164
+      ],
+      "metallic": 0.0,
+      "roughness": 0.6,
+      "opacity": 1.0,
+      "ue_material_slot": "M_Stone_Granite_Paving",
+      "tags": [
+        "stone",
+        "granite",
+        "paving",
+        "landscape"
+      ],
+      "description": "Flame-finished granite paving slabs."
+    },
+    {
+      "material_id": "gravel-raked",
+      "name": "Raked gravel",
+      "category": "mineral",
+      "base_color": [
+        150,
+        144,
+        132
+      ],
+      "metallic": 0.0,
+      "roughness": 0.95,
+      "opacity": 1.0,
+      "ue_material_slot": "M_Gravel_Raked",
+      "tags": [
+        "gravel",
+        "karesansui",
+        "landscape"
+      ],
+      "description": "Fine raked gravel field, karesansui garden."
+    },
+    {
+      "material_id": "water-still",
+      "name": "Still water",
+      "category": "water",
+      "base_color": [
+        18,
+        28,
+        36
+      ],
+      "metallic": 0.0,
+      "roughness": 0.03,
+      "opacity": 0.9,
+      "ue_material_slot": "M_Water_Still",
+      "tags": [
+        "water",
+        "pond",
+        "landscape"
+      ],
+      "description": "Still dark pond water, near-mirror surface."
+    },
+    {
+      "material_id": "foliage-pine",
+      "name": "Pine foliage",
+      "category": "vegetation",
+      "base_color": [
+        52,
+        82,
+        48
+      ],
+      "metallic": 0.0,
+      "roughness": 0.85,
+      "opacity": 1.0,
+      "ue_material_slot": "M_Foliage_Pine",
+      "tags": [
+        "pine",
+        "niwaki",
+        "landscape",
+        "tree"
+      ],
+      "description": "Clipped pine foliage, niwaki garden trees."
     }
   ]
 }

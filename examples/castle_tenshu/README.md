@@ -79,3 +79,22 @@ scaling, 24 km ground plane).
   the neon, AgX exposure -0.3, and Blender 5.x compositor bloom
   (scene.compositing_node_group + Glare BLOOM node; params are INPUT
   SOCKETS in 5.x, and scene.node_tree no longer exists).
+
+## v4: construction-quality detail + landscaping (same session)
+
+- **SITE phase** - granite paths with expansion-joint covers, karesansui
+  raked-gravel panels (wave-texture rake lines in Cycles), a stone-edged
+  pond with rocks, niwaki pines + clipped hedges, 14 stone lanterns
+  (warm-glow light boxes), three tea pavilions (granite floor, oak posts
+  on galvanized base plates, the kit's flared roof so the eave neon and
+  vermilion soffits stay consistent).
+- **JOINTS phase** - grand entry stair embedded in the tenshu ishigaki
+  south batter up to a vermilion portal + canopy; wall-walk stairs in
+  four courtyards; base plates + anchor nubs under the plaza pylons;
+  vertical panel-joint reveals on the two lowest tenshu storeys; coping
+  seams + inner handrails on every bailey wall; splice flanges on the
+  service pipes.
+- **Materials** - library gains stone-granite-paving, gravel-raked,
+  water-still, foliage-pine; MAT now also stamps BCI construction
+  systems (bearing walls, flat plates, column grid) via assign_material.
+  ~5,100 objects, 71 batches.

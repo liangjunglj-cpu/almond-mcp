@@ -181,6 +181,72 @@ def build_flat(name, base, rough=0.6, metal=0.0):
     return mat
 
 
+def build_granite(name):
+    mat = bpy.data.materials.new(name)
+    bsdf, tree = _bsdf(mat)
+    tc = tree.nodes.new("ShaderNodeTexCoord")
+    n1 = tree.nodes.new("ShaderNodeTexNoise")
+    n1.inputs["Scale"].default_value = 900.0
+    mix = tree.nodes.new("ShaderNodeMix")
+    mix.data_type = "RGBA"
+    mix.inputs[6].default_value = (0.30, 0.30, 0.29, 1.0)
+    mix.inputs[7].default_value = (0.42, 0.42, 0.41, 1.0)
+    tree.links.new(tc.outputs["Object"], n1.inputs["Vector"])
+    tree.links.new(n1.outputs["Fac"], mix.inputs["Factor"])
+    tree.links.new(mix.outputs[2], bsdf.inputs["Base Color"])
+    bsdf.inputs["Roughness"].default_value = 0.55
+    # paving-slab seam bump
+    brick = tree.nodes.new("ShaderNodeTexBrick")
+    brick.inputs["Scale"].default_value = 1.6
+    brick.inputs["Mortar Size"].default_value = 0.02
+    bump = tree.nodes.new("ShaderNodeBump")
+    bump.inputs["Strength"].default_value = 0.2
+    tree.links.new(tc.outputs["Object"], brick.inputs["Vector"])
+    tree.links.new(brick.outputs["Fac"], bump.inputs["Height"])
+    tree.links.new(bump.outputs["Normal"], bsdf.inputs["Normal"])
+    return mat
+
+
+def build_gravel(name):
+    """Raked karesansui gravel: wave-texture rake lines + fine grain."""
+    mat = bpy.data.materials.new(name)
+    bsdf, tree = _bsdf(mat)
+    bsdf.inputs["Base Color"].default_value = (0.33, 0.31, 0.27, 1.0)
+    bsdf.inputs["Roughness"].default_value = 0.95
+    tc = tree.nodes.new("ShaderNodeTexCoord")
+    wave = tree.nodes.new("ShaderNodeTexWave")
+    wave.inputs["Scale"].default_value = 3.2
+    wave.inputs["Distortion"].default_value = 3.0
+    grain = tree.nodes.new("ShaderNodeTexNoise")
+    grain.inputs["Scale"].default_value = 1400.0
+    add = tree.nodes.new("ShaderNodeMath")
+    add.operation = "ADD"
+    bump = tree.nodes.new("ShaderNodeBump")
+    bump.inputs["Strength"].default_value = 0.35
+    tree.links.new(tc.outputs["Object"], wave.inputs["Vector"])
+    tree.links.new(tc.outputs["Object"], grain.inputs["Vector"])
+    tree.links.new(wave.outputs["Fac"], add.inputs[0])
+    tree.links.new(grain.outputs["Fac"], add.inputs[1])
+    tree.links.new(add.outputs[0], bump.inputs["Height"])
+    tree.links.new(bump.outputs["Normal"], bsdf.inputs["Normal"])
+    return mat
+
+
+def build_water(name):
+    mat = bpy.data.materials.new(name)
+    bsdf, tree = _bsdf(mat)
+    bsdf.inputs["Base Color"].default_value = (0.010, 0.018, 0.025, 1.0)
+    bsdf.inputs["Roughness"].default_value = 0.02
+    bsdf.inputs["Metallic"].default_value = 0.1
+    n = tree.nodes.new("ShaderNodeTexNoise")
+    n.inputs["Scale"].default_value = 14.0
+    bump = tree.nodes.new("ShaderNodeBump")
+    bump.inputs["Strength"].default_value = 0.015
+    tree.links.new(n.outputs["Fac"], bump.inputs["Height"])
+    tree.links.new(bump.outputs["Normal"], bsdf.inputs["Normal"])
+    return mat
+
+
 _mat_cache = {}
 
 def material_for(key):
@@ -202,6 +268,15 @@ def material_for(key):
         mat = build_screen("ALMOND screen cyan", (0.25, 0.85, 1.0), 2.4, flicker=True)
     elif key == "glowwarm":
         mat = build_glow("ALMOND window warm", (1.0, 0.62, 0.25), 1.8)
+    elif key == "stone-granite-paving":
+        mat = build_granite("ALMOND granite")
+    elif key == "gravel-raked":
+        mat = build_gravel("ALMOND gravel")
+    elif key == "water-still":
+        mat = build_water("ALMOND water")
+    elif key == "foliage-pine":
+        mat = (build_rich_material("ALMOND pine", "foliage") if build_rich_material
+               else build_flat("ALMOND pine", (0.10, 0.20, 0.09), rough=0.85))
     elif build_rich_material:
         mat = build_rich_material(f"ALMOND {key}", key)
     else:

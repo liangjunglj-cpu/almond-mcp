@@ -937,6 +937,154 @@ def phase_det():
     save()
     log(f"DET DONE: {n} objects")
 
+# ══════════════ SITE: courtyards, landscaping, pavilions ══════════════
+L_SITE = "Tenshu::Site::Landscape"
+
+def stone_lantern(x, y, yaw=0.0):
+    cyl("s_lant", L_SITE, [x, y, 40, 0, 0, 1, 350, 520])
+    cyl("s_lant", L_SITE, [x, y, 390, 0, 0, 1, 1100, 210])
+    obl("s_lantglow", L_SITE, [x, y, 1490, 620, 620, 540, yaw, 0])
+    obl("s_lant", L_SITE, [x, y, 2030, 940, 940, 240, yaw + 45, 0])
+
+def pine_tree(x, y, rng):
+    h = rng.uniform(4200, 6800)
+    cyl("s_trunk", L_SITE, [x, y, 40, 0, 0, 1, h, rng.uniform(160, 240)])
+    zc = h * 0.45
+    r = rng.uniform(1500, 2400)
+    for k in range(3):
+        cyl("s_leaf", L_SITE, [x + rng.uniform(-300, 300), y + rng.uniform(-300, 300),
+                               40 + zc, 0, 0, 1, h * 0.16, r * (1 - 0.28 * k)])
+        zc += h * 0.2
+
+def pavilion(cx, cy, yaw=0.0):
+    """Courtyard tea pavilion: granite floor, oak posts on base plates,
+    the kit's flared roof (so eave neon + soffits stay consistent)."""
+    obl("s_pfloor", L_SITE, [cx, cy, 40, 6800, 6800, 320, yaw, 0])
+    for sx, sy in ((1, 1), (1, -1), (-1, 1), (-1, -1)):
+        px, py = rot2(sx * 2700, sy * 2700, yaw)
+        obl("j_plate", L_SITE, [cx + px, cy + py, 360, 560, 560, 60, yaw, 0])
+        cyl("s_post", L_SITE, [cx + px, cy + py, 420, 0, 0, 1, 3100, 170])
+    obl("s_bench", L_SITE, [cx, cy, 360, 3400, 900, 450, yaw, 0])
+    roof(cx, cy, 3520, 5400, 5400, yaw, sc=0.42, finial=True)
+
+def phase_site():
+    log("=== SITE: PATHS + GARDENS + POND + TREES + LANTERNS + PAVILIONS ===")
+    rng = random.Random(33)
+    # granite paths: south gate axis + east gate spur
+    for (x0, y0, x1, y1) in ((-2600, -86000, 2600, -66500),
+                             (-2600, -61500, 2600, -44500),
+                             (-2600, -39500, 2600, -21500),
+                             (22000, -2600, 69500, 2600)):
+        box("s_path", L_SITE, [x0, y0, 40, x1, y1, 300])
+    # expansion joints in the paths
+    for y in range(-84000, -22000, 12000):
+        box("j_cover", L_SITE, [-2600, y - 90, 290, 2600, y + 90, 340])
+    # karesansui raked-gravel panels in the honmaru
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            box("s_gravel", L_SITE, [sx * 24000, sy * 7000, 40, sx * 44000, sy * 21000, 260])
+            box("s_edge", L_SITE, [sx * 24000, sy * 7000, 40, sx * 44000, sy * 7600, 380])
+    # pond with stone edge + rocks (ninomaru SE)
+    box("s_edge", L_SITE, [44000, -60000, 40, 62000, -46000, 420])
+    box("s_pond", L_SITE, [44800, -59200, 40, 61200, -46800, 360])
+    prng = random.Random(5)
+    for _ in range(4):
+        cyl("s_rock", L_SITE, [prng.uniform(47000, 59000), prng.uniform(-58000, -48000),
+                               100, 0, 0, 1, prng.uniform(500, 1300), prng.uniform(600, 1400)])
+    # niwaki pines + clipped hedges in the outer courtyards
+    zones = [(-68000, -44000, -60000, -46000), (46000, 68000, 46000, 60000),
+             (-94000, -76000, -84000, -68000), (76000, 94000, 68000, 84000),
+             (-68000, -50000, 46000, 60000), (50000, 68000, -60000, -46000)]
+    for zi, (xa, xb, ya, yb) in enumerate(zones):
+        for k in range(3):
+            x = xa + (xb - xa) * ((det(zi, k, 1) % 90) / 90 * 0.8 + 0.1)
+            y = ya + (yb - ya) * ((det(zi, k, 2) % 90) / 90 * 0.8 + 0.1)
+            pine_tree(x, y, rng)
+    for y0, y1 in ((-84000, -66500), (-61500, -44500)):
+        for sx in (-1, 1):
+            box("s_hedge", L_SITE, [sx * 4200, y0, 40, sx * 5400, y1, 1300])
+    # stone lanterns pacing the south path + pond edge
+    for y in (-80000, -70000, -56000, -48000, -34000, -26000):
+        for sx in (-1, 1):
+            stone_lantern(sx * 4400, y)
+    stone_lantern(45500, -45000)
+    stone_lantern(61500, -60800)
+    # three pavilions
+    pavilion(-56000, 52000, yaw=0)
+    pavilion(58000, -74000, yaw=15)
+    pavilion(-60000, -74000, yaw=-10)
+    n = flush()
+    save()
+    log(f"SITE DONE: {n} objects")
+
+# ══════════════ JOINTS: construction-quality detail ══════════════
+def phase_joints():
+    log("=== JOINTS: ENTRY STAIR + BASE PLATES + JOINT MECHANISMS ===")
+    # grand entry stair embedded in the tenshu ishigaki south batter,
+    # from the courtyard up to a portal on the first storey face
+    n_steps = 12
+    for k in range(n_steps):
+        y0 = -20500 + k * 750
+        box("s_stair", L_SITE, [-4000, y0, 40, 4000, y0 + 900, 40 + (k + 1) * 1160])
+    box("s_path", L_SITE, [-4000, -21500, 40, 4000, -20500, 300])
+    obl("g_frame", L_GATE, [0, -10550, 14000, 5600, 700, 5200, 0, 0])
+    obl("g_door", L_GATE, [0, -10350, 14000, 4400, 300, 4300, 0, 0])
+    obl("glow", L_GLOW, [0, -10700, 18900, 5800, 260, 240, 0, 0])
+    roof(0, -11400, 19600, 5200, 2400, 0, sc=0.35, finial=False)
+    stone_lantern(-5400, -22500)
+    stone_lantern(5400, -22500)
+    # wall-walk access stairs in four courtyards
+    for (sx0, sy0, ang) in ((-20000, 39000, 180), (46200, -12000, 90),
+                            (-70200, 12000, 270), (20000, -85000, 0)):
+        for k in range(8):
+            dxs, dys = rot2(0, -k * 900, ang)
+            obl("w_stair", L_SITE, [sx0 + dxs, sy0 + dys, 40, 2000, 950, 900 + k * 950, ang, 0])
+    # base plates + anchor nubs under the plaza pylons
+    for k in range(12):
+        a = math.radians(k * 30 + 15)
+        px, py = 61000 * math.cos(a), 61000 * math.sin(a)
+        obl("j_plate", L_SITE, [px, py, 1600, 1150, 1150, 70, math.degrees(a), 0])
+        for sx, sy in ((1, 1), (1, -1), (-1, 1), (-1, -1)):
+            nx2, ny2 = rot2(sx * 480, sy * 480, math.degrees(a))
+            obl("j_plate", L_SITE, [px + nx2, py + ny2, 1670, 130, 130, 110, 0, 0])
+    # vertical panel-joint reveals on the two lowest tenshu tiers
+    z, L, W = 14000.0, 24500.0, 20500.0
+    for i in range(2):
+        h = 6500 * (0.88 ** i)
+        for ex, ey, ang in ((0, 1, 0), (0, -1, 0), (1, 0, 90), (-1, 0, 90)):
+            run = L if ey else W
+            dep = W if ey else L
+            nrev = int(run / 3100)
+            for k in range(1, nrev):
+                u = k * run / nrev - run / 2
+                px = ex * (dep / 2 + 20) + (u if ey else 0)
+                py = ey * (dep / 2 + 20) + (0 if ey else u)
+                obl("j_seam", L_DET, [px, py, z + h * 0.06, 70, 90, h * 0.8, ang, 0])
+        z += h + 3 * max(560 * (L / 24500), 220)
+        L, W = L * 0.84, W * 0.84
+    # coping joint seams + inner handrails on every bailey wall
+    for (x0, y0, x1, y1) in RUNS:
+        dx, dy = x1 - x0, y1 - y0
+        ln = math.hypot(dx, dy)
+        yaw = math.degrees(math.atan2(dy, dx))
+        nxo, nyo = -dy / ln, dx / ln
+        if nxo * (x0 + x1) / 2 + nyo * (y0 + y1) / 2 < 0:
+            nxo, nyo = -nxo, -nyo
+        nseam = int(ln / 9000)
+        for k in range(1, nseam):
+            t = k / nseam
+            obl("j_seam", L_DET, [x0 + dx * t, y0 + dy * t, 8300, 80, 3050, 430, yaw, 0])
+        obl("j_rail", L_DET, [(x0 + x1) / 2 - nxo * 1350, (y0 + y1) / 2 - nyo * 1350,
+                              8720, ln * 0.98, 110, 700, yaw, 0])
+    # splice flanges on the sannomaru service pipes
+    for k in range(10):
+        x = -81000 + k * 18000
+        for zz in (2400, 5000):
+            cyl("j_flange", L_DET, [x, -85200, zz, 0, 0, 1, 140, 560])
+    n = flush()
+    save()
+    log(f"JOINTS DONE: {n} objects")
+
 REDO_BATCHES = ["agg_body", "agg_cap", "agg_frame", "agg_scr_c", "agg_scr_o",
                 "agg_win", "det_plate", "det_batten", "det_ant", "det_equip",
                 "det_cond", "scr_frame", "scr_c", "scr_o", "holo", "pipes"]
@@ -1022,14 +1170,40 @@ MAT = [
     ("ap_mast",   "steel-galvanized",       "apex_mast"),
     ("ap_fin",    "steel-painted-charcoal", "apex_fin"),
     ("ap_glow",   "brick-red",              "apex_glow"),
+    ("s_path",    "stone-granite-paving",   "garden_path"),
+    ("s_edge",    "stone-granite-paving",   "pond_edging"),
+    ("s_stair",   "stone-granite-paving",   "entry_stair"),
+    ("w_stair",   "stone-granite-paving",   "wall_stair"),
+    ("s_pfloor",  "stone-granite-paving",   "pavilion_floor"),
+    ("s_gravel",  "gravel-raked",           "karesansui_field"),
+    ("s_pond",    "water-still",            "pond"),
+    ("s_rock",    "concrete-boardformed",   "garden_rock"),
+    ("s_trunk",   "wood-walnut",            "tree_trunk"),
+    ("s_leaf",    "foliage-pine",           "tree_foliage"),
+    ("s_hedge",   "foliage-pine",           "clipped_hedge"),
+    ("s_lant",    "concrete-boardformed",   "stone_lantern"),
+    ("s_lantglow", "polycarbonate-opal",    "lantern_light"),
+    ("s_post",    "wood-oak",               "pavilion_post"),
+    ("s_bench",   "wood-oak",               "bench"),
+    ("j_plate",   "steel-galvanized",       "base_plate"),
+    ("j_seam",    "rubber-black",           "movement_joint"),
+    ("j_rail",    "steel-galvanized",       "handrail"),
+    ("j_cover",   "aluminium-anodized",     "expansion_joint_cover"),
+    ("j_flange",  "steel-galvanized",       "pipe_flange"),
 ]
 
+# BCI construction-system stamps for the batches with a clear system fit
+SYSTEMS = {"w_body": "concrete-bearing-wall", "p_plinth": "concrete-flat-plate",
+           "g_deck": "concrete-flat-plate", "b_deck": "concrete-flat-plate",
+           "p_pylon": "concrete-column-grid"}
+
 def phase_mat():
-    log("=== MAT: EMBED MATERIALS + ROLES ===")
+    log("=== MAT: EMBED MATERIALS + ROLES + CONSTRUCTION SYSTEMS ===")
     for bi, (batch, mat, role) in enumerate(MAT):
         ids = G.get(batch, [])
         if not ids or DRY: continue
-        json.loads(assign(ids, mat, structural_role=role))
+        json.loads(assign(ids, mat, structural_role=role,
+                          construction_system=SYSTEMS.get(batch, "")))
         if bi % 5 == 0:
             snap_frame()
     log(f"  materials embedded on {len(MAT)} batches")
@@ -1047,7 +1221,7 @@ ASSEMBLIES = {
 GLOW_WHITE = {"glow", "p_glow"}
 GLOW_ORANGE = {"ring1_glow", "ring2_glow", "lan_glow", "ap_glow", "agg_scr_o", "scr_o"}
 GLOW_CYAN = {"agg_scr_c", "scr_c", "holo"}
-GLOW_WARM = {"t_win", "agg_win"}
+GLOW_WARM = {"t_win", "agg_win", "s_lantglow"}
 
 def _matkey(batch):
     if batch in GLOW_WHITE: return "glow"
@@ -1090,6 +1264,7 @@ def phase_save3dm():
 PHASES = {"CLEAR": phase_clear, "SUN": phase_sun, "T1": phase_t1, "T2": phase_t2,
           "T3": phase_t3, "T4": phase_t4, "AGG": phase_agg, "DET": phase_det,
           "MAT": phase_mat, "FIX1": phase_fix1, "REDO": phase_redo,
+          "SITE": phase_site, "JOINTS": phase_joints,
           "EXPORT": phase_export, "SAVE3DM": phase_save3dm}
 
 if PHASE == "ALL":
