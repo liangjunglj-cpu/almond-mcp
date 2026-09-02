@@ -58,3 +58,24 @@ the charcoal + white mix):
 Probes: `ALMOND_ANIM_PROBE="1,480,1104,1560"`. All infinity-kit Blender
 gotchas apply (5.x keyframe interpolation preference, parent after mm->m
 scaling, 24 km ground plane).
+
+## v2: Wasp-style aggregation + night cyberpunk grade (same session)
+
+- **AGG phase** - seeded discrete aggregation (Wasp-like, `random.Random(7)`)
+  on a 3.6 m voxel grid: rooms / corridors / shafts / bridges / 2x2x2
+  tesseract frame-cells with glowing cores, grown from seeds on the tier
+  setbacks, wall caps, yagura and gate tops. A pyramidal height envelope
+  (`env_top`, tallest at the keep) plus a tenshu keep-out cone preserves
+  the castle silhouette. 250 modules, ~1,365 objects.
+- **DET phase** - layered facade plates + corner neon on the tenshu,
+  antenna clusters, wall equipment + conduits, 8 big billboard screens,
+  14 floating holo panels (their own `holo` assembly - they drift and
+  bob in Blender). Scene total ~3,460 objects, 50 material batches.
+- **Glow classes** - matkeys glow (white), gloworange, glowcyan
+  (interface screens: brick-texture UI grid + flicker), glowwarm
+  (window strips).
+- **Night grade** - near-black sky, dim blue moon (0.3 W/m2) along the
+  Rhino sun vector, wet-asphalt glossy ground (rough 0.14) reflecting
+  the neon, AgX exposure -0.3, and Blender 5.x compositor bloom
+  (scene.compositing_node_group + Glare BLOOM node; params are INPUT
+  SOCKETS in 5.x, and scene.node_tree no longer exists).

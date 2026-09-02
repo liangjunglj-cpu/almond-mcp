@@ -104,6 +104,35 @@ def build_glow(name, color, strength):
     return mat
 
 
+def build_screen(name, color, strength, flicker=False):
+    """Interface screen: emission modulated by a grid pattern so panels read
+    as glowing UIs, with an optional slow flicker."""
+    mat = bpy.data.materials.new(name)
+    bsdf, tree = _bsdf(mat)
+    bsdf.inputs["Base Color"].default_value = (0.01, 0.012, 0.016, 1.0)
+    bsdf.inputs["Roughness"].default_value = 0.25
+    if "Emission Color" in bsdf.inputs:
+        bsdf.inputs["Emission Color"].default_value = (*color, 1.0)
+    brick = tree.nodes.new("ShaderNodeTexBrick")
+    brick.inputs["Scale"].default_value = 24.0
+    brick.inputs["Color1"].default_value = (1.0, 1.0, 1.0, 1.0)
+    brick.inputs["Color2"].default_value = (0.15, 0.15, 0.15, 1.0)
+    brick.inputs["Mortar"].default_value = (0.0, 0.0, 0.0, 1.0)
+    brick.inputs["Mortar Size"].default_value = 0.015
+    val = tree.nodes.new("ShaderNodeValue")
+    val.outputs[0].default_value = strength
+    mult = tree.nodes.new("ShaderNodeMath")
+    mult.operation = "MULTIPLY"
+    tree.links.new(brick.outputs["Fac"], mult.inputs[0])
+    tree.links.new(val.outputs[0], mult.inputs[1])
+    tree.links.new(mult.outputs[0], bsdf.inputs["Emission Strength"])
+    if flicker:
+        for f in range(1, END + 1, 16):
+            val.outputs[0].default_value = strength * (1.0 + 0.22 * math.sin(f * 0.37))
+            val.outputs[0].keyframe_insert("default_value", frame=f)
+    return mat
+
+
 def build_flat(name, base, rough=0.6, metal=0.0):
     mat = bpy.data.materials.new(name)
     bsdf, _ = _bsdf(mat)
@@ -127,9 +156,13 @@ def material_for(key):
     elif key == "steel-painted-vermilion":
         mat = build_vermilion("ALMOND vermilion")
     elif key == "glow":
-        mat = build_glow("ALMOND neon white", (0.95, 0.97, 1.0), 42.0)
+        mat = build_glow("ALMOND neon white", (0.95, 0.97, 1.0), 6.5)
     elif key == "gloworange":
-        mat = build_glow("ALMOND neon orange", (1.0, 0.36, 0.07), 44.0)
+        mat = build_glow("ALMOND neon orange", (1.0, 0.36, 0.07), 7.0)
+    elif key == "glowcyan":
+        mat = build_screen("ALMOND screen cyan", (0.25, 0.85, 1.0), 6.0, flicker=True)
+    elif key == "glowwarm":
+        mat = build_glow("ALMOND window warm", (1.0, 0.62, 0.25), 3.5)
     elif build_rich_material:
         mat = build_rich_material(f"ALMOND {key}", key)
     else:
@@ -209,6 +242,20 @@ for asm, deg in SPIN.items():
     parent_to(ASM[asm], e)
     linear_spin(e, deg)
 
+if ASM.get("holo"):
+    # holographic interface panels: slow individual spin + bob
+    for i, o in enumerate(ASM["holo"]):
+        cen = centroid(o)
+        sub = make_empty(f"holo.{i}", loc=cen)
+        parent_to([o], sub)
+        linear_spin(sub, 25 if i % 2 == 0 else -25)
+        amp = 0.35 + 0.05 * (i % 4)
+        period = FPS * (18 + (i % 5) * 4)
+        base_z = sub.location.z
+        for f in range(1, END + 1, 10):
+            sub.location.z = base_z + amp * math.sin(2 * math.pi * f / period + i)
+            sub.keyframe_insert("location", index=2, frame=f)
+
 if ASM.get("lanterns"):
     master = make_empty("lanterns.orbit")
     clusters = {}
@@ -232,29 +279,32 @@ if ASM.get("lanterns"):
     print({k: len(v) for k, v in sorted(clusters.items())})
 
 # ── ground / sun / sky ─────────────────────────────────────────────────────
+# wet-asphalt ground: near-black and glossy so every light reflects
 bpy.ops.mesh.primitive_plane_add(size=60000, location=(0, 0, -0.42))
 ground = bpy.context.active_object
-ground.data.materials.append(
-    build_flat("ALMOND ground dark", (0.028, 0.032, 0.038), rough=0.9))
+gmat = build_flat("ALMOND ground wet", (0.018, 0.021, 0.027), rough=0.14)
+ground.data.materials.append(gmat)
 
+# night: a dim cool moon along the Rhino sun vector keeps the massing
+# legible; the neon, screens and windows carry the scene
 d = Vector(sun_state["vector"]).normalized()
-sun_data = bpy.data.lights.new("RhinoSun", type="SUN")
-sun_data.energy = float(sun_state.get("intensity", 2.22)) * 2.4
+sun_data = bpy.data.lights.new("Moon", type="SUN")
+sun_data.energy = 0.30
+sun_data.color = (0.55, 0.66, 1.0)
 sun_data.angle = math.radians(0.53)
-sun = bpy.data.objects.new("RhinoSun", sun_data)
+sun = bpy.data.objects.new("Moon", sun_data)
 scene.collection.objects.link(sun)
 sun.location = (0, 0, 120)
 sun.rotation_euler = d.to_track_quat("-Z", "Y").to_euler()
 
-# flat cool grey-cyan sky, like the reference boards; the Sun lamp alone
-# carries the directional light and shadows
-world = bpy.data.worlds.new("Tenshu sky")
+# near-black night sky with the faintest blue gradient
+world = bpy.data.worlds.new("Tenshu night")
 scene.world = world
 world.use_nodes = True
 wnodes = world.node_tree.nodes
 bg = wnodes.get("Background")
-bg.inputs["Color"].default_value = (0.44, 0.52, 0.57, 1.0)
-bg.inputs["Strength"].default_value = 0.9
+bg.inputs["Color"].default_value = (0.0035, 0.0055, 0.012, 1.0)
+bg.inputs["Strength"].default_value = 1.0
 
 # ── camera: three slow shots ───────────────────────────────────────────────
 cam_data = bpy.data.cameras.new("filmcam")
@@ -275,7 +325,7 @@ SHOTS = [
     # (start, end, cam0, cam1, tgt0, tgt1, lens)
     (1,    480,  (114, -103, 9),  (165, -150, 48), (98, -88, 7),  (0, 0, 22), 35),
     (481,  1104, None, None, (0, 0, 16), (0, 0, 28), 38),        # orbit, filled below
-    (1105, 1560, (30, -215, 8),   (12, -82, 62),   (0, -60, 10), (0, 0, 44), 32),
+    (1105, 1560, (30, -215, 8),   (12, -82, 70),   (0, -60, 10), (0, 0, 48), 32),
 ]
 
 for (s0, s1, cam0, cam1, tgt0, tgt1, lens) in SHOTS:
@@ -328,8 +378,36 @@ scene.render.resolution_x = 1280
 scene.render.resolution_y = 720
 scene.render.fps = FPS
 scene.view_settings.view_transform = "AgX"
-scene.view_settings.exposure = -1.15         # charcoal + white mix
+scene.view_settings.exposure = -0.3          # night: emissives carry the scene
 scene.view_settings.look = "AgX - Medium High Contrast"
+
+# bloom so the neon and screens visibly luminesce (Blender 5.x compositor
+# node group: scene.compositing_node_group, Glare params are input sockets)
+try:
+    ct = bpy.data.node_groups.new("TenshuComp", "CompositorNodeTree")
+    scene.compositing_node_group = ct
+    ct.interface.new_socket(name="Image", in_out="OUTPUT", socket_type="NodeSocketColor")
+    rl = ct.nodes.new("CompositorNodeRLayers")
+    glare = ct.nodes.new("CompositorNodeGlare")
+    out = ct.nodes.new("NodeGroupOutput")
+    for tv in ("BLOOM", "Bloom", "FOG_GLOW"):
+        try:
+            glare.inputs["Type"].default_value = tv
+            break
+        except Exception:
+            continue
+    for name, v in (("Threshold", 1.0), ("Strength", 0.5), ("Size", 0.55),
+                    ("Quality", "HIGH"), ("Saturation", 1.0)):
+        try:
+            glare.inputs[name].default_value = v
+        except Exception:
+            pass
+    ct.links.new(rl.outputs["Image"], glare.inputs["Image"])
+    ct.links.new(glare.outputs["Image"], out.inputs["Image"])
+    scene.render.use_compositing = True
+    print("bloom compositor armed")
+except Exception as exc:
+    print(f"compositor unavailable ({exc}); rendering without bloom")
 scene.frame_start = int(os.environ.get("ALMOND_ANIM_START", "1"))
 scene.frame_end = int(os.environ.get("ALMOND_ANIM_END", str(END)))
 scene.render.filepath = os.path.join(ANIM_DIR, "f")

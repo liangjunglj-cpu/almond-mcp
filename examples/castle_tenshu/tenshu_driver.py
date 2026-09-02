@@ -608,6 +608,266 @@ def phase_t4():
     save()
     log(f"T4 DONE: {n} objects")
 
+# ══════════════ AGG: Wasp-style discrete aggregation ══════════════
+import random
+
+CELL = 3600.0
+L_AGG = "Tenshu::Aggregation"
+L_DET = "Tenshu::Detail"
+L_SCR = "Tenshu::Screens"
+
+def env_top(r):
+    """Height envelope: tallest at the keep, decaying outward, so the
+    aggregation keeps the castle's pyramidal silhouette."""
+    return max(56000.0 * math.exp(-r / 130000.0), 14000.0)
+
+def keep_hw(z):
+    """Approximate tenshu body half-width at height z (keep-out zone)."""
+    return 16000.0 * max(1.0 - z / 56000.0, 0.0) + 3000.0
+
+def cell_center(c):
+    return (c[0] * CELL, c[1] * CELL, c[2] * CELL)
+
+def cell_ok(c, occupied):
+    x, y, z = c[0] * CELL, c[1] * CELL, c[2] * CELL
+    if c in occupied or z < 0:
+        return False
+    if abs(x) > 106000 or abs(y) > 106000:
+        return False
+    r = math.hypot(x, y)
+    if z + CELL > env_top(r):
+        return False
+    hw = keep_hw(z)
+    if abs(x) < hw and abs(y) < hw:
+        return False
+    return True
+
+def mod_room(ix, iy, iz, nx, ny, rng):
+    cx, cy, zb = (ix + nx / 2) * CELL, (iy + ny / 2) * CELL, iz * CELL
+    L, W, H = nx * CELL * 0.94, ny * CELL * 0.94, CELL * 0.92
+    obl("agg_body", L_AGG, [cx, cy, zb, L, W, H, 0, 0])
+    obl("agg_cap", L_AGG, [cx, cy, zb + H, L * 1.06, W * 1.06, 240, 0, 0])
+    # screen / interface faces
+    for _ in range(rng.randint(1, 2)):
+        face = rng.randint(0, 3)
+        ex, ey, ang = ((0, 1, 0), (0, -1, 0), (1, 0, 90), (-1, 0, 90))[face]
+        run = L if ey else W
+        b = "agg_scr_c" if rng.random() < 0.55 else "agg_scr_o"
+        obl(b, L_SCR, [cx + ex * (L / 2 + 70), cy + ey * (W / 2 + 70),
+                       zb + H * 0.28, run * 0.55, 120, H * 0.42, ang, 0])
+    for s in (-1, 1):
+        obl("agg_frame", L_AGG, [cx + s * L / 2, cy + s * W / 2, zb, 170, 170, H, 0, 0])
+    if rng.random() < 0.12:
+        cyl("det_ant", L_DET, [cx, cy, zb + H + 240, 0, 0, 1, 2600, 130])
+
+def mod_corridor(ix, iy, iz, nx, ny, rng):
+    cx, cy, zb = (ix + nx / 2) * CELL, (iy + ny / 2) * CELL, iz * CELL
+    L, W, H = nx * CELL * (0.99 if nx > ny else 0.86), ny * CELL * (0.99 if ny > nx else 0.86), CELL * 0.78
+    obl("agg_body", L_AGG, [cx, cy, zb, L, W, H, 0, 0])
+    along_x = nx > ny
+    for s in (-1, 1):
+        fx = cx + (s * L / 2 if along_x else 0)
+        fy = cy + (0 if along_x else s * W / 2)
+        obl("agg_frame", L_AGG, [fx, fy, zb - 120, (340 if along_x else W * 1.12),
+                                 (W * 1.12 if along_x else 340), H + 360, 0, 0])
+    obl("agg_win", L_SCR, [cx, cy + (W / 2 + 60) * (1 if rng.random() < 0.5 else -1),
+                           zb + H * 0.5, (L if along_x else 340) * 0.72,
+                           (90 if along_x else 90), 480, 0 if along_x else 90, 0])
+    if rng.random() < 0.3:
+        obl("glow", L_GLOW, [cx, cy, zb - 140, L * 0.8, 140, 130, 0 if along_x else 90, 0])
+
+def mod_shaft(ix, iy, iz, nz, rng):
+    cx, cy, zb = (ix + 0.5) * CELL, (iy + 0.5) * CELL, iz * CELL
+    W, H = CELL * 0.78, nz * CELL * 0.98
+    obl("agg_body", L_AGG, [cx, cy, zb, W, W, H, 0, 0])
+    obl("agg_cap", L_AGG, [cx, cy, zb + H, W * 1.12, W * 1.12, 260, 0, 0])
+    ang = rng.choice((0, 90, 180, 270))
+    ex, ey = rot2(1, 0, ang)
+    obl("glow", L_GLOW, [cx + ex * (W / 2 + 60), cy + ey * (W / 2 + 60),
+                         zb + H * 0.06, 150, 150, H * 0.88, ang, 0])
+
+def mod_bridge(ix, iy, iz, nx, ny, rng):
+    cx, cy, zb = (ix + nx / 2) * CELL, (iy + ny / 2) * CELL, iz * CELL
+    along_x = nx > ny
+    L = nx * CELL * 0.99 if along_x else CELL * 0.7
+    W = CELL * 0.7 if along_x else ny * CELL * 0.99
+    obl("agg_body", L_AGG, [cx, cy, zb, L, W, 260, 0, 0])
+    obl("agg_cap", L_AGG, [cx, cy, zb + CELL * 0.72, L, W, 220, 0, 0])
+    for s in (-1, 1):
+        rx = cx + (0 if along_x else s * (W / 2 - 90))
+        ry = cy + (s * (W / 2 - 90) if along_x else 0)
+        obl("agg_frame", L_AGG, [rx, ry, zb + 260, (L * 0.98 if along_x else 150),
+                                 (150 if along_x else W * 0.98), 620, 0, 0])
+    obl("agg_win", L_SCR, [cx, cy, zb + CELL * 0.66, (L if along_x else 170) * 0.9,
+                           (170 if along_x else W * 0.9), 120, 0, 0])
+
+def mod_tessa(ix, iy, iz, rng):
+    """Tesseract frame cell: open 2x2x2 frame with a glowing inner cube."""
+    n = 2
+    x0, y0, zb = ix * CELL, iy * CELL, iz * CELL
+    S = n * CELL
+    for sx in (0, 1):
+        for sy in (0, 1):
+            obl("agg_frame", L_AGG, [x0 + sx * S, y0 + sy * S, zb, 300, 300, S, 0, 0])
+    for zz in (zb, zb + S - 280):
+        obl("agg_frame", L_AGG, [x0 + S / 2, y0, zz, S, 300, 280, 0, 0])
+        obl("agg_frame", L_AGG, [x0 + S / 2, y0 + S, zz, S, 300, 280, 0, 0])
+        obl("agg_frame", L_AGG, [x0, y0 + S / 2, zz, 300, S, 280, 0, 0])
+        obl("agg_frame", L_AGG, [x0 + S, y0 + S / 2, zz, 300, S, 280, 0, 0])
+    b = "agg_scr_c" if rng.random() < 0.6 else "agg_scr_o"
+    obl(b, L_SCR, [x0 + S / 2, y0 + S / 2, zb + S * 0.22, S * 0.5, S * 0.5, S * 0.5, 0, 0])
+
+def phase_agg():
+    log("=== AGG: WASP-STYLE DISCRETE AGGREGATION ===")
+    rng = random.Random(7)
+    occupied, frontier = set(), []
+
+    def to_cell(x, y, z):
+        return (round(x / CELL), round(y / CELL), max(round(z / CELL), 0))
+
+    seeds = []
+    z, L = 14000.0, 24500.0
+    for i in range(6):
+        h = 6500 * (0.88 ** i)
+        z += h + 1700
+        hw = L / 2 + 2200
+        for k in range(8):
+            a = math.radians(k * 45)
+            seeds.append((hw * 1.1 * math.cos(a), hw * 1.1 * math.sin(a), z))
+        L *= 0.84
+    for (x0, y0, x1, y1) in RUNS:
+        n = max(int(math.hypot(x1 - x0, y1 - y0) / (CELL * 5)), 1)
+        for k in range(n + 1):
+            t = k / n
+            seeds.append((x0 + (x1 - x0) * t, y0 + (y1 - y0) * t, 9000))
+    for cx, cy, s in ((-48000, -42000, .5), (48000, -42000, .5), (-48000, 42000, .5), (48000, 42000, .5),
+                      (-72000, -64000, .38), (72000, -64000, .38), (-72000, 64000, .38), (72000, 64000, .38),
+                      (-98000, -88000, .3), (98000, -88000, .3), (-98000, 88000, .3), (98000, 88000, .3)):
+        seeds.append((cx, cy, 16600 * s))
+    for cx, cy, zz in ((0, -42000, 16000), (0, -64000, 13500), (72000, 0, 12800), (0, -88000, 12000),
+                       (-25500, 0, 10800), (25500, 0, 10800)):
+        seeds.append((cx, cy, zz))
+    frontier = [to_cell(*s) for s in seeds]
+
+    placed, attempts = 0, 0
+    TARGET = 250
+    while placed < TARGET and attempts < 5000 and frontier:
+        attempts += 1
+        anchor = rng.choice(frontier)
+        kind = rng.random()
+        if kind < 0.40:
+            nx, ny = rng.choice(((1, 1), (1, 1), (2, 1), (1, 2)))
+            cells = [(anchor[0] + dx, anchor[1] + dy, anchor[2])
+                     for dx in range(nx) for dy in range(ny)]
+            emit = lambda: mod_room(anchor[0], anchor[1], anchor[2], nx, ny, rng)
+        elif kind < 0.62:
+            ln = rng.randint(3, 5)
+            if rng.random() < 0.5:
+                nx, ny = ln, 1
+            else:
+                nx, ny = 1, ln
+            cells = [(anchor[0] + dx, anchor[1] + dy, anchor[2])
+                     for dx in range(nx) for dy in range(ny)]
+            emit = lambda: mod_corridor(anchor[0], anchor[1], anchor[2], nx, ny, rng)
+        elif kind < 0.77:
+            nz = rng.randint(2, 4)
+            cells = [(anchor[0], anchor[1], anchor[2] + dz) for dz in range(nz)]
+            emit = lambda: mod_shaft(anchor[0], anchor[1], anchor[2], nz, rng)
+        elif kind < 0.92:
+            ln = rng.randint(3, 6)
+            if rng.random() < 0.5:
+                nx, ny = ln, 1
+            else:
+                nx, ny = 1, ln
+            cells = [(anchor[0] + dx, anchor[1] + dy, anchor[2])
+                     for dx in range(nx) for dy in range(ny)]
+            emit = lambda: mod_bridge(anchor[0], anchor[1], anchor[2], nx, ny, rng)
+        else:
+            cells = [(anchor[0] + dx, anchor[1] + dy, anchor[2] + dz)
+                     for dx in range(2) for dy in range(2) for dz in range(2)]
+            emit = lambda: mod_tessa(anchor[0], anchor[1], anchor[2], rng)
+        if not all(cell_ok(c, occupied) for c in cells):
+            continue
+        emit()
+        occupied.update(cells)
+        placed += 1
+        for c in cells:
+            for d in ((1, 0, 0), (-1, 0, 0), (0, 1, 0), (0, -1, 0), (0, 0, 1)):
+                nc = (c[0] + d[0], c[1] + d[1], c[2] + d[2])
+                if nc not in occupied:
+                    frontier.append(nc)
+    n = flush()
+    save()
+    log(f"AGG DONE: {placed} modules, {n} objects ({attempts} attempts)")
+
+# ══════════════ DET: high-tech facade detail + screens + holo ══════════════
+def phase_det():
+    log("=== DET: FACADE DETAIL + SCREENS + HOLO PANELS ===")
+    rng = random.Random(21)
+    # layered secondary plates + corner neon strips on the tenshu tiers
+    z, L, W = 14000.0, 24500.0, 20500.0
+    for i in range(6):
+        h = 6500 * (0.88 ** i)
+        for face in range(4):
+            ex, ey, ang = ((0, 1, 0), (0, -1, 0), (1, 0, 90), (-1, 0, 90))[face]
+            run = L if ey else W
+            dep = W if ey else L
+            for _ in range(2):
+                u = (rng.random() - 0.5) * run * 0.6
+                px = ex * (dep / 2 + 200) + (u if ey else 0)
+                py = ey * (dep / 2 + 200) + (0 if ey else u)
+                obl("det_plate", L_DET, [px, py, z + h * rng.uniform(0.1, 0.35),
+                                         run * rng.uniform(0.18, 0.34), 150,
+                                         h * rng.uniform(0.25, 0.45), ang, 0])
+        for sx, sy in ((1, 1), (1, -1), (-1, 1), (-1, -1)):
+            obl("glow", L_GLOW, [sx * L / 2, sy * W / 2, z + h * 0.08, 160, 160, h * 0.8, 0, 0])
+        z += h + 3 * max(560 * (L / 24500), 220)
+        L, W = L * 0.84, W * 0.84
+    # antenna clusters on yagura + gate towers
+    for cx, cy, s in ((-48000, -42000, .5), (48000, -42000, .5), (-48000, 42000, .5), (48000, 42000, .5),
+                      (-72000, -64000, .38), (72000, -64000, .38), (-72000, 64000, .38), (72000, 64000, .38),
+                      (-98000, -88000, .3), (98000, -88000, .3), (-98000, 88000, .3), (98000, 88000, .3),
+                      (0, -42000, .55), (0, -64000, .5), (72000, 0, .48), (0, -88000, .45)):
+        zt = 16600 * s + 1000
+        cyl("det_ant", L_DET, [cx, cy, zt, 0, 0, 1, 5200 * s + 1500, 150])
+        obl("det_ant", L_DET, [cx, cy, zt + 3600 * s + 900, 2600 * s + 700, 170, 170, rng.choice((0, 45, 90)), 0])
+        cyl("det_ant", L_DET, [cx + 600, cy, zt + 2400 * s, 0, 1, 0.35, 900, 320])
+    # equipment boxes + conduits on the bailey wall inner faces
+    for ri, (x0, y0, x1, y1) in enumerate(RUNS):
+        dx, dy = x1 - x0, y1 - y0
+        ln = math.hypot(dx, dy)
+        yaw = math.degrees(math.atan2(dy, dx))
+        nxo, nyo = -dy / ln, dx / ln
+        if nxo * (x0 + x1) / 2 + nyo * (y0 + y1) / 2 < 0:
+            nxo, nyo = -nxo, -nyo
+        n = max(int(ln / 20000), 1)
+        for k in range(n):
+            t = (k + 0.5) / n
+            px = x0 + dx * t - nxo * 1400
+            py = y0 + dy * t - nyo * 1400
+            obl("det_equip", L_DET, [px, py, 3900, 2000, 1000, 1500, yaw, 0])
+            obl("det_cond", L_DET, [px, py, 5600, 3400, 200, 200, yaw, 0])
+    # big interface screens on outer walls + the tenshu base
+    spots = [(-30000, -88500, 0, 9500, 5600), (34000, -88500, 0, 12000, 6800),
+             (-98500, -20000, 90, 9500, 5600), (98500, 24000, 90, 9500, 5600),
+             (-45000, -64500, 0, 8000, 4800), (56000, 64500, 0, 9500, 5600),
+             (-14500, -18800, 0, 7200, 5200), (14500, 18800, 0, 7200, 5200)]
+    for si, (px, py, ang, sw, sh) in enumerate(spots):
+        obl("scr_frame", L_SCR, [px, py, 3400, sw * 1.08, 300, sh * 1.12, ang, 0])
+        b = "scr_c" if si % 2 == 0 else "scr_o"
+        obl(b, L_SCR, [px, py + (60 if ang == 0 else 0), 3700, sw, 180, sh, ang, 0])
+    # floating holo panels (their own assembly - they drift in Blender)
+    for k in range(14):
+        a = rng.uniform(0, 360)
+        R = rng.uniform(30000, 88000)
+        px, py = R * math.cos(math.radians(a)), R * math.sin(math.radians(a))
+        obl("holo", L_SCR, [px, py, rng.uniform(9000, 38000),
+                            rng.uniform(2200, 4200), 90, rng.uniform(1400, 2600),
+                            rng.uniform(0, 360), 0])
+    n = flush()
+    save()
+    log(f"DET DONE: {n} objects")
+
 # ══════════════ MAT ══════════════
 MAT = [
     ("g_ground",  "concrete-smooth",        "site_ground"),
@@ -617,7 +877,21 @@ MAT = [
     ("w_base",    "concrete-boardformed",   "wall_base"),
     ("g_base",    "concrete-boardformed",   "gate_base"),
     ("t_body",    "steel-painted-charcoal", "keep_storey"),
-    ("t_win",     "rubber-black",           "window_band"),
+    ("t_win",     "polycarbonate-opal",     "window_band"),
+    ("agg_body",  "steel-painted-charcoal", "agg_module"),
+    ("agg_cap",   "steel-painted-charcoal", "agg_cap"),
+    ("agg_frame", "steel-galvanized",       "agg_frame"),
+    ("agg_scr_c", "polycarbonate-opal",     "interface_screen"),
+    ("agg_scr_o", "brick-red",              "interface_screen"),
+    ("agg_win",   "polycarbonate-opal",     "window_strip"),
+    ("det_plate", "steel-painted-charcoal", "facade_plate"),
+    ("det_ant",   "steel-galvanized",       "antenna"),
+    ("det_equip", "steel-painted-charcoal", "equipment"),
+    ("det_cond",  "steel-galvanized",       "conduit"),
+    ("scr_frame", "rubber-black",           "screen_frame"),
+    ("scr_c",     "polycarbonate-opal",     "billboard_screen"),
+    ("scr_o",     "brick-red",              "billboard_screen"),
+    ("holo",      "polycarbonate-opal",     "holo_panel"),
     ("r_slab",    "steel-painted-charcoal", "roof_slab"),
     ("r_skirt",   "steel-painted-charcoal", "eave_skirt"),
     ("r_soffit",  "steel-painted-vermilion", "eave_soffit"),
@@ -666,13 +940,18 @@ ASSEMBLIES = {
     "ring2": ["ring2_body", "ring2_glow"],
     "lanterns": ["lan_glow", "lan_cap"],
     "apex": ["ap_mast", "ap_fin", "ap_glow"],
+    "holo": ["holo"],
 }
 GLOW_WHITE = {"glow", "p_glow"}
-GLOW_ORANGE = {"ring1_glow", "ring2_glow", "lan_glow", "ap_glow"}
+GLOW_ORANGE = {"ring1_glow", "ring2_glow", "lan_glow", "ap_glow", "agg_scr_o", "scr_o"}
+GLOW_CYAN = {"agg_scr_c", "scr_c", "holo"}
+GLOW_WARM = {"t_win", "agg_win"}
 
 def _matkey(batch):
     if batch in GLOW_WHITE: return "glow"
     if batch in GLOW_ORANGE: return "gloworange"
+    if batch in GLOW_CYAN: return "glowcyan"
+    if batch in GLOW_WARM: return "glowwarm"
     return next(mt for b, mt, _ in MAT if b == batch)
 
 def phase_export():
@@ -707,11 +986,12 @@ def phase_save3dm():
     log(f"SAVE3DM: {r.get('status')} -> {out}")
 
 PHASES = {"CLEAR": phase_clear, "SUN": phase_sun, "T1": phase_t1, "T2": phase_t2,
-          "T3": phase_t3, "T4": phase_t4, "MAT": phase_mat, "FIX1": phase_fix1,
+          "T3": phase_t3, "T4": phase_t4, "AGG": phase_agg, "DET": phase_det,
+          "MAT": phase_mat, "FIX1": phase_fix1,
           "EXPORT": phase_export, "SAVE3DM": phase_save3dm}
 
 if PHASE == "ALL":
-    for p in ("SUN", "T1", "T2", "T3", "T4", "MAT"):
+    for p in ("SUN", "T1", "T2", "T3", "T4", "AGG", "DET", "MAT"):
         PHASES[p]()
 elif PHASE in PHASES:
     PHASES[PHASE]()
