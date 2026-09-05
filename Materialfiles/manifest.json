@@ -462,6 +462,68 @@
         "tree"
       ],
       "description": "Clipped pine foliage, niwaki garden trees."
+    },
+    {
+      "material_id": "brass-polished",
+      "name": "Polished brass",
+      "category": "metal",
+      "base_color": [
+        212,
+        168,
+        90
+      ],
+      "metallic": 1.0,
+      "roughness": 0.3,
+      "opacity": 1.0,
+      "ue_material_slot": "M_Brass_Polished",
+      "tags": [
+        "brass",
+        "gold",
+        "trim",
+        "ornament"
+      ],
+      "description": "Polished brass trim, warm gold tone."
+    },
+    {
+      "material_id": "ceramic-teal",
+      "name": "Glazed teal ceramic",
+      "category": "mineral",
+      "base_color": [
+        42,
+        108,
+        118
+      ],
+      "metallic": 0.0,
+      "roughness": 0.35,
+      "opacity": 1.0,
+      "ue_material_slot": "M_Ceramic_Teal",
+      "tags": [
+        "ceramic",
+        "glazed",
+        "roof",
+        "teal"
+      ],
+      "description": "Glazed ceramic roof tile, deep teal."
+    },
+    {
+      "material_id": "grass-meadow",
+      "name": "Meadow grass",
+      "category": "vegetation",
+      "base_color": [
+        116,
+        166,
+        96
+      ],
+      "metallic": 0.0,
+      "roughness": 0.9,
+      "opacity": 1.0,
+      "ue_material_slot": "M_Grass_Meadow",
+      "tags": [
+        "grass",
+        "meadow",
+        "landscape"
+      ],
+      "description": "Bright meadow grass ground cover."
     }
   ]
 }
