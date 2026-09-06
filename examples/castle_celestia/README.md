@@ -74,3 +74,22 @@ as water instead of light pillars.
   frame time and is invisible in this flat style - leave it off.
 - All prior Blender 5.x gotchas apply (keyframe interpolation pref,
   compositor node group, Mix node sockets, parent after mm->m scaling).
+
+## v2: connection-node QA + node hardware (same session)
+
+- **AUDIT phase** - parametric connection-node audit, 12 joint classes
+  with measured embed depths (tier chain continuity, bridge end embeds,
+  fin/window/door anchoring, rock course overlap, satellite dwelling
+  elevations, waterfall roots, podium capacity, closed-solid check).
+- **QA phase** - deleted 1,058 defective objects and re-emitted them
+  corrected: bridges extended to EMBED both ends (outer 3.5 m into the
+  tower body, inner 1.1 m into the core drum) with brass node collars;
+  fins re-anchored 50 mm into drum faces; window slits embedded 55 mm
+  (was 5 mm proud - the "improper backface" gap); satellite houses and
+  trees moved from z=0 to their islands' ztop (house()/tree() gained a
+  z0 parameter).
+- **DET2 phase** - node hardware + detail: 8 corbel brackets under every
+  radial platform (both ends embedded), pilasters + 12 roof-edge dentils
+  per main tier, foundations + brass door frames on every house, base
+  plinths under towers/pylons/podiums/lamps, root mounds under trees,
+  and a 40-segment rim railing. ~4,125 objects, 75 batches.

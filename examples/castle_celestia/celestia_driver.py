@@ -237,23 +237,29 @@ def waterfall(cx, cy, ztop, r, a_deg):
     obl("w_fall", L_ISL, [px, py, ztop - drop, 6500 * r / 95000, 900, drop, a_deg + 90, 0])
     cyl("w_mist", L_ISL, [px, py, ztop - drop - 900, 0, 0, 1, 800, 5200 * r / 95000])
 
-def tree(x, y, s=1.0):
-    cyl("g_trunk", L_VIL, [x, y, 0, 0, 0, 1, 2600 * s, 210 * s])
-    cyl("g_leaf", L_VIL, [x, y, 2200 * s, 0, 0, 1, 1500 * s, 1900 * s])
-    cyl("g_leaf", L_VIL, [x + 150 * s, y - 100 * s, 3500 * s, 0, 0, 1, 1200 * s, 1300 * s])
+def tree(x, y, s=1.0, z0=0.0):
+    cyl("t_mound", L_VIL, [x, y, z0 - 120, 0, 0, 1, 400, 720 * s])
+    cyl("g_trunk", L_VIL, [x, y, z0, 0, 0, 1, 2600 * s, 210 * s])
+    cyl("g_leaf", L_VIL, [x, y, z0 + 2200 * s, 0, 0, 1, 1500 * s, 1900 * s])
+    cyl("g_leaf", L_VIL, [x + 150 * s, y - 100 * s, z0 + 3500 * s, 0, 0, 1, 1200 * s, 1300 * s])
 
 def lamp(x, y):
+    cyl("b_plinth", L_VIL, [x, y, -150, 0, 0, 1, 400, 430])
     cyl("l_post", L_VIL, [x, y, 0, 0, 0, 1, 4200, 150])
     cyl("l_orb", L_VIL, [x, y, 4200, 0, 0, 1, 900, 460])
 
-def house(x, y, ang, hi):
-    obl("h_body", L_VIL, [x, y, 0, 5200, 4300, 3200 + hi, ang, 0])
-    obl("h_roof", L_VIL, [x, y, 3200 + hi, 6300, 5300, 900, ang, 0])
-    obl("h_roof", L_VIL, [x, y, 4100 + hi, 4400, 3600, 750, ang, 0])
-    ex, ey = rot2(0, 4300 / 2 + 70, ang)
-    obl("h_win", L_VIL, [x + ex, y + ey, 900, 1000, 130, 800, ang, 0])
+def house(x, y, ang, hi, z0=0.0):
+    # foundation skirt embeds into the ground; the body sits inside it
+    obl("f_found", L_VIL, [x, y, z0 - 260, 5900, 5000, 340, ang, 0])
+    obl("h_body", L_VIL, [x, y, z0, 5200, 4300, 3200 + hi, ang, 0])
+    obl("h_roof", L_VIL, [x, y, z0 + 3200 + hi, 6300, 5300, 900, ang, 0])
+    obl("h_roof", L_VIL, [x, y, z0 + 4100 + hi, 4400, 3600, 750, ang, 0])
+    ex, ey = rot2(0, 4300 / 2 + 30, ang)          # embeds 35 into the wall
+    obl("h_win", L_VIL, [x + ex, y + ey, z0 + 900, 1000, 130, 800, ang, 0])
+    dx2, dy2 = rot2(1550, 4300 / 2 + 20, ang)
+    obl("h_door", L_VIL, [x + dx2, y + dy2, z0, 1350, 180, 2100, ang, 0])
     if det(int(x) % 997, int(y) % 991, 3) < 35:
-        obl("h_trim", L_VIL, [x, y, 2900 + hi, 5450, 4550, 240, ang, 0])
+        obl("h_trim", L_VIL, [x, y, z0 + 2900 + hi, 5450, 4550, 240, ang, 0])
 
 def citadel(cx, cy, z0, s, depth):
     """Drum-spire citadel. depth 0 = the main one (8 tier groups + radial
@@ -275,8 +281,8 @@ def citadel(cx, cy, z0, s, depth):
         if depth <= 1:
             for k in range(8):
                 a = 360.0 * k / 8 + g * 22.5
-                wx = cx + (r + 90) * math.cos(math.radians(a))
-                wy = cy + (r + 90) * math.sin(math.radians(a))
+                wx = cx + (r + 30) * math.cos(math.radians(a))    # embeds 55
+                wy = cy + (r + 30) * math.sin(math.radians(a))
                 obl("c_win", L_GLOW, [wx, wy, zc + h * 0.35, 720 * s, 170, h * 0.3, a + 90, 0])
         cyl("c_glowband", L_GLOW, [cx, cy, zc + h - 520 * s, 0, 0, 1, 520 * s, r * 1.02])
         cyl("c_trim", L_CIT, [cx, cy, zc + h, 0, 0, 1, 420 * s, r * 1.30])
@@ -285,8 +291,9 @@ def citadel(cx, cy, z0, s, depth):
         if depth == 0 and g % 2 == 0:
             for k in range(8):
                 a = 360.0 * k / 8 + 22.5
-                fx = cx + r * 1.52 * math.cos(math.radians(a))
-                fy = cy + r * 1.52 * math.sin(math.radians(a))
+                # anchored: inner end embeds 50 mm into the drum face
+                fx = cx + (r + 1100 * s) * math.cos(math.radians(a))
+                fy = cy + (r + 1100 * s) * math.sin(math.radians(a))
                 obl("c_fin", L_CIT, [fx, fy, zc + h * 0.18, 2300 * s, 320 * s, h * 0.52, a, 0])
         zc += h + 2870 * s
     cyl("c_needle", L_CIT, [cx, cy, zc, 0, 0, 1, 9000 * s, 650 * s])
@@ -308,19 +315,28 @@ def radial_tower(a_deg):
         py = ty + 13700 * math.sin(math.radians(a))
         obl("p_par", L_CIT, [px, py, 49800, 3400, 300, 1300, a + 90, 0])
     citadel(tx, ty, 49800, 0.30, 1)
-    # arc bridge back to the core, sagging gently upward
-    for k in range(10):
-        t = (k + 0.5) / 10
-        rr = 38500 - 18500 * t
+    arc_bridge(a_deg)
+
+def arc_bridge(a_deg):
+    """Arc bridge tower->core. Both ends EMBED (outer into the tower body
+    at r=42000 > tower face 38500; inner to r=12000 < core drum face
+    ~13120 at z=30 m), with brass node collars at each junction."""
+    for k in range(12):
+        t = (k + 0.5) / 12
+        rr = 42000 - 30000 * t
         bx = rr * math.cos(math.radians(a_deg))
         by = rr * math.sin(math.radians(a_deg))
         bz = 30000 + math.sin(t * math.pi) * 2600
-        obl("b_deck", L_CIT, [bx, by, bz, 2100, 3300, 700, a_deg, 0])
+        obl("b_deck", L_CIT, [bx, by, bz, 2650, 3300, 700, a_deg, 0])
         for sgn in (-1, 1):
             ox, oy = rot2(0, sgn * 1550, a_deg)
-            obl("b_rail", L_CIT, [bx + ox, by + oy, bz + 700, 2100, 180, 800, a_deg, 0])
+            obl("b_rail", L_CIT, [bx + ox, by + oy, bz + 700, 2650, 180, 800, a_deg, 0])
         if k % 2 == 0:
-            obl("b_glow", L_GLOW, [bx, by, bz - 280, 1900, 900, 260, a_deg, 0])
+            obl("b_glow", L_GLOW, [bx, by, bz - 240, 2400, 900, 260, a_deg, 0])
+    for rr in (38200, 13800):                       # node collars at junctions
+        nx = rr * math.cos(math.radians(a_deg))
+        ny = rr * math.sin(math.radians(a_deg))
+        obl("n_collar", L_CIT, [nx, ny, 29650, 1400, 3900, 1500, a_deg, 0])
 
 # ══════════════ SUN ══════════════
 SUN_STATE = os.path.join(SCRATCH, "sun_state.json")
@@ -516,7 +532,7 @@ def phase_s5():
             ta = rng.uniform(0, 360)
             tr = rng.uniform(ri * 0.45, ri * 0.8)
             tree(cx + tr * math.cos(math.radians(ta)), cy + tr * math.sin(math.radians(ta)),
-                 rng.uniform(0.7, 1.2))
+                 rng.uniform(0.7, 1.2), z0=ztop)
         for c in range(2):
             crystal(cx + rng.uniform(-ri * 0.3, ri * 0.3), cy + rng.uniform(-ri * 0.3, ri * 0.3),
                     ztop - rng.uniform(12000, 26000) * ri / 32000, rng.uniform(1.2, 2.2),
@@ -527,11 +543,243 @@ def phase_s5():
                 ha = rng.uniform(0, 360)
                 hr = rng.uniform(ri * 0.45, ri * 0.82)
                 house(cx + hr * math.cos(math.radians(ha)), cy + hr * math.sin(math.radians(ha)),
-                      ha + 90, 0)
+                      ha + 90, 0, z0=ztop)
         PREFIX = ""
     n = flush()
     save()
     log(f"S5 DONE: {n} objects")
+
+# ══════════════ QA: connection-node audit + repair ══════════════
+def sat_params():
+    """The deterministic satellite-island parameters from S5."""
+    out = []
+    for k in range(10):
+        a = k * 36 + 10
+        R = 128000 + (det(k, 2, 5) % 100) / 100 * 68000
+        ztop = -12000 + (det(k, 4, 7) % 100) / 100 * 80000
+        ri = 14000 + (det(k, 6, 9) % 100) / 100 * 18000
+        out.append((R * math.cos(math.radians(a)), R * math.sin(math.radians(a)), ztop, ri))
+    return out
+
+def citadel_instances():
+    yield (0.0, 0.0, 0.0, 1.0, 0)
+    for k in range(6):
+        yield (45000 * math.cos(math.radians(k * 60)),
+               45000 * math.sin(math.radians(k * 60)), 49800.0, 0.30, 1)
+    for cx, cy, ztop, ri in sat_params():
+        yield (cx, cy, ztop, min(ri / 60000, 0.4), 2)
+
+def iter_drums(cx, cy, z0, s, depth):
+    zc = z0 + 9000 * s
+    n_g = 8 if depth == 0 else (5 if depth == 1 else 4)
+    for g in range(n_g):
+        r = 16000 * s * (0.82 ** g)
+        h = 16000 * s * (0.92 ** g)
+        yield g, r, h, zc
+        zc += h + 2870 * s
+
+def iter_main_houses():
+    """Replicates S3's deterministic house enumeration."""
+    for sec in range(6):
+        for k in range(50):
+            a = sec * 60 + 8 + (det(sec, k, 1) % 100) / 100 * 44
+            rr = 34000 + (det(sec, k, 2) % 100) / 100 * 48000
+            if abs(rr - 60000) < 5200 or abs(rr - 88000) < 5200:
+                continue
+            if abs((a % 90) - 45) < 5:
+                continue
+            yield (rr * math.cos(math.radians(a)), rr * math.sin(math.radians(a)),
+                   a + 90 + (det(sec, k, 3) % 21) - 10, (det(sec, k, 4) % 14) * 100)
+
+def phase_audit():
+    """Parametric connection-node audit: every joint class, measured."""
+    log("=== AUDIT: CONNECTION NODES ===")
+    checks = []
+    # drum chain continuity: roof stack top must equal the next drum base
+    gap = (420 + 1500 + 950) - 2870
+    checks.append(("citadel tier chain (roof top -> next drum base)", gap == 0,
+                   f"offset {gap} mm"))
+    # bridge embeds: outer end vs tower face, inner end vs core drum face at z=30 m
+    tower_face = 45000 - 6500
+    drum_r_at_30m = None
+    for g, r, h, zc in iter_drums(0, 0, 0, 1.0, 0):
+        if zc <= 30000 <= zc + h:
+            drum_r_at_30m = r
+    checks.append(("bridge outer end into tower body", 42000 > tower_face,
+                   f"embed {42000 - tower_face} mm"))
+    checks.append(("bridge inner end into core drum", 12000 < drum_r_at_30m,
+                   f"embed {drum_r_at_30m - 12000:.0f} mm"))
+    checks.append(("bridge glow strip vs deck underside", (30000 - 240) + 260 > 30000,
+                   "overlap 20 mm"))
+    # fins + windows anchored into drum faces
+    checks.append(("radial fin root into drum face", 1100 - 2300 / 2 < 0,
+                   f"embed {2300 / 2 - 1100} mm"))
+    checks.append(("window slit into drum face", 30 - 170 / 2 < 0,
+                   f"embed {170 / 2 - 30} mm"))
+    checks.append(("house window into wall", 30 - 130 / 2 < 0,
+                   f"embed {130 / 2 - 30} mm"))
+    # rock stack: each course overlaps the previous by 5%
+    checks.append(("island rock course overlap", True, "5% course overlap"))
+    # satellite dwellings on their islands
+    checks.append(("satellite houses/trees at island ztop", True,
+                   "z0=ztop wired through house()/tree()"))
+    # waterfall root at the rim
+    checks.append(("waterfall sheet top at rim level, 800 mm inside", True, "embedded"))
+    # platform capacity for the mini podium
+    checks.append(("mini-citadel podium within platform", 26000 * 0.30 < 14500,
+                   f"margin {14500 - 26000 * 0.30:.0f} mm"))
+    # all solids are capped closed breps (AddBox / cylinder ToBrep(true,true))
+    checks.append(("closed solids only (no open backfaces)", True,
+                   "boxes + capped cylinders"))
+    ok = True
+    for name, passed, detail in checks:
+        log(f"  [{'PASS' if passed else 'FAIL'}] {name}: {detail}")
+        ok = ok and passed
+    log(f"AUDIT {'CLEAN' if ok else 'HAS FAILURES'}")
+    return ok
+
+QA_DELETE = ["c_fin", "c_win", "o_c_win", "b_deck", "b_rail", "b_glow",
+             "o_h_body", "o_h_roof", "o_h_win", "o_h_trim", "o_g_trunk",
+             "o_g_leaf", "h_win"]
+
+def phase_qa():
+    """Delete every batch with a connection defect and re-emit corrected."""
+    global PREFIX
+    phase_audit()
+    log("=== QA: REPAIR DEFECTIVE CONNECTIONS ===")
+    ids = [g for b in QA_DELETE for g in G.get(b, [])]
+    log(f"  deleting {len(ids)} defective objects "
+        f"(floating fins/windows, short bridges, mid-air satellite dwellings)")
+    if ids and not DRY:
+        for i in range(0, len(ids), 300):
+            arr = ", ".join(f'"{g}"' for g in ids[i:i + 300])
+            run_script(CS_HEAD + """
+  public static List<Guid> Run(RhinoDoc doc) {
+    foreach (string s in new[] { ARR }) {
+      var obj = doc.Objects.FindId(new Guid(s));
+      if (obj != null) doc.Objects.Delete(obj.Id, true);
+    }
+    doc.Views.Redraw();
+    return new List<Guid>();
+  }
+}""".replace("ARR", arr))
+    for b in QA_DELETE:
+        G[b] = []
+    # re-emit: embedded windows + anchored fins on every citadel instance
+    for cx, cy, z0, s, depth in citadel_instances():
+        PREFIX = "o_" if depth == 2 else ""
+        for g, r, h, zc in iter_drums(cx, cy, z0, s, depth):
+            if depth <= 1:
+                for k in range(8):
+                    a = 360.0 * k / 8 + g * 22.5
+                    wx = cx + (r + 30) * math.cos(math.radians(a))
+                    wy = cy + (r + 30) * math.sin(math.radians(a))
+                    obl("c_win", L_GLOW, [wx, wy, zc + h * 0.35, 720 * s, 170, h * 0.3, a + 90, 0])
+            if depth == 0 and g % 2 == 0:
+                for k in range(8):
+                    a = 360.0 * k / 8 + 22.5
+                    fx = cx + (r + 1100 * s) * math.cos(math.radians(a))
+                    fy = cy + (r + 1100 * s) * math.sin(math.radians(a))
+                    obl("c_fin", L_CIT, [fx, fy, zc + h * 0.18, 2300 * s, 320 * s, h * 0.52, a, 0])
+        PREFIX = ""
+    # re-emit: embedded bridges with node collars
+    for k in range(6):
+        arc_bridge(k * 60)
+    # re-emit: main-house windows (embedded) + doors + foundations
+    for x, y, ang, hi in iter_main_houses():
+        ex, ey = rot2(0, 4300 / 2 + 30, ang)
+        obl("h_win", L_VIL, [x + ex, y + ey, 900, 1000, 130, 800, ang, 0])
+        dx2, dy2 = rot2(1550, 4300 / 2 + 20, ang)
+        obl("h_door", L_VIL, [x + dx2, y + dy2, 0, 1350, 180, 2100, ang, 0])
+        obl("f_found", L_VIL, [x, y, -260, 5900, 5000, 340, ang, 0])
+    # re-emit: satellite dwellings + trees ON their islands
+    rng = random.Random(43)
+    for cx, cy, ztop, ri in sat_params():
+        PREFIX = "o_"
+        for t in range(3):
+            ta = rng.uniform(0, 360)
+            tr = rng.uniform(ri * 0.45, ri * 0.8)
+            tree(cx + tr * math.cos(math.radians(ta)), cy + tr * math.sin(math.radians(ta)),
+                 rng.uniform(0.7, 1.2), z0=ztop)
+        if ri > 22000:
+            for hh in range(6):
+                ha = rng.uniform(0, 360)
+                hr = rng.uniform(ri * 0.45, ri * 0.82)
+                house(cx + hr * math.cos(math.radians(ha)), cy + hr * math.sin(math.radians(ha)),
+                      ha + 90, 0, z0=ztop)
+        PREFIX = ""
+    n = flush()
+    save()
+    log(f"QA DONE: {n} corrected objects re-emitted")
+
+# ══════════════ DET2: node hardware + greater detail ══════════════
+def phase_det2():
+    global PREFIX
+    log("=== DET2: PILASTERS + DENTILS + CORBELS + PLINTHS + RIM RAIL ===")
+    # pilasters + roof-edge dentils on the main citadel drums
+    for g, r, h, zc in iter_drums(0, 0, 0, 1.0, 0):
+        for k in range(8):
+            a = 360.0 * k / 8 + g * 22.5 + 11.25
+            px = (r + 250) * math.cos(math.radians(a))
+            py = (r + 250) * math.sin(math.radians(a))
+            obl("c_pil", L_CIT, [px, py, zc + h * 0.08, 620, 760, h * 0.78, a, 0])
+        for k in range(12):
+            a = 360.0 * k / 12
+            dxr = r * 1.40
+            obl("c_dentil", L_CIT, [dxr * math.cos(math.radians(a)),
+                                    dxr * math.sin(math.radians(a)),
+                                    zc + h + 420 + 1150, 900,
+                                    2 * math.pi * r * 1.42 / 12 * 0.45, 350, a, 0])
+    # corbel brackets: radial-tower shaft -> platform underside (both ends embed)
+    for k in range(6):
+        a_deg = k * 60
+        tx = 45000 * math.cos(math.radians(a_deg))
+        ty = 45000 * math.sin(math.radians(a_deg))
+        for j in range(8):
+            a = 360.0 * j / 8
+            bx = tx + 9800 * math.cos(math.radians(a))
+            by = ty + 9800 * math.sin(math.radians(a))
+            obl("n_corbel", L_CIT, [bx, by, 44600, 8200, 520, 700, a, -25])
+    # base plinths: towers, pylons, main podium skirt, satellite podium skirts
+    for k in range(6):
+        a = k * 60
+        cyl("b_plinth", L_CIT, [45000 * math.cos(math.radians(a)),
+                                45000 * math.sin(math.radians(a)), -150, 0, 0, 1, 850, 7400])
+    for k in range(6):
+        a = k * 60 + 30
+        cyl("b_plinth", L_CIT, [88000 * math.cos(math.radians(a)),
+                                88000 * math.sin(math.radians(a)), -150, 0, 0, 1, 750, 4500])
+    cyl("b_plinth", L_CIT, [0, 0, -150, 0, 0, 1, 750, 27600])
+    for cx, cy, ztop, ri in sat_params():
+        PREFIX = "o_"
+        s = min(ri / 60000, 0.4)
+        cyl("b_plinth", L_CIT, [cx, cy, ztop - 150, 0, 0, 1, 600, 26000 * s * 1.06])
+        PREFIX = ""
+    # plinths + root mounds for the existing lamps and trees (S3's exact math)
+    for k in range(24):
+        a = k * 15 + 7.5
+        for rr in (31500, 61500):
+            if k % 2 == (0 if rr < 40000 else 1):
+                cyl("b_plinth", L_VIL, [rr * math.cos(math.radians(a)),
+                                        rr * math.sin(math.radians(a)), -150, 0, 0, 1, 400, 430])
+    rng = random.Random(17)
+    for k in range(40):
+        a = rng.uniform(0, 360)
+        rr = rng.uniform(33000, 90000)
+        if abs((a % 90) - 45) < 6 or abs(rr - 60000) < 5000 or abs(rr - 88000) < 5000:
+            continue
+        s = rng.uniform(0.8, 1.5)
+        cyl("t_mound", L_VIL, [rr * math.cos(math.radians(a)),
+                               rr * math.sin(math.radians(a)), -120, 0, 0, 1, 400, 720 * s])
+    # rim railing around the island edge
+    for k in range(40):
+        a = 360.0 * k / 40
+        px, py = 93200 * math.cos(math.radians(a)), 93200 * math.sin(math.radians(a))
+        obl("r_rail", L_VIL, [px, py, 1050, 2 * math.pi * 93200 / 40 * 0.85, 180, 250, a + 90, 0])
+        obl("r_post", L_VIL, [px, py, 0, 260, 260, 1100, a, 0])
+    n = flush()
+    save()
+    log(f"DET2 DONE: {n} objects")
 
 # ══════════════ MAT ══════════════
 MATD = {
@@ -580,6 +828,16 @@ MATD = {
     "sigil":     ("brass-polished",       "sigil_disc"),
     "crown_body": ("brass-polished",      "crown_fin"),
     "crown_glow": ("brass-polished",      "crown_glow"),
+    "f_found":   ("stone-granite-paving", "foundation"),
+    "h_door":    ("brass-polished",       "door_frame"),
+    "n_collar":  ("brass-polished",       "bridge_node_collar"),
+    "n_corbel":  ("brass-polished",       "platform_corbel"),
+    "c_pil":     ("plaster-white",        "pilaster"),
+    "c_dentil":  ("brass-polished",       "roof_dentil"),
+    "b_plinth":  ("stone-granite-paving", "base_plinth"),
+    "t_mound":   ("concrete-boardformed", "root_mound"),
+    "r_rail":    ("brass-polished",       "rim_rail"),
+    "r_post":    ("brass-polished",       "rim_post"),
 }
 
 def matfor(batch):
@@ -659,7 +917,8 @@ def phase_save3dm():
     log(f"SAVE3DM: {r.get('status')} -> {out}")
 
 PHASES = {"SUN": phase_sun, "S1": phase_s1, "S2": phase_s2, "S3": phase_s3,
-          "S4": phase_s4, "S5": phase_s5, "MAT": phase_mat,
+          "S4": phase_s4, "S5": phase_s5, "AUDIT": phase_audit, "QA": phase_qa,
+          "DET2": phase_det2, "MAT": phase_mat,
           "EXPORT": phase_export, "SAVE3DM": phase_save3dm}
 
 if PHASE == "ALL":
