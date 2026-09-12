@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-shrub-round-1",
+  "library_id": "generated_assets",
+  "name": "Shrub (round clipped)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-shrub-round-1.glb",
+  "dimensions_mm": {
+    "width": 964.1,
+    "depth": 962.2,
+    "height": 900.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "ground",
+    "local_aabb": {
+      "min": [
+        -482.05,
+        -481.1,
+        0.0
+      ],
+      "max": [
+        482.05,
+        481.1,
+        900.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "accessory"
+  },
+  "materials": [
+    {
+      "material_id": "foliage-pine",
+      "objects": [
+        "gen-shrub-round-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

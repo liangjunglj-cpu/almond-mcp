@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-tree-conifer-1",
+  "library_id": "generated_assets",
+  "name": "Conifer tree (tall, narrow)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-tree-conifer-1.glb",
+  "dimensions_mm": {
+    "width": 2452.1,
+    "depth": 2443.4,
+    "height": 9000.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "ground",
+    "local_aabb": {
+      "min": [
+        -1226.05,
+        -1221.7,
+        0.0
+      ],
+      "max": [
+        1226.05,
+        1221.7,
+        9000.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "accessory"
+  },
+  "materials": [
+    {
+      "material_id": "foliage-pine",
+      "objects": [
+        "gen-tree-conifer-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

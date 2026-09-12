@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-door-single-1",
+  "library_id": "generated_assets",
+  "name": "Single leaf door (flush leaf with frame and lever handle)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-door-single-1.glb",
+  "dimensions_mm": {
+    "width": 818.8,
+    "depth": 149.1,
+    "height": 2150.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "local_aabb": {
+      "min": [
+        -409.4,
+        -74.55,
+        0.0
+      ],
+      "max": [
+        409.4,
+        74.55,
+        2150.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 1000,
+      "back": 1000,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "fixed"
+  },
+  "materials": [
+    {
+      "material_id": "wood-oak",
+      "objects": [
+        "gen-door-single-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

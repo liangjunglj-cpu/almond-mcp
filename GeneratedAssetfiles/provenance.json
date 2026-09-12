@@ -1,0 +1,236 @@
+{
+  "library_id": "generated_assets",
+  "assets": {
+    "gen-person-standing-1": {
+      "image_task_id": "01a09787-a448-7360-939a-ab919d08398e",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978d-653f-734a-8edf-ce2ffc1bda07",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-person-walking-1": {
+      "image_task_id": "01a09787-b24a-7035-9f02-e9e209cc99e3",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978d-73c0-710c-9a02-fdb87841247f",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-person-sitting-1": {
+      "image_task_id": "01a09787-bec7-77ba-bc26-f0c50c9def2a",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978d-8188-779f-ae9f-bf62075e5983",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-tree-deciduous-medium-1": {
+      "image_task_id": "01a09787-cc57-75eb-a1b1-574938e586f0",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978d-8f6c-7137-9eba-b15c3ed6ec24",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-tree-conifer-1": {
+      "image_task_id": "01a09787-da17-71e3-8e11-e66c7f7a9a0f",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978d-9e4d-749e-ad51-2ed80aa9ce3b",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-shrub-round-1": {
+      "image_task_id": "01a09787-e661-70dd-875d-fb62697869b8",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978d-acef-75f5-a38b-51c64e60e2c2",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-car-sedan-1": {
+      "image_task_id": "01a09787-f336-72a4-8574-307a3c02979f",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978d-bbcd-726c-9c1c-d5c85d139dc7",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-bicycle-1": {
+      "image_task_id": "01a09788-0028-73c1-b138-5be23b86a987",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978d-c97d-77f6-a39b-31bb45348599",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-park-bench-1": {
+      "image_task_id": "01a09788-0f5c-7679-ad0c-e716a5c3c118",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978d-e43a-708f-be6d-e8de89fde6f9",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-street-lamp-1": {
+      "image_task_id": "01a09788-1b92-70f7-9723-f979b9bd5d8f",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978d-f18b-75a9-841a-5f4713d5d66f",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-bollard-1": {
+      "image_task_id": "01a09788-29cb-7622-915a-8f9095238de7",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978d-fee4-72c7-9cc1-f2bbf76bb25b",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-bike-rack-1": {
+      "image_task_id": "01a09788-35cb-70ce-aabe-731f4ae38e2e",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978e-0b68-73de-83cd-43a250b2dbc2",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-litter-bin-1": {
+      "image_task_id": "01a09788-425a-7555-99e9-3ffc46471c5b",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978e-1a0e-7798-b364-8d700fccf022",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-door-single-1": {
+      "image_task_id": "01a09788-50a1-7584-bcbc-2587d50c85d3",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978e-276a-7595-8ecc-c732739be4ec",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-door-double-1": {
+      "image_task_id": "01a09788-5d85-75bb-ac39-215bcc54ccbd",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978e-34f7-7460-9a3b-11554dda5c02",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-window-casement-1": {
+      "image_task_id": "01a09788-6d12-74de-b7e8-76de739a2293",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978e-4312-71a8-a9cf-48f4289875d6",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-stair-straight-1": {
+      "image_task_id": "01a09788-7bac-739c-98db-54e438cca44a",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978e-53cb-7198-b10d-45f02503b5ea",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-stair-spiral-1": {
+      "image_task_id": "01a09788-88a1-7312-b1a8-2cfb3c55b4d5",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978e-808f-7546-b2e0-539b7b427308",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-column-round-1": {
+      "image_task_id": "01a09788-95fb-758f-891c-de0ce066dad6",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978e-8ea9-7486-adee-fc9950ee7c89",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-column-square-1": {
+      "image_task_id": "01a09788-a362-736d-a43d-cf3cc88ce046",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978e-9c7d-7753-81ab-fa258d35eb88",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-balustrade-glass-1": {
+      "image_task_id": "01a09788-b03a-778e-bfd7-bfb576737cf3",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978e-aa4a-771f-ab26-dba2f725530e",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-toilet-1": {
+      "image_task_id": "01a09788-bf8b-74b2-be55-75e578e73068",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978e-b787-7347-afc4-29e5a6b44b90",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-washbasin-pedestal-1": {
+      "image_task_id": "01a09788-cd24-7133-b6bf-24be3b9e982d",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978e-c613-7771-a80e-de66c4d484d3",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-bathtub-1": {
+      "image_task_id": "01a09788-d970-7010-a926-a5bbfece1492",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978e-d36f-7288-892f-fbd07b26f425",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-shower-enclosure-1": {
+      "image_task_id": "01a09788-e678-710f-8a5a-72838507090a",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978e-e0ce-7335-a72e-c933cb1e0723",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-kitchen-range-1": {
+      "image_task_id": "01a09788-f46c-7507-8a37-d715e3da5091",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978e-ee7e-750c-91f6-c5e4724b3c6c",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-refrigerator-1": {
+      "image_task_id": "01a09789-01b0-7012-a2f8-f58cadfeb3f4",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978e-fc89-71c4-985b-8599687baf80",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-sofa-3-seat-1": {
+      "image_task_id": "01a09789-0ef6-754a-b0cd-e3f54dfe4a6e",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978f-0a4a-7263-b015-501f0fd70df6",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-dining-table-rect-1": {
+      "image_task_id": "01a09789-1dd2-747e-b428-a89dce8ca12d",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978f-1858-713a-992e-8b1f307a53a1",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-dining-chair-1": {
+      "image_task_id": "01a09789-2b97-72fd-8906-ed90e2d6402d",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978f-2694-77ef-92e9-19a4597946d2",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-bed-double-1": {
+      "image_task_id": "01a09789-3c20-75e3-98cb-9bc2f6445c39",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978f-3449-76fe-9462-d31daf954c53",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-desk-1": {
+      "image_task_id": "01a09789-49cf-751a-91c2-e35703aadf86",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978f-411c-776c-b0dd-45ba52352c11",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-office-chair-1": {
+      "image_task_id": "01a09789-5785-7773-8dcc-ed507a95c80a",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978f-4e8d-707c-a258-c9b3897bfcad",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    }
+  }
+}

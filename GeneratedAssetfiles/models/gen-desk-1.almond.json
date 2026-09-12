@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-desk-1",
+  "library_id": "generated_assets",
+  "name": "Desk (generic writing desk, timber top, steel legs)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-desk-1.glb",
+  "dimensions_mm": {
+    "width": 1306.1,
+    "depth": 655.6,
+    "height": 750.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "local_aabb": {
+      "min": [
+        -653.05,
+        -327.8,
+        0.0
+      ],
+      "max": [
+        653.05,
+        327.8,
+        750.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 900,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "primary"
+  },
+  "materials": [
+    {
+      "material_id": "wood-birch-ply",
+      "objects": [
+        "gen-desk-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

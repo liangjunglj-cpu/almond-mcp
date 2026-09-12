@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-door-double-1",
+  "library_id": "generated_assets",
+  "name": "Double leaf door (pair of flush leaves with frame)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-door-double-1.glb",
+  "dimensions_mm": {
+    "width": 1222.0,
+    "depth": 154.8,
+    "height": 2150.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "local_aabb": {
+      "min": [
+        -611.0,
+        -77.4,
+        0.0
+      ],
+      "max": [
+        611.0,
+        77.4,
+        2150.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 1900,
+      "back": 1900,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "fixed"
+  },
+  "materials": [
+    {
+      "material_id": "wood-oak",
+      "objects": [
+        "gen-door-double-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-bicycle-1",
+  "library_id": "generated_assets",
+  "name": "Bicycle (city bike)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-bicycle-1.glb",
+  "dimensions_mm": {
+    "width": 560.5,
+    "depth": 1654.2,
+    "height": 1050.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "ground",
+    "local_aabb": {
+      "min": [
+        -280.25,
+        -827.1,
+        0.0
+      ],
+      "max": [
+        280.25,
+        827.1,
+        1050.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 300,
+      "back": 300,
+      "left": 300,
+      "right": 300
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "accessory"
+  },
+  "materials": [
+    {
+      "material_id": "steel-painted-charcoal",
+      "objects": [
+        "gen-bicycle-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

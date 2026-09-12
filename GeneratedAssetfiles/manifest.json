@@ -1,0 +1,3708 @@
+{
+  "library_id": "generated_assets",
+  "library_name": "Almond Generated Architectural Asset Library",
+  "catalogue_region": "Generated (Meshy) - no vendor catalogue",
+  "catalogue_checked": "2026-09-12",
+  "schema_version": "2.0",
+  "purpose": "Redistributable 3D architectural entourage, building components, fixtures and unbranded furniture placeholders, generated with Meshy and normalised to real-world millimetre dimensions with authored Almond spatial contracts.",
+  "license": "CC-BY-4.0",
+  "license_note": "Generated with Meshy (meshy.ai) on a paid plan, whose terms assign the output to the generating account; released under CC BY 4.0. Attribute 'Almond generated asset library'.",
+  "generation_recipe": {
+    "image_stage": {
+      "tool": "meshy_text_to_image",
+      "ai_model": "nano-banana",
+      "aspect_ratio": "1:1",
+      "prompt_suffix": " Single object, isolated on a plain white background, three-quarter view from slightly above, soft even studio lighting, no cast shadow, no text, realistic real-world proportions, clean architectural visualisation asset."
+    },
+    "mesh_stage": {
+      "tool": "meshy_image_to_3d",
+      "ai_model": "meshy-t2",
+      "model_type": "smart-topology",
+      "should_texture": false,
+      "target_formats": [
+        "glb"
+      ],
+      "auto_size": true,
+      "origin_at": "bottom"
+    },
+    "post_process": "tools/build_generated_assets.py normalises each GLB: scales uniformly to the catalogue height, re-centres bottom-centre on the origin, renames every material to ALMOND::<render_material_id>, measures bounds, writes manifest.json and one .almond.json contract per asset."
+  },
+  "placement_policy": {
+    "participates_in_room_furniture_search": true,
+    "participates_in_room_collision_by_default": true,
+    "default_rhino_layer": "ALMOND-GEN"
+  },
+  "spatial_contract": {
+    "units": "millimeters",
+    "coordinate_system": "asset_local_z_up",
+    "default_anchor": "bottom_center",
+    "nominal_bounds_require_runtime_measurement": false
+  },
+  "assets": [
+    {
+      "asset_id": "gen-person-standing-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "section",
+        "elevation",
+        "interior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "lod": "medium",
+      "category": "human_figure",
+      "series": "ALMOND-GEN",
+      "product": "Person standing",
+      "variant": "adult, casual clothing",
+      "dimensions_mm": {
+        "width": 577.6,
+        "depth": 284.5,
+        "height": 1750.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 550,
+        "depth": 350,
+        "height": 1750
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.187,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-person-standing-1.glb",
+      "contract_file": "models/gen-person-standing-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-person-standing-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-person-standing-1.almond.json",
+      "sha256": "C5E595DBFCCC15B2C1AC77D9CE70ECBA9D8712A39E27D5D4F4A7D0094B65E324",
+      "file_size_bytes": 340612,
+      "triangle_count": 4383,
+      "tags": [
+        "person",
+        "human",
+        "scale figure",
+        "entourage",
+        "standing"
+      ],
+      "render_material_id": "plaster-white",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A full-body adult person standing upright in a relaxed pose, casual everyday clothing, arms at sides, plain matte grey clay-like appearance.",
+          "image_task_id": "01a09787-a448-7360-939a-ab919d08398e",
+          "image_model": "nano-banana",
+          "mesh_task_id": "01a0978d-653f-734a-8edf-ce2ffc1bda07",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-12",
+          "orientation_correction": null,
+          "scale_applied": 1029.411736
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -288.8,
+            -142.25,
+            0.0
+          ],
+          "max": [
+            288.8,
+            142.25,
+            1750.0
+          ]
+        },
+        "footprint": [
+          [
+            -288.8,
+            -142.25
+          ],
+          [
+            288.8,
+            -142.25
+          ],
+          [
+            288.8,
+            142.25
+          ],
+          [
+            -288.8,
+            142.25
+          ]
+        ],
+        "clearance_mm": {
+          "front": 0,
+          "back": 0,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "accessory"
+      }
+    },
+    {
+      "asset_id": "gen-person-walking-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "section",
+        "elevation",
+        "interior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "lod": "medium",
+      "category": "human_figure",
+      "series": "ALMOND-GEN",
+      "product": "Person walking",
+      "variant": "adult, mid-stride",
+      "dimensions_mm": {
+        "width": 584.5,
+        "depth": 1032.2,
+        "height": 1750.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 500,
+        "depth": 750,
+        "height": 1750
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.376,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-person-walking-1.glb",
+      "contract_file": "models/gen-person-walking-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-person-walking-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-person-walking-1.almond.json",
+      "sha256": "F6C6EB991C92CA0886B7FBF7F28B48BE5657E0D84DAFEA7445725662A05FF331",
+      "file_size_bytes": 332000,
+      "triangle_count": 4270,
+      "tags": [
+        "person",
+        "human",
+        "scale figure",
+        "entourage",
+        "walking"
+      ],
+      "render_material_id": "plaster-white",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A full-body adult person walking, mid-stride, casual clothing, one arm swinging forward, plain matte grey clay-like appearance.",
+          "image_task_id": "01a09787-b24a-7035-9f02-e9e209cc99e3",
+          "image_model": "nano-banana",
+          "mesh_task_id": "01a0978d-73c0-710c-9a02-fdb87841247f",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-12",
+          "orientation_correction": null,
+          "scale_applied": 1000.0
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -292.25,
+            -516.1,
+            0.0
+          ],
+          "max": [
+            292.25,
+            516.1,
+            1750.0
+          ]
+        },
+        "footprint": [
+          [
+            -292.25,
+            -516.1
+          ],
+          [
+            292.25,
+            -516.1
+          ],
+          [
+            292.25,
+            516.1
+          ],
+          [
+            -292.25,
+            516.1
+          ]
+        ],
+        "clearance_mm": {
+          "front": 0,
+          "back": 0,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "accessory"
+      }
+    },
+    {
+      "asset_id": "gen-person-sitting-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "section",
+        "interior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "lod": "medium",
+      "category": "human_figure",
+      "series": "ALMOND-GEN",
+      "product": "Person sitting",
+      "variant": "adult, seated on a plain stool",
+      "dimensions_mm": {
+        "width": 562.4,
+        "depth": 587.8,
+        "height": 1300.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 500,
+        "depth": 700,
+        "height": 1300
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.16,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-person-sitting-1.glb",
+      "contract_file": "models/gen-person-sitting-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-person-sitting-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-person-sitting-1.almond.json",
+      "sha256": "B47AC092A212F13DA7DE06FB7569361A45ACE326D18D2E4CC6604DD8476F3732",
+      "file_size_bytes": 323612,
+      "triangle_count": 4153,
+      "tags": [
+        "person",
+        "human",
+        "scale figure",
+        "entourage",
+        "sitting",
+        "seated"
+      ],
+      "render_material_id": "plaster-white",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A full-body adult person sitting on a plain simple stool, hands resting on knees, casual clothing, plain matte grey clay-like appearance.",
+          "image_task_id": "01a09787-bec7-77ba-bc26-f0c50c9def2a",
+          "image_model": "nano-banana",
+          "mesh_task_id": "01a0978d-8188-779f-ae9f-bf62075e5983",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-12",
+          "orientation_correction": null,
+          "scale_applied": 742.857143
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -281.2,
+            -293.9,
+            0.0
+          ],
+          "max": [
+            281.2,
+            293.9,
+            1300.0
+          ]
+        },
+        "footprint": [
+          [
+            -281.2,
+            -293.9
+          ],
+          [
+            281.2,
+            -293.9
+          ],
+          [
+            281.2,
+            293.9
+          ],
+          [
+            -281.2,
+            293.9
+          ]
+        ],
+        "clearance_mm": {
+          "front": 0,
+          "back": 0,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "accessory"
+      }
+    },
+    {
+      "asset_id": "gen-tree-deciduous-medium-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "site_plan",
+        "section",
+        "elevation",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "lod": "low",
+      "category": "vegetation",
+      "series": "ALMOND-GEN",
+      "product": "Deciduous tree",
+      "variant": "medium, round crown",
+      "dimensions_mm": {
+        "width": 4785.2,
+        "depth": 4949.2,
+        "height": 7000.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 5000,
+        "depth": 5000,
+        "height": 7000
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.043,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-tree-deciduous-medium-1.glb",
+      "contract_file": "models/gen-tree-deciduous-medium-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-tree-deciduous-medium-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-tree-deciduous-medium-1.almond.json",
+      "sha256": "720F05AEF9C84B5FED9927DD2E706581B035FD77FAFA7675593EFDF0DB9A1739",
+      "file_size_bytes": 317964,
+      "triangle_count": 4063,
+      "tags": [
+        "tree",
+        "deciduous",
+        "landscape",
+        "site",
+        "entourage",
+        "vegetation"
+      ],
+      "render_material_id": "foliage-pine",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A medium-sized deciduous tree with a single straight trunk and a full rounded leafy crown, simplified stylised foliage clumps, architectural model tree.",
+          "image_task_id": "01a09787-cc57-75eb-a1b1-574938e586f0",
+          "image_model": "nano-banana",
+          "mesh_task_id": "01a0978d-8f6c-7137-9eba-b15c3ed6ec24",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-12",
+          "orientation_correction": null,
+          "scale_applied": 1166.666667
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "ground",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -2392.6,
+            -2474.6,
+            0.0
+          ],
+          "max": [
+            2392.6,
+            2474.6,
+            7000.0
+          ]
+        },
+        "footprint": [
+          [
+            -2392.6,
+            -2474.6
+          ],
+          [
+            2392.6,
+            -2474.6
+          ],
+          [
+            2392.6,
+            2474.6
+          ],
+          [
+            -2392.6,
+            2474.6
+          ]
+        ],
+        "clearance_mm": {
+          "front": 0,
+          "back": 0,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "accessory"
+      }
+    },
+    {
+      "asset_id": "gen-tree-conifer-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "site_plan",
+        "section",
+        "elevation",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "lod": "low",
+      "category": "vegetation",
+      "series": "ALMOND-GEN",
+      "product": "Conifer tree",
+      "variant": "tall, narrow",
+      "dimensions_mm": {
+        "width": 2452.1,
+        "depth": 2443.4,
+        "height": 9000.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 3000,
+        "depth": 3000,
+        "height": 9000
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.186,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-tree-conifer-1.glb",
+      "contract_file": "models/gen-tree-conifer-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-tree-conifer-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-tree-conifer-1.almond.json",
+      "sha256": "9ED0F73AE11FF1AA2DA805D4D8783DBF63419650C15E550D58A80FCA0B73BEF6",
+      "file_size_bytes": 324600,
+      "triangle_count": 4183,
+      "tags": [
+        "tree",
+        "conifer",
+        "pine",
+        "landscape",
+        "site",
+        "entourage",
+        "vegetation"
+      ],
+      "render_material_id": "foliage-pine",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A tall narrow conifer pine tree with a straight trunk and layered conical foliage, simplified stylised architectural model tree.",
+          "image_task_id": "01a09787-da17-71e3-8e11-e66c7f7a9a0f",
+          "image_model": "nano-banana",
+          "mesh_task_id": "01a0978d-9e4d-749e-ad51-2ed80aa9ce3b",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-12",
+          "orientation_correction": null,
+          "scale_applied": 600.0
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "ground",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -1226.05,
+            -1221.7,
+            0.0
+          ],
+          "max": [
+            1226.05,
+            1221.7,
+            9000.0
+          ]
+        },
+        "footprint": [
+          [
+            -1226.05,
+            -1221.7
+          ],
+          [
+            1226.05,
+            -1221.7
+          ],
+          [
+            1226.05,
+            1221.7
+          ],
+          [
+            -1226.05,
+            1221.7
+          ]
+        ],
+        "clearance_mm": {
+          "front": 0,
+          "back": 0,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "accessory"
+      }
+    },
+    {
+      "asset_id": "gen-shrub-round-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "site_plan",
+        "section",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "lod": "low",
+      "category": "vegetation",
+      "series": "ALMOND-GEN",
+      "product": "Shrub",
+      "variant": "round clipped",
+      "dimensions_mm": {
+        "width": 964.1,
+        "depth": 962.2,
+        "height": 900.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 1000,
+        "depth": 1000,
+        "height": 900
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.038,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-shrub-round-1.glb",
+      "contract_file": "models/gen-shrub-round-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-shrub-round-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-shrub-round-1.almond.json",
+      "sha256": "B7EFE69C00EF9A1B9BA276E67BE759E7B6418DF33F08F2FF67573CD360041118",
+      "file_size_bytes": 195708,
+      "triangle_count": 2499,
+      "tags": [
+        "shrub",
+        "bush",
+        "hedge",
+        "landscape",
+        "planting",
+        "vegetation"
+      ],
+      "render_material_id": "foliage-pine",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A round clipped garden shrub, dense simplified foliage, no pot, sitting directly on the ground.",
+          "image_task_id": "01a09787-e661-70dd-875d-fb62697869b8",
+          "image_model": "nano-banana",
+          "mesh_task_id": "01a0978d-acef-75f5-a38b-51c64e60e2c2",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-12",
+          "orientation_correction": null,
+          "scale_applied": 11250.000775
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "ground",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -482.05,
+            -481.1,
+            0.0
+          ],
+          "max": [
+            482.05,
+            481.1,
+            900.0
+          ]
+        },
+        "footprint": [
+          [
+            -482.05,
+            -481.1
+          ],
+          [
+            482.05,
+            -481.1
+          ],
+          [
+            482.05,
+            481.1
+          ],
+          [
+            -482.05,
+            481.1
+          ]
+        ],
+        "clearance_mm": {
+          "front": 0,
+          "back": 0,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "accessory"
+      }
+    },
+    {
+      "asset_id": "gen-car-sedan-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "site_plan",
+        "elevation",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "lod": "medium",
+      "category": "vehicle",
+      "series": "ALMOND-GEN",
+      "product": "Car",
+      "variant": "generic mid-size sedan",
+      "dimensions_mm": {
+        "width": 2056.6,
+        "depth": 5050.3,
+        "height": 1450.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 1800,
+        "depth": 4600,
+        "height": 1450
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.143,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-car-sedan-1.glb",
+      "contract_file": "models/gen-car-sedan-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-car-sedan-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-car-sedan-1.almond.json",
+      "sha256": "CCDA35096CD5137F35EBBA32C34847FAB6FEFDEB810F587502EC56EC81A14378",
+      "file_size_bytes": 322312,
+      "triangle_count": 4198,
+      "tags": [
+        "car",
+        "vehicle",
+        "sedan",
+        "parking",
+        "site",
+        "entourage"
+      ],
+      "render_material_id": "steel-painted-charcoal",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A generic modern mid-size four-door sedan car, no brand badges, plain matte grey body, wheels touching the ground.",
+          "image_task_id": "01a09787-f336-72a4-8574-307a3c02979f",
+          "image_model": "nano-banana",
+          "mesh_task_id": "01a0978d-bbcd-726c-9c1c-d5c85d139dc7",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-12",
+          "orientation_correction": "rotated_90_about_vertical",
+          "scale_applied": 999.999967
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "ground",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -1028.3,
+            -2525.15,
+            0.0
+          ],
+          "max": [
+            1028.3,
+            2525.15,
+            1450.0
+          ]
+        },
+        "footprint": [
+          [
+            -1028.3,
+            -2525.15
+          ],
+          [
+            1028.3,
+            -2525.15
+          ],
+          [
+            1028.3,
+            2525.15
+          ],
+          [
+            -1028.3,
+            2525.15
+          ]
+        ],
+        "clearance_mm": {
+          "front": 1000,
+          "back": 1000,
+          "left": 600,
+          "right": 600
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "movable"
+      }
+    },
+    {
+      "asset_id": "gen-bicycle-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "site_plan",
+        "elevation",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "lod": "medium",
+      "category": "vehicle",
+      "series": "ALMOND-GEN",
+      "product": "Bicycle",
+      "variant": "city bike",
+      "dimensions_mm": {
+        "width": 560.5,
+        "depth": 1654.2,
+        "height": 1050.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 600,
+        "depth": 1750,
+        "height": 1050
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.066,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-bicycle-1.glb",
+      "contract_file": "models/gen-bicycle-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-bicycle-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-bicycle-1.almond.json",
+      "sha256": "2488EFD1466EDFC80224E6B7020788DB66A96056CC2E0D26BD8402038C90FE13",
+      "file_size_bytes": 332336,
+      "triangle_count": 4322,
+      "tags": [
+        "bicycle",
+        "bike",
+        "cycling",
+        "entourage",
+        "site"
+      ],
+      "render_material_id": "steel-painted-charcoal",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A generic city bicycle standing upright, simple diamond frame, two wheels, handlebars and saddle, plain matte grey.",
+          "image_task_id": "01a09788-0028-73c1-b138-5be23b86a987",
+          "image_model": "nano-banana",
+          "mesh_task_id": "01a0978d-c97d-77f6-a39b-31bb45348599",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-12",
+          "orientation_correction": "rotated_90_about_vertical",
+          "scale_applied": 1050.0
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "ground",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -280.25,
+            -827.1,
+            0.0
+          ],
+          "max": [
+            280.25,
+            827.1,
+            1050.0
+          ]
+        },
+        "footprint": [
+          [
+            -280.25,
+            -827.1
+          ],
+          [
+            280.25,
+            -827.1
+          ],
+          [
+            280.25,
+            827.1
+          ],
+          [
+            -280.25,
+            827.1
+          ]
+        ],
+        "clearance_mm": {
+          "front": 300,
+          "back": 300,
+          "left": 300,
+          "right": 300
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "accessory"
+      }
+    },
+    {
+      "asset_id": "gen-park-bench-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "site_plan",
+        "section",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "lod": "medium",
+      "category": "site_furniture",
+      "series": "ALMOND-GEN",
+      "product": "Park bench",
+      "variant": "timber slats, steel frame",
+      "dimensions_mm": {
+        "width": 1330.9,
+        "depth": 565.4,
+        "height": 850.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 1800,
+        "depth": 600,
+        "height": 850
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.261,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-park-bench-1.glb",
+      "contract_file": "models/gen-park-bench-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-park-bench-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-park-bench-1.almond.json",
+      "sha256": "4DAAF2E539DE04E2A8ECEDF17F49B83A099051C4387D81205BA6E7B999EBD210",
+      "file_size_bytes": 249340,
+      "triangle_count": 3990,
+      "tags": [
+        "bench",
+        "seating",
+        "park",
+        "street furniture",
+        "site",
+        "outdoor"
+      ],
+      "render_material_id": "wood-oak",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A public park bench with horizontal timber slats for seat and backrest on two cast steel side frames, plain simple design.",
+          "image_task_id": "01a09788-0f5c-7679-ad0c-e716a5c3c118",
+          "image_model": "nano-banana",
+          "mesh_task_id": "01a0978d-e43a-708f-be6d-e8de89fde6f9",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-12",
+          "orientation_correction": null,
+          "scale_applied": 1000.000007
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "ground",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -665.45,
+            -282.7,
+            0.0
+          ],
+          "max": [
+            665.45,
+            282.7,
+            850.0
+          ]
+        },
+        "footprint": [
+          [
+            -665.45,
+            -282.7
+          ],
+          [
+            665.45,
+            -282.7
+          ],
+          [
+            665.45,
+            282.7
+          ],
+          [
+            -665.45,
+            282.7
+          ]
+        ],
+        "clearance_mm": {
+          "front": 600,
+          "back": 0,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "movable"
+      }
+    },
+    {
+      "asset_id": "gen-street-lamp-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "site_plan",
+        "elevation",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "lod": "low",
+      "category": "site_furniture",
+      "series": "ALMOND-GEN",
+      "product": "Street lamp",
+      "variant": "single-arm LED",
+      "dimensions_mm": {
+        "width": 319.7,
+        "depth": 1441.4,
+        "height": 4500.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 400,
+        "depth": 900,
+        "height": 4500
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.602,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-street-lamp-1.glb",
+      "contract_file": "models/gen-street-lamp-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-street-lamp-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-street-lamp-1.almond.json",
+      "sha256": "2A6440322684C72B23B8C6B7C45D516F99500E1340259F20DF9EB3FD6DE8D93B",
+      "file_size_bytes": 272076,
+      "triangle_count": 3979,
+      "tags": [
+        "lamp",
+        "lighting",
+        "street",
+        "pole",
+        "site",
+        "urban"
+      ],
+      "render_material_id": "steel-painted-charcoal",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A modern single-arm street lamp post, tall slender cylindrical pole with a flat LED luminaire on a short horizontal arm at the top, small base plate, plain matte dark grey.",
+          "image_task_id": "01a09788-1b92-70f7-9723-f979b9bd5d8f",
+          "image_model": "nano-banana",
+          "mesh_task_id": "01a0978d-f18b-75a9-841a-5f4713d5d66f",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-12",
+          "orientation_correction": "rotated_90_about_vertical",
+          "scale_applied": 2647.058749
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "ground",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -159.85,
+            -720.7,
+            0.0
+          ],
+          "max": [
+            159.85,
+            720.7,
+            4500.0
+          ]
+        },
+        "footprint": [
+          [
+            -159.85,
+            -720.7
+          ],
+          [
+            159.85,
+            -720.7
+          ],
+          [
+            159.85,
+            720.7
+          ],
+          [
+            -159.85,
+            720.7
+          ]
+        ],
+        "clearance_mm": {
+          "front": 0,
+          "back": 0,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "fixed"
+      }
+    },
+    {
+      "asset_id": "gen-bollard-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "site_plan",
+        "elevation",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "lod": "low",
+      "category": "site_furniture",
+      "series": "ALMOND-GEN",
+      "product": "Bollard",
+      "variant": "cylindrical steel",
+      "dimensions_mm": {
+        "width": 190.7,
+        "depth": 189.4,
+        "height": 900.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 160,
+        "depth": 160,
+        "height": 900
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.192,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-bollard-1.glb",
+      "contract_file": "models/gen-bollard-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-bollard-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-bollard-1.almond.json",
+      "sha256": "90D5AAE2625D256D2E6BE80AE383FFB5EA65EB881D21FF9107B9E4B393C8EB0A",
+      "file_size_bytes": 308112,
+      "triangle_count": 4278,
+      "tags": [
+        "bollard",
+        "traffic",
+        "street furniture",
+        "site",
+        "urban"
+      ],
+      "render_material_id": "steel-painted-charcoal",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A simple cylindrical steel street bollard with a slightly domed top, plain matte dark grey, standing on the ground.",
+          "image_task_id": "01a09788-29cb-7622-915a-8f9095238de7",
+          "image_model": "nano-banana",
+          "mesh_task_id": "01a0978d-fee4-72c7-9cc1-f2bbf76bb25b",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-12",
+          "orientation_correction": null,
+          "scale_applied": 5999.999762
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "ground",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -95.35,
+            -94.7,
+            0.0
+          ],
+          "max": [
+            95.35,
+            94.7,
+            900.0
+          ]
+        },
+        "footprint": [
+          [
+            -95.35,
+            -94.7
+          ],
+          [
+            95.35,
+            -94.7
+          ],
+          [
+            95.35,
+            94.7
+          ],
+          [
+            -95.35,
+            94.7
+          ]
+        ],
+        "clearance_mm": {
+          "front": 0,
+          "back": 0,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "fixed"
+      }
+    },
+    {
+      "asset_id": "gen-bike-rack-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "site_plan",
+        "elevation",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "lod": "low",
+      "category": "site_furniture",
+      "series": "ALMOND-GEN",
+      "product": "Bike rack",
+      "variant": "inverted U hoop",
+      "dimensions_mm": {
+        "width": 553.1,
+        "depth": 36.4,
+        "height": 800.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 800,
+        "depth": 80,
+        "height": 800
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.545,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-bike-rack-1.glb",
+      "contract_file": "models/gen-bike-rack-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-bike-rack-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-bike-rack-1.almond.json",
+      "sha256": "A031D341758F1941D031FF3FCDAA8422A09C0A154B7790259EAFD05A608011FF",
+      "file_size_bytes": 315420,
+      "triangle_count": 4179,
+      "tags": [
+        "bike rack",
+        "bicycle",
+        "parking",
+        "hoop",
+        "street furniture",
+        "site"
+      ],
+      "render_material_id": "steel-galvanized",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "An inverted-U shaped steel tube bicycle parking hoop, single hoop, galvanised grey finish, standing on the ground.",
+          "image_task_id": "01a09788-35cb-70ce-aabe-731f4ae38e2e",
+          "image_model": "nano-banana",
+          "mesh_task_id": "01a0978e-0b68-73de-83cd-43a250b2dbc2",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-12",
+          "orientation_correction": null,
+          "scale_applied": 999.999985
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "ground",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -276.55,
+            -18.2,
+            0.0
+          ],
+          "max": [
+            276.55,
+            18.2,
+            800.0
+          ]
+        },
+        "footprint": [
+          [
+            -276.55,
+            -18.2
+          ],
+          [
+            276.55,
+            -18.2
+          ],
+          [
+            276.55,
+            18.2
+          ],
+          [
+            -276.55,
+            18.2
+          ]
+        ],
+        "clearance_mm": {
+          "front": 900,
+          "back": 900,
+          "left": 300,
+          "right": 300
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "fixed"
+      }
+    },
+    {
+      "asset_id": "gen-litter-bin-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "site_plan",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "lod": "low",
+      "category": "site_furniture",
+      "series": "ALMOND-GEN",
+      "product": "Litter bin",
+      "variant": "cylindrical public",
+      "dimensions_mm": {
+        "width": 491.2,
+        "depth": 490.2,
+        "height": 1000.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 500,
+        "depth": 500,
+        "height": 1000
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.02,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-litter-bin-1.glb",
+      "contract_file": "models/gen-litter-bin-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-litter-bin-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-litter-bin-1.almond.json",
+      "sha256": "414B4229296EE820EA546ED41ADFA9DF9ED770475418A7D12D0C6AFB9EBC7AD7",
+      "file_size_bytes": 325004,
+      "triangle_count": 4402,
+      "tags": [
+        "bin",
+        "litter",
+        "waste",
+        "street furniture",
+        "site"
+      ],
+      "render_material_id": "steel-painted-charcoal",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A cylindrical public street litter bin with a small hooded top opening, plain matte dark grey metal, standing on the ground.",
+          "image_task_id": "01a09788-425a-7555-99e9-3ffc46471c5b",
+          "image_model": "nano-banana",
+          "mesh_task_id": "01a0978e-1a0e-7798-b364-8d700fccf022",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-12",
+          "orientation_correction": null,
+          "scale_applied": 1666.6666
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "ground",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -245.6,
+            -245.1,
+            0.0
+          ],
+          "max": [
+            245.6,
+            245.1,
+            1000.0
+          ]
+        },
+        "footprint": [
+          [
+            -245.6,
+            -245.1
+          ],
+          [
+            245.6,
+            -245.1
+          ],
+          [
+            245.6,
+            245.1
+          ],
+          [
+            -245.6,
+            245.1
+          ]
+        ],
+        "clearance_mm": {
+          "front": 400,
+          "back": 0,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "movable"
+      }
+    },
+    {
+      "asset_id": "gen-door-single-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "elevation",
+        "section",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_component",
+      "lod": "medium",
+      "category": "door",
+      "series": "ALMOND-GEN",
+      "product": "Single leaf door",
+      "variant": "flush leaf with frame and lever handle",
+      "dimensions_mm": {
+        "width": 818.8,
+        "depth": 149.1,
+        "height": 2150.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 1000,
+        "depth": 120,
+        "height": 2150
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.242,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-door-single-1.glb",
+      "contract_file": "models/gen-door-single-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-door-single-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-door-single-1.almond.json",
+      "sha256": "41565BAC56DD41D4BBA16CF8DF9DCC60B1E5D78167764889F4D282333925AEEE",
+      "file_size_bytes": 284160,
+      "triangle_count": 3993,
+      "tags": [
+        "door",
+        "single",
+        "leaf",
+        "opening",
+        "interior",
+        "component"
+      ],
+      "render_material_id": "wood-oak",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A single flush interior door leaf hung in a plain rectangular door frame with architraves, lever handle, door closed, plain light timber, no wall around it.",
+          "image_task_id": "01a09788-50a1-7584-bcbc-2587d50c85d3",
+          "image_model": "nano-banana",
+          "mesh_task_id": "01a0978e-276a-7595-8ecc-c732739be4ec",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-12",
+          "orientation_correction": null,
+          "scale_applied": 1075.0
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -409.4,
+            -74.55,
+            0.0
+          ],
+          "max": [
+            409.4,
+            74.55,
+            2150.0
+          ]
+        },
+        "footprint": [
+          [
+            -409.4,
+            -74.55
+          ],
+          [
+            409.4,
+            -74.55
+          ],
+          [
+            409.4,
+            74.55
+          ],
+          [
+            -409.4,
+            74.55
+          ]
+        ],
+        "clearance_mm": {
+          "front": 1000,
+          "back": 1000,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "fixed"
+      }
+    },
+    {
+      "asset_id": "gen-door-double-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "elevation",
+        "section",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_component",
+      "lod": "medium",
+      "category": "door",
+      "series": "ALMOND-GEN",
+      "product": "Double leaf door",
+      "variant": "pair of flush leaves with frame",
+      "dimensions_mm": {
+        "width": 1222.0,
+        "depth": 154.8,
+        "height": 2150.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 1900,
+        "depth": 120,
+        "height": 2150
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.357,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-door-double-1.glb",
+      "contract_file": "models/gen-door-double-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-door-double-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-door-double-1.almond.json",
+      "sha256": "3B473AD6A05807607D27E9CE0FABC004B8E292990B7735644DF51DB46227A214",
+      "file_size_bytes": 289564,
+      "triangle_count": 3829,
+      "tags": [
+        "door",
+        "double",
+        "pair",
+        "opening",
+        "entrance",
+        "component"
+      ],
+      "render_material_id": "wood-oak",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A pair of flush double doors hung in a plain rectangular frame with architraves, two lever handles meeting at the centre, doors closed, plain light timber, no wall around it.",
+          "image_task_id": "01a09788-5d85-75bb-ac39-215bcc54ccbd",
+          "image_model": "nano-banana",
+          "mesh_task_id": "01a0978e-34f7-7460-9a3b-11554dda5c02",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-12",
+          "orientation_correction": null,
+          "scale_applied": 1075.0
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -611.0,
+            -77.4,
+            0.0
+          ],
+          "max": [
+            611.0,
+            77.4,
+            2150.0
+          ]
+        },
+        "footprint": [
+          [
+            -611.0,
+            -77.4
+          ],
+          [
+            611.0,
+            -77.4
+          ],
+          [
+            611.0,
+            77.4
+          ],
+          [
+            -611.0,
+            77.4
+          ]
+        ],
+        "clearance_mm": {
+          "front": 1900,
+          "back": 1900,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "fixed"
+      }
+    },
+    {
+      "asset_id": "gen-window-casement-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "elevation",
+        "section",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_component",
+      "lod": "medium",
+      "category": "window",
+      "series": "ALMOND-GEN",
+      "product": "Casement window",
+      "variant": "two-light with frame",
+      "dimensions_mm": {
+        "width": 1500.0,
+        "depth": 106.6,
+        "height": 1500.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 1200,
+        "depth": 150,
+        "height": 1500
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.289,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-window-casement-1.glb",
+      "contract_file": "models/gen-window-casement-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-window-casement-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-window-casement-1.almond.json",
+      "sha256": "79003C704F03B67FAF97CC095C209BE1652E7D10E3A7EFD03DDD85949DD713B9",
+      "file_size_bytes": 323112,
+      "triangle_count": 4320,
+      "tags": [
+        "window",
+        "casement",
+        "glazing",
+        "opening",
+        "facade",
+        "component"
+      ],
+      "render_material_id": "aluminium-anodized",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A rectangular two-light casement window in a slim aluminium frame with a central mullion, clear glazing, closed, no wall around it.",
+          "image_task_id": "01a09788-6d12-74de-b7e8-76de739a2293",
+          "image_model": "nano-banana",
+          "mesh_task_id": "01a0978e-4312-71a8-a9cf-48f4289875d6",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-12",
+          "orientation_correction": null,
+          "scale_applied": 1249.99995
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "wall",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -750.0,
+            -53.3,
+            0.0
+          ],
+          "max": [
+            750.0,
+            53.3,
+            1500.0
+          ]
+        },
+        "footprint": [
+          [
+            -750.0,
+            -53.3
+          ],
+          [
+            750.0,
+            -53.3
+          ],
+          [
+            750.0,
+            53.3
+          ],
+          [
+            -750.0,
+            53.3
+          ]
+        ],
+        "clearance_mm": {
+          "front": 0,
+          "back": 0,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "fixed",
+        "mount_height_mm": 900
+      }
+    },
+    {
+      "asset_id": "gen-stair-straight-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_component",
+      "lod": "medium",
+      "category": "stair",
+      "series": "ALMOND-GEN",
+      "product": "Straight stair flight",
+      "variant": "closed risers, one handrail",
+      "dimensions_mm": {
+        "width": 1340.6,
+        "depth": 3710.1,
+        "height": 3000.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 1000,
+        "depth": 3600,
+        "height": 3000
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.341,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-stair-straight-1.glb",
+      "contract_file": "models/gen-stair-straight-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-stair-straight-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-stair-straight-1.almond.json",
+      "sha256": "7B35E9B33FC57F5E61C3EDCA7648CCC8F435A41E922D16B3FDEF5D76DDECACCD",
+      "file_size_bytes": 295212,
+      "triangle_count": 4356,
+      "tags": [
+        "stair",
+        "staircase",
+        "flight",
+        "circulation",
+        "vertical",
+        "component"
+      ],
+      "render_material_id": "concrete-smooth",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A straight single-flight staircase of sixteen solid steps with closed risers, one simple handrail on the left side, plain matte concrete, rising from the ground.",
+          "image_task_id": "01a09788-7bac-739c-98db-54e438cca44a",
+          "image_model": "nano-banana",
+          "mesh_task_id": "01a0978e-53cb-7198-b10d-45f02503b5ea",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-12",
+          "orientation_correction": null,
+          "scale_applied": 1000.0
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -670.3,
+            -1855.05,
+            0.0
+          ],
+          "max": [
+            670.3,
+            1855.05,
+            3000.0
+          ]
+        },
+        "footprint": [
+          [
+            -670.3,
+            -1855.05
+          ],
+          [
+            670.3,
+            -1855.05
+          ],
+          [
+            670.3,
+            1855.05
+          ],
+          [
+            -670.3,
+            1855.05
+          ]
+        ],
+        "clearance_mm": {
+          "front": 1000,
+          "back": 1000,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "fixed"
+      }
+    },
+    {
+      "asset_id": "gen-stair-spiral-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_component",
+      "lod": "medium",
+      "category": "stair",
+      "series": "ALMOND-GEN",
+      "product": "Spiral stair",
+      "variant": "central column, steel treads",
+      "dimensions_mm": {
+        "width": 2841.8,
+        "depth": 2824.2,
+        "height": 3000.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 2000,
+        "depth": 2000,
+        "height": 3000
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.421,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-stair-spiral-1.glb",
+      "contract_file": "models/gen-stair-spiral-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-stair-spiral-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-stair-spiral-1.almond.json",
+      "sha256": "18BD2E092B982B075741C6A20BF78256CF15BDCB2B9274EC8DBF2453A148E160",
+      "file_size_bytes": 258792,
+      "triangle_count": 3449,
+      "tags": [
+        "stair",
+        "spiral",
+        "circulation",
+        "vertical",
+        "component"
+      ],
+      "render_material_id": "steel-painted-charcoal",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A spiral staircase around a central steel column, thin steel treads fanning out, simple vertical balusters and a curved handrail, one full turn, plain matte dark grey.",
+          "image_task_id": "01a09788-88a1-7312-b1a8-2cfb3c55b4d5",
+          "image_model": "nano-banana",
+          "mesh_task_id": "01a0978e-808f-7546-b2e0-539b7b427308",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-12",
+          "orientation_correction": null,
+          "scale_applied": 1000.0
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -1420.9,
+            -1412.1,
+            0.0
+          ],
+          "max": [
+            1420.9,
+            1412.1,
+            3000.0
+          ]
+        },
+        "footprint": [
+          [
+            -1420.9,
+            -1412.1
+          ],
+          [
+            1420.9,
+            -1412.1
+          ],
+          [
+            1420.9,
+            1412.1
+          ],
+          [
+            -1420.9,
+            1412.1
+          ]
+        ],
+        "clearance_mm": {
+          "front": 600,
+          "back": 600,
+          "left": 600,
+          "right": 600
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "fixed"
+      }
+    },
+    {
+      "asset_id": "gen-column-round-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "elevation",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_component",
+      "lod": "low",
+      "category": "column",
+      "series": "ALMOND-GEN",
+      "product": "Round column",
+      "variant": "plain concrete",
+      "dimensions_mm": {
+        "width": 454.1,
+        "depth": 457.0,
+        "height": 3000.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 400,
+        "depth": 400,
+        "height": 3000
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.142,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-column-round-1.glb",
+      "contract_file": "models/gen-column-round-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-column-round-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-column-round-1.almond.json",
+      "sha256": "ED3BB20261B90924896B647F52070CC73D50A7BE821B66101F1AF3517362E944",
+      "file_size_bytes": 262392,
+      "triangle_count": 4436,
+      "tags": [
+        "column",
+        "round",
+        "pillar",
+        "structure",
+        "component"
+      ],
+      "render_material_id": "concrete-smooth",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A plain cylindrical concrete column, no capital or base, smooth matte finish, standing vertically on the ground.",
+          "image_task_id": "01a09788-95fb-758f-891c-de0ce066dad6",
+          "image_model": "nano-banana",
+          "mesh_task_id": "01a0978e-8ea9-7486-adee-fc9950ee7c89",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-12",
+          "orientation_correction": null,
+          "scale_applied": 1000.0
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -227.05,
+            -228.5,
+            0.0
+          ],
+          "max": [
+            227.05,
+            228.5,
+            3000.0
+          ]
+        },
+        "footprint": [
+          [
+            -227.05,
+            -228.5
+          ],
+          [
+            227.05,
+            -228.5
+          ],
+          [
+            227.05,
+            228.5
+          ],
+          [
+            -227.05,
+            228.5
+          ]
+        ],
+        "clearance_mm": {
+          "front": 0,
+          "back": 0,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "fixed"
+      }
+    },
+    {
+      "asset_id": "gen-column-square-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "elevation",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_component",
+      "lod": "low",
+      "category": "column",
+      "series": "ALMOND-GEN",
+      "product": "Square column",
+      "variant": "plain concrete",
+      "dimensions_mm": {
+        "width": 471.7,
+        "depth": 496.6,
+        "height": 3000.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 400,
+        "depth": 400,
+        "height": 3000
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.242,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-column-square-1.glb",
+      "contract_file": "models/gen-column-square-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-column-square-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-column-square-1.almond.json",
+      "sha256": "56FEA0B5095BC739081F71CCD99E91A4CEB0559AC7277E1B97977E39646AD8B4",
+      "file_size_bytes": 289276,
+      "triangle_count": 4258,
+      "tags": [
+        "column",
+        "square",
+        "pillar",
+        "structure",
+        "component"
+      ],
+      "render_material_id": "concrete-smooth",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A plain square-section concrete column, no capital or base, sharp edges, smooth matte finish, standing vertically on the ground.",
+          "image_task_id": "01a09788-a362-736d-a43d-cf3cc88ce046",
+          "image_model": "nano-banana",
+          "mesh_task_id": "01a0978e-9c7d-7753-81ab-fa258d35eb88",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-12",
+          "orientation_correction": null,
+          "scale_applied": 1000.0
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -235.85,
+            -248.3,
+            0.0
+          ],
+          "max": [
+            235.85,
+            248.3,
+            3000.0
+          ]
+        },
+        "footprint": [
+          [
+            -235.85,
+            -248.3
+          ],
+          [
+            235.85,
+            -248.3
+          ],
+          [
+            235.85,
+            248.3
+          ],
+          [
+            -235.85,
+            248.3
+          ]
+        ],
+        "clearance_mm": {
+          "front": 0,
+          "back": 0,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "fixed"
+      }
+    },
+    {
+      "asset_id": "gen-balustrade-glass-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "elevation",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_component",
+      "lod": "medium",
+      "category": "railing",
+      "series": "ALMOND-GEN",
+      "product": "Glass balustrade",
+      "variant": "frameless with steel handrail, 2 m segment",
+      "dimensions_mm": {
+        "width": 1743.7,
+        "depth": 20.8,
+        "height": 1100.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 2000,
+        "depth": 60,
+        "height": 1100
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.653,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-balustrade-glass-1.glb",
+      "contract_file": "models/gen-balustrade-glass-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-balustrade-glass-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-balustrade-glass-1.almond.json",
+      "sha256": "3E2C3BE622A58FAFC5D5EC82301E13F30685EAF7B8AC19BAE6C59668E56D90AD",
+      "file_size_bytes": 283268,
+      "triangle_count": 4026,
+      "tags": [
+        "balustrade",
+        "railing",
+        "handrail",
+        "glass",
+        "guard",
+        "component"
+      ],
+      "render_material_id": "glass-clear",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A straight two-metre segment of frameless clear glass balustrade with a slim round stainless steel top handrail and a low base channel.",
+          "image_task_id": "01a09788-b03a-778e-bfd7-bfb576737cf3",
+          "image_model": "nano-banana",
+          "mesh_task_id": "01a0978e-aa4a-771f-ab26-dba2f725530e",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-12",
+          "orientation_correction": null,
+          "scale_applied": 1222.222255
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -871.85,
+            -10.4,
+            0.0
+          ],
+          "max": [
+            871.85,
+            10.4,
+            1100.0
+          ]
+        },
+        "footprint": [
+          [
+            -871.85,
+            -10.4
+          ],
+          [
+            871.85,
+            -10.4
+          ],
+          [
+            871.85,
+            10.4
+          ],
+          [
+            -871.85,
+            10.4
+          ]
+        ],
+        "clearance_mm": {
+          "front": 0,
+          "back": 0,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "fixed"
+      }
+    },
+    {
+      "asset_id": "gen-toilet-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_fixture",
+      "lod": "medium",
+      "category": "sanitary",
+      "series": "ALMOND-GEN",
+      "product": "Toilet",
+      "variant": "close-coupled floor mounted",
+      "dimensions_mm": {
+        "width": 448.4,
+        "depth": 670.3,
+        "height": 800.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 380,
+        "depth": 700,
+        "height": 800
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.18,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-toilet-1.glb",
+      "contract_file": "models/gen-toilet-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-toilet-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-toilet-1.almond.json",
+      "sha256": "9BF180AEC9D830ED8074BF7910431F448125BFC99AE77119312C4EE6A3383326",
+      "file_size_bytes": 303648,
+      "triangle_count": 4216,
+      "tags": [
+        "toilet",
+        "wc",
+        "bathroom",
+        "sanitary",
+        "fixture"
+      ],
+      "render_material_id": "ceramic-teal",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A close-coupled floor-mounted white ceramic toilet with cistern and closed seat lid, plain modern design.",
+          "image_task_id": "01a09788-bf8b-74b2-be55-75e578e73068",
+          "image_model": "nano-banana",
+          "mesh_task_id": "01a0978e-b787-7347-afc4-29e5a6b44b90",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-12",
+          "orientation_correction": null,
+          "scale_applied": 999.999985
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -224.2,
+            -335.15,
+            0.0
+          ],
+          "max": [
+            224.2,
+            335.15,
+            800.0
+          ]
+        },
+        "footprint": [
+          [
+            -224.2,
+            -335.15
+          ],
+          [
+            224.2,
+            -335.15
+          ],
+          [
+            224.2,
+            335.15
+          ],
+          [
+            -224.2,
+            335.15
+          ]
+        ],
+        "clearance_mm": {
+          "front": 600,
+          "back": 0,
+          "left": 200,
+          "right": 200
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "fixed"
+      }
+    },
+    {
+      "asset_id": "gen-washbasin-pedestal-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_fixture",
+      "lod": "medium",
+      "category": "sanitary",
+      "series": "ALMOND-GEN",
+      "product": "Washbasin",
+      "variant": "pedestal with mixer tap",
+      "dimensions_mm": {
+        "width": 444.9,
+        "depth": 381.8,
+        "height": 850.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 550,
+        "depth": 450,
+        "height": 850
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.191,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-washbasin-pedestal-1.glb",
+      "contract_file": "models/gen-washbasin-pedestal-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-washbasin-pedestal-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-washbasin-pedestal-1.almond.json",
+      "sha256": "1E6D3663C149BEC327BF6F001F41122889D099B73F828775534F0BC6174482CE",
+      "file_size_bytes": 295488,
+      "triangle_count": 3986,
+      "tags": [
+        "basin",
+        "sink",
+        "washbasin",
+        "bathroom",
+        "sanitary",
+        "fixture"
+      ],
+      "render_material_id": "ceramic-teal",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A white ceramic pedestal washbasin with a single chrome mixer tap, plain modern design.",
+          "image_task_id": "01a09788-cd24-7133-b6bf-24be3b9e982d",
+          "image_model": "nano-banana",
+          "mesh_task_id": "01a0978e-c613-7771-a80e-de66c4d484d3",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-12",
+          "orientation_correction": null,
+          "scale_applied": 944.444469
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -222.45,
+            -190.9,
+            0.0
+          ],
+          "max": [
+            222.45,
+            190.9,
+            850.0
+          ]
+        },
+        "footprint": [
+          [
+            -222.45,
+            -190.9
+          ],
+          [
+            222.45,
+            -190.9
+          ],
+          [
+            222.45,
+            190.9
+          ],
+          [
+            -222.45,
+            190.9
+          ]
+        ],
+        "clearance_mm": {
+          "front": 600,
+          "back": 0,
+          "left": 100,
+          "right": 100
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "fixed"
+      }
+    },
+    {
+      "asset_id": "gen-bathtub-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_fixture",
+      "lod": "medium",
+      "category": "sanitary",
+      "series": "ALMOND-GEN",
+      "product": "Bathtub",
+      "variant": "rectangular built-in",
+      "dimensions_mm": {
+        "width": 1274.5,
+        "depth": 524.0,
+        "height": 580.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 1700,
+        "depth": 750,
+        "height": 580
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.301,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-bathtub-1.glb",
+      "contract_file": "models/gen-bathtub-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-bathtub-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-bathtub-1.almond.json",
+      "sha256": "7BABB0164E4317C2EBB56DCF7DACE658818B3C65636D8B1FE0DB162439576AA6",
+      "file_size_bytes": 302496,
+      "triangle_count": 4277,
+      "tags": [
+        "bath",
+        "bathtub",
+        "tub",
+        "bathroom",
+        "sanitary",
+        "fixture"
+      ],
+      "render_material_id": "ceramic-teal",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A rectangular white built-in bathtub with a plain front panel and a wall mixer tap at one end.",
+          "image_task_id": "01a09788-d970-7010-a926-a5bbfece1492",
+          "image_model": "nano-banana",
+          "mesh_task_id": "01a0978e-d36f-7288-892f-fbd07b26f425",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-12",
+          "orientation_correction": null,
+          "scale_applied": 1054.545432
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -637.25,
+            -262.0,
+            0.0
+          ],
+          "max": [
+            637.25,
+            262.0,
+            580.0
+          ]
+        },
+        "footprint": [
+          [
+            -637.25,
+            -262.0
+          ],
+          [
+            637.25,
+            -262.0
+          ],
+          [
+            637.25,
+            262.0
+          ],
+          [
+            -637.25,
+            262.0
+          ]
+        ],
+        "clearance_mm": {
+          "front": 700,
+          "back": 0,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "fixed"
+      }
+    },
+    {
+      "asset_id": "gen-shower-enclosure-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_fixture",
+      "lod": "medium",
+      "category": "sanitary",
+      "series": "ALMOND-GEN",
+      "product": "Shower enclosure",
+      "variant": "square, glass, low tray",
+      "dimensions_mm": {
+        "width": 1035.2,
+        "depth": 1035.2,
+        "height": 2000.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 900,
+        "depth": 900,
+        "height": 2000
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.15,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-shower-enclosure-1.glb",
+      "contract_file": "models/gen-shower-enclosure-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-shower-enclosure-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-shower-enclosure-1.almond.json",
+      "sha256": "67275D5528E9E20FDDEC55C941A1CE3A62B5779DA1DA0EE407707B0647AA8F6C",
+      "file_size_bytes": 283452,
+      "triangle_count": 3870,
+      "tags": [
+        "shower",
+        "enclosure",
+        "cubicle",
+        "bathroom",
+        "sanitary",
+        "fixture"
+      ],
+      "render_material_id": "glass-clear",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A square shower enclosure with a low white tray, two clear glass sides with slim chrome frame and a hinged glass door, wall-mounted shower head and mixer.",
+          "image_task_id": "01a09788-e678-710f-8a5a-72838507090a",
+          "image_model": "nano-banana",
+          "mesh_task_id": "01a0978e-e0ce-7335-a72e-c933cb1e0723",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-12",
+          "orientation_correction": null,
+          "scale_applied": 1111.111141
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -517.6,
+            -517.6,
+            0.0
+          ],
+          "max": [
+            517.6,
+            517.6,
+            2000.0
+          ]
+        },
+        "footprint": [
+          [
+            -517.6,
+            -517.6
+          ],
+          [
+            517.6,
+            -517.6
+          ],
+          [
+            517.6,
+            517.6
+          ],
+          [
+            -517.6,
+            517.6
+          ]
+        ],
+        "clearance_mm": {
+          "front": 700,
+          "back": 0,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "fixed"
+      }
+    },
+    {
+      "asset_id": "gen-kitchen-range-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_fixture",
+      "lod": "medium",
+      "category": "appliance",
+      "series": "ALMOND-GEN",
+      "product": "Kitchen range",
+      "variant": "freestanding cooker with oven",
+      "dimensions_mm": {
+        "width": 715.4,
+        "depth": 727.7,
+        "height": 900.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 600,
+        "depth": 600,
+        "height": 900
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.213,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-kitchen-range-1.glb",
+      "contract_file": "models/gen-kitchen-range-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-kitchen-range-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-kitchen-range-1.almond.json",
+      "sha256": "50A1664366B7712AB49BAC5CEDE9130C8390C41690DB62E59603F7EE3B5189FC",
+      "file_size_bytes": 217364,
+      "triangle_count": 2935,
+      "tags": [
+        "cooker",
+        "range",
+        "oven",
+        "hob",
+        "kitchen",
+        "appliance"
+      ],
+      "render_material_id": "steel-galvanized",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A freestanding stainless steel kitchen range cooker with a four-burner gas hob on top and a single oven door with handle, plain modern design.",
+          "image_task_id": "01a09788-f46c-7507-8a37-d715e3da5091",
+          "image_model": "nano-banana",
+          "mesh_task_id": "01a0978e-ee7e-750c-91f6-c5e4724b3c6c",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-12",
+          "orientation_correction": null,
+          "scale_applied": 1000.000026
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -357.7,
+            -363.85,
+            0.0
+          ],
+          "max": [
+            357.7,
+            363.85,
+            900.0
+          ]
+        },
+        "footprint": [
+          [
+            -357.7,
+            -363.85
+          ],
+          [
+            357.7,
+            -363.85
+          ],
+          [
+            357.7,
+            363.85
+          ],
+          [
+            -357.7,
+            363.85
+          ]
+        ],
+        "clearance_mm": {
+          "front": 1000,
+          "back": 0,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "fixed"
+      }
+    },
+    {
+      "asset_id": "gen-refrigerator-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_fixture",
+      "lod": "medium",
+      "category": "appliance",
+      "series": "ALMOND-GEN",
+      "product": "Refrigerator",
+      "variant": "freestanding fridge-freezer",
+      "dimensions_mm": {
+        "width": 766.2,
+        "depth": 671.3,
+        "height": 1800.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 700,
+        "depth": 700,
+        "height": 1800
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.095,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-refrigerator-1.glb",
+      "contract_file": "models/gen-refrigerator-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-refrigerator-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-refrigerator-1.almond.json",
+      "sha256": "965122B500176EACA7EABA423FDBAD095F863524A59329AA82F5EB71610302F2",
+      "file_size_bytes": 74836,
+      "triangle_count": 1016,
+      "tags": [
+        "fridge",
+        "refrigerator",
+        "freezer",
+        "kitchen",
+        "appliance"
+      ],
+      "render_material_id": "steel-galvanized",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A freestanding tall stainless steel fridge-freezer with two vertical doors and long handles, plain modern design.",
+          "image_task_id": "01a09789-01b0-7012-a2f8-f58cadfeb3f4",
+          "image_model": "nano-banana",
+          "mesh_task_id": "01a0978e-fc89-71c4-985b-8599687baf80",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-12",
+          "orientation_correction": null,
+          "scale_applied": 1000.000026
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -383.1,
+            -335.65,
+            0.0
+          ],
+          "max": [
+            383.1,
+            335.65,
+            1800.0
+          ]
+        },
+        "footprint": [
+          [
+            -383.1,
+            -335.65
+          ],
+          [
+            383.1,
+            -335.65
+          ],
+          [
+            383.1,
+            335.65
+          ],
+          [
+            -383.1,
+            335.65
+          ]
+        ],
+        "clearance_mm": {
+          "front": 1000,
+          "back": 50,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "fixed"
+      }
+    },
+    {
+      "asset_id": "gen-sofa-3-seat-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "lod": "medium",
+      "category": "seating",
+      "series": "ALMOND-GEN",
+      "product": "Sofa",
+      "variant": "generic three-seat, fabric",
+      "dimensions_mm": {
+        "width": 2346.1,
+        "depth": 982.9,
+        "height": 850.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 2100,
+        "depth": 900,
+        "height": 850
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.117,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-sofa-3-seat-1.glb",
+      "contract_file": "models/gen-sofa-3-seat-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-sofa-3-seat-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-sofa-3-seat-1.almond.json",
+      "sha256": "577F94941BABE55C8E82690BFB813D6CE76C39F3826589AEB9C1ABFF98F933C2",
+      "file_size_bytes": 306452,
+      "triangle_count": 4087,
+      "tags": [
+        "sofa",
+        "couch",
+        "seating",
+        "living room",
+        "furniture"
+      ],
+      "render_material_id": "rubber-black",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A generic modern three-seat sofa with square arms, three seat cushions and three back cushions, plain grey fabric upholstery, short legs.",
+          "image_task_id": "01a09789-0ef6-754a-b0cd-e3f54dfe4a6e",
+          "image_model": "nano-banana",
+          "mesh_task_id": "01a0978f-0a4a-7263-b015-501f0fd70df6",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-12",
+          "orientation_correction": null,
+          "scale_applied": 999.999937
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -1173.05,
+            -491.45,
+            0.0
+          ],
+          "max": [
+            1173.05,
+            491.45,
+            850.0
+          ]
+        },
+        "footprint": [
+          [
+            -1173.05,
+            -491.45
+          ],
+          [
+            1173.05,
+            -491.45
+          ],
+          [
+            1173.05,
+            491.45
+          ],
+          [
+            -1173.05,
+            491.45
+          ]
+        ],
+        "clearance_mm": {
+          "front": 450,
+          "back": 0,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "primary"
+      }
+    },
+    {
+      "asset_id": "gen-dining-table-rect-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "lod": "medium",
+      "category": "table",
+      "series": "ALMOND-GEN",
+      "product": "Dining table",
+      "variant": "generic rectangular, timber",
+      "dimensions_mm": {
+        "width": 1536.0,
+        "depth": 822.0,
+        "height": 750.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 1600,
+        "depth": 900,
+        "height": 750
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.087,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-dining-table-rect-1.glb",
+      "contract_file": "models/gen-dining-table-rect-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-dining-table-rect-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-dining-table-rect-1.almond.json",
+      "sha256": "9EB070AC5E3FFF86415B886221A822BB9AD56070652A3AB486B31EDF5477EC9D",
+      "file_size_bytes": 264408,
+      "triangle_count": 4362,
+      "tags": [
+        "table",
+        "dining",
+        "furniture",
+        "kitchen",
+        "dining room"
+      ],
+      "render_material_id": "wood-oak",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A generic rectangular dining table with a plain timber top and four straight square legs, plain light oak.",
+          "image_task_id": "01a09789-1dd2-747e-b428-a89dce8ca12d",
+          "image_model": "nano-banana",
+          "mesh_task_id": "01a0978f-1858-713a-992e-8b1f307a53a1",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-12",
+          "orientation_correction": null,
+          "scale_applied": 1000.0
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -768.0,
+            -411.0,
+            0.0
+          ],
+          "max": [
+            768.0,
+            411.0,
+            750.0
+          ]
+        },
+        "footprint": [
+          [
+            -768.0,
+            -411.0
+          ],
+          [
+            768.0,
+            -411.0
+          ],
+          [
+            768.0,
+            411.0
+          ],
+          [
+            -768.0,
+            411.0
+          ]
+        ],
+        "clearance_mm": {
+          "front": 900,
+          "back": 900,
+          "left": 900,
+          "right": 900
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "primary"
+      }
+    },
+    {
+      "asset_id": "gen-dining-chair-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "lod": "medium",
+      "category": "seating",
+      "series": "ALMOND-GEN",
+      "product": "Dining chair",
+      "variant": "generic timber, armless",
+      "dimensions_mm": {
+        "width": 462.3,
+        "depth": 566.0,
+        "height": 900.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 450,
+        "depth": 520,
+        "height": 900
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.088,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-dining-chair-1.glb",
+      "contract_file": "models/gen-dining-chair-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-dining-chair-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-dining-chair-1.almond.json",
+      "sha256": "A5C97F57655E4CB2F267E6878311A5FFAEF6FE620EAF292CB352BB6EB4EF27BD",
+      "file_size_bytes": 280700,
+      "triangle_count": 4337,
+      "tags": [
+        "chair",
+        "dining",
+        "seating",
+        "furniture"
+      ],
+      "render_material_id": "wood-oak",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A generic armless timber dining chair with four straight legs, a flat seat and a simple slatted backrest, plain light oak.",
+          "image_task_id": "01a09789-2b97-72fd-8906-ed90e2d6402d",
+          "image_model": "nano-banana",
+          "mesh_task_id": "01a0978f-2694-77ef-92e9-19a4597946d2",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-12",
+          "orientation_correction": null,
+          "scale_applied": 1000.000026
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -231.15,
+            -283.0,
+            0.0
+          ],
+          "max": [
+            231.15,
+            283.0,
+            900.0
+          ]
+        },
+        "footprint": [
+          [
+            -231.15,
+            -283.0
+          ],
+          [
+            231.15,
+            -283.0
+          ],
+          [
+            231.15,
+            283.0
+          ],
+          [
+            -231.15,
+            283.0
+          ]
+        ],
+        "clearance_mm": {
+          "front": 0,
+          "back": 500,
+          "left": 100,
+          "right": 100
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "secondary"
+      }
+    },
+    {
+      "asset_id": "gen-bed-double-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "lod": "medium",
+      "category": "bed",
+      "series": "ALMOND-GEN",
+      "product": "Double bed",
+      "variant": "generic platform bed with mattress and headboard",
+      "dimensions_mm": {
+        "width": 2212.9,
+        "depth": 2288.9,
+        "height": 950.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 1650,
+        "depth": 2100,
+        "height": 950
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.341,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-bed-double-1.glb",
+      "contract_file": "models/gen-bed-double-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-bed-double-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-bed-double-1.almond.json",
+      "sha256": "4D5A031BA77242D4A79C6B31670CF0BB793CE4AFFDCDA6BDEDC18F1570AD7AB4",
+      "file_size_bytes": 337508,
+      "triangle_count": 4353,
+      "tags": [
+        "bed",
+        "double",
+        "bedroom",
+        "furniture",
+        "sleeping"
+      ],
+      "render_material_id": "wood-oak",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A generic double platform bed with a low timber frame, a plain mattress with a folded duvet and two pillows, and a simple rectangular headboard, plain light oak and white bedding.",
+          "image_task_id": "01a09789-3c20-75e3-98cb-9bc2f6445c39",
+          "image_model": "nano-banana",
+          "mesh_task_id": "01a0978f-3449-76fe-9462-d31daf954c53",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-12",
+          "orientation_correction": null,
+          "scale_applied": 950.000057
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -1106.45,
+            -1144.45,
+            0.0
+          ],
+          "max": [
+            1106.45,
+            1144.45,
+            950.0
+          ]
+        },
+        "footprint": [
+          [
+            -1106.45,
+            -1144.45
+          ],
+          [
+            1106.45,
+            -1144.45
+          ],
+          [
+            1106.45,
+            1144.45
+          ],
+          [
+            -1106.45,
+            1144.45
+          ]
+        ],
+        "clearance_mm": {
+          "front": 700,
+          "back": 0,
+          "left": 700,
+          "right": 700
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "primary"
+      }
+    },
+    {
+      "asset_id": "gen-desk-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "lod": "medium",
+      "category": "desk",
+      "series": "ALMOND-GEN",
+      "product": "Desk",
+      "variant": "generic writing desk, timber top, steel legs",
+      "dimensions_mm": {
+        "width": 1306.1,
+        "depth": 655.6,
+        "height": 750.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 1400,
+        "depth": 700,
+        "height": 750
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.067,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-desk-1.glb",
+      "contract_file": "models/gen-desk-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-desk-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-desk-1.almond.json",
+      "sha256": "86AC2E920CA5218913BA858D406B0BEADC2772A176BB327C10FDCEB6815821DE",
+      "file_size_bytes": 233896,
+      "triangle_count": 3965,
+      "tags": [
+        "desk",
+        "table",
+        "workstation",
+        "office",
+        "study",
+        "furniture"
+      ],
+      "render_material_id": "wood-birch-ply",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A generic minimal writing desk with a plain rectangular light plywood top on four slim black steel legs, no drawers.",
+          "image_task_id": "01a09789-49cf-751a-91c2-e35703aadf86",
+          "image_model": "nano-banana",
+          "mesh_task_id": "01a0978f-411c-776c-b0dd-45ba52352c11",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-12",
+          "orientation_correction": null,
+          "scale_applied": 1000.0
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -653.05,
+            -327.8,
+            0.0
+          ],
+          "max": [
+            653.05,
+            327.8,
+            750.0
+          ]
+        },
+        "footprint": [
+          [
+            -653.05,
+            -327.8
+          ],
+          [
+            653.05,
+            -327.8
+          ],
+          [
+            653.05,
+            327.8
+          ],
+          [
+            -653.05,
+            327.8
+          ]
+        ],
+        "clearance_mm": {
+          "front": 900,
+          "back": 0,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "primary"
+      }
+    },
+    {
+      "asset_id": "gen-office-chair-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "lod": "medium",
+      "category": "seating",
+      "series": "ALMOND-GEN",
+      "product": "Office chair",
+      "variant": "generic swivel task chair",
+      "dimensions_mm": {
+        "width": 878.7,
+        "depth": 831.4,
+        "height": 1100.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 650,
+        "depth": 650,
+        "height": 1100
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.352,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-office-chair-1.glb",
+      "contract_file": "models/gen-office-chair-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-office-chair-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-office-chair-1.almond.json",
+      "sha256": "28B9A9C019B3D26B8CF7A98E08C29F292828FA8C6FFCDDB5626BA6AD17CEC326",
+      "file_size_bytes": 313500,
+      "triangle_count": 4101,
+      "tags": [
+        "chair",
+        "office",
+        "task chair",
+        "swivel",
+        "seating",
+        "furniture"
+      ],
+      "render_material_id": "rubber-black",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A generic black swivel office task chair with a padded seat, mesh backrest, armrests and a five-star base on castors.",
+          "image_task_id": "01a09789-5785-7773-8dcc-ed507a95c80a",
+          "image_model": "nano-banana",
+          "mesh_task_id": "01a0978f-4e8d-707c-a258-c9b3897bfcad",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-12",
+          "orientation_correction": null,
+          "scale_applied": 1100.0
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -439.35,
+            -415.7,
+            0.0
+          ],
+          "max": [
+            439.35,
+            415.7,
+            1100.0
+          ]
+        },
+        "footprint": [
+          [
+            -439.35,
+            -415.7
+          ],
+          [
+            439.35,
+            -415.7
+          ],
+          [
+            439.35,
+            415.7
+          ],
+          [
+            -439.35,
+            415.7
+          ]
+        ],
+        "clearance_mm": {
+          "front": 0,
+          "back": 600,
+          "left": 100,
+          "right": 100
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "secondary"
+      }
+    }
+  ]
+}

@@ -22,6 +22,7 @@ user-facing summary; this file is the reasoning.
 | RhinoCommon / Grasshopper SDK | McNeel | MIT (RhinoCommon) / developer terms; referenced not shipped | **no** |
 | Newtonsoft.Json, Roslyn, System.* DLLs | NuGet | MIT | yes — inside Yak package only, with notices |
 | IKEA product names in manifests | public catalogue facts | nominative fair use; disclaimer in notices | yes (names only) |
+| Generated asset library (`GeneratedAssetfiles/models/*.glb` + `.almond.json` contracts) | generated with Meshy from self-authored prompts (`GeneratedAssetfiles/catalogue.json`), normalised by `tools/build_generated_assets.py` | Meshy Terms: output generated on a paid plan belongs to the account; released here under CC BY 4.0 (manifest/contracts MIT) | yes — git repository; manifest in the wheel, model files fetched by `almond-mcp fetch-assets` |
 
 ## 3D Warehouse analysis
 
@@ -50,6 +51,27 @@ as non-redistributable and `fetch-assets` reports them as
 "no recorded source URL". TODO: replace with original SVGs, then move them
 into the distributable set.
 
+## Generated (Meshy) asset library
+
+`GeneratedAssetfiles/` is the one library whose model files *are*
+distributed. Every asset was produced from a self-authored prompt through
+Meshy's image and image-to-3D pipelines on a paid plan; Meshy's terms grant
+paid accounts ownership of generated output, so the files are ours to
+license. They are released under CC BY 4.0 (attribution: "Almond generated
+asset library"), and the manifest, contracts and build tooling are MIT like
+the rest of the repository. Provenance is recorded per asset in the manifest
+(`geometry_source.parameters`: prompt, image task id, mesh task id, model,
+date) and in `GeneratedAssetfiles/provenance.json`.
+
+The models are kept out of the PyPI wheel to keep it small; the manifest
+ships in the wheel and `almond-mcp fetch-assets` downloads the GLB and
+contract for each asset from the repository's `download_url`. This is the
+only library `fetch-assets` downloads automatically - 3D Warehouse content
+stays manual because its terms forbid redistribution.
+
+Raw Meshy downloads (`GeneratedAssetfiles/raw/`) are gitignored; the tracked
+normalised files are derived from them deterministically.
+
 ## Capsules vs. example files
 
 A capsule manifest declares an input/output contract (reserved
@@ -68,6 +90,8 @@ Re-run this audit if any of these change:
   manifest at the same time);
 - `Grasshopperfiles` content is referenced by a distributed artifact;
 - the bridge gains a NuGet dependency (extend the Yak notices);
+- a generated asset is regenerated or re-prompted (update `provenance.json` and
+  rebuild the manifest so task ids and checksums stay truthful);
 - Almond starts shipping generated geometry derived from 3D Warehouse meshes
   (bounding boxes computed from a mesh are fine; simplified copies of the
   mesh are not).

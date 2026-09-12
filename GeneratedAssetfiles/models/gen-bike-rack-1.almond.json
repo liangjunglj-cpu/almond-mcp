@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-bike-rack-1",
+  "library_id": "generated_assets",
+  "name": "Bike rack (inverted U hoop)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-bike-rack-1.glb",
+  "dimensions_mm": {
+    "width": 553.1,
+    "depth": 36.4,
+    "height": 800.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "ground",
+    "local_aabb": {
+      "min": [
+        -276.55,
+        -18.2,
+        0.0
+      ],
+      "max": [
+        276.55,
+        18.2,
+        800.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 900,
+      "back": 900,
+      "left": 300,
+      "right": 300
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "fixed"
+  },
+  "materials": [
+    {
+      "material_id": "steel-galvanized",
+      "objects": [
+        "gen-bike-rack-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

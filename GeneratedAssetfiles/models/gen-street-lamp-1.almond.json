@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-street-lamp-1",
+  "library_id": "generated_assets",
+  "name": "Street lamp (single-arm LED)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-street-lamp-1.glb",
+  "dimensions_mm": {
+    "width": 319.7,
+    "depth": 1441.4,
+    "height": 4500.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "ground",
+    "local_aabb": {
+      "min": [
+        -159.85,
+        -720.7,
+        0.0
+      ],
+      "max": [
+        159.85,
+        720.7,
+        4500.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "fixed"
+  },
+  "materials": [
+    {
+      "material_id": "steel-painted-charcoal",
+      "objects": [
+        "gen-street-lamp-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

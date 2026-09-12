@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-shower-enclosure-1",
+  "library_id": "generated_assets",
+  "name": "Shower enclosure (square, glass, low tray)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-shower-enclosure-1.glb",
+  "dimensions_mm": {
+    "width": 1035.2,
+    "depth": 1035.2,
+    "height": 2000.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "local_aabb": {
+      "min": [
+        -517.6,
+        -517.6,
+        0.0
+      ],
+      "max": [
+        517.6,
+        517.6,
+        2000.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 700,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "fixed"
+  },
+  "materials": [
+    {
+      "material_id": "glass-clear",
+      "objects": [
+        "gen-shower-enclosure-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

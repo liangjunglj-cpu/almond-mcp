@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-toilet-1",
+  "library_id": "generated_assets",
+  "name": "Toilet (close-coupled floor mounted)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-toilet-1.glb",
+  "dimensions_mm": {
+    "width": 448.4,
+    "depth": 670.3,
+    "height": 800.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "local_aabb": {
+      "min": [
+        -224.2,
+        -335.15,
+        0.0
+      ],
+      "max": [
+        224.2,
+        335.15,
+        800.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 600,
+      "back": 0,
+      "left": 200,
+      "right": 200
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "fixed"
+  },
+  "materials": [
+    {
+      "material_id": "ceramic-teal",
+      "objects": [
+        "gen-toilet-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

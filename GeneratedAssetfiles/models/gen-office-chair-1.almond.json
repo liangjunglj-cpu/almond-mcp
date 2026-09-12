@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-office-chair-1",
+  "library_id": "generated_assets",
+  "name": "Office chair (generic swivel task chair)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-office-chair-1.glb",
+  "dimensions_mm": {
+    "width": 878.7,
+    "depth": 831.4,
+    "height": 1100.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "local_aabb": {
+      "min": [
+        -439.35,
+        -415.7,
+        0.0
+      ],
+      "max": [
+        439.35,
+        415.7,
+        1100.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 0,
+      "back": 600,
+      "left": 100,
+      "right": 100
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "secondary"
+  },
+  "materials": [
+    {
+      "material_id": "rubber-black",
+      "objects": [
+        "gen-office-chair-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

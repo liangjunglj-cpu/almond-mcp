@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-bathtub-1",
+  "library_id": "generated_assets",
+  "name": "Bathtub (rectangular built-in)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-bathtub-1.glb",
+  "dimensions_mm": {
+    "width": 1274.5,
+    "depth": 524.0,
+    "height": 580.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "local_aabb": {
+      "min": [
+        -637.25,
+        -262.0,
+        0.0
+      ],
+      "max": [
+        637.25,
+        262.0,
+        580.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 700,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "fixed"
+  },
+  "materials": [
+    {
+      "material_id": "ceramic-teal",
+      "objects": [
+        "gen-bathtub-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

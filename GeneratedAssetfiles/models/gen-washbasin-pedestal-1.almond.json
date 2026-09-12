@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-washbasin-pedestal-1",
+  "library_id": "generated_assets",
+  "name": "Washbasin (pedestal with mixer tap)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-washbasin-pedestal-1.glb",
+  "dimensions_mm": {
+    "width": 444.9,
+    "depth": 381.8,
+    "height": 850.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "local_aabb": {
+      "min": [
+        -222.45,
+        -190.9,
+        0.0
+      ],
+      "max": [
+        222.45,
+        190.9,
+        850.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 600,
+      "back": 0,
+      "left": 100,
+      "right": 100
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "fixed"
+  },
+  "materials": [
+    {
+      "material_id": "ceramic-teal",
+      "objects": [
+        "gen-washbasin-pedestal-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

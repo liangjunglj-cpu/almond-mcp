@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-park-bench-1",
+  "library_id": "generated_assets",
+  "name": "Park bench (timber slats, steel frame)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-park-bench-1.glb",
+  "dimensions_mm": {
+    "width": 1330.9,
+    "depth": 565.4,
+    "height": 850.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "ground",
+    "local_aabb": {
+      "min": [
+        -665.45,
+        -282.7,
+        0.0
+      ],
+      "max": [
+        665.45,
+        282.7,
+        850.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 600,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "movable"
+  },
+  "materials": [
+    {
+      "material_id": "wood-oak",
+      "objects": [
+        "gen-park-bench-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

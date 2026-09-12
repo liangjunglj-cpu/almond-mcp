@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-litter-bin-1",
+  "library_id": "generated_assets",
+  "name": "Litter bin (cylindrical public)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-litter-bin-1.glb",
+  "dimensions_mm": {
+    "width": 491.2,
+    "depth": 490.2,
+    "height": 1000.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "ground",
+    "local_aabb": {
+      "min": [
+        -245.6,
+        -245.1,
+        0.0
+      ],
+      "max": [
+        245.6,
+        245.1,
+        1000.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 400,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "movable"
+  },
+  "materials": [
+    {
+      "material_id": "steel-painted-charcoal",
+      "objects": [
+        "gen-litter-bin-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

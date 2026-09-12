@@ -22,6 +22,20 @@ clearances, collision shape). Each user downloads the model files from the
 recorded source pages themselves; `almond-mcp fetch-assets` lists what is
 missing and verifies checksums after download.
 
+## Generated asset library — distributed (CC BY 4.0)
+
+The models in `GeneratedAssetfiles/models/` (people, trees, vehicles, site
+furniture, doors, windows, stairs, columns, sanitary fixtures, generic
+furniture) were generated with [Meshy](https://www.meshy.ai) from prompts
+written for this project and normalised by `tools/build_generated_assets.py`.
+Output generated on a paid Meshy plan belongs to the generating account, and
+these files are released under the
+[Creative Commons Attribution 4.0](https://creativecommons.org/licenses/by/4.0/)
+license. Attribute as "Almond generated asset library
+(github.com/liangjunglj-cpu/almond-mcp)". The accompanying manifest,
+`.almond.json` contracts and tooling are MIT-licensed with the rest of the
+project. No 3D Warehouse content was used to produce them.
+
 ## IKEA trademarks
 
 IKEA product and series names (BILLY, KALLAX, KLIPPAN, …) appear in the

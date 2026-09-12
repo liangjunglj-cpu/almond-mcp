@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-dining-chair-1",
+  "library_id": "generated_assets",
+  "name": "Dining chair (generic timber, armless)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-dining-chair-1.glb",
+  "dimensions_mm": {
+    "width": 462.3,
+    "depth": 566.0,
+    "height": 900.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "local_aabb": {
+      "min": [
+        -231.15,
+        -283.0,
+        0.0
+      ],
+      "max": [
+        231.15,
+        283.0,
+        900.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 0,
+      "back": 500,
+      "left": 100,
+      "right": 100
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "secondary"
+  },
+  "materials": [
+    {
+      "material_id": "wood-oak",
+      "objects": [
+        "gen-dining-chair-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

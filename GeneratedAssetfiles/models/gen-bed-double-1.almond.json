@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-bed-double-1",
+  "library_id": "generated_assets",
+  "name": "Double bed (generic platform bed with mattress and headboard)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-bed-double-1.glb",
+  "dimensions_mm": {
+    "width": 2212.9,
+    "depth": 2288.9,
+    "height": 950.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "local_aabb": {
+      "min": [
+        -1106.45,
+        -1144.45,
+        0.0
+      ],
+      "max": [
+        1106.45,
+        1144.45,
+        950.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 700,
+      "back": 0,
+      "left": 700,
+      "right": 700
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "primary"
+  },
+  "materials": [
+    {
+      "material_id": "wood-oak",
+      "objects": [
+        "gen-bed-double-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

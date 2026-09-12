@@ -144,6 +144,7 @@ locations:
 | `RHINO_MCP_DRAWING_ASSET_DIR` | `DrawingAssetfiles` |
 | `RHINO_MCP_DIAGRAM_ASSET_DIR` | `DiagramAssetfiles` |
 | `RHINO_MCP_DRAWING_RECIPE_DIR` | `DrawingRecipes` |
+| `RHINO_MCP_GENERATED_ASSET_DIR` | `GeneratedAssetfiles` |
 | `RHINO_MCP_CAPSULE_DIR` | `capsules` |
 | `RHINO_MCP_STATE_DB` | `%LOCALAPPDATA%\Almond\almond_state.sqlite3` |
 
@@ -250,6 +251,44 @@ create_generation_plan(
   scope="drawing"
 )
 ```
+
+## Generated asset library (open, redistributable)
+
+The IKEA and drawing libraries describe 3D Warehouse models that each user
+must download themselves. `GeneratedAssetfiles/` is different: 33 (and
+growing) architectural models generated with Meshy from Almond's own
+prompts, owned by the project and released under **CC BY 4.0**, so they ship
+with the repository and `almond-mcp fetch-assets` downloads them
+automatically on a wheel install. Categories:
+
+| Group | Assets |
+| --- | --- |
+| Entourage | standing / walking / sitting person, deciduous and conifer tree, shrub, sedan car, bicycle |
+| Site furniture | park bench, street lamp, bollard, bike hoop, litter bin |
+| Building components | single and double door, casement window, straight and spiral stair, round and square column, glass balustrade |
+| Fixtures and appliances | toilet, pedestal basin, bathtub, shower enclosure, range cooker, fridge-freezer |
+| Generic furniture | three-seat sofa, dining table and chair, double bed, desk, office chair |
+
+Every GLB is normalised by `tools/build_generated_assets.py`: scaled to its
+catalogue height, bottom-centre on the origin, measured (never nominal)
+bounds in the manifest, one `ALMOND::<material_id>` material so
+`import_asset_contract`'s restore step gives it the canonical Almond
+material, and a `.almond.json` contract beside it.
+
+```text
+search_generated_assets(query="bench", max_height_mm=1000)
+get_generated_asset(asset_id="gen-park-bench-1")
+place_generated_asset(asset_id="gen-park-bench-1", x_mm=2400, y_mm=800, rotation_degrees=90)
+register_scene_instance(scene_id=..., asset_id="gen-park-bench-1", ...)  # then validate_scene_layout
+```
+
+To extend the library, add an entry to `GeneratedAssetfiles/catalogue.json`
+(prompt, nominal size, material, clearances), generate it with Meshy
+(the recipe is recorded in the catalogue: nano-banana concept image →
+meshy-t2 smart-topology mesh, untextured), save the GLB as
+`GeneratedAssetfiles/raw/<asset_id>.glb`, record the task ids in
+`provenance.json`, and run the build script. Provenance and licensing are
+documented in `docs/licensing-audit.md`.
 
 ## Structural validation with reports
 

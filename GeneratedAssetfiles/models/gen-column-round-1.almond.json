@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-column-round-1",
+  "library_id": "generated_assets",
+  "name": "Round column (plain concrete)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-column-round-1.glb",
+  "dimensions_mm": {
+    "width": 454.1,
+    "depth": 457.0,
+    "height": 3000.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "local_aabb": {
+      "min": [
+        -227.05,
+        -228.5,
+        0.0
+      ],
+      "max": [
+        227.05,
+        228.5,
+        3000.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "fixed"
+  },
+  "materials": [
+    {
+      "material_id": "concrete-smooth",
+      "objects": [
+        "gen-column-round-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-balustrade-glass-1",
+  "library_id": "generated_assets",
+  "name": "Glass balustrade (frameless with steel handrail, 2 m segment)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-balustrade-glass-1.glb",
+  "dimensions_mm": {
+    "width": 1743.7,
+    "depth": 20.8,
+    "height": 1100.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "local_aabb": {
+      "min": [
+        -871.85,
+        -10.4,
+        0.0
+      ],
+      "max": [
+        871.85,
+        10.4,
+        1100.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "fixed"
+  },
+  "materials": [
+    {
+      "material_id": "glass-clear",
+      "objects": [
+        "gen-balustrade-glass-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

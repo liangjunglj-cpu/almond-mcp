@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-person-sitting-1",
+  "library_id": "generated_assets",
+  "name": "Person sitting (adult, seated on a plain stool)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-person-sitting-1.glb",
+  "dimensions_mm": {
+    "width": 562.4,
+    "depth": 587.8,
+    "height": 1300.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "local_aabb": {
+      "min": [
+        -281.2,
+        -293.9,
+        0.0
+      ],
+      "max": [
+        281.2,
+        293.9,
+        1300.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "accessory"
+  },
+  "materials": [
+    {
+      "material_id": "plaster-white",
+      "objects": [
+        "gen-person-sitting-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

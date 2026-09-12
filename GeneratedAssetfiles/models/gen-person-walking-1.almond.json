@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-person-walking-1",
+  "library_id": "generated_assets",
+  "name": "Person walking (adult, mid-stride)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-person-walking-1.glb",
+  "dimensions_mm": {
+    "width": 584.5,
+    "depth": 1032.2,
+    "height": 1750.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "local_aabb": {
+      "min": [
+        -292.25,
+        -516.1,
+        0.0
+      ],
+      "max": [
+        292.25,
+        516.1,
+        1750.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "accessory"
+  },
+  "materials": [
+    {
+      "material_id": "plaster-white",
+      "objects": [
+        "gen-person-walking-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

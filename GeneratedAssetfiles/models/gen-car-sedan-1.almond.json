@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-car-sedan-1",
+  "library_id": "generated_assets",
+  "name": "Car (generic mid-size sedan)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-car-sedan-1.glb",
+  "dimensions_mm": {
+    "width": 2056.6,
+    "depth": 5050.3,
+    "height": 1450.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "ground",
+    "local_aabb": {
+      "min": [
+        -1028.3,
+        -2525.15,
+        0.0
+      ],
+      "max": [
+        1028.3,
+        2525.15,
+        1450.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 1000,
+      "back": 1000,
+      "left": 600,
+      "right": 600
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "movable"
+  },
+  "materials": [
+    {
+      "material_id": "steel-painted-charcoal",
+      "objects": [
+        "gen-car-sedan-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

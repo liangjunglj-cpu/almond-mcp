@@ -30,6 +30,7 @@ LIBRARY_DIRS = {
     "RHINO_MCP_FURNITURE_DIR": "IkeaFurniturefiles",
     "RHINO_MCP_DRAWING_ASSET_DIR": "DrawingAssetfiles",
     "RHINO_MCP_DIAGRAM_ASSET_DIR": "DiagramAssetfiles",
+    "RHINO_MCP_GENERATED_ASSET_DIR": "GeneratedAssetfiles",
     "RHINO_MCP_DRAWING_RECIPE_DIR": "DrawingRecipes",
     "RHINO_MCP_CAPSULE_DIR": "capsules",
     "RHINO_MCP_MATERIAL_DIR": "Materialfiles",

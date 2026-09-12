@@ -27,6 +27,7 @@ _MODEL_LIBRARIES = (
     ("RHINO_MCP_FURNITURE_DIR", "IKEA furniture"),
     ("RHINO_MCP_DRAWING_ASSET_DIR", "drawing assets"),
     ("RHINO_MCP_DIAGRAM_ASSET_DIR", "diagram assets"),
+    ("RHINO_MCP_GENERATED_ASSET_DIR", "generated assets"),
 )
 
 
@@ -43,6 +44,21 @@ def _sha256(path: Path) -> str:
         for chunk in iter(lambda: handle.read(1 << 20), b""):
             digest.update(chunk)
     return digest.hexdigest().upper()
+
+
+def _download(url: str, target: Path) -> bool:
+    """Fetch one redistributable file (the generated library only). Returns
+    True on success; never raises, so fetch-assets keeps going."""
+    import urllib.request
+    try:
+        target.parent.mkdir(parents=True, exist_ok=True)
+        with urllib.request.urlopen(url, timeout=60) as response, target.open("wb") as out:
+            for chunk in iter(lambda: response.read(1 << 20), b""):
+                out.write(chunk)
+        return True
+    except Exception as exc:  # network, 404, permissions - report and continue
+        print(f"                download failed: {exc}")
+        return False
 
 
 def _asset_status(library_dir: Path, asset: dict) -> tuple[str, str]:
@@ -80,6 +96,18 @@ def cmd_fetch_assets(args: argparse.Namespace) -> int:
         print(f"\n[{label}] {library_dir}")
         for asset in manifest.get("assets", []):
             status, detail = _asset_status(library_dir, asset)
+            # Generated assets are ours (CC BY 4.0) and carry a download_url,
+            # so - unlike 3D Warehouse content - they can be fetched directly.
+            if (status in ("missing", "hash-mismatch") and asset.get("download_url")
+                    and not getattr(args, "no_download", False)):
+                if _download(asset["download_url"], library_dir / asset["file"]):
+                    contract = asset.get("contract_file")
+                    if contract and asset.get("contract_download_url"):
+                        _download(asset["contract_download_url"], library_dir / contract)
+                    status, detail = _asset_status(library_dir, asset)
+                    if status == "ok":
+                        print(f"  downloaded    {asset['asset_id']}")
+                        continue
             if status == "ok":
                 if args.verbose:
                     print(f"  ok            {asset['asset_id']}")
@@ -198,6 +226,8 @@ def main(argv: list[str] | None = None) -> int:
     fetch = sub.add_parser(
         "fetch-assets", help="report missing/invalid model files and their sources"
     )
+    fetch.add_argument("--no-download", action="store_true",
+                     help="do not auto-download the generated (CC BY 4.0) models")
     fetch.add_argument(
         "--open", action="store_true", help="open missing assets' source pages"
     )

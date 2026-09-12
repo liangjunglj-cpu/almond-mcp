@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-sofa-3-seat-1",
+  "library_id": "generated_assets",
+  "name": "Sofa (generic three-seat, fabric)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-sofa-3-seat-1.glb",
+  "dimensions_mm": {
+    "width": 2346.1,
+    "depth": 982.9,
+    "height": 850.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "local_aabb": {
+      "min": [
+        -1173.05,
+        -491.45,
+        0.0
+      ],
+      "max": [
+        1173.05,
+        491.45,
+        850.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 450,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "primary"
+  },
+  "materials": [
+    {
+      "material_id": "rubber-black",
+      "objects": [
+        "gen-sofa-3-seat-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

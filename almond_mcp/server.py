@@ -9,6 +9,7 @@ Exposes tools for Claude to:
 """
 import os
 import json
+import math
 import socket
 import hashlib
 import re
@@ -30,6 +31,7 @@ LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_LIBRARY_DIR")
 FURNITURE_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_FURNITURE_DIR")
 DRAWING_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_DRAWING_ASSET_DIR")
 DIAGRAM_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_DIAGRAM_ASSET_DIR")
+GENERATED_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_GENERATED_ASSET_DIR")
 DRAWING_RECIPE_DIR = paths.resolve_dir("RHINO_MCP_DRAWING_RECIPE_DIR")
 CAPSULE_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_CAPSULE_DIR")
 MATERIAL_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_MATERIAL_DIR")
@@ -221,6 +223,11 @@ diagram_asset_indexer = AssetLibraryIndexer(
     DIAGRAM_LIBRARY_DIR,
     library_id="diagram_assets",
     label="diagram",
+)
+generated_asset_indexer = AssetLibraryIndexer(
+    GENERATED_LIBRARY_DIR,
+    library_id="generated_assets",
+    label="generated",
 )
 drawing_recipe_indexer = DrawingRecipeIndexer(DRAWING_RECIPE_DIR)
 
@@ -476,6 +483,10 @@ retrieval_store.sync_assets(
 retrieval_store.sync_assets(
     list(diagram_asset_indexer.assets.values()),
     library_id="diagram_assets",
+)
+retrieval_store.sync_assets(
+    list(generated_asset_indexer.assets.values()),
+    library_id="generated_assets",
 )
 
 
@@ -867,6 +878,72 @@ def get_drawing_asset(asset_id: str) -> str:
 
 
 @mcp.tool()
+def list_generated_assets(
+    category: str = "",
+    limit: int = 20,
+    offset: int = 0,
+) -> str:
+    """
+    Lists the redistributable generated asset library: 3D entourage (people,
+    trees, vehicles), site furniture, building components (doors, windows,
+    stairs, columns, balustrades), sanitary/kitchen fixtures, and unbranded
+    furniture placeholders. Every asset is a GLB normalised to real-world
+    millimetres with a measured spatial contract and an Almond material_id,
+    so placement, collision checks and material restore work without any
+    third-party download. Place with place_generated_asset.
+    """
+    page = retrieval_store.search_assets(
+        library_id="generated_assets",
+        category=category,
+        limit=limit,
+        offset=offset,
+    )
+    return json.dumps({
+        "library_id": "generated_assets",
+        "purpose": "redistributable generated entourage, components and fixtures",
+        "license": "CC-BY-4.0",
+        **page,
+    })
+
+
+@mcp.tool()
+def search_generated_assets(
+    query: str = "",
+    category: str = "",
+    max_width_mm: float = 0,
+    max_depth_mm: float = 0,
+    max_height_mm: float = 0,
+    limit: int = 10,
+    offset: int = 0,
+) -> str:
+    """Searches only the generated asset library (FTS over product, variant,
+    category and tags; dimension filters use the measured GLB bounds)."""
+    return json.dumps(retrieval_store.search_assets(
+        query=query,
+        library_id="generated_assets",
+        category=category,
+        max_width_mm=max_width_mm,
+        max_depth_mm=max_depth_mm,
+        max_height_mm=max_height_mm,
+        limit=limit,
+        offset=offset,
+    ))
+
+
+@mcp.tool()
+def get_generated_asset(asset_id: str) -> str:
+    """Returns one generated asset's measured dimensions, spatial contract,
+    material, generation provenance (Meshy task ids, prompt) and availability."""
+    asset = retrieval_store.get_asset(asset_id, library_id="generated_assets")
+    if not asset:
+        return json.dumps({
+            "status": "error",
+            "message": f"Unknown generated asset_id: {asset_id}",
+        })
+    return json.dumps({"status": "success", "asset": asset})
+
+
+@mcp.tool()
 def list_drawing_recipes() -> str:
     """Lists compact audited layer, lineweight, projection, and export recipes."""
     recipes = []
@@ -905,6 +982,7 @@ def get_retrieval_status() -> str:
         "asset_index": retrieval_store.asset_stats(),
         "ikea_index": retrieval_store.asset_stats("ikea"),
         "drawing_asset_index": retrieval_store.asset_stats("drawing_assets"),
+        "generated_asset_index": retrieval_store.asset_stats("generated_assets"),
         "drawing_recipes": len(drawing_recipe_indexer.recipes),
         "retrieval": ["sqlite", "fts5", "rtree"],
         "embedding_adapter": "not_configured",
@@ -2598,7 +2676,14 @@ def import_asset_contract(
         contract = exchange.load_contract(contract_path)
     except Exception as exc:
         return json.dumps({"status": "error", "message": str(exc)})
+    return json.dumps(_receive_contract(contract, x_mm, y_mm, z_mm, rotation_degrees, layer))
 
+
+def _receive_contract(contract: dict, x_mm: float, y_mm: float, z_mm: float,
+                      rotation_degrees: float, layer: str) -> dict:
+    """Import a loaded contract's GLB into Rhino, restore materials and
+    metadata, place it per the contract anchor, and report the dimension
+    check. Shared by import_asset_contract and place_generated_asset."""
     import_script = """
 using System;
 using System.Collections.Generic;
@@ -2624,15 +2709,15 @@ public class Script
             json.dumps({"type": "execute", "script": import_script}).encode("utf-8"),
             timeout=120.0))
     except ConnectionRefusedError:
-        return json.dumps({"status": "error", "message": "Rhino bridge is unavailable."})
+        return {"status": "error", "message": "Rhino bridge is unavailable."}
     except Exception as exc:
-        return json.dumps({"status": "error", "message": f"Import failed: {exc}"})
+        return {"status": "error", "message": f"Import failed: {exc}"}
     if result.get("status") != "success":
-        return json.dumps(result)
+        return result
     imported = result.get("guids") or []
     if not imported:
-        return json.dumps({"status": "error",
-                           "message": "Rhino imported no objects from the GLB."})
+        return {"status": "error",
+                           "message": "Rhino imported no objects from the GLB."}
 
     contract["_imported_guids"] = imported
     needed = {row["material_id"] for row in contract.get("materials", [])}
@@ -2647,12 +2732,12 @@ public class Script
             json.dumps({"type": "execute", "script": script}).encode("utf-8"),
             timeout=120.0))
     except Exception as exc:
-        return json.dumps({"status": "error",
+        return {"status": "error",
                            "message": f"Imported, but restore/place failed: {exc}",
-                           "imported_guids": imported})
+                           "imported_guids": imported}
     if restore.get("status") != "success":
-        return json.dumps({"status": "error", "message": restore.get("message", "restore failed"),
-                           "imported_guids": imported})
+        return {"status": "error", "message": restore.get("message", "restore failed"),
+                           "imported_guids": imported}
 
     report_path = Path(tempfile.gettempdir()) / "almond_import_report.json"
     report = {}
@@ -2662,7 +2747,7 @@ public class Script
         except ValueError:
             report = {}
     check = exchange.dimension_report(contract, report) if report else {"status": "unknown"}
-    return json.dumps({
+    return {
         "status": "success",
         "asset_id": contract["asset_id"],
         "source_app": contract.get("source_app", "unknown"),
@@ -2673,7 +2758,65 @@ public class Script
         "dimension_check": check,
         "layer": layer,
         "imported_guids": imported,
-    })
+    }
+
+
+@mcp.tool()
+def place_generated_asset(
+    asset_id: str,
+    x_mm: float = 0,
+    y_mm: float = 0,
+    z_mm: float = 0,
+    rotation_degrees: float = 0,
+    layer: str = "ALMOND-GEN",
+) -> str:
+    """
+    Imports a generated-library asset into the open Rhino document and places
+    it at a point (contract anchor = bottom centre, mm), restoring its Almond
+    material and almond:* metadata and verifying the landed size against the
+    contract. Use search_generated_assets to choose an asset_id; afterwards
+    call register_scene_instance so the scene ledger and layout validation
+    know about it.
+
+    Args:
+        asset_id: e.g. "gen-park-bench-1".
+        x_mm, y_mm, z_mm: placement point in millimetres.
+        rotation_degrees: rotation about world Z.
+        layer: destination layer, created if absent.
+    """
+    asset = generated_asset_indexer.get(asset_id)
+    if not asset:
+        return json.dumps({"status": "error",
+                           "message": f"Unknown generated asset_id: {asset_id}"})
+    if not asset.get("file_available"):
+        return json.dumps({"status": "error",
+                           "message": f"Model file missing for {asset_id}; run "
+                                      "almond-mcp fetch-assets to download it."})
+    values = [x_mm, y_mm, z_mm, rotation_degrees]
+    if not all(isinstance(v, (int, float)) and math.isfinite(v) for v in values):
+        return json.dumps({"status": "error", "message": "Placement values must be finite numbers."})
+    contract_rel = str(asset.get("contract_file") or "").strip()
+    if not contract_rel:
+        return json.dumps({"status": "error", "message": f"{asset_id} has no contract_file."})
+    library_root = Path(GENERATED_LIBRARY_DIR).resolve()
+    contract_path = (library_root / contract_rel).resolve()
+    try:
+        contract_path.relative_to(library_root)
+        contract = exchange.load_contract(contract_path)
+    except Exception as exc:
+        return json.dumps({"status": "error", "message": str(exc)})
+    result = _receive_contract(contract, x_mm, y_mm, z_mm, rotation_degrees, layer)
+    if result.get("status") == "success":
+        result.update({
+            "library_id": "generated_assets",
+            "product": asset.get("product"),
+            "dimensions_mm": asset.get("dimensions_mm"),
+            "clearance_mm": (asset.get("spatial") or {}).get("clearance_mm"),
+            "render_material_id": asset.get("render_material_id"),
+            "next_step": "register_scene_instance(scene_id, asset_id=..., x, y, rotation) "
+                         "so validate_scene_layout can see this placement.",
+        })
+    return json.dumps(result)
 
 
 @mcp.tool()

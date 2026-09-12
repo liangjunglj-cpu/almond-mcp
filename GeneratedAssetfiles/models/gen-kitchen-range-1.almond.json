@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-kitchen-range-1",
+  "library_id": "generated_assets",
+  "name": "Kitchen range (freestanding cooker with oven)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-kitchen-range-1.glb",
+  "dimensions_mm": {
+    "width": 715.4,
+    "depth": 727.7,
+    "height": 900.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "local_aabb": {
+      "min": [
+        -357.7,
+        -363.85,
+        0.0
+      ],
+      "max": [
+        357.7,
+        363.85,
+        900.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 1000,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "fixed"
+  },
+  "materials": [
+    {
+      "material_id": "steel-galvanized",
+      "objects": [
+        "gen-kitchen-range-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}
