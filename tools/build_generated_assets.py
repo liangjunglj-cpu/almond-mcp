@@ -263,19 +263,20 @@ def normalise(asset: dict, raw_path: Path, out_dir: Path, materials: dict[str, d
     lo, hi, tris = world_bounds(gltf, binary)
     width, height, depth = (round(hi[a] - lo[a], 1) for a in range(3))
 
-    # 4. materials: one Almond identity for the whole asset
+    # 4. materials: the catalogue's Almond identity for every material, except
+    #    materials the source already named ALMOND::<id> (procedural assets
+    #    ship e.g. wood + foliage), which keep their own library identity.
     material_id = asset["render_material_id"]
-    spec = materials.get(material_id)
-    base = [1.0, 1.0, 1.0, 1.0]
-    if spec:
-        r, g, b = spec["base_color"]
-        base = [exchange.srgb_to_linear(r), exchange.srgb_to_linear(g),
-                exchange.srgb_to_linear(b), float(spec.get("opacity", 1.0))]
-    mats = gltf.setdefault("materials", [])
-    if not mats:
-        mats.append({})
-    for mat in mats:
-        mat["name"] = exchange.material_name(material_id)
+
+    def apply_material(mat: dict, mid: str) -> None:
+        spec = materials.get(mid)
+        base = [1.0, 1.0, 1.0, 1.0]
+        if spec:
+            r, g, b = spec["base_color"]
+            base = [exchange.srgb_to_linear(r), exchange.srgb_to_linear(g),
+                    exchange.srgb_to_linear(b), float(spec.get("opacity", 1.0))]
+        mat["name"] = exchange.material_name(mid)
+        mat.pop("pbrMetallicRoughness", None)
         pbr = mat.setdefault("pbrMetallicRoughness", {})
         pbr["baseColorFactor"] = [round(v, 4) for v in base]
         if spec:
@@ -283,12 +284,28 @@ def normalise(asset: dict, raw_path: Path, out_dir: Path, materials: dict[str, d
             pbr["roughnessFactor"] = float(spec["roughness"])
         if base[3] < 1.0:
             mat["alphaMode"] = "BLEND"
+
+    mats = gltf.setdefault("materials", [])
+    if not mats:
+        mats.append({})
+    mat_ids: list[str] = []
+    for mat in mats:
+        existing = exchange.material_id_from_name(mat.get("name", ""))
+        mid = existing if existing in materials else material_id
+        apply_material(mat, mid)
+        mat_ids.append(mid)
     object_names: list[str] = []
+    objects_by_material: dict[str, list[str]] = {}
     for mesh_index, mesh in enumerate(gltf.get("meshes", [])):
         mesh["name"] = f"{asset['asset_id']}_part{mesh_index + 1}"
         object_names.append(mesh["name"])
-        for prim in mesh.get("primitives", []):
+        prims = mesh.get("primitives", [])
+        for prim in prims:
             prim.setdefault("material", 0)
+        mesh_mid = mat_ids[prims[0]["material"]] if prims else material_id
+        objects_by_material.setdefault(mesh_mid, []).append(mesh["name"])
+    material_groups = [{"material_id": mid, "objects": names}
+                       for mid, names in sorted(objects_by_material.items())]
     for node in gltf.get("nodes", []):
         if "mesh" in node:
             node["name"] = gltf["meshes"][node["mesh"]]["name"]
@@ -310,7 +327,7 @@ def normalise(asset: dict, raw_path: Path, out_dir: Path, materials: dict[str, d
     contract = exchange.build_contract(
         asset_id=asset["asset_id"], name=f"{asset['product']} ({asset['variant']})",
         glb_filename=glb_path.name, bounds_mm=bounds_mm,
-        materials=[{"material_id": material_id, "objects": object_names}],
+        materials=material_groups,
         source_app="meshy", source_units="m", clearance_mm=clearance,
         object_count=len(object_names),
     )

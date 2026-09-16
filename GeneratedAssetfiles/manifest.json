@@ -2,7 +2,7 @@
   "library_id": "generated_assets",
   "library_name": "Almond Generated Architectural Asset Library",
   "catalogue_region": "Generated (Meshy) - no vendor catalogue",
-  "catalogue_checked": "2026-09-12",
+  "catalogue_checked": "2026-09-16",
   "schema_version": "2.0",
   "purpose": "Redistributable 3D architectural entourage, building components, fixtures and unbranded furniture placeholders, generated with Meshy and normalised to real-world millimetre dimensions with authored Almond spatial contracts.",
   "license": "CC-BY-4.0",
@@ -25,7 +25,29 @@
       "auto_size": true,
       "origin_at": "bottom"
     },
-    "post_process": "tools/build_generated_assets.py normalises each GLB: scales uniformly to the catalogue height, re-centres bottom-centre on the origin, renames every material to ALMOND::<render_material_id>, measures bounds, writes manifest.json and one .almond.json contract per asset."
+    "post_process": "tools/build_generated_assets.py normalises each GLB: scales uniformly to the catalogue height, re-centres bottom-centre on the origin, renames every material to ALMOND::<render_material_id>, measures bounds, writes manifest.json and one .almond.json contract per asset.",
+    "high_detail_override": {
+      "applies_to": "assets with recipe_override = high_detail (trees)",
+      "image_stage": {
+        "tool": "meshy_text_to_image",
+        "ai_model": "nano-banana-pro",
+        "aspect_ratio": "1:1",
+        "prompt_suffix": " Single tree, isolated on a plain white background, side view slightly from above, soft even studio lighting, no cast shadow, no ground, no text, realistic proportions."
+      },
+      "mesh_stage": {
+        "tool": "meshy_image_to_3d",
+        "ai_model": "meshy-7",
+        "ultra_mode": true,
+        "should_texture": false,
+        "target_formats": [
+          "glb"
+        ],
+        "target_polycount": 60000,
+        "auto_size": true,
+        "origin_at": "bottom"
+      },
+      "credits_per_asset": 34
+    }
   },
   "placement_policy": {
     "participates_in_room_furniture_search": true,
@@ -384,14 +406,14 @@
         "axonometric"
       ],
       "geometry_mode": "3d_entourage",
-      "lod": "low",
+      "lod": "high",
       "category": "vegetation",
       "series": "ALMOND-GEN",
       "product": "Deciduous tree",
       "variant": "medium, round crown",
       "dimensions_mm": {
-        "width": 4785.2,
-        "depth": 4949.2,
+        "width": 5206.9,
+        "depth": 4884.3,
         "height": 7000.0
       },
       "nominal_dimensions_mm": {
@@ -400,7 +422,7 @@
         "height": 7000
       },
       "match_status": "generated_height_normalised",
-      "plan_dimension_deviation": 0.043,
+      "plan_dimension_deviation": 0.041,
       "warehouse_title": null,
       "warehouse_publisher": null,
       "warehouse_status": "generated",
@@ -409,9 +431,9 @@
       "contract_file": "models/gen-tree-deciduous-medium-1.almond.json",
       "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-tree-deciduous-medium-1.glb",
       "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-tree-deciduous-medium-1.almond.json",
-      "sha256": "720F05AEF9C84B5FED9927DD2E706581B035FD77FAFA7675593EFDF0DB9A1739",
-      "file_size_bytes": 317964,
-      "triangle_count": 4063,
+      "sha256": "F10BAEB60B8555AA633D73D4E288DDA337AFE767761A70D9397E18439922E17E",
+      "file_size_bytes": 3053656,
+      "triangle_count": 80000,
       "tags": [
         "tree",
         "deciduous",
@@ -427,14 +449,14 @@
         "format": "glb",
         "generator": "meshy",
         "parameters": {
-          "prompt": "A medium-sized deciduous tree with a single straight trunk and a full rounded leafy crown, simplified stylised foliage clumps, architectural model tree.",
-          "image_task_id": "01a09787-cc57-75eb-a1b1-574938e586f0",
-          "image_model": "nano-banana",
-          "mesh_task_id": "01a0978d-8f6c-7137-9eba-b15c3ed6ec24",
-          "mesh_model": "meshy-t2 smart-topology (untextured)",
-          "generated_at": "2026-09-12",
+          "prompt": "Architectural visualisation model of a medium deciduous tree, about 7 metres tall: a clearly visible straight trunk splitting into four or five main branches, foliage arranged in several distinct rounded leaf clusters with gaps between them so branches show through, mid-green leaves with visible leaf texture, natural asymmetric silhouette.",
+          "image_task_id": "01a097aa-ecbb-76f3-92c4-f075fd9374d1",
+          "image_model": "nano-banana-pro",
+          "mesh_task_id": "01a097ad-8b27-7101-9f6f-dfaffbe34d12",
+          "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+          "generated_at": "2026-09-13",
           "orientation_correction": null,
-          "scale_applied": 1166.666667
+          "scale_applied": 883.30428
         }
       },
       "spatial": {
@@ -446,32 +468,32 @@
         "geometry_bounds_status": "measured",
         "local_aabb": {
           "min": [
-            -2392.6,
-            -2474.6,
+            -2603.45,
+            -2442.15,
             0.0
           ],
           "max": [
-            2392.6,
-            2474.6,
+            2603.45,
+            2442.15,
             7000.0
           ]
         },
         "footprint": [
           [
-            -2392.6,
-            -2474.6
+            -2603.45,
+            -2442.15
           ],
           [
-            2392.6,
-            -2474.6
+            2603.45,
+            -2442.15
           ],
           [
-            2392.6,
-            2474.6
+            2603.45,
+            2442.15
           ],
           [
-            -2392.6,
-            2474.6
+            -2603.45,
+            2442.15
           ]
         ],
         "clearance_mm": {
@@ -496,14 +518,14 @@
         "axonometric"
       ],
       "geometry_mode": "3d_entourage",
-      "lod": "low",
+      "lod": "high",
       "category": "vegetation",
       "series": "ALMOND-GEN",
       "product": "Conifer tree",
       "variant": "tall, narrow",
       "dimensions_mm": {
-        "width": 2452.1,
-        "depth": 2443.4,
+        "width": 3837.4,
+        "depth": 3716.9,
         "height": 9000.0
       },
       "nominal_dimensions_mm": {
@@ -512,7 +534,7 @@
         "height": 9000
       },
       "match_status": "generated_height_normalised",
-      "plan_dimension_deviation": 0.186,
+      "plan_dimension_deviation": 0.279,
       "warehouse_title": null,
       "warehouse_publisher": null,
       "warehouse_status": "generated",
@@ -521,9 +543,9 @@
       "contract_file": "models/gen-tree-conifer-1.almond.json",
       "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-tree-conifer-1.glb",
       "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-tree-conifer-1.almond.json",
-      "sha256": "9ED0F73AE11FF1AA2DA805D4D8783DBF63419650C15E550D58A80FCA0B73BEF6",
-      "file_size_bytes": 324600,
-      "triangle_count": 4183,
+      "sha256": "097D5AB1A86B045F30F7DD9F9E64A83DDA2403FD05545CD1A9B5A89614CA99B1",
+      "file_size_bytes": 2660032,
+      "triangle_count": 80000,
       "tags": [
         "tree",
         "conifer",
@@ -540,14 +562,14 @@
         "format": "glb",
         "generator": "meshy",
         "parameters": {
-          "prompt": "A tall narrow conifer pine tree with a straight trunk and layered conical foliage, simplified stylised architectural model tree.",
-          "image_task_id": "01a09787-da17-71e3-8e11-e66c7f7a9a0f",
-          "image_model": "nano-banana",
-          "mesh_task_id": "01a0978d-9e4d-749e-ad51-2ed80aa9ce3b",
-          "mesh_model": "meshy-t2 smart-topology (untextured)",
-          "generated_at": "2026-09-12",
+          "prompt": "Architectural visualisation model of a tall conifer (Scots pine style) tree, about 9 metres tall: a straight trunk visible from the ground up through the crown, whorls of horizontal branches with layered flat needle foliage clusters, gaps between the layers showing trunk and branches, deep green needles, slightly irregular natural silhouette, narrow crown.",
+          "image_task_id": "01a097aa-f72a-71a9-b906-e9eecce976c0",
+          "image_model": "nano-banana-pro",
+          "mesh_task_id": "01a097ad-99ec-7424-8b6b-17b218a4c717",
+          "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+          "generated_at": "2026-09-13",
           "orientation_correction": null,
-          "scale_applied": 600.0
+          "scale_applied": 450.807332
         }
       },
       "spatial": {
@@ -559,32 +581,32 @@
         "geometry_bounds_status": "measured",
         "local_aabb": {
           "min": [
-            -1226.05,
-            -1221.7,
+            -1918.7,
+            -1858.45,
             0.0
           ],
           "max": [
-            1226.05,
-            1221.7,
+            1918.7,
+            1858.45,
             9000.0
           ]
         },
         "footprint": [
           [
-            -1226.05,
-            -1221.7
+            -1918.7,
+            -1858.45
           ],
           [
-            1226.05,
-            -1221.7
+            1918.7,
+            -1858.45
           ],
           [
-            1226.05,
-            1221.7
+            1918.7,
+            1858.45
           ],
           [
-            -1226.05,
-            1221.7
+            -1918.7,
+            1858.45
           ]
         ],
         "clearance_mm": {

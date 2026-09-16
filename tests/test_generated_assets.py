@@ -83,7 +83,10 @@ def test_glb_materials_carry_the_almond_identity():
     for asset in manifest()["assets"]:
         gltf, _ = build.read_glb(LIBRARY / asset["file"])
         names = {m.get("name") for m in gltf.get("materials", [])}
-        assert names == {exchange.material_name(asset["render_material_id"])}, asset["asset_id"]
+        # every material is an Almond identity, and the catalogue's render
+        # material is among them (procedural assets may add e.g. wood + foliage)
+        assert names and all(exchange.material_id_from_name(n) for n in names), asset["asset_id"]
+        assert exchange.material_name(asset["render_material_id"]) in names, asset["asset_id"]
         for mesh in gltf["meshes"]:
             for prim in mesh["primitives"]:
                 assert "material" in prim

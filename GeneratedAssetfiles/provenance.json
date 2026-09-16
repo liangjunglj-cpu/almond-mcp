@@ -23,18 +23,26 @@
       "mesh_model": "meshy-t2 smart-topology (untextured)"
     },
     "gen-tree-deciduous-medium-1": {
-      "image_task_id": "01a09787-cc57-75eb-a1b1-574938e586f0",
-      "image_model": "nano-banana",
-      "generated_at": "2026-09-12",
-      "mesh_task_id": "01a0978d-8f6c-7137-9eba-b15c3ed6ec24",
-      "mesh_model": "meshy-t2 smart-topology (untextured)"
+      "image_task_id": "01a097aa-ecbb-76f3-92c4-f075fd9374d1",
+      "image_model": "nano-banana-pro",
+      "mesh_task_id": "01a097ad-8b27-7101-9f6f-dfaffbe34d12",
+      "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+      "generated_at": "2026-09-13",
+      "supersedes": {
+        "image_task_id": "see git history",
+        "reason": "first pass (meshy-t2) foliage too blobby"
+      }
     },
     "gen-tree-conifer-1": {
-      "image_task_id": "01a09787-da17-71e3-8e11-e66c7f7a9a0f",
-      "image_model": "nano-banana",
-      "generated_at": "2026-09-12",
-      "mesh_task_id": "01a0978d-9e4d-749e-ad51-2ed80aa9ce3b",
-      "mesh_model": "meshy-t2 smart-topology (untextured)"
+      "image_task_id": "01a097aa-f72a-71a9-b906-e9eecce976c0",
+      "image_model": "nano-banana-pro",
+      "mesh_task_id": "01a097ad-99ec-7424-8b6b-17b218a4c717",
+      "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+      "generated_at": "2026-09-13",
+      "supersedes": {
+        "image_task_id": "see git history",
+        "reason": "first pass (meshy-t2) foliage too blobby"
+      }
     },
     "gen-shrub-round-1": {
       "image_task_id": "01a09787-e661-70dd-875d-fb62697869b8",

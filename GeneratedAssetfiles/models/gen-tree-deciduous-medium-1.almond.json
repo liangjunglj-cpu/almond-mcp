@@ -7,8 +7,8 @@
   "source_units": "m",
   "file": "gen-tree-deciduous-medium-1.glb",
   "dimensions_mm": {
-    "width": 4785.2,
-    "depth": 4949.2,
+    "width": 5206.9,
+    "depth": 4884.3,
     "height": 7000.0
   },
   "spatial": {
@@ -17,13 +17,13 @@
     "support_plane": "ground",
     "local_aabb": {
       "min": [
-        -2392.6,
-        -2474.6,
+        -2603.45,
+        -2442.15,
         0.0
       ],
       "max": [
-        2392.6,
-        2474.6,
+        2603.45,
+        2442.15,
         7000.0
       ]
     },
