@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-coffee-table-freeform-glass-1",
+  "library_id": "generated_assets",
+  "name": "Coffee table (freeform glass top on two-piece sculptural wood base)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-coffee-table-freeform-glass-1.glb",
+  "dimensions_mm": {
+    "width": 1438.8,
+    "depth": 1274.4,
+    "height": 400.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "local_aabb": {
+      "min": [
+        -719.4,
+        -637.2,
+        0.0
+      ],
+      "max": [
+        719.4,
+        637.2,
+        400.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 450,
+      "back": 450,
+      "left": 450,
+      "right": 450
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "primary"
+  },
+  "materials": [
+    {
+      "material_id": "wood-walnut",
+      "objects": [
+        "gen-coffee-table-freeform-glass-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

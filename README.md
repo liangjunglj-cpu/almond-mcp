@@ -255,7 +255,7 @@ create_generation_plan(
 ## Generated asset library (open, redistributable)
 
 The IKEA and drawing libraries describe 3D Warehouse models that each user
-must download themselves. `GeneratedAssetfiles/` is different: 27 (and
+must download themselves. `GeneratedAssetfiles/` is different: 47 (and
 growing) architectural models generated with Meshy from Almond's own
 prompts, owned by the project and released under **CC BY 4.0**, so they ship
 with the repository and `almond-mcp fetch-assets` downloads them
@@ -268,6 +268,8 @@ automatically on a wheel install. Categories:
 | Building components | round and square column, glass balustrade (doors, windows and stairs are deliberately excluded: they need exact dimensions, so model them directly) |
 | Fixtures and appliances | toilet, pedestal basin, bathtub, shower enclosure, range cooker, fridge-freezer |
 | Generic furniture | three-seat sofa, dining table and chair, double bed, desk, office chair |
+| Design-idiom furniture | bent-birch stool, table, trolley, webbed and cantilevered armchairs; moulded-plywood, shell and leather lounge chairs with ottoman; freeform coffee table, slatted bench, mesh task chair; loose-cover sofa, cube and track shelving, wire side table |
+| Lighting | spherical pendant, arc floor lamp, balanced-arm task lamp |
 
 Every GLB is normalised by `tools/build_generated_assets.py`: scaled to its
 catalogue height, bottom-centre on the origin, measured (never nominal)

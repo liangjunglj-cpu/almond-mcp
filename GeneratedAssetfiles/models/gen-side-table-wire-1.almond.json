@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-side-table-wire-1",
+  "library_id": "generated_assets",
+  "name": "Side table (stacking wire side table)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-side-table-wire-1.glb",
+  "dimensions_mm": {
+    "width": 377.9,
+    "depth": 377.9,
+    "height": 500.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "local_aabb": {
+      "min": [
+        -188.95,
+        -188.95,
+        0.0
+      ],
+      "max": [
+        188.95,
+        188.95,
+        500.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 300,
+      "back": 300,
+      "left": 300,
+      "right": 300
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "secondary"
+  },
+  "materials": [
+    {
+      "material_id": "steel-painted-charcoal",
+      "objects": [
+        "gen-side-table-wire-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

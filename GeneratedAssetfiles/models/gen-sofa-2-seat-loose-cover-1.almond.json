@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-sofa-2-seat-loose-cover-1",
+  "library_id": "generated_assets",
+  "name": "Sofa (boxy two-seat sofa with loose fabric cover)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-sofa-2-seat-loose-cover-1.glb",
+  "dimensions_mm": {
+    "width": 1405.1,
+    "depth": 751.9,
+    "height": 660.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "local_aabb": {
+      "min": [
+        -702.55,
+        -375.95,
+        0.0
+      ],
+      "max": [
+        702.55,
+        375.95,
+        660.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 450,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "primary"
+  },
+  "materials": [
+    {
+      "material_id": "rubber-black",
+      "objects": [
+        "gen-sofa-2-seat-loose-cover-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

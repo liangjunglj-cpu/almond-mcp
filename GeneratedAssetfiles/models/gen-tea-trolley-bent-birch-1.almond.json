@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-tea-trolley-bent-birch-1",
+  "library_id": "generated_assets",
+  "name": "Tea trolley (bent-birch frame, two large plywood wheels, rattan basket)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-tea-trolley-bent-birch-1.glb",
+  "dimensions_mm": {
+    "width": 771.2,
+    "depth": 489.9,
+    "height": 600.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "local_aabb": {
+      "min": [
+        -385.6,
+        -244.95,
+        0.0
+      ],
+      "max": [
+        385.6,
+        244.95,
+        600.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 600,
+      "back": 600,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "movable"
+  },
+  "materials": [
+    {
+      "material_id": "wood-birch-ply",
+      "objects": [
+        "gen-tea-trolley-bent-birch-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

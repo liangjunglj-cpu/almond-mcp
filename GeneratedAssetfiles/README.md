@@ -2,7 +2,7 @@
 
 Open, redistributable 3D architectural assets for [Almond MCP](../README.md):
 entourage, site furniture, fixtures and unbranded
-furniture placeholders. **33 assets**, all generated with
+furniture placeholders. **47 assets**, all generated with
 [Meshy](https://www.meshy.ai) from prompts written for this project and
 normalised to real-world millimetres with an authored Almond spatial
 contract. Unlike the IKEA / drawing libraries (3D Warehouse content that
@@ -50,7 +50,7 @@ that.
 
 ## Assets
 
-Contact sheets: [entourage](previews/sheet-1-entourage.png) · [site furniture](previews/sheet-2-site-furniture.png) · [components](previews/sheet-3-components.png) · [fixtures](previews/sheet-4-fixtures.png) · [furniture](previews/sheet-5-furniture.png). Regenerate with `blender -b --python tools/render_generated_previews.py -- GeneratedAssetfiles/models <out>`.
+Contact sheets: [entourage](previews/sheet-1-entourage.png) · [site furniture](previews/sheet-2-site-furniture.png) · [components](previews/sheet-3-components.png) · [fixtures](previews/sheet-4-fixtures.png) · [furniture](previews/sheet-5-furniture.png) · [lighting](previews/sheet-6-lighting.png). Regenerate with `blender -b --python tools/render_generated_previews.py -- GeneratedAssetfiles/models <out>`.
 
 | Preview | asset_id | Product | Category | W x D x H (mm) | Material | Triangles |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -76,11 +76,41 @@ Contact sheets: [entourage](previews/sheet-1-entourage.png) · [site furniture](
 | <img src="previews/gen-kitchen-range-1.png" width="96" alt=""> | `gen-kitchen-range-1` | Kitchen range (freestanding cooker with oven) | appliance | 715 x 728 x 900 | `steel-galvanized` | 2,935 |
 | <img src="previews/gen-refrigerator-1.png" width="96" alt=""> | `gen-refrigerator-1` | Refrigerator (freestanding fridge-freezer) | appliance | 766 x 671 x 1800 | `steel-galvanized` | 1,016 |
 | <img src="previews/gen-sofa-3-seat-1.png" width="96" alt=""> | `gen-sofa-3-seat-1` | Sofa (generic three-seat, fabric) | seating | 2346 x 983 x 850 | `rubber-black` | 4,087 |
-| <img src="previews/gen-dining-chair-1.png" width="96" alt=""> | `gen-dining-chair-1` | Dining chair (generic timber, armless) | seating | 462 x 566 x 900 | `wood-oak` | 4,337 |
-| <img src="previews/gen-office-chair-1.png" width="96" alt=""> | `gen-office-chair-1` | Office chair (generic swivel task chair) | seating | 879 x 831 x 1100 | `rubber-black` | 4,101 |
 | <img src="previews/gen-dining-table-rect-1.png" width="96" alt=""> | `gen-dining-table-rect-1` | Dining table (generic rectangular, timber) | table | 1536 x 822 x 750 | `wood-oak` | 4,362 |
+| <img src="previews/gen-dining-chair-1.png" width="96" alt=""> | `gen-dining-chair-1` | Dining chair (generic timber, armless) | seating | 462 x 566 x 900 | `wood-oak` | 4,337 |
 | <img src="previews/gen-bed-double-1.png" width="96" alt=""> | `gen-bed-double-1` | Double bed (generic platform bed with mattress and headboard) | bed | 2213 x 2289 x 950 | `wood-oak` | 4,353 |
 | <img src="previews/gen-desk-1.png" width="96" alt=""> | `gen-desk-1` | Desk (generic writing desk, timber top, steel legs) | desk | 1306 x 656 x 750 | `wood-birch-ply` | 3,965 |
+| <img src="previews/gen-office-chair-1.png" width="96" alt=""> | `gen-office-chair-1` | Office chair (generic swivel task chair) | seating | 879 x 831 x 1100 | `rubber-black` | 4,101 |
+| <img src="previews/gen-stool-bent-birch-3leg-1.png" width="96" alt=""> | `gen-stool-bent-birch-3leg-1` | Stool (three-legged bent-birch stool, round seat) | seating | 489 x 489 x 440 | `wood-birch-ply` | 4,125 |
+| <img src="previews/gen-lounge-chair-bent-plywood-1.png" width="96" alt=""> | `gen-lounge-chair-bent-plywood-1` | Lounge chair (cantilevered bent-plywood lounge chair, scroll seat) | seating | 565 x 911 x 640 | `wood-birch-ply` | 79,999 |
+| <img src="previews/gen-tea-trolley-bent-birch-1.png" width="96" alt=""> | `gen-tea-trolley-bent-birch-1` | Tea trolley (bent-birch frame, two large plywood wheels, rattan basket) | table | 771 x 490 x 600 | `wood-birch-ply` | 110,854 |
+| <img src="previews/gen-dining-table-round-birch-1.png" width="96" alt=""> | `gen-dining-table-round-birch-1` | Dining table (round white laminate top on four bent-birch L-legs) | table | 1117 x 1117 x 720 | `wood-birch-ply` | 4,288 |
+| <img src="previews/gen-armchair-bent-birch-webbed-1.png" width="96" alt=""> | `gen-armchair-bent-birch-webbed-1` | Armchair (bent-birch frame with linen webbing seat and back) | seating | 688 x 704 x 800 | `wood-birch-ply` | 79,977 |
+| <img src="previews/gen-lounge-chair-molded-plywood-1.png" width="96" alt=""> | `gen-lounge-chair-molded-plywood-1` | Lounge chair (moulded plywood lounge chair, low, wood legs) | seating | 732 x 831 x 680 | `wood-walnut` | 79,996 |
+| <img src="previews/gen-side-chair-shell-wire-base-1.png" width="96" alt=""> | `gen-side-chair-shell-wire-base-1` | Side chair (moulded shell seat on wire tower base) | seating | 659 x 595 x 800 | `plaster-white` | 80,000 |
+| <img src="previews/gen-lounge-chair-leather-plywood-1.png" width="96" alt=""> | `gen-lounge-chair-leather-plywood-1` | Lounge chair (leather lounge chair, three bent plywood shells, swivel base) | seating | 882 x 899 x 840 | `wood-walnut` | 79,998 |
+| <img src="previews/gen-ottoman-leather-plywood-1.png" width="96" alt=""> | `gen-ottoman-leather-plywood-1` | Ottoman (matching leather ottoman on aluminium base) | seating | 703 x 653 x 430 | `wood-walnut` | 3,976 |
+| <img src="previews/gen-coffee-table-freeform-glass-1.png" width="96" alt=""> | `gen-coffee-table-freeform-glass-1` | Coffee table (freeform glass top on two-piece sculptural wood base) | table | 1439 x 1274 x 400 | `wood-walnut` | 57,260 |
+| <img src="previews/gen-bench-slatted-platform-1.png" width="96" alt=""> | `gen-bench-slatted-platform-1` | Bench (slatted wood platform bench on ebonised frame) | seating | 1800 x 624 x 355 | `wood-walnut` | 3,581 |
+| <img src="previews/gen-pendant-lamp-sphere-1.png" width="96" alt=""> | `gen-pendant-lamp-sphere-1` | Pendant lamp (spherical white pendant, spun web shade) | lighting | 474 x 471 x 640 | `polycarbonate-opal` | 4,153 |
+| <img src="previews/gen-task-chair-mesh-ergonomic-1.png" width="96" alt=""> | `gen-task-chair-mesh-ergonomic-1` | Office chair (ergonomic mesh task chair, adjustable arms) | seating | 823 x 804 x 1080 | `rubber-black` | 79,997 |
+| <img src="previews/gen-armchair-cantilever-bentwood-1.png" width="96" alt=""> | `gen-armchair-cantilever-bentwood-1` | Armchair (cantilevered bent-wood armchair with thick cushion) | seating | 691 x 912 x 1000 | `wood-birch-ply` | 4,368 |
+| <img src="previews/gen-sofa-2-seat-loose-cover-1.png" width="96" alt=""> | `gen-sofa-2-seat-loose-cover-1` | Sofa (boxy two-seat sofa with loose fabric cover) | seating | 1405 x 752 x 660 | `rubber-black` | 4,301 |
+| <img src="previews/gen-shelving-cube-2x4-1.png" width="96" alt=""> | `gen-shelving-cube-2x4-1` | Shelving unit (open cube shelving, 2 by 4) | storage | 626 x 293 x 1470 | `wood-birch-ply` | 4,203 |
+| <img src="previews/gen-shelving-modular-track-1.png" width="96" alt=""> | `gen-shelving-modular-track-1` | Shelving system (wall-mounted modular shelving on aluminium tracks) | storage | 1966 x 313 x 2000 | `aluminium-anodized` | 79,999 |
+| <img src="previews/gen-floor-lamp-arc-1.png" width="96" alt=""> | `gen-floor-lamp-arc-1` | Floor lamp (arc floor lamp on a marble base) | lighting | 2180 x 621 x 2400 | `steel-galvanized` | 4,271 |
+| <img src="previews/gen-task-lamp-balanced-arm-1.png" width="96" alt=""> | `gen-task-lamp-balanced-arm-1` | Task lamp (two-arm balanced desk lamp) | lighting | 321 x 116 x 450 | `aluminium-anodized` | 80,000 |
+| <img src="previews/gen-side-table-wire-1.png" width="96" alt=""> | `gen-side-table-wire-1` | Side table (stacking wire side table) | table | 378 x 378 x 500 | `steel-painted-charcoal` | 4,235 |
+
+## Batch 2: design-idiom furniture and lighting
+
+The second batch (ids with `batch: 2` in the catalogue) describes design language
+rather than products: Scandinavian bent birch, American mid-century moulded
+plywood and shell seating, democratic-design staples, Italian lighting. Prompts
+never name a brand or product and ids stay generic, so the CC BY 4.0 release is
+clean; treat them as placeholders in the idiom, not replicas. Concept images came
+from Higgsfield (nano_banana); meshes from Meshy, with the complex pieces on
+Meshy 7 ultra and decimated to about 80k triangles.
 
 ## Regenerating or extending
 

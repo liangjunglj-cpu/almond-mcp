@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-lounge-chair-bent-plywood-1",
+  "library_id": "generated_assets",
+  "name": "Lounge chair (cantilevered bent-plywood lounge chair, scroll seat)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-lounge-chair-bent-plywood-1.glb",
+  "dimensions_mm": {
+    "width": 564.6,
+    "depth": 910.7,
+    "height": 640.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "local_aabb": {
+      "min": [
+        -282.3,
+        -455.35,
+        0.0
+      ],
+      "max": [
+        282.3,
+        455.35,
+        640.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 500,
+      "back": 0,
+      "left": 100,
+      "right": 100
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "primary"
+  },
+  "materials": [
+    {
+      "material_id": "wood-birch-ply",
+      "objects": [
+        "gen-lounge-chair-bent-plywood-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

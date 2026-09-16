@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-armchair-cantilever-bentwood-1",
+  "library_id": "generated_assets",
+  "name": "Armchair (cantilevered bent-wood armchair with thick cushion)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-armchair-cantilever-bentwood-1.glb",
+  "dimensions_mm": {
+    "width": 691.4,
+    "depth": 912.1,
+    "height": 1000.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "local_aabb": {
+      "min": [
+        -345.7,
+        -456.05,
+        0.0
+      ],
+      "max": [
+        345.7,
+        456.05,
+        1000.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 500,
+      "back": 0,
+      "left": 100,
+      "right": 100
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "primary"
+  },
+  "materials": [
+    {
+      "material_id": "wood-birch-ply",
+      "objects": [
+        "gen-armchair-cantilever-bentwood-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

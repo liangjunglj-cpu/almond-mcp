@@ -47,7 +47,8 @@
         "origin_at": "bottom"
       },
       "credits_per_asset": 34
-    }
+    },
+    "batch_2_note": "Batch 2 (2026-09-16) describes design language only - Scandinavian bent birch, American mid-century moulded plywood/shell, democratic design, Italian lighting - never brand or product names; ids and products stay generic so the CC BY 4.0 release is clean."
   },
   "placement_policy": {
     "participates_in_room_furniture_search": true,
@@ -3052,6 +3053,2229 @@
           "back": 600,
           "left": 100,
           "right": 100
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "secondary"
+      }
+    },
+    {
+      "asset_id": "gen-stool-bent-birch-3leg-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "lod": "medium",
+      "category": "seating",
+      "series": "ALMOND-GEN",
+      "product": "Stool",
+      "variant": "three-legged bent-birch stool, round seat",
+      "dimensions_mm": {
+        "width": 488.7,
+        "depth": 488.7,
+        "height": 440.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 380,
+        "depth": 380,
+        "height": 440
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.286,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-stool-bent-birch-3leg-1.glb",
+      "contract_file": "models/gen-stool-bent-birch-3leg-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-stool-bent-birch-3leg-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-stool-bent-birch-3leg-1.almond.json",
+      "sha256": "F21A446A940FB15C8ED7BFCD24C4C8420035CDA52DD5AD7FBA01C5F3F50FCE16",
+      "file_size_bytes": 295224,
+      "triangle_count": 4125,
+      "tags": [
+        "stool",
+        "seating",
+        "birch",
+        "bentwood",
+        "scandinavian",
+        "stackable"
+      ],
+      "render_material_id": "wood-birch-ply",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A three-legged wooden stool: a plain round birch seat on three L-shaped legs made of solid birch that bend in a smooth right-angle curve at the top and screw directly under the seat, pale natural birch, Scandinavian functionalist design from the 1930s, no branding.",
+          "image_task_id": null,
+          "image_model": "nano_banana",
+          "mesh_task_id": "01a0aa90-d6d6-738a-bbbd-8a010748356c",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-16",
+          "orientation_correction": null,
+          "scale_applied": 977.777804
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -244.35,
+            -244.35,
+            0.0
+          ],
+          "max": [
+            244.35,
+            244.35,
+            440.0
+          ]
+        },
+        "footprint": [
+          [
+            -244.35,
+            -244.35
+          ],
+          [
+            244.35,
+            -244.35
+          ],
+          [
+            244.35,
+            244.35
+          ],
+          [
+            -244.35,
+            244.35
+          ]
+        ],
+        "clearance_mm": {
+          "front": 300,
+          "back": 0,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "secondary"
+      }
+    },
+    {
+      "asset_id": "gen-lounge-chair-bent-plywood-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "lod": "high",
+      "category": "seating",
+      "series": "ALMOND-GEN",
+      "product": "Lounge chair",
+      "variant": "cantilevered bent-plywood lounge chair, scroll seat",
+      "dimensions_mm": {
+        "width": 564.6,
+        "depth": 910.7,
+        "height": 640.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 600,
+        "depth": 800,
+        "height": 640
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.138,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-lounge-chair-bent-plywood-1.glb",
+      "contract_file": "models/gen-lounge-chair-bent-plywood-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-lounge-chair-bent-plywood-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-lounge-chair-bent-plywood-1.almond.json",
+      "sha256": "E389E53D31F77C36F116E188038007A98A072C01219A68F1AA86BB06B99AA4FC",
+      "file_size_bytes": 972716,
+      "triangle_count": 79999,
+      "tags": [
+        "lounge chair",
+        "armchair",
+        "cantilever",
+        "bent plywood",
+        "scandinavian"
+      ],
+      "render_material_id": "wood-birch-ply",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A cantilevered lounge chair whose frame is two closed loops of laminated bent birch on each side, with a single thin sheet of moulded plywood seat and back that curls into a scroll at the head and foot, pale birch frame, black lacquered seat, 1930s Scandinavian functionalist design, no branding.",
+          "image_task_id": null,
+          "image_model": "nano_banana",
+          "mesh_task_id": "01a0aa90-e5e2-7691-95e9-74574f2c643d",
+          "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+          "generated_at": "2026-09-16",
+          "orientation_correction": null,
+          "scale_applied": 800.003535
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -282.3,
+            -455.35,
+            0.0
+          ],
+          "max": [
+            282.3,
+            455.35,
+            640.0
+          ]
+        },
+        "footprint": [
+          [
+            -282.3,
+            -455.35
+          ],
+          [
+            282.3,
+            -455.35
+          ],
+          [
+            282.3,
+            455.35
+          ],
+          [
+            -282.3,
+            455.35
+          ]
+        ],
+        "clearance_mm": {
+          "front": 500,
+          "back": 0,
+          "left": 100,
+          "right": 100
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "primary"
+      }
+    },
+    {
+      "asset_id": "gen-tea-trolley-bent-birch-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "lod": "high",
+      "category": "table",
+      "series": "ALMOND-GEN",
+      "product": "Tea trolley",
+      "variant": "bent-birch frame, two large plywood wheels, rattan basket",
+      "dimensions_mm": {
+        "width": 771.2,
+        "depth": 489.9,
+        "height": 600.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 900,
+        "depth": 650,
+        "height": 600
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.246,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-tea-trolley-bent-birch-1.glb",
+      "contract_file": "models/gen-tea-trolley-bent-birch-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-tea-trolley-bent-birch-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-tea-trolley-bent-birch-1.almond.json",
+      "sha256": "9148FDE3D9BE9946789613249DD308B61D12F3A2426FC96C18354236E3DB85E1",
+      "file_size_bytes": 2315684,
+      "triangle_count": 110854,
+      "tags": [
+        "trolley",
+        "tea trolley",
+        "serving",
+        "birch",
+        "rattan",
+        "scandinavian"
+      ],
+      "render_material_id": "wood-birch-ply",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A tea trolley with a continuous bent birch frame forming the handles and legs, two large solid plywood disc wheels with black rubber rims at one end, a white tiled top shelf and a woven rattan basket hanging below, pale birch, 1930s Scandinavian design, no branding.",
+          "image_task_id": null,
+          "image_model": "nano_banana",
+          "mesh_task_id": "01a0aa90-f4d7-7161-b2ce-917ab0a4412c",
+          "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+          "generated_at": "2026-09-16",
+          "orientation_correction": null,
+          "scale_applied": 648.408569
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -385.6,
+            -244.95,
+            0.0
+          ],
+          "max": [
+            385.6,
+            244.95,
+            600.0
+          ]
+        },
+        "footprint": [
+          [
+            -385.6,
+            -244.95
+          ],
+          [
+            385.6,
+            -244.95
+          ],
+          [
+            385.6,
+            244.95
+          ],
+          [
+            -385.6,
+            244.95
+          ]
+        ],
+        "clearance_mm": {
+          "front": 600,
+          "back": 600,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "movable"
+      }
+    },
+    {
+      "asset_id": "gen-dining-table-round-birch-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "lod": "medium",
+      "category": "table",
+      "series": "ALMOND-GEN",
+      "product": "Dining table",
+      "variant": "round white laminate top on four bent-birch L-legs",
+      "dimensions_mm": {
+        "width": 1117.1,
+        "depth": 1117.1,
+        "height": 720.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 1250,
+        "depth": 1250,
+        "height": 720
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.106,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-dining-table-round-birch-1.glb",
+      "contract_file": "models/gen-dining-table-round-birch-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-dining-table-round-birch-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-dining-table-round-birch-1.almond.json",
+      "sha256": "167B2D03C8A5427E9ECCF3A3E004DD826B30208AF079735BDF02A6B81C743ABB",
+      "file_size_bytes": 290588,
+      "triangle_count": 4288,
+      "tags": [
+        "table",
+        "dining",
+        "round",
+        "birch",
+        "scandinavian"
+      ],
+      "render_material_id": "wood-birch-ply",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A round dining table with a plain white laminate top and a birch edge, standing on four solid birch L-shaped legs that curve smoothly from vertical into horizontal under the top, pale natural birch, Scandinavian functionalist design, no branding.",
+          "image_task_id": null,
+          "image_model": "nano_banana",
+          "mesh_task_id": "01a0aa91-03c7-7285-b20e-1b5ac1132a27",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-16",
+          "orientation_correction": null,
+          "scale_applied": 960.0
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -558.55,
+            -558.55,
+            0.0
+          ],
+          "max": [
+            558.55,
+            558.55,
+            720.0
+          ]
+        },
+        "footprint": [
+          [
+            -558.55,
+            -558.55
+          ],
+          [
+            558.55,
+            -558.55
+          ],
+          [
+            558.55,
+            558.55
+          ],
+          [
+            -558.55,
+            558.55
+          ]
+        ],
+        "clearance_mm": {
+          "front": 900,
+          "back": 900,
+          "left": 900,
+          "right": 900
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "primary"
+      }
+    },
+    {
+      "asset_id": "gen-armchair-bent-birch-webbed-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "lod": "high",
+      "category": "seating",
+      "series": "ALMOND-GEN",
+      "product": "Armchair",
+      "variant": "bent-birch frame with linen webbing seat and back",
+      "dimensions_mm": {
+        "width": 687.9,
+        "depth": 704.4,
+        "height": 800.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 600,
+        "depth": 700,
+        "height": 800
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.146,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-armchair-bent-birch-webbed-1.glb",
+      "contract_file": "models/gen-armchair-bent-birch-webbed-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-armchair-bent-birch-webbed-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-armchair-bent-birch-webbed-1.almond.json",
+      "sha256": "F477A89C0B630B0B914552F35B557139191A6EF9DF3AF0D452ED31BFDB3E6950",
+      "file_size_bytes": 1098096,
+      "triangle_count": 79977,
+      "tags": [
+        "armchair",
+        "webbing",
+        "birch",
+        "bentwood",
+        "scandinavian"
+      ],
+      "render_material_id": "wood-birch-ply",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "An armchair whose frame is a continuous closed loop of laminated bent birch on each side, forming armrest, front leg and back leg in one curve, with a seat and back of natural linen webbing straps woven across the frame, pale birch, 1930s Scandinavian design, no branding.",
+          "image_task_id": null,
+          "image_model": "nano_banana",
+          "mesh_task_id": "01a0aa91-1266-74dc-bbcb-55739329bcf8",
+          "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+          "generated_at": "2026-09-16",
+          "orientation_correction": null,
+          "scale_applied": 1001.313667
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -343.95,
+            -352.2,
+            0.0
+          ],
+          "max": [
+            343.95,
+            352.2,
+            800.0
+          ]
+        },
+        "footprint": [
+          [
+            -343.95,
+            -352.2
+          ],
+          [
+            343.95,
+            -352.2
+          ],
+          [
+            343.95,
+            352.2
+          ],
+          [
+            -343.95,
+            352.2
+          ]
+        ],
+        "clearance_mm": {
+          "front": 500,
+          "back": 0,
+          "left": 100,
+          "right": 100
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "primary"
+      }
+    },
+    {
+      "asset_id": "gen-lounge-chair-molded-plywood-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "lod": "high",
+      "category": "seating",
+      "series": "ALMOND-GEN",
+      "product": "Lounge chair",
+      "variant": "moulded plywood lounge chair, low, wood legs",
+      "dimensions_mm": {
+        "width": 732.0,
+        "depth": 830.9,
+        "height": 680.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 560,
+        "depth": 610,
+        "height": 680
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.362,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-lounge-chair-molded-plywood-1.glb",
+      "contract_file": "models/gen-lounge-chair-molded-plywood-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-lounge-chair-molded-plywood-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-lounge-chair-molded-plywood-1.almond.json",
+      "sha256": "B809E6A383F8910B35CFDAFC0EA32C4FB756C913D073C66E280C8B4E9D7671AD",
+      "file_size_bytes": 1009604,
+      "triangle_count": 79996,
+      "tags": [
+        "lounge chair",
+        "moulded plywood",
+        "mid-century",
+        "walnut"
+      ],
+      "render_material_id": "wood-walnut",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A low lounge chair made of five separate pieces of moulded walnut plywood: a curved seat panel, a curved back panel, a bent spine and two bent plywood leg frames, joined by black rubber shock mounts, warm walnut veneer, 1940s American mid-century design, no branding.",
+          "image_task_id": null,
+          "image_model": "nano_banana",
+          "mesh_task_id": "01a0aa91-1d40-7618-b8d3-e353a136748f",
+          "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+          "generated_at": "2026-09-16",
+          "orientation_correction": null,
+          "scale_applied": 906.719378
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -366.0,
+            -415.45,
+            0.0
+          ],
+          "max": [
+            366.0,
+            415.45,
+            680.0
+          ]
+        },
+        "footprint": [
+          [
+            -366.0,
+            -415.45
+          ],
+          [
+            366.0,
+            -415.45
+          ],
+          [
+            366.0,
+            415.45
+          ],
+          [
+            -366.0,
+            415.45
+          ]
+        ],
+        "clearance_mm": {
+          "front": 500,
+          "back": 0,
+          "left": 100,
+          "right": 100
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "primary"
+      }
+    },
+    {
+      "asset_id": "gen-side-chair-shell-wire-base-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "lod": "high",
+      "category": "seating",
+      "series": "ALMOND-GEN",
+      "product": "Side chair",
+      "variant": "moulded shell seat on wire tower base",
+      "dimensions_mm": {
+        "width": 658.6,
+        "depth": 594.8,
+        "height": 800.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 470,
+        "depth": 550,
+        "height": 800
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.401,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-side-chair-shell-wire-base-1.glb",
+      "contract_file": "models/gen-side-chair-shell-wire-base-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-side-chair-shell-wire-base-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-side-chair-shell-wire-base-1.almond.json",
+      "sha256": "15BA0642486B7689A987B74576FBE6C8A9BF558FB9B4CE050D61DD7C9840D114",
+      "file_size_bytes": 1071364,
+      "triangle_count": 80000,
+      "tags": [
+        "side chair",
+        "dining chair",
+        "shell chair",
+        "wire base",
+        "mid-century"
+      ],
+      "render_material_id": "plaster-white",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A side chair with a single moulded white fibreglass shell seat with slightly rolled edges, sitting on a base of thin welded black steel wire rods forming a lattice tower with four splayed legs, 1950s American mid-century design, no branding.",
+          "image_task_id": null,
+          "image_model": "nano_banana",
+          "mesh_task_id": "01a0aa91-2bb3-70e6-b947-8c7b42459e59",
+          "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+          "generated_at": "2026-09-16",
+          "orientation_correction": null,
+          "scale_applied": 987.481058
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -329.3,
+            -297.4,
+            0.0
+          ],
+          "max": [
+            329.3,
+            297.4,
+            800.0
+          ]
+        },
+        "footprint": [
+          [
+            -329.3,
+            -297.4
+          ],
+          [
+            329.3,
+            -297.4
+          ],
+          [
+            329.3,
+            297.4
+          ],
+          [
+            -329.3,
+            297.4
+          ]
+        ],
+        "clearance_mm": {
+          "front": 0,
+          "back": 500,
+          "left": 100,
+          "right": 100
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "secondary"
+      }
+    },
+    {
+      "asset_id": "gen-lounge-chair-leather-plywood-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "lod": "high",
+      "category": "seating",
+      "series": "ALMOND-GEN",
+      "product": "Lounge chair",
+      "variant": "leather lounge chair, three bent plywood shells, swivel base",
+      "dimensions_mm": {
+        "width": 882.4,
+        "depth": 899.2,
+        "height": 840.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 840,
+        "depth": 850,
+        "height": 840
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.058,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-lounge-chair-leather-plywood-1.glb",
+      "contract_file": "models/gen-lounge-chair-leather-plywood-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-lounge-chair-leather-plywood-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-lounge-chair-leather-plywood-1.almond.json",
+      "sha256": "22FC8689946AC10E607CA553A7856E35934908D892694B69B41E56756BD73320",
+      "file_size_bytes": 1074828,
+      "triangle_count": 79998,
+      "tags": [
+        "lounge chair",
+        "leather",
+        "plywood shell",
+        "swivel",
+        "mid-century"
+      ],
+      "render_material_id": "wood-walnut",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A deep lounge chair made of three separate curved moulded rosewood plywood shells - headrest, back and seat - each holding thick tufted black leather cushions, on a five-star cast aluminium swivel base, 1950s American mid-century design, no branding.",
+          "image_task_id": null,
+          "image_model": "nano_banana",
+          "mesh_task_id": "01a0aa91-3b31-761a-bcc4-8ef82294e54f",
+          "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+          "generated_at": "2026-09-16",
+          "orientation_correction": null,
+          "scale_applied": 1000.023942
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -441.2,
+            -449.6,
+            0.0
+          ],
+          "max": [
+            441.2,
+            449.6,
+            840.0
+          ]
+        },
+        "footprint": [
+          [
+            -441.2,
+            -449.6
+          ],
+          [
+            441.2,
+            -449.6
+          ],
+          [
+            441.2,
+            449.6
+          ],
+          [
+            -441.2,
+            449.6
+          ]
+        ],
+        "clearance_mm": {
+          "front": 600,
+          "back": 0,
+          "left": 150,
+          "right": 150
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "primary"
+      }
+    },
+    {
+      "asset_id": "gen-ottoman-leather-plywood-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "lod": "medium",
+      "category": "seating",
+      "series": "ALMOND-GEN",
+      "product": "Ottoman",
+      "variant": "matching leather ottoman on aluminium base",
+      "dimensions_mm": {
+        "width": 703.4,
+        "depth": 652.6,
+        "height": 430.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 660,
+        "depth": 540,
+        "height": 430
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.209,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-ottoman-leather-plywood-1.glb",
+      "contract_file": "models/gen-ottoman-leather-plywood-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-ottoman-leather-plywood-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-ottoman-leather-plywood-1.almond.json",
+      "sha256": "E1D932161729CA14427926C57FFD7533D133258416787CE04A85B901EF1AA332",
+      "file_size_bytes": 286564,
+      "triangle_count": 3976,
+      "tags": [
+        "ottoman",
+        "footstool",
+        "leather",
+        "mid-century"
+      ],
+      "render_material_id": "wood-walnut",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A rectangular ottoman with a single curved moulded rosewood plywood shell holding a thick tufted black leather cushion, on a four-star cast aluminium base, 1950s American mid-century design, no branding.",
+          "image_task_id": null,
+          "image_model": "nano_banana",
+          "mesh_task_id": "01a0aa91-49ea-7048-9c4c-58c716e6105c",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-16",
+          "orientation_correction": null,
+          "scale_applied": 781.81808
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -351.7,
+            -326.3,
+            0.0
+          ],
+          "max": [
+            351.7,
+            326.3,
+            430.0
+          ]
+        },
+        "footprint": [
+          [
+            -351.7,
+            -326.3
+          ],
+          [
+            351.7,
+            -326.3
+          ],
+          [
+            351.7,
+            326.3
+          ],
+          [
+            -351.7,
+            326.3
+          ]
+        ],
+        "clearance_mm": {
+          "front": 0,
+          "back": 0,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "secondary"
+      }
+    },
+    {
+      "asset_id": "gen-coffee-table-freeform-glass-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "lod": "high",
+      "category": "table",
+      "series": "ALMOND-GEN",
+      "product": "Coffee table",
+      "variant": "freeform glass top on two-piece sculptural wood base",
+      "dimensions_mm": {
+        "width": 1438.8,
+        "depth": 1274.4,
+        "height": 400.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 1280,
+        "depth": 930,
+        "height": 400
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.37,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-coffee-table-freeform-glass-1.glb",
+      "contract_file": "models/gen-coffee-table-freeform-glass-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-coffee-table-freeform-glass-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-coffee-table-freeform-glass-1.almond.json",
+      "sha256": "BD1409055DB072AD64A5D7018C9C0F2EBDFA2FB6B7D91BC9F009BA8F6911C97A",
+      "file_size_bytes": 688484,
+      "triangle_count": 57260,
+      "tags": [
+        "coffee table",
+        "glass",
+        "sculptural",
+        "mid-century",
+        "walnut"
+      ],
+      "render_material_id": "wood-walnut",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A low coffee table with a thick freeform organic-shaped clear glass top resting on a base made of two identical curved sculptural solid walnut pieces interlocked at right angles, 1940s American mid-century design, no branding.",
+          "image_task_id": null,
+          "image_model": "nano_banana",
+          "mesh_task_id": "01a0aa91-591a-7750-88c8-0977b4dafd51",
+          "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+          "generated_at": "2026-09-16",
+          "orientation_correction": null,
+          "scale_applied": 1000.00006
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -719.4,
+            -637.2,
+            0.0
+          ],
+          "max": [
+            719.4,
+            637.2,
+            400.0
+          ]
+        },
+        "footprint": [
+          [
+            -719.4,
+            -637.2
+          ],
+          [
+            719.4,
+            -637.2
+          ],
+          [
+            719.4,
+            637.2
+          ],
+          [
+            -719.4,
+            637.2
+          ]
+        ],
+        "clearance_mm": {
+          "front": 450,
+          "back": 450,
+          "left": 450,
+          "right": 450
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "primary"
+      }
+    },
+    {
+      "asset_id": "gen-bench-slatted-platform-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "lod": "medium",
+      "category": "seating",
+      "series": "ALMOND-GEN",
+      "product": "Bench",
+      "variant": "slatted wood platform bench on ebonised frame",
+      "dimensions_mm": {
+        "width": 1799.6,
+        "depth": 623.9,
+        "height": 355.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 1830,
+        "depth": 470,
+        "height": 355
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.327,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-bench-slatted-platform-1.glb",
+      "contract_file": "models/gen-bench-slatted-platform-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-bench-slatted-platform-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-bench-slatted-platform-1.almond.json",
+      "sha256": "858C9274569AEF889DB721C1CBE86B54DC64EEC7836E1E70462A4D985F81EFFA",
+      "file_size_bytes": 250316,
+      "triangle_count": 3581,
+      "tags": [
+        "bench",
+        "platform",
+        "slatted",
+        "mid-century",
+        "seating",
+        "table"
+      ],
+      "render_material_id": "wood-walnut",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A long low platform bench made of narrow parallel maple wood slats with small gaps between them, on a simple black ebonised wood frame with two rectangular trestle-like supports, 1940s American mid-century design, no branding.",
+          "image_task_id": null,
+          "image_model": "nano_banana",
+          "mesh_task_id": "01a0aa91-6772-760d-9c3c-a799506e6a09",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-16",
+          "orientation_correction": null,
+          "scale_applied": 473.333333
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -899.8,
+            -311.95,
+            0.0
+          ],
+          "max": [
+            899.8,
+            311.95,
+            355.0
+          ]
+        },
+        "footprint": [
+          [
+            -899.8,
+            -311.95
+          ],
+          [
+            899.8,
+            -311.95
+          ],
+          [
+            899.8,
+            311.95
+          ],
+          [
+            -899.8,
+            311.95
+          ]
+        ],
+        "clearance_mm": {
+          "front": 450,
+          "back": 0,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "primary"
+      }
+    },
+    {
+      "asset_id": "gen-pendant-lamp-sphere-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_fixture",
+      "lod": "medium",
+      "category": "lighting",
+      "series": "ALMOND-GEN",
+      "product": "Pendant lamp",
+      "variant": "spherical white pendant, spun web shade",
+      "dimensions_mm": {
+        "width": 473.8,
+        "depth": 471.2,
+        "height": 640.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 640,
+        "depth": 640,
+        "height": 640
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.264,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-pendant-lamp-sphere-1.glb",
+      "contract_file": "models/gen-pendant-lamp-sphere-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-pendant-lamp-sphere-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-pendant-lamp-sphere-1.almond.json",
+      "sha256": "92AE985D18D251D166D28B97734583D44853FD4DBE8B2B9CF46AECBC0CCA98FE",
+      "file_size_bytes": 324076,
+      "triangle_count": 4153,
+      "tags": [
+        "pendant",
+        "lamp",
+        "lighting",
+        "sphere",
+        "mid-century"
+      ],
+      "render_material_id": "polycarbonate-opal",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A large spherical pendant lamp shade made of a translucent white plastic web sprayed over a thin steel wire frame, with a small metal top fitting and a cord, glowing soft white, 1950s American mid-century design, no branding.",
+          "image_task_id": null,
+          "image_model": "nano_banana",
+          "mesh_task_id": "01a0aa91-75ea-76ce-b117-2d68dd0efc3f",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-16",
+          "orientation_correction": null,
+          "scale_applied": 2133.333249
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "ceiling",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -236.9,
+            -235.6,
+            0.0
+          ],
+          "max": [
+            236.9,
+            235.6,
+            640.0
+          ]
+        },
+        "footprint": [
+          [
+            -236.9,
+            -235.6
+          ],
+          [
+            236.9,
+            -235.6
+          ],
+          [
+            236.9,
+            235.6
+          ],
+          [
+            -236.9,
+            235.6
+          ]
+        ],
+        "clearance_mm": {
+          "front": 0,
+          "back": 0,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "accessory",
+        "mount_height_mm": 1900
+      }
+    },
+    {
+      "asset_id": "gen-task-chair-mesh-ergonomic-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "lod": "high",
+      "category": "seating",
+      "series": "ALMOND-GEN",
+      "product": "Office chair",
+      "variant": "ergonomic mesh task chair, adjustable arms",
+      "dimensions_mm": {
+        "width": 822.7,
+        "depth": 804.3,
+        "height": 1080.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 690,
+        "depth": 690,
+        "height": 1080
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.192,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-task-chair-mesh-ergonomic-1.glb",
+      "contract_file": "models/gen-task-chair-mesh-ergonomic-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-task-chair-mesh-ergonomic-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-task-chair-mesh-ergonomic-1.almond.json",
+      "sha256": "4CC2324BDDD3DE2C2C6EC59306ABEC9F5E3B1B547CDC6A49BC04451C372217B5",
+      "file_size_bytes": 1066560,
+      "triangle_count": 79997,
+      "tags": [
+        "office chair",
+        "task chair",
+        "mesh",
+        "ergonomic",
+        "swivel"
+      ],
+      "render_material_id": "rubber-black",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "An ergonomic office task chair with a suspended breathable black mesh seat and high mesh back on a curved graphite frame, adjustable padded armrests, a tilt mechanism and a five-star base on castors, 1990s American design, no branding.",
+          "image_task_id": null,
+          "image_model": "nano_banana",
+          "mesh_task_id": "01a0aa91-851f-7501-a0c8-9d5e9a7267e5",
+          "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+          "generated_at": "2026-09-16",
+          "orientation_correction": null,
+          "scale_applied": 1080.207063
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -411.35,
+            -402.15,
+            0.0
+          ],
+          "max": [
+            411.35,
+            402.15,
+            1080.0
+          ]
+        },
+        "footprint": [
+          [
+            -411.35,
+            -402.15
+          ],
+          [
+            411.35,
+            -402.15
+          ],
+          [
+            411.35,
+            402.15
+          ],
+          [
+            -411.35,
+            402.15
+          ]
+        ],
+        "clearance_mm": {
+          "front": 0,
+          "back": 600,
+          "left": 100,
+          "right": 100
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "secondary"
+      }
+    },
+    {
+      "asset_id": "gen-armchair-cantilever-bentwood-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "lod": "medium",
+      "category": "seating",
+      "series": "ALMOND-GEN",
+      "product": "Armchair",
+      "variant": "cantilevered bent-wood armchair with thick cushion",
+      "dimensions_mm": {
+        "width": 691.4,
+        "depth": 912.1,
+        "height": 1000.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 680,
+        "depth": 820,
+        "height": 1000
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.112,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-armchair-cantilever-bentwood-1.glb",
+      "contract_file": "models/gen-armchair-cantilever-bentwood-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-armchair-cantilever-bentwood-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-armchair-cantilever-bentwood-1.almond.json",
+      "sha256": "653F7A93B5C14BD21EDDF6CB318047DDBE15BB3C2DBFFB799CFD7F7CD95EF873",
+      "file_size_bytes": 321252,
+      "triangle_count": 4368,
+      "tags": [
+        "armchair",
+        "cantilever",
+        "bentwood",
+        "cushion",
+        "scandinavian"
+      ],
+      "render_material_id": "wood-birch-ply",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A cantilevered armchair with a frame of two bent laminated birch loops forming the armrests and the springy base, and a thick single cushion in natural beige fabric running up seat and high back, pale birch, 1970s Scandinavian democratic design, no branding.",
+          "image_task_id": null,
+          "image_model": "nano_banana",
+          "mesh_task_id": "01a0aa91-a9c8-71fd-bffd-5ac11306c735",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-16",
+          "orientation_correction": null,
+          "scale_applied": 1000.0
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -345.7,
+            -456.05,
+            0.0
+          ],
+          "max": [
+            345.7,
+            456.05,
+            1000.0
+          ]
+        },
+        "footprint": [
+          [
+            -345.7,
+            -456.05
+          ],
+          [
+            345.7,
+            -456.05
+          ],
+          [
+            345.7,
+            456.05
+          ],
+          [
+            -345.7,
+            456.05
+          ]
+        ],
+        "clearance_mm": {
+          "front": 500,
+          "back": 0,
+          "left": 100,
+          "right": 100
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "primary"
+      }
+    },
+    {
+      "asset_id": "gen-sofa-2-seat-loose-cover-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "lod": "medium",
+      "category": "seating",
+      "series": "ALMOND-GEN",
+      "product": "Sofa",
+      "variant": "boxy two-seat sofa with loose fabric cover",
+      "dimensions_mm": {
+        "width": 1405.1,
+        "depth": 751.9,
+        "height": 660.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 1800,
+        "depth": 880,
+        "height": 660
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.219,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-sofa-2-seat-loose-cover-1.glb",
+      "contract_file": "models/gen-sofa-2-seat-loose-cover-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-sofa-2-seat-loose-cover-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-sofa-2-seat-loose-cover-1.almond.json",
+      "sha256": "AF447C29EF608F19027027C4BD79A9EBF5FAC7388C5E1C91B239CAB7F1C05114",
+      "file_size_bytes": 322060,
+      "triangle_count": 4301,
+      "tags": [
+        "sofa",
+        "two-seat",
+        "loose cover",
+        "compact",
+        "scandinavian"
+      ],
+      "render_material_id": "rubber-black",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A compact boxy two-seat sofa with a straight low back, straight square arms of the same height as the back, two seat cushions, all wrapped in a loose light grey fabric cover, sitting close to the floor, 1980s Scandinavian democratic design, no branding.",
+          "image_task_id": null,
+          "image_model": "nano_banana",
+          "mesh_task_id": "01a0aa91-b517-743a-8a06-09e099492995",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-16",
+          "orientation_correction": null,
+          "scale_applied": 776.470566
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -702.55,
+            -375.95,
+            0.0
+          ],
+          "max": [
+            702.55,
+            375.95,
+            660.0
+          ]
+        },
+        "footprint": [
+          [
+            -702.55,
+            -375.95
+          ],
+          [
+            702.55,
+            -375.95
+          ],
+          [
+            702.55,
+            375.95
+          ],
+          [
+            -702.55,
+            375.95
+          ]
+        ],
+        "clearance_mm": {
+          "front": 450,
+          "back": 0,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "primary"
+      }
+    },
+    {
+      "asset_id": "gen-shelving-cube-2x4-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "lod": "medium",
+      "category": "storage",
+      "series": "ALMOND-GEN",
+      "product": "Shelving unit",
+      "variant": "open cube shelving, 2 by 4",
+      "dimensions_mm": {
+        "width": 625.9,
+        "depth": 292.9,
+        "height": 1470.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 770,
+        "depth": 390,
+        "height": 1470
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.249,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-shelving-cube-2x4-1.glb",
+      "contract_file": "models/gen-shelving-cube-2x4-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-shelving-cube-2x4-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-shelving-cube-2x4-1.almond.json",
+      "sha256": "05B529932B8EDDD975E306D3DFFC08805533DEB88D4CF2CD955AD26A4D41D8AC",
+      "file_size_bytes": 273956,
+      "triangle_count": 4203,
+      "tags": [
+        "shelving",
+        "cube storage",
+        "bookcase",
+        "storage"
+      ],
+      "render_material_id": "wood-birch-ply",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A tall open cube shelving unit made of thick white lacquered board, two cubes wide and four cubes high, all compartments open front and back, plain flat panels, standing on the floor, Scandinavian democratic design, no branding.",
+          "image_task_id": null,
+          "image_model": "nano_banana",
+          "mesh_task_id": "01a0aa91-c5d7-73c0-85d6-054ce86965ff",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-16",
+          "orientation_correction": null,
+          "scale_applied": 999.999981
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -312.95,
+            -146.45,
+            0.0
+          ],
+          "max": [
+            312.95,
+            146.45,
+            1470.0
+          ]
+        },
+        "footprint": [
+          [
+            -312.95,
+            -146.45
+          ],
+          [
+            312.95,
+            -146.45
+          ],
+          [
+            312.95,
+            146.45
+          ],
+          [
+            -312.95,
+            146.45
+          ]
+        ],
+        "clearance_mm": {
+          "front": 900,
+          "back": 0,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "primary"
+      }
+    },
+    {
+      "asset_id": "gen-shelving-modular-track-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "lod": "high",
+      "category": "storage",
+      "series": "ALMOND-GEN",
+      "product": "Shelving system",
+      "variant": "wall-mounted modular shelving on aluminium tracks",
+      "dimensions_mm": {
+        "width": 1966.4,
+        "depth": 313.1,
+        "height": 2000.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 1330,
+        "depth": 360,
+        "height": 2000
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.478,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-shelving-modular-track-1.glb",
+      "contract_file": "models/gen-shelving-modular-track-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-shelving-modular-track-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-shelving-modular-track-1.almond.json",
+      "sha256": "9CA066491B9E742E7B7680F949BCCDE2C382752C4BE422DCFA196B8154DE9ADD",
+      "file_size_bytes": 1087324,
+      "triangle_count": 79999,
+      "tags": [
+        "shelving",
+        "modular",
+        "wall-mounted",
+        "aluminium",
+        "modernist"
+      ],
+      "render_material_id": "aluminium-anodized",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A wall-mounted modular shelving system: three vertical slotted aluminium tracks, thin powder-coated aluminium shelves of different depths hooked in at several heights, one closed cabinet box with sliding doors, silver anodised aluminium and off-white panels, 1960s British modernist design, no branding.",
+          "image_task_id": null,
+          "image_model": "nano_banana",
+          "mesh_task_id": "01a0aa91-d506-742f-969d-309284858542",
+          "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+          "generated_at": "2026-09-16",
+          "orientation_correction": null,
+          "scale_applied": 998.24357
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "wall",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -983.2,
+            -156.55,
+            0.0
+          ],
+          "max": [
+            983.2,
+            156.55,
+            2000.0
+          ]
+        },
+        "footprint": [
+          [
+            -983.2,
+            -156.55
+          ],
+          [
+            983.2,
+            -156.55
+          ],
+          [
+            983.2,
+            156.55
+          ],
+          [
+            -983.2,
+            156.55
+          ]
+        ],
+        "clearance_mm": {
+          "front": 600,
+          "back": 0,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "fixed",
+        "mount_height_mm": 0
+      }
+    },
+    {
+      "asset_id": "gen-floor-lamp-arc-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_fixture",
+      "lod": "medium",
+      "category": "lighting",
+      "series": "ALMOND-GEN",
+      "product": "Floor lamp",
+      "variant": "arc floor lamp on a marble base",
+      "dimensions_mm": {
+        "width": 2179.7,
+        "depth": 621.1,
+        "height": 2400.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 2200,
+        "depth": 400,
+        "height": 2400
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.553,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-floor-lamp-arc-1.glb",
+      "contract_file": "models/gen-floor-lamp-arc-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-floor-lamp-arc-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-floor-lamp-arc-1.almond.json",
+      "sha256": "B9EB09E6695C462EFEC9717FA7ED2C420D014E884281B17CA0056416FB1C526F",
+      "file_size_bytes": 319520,
+      "triangle_count": 4271,
+      "tags": [
+        "floor lamp",
+        "arc lamp",
+        "lighting",
+        "marble",
+        "italian"
+      ],
+      "render_material_id": "steel-galvanized",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "An arc floor lamp with a heavy rectangular white marble block base, a long slender stainless steel stem that rises and arcs far outward, ending in a perforated polished aluminium dome shade hanging over the floor, 1960s Italian design, no branding.",
+          "image_task_id": null,
+          "image_model": "nano_banana",
+          "mesh_task_id": "01a0aa91-e41b-7350-bea3-c9dcefe96f1e",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-16",
+          "orientation_correction": null,
+          "scale_applied": 1200.0
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -1089.85,
+            -310.55,
+            0.0
+          ],
+          "max": [
+            1089.85,
+            310.55,
+            2400.0
+          ]
+        },
+        "footprint": [
+          [
+            -1089.85,
+            -310.55
+          ],
+          [
+            1089.85,
+            -310.55
+          ],
+          [
+            1089.85,
+            310.55
+          ],
+          [
+            -1089.85,
+            310.55
+          ]
+        ],
+        "clearance_mm": {
+          "front": 0,
+          "back": 0,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "accessory"
+      }
+    },
+    {
+      "asset_id": "gen-task-lamp-balanced-arm-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_fixture",
+      "lod": "high",
+      "category": "lighting",
+      "series": "ALMOND-GEN",
+      "product": "Task lamp",
+      "variant": "two-arm balanced desk lamp",
+      "dimensions_mm": {
+        "width": 321.4,
+        "depth": 115.9,
+        "height": 450.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 1000,
+        "depth": 200,
+        "height": 450
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.679,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-task-lamp-balanced-arm-1.glb",
+      "contract_file": "models/gen-task-lamp-balanced-arm-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-task-lamp-balanced-arm-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-task-lamp-balanced-arm-1.almond.json",
+      "sha256": "15D88FD60E063B22F32CED3BD13F772149B1931DADE960B81AC7822C28E46DE3",
+      "file_size_bytes": 1132044,
+      "triangle_count": 80000,
+      "tags": [
+        "desk lamp",
+        "task lamp",
+        "lighting",
+        "balanced arm",
+        "italian"
+      ],
+      "render_material_id": "aluminium-anodized",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A desk task lamp with two slender polished aluminium arms joined by a balanced hinge with exposed springs and cables, a small round base, and a conical aluminium shade with a knurled swivel, 1980s Italian design, no branding.",
+          "image_task_id": null,
+          "image_model": "nano_banana",
+          "mesh_task_id": "01a0aa92-2a21-71f4-9798-7d07610f78ef",
+          "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+          "generated_at": "2026-09-16",
+          "orientation_correction": "rotated_90_about_vertical",
+          "scale_applied": 899.941195
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "work_surface",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -160.7,
+            -57.95,
+            0.0
+          ],
+          "max": [
+            160.7,
+            57.95,
+            450.0
+          ]
+        },
+        "footprint": [
+          [
+            -160.7,
+            -57.95
+          ],
+          [
+            160.7,
+            -57.95
+          ],
+          [
+            160.7,
+            57.95
+          ],
+          [
+            -160.7,
+            57.95
+          ]
+        ],
+        "clearance_mm": {
+          "front": 0,
+          "back": 0,
+          "left": 0,
+          "right": 0
+        },
+        "collision_shape": "oriented_box",
+        "placement_priority": "accessory",
+        "mount_height_mm": 750
+      }
+    },
+    {
+      "asset_id": "gen-side-table-wire-1",
+      "brand": "Generic",
+      "source_class": "generated_asset",
+      "catalogue_status": "generated",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "lod": "medium",
+      "category": "table",
+      "series": "ALMOND-GEN",
+      "product": "Side table",
+      "variant": "stacking wire side table",
+      "dimensions_mm": {
+        "width": 377.9,
+        "depth": 377.9,
+        "height": 500.0
+      },
+      "nominal_dimensions_mm": {
+        "width": 450,
+        "depth": 450,
+        "height": 500
+      },
+      "match_status": "generated_height_normalised",
+      "plan_dimension_deviation": 0.16,
+      "warehouse_title": null,
+      "warehouse_publisher": null,
+      "warehouse_status": "generated",
+      "warehouse_url": "",
+      "file": "models/gen-side-table-wire-1.glb",
+      "contract_file": "models/gen-side-table-wire-1.almond.json",
+      "download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-side-table-wire-1.glb",
+      "contract_download_url": "https://raw.githubusercontent.com/liangjunglj-cpu/almond-mcp/master/GeneratedAssetfiles/models/gen-side-table-wire-1.almond.json",
+      "sha256": "624149EEF5A0775F906E31BCD6FA1BEAD02B5996FF08962C2067A9736B92BA4A",
+      "file_size_bytes": 272872,
+      "triangle_count": 4235,
+      "tags": [
+        "side table",
+        "wire",
+        "stacking",
+        "occasional table",
+        "mid-century"
+      ],
+      "render_material_id": "steel-painted-charcoal",
+      "license": "CC-BY-4.0",
+      "geometry_source": {
+        "type": "generated",
+        "format": "glb",
+        "generator": "meshy",
+        "parameters": {
+          "prompt": "A small round stacking side table made entirely of thin powder-coated steel wire: a flat round wire-mesh top on a tapered cage of vertical wires that flare out to a wire ring foot, matte charcoal, 1950s design, no branding.",
+          "image_task_id": null,
+          "image_model": "nano_banana",
+          "mesh_task_id": "01a0aa92-37e0-71b6-9452-48d949d658dd",
+          "mesh_model": "meshy-t2 smart-topology (untextured)",
+          "generated_at": "2026-09-16",
+          "orientation_correction": null,
+          "scale_applied": 1111.111141
+        }
+      },
+      "spatial": {
+        "metadata_version": 1,
+        "units": "mm",
+        "anchor": "bottom_center",
+        "support_plane": "floor",
+        "bounds_source": "measured_from_normalised_glb",
+        "geometry_bounds_status": "measured",
+        "local_aabb": {
+          "min": [
+            -188.95,
+            -188.95,
+            0.0
+          ],
+          "max": [
+            188.95,
+            188.95,
+            500.0
+          ]
+        },
+        "footprint": [
+          [
+            -188.95,
+            -188.95
+          ],
+          [
+            188.95,
+            -188.95
+          ],
+          [
+            188.95,
+            188.95
+          ],
+          [
+            -188.95,
+            188.95
+          ]
+        ],
+        "clearance_mm": {
+          "front": 300,
+          "back": 300,
+          "left": 300,
+          "right": 300
         },
         "collision_shape": "oriented_box",
         "placement_priority": "secondary"

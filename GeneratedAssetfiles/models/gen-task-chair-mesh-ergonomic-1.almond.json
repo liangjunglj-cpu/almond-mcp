@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-task-chair-mesh-ergonomic-1",
+  "library_id": "generated_assets",
+  "name": "Office chair (ergonomic mesh task chair, adjustable arms)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-task-chair-mesh-ergonomic-1.glb",
+  "dimensions_mm": {
+    "width": 822.7,
+    "depth": 804.3,
+    "height": 1080.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "local_aabb": {
+      "min": [
+        -411.35,
+        -402.15,
+        0.0
+      ],
+      "max": [
+        411.35,
+        402.15,
+        1080.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 0,
+      "back": 600,
+      "left": 100,
+      "right": 100
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "secondary"
+  },
+  "materials": [
+    {
+      "material_id": "rubber-black",
+      "objects": [
+        "gen-task-chair-mesh-ergonomic-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

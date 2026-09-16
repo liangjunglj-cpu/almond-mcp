@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-dining-table-round-birch-1",
+  "library_id": "generated_assets",
+  "name": "Dining table (round white laminate top on four bent-birch L-legs)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-dining-table-round-birch-1.glb",
+  "dimensions_mm": {
+    "width": 1117.1,
+    "depth": 1117.1,
+    "height": 720.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "local_aabb": {
+      "min": [
+        -558.55,
+        -558.55,
+        0.0
+      ],
+      "max": [
+        558.55,
+        558.55,
+        720.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 900,
+      "back": 900,
+      "left": 900,
+      "right": 900
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "primary"
+  },
+  "materials": [
+    {
+      "material_id": "wood-birch-ply",
+      "objects": [
+        "gen-dining-table-round-birch-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

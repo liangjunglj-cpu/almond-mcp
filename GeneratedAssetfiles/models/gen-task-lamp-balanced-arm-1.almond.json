@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-task-lamp-balanced-arm-1",
+  "library_id": "generated_assets",
+  "name": "Task lamp (two-arm balanced desk lamp)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-task-lamp-balanced-arm-1.glb",
+  "dimensions_mm": {
+    "width": 321.4,
+    "depth": 115.9,
+    "height": 450.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "work_surface",
+    "local_aabb": {
+      "min": [
+        -160.7,
+        -57.95,
+        0.0
+      ],
+      "max": [
+        160.7,
+        57.95,
+        450.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "accessory"
+  },
+  "materials": [
+    {
+      "material_id": "aluminium-anodized",
+      "objects": [
+        "gen-task-lamp-balanced-arm-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

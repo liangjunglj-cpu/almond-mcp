@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-shelving-cube-2x4-1",
+  "library_id": "generated_assets",
+  "name": "Shelving unit (open cube shelving, 2 by 4)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-shelving-cube-2x4-1.glb",
+  "dimensions_mm": {
+    "width": 625.9,
+    "depth": 292.9,
+    "height": 1470.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "local_aabb": {
+      "min": [
+        -312.95,
+        -146.45,
+        0.0
+      ],
+      "max": [
+        312.95,
+        146.45,
+        1470.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 900,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "primary"
+  },
+  "materials": [
+    {
+      "material_id": "wood-birch-ply",
+      "objects": [
+        "gen-shelving-cube-2x4-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

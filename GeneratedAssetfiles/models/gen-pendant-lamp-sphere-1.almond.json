@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-pendant-lamp-sphere-1",
+  "library_id": "generated_assets",
+  "name": "Pendant lamp (spherical white pendant, spun web shade)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-pendant-lamp-sphere-1.glb",
+  "dimensions_mm": {
+    "width": 473.8,
+    "depth": 471.2,
+    "height": 640.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "ceiling",
+    "local_aabb": {
+      "min": [
+        -236.9,
+        -235.6,
+        0.0
+      ],
+      "max": [
+        236.9,
+        235.6,
+        640.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "accessory"
+  },
+  "materials": [
+    {
+      "material_id": "polycarbonate-opal",
+      "objects": [
+        "gen-pendant-lamp-sphere-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

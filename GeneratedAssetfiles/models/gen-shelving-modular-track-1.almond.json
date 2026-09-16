@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-shelving-modular-track-1",
+  "library_id": "generated_assets",
+  "name": "Shelving system (wall-mounted modular shelving on aluminium tracks)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-shelving-modular-track-1.glb",
+  "dimensions_mm": {
+    "width": 1966.4,
+    "depth": 313.1,
+    "height": 2000.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "wall",
+    "local_aabb": {
+      "min": [
+        -983.2,
+        -156.55,
+        0.0
+      ],
+      "max": [
+        983.2,
+        156.55,
+        2000.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 600,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "fixed"
+  },
+  "materials": [
+    {
+      "material_id": "aluminium-anodized",
+      "objects": [
+        "gen-shelving-modular-track-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

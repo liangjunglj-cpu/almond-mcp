@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-bench-slatted-platform-1",
+  "library_id": "generated_assets",
+  "name": "Bench (slatted wood platform bench on ebonised frame)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-bench-slatted-platform-1.glb",
+  "dimensions_mm": {
+    "width": 1799.6,
+    "depth": 623.9,
+    "height": 355.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "local_aabb": {
+      "min": [
+        -899.8,
+        -311.95,
+        0.0
+      ],
+      "max": [
+        899.8,
+        311.95,
+        355.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 450,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "primary"
+  },
+  "materials": [
+    {
+      "material_id": "wood-walnut",
+      "objects": [
+        "gen-bench-slatted-platform-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

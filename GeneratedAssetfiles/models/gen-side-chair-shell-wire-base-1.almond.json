@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-side-chair-shell-wire-base-1",
+  "library_id": "generated_assets",
+  "name": "Side chair (moulded shell seat on wire tower base)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-side-chair-shell-wire-base-1.glb",
+  "dimensions_mm": {
+    "width": 658.6,
+    "depth": 594.8,
+    "height": 800.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "local_aabb": {
+      "min": [
+        -329.3,
+        -297.4,
+        0.0
+      ],
+      "max": [
+        329.3,
+        297.4,
+        800.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 0,
+      "back": 500,
+      "left": 100,
+      "right": 100
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "secondary"
+  },
+  "materials": [
+    {
+      "material_id": "plaster-white",
+      "objects": [
+        "gen-side-chair-shell-wire-base-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

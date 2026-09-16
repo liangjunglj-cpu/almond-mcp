@@ -1,0 +1,49 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-armchair-bent-birch-webbed-1",
+  "library_id": "generated_assets",
+  "name": "Armchair (bent-birch frame with linen webbing seat and back)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-armchair-bent-birch-webbed-1.glb",
+  "dimensions_mm": {
+    "width": 687.9,
+    "depth": 704.4,
+    "height": 800.0
+  },
+  "spatial": {
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "local_aabb": {
+      "min": [
+        -343.95,
+        -352.2,
+        0.0
+      ],
+      "max": [
+        343.95,
+        352.2,
+        800.0
+      ]
+    },
+    "clearance_mm": {
+      "front": 500,
+      "back": 0,
+      "left": 100,
+      "right": 100
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "primary"
+  },
+  "materials": [
+    {
+      "material_id": "wood-birch-ply",
+      "objects": [
+        "gen-armchair-bent-birch-webbed-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0"
+}

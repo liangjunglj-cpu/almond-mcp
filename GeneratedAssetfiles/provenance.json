@@ -203,140 +203,200 @@
       "image_model": "nano_banana",
       "image_job_id": "38c416c0-6cda-4997-a11f-3f943433f1bf",
       "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130155_38c416c0-6cda-4997-a11f-3f943433f1bf.png",
-      "generated_at": "2026-09-16"
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa90-d6d6-738a-bbbd-8a010748356c",
+      "mesh_model": "meshy-t2 smart-topology (untextured)",
+      "mesh_provider": "meshy"
     },
     "gen-lounge-chair-bent-plywood-1": {
       "image_provider": "higgsfield",
       "image_model": "nano_banana",
       "image_job_id": "a06b9eba-bd31-4b55-8e95-bb1c948be748",
       "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130155_a06b9eba-bd31-4b55-8e95-bb1c948be748.png",
-      "generated_at": "2026-09-16"
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa90-e5e2-7691-95e9-74574f2c643d",
+      "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+      "mesh_provider": "meshy"
     },
     "gen-tea-trolley-bent-birch-1": {
       "image_provider": "higgsfield",
       "image_model": "nano_banana",
       "image_job_id": "e52e2554-1c6d-4934-8530-5dec0a5cfc18",
       "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130223_e52e2554-1c6d-4934-8530-5dec0a5cfc18.png",
-      "generated_at": "2026-09-16"
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa90-f4d7-7161-b2ce-917ab0a4412c",
+      "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+      "mesh_provider": "meshy"
     },
     "gen-dining-table-round-birch-1": {
       "image_provider": "higgsfield",
       "image_model": "nano_banana",
       "image_job_id": "e846e622-3e25-4311-a535-bcfaafe84fbf",
       "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130155_e846e622-3e25-4311-a535-bcfaafe84fbf.png",
-      "generated_at": "2026-09-16"
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa91-03c7-7285-b20e-1b5ac1132a27",
+      "mesh_model": "meshy-t2 smart-topology (untextured)",
+      "mesh_provider": "meshy"
     },
     "gen-armchair-bent-birch-webbed-1": {
       "image_provider": "higgsfield",
       "image_model": "nano_banana",
       "image_job_id": "845f0055-de6b-4052-8a58-b82168c8caef",
       "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130155_845f0055-de6b-4052-8a58-b82168c8caef.png",
-      "generated_at": "2026-09-16"
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa91-1266-74dc-bbcb-55739329bcf8",
+      "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+      "mesh_provider": "meshy"
     },
     "gen-lounge-chair-molded-plywood-1": {
       "image_provider": "higgsfield",
       "image_model": "nano_banana",
       "image_job_id": "1bf40e69-0c3e-4c59-9980-7081e4de0cd7",
       "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130156_1bf40e69-0c3e-4c59-9980-7081e4de0cd7.png",
-      "generated_at": "2026-09-16"
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa91-1d40-7618-b8d3-e353a136748f",
+      "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+      "mesh_provider": "meshy"
     },
     "gen-side-chair-shell-wire-base-1": {
       "image_provider": "higgsfield",
       "image_model": "nano_banana",
       "image_job_id": "176a5471-bc89-4810-85f1-c6298bc82474",
       "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130156_176a5471-bc89-4810-85f1-c6298bc82474.png",
-      "generated_at": "2026-09-16"
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa91-2bb3-70e6-b947-8c7b42459e59",
+      "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+      "mesh_provider": "meshy"
     },
     "gen-lounge-chair-leather-plywood-1": {
       "image_provider": "higgsfield",
       "image_model": "nano_banana",
       "image_job_id": "96ffbed7-b3a9-4fd0-80e4-2203892d1579",
       "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130156_96ffbed7-b3a9-4fd0-80e4-2203892d1579.png",
-      "generated_at": "2026-09-16"
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa91-3b31-761a-bcc4-8ef82294e54f",
+      "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+      "mesh_provider": "meshy"
     },
     "gen-ottoman-leather-plywood-1": {
       "image_provider": "higgsfield",
       "image_model": "nano_banana",
       "image_job_id": "9ee68080-35d4-4726-9d51-6b136e9fdb32",
       "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130155_9ee68080-35d4-4726-9d51-6b136e9fdb32.png",
-      "generated_at": "2026-09-16"
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa91-49ea-7048-9c4c-58c716e6105c",
+      "mesh_model": "meshy-t2 smart-topology (untextured)",
+      "mesh_provider": "meshy"
     },
     "gen-coffee-table-freeform-glass-1": {
       "image_provider": "higgsfield",
       "image_model": "nano_banana",
       "image_job_id": "6e3f65ab-3d6f-4e85-a57c-78af69e49a97",
       "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130155_6e3f65ab-3d6f-4e85-a57c-78af69e49a97.png",
-      "generated_at": "2026-09-16"
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa91-591a-7750-88c8-0977b4dafd51",
+      "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+      "mesh_provider": "meshy"
     },
     "gen-bench-slatted-platform-1": {
       "image_provider": "higgsfield",
       "image_model": "nano_banana",
       "image_job_id": "fdb8a13f-6a48-4d6c-b4ca-1b6cdcf1e42b",
       "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130156_fdb8a13f-6a48-4d6c-b4ca-1b6cdcf1e42b.png",
-      "generated_at": "2026-09-16"
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa91-6772-760d-9c3c-a799506e6a09",
+      "mesh_model": "meshy-t2 smart-topology (untextured)",
+      "mesh_provider": "meshy"
     },
     "gen-pendant-lamp-sphere-1": {
       "image_provider": "higgsfield",
       "image_model": "nano_banana",
       "image_job_id": "289186b1-08c4-45be-92d0-888ea36956fc",
       "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130155_289186b1-08c4-45be-92d0-888ea36956fc.png",
-      "generated_at": "2026-09-16"
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa91-75ea-76ce-b117-2d68dd0efc3f",
+      "mesh_model": "meshy-t2 smart-topology (untextured)",
+      "mesh_provider": "meshy"
     },
     "gen-task-chair-mesh-ergonomic-1": {
       "image_provider": "higgsfield",
       "image_model": "nano_banana",
       "image_job_id": "6a5646d9-2e30-4392-ae0c-2a263434fb08",
       "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130209_6a5646d9-2e30-4392-ae0c-2a263434fb08.png",
-      "generated_at": "2026-09-16"
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa91-851f-7501-a0c8-9d5e9a7267e5",
+      "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+      "mesh_provider": "meshy"
     },
     "gen-armchair-cantilever-bentwood-1": {
       "image_provider": "higgsfield",
       "image_model": "nano_banana",
       "image_job_id": "981e3ff2-9022-43a9-a659-63be2f57d3cd",
       "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130209_981e3ff2-9022-43a9-a659-63be2f57d3cd.png",
-      "generated_at": "2026-09-16"
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa91-a9c8-71fd-bffd-5ac11306c735",
+      "mesh_model": "meshy-t2 smart-topology (untextured)",
+      "mesh_provider": "meshy"
     },
     "gen-sofa-2-seat-loose-cover-1": {
       "image_provider": "higgsfield",
       "image_model": "nano_banana",
       "image_job_id": "1ac90e4a-3ffc-4be5-9921-6b289294b6f6",
       "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130209_1ac90e4a-3ffc-4be5-9921-6b289294b6f6.png",
-      "generated_at": "2026-09-16"
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa91-b517-743a-8a06-09e099492995",
+      "mesh_model": "meshy-t2 smart-topology (untextured)",
+      "mesh_provider": "meshy"
     },
     "gen-shelving-cube-2x4-1": {
       "image_provider": "higgsfield",
       "image_model": "nano_banana",
       "image_job_id": "044fa7b2-ce46-4841-9088-272c4c08de09",
       "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130209_044fa7b2-ce46-4841-9088-272c4c08de09.png",
-      "generated_at": "2026-09-16"
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa91-c5d7-73c0-85d6-054ce86965ff",
+      "mesh_model": "meshy-t2 smart-topology (untextured)",
+      "mesh_provider": "meshy"
     },
     "gen-shelving-modular-track-1": {
       "image_provider": "higgsfield",
       "image_model": "nano_banana",
       "image_job_id": "b0f5d87b-2a6c-4cf8-b1b5-e69d47048959",
       "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130209_b0f5d87b-2a6c-4cf8-b1b5-e69d47048959.png",
-      "generated_at": "2026-09-16"
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa91-d506-742f-969d-309284858542",
+      "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+      "mesh_provider": "meshy"
     },
     "gen-floor-lamp-arc-1": {
       "image_provider": "higgsfield",
       "image_model": "nano_banana",
       "image_job_id": "78879a5e-4099-4b02-8366-2071d63054be",
       "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130209_78879a5e-4099-4b02-8366-2071d63054be.png",
-      "generated_at": "2026-09-16"
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa91-e41b-7350-bea3-c9dcefe96f1e",
+      "mesh_model": "meshy-t2 smart-topology (untextured)",
+      "mesh_provider": "meshy"
     },
     "gen-task-lamp-balanced-arm-1": {
       "image_provider": "higgsfield",
       "image_model": "nano_banana",
       "image_job_id": "a4941f59-8e5d-4c56-98b5-d51a863153b9",
       "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130209_a4941f59-8e5d-4c56-98b5-d51a863153b9.png",
-      "generated_at": "2026-09-16"
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa92-2a21-71f4-9798-7d07610f78ef",
+      "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+      "mesh_provider": "meshy"
     },
     "gen-side-table-wire-1": {
       "image_provider": "higgsfield",
       "image_model": "nano_banana",
       "image_job_id": "91d5c06c-6c11-43f7-9437-e92cb03389f6",
       "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130209_91d5c06c-6c11-43f7-9437-e92cb03389f6.png",
-      "generated_at": "2026-09-16"
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa92-37e0-71b6-9452-48d949d658dd",
+      "mesh_model": "meshy-t2 smart-topology (untextured)",
+      "mesh_provider": "meshy"
     }
   }
 }
