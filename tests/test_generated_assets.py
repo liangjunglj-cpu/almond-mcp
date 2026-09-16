@@ -127,9 +127,9 @@ def test_server_indexes_and_searches_generated_library():
     assert "gen-tree-conifer-1" not in low_ids
     assert "gen-litter-bin-1" in low_ids
 
-    one = json.loads(server.get_generated_asset("gen-door-single-1"))
+    one = json.loads(server.get_generated_asset("gen-toilet-1"))
     assert one["status"] == "success"
-    assert one["asset"]["dimensions_mm"]["height"] == 2150
+    assert one["asset"]["dimensions_mm"]["height"] == 800
 
     # generated assets never leak into the IKEA search
     ikea = json.loads(server.search_ikea_furniture(query="bench"))
