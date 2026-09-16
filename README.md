@@ -255,7 +255,7 @@ create_generation_plan(
 ## Generated asset library (open, redistributable)
 
 The IKEA and drawing libraries describe 3D Warehouse models that each user
-must download themselves. `GeneratedAssetfiles/` is different: 33 (and
+must download themselves. `GeneratedAssetfiles/` is different: 27 (and
 growing) architectural models generated with Meshy from Almond's own
 prompts, owned by the project and released under **CC BY 4.0**, so they ship
 with the repository and `almond-mcp fetch-assets` downloads them
@@ -265,7 +265,7 @@ automatically on a wheel install. Categories:
 | --- | --- |
 | Entourage | standing / walking / sitting person, deciduous and conifer tree, shrub, sedan car, bicycle |
 | Site furniture | park bench, street lamp, bollard, bike hoop, litter bin |
-| Building components | single and double door, casement window, straight and spiral stair, round and square column, glass balustrade |
+| Building components | round and square column, glass balustrade (doors, windows and stairs are deliberately excluded: they need exact dimensions, so model them directly) |
 | Fixtures and appliances | toilet, pedestal basin, bathtub, shower enclosure, range cooker, fridge-freezer |
 | Generic furniture | three-seat sofa, dining table and chair, double bed, desk, office chair |
 

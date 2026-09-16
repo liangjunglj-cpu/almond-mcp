@@ -40,7 +40,7 @@ def test_manifest_covers_every_catalogue_entry_with_present_files():
     ids_manifest = [a["asset_id"] for a in manifest()["assets"]]
     ids_catalogue = [a["asset_id"] for a in catalogue()["assets"]]
     assert ids_manifest == ids_catalogue
-    assert len(ids_manifest) >= 30
+    assert len(ids_manifest) >= 25
     for asset in manifest()["assets"]:
         glb = LIBRARY / asset["file"]
         assert glb.is_file(), asset["asset_id"]

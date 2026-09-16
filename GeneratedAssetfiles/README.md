@@ -1,7 +1,7 @@
 # Almond generated asset library
 
 Open, redistributable 3D architectural assets for [Almond MCP](../README.md):
-entourage, site furniture, building components, fixtures and unbranded
+entourage, site furniture, fixtures and unbranded
 furniture placeholders. **33 assets**, all generated with
 [Meshy](https://www.meshy.ai) from prompts written for this project and
 normalised to real-world millimetres with an authored Almond spatial
@@ -59,7 +59,6 @@ Contact sheets: [entourage](previews/sheet-1-entourage.png) · [site furniture](
 | <img src="previews/gen-person-sitting-1.png" width="96" alt=""> | `gen-person-sitting-1` | Person sitting (adult, seated on a plain stool) | human_figure | 562 x 588 x 1300 | `plaster-white` | 4,153 |
 | <img src="previews/gen-tree-deciduous-medium-1.png" width="96" alt=""> | `gen-tree-deciduous-medium-1` | Deciduous tree (medium, round crown) | vegetation | 5207 x 4884 x 7000 | `foliage-pine` | 80,000 |
 | <img src="previews/gen-tree-conifer-1.png" width="96" alt=""> | `gen-tree-conifer-1` | Conifer tree (tall, narrow) | vegetation | 3837 x 3717 x 9000 | `foliage-pine` | 80,000 |
-| <img src="previews/gen-shrub-round-1.png" width="96" alt=""> | `gen-shrub-round-1` | Shrub (round clipped) | vegetation | 964 x 962 x 900 | `foliage-pine` | 2,499 |
 | <img src="previews/gen-car-sedan-1.png" width="96" alt=""> | `gen-car-sedan-1` | Car (generic mid-size sedan) | vehicle | 2057 x 5050 x 1450 | `steel-painted-charcoal` | 4,198 |
 | <img src="previews/gen-bicycle-1.png" width="96" alt=""> | `gen-bicycle-1` | Bicycle (city bike) | vehicle | 560 x 1654 x 1050 | `steel-painted-charcoal` | 4,322 |
 | <img src="previews/gen-park-bench-1.png" width="96" alt=""> | `gen-park-bench-1` | Park bench (timber slats, steel frame) | site_furniture | 1331 x 565 x 850 | `wood-oak` | 3,990 |
@@ -67,11 +66,6 @@ Contact sheets: [entourage](previews/sheet-1-entourage.png) · [site furniture](
 | <img src="previews/gen-bollard-1.png" width="96" alt=""> | `gen-bollard-1` | Bollard (cylindrical steel) | site_furniture | 191 x 189 x 900 | `steel-painted-charcoal` | 4,278 |
 | <img src="previews/gen-bike-rack-1.png" width="96" alt=""> | `gen-bike-rack-1` | Bike rack (inverted U hoop) | site_furniture | 553 x 36 x 800 | `steel-galvanized` | 4,179 |
 | <img src="previews/gen-litter-bin-1.png" width="96" alt=""> | `gen-litter-bin-1` | Litter bin (cylindrical public) | site_furniture | 491 x 490 x 1000 | `steel-painted-charcoal` | 4,402 |
-| <img src="previews/gen-door-single-1.png" width="96" alt=""> | `gen-door-single-1` | Single leaf door (flush leaf with frame and lever handle) | door | 819 x 149 x 2150 | `wood-oak` | 3,993 |
-| <img src="previews/gen-door-double-1.png" width="96" alt=""> | `gen-door-double-1` | Double leaf door (pair of flush leaves with frame) | door | 1222 x 155 x 2150 | `wood-oak` | 3,829 |
-| <img src="previews/gen-window-casement-1.png" width="96" alt=""> | `gen-window-casement-1` | Casement window (two-light with frame) | window | 1500 x 107 x 1500 | `aluminium-anodized` | 4,320 |
-| <img src="previews/gen-stair-straight-1.png" width="96" alt=""> | `gen-stair-straight-1` | Straight stair flight (closed risers, one handrail) | stair | 1341 x 3710 x 3000 | `concrete-smooth` | 4,356 |
-| <img src="previews/gen-stair-spiral-1.png" width="96" alt=""> | `gen-stair-spiral-1` | Spiral stair (central column, steel treads) | stair | 2842 x 2824 x 3000 | `steel-painted-charcoal` | 3,449 |
 | <img src="previews/gen-column-round-1.png" width="96" alt=""> | `gen-column-round-1` | Round column (plain concrete) | column | 454 x 457 x 3000 | `concrete-smooth` | 4,436 |
 | <img src="previews/gen-column-square-1.png" width="96" alt=""> | `gen-column-square-1` | Square column (plain concrete) | column | 472 x 497 x 3000 | `concrete-smooth` | 4,258 |
 | <img src="previews/gen-balustrade-glass-1.png" width="96" alt=""> | `gen-balustrade-glass-1` | Glass balustrade (frameless with steel handrail, 2 m segment) | railing | 1744 x 21 x 1100 | `glass-clear` | 4,026 |

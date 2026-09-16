@@ -44,13 +44,6 @@
         "reason": "first pass (meshy-t2) foliage too blobby"
       }
     },
-    "gen-shrub-round-1": {
-      "image_task_id": "01a09787-e661-70dd-875d-fb62697869b8",
-      "image_model": "nano-banana",
-      "generated_at": "2026-09-12",
-      "mesh_task_id": "01a0978d-acef-75f5-a38b-51c64e60e2c2",
-      "mesh_model": "meshy-t2 smart-topology (untextured)"
-    },
     "gen-car-sedan-1": {
       "image_task_id": "01a09787-f336-72a4-8574-307a3c02979f",
       "image_model": "nano-banana",
@@ -98,41 +91,6 @@
       "image_model": "nano-banana",
       "generated_at": "2026-09-12",
       "mesh_task_id": "01a0978e-1a0e-7798-b364-8d700fccf022",
-      "mesh_model": "meshy-t2 smart-topology (untextured)"
-    },
-    "gen-door-single-1": {
-      "image_task_id": "01a09788-50a1-7584-bcbc-2587d50c85d3",
-      "image_model": "nano-banana",
-      "generated_at": "2026-09-12",
-      "mesh_task_id": "01a0978e-276a-7595-8ecc-c732739be4ec",
-      "mesh_model": "meshy-t2 smart-topology (untextured)"
-    },
-    "gen-door-double-1": {
-      "image_task_id": "01a09788-5d85-75bb-ac39-215bcc54ccbd",
-      "image_model": "nano-banana",
-      "generated_at": "2026-09-12",
-      "mesh_task_id": "01a0978e-34f7-7460-9a3b-11554dda5c02",
-      "mesh_model": "meshy-t2 smart-topology (untextured)"
-    },
-    "gen-window-casement-1": {
-      "image_task_id": "01a09788-6d12-74de-b7e8-76de739a2293",
-      "image_model": "nano-banana",
-      "generated_at": "2026-09-12",
-      "mesh_task_id": "01a0978e-4312-71a8-a9cf-48f4289875d6",
-      "mesh_model": "meshy-t2 smart-topology (untextured)"
-    },
-    "gen-stair-straight-1": {
-      "image_task_id": "01a09788-7bac-739c-98db-54e438cca44a",
-      "image_model": "nano-banana",
-      "generated_at": "2026-09-12",
-      "mesh_task_id": "01a0978e-53cb-7198-b10d-45f02503b5ea",
-      "mesh_model": "meshy-t2 smart-topology (untextured)"
-    },
-    "gen-stair-spiral-1": {
-      "image_task_id": "01a09788-88a1-7312-b1a8-2cfb3c55b4d5",
-      "image_model": "nano-banana",
-      "generated_at": "2026-09-12",
-      "mesh_task_id": "01a0978e-808f-7546-b2e0-539b7b427308",
       "mesh_model": "meshy-t2 smart-topology (untextured)"
     },
     "gen-column-round-1": {

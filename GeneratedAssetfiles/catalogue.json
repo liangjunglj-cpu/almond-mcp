@@ -232,42 +232,6 @@
       "recipe_override": "high_detail"
     },
     {
-      "asset_id": "gen-shrub-round-1",
-      "category": "vegetation",
-      "product": "Shrub",
-      "variant": "round clipped",
-      "dimensions_mm": {
-        "width": 1000,
-        "depth": 1000,
-        "height": 900
-      },
-      "render_material_id": "foliage-pine",
-      "prompt": "A round clipped garden shrub, dense simplified foliage, no pot, sitting directly on the ground.",
-      "tags": [
-        "shrub",
-        "bush",
-        "hedge",
-        "landscape",
-        "planting",
-        "vegetation"
-      ],
-      "drawing_roles": [
-        "site_plan",
-        "section",
-        "axonometric"
-      ],
-      "geometry_mode": "3d_entourage",
-      "support_plane": "ground",
-      "clearance_mm": {
-        "front": 0,
-        "back": 0,
-        "left": 0,
-        "right": 0
-      },
-      "placement_priority": "accessory",
-      "lod": "low"
-    },
-    {
       "asset_id": "gen-car-sedan-1",
       "category": "vehicle",
       "product": "Car",
@@ -514,189 +478,6 @@
       },
       "placement_priority": "movable",
       "lod": "low"
-    },
-    {
-      "asset_id": "gen-door-single-1",
-      "category": "door",
-      "product": "Single leaf door",
-      "variant": "flush leaf with frame and lever handle",
-      "dimensions_mm": {
-        "width": 1000,
-        "depth": 120,
-        "height": 2150
-      },
-      "render_material_id": "wood-oak",
-      "prompt": "A single flush interior door leaf hung in a plain rectangular door frame with architraves, lever handle, door closed, plain light timber, no wall around it.",
-      "tags": [
-        "door",
-        "single",
-        "leaf",
-        "opening",
-        "interior",
-        "component"
-      ],
-      "drawing_roles": [
-        "plan",
-        "elevation",
-        "section",
-        "axonometric"
-      ],
-      "geometry_mode": "3d_component",
-      "support_plane": "floor",
-      "clearance_mm": {
-        "front": 1000,
-        "back": 1000,
-        "left": 0,
-        "right": 0
-      },
-      "placement_priority": "fixed",
-      "lod": "medium"
-    },
-    {
-      "asset_id": "gen-door-double-1",
-      "category": "door",
-      "product": "Double leaf door",
-      "variant": "pair of flush leaves with frame",
-      "dimensions_mm": {
-        "width": 1900,
-        "depth": 120,
-        "height": 2150
-      },
-      "render_material_id": "wood-oak",
-      "prompt": "A pair of flush double doors hung in a plain rectangular frame with architraves, two lever handles meeting at the centre, doors closed, plain light timber, no wall around it.",
-      "tags": [
-        "door",
-        "double",
-        "pair",
-        "opening",
-        "entrance",
-        "component"
-      ],
-      "drawing_roles": [
-        "plan",
-        "elevation",
-        "section",
-        "axonometric"
-      ],
-      "geometry_mode": "3d_component",
-      "support_plane": "floor",
-      "clearance_mm": {
-        "front": 1900,
-        "back": 1900,
-        "left": 0,
-        "right": 0
-      },
-      "placement_priority": "fixed",
-      "lod": "medium"
-    },
-    {
-      "asset_id": "gen-window-casement-1",
-      "category": "window",
-      "product": "Casement window",
-      "variant": "two-light with frame",
-      "dimensions_mm": {
-        "width": 1200,
-        "depth": 150,
-        "height": 1500
-      },
-      "render_material_id": "aluminium-anodized",
-      "prompt": "A rectangular two-light casement window in a slim aluminium frame with a central mullion, clear glazing, closed, no wall around it.",
-      "tags": [
-        "window",
-        "casement",
-        "glazing",
-        "opening",
-        "facade",
-        "component"
-      ],
-      "drawing_roles": [
-        "plan",
-        "elevation",
-        "section",
-        "axonometric"
-      ],
-      "geometry_mode": "3d_component",
-      "support_plane": "wall",
-      "mount_height_mm": 900,
-      "clearance_mm": {
-        "front": 0,
-        "back": 0,
-        "left": 0,
-        "right": 0
-      },
-      "placement_priority": "fixed",
-      "lod": "medium"
-    },
-    {
-      "asset_id": "gen-stair-straight-1",
-      "category": "stair",
-      "product": "Straight stair flight",
-      "variant": "closed risers, one handrail",
-      "dimensions_mm": {
-        "width": 1000,
-        "depth": 3600,
-        "height": 3000
-      },
-      "render_material_id": "concrete-smooth",
-      "prompt": "A straight single-flight staircase of sixteen solid steps with closed risers, one simple handrail on the left side, plain matte concrete, rising from the ground.",
-      "tags": [
-        "stair",
-        "staircase",
-        "flight",
-        "circulation",
-        "vertical",
-        "component"
-      ],
-      "drawing_roles": [
-        "plan",
-        "section",
-        "axonometric"
-      ],
-      "geometry_mode": "3d_component",
-      "support_plane": "floor",
-      "clearance_mm": {
-        "front": 1000,
-        "back": 1000,
-        "left": 0,
-        "right": 0
-      },
-      "placement_priority": "fixed",
-      "lod": "medium"
-    },
-    {
-      "asset_id": "gen-stair-spiral-1",
-      "category": "stair",
-      "product": "Spiral stair",
-      "variant": "central column, steel treads",
-      "dimensions_mm": {
-        "width": 2000,
-        "depth": 2000,
-        "height": 3000
-      },
-      "render_material_id": "steel-painted-charcoal",
-      "prompt": "A spiral staircase around a central steel column, thin steel treads fanning out, simple vertical balusters and a curved handrail, one full turn, plain matte dark grey.",
-      "tags": [
-        "stair",
-        "spiral",
-        "circulation",
-        "vertical",
-        "component"
-      ],
-      "drawing_roles": [
-        "plan",
-        "section",
-        "axonometric"
-      ],
-      "geometry_mode": "3d_component",
-      "support_plane": "floor",
-      "clearance_mm": {
-        "front": 600,
-        "back": 600,
-        "left": 600,
-        "right": 600
-      },
-      "placement_priority": "fixed",
-      "lod": "medium"
     },
     {
       "asset_id": "gen-column-round-1",
@@ -1237,6 +1018,38 @@
       },
       "placement_priority": "secondary",
       "lod": "medium"
+    }
+  ],
+  "retired": [
+    {
+      "asset_id": "gen-door-single-1",
+      "retired_on": "2026-09-16",
+      "reason": "doors, windows and stairs need exact dimensions - model them directly in Rhino"
+    },
+    {
+      "asset_id": "gen-door-double-1",
+      "retired_on": "2026-09-16",
+      "reason": "doors, windows and stairs need exact dimensions - model them directly in Rhino"
+    },
+    {
+      "asset_id": "gen-window-casement-1",
+      "retired_on": "2026-09-16",
+      "reason": "doors, windows and stairs need exact dimensions - model them directly in Rhino"
+    },
+    {
+      "asset_id": "gen-stair-straight-1",
+      "retired_on": "2026-09-16",
+      "reason": "doors, windows and stairs need exact dimensions - model them directly in Rhino"
+    },
+    {
+      "asset_id": "gen-stair-spiral-1",
+      "retired_on": "2026-09-16",
+      "reason": "doors, windows and stairs need exact dimensions - model them directly in Rhino"
+    },
+    {
+      "asset_id": "gen-shrub-round-1",
+      "retired_on": "2026-09-16",
+      "reason": "quality rejected"
     }
   ]
 }
