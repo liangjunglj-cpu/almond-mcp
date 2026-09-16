@@ -197,6 +197,146 @@
       "generated_at": "2026-09-12",
       "mesh_task_id": "01a0978f-4e8d-707c-a258-c9b3897bfcad",
       "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-stool-bent-birch-3leg-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "38c416c0-6cda-4997-a11f-3f943433f1bf",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130155_38c416c0-6cda-4997-a11f-3f943433f1bf.png",
+      "generated_at": "2026-09-16"
+    },
+    "gen-lounge-chair-bent-plywood-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "a06b9eba-bd31-4b55-8e95-bb1c948be748",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130155_a06b9eba-bd31-4b55-8e95-bb1c948be748.png",
+      "generated_at": "2026-09-16"
+    },
+    "gen-tea-trolley-bent-birch-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "e52e2554-1c6d-4934-8530-5dec0a5cfc18",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130223_e52e2554-1c6d-4934-8530-5dec0a5cfc18.png",
+      "generated_at": "2026-09-16"
+    },
+    "gen-dining-table-round-birch-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "e846e622-3e25-4311-a535-bcfaafe84fbf",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130155_e846e622-3e25-4311-a535-bcfaafe84fbf.png",
+      "generated_at": "2026-09-16"
+    },
+    "gen-armchair-bent-birch-webbed-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "845f0055-de6b-4052-8a58-b82168c8caef",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130155_845f0055-de6b-4052-8a58-b82168c8caef.png",
+      "generated_at": "2026-09-16"
+    },
+    "gen-lounge-chair-molded-plywood-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "1bf40e69-0c3e-4c59-9980-7081e4de0cd7",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130156_1bf40e69-0c3e-4c59-9980-7081e4de0cd7.png",
+      "generated_at": "2026-09-16"
+    },
+    "gen-side-chair-shell-wire-base-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "176a5471-bc89-4810-85f1-c6298bc82474",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130156_176a5471-bc89-4810-85f1-c6298bc82474.png",
+      "generated_at": "2026-09-16"
+    },
+    "gen-lounge-chair-leather-plywood-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "96ffbed7-b3a9-4fd0-80e4-2203892d1579",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130156_96ffbed7-b3a9-4fd0-80e4-2203892d1579.png",
+      "generated_at": "2026-09-16"
+    },
+    "gen-ottoman-leather-plywood-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "9ee68080-35d4-4726-9d51-6b136e9fdb32",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130155_9ee68080-35d4-4726-9d51-6b136e9fdb32.png",
+      "generated_at": "2026-09-16"
+    },
+    "gen-coffee-table-freeform-glass-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "6e3f65ab-3d6f-4e85-a57c-78af69e49a97",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130155_6e3f65ab-3d6f-4e85-a57c-78af69e49a97.png",
+      "generated_at": "2026-09-16"
+    },
+    "gen-bench-slatted-platform-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "fdb8a13f-6a48-4d6c-b4ca-1b6cdcf1e42b",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130156_fdb8a13f-6a48-4d6c-b4ca-1b6cdcf1e42b.png",
+      "generated_at": "2026-09-16"
+    },
+    "gen-pendant-lamp-sphere-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "289186b1-08c4-45be-92d0-888ea36956fc",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130155_289186b1-08c4-45be-92d0-888ea36956fc.png",
+      "generated_at": "2026-09-16"
+    },
+    "gen-task-chair-mesh-ergonomic-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "6a5646d9-2e30-4392-ae0c-2a263434fb08",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130209_6a5646d9-2e30-4392-ae0c-2a263434fb08.png",
+      "generated_at": "2026-09-16"
+    },
+    "gen-armchair-cantilever-bentwood-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "981e3ff2-9022-43a9-a659-63be2f57d3cd",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130209_981e3ff2-9022-43a9-a659-63be2f57d3cd.png",
+      "generated_at": "2026-09-16"
+    },
+    "gen-sofa-2-seat-loose-cover-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "1ac90e4a-3ffc-4be5-9921-6b289294b6f6",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130209_1ac90e4a-3ffc-4be5-9921-6b289294b6f6.png",
+      "generated_at": "2026-09-16"
+    },
+    "gen-shelving-cube-2x4-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "044fa7b2-ce46-4841-9088-272c4c08de09",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130209_044fa7b2-ce46-4841-9088-272c4c08de09.png",
+      "generated_at": "2026-09-16"
+    },
+    "gen-shelving-modular-track-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "b0f5d87b-2a6c-4cf8-b1b5-e69d47048959",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130209_b0f5d87b-2a6c-4cf8-b1b5-e69d47048959.png",
+      "generated_at": "2026-09-16"
+    },
+    "gen-floor-lamp-arc-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "78879a5e-4099-4b02-8366-2071d63054be",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130209_78879a5e-4099-4b02-8366-2071d63054be.png",
+      "generated_at": "2026-09-16"
+    },
+    "gen-task-lamp-balanced-arm-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "a4941f59-8e5d-4c56-98b5-d51a863153b9",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130209_a4941f59-8e5d-4c56-98b5-d51a863153b9.png",
+      "generated_at": "2026-09-16"
+    },
+    "gen-side-table-wire-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "91d5c06c-6c11-43f7-9437-e92cb03389f6",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130209_91d5c06c-6c11-43f7-9437-e92cb03389f6.png",
+      "generated_at": "2026-09-16"
     }
   }
 }

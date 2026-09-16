@@ -43,7 +43,8 @@
         "origin_at": "bottom"
       },
       "credits_per_asset": 34
-    }
+    },
+    "batch_2_note": "Batch 2 (2026-09-16) describes design language only - Scandinavian bent birch, American mid-century moulded plywood/shell, democratic design, Italian lighting - never brand or product names; ids and products stay generic so the CC BY 4.0 release is clean."
   },
   "assets": [
     {
@@ -1018,6 +1019,779 @@
       },
       "placement_priority": "secondary",
       "lod": "medium"
+    },
+    {
+      "asset_id": "gen-stool-bent-birch-3leg-1",
+      "category": "seating",
+      "product": "Stool",
+      "variant": "three-legged bent-birch stool, round seat",
+      "dimensions_mm": {
+        "width": 380,
+        "depth": 380,
+        "height": 440
+      },
+      "render_material_id": "wood-birch-ply",
+      "prompt": "A three-legged wooden stool: a plain round birch seat on three L-shaped legs made of solid birch that bend in a smooth right-angle curve at the top and screw directly under the seat, pale natural birch, Scandinavian functionalist design from the 1930s, no branding.",
+      "tags": [
+        "stool",
+        "seating",
+        "birch",
+        "bentwood",
+        "scandinavian",
+        "stackable"
+      ],
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "support_plane": "floor",
+      "clearance_mm": {
+        "front": 300,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "placement_priority": "secondary",
+      "lod": "medium",
+      "design_idiom": null,
+      "batch": 2
+    },
+    {
+      "asset_id": "gen-lounge-chair-bent-plywood-1",
+      "category": "seating",
+      "product": "Lounge chair",
+      "variant": "cantilevered bent-plywood lounge chair, scroll seat",
+      "dimensions_mm": {
+        "width": 600,
+        "depth": 800,
+        "height": 640
+      },
+      "render_material_id": "wood-birch-ply",
+      "prompt": "A cantilevered lounge chair whose frame is two closed loops of laminated bent birch on each side, with a single thin sheet of moulded plywood seat and back that curls into a scroll at the head and foot, pale birch frame, black lacquered seat, 1930s Scandinavian functionalist design, no branding.",
+      "tags": [
+        "lounge chair",
+        "armchair",
+        "cantilever",
+        "bent plywood",
+        "scandinavian"
+      ],
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "support_plane": "floor",
+      "clearance_mm": {
+        "front": 500,
+        "back": 0,
+        "left": 100,
+        "right": 100
+      },
+      "placement_priority": "primary",
+      "lod": "high",
+      "design_idiom": null,
+      "batch": 2,
+      "recipe_override": "high_detail"
+    },
+    {
+      "asset_id": "gen-tea-trolley-bent-birch-1",
+      "category": "table",
+      "product": "Tea trolley",
+      "variant": "bent-birch frame, two large plywood wheels, rattan basket",
+      "dimensions_mm": {
+        "width": 900,
+        "depth": 650,
+        "height": 600
+      },
+      "render_material_id": "wood-birch-ply",
+      "prompt": "A tea trolley with a continuous bent birch frame forming the handles and legs, two large solid plywood disc wheels with black rubber rims at one end, a white tiled top shelf and a woven rattan basket hanging below, pale birch, 1930s Scandinavian design, no branding.",
+      "tags": [
+        "trolley",
+        "tea trolley",
+        "serving",
+        "birch",
+        "rattan",
+        "scandinavian"
+      ],
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "support_plane": "floor",
+      "clearance_mm": {
+        "front": 600,
+        "back": 600,
+        "left": 0,
+        "right": 0
+      },
+      "placement_priority": "movable",
+      "lod": "high",
+      "design_idiom": null,
+      "batch": 2,
+      "recipe_override": "high_detail"
+    },
+    {
+      "asset_id": "gen-dining-table-round-birch-1",
+      "category": "table",
+      "product": "Dining table",
+      "variant": "round white laminate top on four bent-birch L-legs",
+      "dimensions_mm": {
+        "width": 1250,
+        "depth": 1250,
+        "height": 720
+      },
+      "render_material_id": "wood-birch-ply",
+      "prompt": "A round dining table with a plain white laminate top and a birch edge, standing on four solid birch L-shaped legs that curve smoothly from vertical into horizontal under the top, pale natural birch, Scandinavian functionalist design, no branding.",
+      "tags": [
+        "table",
+        "dining",
+        "round",
+        "birch",
+        "scandinavian"
+      ],
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "support_plane": "floor",
+      "clearance_mm": {
+        "front": 900,
+        "back": 900,
+        "left": 900,
+        "right": 900
+      },
+      "placement_priority": "primary",
+      "lod": "medium",
+      "design_idiom": null,
+      "batch": 2
+    },
+    {
+      "asset_id": "gen-armchair-bent-birch-webbed-1",
+      "category": "seating",
+      "product": "Armchair",
+      "variant": "bent-birch frame with linen webbing seat and back",
+      "dimensions_mm": {
+        "width": 600,
+        "depth": 700,
+        "height": 800
+      },
+      "render_material_id": "wood-birch-ply",
+      "prompt": "An armchair whose frame is a continuous closed loop of laminated bent birch on each side, forming armrest, front leg and back leg in one curve, with a seat and back of natural linen webbing straps woven across the frame, pale birch, 1930s Scandinavian design, no branding.",
+      "tags": [
+        "armchair",
+        "webbing",
+        "birch",
+        "bentwood",
+        "scandinavian"
+      ],
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "support_plane": "floor",
+      "clearance_mm": {
+        "front": 500,
+        "back": 0,
+        "left": 100,
+        "right": 100
+      },
+      "placement_priority": "primary",
+      "lod": "high",
+      "design_idiom": null,
+      "batch": 2,
+      "recipe_override": "high_detail"
+    },
+    {
+      "asset_id": "gen-lounge-chair-molded-plywood-1",
+      "category": "seating",
+      "product": "Lounge chair",
+      "variant": "moulded plywood lounge chair, low, wood legs",
+      "dimensions_mm": {
+        "width": 560,
+        "depth": 610,
+        "height": 680
+      },
+      "render_material_id": "wood-walnut",
+      "prompt": "A low lounge chair made of five separate pieces of moulded walnut plywood: a curved seat panel, a curved back panel, a bent spine and two bent plywood leg frames, joined by black rubber shock mounts, warm walnut veneer, 1940s American mid-century design, no branding.",
+      "tags": [
+        "lounge chair",
+        "moulded plywood",
+        "mid-century",
+        "walnut"
+      ],
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "support_plane": "floor",
+      "clearance_mm": {
+        "front": 500,
+        "back": 0,
+        "left": 100,
+        "right": 100
+      },
+      "placement_priority": "primary",
+      "lod": "high",
+      "design_idiom": null,
+      "batch": 2,
+      "recipe_override": "high_detail"
+    },
+    {
+      "asset_id": "gen-side-chair-shell-wire-base-1",
+      "category": "seating",
+      "product": "Side chair",
+      "variant": "moulded shell seat on wire tower base",
+      "dimensions_mm": {
+        "width": 470,
+        "depth": 550,
+        "height": 800
+      },
+      "render_material_id": "plaster-white",
+      "prompt": "A side chair with a single moulded white fibreglass shell seat with slightly rolled edges, sitting on a base of thin welded black steel wire rods forming a lattice tower with four splayed legs, 1950s American mid-century design, no branding.",
+      "tags": [
+        "side chair",
+        "dining chair",
+        "shell chair",
+        "wire base",
+        "mid-century"
+      ],
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "support_plane": "floor",
+      "clearance_mm": {
+        "front": 0,
+        "back": 500,
+        "left": 100,
+        "right": 100
+      },
+      "placement_priority": "secondary",
+      "lod": "high",
+      "design_idiom": null,
+      "batch": 2,
+      "recipe_override": "high_detail"
+    },
+    {
+      "asset_id": "gen-lounge-chair-leather-plywood-1",
+      "category": "seating",
+      "product": "Lounge chair",
+      "variant": "leather lounge chair, three bent plywood shells, swivel base",
+      "dimensions_mm": {
+        "width": 840,
+        "depth": 850,
+        "height": 840
+      },
+      "render_material_id": "wood-walnut",
+      "prompt": "A deep lounge chair made of three separate curved moulded rosewood plywood shells - headrest, back and seat - each holding thick tufted black leather cushions, on a five-star cast aluminium swivel base, 1950s American mid-century design, no branding.",
+      "tags": [
+        "lounge chair",
+        "leather",
+        "plywood shell",
+        "swivel",
+        "mid-century"
+      ],
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "support_plane": "floor",
+      "clearance_mm": {
+        "front": 600,
+        "back": 0,
+        "left": 150,
+        "right": 150
+      },
+      "placement_priority": "primary",
+      "lod": "high",
+      "design_idiom": null,
+      "batch": 2,
+      "recipe_override": "high_detail"
+    },
+    {
+      "asset_id": "gen-ottoman-leather-plywood-1",
+      "category": "seating",
+      "product": "Ottoman",
+      "variant": "matching leather ottoman on aluminium base",
+      "dimensions_mm": {
+        "width": 660,
+        "depth": 540,
+        "height": 430
+      },
+      "render_material_id": "wood-walnut",
+      "prompt": "A rectangular ottoman with a single curved moulded rosewood plywood shell holding a thick tufted black leather cushion, on a four-star cast aluminium base, 1950s American mid-century design, no branding.",
+      "tags": [
+        "ottoman",
+        "footstool",
+        "leather",
+        "mid-century"
+      ],
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "support_plane": "floor",
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "placement_priority": "secondary",
+      "lod": "medium",
+      "design_idiom": null,
+      "batch": 2
+    },
+    {
+      "asset_id": "gen-coffee-table-freeform-glass-1",
+      "category": "table",
+      "product": "Coffee table",
+      "variant": "freeform glass top on two-piece sculptural wood base",
+      "dimensions_mm": {
+        "width": 1280,
+        "depth": 930,
+        "height": 400
+      },
+      "render_material_id": "wood-walnut",
+      "prompt": "A low coffee table with a thick freeform organic-shaped clear glass top resting on a base made of two identical curved sculptural solid walnut pieces interlocked at right angles, 1940s American mid-century design, no branding.",
+      "tags": [
+        "coffee table",
+        "glass",
+        "sculptural",
+        "mid-century",
+        "walnut"
+      ],
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "support_plane": "floor",
+      "clearance_mm": {
+        "front": 450,
+        "back": 450,
+        "left": 450,
+        "right": 450
+      },
+      "placement_priority": "primary",
+      "lod": "high",
+      "design_idiom": null,
+      "batch": 2,
+      "recipe_override": "high_detail"
+    },
+    {
+      "asset_id": "gen-bench-slatted-platform-1",
+      "category": "seating",
+      "product": "Bench",
+      "variant": "slatted wood platform bench on ebonised frame",
+      "dimensions_mm": {
+        "width": 1830,
+        "depth": 470,
+        "height": 355
+      },
+      "render_material_id": "wood-walnut",
+      "prompt": "A long low platform bench made of narrow parallel maple wood slats with small gaps between them, on a simple black ebonised wood frame with two rectangular trestle-like supports, 1940s American mid-century design, no branding.",
+      "tags": [
+        "bench",
+        "platform",
+        "slatted",
+        "mid-century",
+        "seating",
+        "table"
+      ],
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "support_plane": "floor",
+      "clearance_mm": {
+        "front": 450,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "placement_priority": "primary",
+      "lod": "medium",
+      "design_idiom": null,
+      "batch": 2
+    },
+    {
+      "asset_id": "gen-pendant-lamp-sphere-1",
+      "category": "lighting",
+      "product": "Pendant lamp",
+      "variant": "spherical white pendant, spun web shade",
+      "dimensions_mm": {
+        "width": 640,
+        "depth": 640,
+        "height": 640
+      },
+      "render_material_id": "polycarbonate-opal",
+      "prompt": "A large spherical pendant lamp shade made of a translucent white plastic web sprayed over a thin steel wire frame, with a small metal top fitting and a cord, glowing soft white, 1950s American mid-century design, no branding.",
+      "tags": [
+        "pendant",
+        "lamp",
+        "lighting",
+        "sphere",
+        "mid-century"
+      ],
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_fixture",
+      "support_plane": "ceiling",
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "placement_priority": "accessory",
+      "lod": "medium",
+      "design_idiom": null,
+      "batch": 2,
+      "mount_height_mm": 1900
+    },
+    {
+      "asset_id": "gen-task-chair-mesh-ergonomic-1",
+      "category": "seating",
+      "product": "Office chair",
+      "variant": "ergonomic mesh task chair, adjustable arms",
+      "dimensions_mm": {
+        "width": 690,
+        "depth": 690,
+        "height": 1080
+      },
+      "render_material_id": "rubber-black",
+      "prompt": "An ergonomic office task chair with a suspended breathable black mesh seat and high mesh back on a curved graphite frame, adjustable padded armrests, a tilt mechanism and a five-star base on castors, 1990s American design, no branding.",
+      "tags": [
+        "office chair",
+        "task chair",
+        "mesh",
+        "ergonomic",
+        "swivel"
+      ],
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "support_plane": "floor",
+      "clearance_mm": {
+        "front": 0,
+        "back": 600,
+        "left": 100,
+        "right": 100
+      },
+      "placement_priority": "secondary",
+      "lod": "high",
+      "design_idiom": null,
+      "batch": 2,
+      "recipe_override": "high_detail"
+    },
+    {
+      "asset_id": "gen-armchair-cantilever-bentwood-1",
+      "category": "seating",
+      "product": "Armchair",
+      "variant": "cantilevered bent-wood armchair with thick cushion",
+      "dimensions_mm": {
+        "width": 680,
+        "depth": 820,
+        "height": 1000
+      },
+      "render_material_id": "wood-birch-ply",
+      "prompt": "A cantilevered armchair with a frame of two bent laminated birch loops forming the armrests and the springy base, and a thick single cushion in natural beige fabric running up seat and high back, pale birch, 1970s Scandinavian democratic design, no branding.",
+      "tags": [
+        "armchair",
+        "cantilever",
+        "bentwood",
+        "cushion",
+        "scandinavian"
+      ],
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "support_plane": "floor",
+      "clearance_mm": {
+        "front": 500,
+        "back": 0,
+        "left": 100,
+        "right": 100
+      },
+      "placement_priority": "primary",
+      "lod": "medium",
+      "design_idiom": null,
+      "batch": 2
+    },
+    {
+      "asset_id": "gen-sofa-2-seat-loose-cover-1",
+      "category": "seating",
+      "product": "Sofa",
+      "variant": "boxy two-seat sofa with loose fabric cover",
+      "dimensions_mm": {
+        "width": 1800,
+        "depth": 880,
+        "height": 660
+      },
+      "render_material_id": "rubber-black",
+      "prompt": "A compact boxy two-seat sofa with a straight low back, straight square arms of the same height as the back, two seat cushions, all wrapped in a loose light grey fabric cover, sitting close to the floor, 1980s Scandinavian democratic design, no branding.",
+      "tags": [
+        "sofa",
+        "two-seat",
+        "loose cover",
+        "compact",
+        "scandinavian"
+      ],
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "support_plane": "floor",
+      "clearance_mm": {
+        "front": 450,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "placement_priority": "primary",
+      "lod": "medium",
+      "design_idiom": null,
+      "batch": 2
+    },
+    {
+      "asset_id": "gen-shelving-cube-2x4-1",
+      "category": "storage",
+      "product": "Shelving unit",
+      "variant": "open cube shelving, 2 by 4",
+      "dimensions_mm": {
+        "width": 770,
+        "depth": 390,
+        "height": 1470
+      },
+      "render_material_id": "wood-birch-ply",
+      "prompt": "A tall open cube shelving unit made of thick white lacquered board, two cubes wide and four cubes high, all compartments open front and back, plain flat panels, standing on the floor, Scandinavian democratic design, no branding.",
+      "tags": [
+        "shelving",
+        "cube storage",
+        "bookcase",
+        "storage"
+      ],
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "support_plane": "floor",
+      "clearance_mm": {
+        "front": 900,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "placement_priority": "primary",
+      "lod": "medium",
+      "design_idiom": null,
+      "batch": 2
+    },
+    {
+      "asset_id": "gen-shelving-modular-track-1",
+      "category": "storage",
+      "product": "Shelving system",
+      "variant": "wall-mounted modular shelving on aluminium tracks",
+      "dimensions_mm": {
+        "width": 1330,
+        "depth": 360,
+        "height": 2000
+      },
+      "render_material_id": "aluminium-anodized",
+      "prompt": "A wall-mounted modular shelving system: three vertical slotted aluminium tracks, thin powder-coated aluminium shelves of different depths hooked in at several heights, one closed cabinet box with sliding doors, silver anodised aluminium and off-white panels, 1960s British modernist design, no branding.",
+      "tags": [
+        "shelving",
+        "modular",
+        "wall-mounted",
+        "aluminium",
+        "modernist"
+      ],
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "support_plane": "wall",
+      "clearance_mm": {
+        "front": 600,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "placement_priority": "fixed",
+      "lod": "high",
+      "design_idiom": null,
+      "batch": 2,
+      "recipe_override": "high_detail",
+      "mount_height_mm": 0
+    },
+    {
+      "asset_id": "gen-floor-lamp-arc-1",
+      "category": "lighting",
+      "product": "Floor lamp",
+      "variant": "arc floor lamp on a marble base",
+      "dimensions_mm": {
+        "width": 2200,
+        "depth": 400,
+        "height": 2400
+      },
+      "render_material_id": "steel-galvanized",
+      "prompt": "An arc floor lamp with a heavy rectangular white marble block base, a long slender stainless steel stem that rises and arcs far outward, ending in a perforated polished aluminium dome shade hanging over the floor, 1960s Italian design, no branding.",
+      "tags": [
+        "floor lamp",
+        "arc lamp",
+        "lighting",
+        "marble",
+        "italian"
+      ],
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_fixture",
+      "support_plane": "floor",
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "placement_priority": "accessory",
+      "lod": "medium",
+      "design_idiom": null,
+      "batch": 2
+    },
+    {
+      "asset_id": "gen-task-lamp-balanced-arm-1",
+      "category": "lighting",
+      "product": "Task lamp",
+      "variant": "two-arm balanced desk lamp",
+      "dimensions_mm": {
+        "width": 1000,
+        "depth": 200,
+        "height": 450
+      },
+      "render_material_id": "aluminium-anodized",
+      "prompt": "A desk task lamp with two slender polished aluminium arms joined by a balanced hinge with exposed springs and cables, a small round base, and a conical aluminium shade with a knurled swivel, 1980s Italian design, no branding.",
+      "tags": [
+        "desk lamp",
+        "task lamp",
+        "lighting",
+        "balanced arm",
+        "italian"
+      ],
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_fixture",
+      "support_plane": "work_surface",
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "placement_priority": "accessory",
+      "lod": "high",
+      "design_idiom": null,
+      "batch": 2,
+      "recipe_override": "high_detail",
+      "mount_height_mm": 750
+    },
+    {
+      "asset_id": "gen-side-table-wire-1",
+      "category": "table",
+      "product": "Side table",
+      "variant": "stacking wire side table",
+      "dimensions_mm": {
+        "width": 450,
+        "depth": 450,
+        "height": 500
+      },
+      "render_material_id": "steel-painted-charcoal",
+      "prompt": "A small round stacking side table made entirely of thin powder-coated steel wire: a flat round wire-mesh top on a tapered cage of vertical wires that flare out to a wire ring foot, matte charcoal, 1950s design, no branding.",
+      "tags": [
+        "side table",
+        "wire",
+        "stacking",
+        "occasional table",
+        "mid-century"
+      ],
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "geometry_mode": "3d_furniture",
+      "support_plane": "floor",
+      "clearance_mm": {
+        "front": 300,
+        "back": 300,
+        "left": 300,
+        "right": 300
+      },
+      "placement_priority": "secondary",
+      "lod": "medium",
+      "design_idiom": null,
+      "batch": 2
     }
   ],
   "retired": [
