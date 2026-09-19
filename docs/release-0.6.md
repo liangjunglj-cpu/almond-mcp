@@ -1,7 +1,8 @@
 # Almond 0.6 release infrastructure
 
 Candidate pair: **almondbridge 0.6.0-rc.13** and **almond-mcp 0.6.0rc13**.
-Both are unpublished candidates. The Yak targets **Rhino 8.0 / Windows**;
+The Yak prerelease was published on 19 September 2026. The matching Python
+package is prepared but its PyPI publication awaits maintainer credentials. The Yak targets **Rhino 8.0 / Windows**;
 RhinoCommon remains pinned to 8.0.23304.9001. Plugin identity stays
 `c337dbb8-394a-4593-9c2b-a3d7cfc91893`. No Rhino update is required.
 
@@ -271,3 +272,26 @@ Validation: pinned Rhino 8 GA SDK build, material round-trip tests, packaged mod
 routes, and browser checks of thumbnails, enlarged models and narrow sidebar layout.
 Native viewport switching must still be checked after saving work and restarting
 Rhino into rc.13. No public release is performed by preparation or local installation.
+
+## Publication record — 19 September 2026
+
+- **Rhino Package Manager: published** `almondbridge 0.6.0-rc.13`, Windows / Rhino 8.0+.
+- Source commit: `f83fe392901ed49af38238466bb16809bcd4158e`.
+- Artifact: `almondbridge-0.6.0-rc.13-rh8_0-win.yak`.
+- SHA-256: `fa40abae6a630fb7fe6afba123ea51f829ca231e1ec57028488f265804a0fe42`.
+- Production Yak push succeeded and public `search --all --prerelease almondbridge`
+  returned the new version. Users must enable **Include pre-releases**.
+- 185 tests, clean wheel/MCP installation, 388 package routes, 421 installed files
+  and [CI](https://github.com/liangjunglj-cpu/almond-mcp/actions/runs/35457176696) passed.
+- User accepted the preview update and explicitly requested deployment. The full
+  native smoke checklist has not been independently recorded; this remains a prerelease.
+- Food4Rhino: [existing Almond MCP listing](https://www.food4rhino.com/en/app/almond-mcp)
+  updated and saved successfully. rc.13 is the first download, with the uploaded ZIP
+  containing the exact published Yak and updated quickstart. Existing app GUID,
+  icon, screenshots and historical downloads were preserved. Public description
+  explains the library, display-mode approximation and optional PyPI limitation.
+- PyPI `almond-mcp 0.6.0rc13`: upload blocked by missing publishing credentials.
+  The included Rhino library needs no Python. Optional MCP users must use the
+  supplied local wheel until the matching PyPI prerelease is available.
+
+The published Yak is immutable. Documentation/status updates do not replace it.

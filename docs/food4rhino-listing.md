@@ -1,6 +1,9 @@
 # Food4Rhino listing - Almond 0.6 release candidate
 
-Prepared for publication; this document does not mean the release is live.
+The Yak prerelease is live in Rhino Package Manager. The existing
+[Food4Rhino listing](https://www.food4rhino.com/en/app/almond-mcp) was updated
+on 19 September 2026, with rc.13 first in downloads. The optional matching
+PyPI release awaits publishing credentials.
 Update the existing Almond MCP listing, preserving the permanent plugin GUID.
 Use the Rhino Account that owns the existing app / Yak package.
 
@@ -33,7 +36,9 @@ for full-size browsing. Browsing the included collection needs no
 Python installation, Meshy account or AI subscription.
 
 The package includes 50 generated GLB models with embedded Almond passports,
-spatial contracts, measured mesh dimensions, neutral previews and source records.
+spatial contracts, measured mesh dimensions, coloured previews and source records.
+Previews can follow the active Rhino viewport, approximating Ghosted, Arctic,
+Shaded and Rendered; scene lighting and custom edge settings are not reproduced.
 Ten models have linked drawing packages: 60 plan/front/right view-scale pairs
 in SVG and DXF, plus 20 A3 SVG sheets at 1:50 and 1:100. Search the collection,
 rotate a model, inspect its drawings and download the representation you need.
@@ -74,7 +79,8 @@ than creating a duplicate app. The permanent GUID remains unchanged.
 Download title: **Almond 0.6 release candidate - Rhino 8 Windows + Object Archive**.
 Description: Install through Rhino Package Manager (Include pre-releases) or use
 the provided Yak package. Restart Rhino, then run Almond. The 50 generated
-models are included. See GETTING-STARTED.md for optional MCP setup.
+models are included. See rhino-archive-quickstart.md for optional MCP setup. The matching PyPI
+prerelease is pending; the supplied local Python wheel is available for testing.
 
 ## Release notes
 
@@ -100,8 +106,8 @@ Food4Rhino account access and any listing review remain separate from local buil
 
 Compact model tiles, thumbnail-to-viewport placement, a keyboard-accessible
 Place action, shared blocks, optional lighter meshes and embedded derivation
-records. Viewport dragging was confirmed by the user on rc.6. Keep this listing a draft until the remaining native checklist in
-release-0.6.md passes. Public publishing has not been performed.
+records. Viewport dragging was confirmed by the user on rc.6. The user accepted the preview update and authorized prerelease publication.
+The Yak is published; the comprehensive native checklist remains only partially recorded.
 
 The rc.7 menu separates Models and Karamba Validation. The analysis workspace
 shows assumptions, support/load diagrams, view toggles, mapped utilization,

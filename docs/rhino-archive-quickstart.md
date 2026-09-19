@@ -1,9 +1,13 @@
 # Almond workspace for Rhino 8
 
-For this prepared release candidate, install the supplied
-**almondbridge-0.6.0-rc.13-rh8_0-win.yak**, save your work, restart Rhino,
-and run **Almond**. This candidate has not yet been published to the
-public Package Manager. The package targets Windows / Rhino 8.0+.
+Install **almondbridge 0.6.0-rc.13** from Rhino's Package Manager with
+**Include pre-releases** enabled, or install the supplied
+**almondbridge-0.6.0-rc.13-rh8_0-win.yak**. Save your work, restart Rhino,
+and run **Almond**. This prerelease is published for Windows / Rhino 8.0+.
+
+The optional matching Python/MCP package is not yet on PyPI. Use the supplied
+local wheel for that workflow until publication completes. Browsing and placing
+the included library models need neither Python nor an MCP client.
 
 The archive opens in a dockable **Almond** panel inside Rhino. Its background,
 text, controls and font follow Rhino appearance settings, including theme changes.
