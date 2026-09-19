@@ -12,9 +12,12 @@
     "height": 600.0
   },
   "spatial": {
+    "metadata_version": 1,
     "units": "mm",
     "anchor": "bottom_center",
     "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
     "local_aabb": {
       "min": [
         -385.6,
@@ -27,6 +30,24 @@
         600.0
       ]
     },
+    "footprint": [
+      [
+        -385.6,
+        -244.95
+      ],
+      [
+        385.6,
+        -244.95
+      ],
+      [
+        385.6,
+        244.95
+      ],
+      [
+        -385.6,
+        244.95
+      ]
+    ],
     "clearance_mm": {
       "front": 600,
       "back": 600,
@@ -45,5 +66,139 @@
     }
   ],
   "object_count": 1,
-  "license": "CC-BY-4.0"
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-tea-trolley-bent-birch-1",
+    "library_id": "generated_assets",
+    "name": "Tea trolley (bent-birch frame, two large plywood wheels, rattan basket)",
+    "category": "table",
+    "tags": [
+      "trolley",
+      "tea trolley",
+      "serving",
+      "birch",
+      "rattan",
+      "scandinavian"
+    ],
+    "dimensions_mm": {
+      "width": 771.2,
+      "depth": 489.9,
+      "height": 600.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 900.0,
+      "depth": 650.0,
+      "height": 600.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -385.6,
+          -244.95,
+          0.0
+        ],
+        "max": [
+          385.6,
+          244.95,
+          600.0
+        ]
+      },
+      "footprint": [
+        [
+          -385.6,
+          -244.95
+        ],
+        [
+          385.6,
+          -244.95
+        ],
+        [
+          385.6,
+          244.95
+        ],
+        [
+          -385.6,
+          244.95
+        ]
+      ],
+      "clearance_mm": {
+        "front": 600,
+        "back": 600,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "movable"
+    },
+    "materials": [
+      {
+        "material_id": "wood-birch-ply",
+        "objects": [
+          "gen-tea-trolley-bent-birch-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "A tea trolley with a continuous bent birch frame forming the handles and legs, two large solid plywood disc wheels with black rubber rims at one end, a white tiled top shelf and a woven rattan basket hanging below, pale birch, 1930s Scandinavian design, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa90-f4d7-7161-b2ce-917ab0a4412c",
+        "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 648.408569
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "living_room",
+        "dining_room"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.246,
+      "triangle_count": 110854,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "0B8506240712F7538E6F837F67C1EF363B5638810A8768176AC85E5BFA3F813C"
 }

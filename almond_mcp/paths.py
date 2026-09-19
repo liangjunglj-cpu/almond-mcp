@@ -8,10 +8,9 @@ Resolution order for every library directory:
 3. the per-user data directory (``%LOCALAPPDATA%\\Almond`` on Windows),
    scaffolded on first use from the manifests bundled inside the wheel.
 
-Model files (.skp and other downloaded geometry) are never bundled; the
-scaffold copies manifests and audited recipe/capsule JSON only. Run
-``almond-mcp fetch-assets`` to see which model files are missing and where
-to download them from.
+Third-party downloaded geometry is never bundled. The generated library
+is bundled in full, and scaffolded into a versioned directory so upgrades
+cannot reuse an old manifest or overwrite a user's previous asset pack.
 """
 from __future__ import annotations
 
@@ -20,6 +19,7 @@ import shutil
 import sys
 from importlib import resources
 from pathlib import Path
+from almond_mcp import __version__
 
 APP_NAME = "Almond"
 
@@ -32,6 +32,7 @@ LIBRARY_DIRS = {
     "RHINO_MCP_DIAGRAM_ASSET_DIR": "DiagramAssetfiles",
     "RHINO_MCP_GENERATED_ASSET_DIR": "GeneratedAssetfiles",
     "RHINO_MCP_DRAWING_RECIPE_DIR": "DrawingRecipes",
+    "RHINO_MCP_DRAFTING_DIR": "Draftingfiles",
     "RHINO_MCP_CAPSULE_DIR": "capsules",
     "RHINO_MCP_MATERIAL_DIR": "Materialfiles",
     "RHINO_MCP_CONSTRUCTION_DIR": "Constructionfiles",
@@ -64,10 +65,32 @@ def _bundled_data(name: str):
     return candidate if candidate.is_dir() else None
 
 
+def _copy_missing(source, target: Path) -> None:
+    target.mkdir(parents=True, exist_ok=True)
+    for entry in source.iterdir():
+        dest = target / entry.name
+        if entry.is_dir():
+            _copy_missing(entry, dest)
+        elif not dest.exists():
+            with resources.as_file(entry) as src:
+                # Replace atomically; interruption cannot leave half a model.
+                import tempfile
+                with tempfile.NamedTemporaryFile(dir=target, delete=False) as handle:
+                    pending = Path(handle.name)
+                try:
+                    shutil.copy2(src, pending)
+                    os.replace(pending, dest)
+                finally:
+                    pending.unlink(missing_ok=True)
+
+
 def _scaffold(name: str, target: Path) -> None:
     target.mkdir(parents=True, exist_ok=True)
     bundled = _bundled_data(name)
     if bundled is None:
+        return
+    if name in {"GeneratedAssetfiles", "Draftingfiles"}:
+        _copy_missing(bundled, target)
         return
     for entry in bundled.iterdir():
         dest = target / entry.name
@@ -91,6 +114,8 @@ def resolve_dir(env_var: str) -> str:
     if repo is not None:
         return str(repo)
     target = user_data_dir() / name
+    if name in {"GeneratedAssetfiles", "Draftingfiles"}:
+        target = target / "releases" / __version__
     _scaffold(name, target)
     return str(target)
 

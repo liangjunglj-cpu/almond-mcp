@@ -12,9 +12,12 @@
     "height": 1100.0
   },
   "spatial": {
+    "metadata_version": 1,
     "units": "mm",
     "anchor": "bottom_center",
     "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
     "local_aabb": {
       "min": [
         -439.35,
@@ -27,6 +30,24 @@
         1100.0
       ]
     },
+    "footprint": [
+      [
+        -439.35,
+        -415.7
+      ],
+      [
+        439.35,
+        -415.7
+      ],
+      [
+        439.35,
+        415.7
+      ],
+      [
+        -439.35,
+        415.7
+      ]
+    ],
     "clearance_mm": {
       "front": 0,
       "back": 600,
@@ -45,5 +66,139 @@
     }
   ],
   "object_count": 1,
-  "license": "CC-BY-4.0"
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-office-chair-1",
+    "library_id": "generated_assets",
+    "name": "Office chair (generic swivel task chair)",
+    "category": "seating",
+    "tags": [
+      "chair",
+      "office",
+      "task chair",
+      "swivel",
+      "seating",
+      "furniture"
+    ],
+    "dimensions_mm": {
+      "width": 878.7,
+      "depth": 831.4,
+      "height": 1100.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 650.0,
+      "depth": 650.0,
+      "height": 1100.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -439.35,
+          -415.7,
+          0.0
+        ],
+        "max": [
+          439.35,
+          415.7,
+          1100.0
+        ]
+      },
+      "footprint": [
+        [
+          -439.35,
+          -415.7
+        ],
+        [
+          439.35,
+          -415.7
+        ],
+        [
+          439.35,
+          415.7
+        ],
+        [
+          -439.35,
+          415.7
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 600,
+        "left": 100,
+        "right": 100
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "secondary"
+    },
+    "materials": [
+      {
+        "material_id": "rubber-black",
+        "objects": [
+          "gen-office-chair-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "A generic black swivel office task chair with a padded seat, mesh backrest, armrests and a five-star base on castors.",
+        "image_task_id": "01a09789-5785-7773-8dcc-ed507a95c80a",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978f-4e8d-707c-a258-c9b3897bfcad",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 1100.0
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "office"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.352,
+      "triangle_count": 4101,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product.",
+        "Measured width/depth differs from the prompt target by more than 25%."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "290B51B30E4DB2DA0405D71AA7C08A93CCE42EB9DF33DD70F76D863D82F02CB3"
 }

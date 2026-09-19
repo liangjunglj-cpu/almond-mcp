@@ -12,9 +12,12 @@
     "height": 660.0
   },
   "spatial": {
+    "metadata_version": 1,
     "units": "mm",
     "anchor": "bottom_center",
     "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
     "local_aabb": {
       "min": [
         -702.55,
@@ -27,6 +30,24 @@
         660.0
       ]
     },
+    "footprint": [
+      [
+        -702.55,
+        -375.95
+      ],
+      [
+        702.55,
+        -375.95
+      ],
+      [
+        702.55,
+        375.95
+      ],
+      [
+        -702.55,
+        375.95
+      ]
+    ],
     "clearance_mm": {
       "front": 450,
       "back": 0,
@@ -45,5 +66,137 @@
     }
   ],
   "object_count": 1,
-  "license": "CC-BY-4.0"
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-sofa-2-seat-loose-cover-1",
+    "library_id": "generated_assets",
+    "name": "Sofa (boxy two-seat sofa with loose fabric cover)",
+    "category": "seating",
+    "tags": [
+      "sofa",
+      "two-seat",
+      "loose cover",
+      "compact",
+      "scandinavian"
+    ],
+    "dimensions_mm": {
+      "width": 1405.1,
+      "depth": 751.9,
+      "height": 660.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 1800.0,
+      "depth": 880.0,
+      "height": 660.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -702.55,
+          -375.95,
+          0.0
+        ],
+        "max": [
+          702.55,
+          375.95,
+          660.0
+        ]
+      },
+      "footprint": [
+        [
+          -702.55,
+          -375.95
+        ],
+        [
+          702.55,
+          -375.95
+        ],
+        [
+          702.55,
+          375.95
+        ],
+        [
+          -702.55,
+          375.95
+        ]
+      ],
+      "clearance_mm": {
+        "front": 450,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "primary"
+    },
+    "materials": [
+      {
+        "material_id": "rubber-black",
+        "objects": [
+          "gen-sofa-2-seat-loose-cover-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "A compact boxy two-seat sofa with a straight low back, straight square arms of the same height as the back, two seat cushions, all wrapped in a loose light grey fabric cover, sitting close to the floor, 1980s Scandinavian democratic design, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa91-b517-743a-8a06-09e099492995",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 776.470566
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "living_room"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.219,
+      "triangle_count": 4301,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "11B717522276DD8D2211525728DBFC835C58DFC3018E03A02030E2FBC664D885"
 }

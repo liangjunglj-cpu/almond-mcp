@@ -12,9 +12,12 @@
     "height": 1300.0
   },
   "spatial": {
+    "metadata_version": 1,
     "units": "mm",
     "anchor": "bottom_center",
     "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
     "local_aabb": {
       "min": [
         -281.2,
@@ -27,6 +30,24 @@
         1300.0
       ]
     },
+    "footprint": [
+      [
+        -281.2,
+        -293.9
+      ],
+      [
+        281.2,
+        -293.9
+      ],
+      [
+        281.2,
+        293.9
+      ],
+      [
+        -281.2,
+        293.9
+      ]
+    ],
     "clearance_mm": {
       "front": 0,
       "back": 0,
@@ -45,5 +66,138 @@
     }
   ],
   "object_count": 1,
-  "license": "CC-BY-4.0"
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-person-sitting-1",
+    "library_id": "generated_assets",
+    "name": "Person sitting (adult, seated on a plain stool)",
+    "category": "human_figure",
+    "tags": [
+      "person",
+      "human",
+      "scale figure",
+      "entourage",
+      "sitting",
+      "seated"
+    ],
+    "dimensions_mm": {
+      "width": 562.4,
+      "depth": 587.8,
+      "height": 1300.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 500.0,
+      "depth": 700.0,
+      "height": 1300.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -281.2,
+          -293.9,
+          0.0
+        ],
+        "max": [
+          281.2,
+          293.9,
+          1300.0
+        ]
+      },
+      "footprint": [
+        [
+          -281.2,
+          -293.9
+        ],
+        [
+          281.2,
+          -293.9
+        ],
+        [
+          281.2,
+          293.9
+        ],
+        [
+          -281.2,
+          293.9
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "accessory"
+    },
+    "materials": [
+      {
+        "material_id": "plaster-white",
+        "objects": [
+          "gen-person-sitting-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "A full-body adult person sitting on a plain simple stool, hands resting on knees, casual clothing, plain matte grey clay-like appearance.",
+        "image_task_id": "01a09787-bec7-77ba-bc26-f0c50c9def2a",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978d-8188-779f-ae9f-bf62075e5983",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 742.857143
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "interior",
+        "streetscape"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "section",
+        "interior_perspective",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.16,
+      "triangle_count": 4153,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "A4BCA08AA841E213EB59494B48A2E57FC90794A940EE78E7DB4B67717A7D23D2"
 }

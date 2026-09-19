@@ -8,10 +8,10 @@ normalised to real-world millimetres with an authored Almond spatial
 contract. Unlike the IKEA / drawing libraries (3D Warehouse content that
 each user downloads), these files ship with the repository.
 
-- **License:** models and contracts are released under
+- **License:** models are released under
   [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) - attribute as
   "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)".
-  Manifest, catalogue and tooling are MIT with the rest of the repo.
+  Contracts, manifest, catalogue and tooling are MIT with the rest of the repo.
 - **Units / axes:** millimetres; glTF Y-up in the file (Rhino's importer maps
   it to Z-up); bottom-centre at the origin; width = X, depth = Y (Rhino).
 - **Materials:** one `ALMOND::<material_id>` material per asset so
@@ -44,9 +44,36 @@ get_generated_asset(asset_id="gen-street-lamp-1")
 place_generated_asset(asset_id="gen-street-lamp-1", x_mm=0, y_mm=0)
 ```
 
-`almond-mcp fetch-assets` downloads any missing GLB/contract from this
-repository (wheel installs ship only the manifest); `--no-download` disables
-that.
+Version 0.6 bundles all 47 models, contracts and previews in the wheel.
+Run `almond-mcp audit-assets` to check checksums and agreement between embedded,
+sidecar and manifest passports. Wheel installs use a versioned user-data pack;
+explicit library directory overrides continue to take precedence.
+
+## Embedded passports and reasoning tools
+
+Each GLB contains `asset.extras.almond.passport`; nodes carry stable Almond
+identity references. The same passport lives in the `.almond.json` contract
+and the manifest, validated against `passport.schema.json`. It records
+measured and nominal dimensions separately, source prompts and Meshy task ids,
+materials, clearances, support plane, usage suggestions, quality caveats and
+attribution. Suggested rooms are category/label heuristics, not audited facts.
+
+```text
+recommend_generated_assets(query="bench", width_mm=2400, depth_mm=1600)
+get_generated_asset_passport(asset_id="gen-park-bench-1")
+evaluate_generated_asset_fit(asset_id="gen-park-bench-1", width_mm=2400, depth_mm=1600)
+```
+
+Read `almond://generated/catalogue` and the per-asset `/passport` and `/preview`
+resources from an MCP client. Clearances are authored design allowances;
+rectangular fit does not check actual room obstacles or certify accessibility.
+Existing geometry remains unchanged. These legacy GLBs contain numeric mm,
+so a generic metre-based glTF viewer needs a 0.001 scale conversion; Almond's
+existing Rhino placement uses its millimetre contract.
+
+Run `python tools/enrich_generated_assets.py` to refresh passports on existing
+normalised models. The normalisation builder also embeds passports for new
+models. `almond-mcp audit-assets` verifies the result.
 
 ## Assets
 

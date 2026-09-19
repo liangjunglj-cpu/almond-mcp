@@ -12,9 +12,12 @@
     "height": 800.0
   },
   "spatial": {
+    "metadata_version": 1,
     "units": "mm",
     "anchor": "bottom_center",
     "support_plane": "ground",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
     "local_aabb": {
       "min": [
         -276.55,
@@ -27,6 +30,24 @@
         800.0
       ]
     },
+    "footprint": [
+      [
+        -276.55,
+        -18.2
+      ],
+      [
+        276.55,
+        -18.2
+      ],
+      [
+        276.55,
+        18.2
+      ],
+      [
+        -276.55,
+        18.2
+      ]
+    ],
     "clearance_mm": {
       "front": 900,
       "back": 900,
@@ -45,5 +66,139 @@
     }
   ],
   "object_count": 1,
-  "license": "CC-BY-4.0"
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-bike-rack-1",
+    "library_id": "generated_assets",
+    "name": "Bike rack (inverted U hoop)",
+    "category": "site_furniture",
+    "tags": [
+      "bike rack",
+      "bicycle",
+      "parking",
+      "hoop",
+      "street furniture",
+      "site"
+    ],
+    "dimensions_mm": {
+      "width": 553.1,
+      "depth": 36.4,
+      "height": 800.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 800.0,
+      "depth": 80.0,
+      "height": 800.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "ground",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -276.55,
+          -18.2,
+          0.0
+        ],
+        "max": [
+          276.55,
+          18.2,
+          800.0
+        ]
+      },
+      "footprint": [
+        [
+          -276.55,
+          -18.2
+        ],
+        [
+          276.55,
+          -18.2
+        ],
+        [
+          276.55,
+          18.2
+        ],
+        [
+          -276.55,
+          18.2
+        ]
+      ],
+      "clearance_mm": {
+        "front": 900,
+        "back": 900,
+        "left": 300,
+        "right": 300
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "fixed"
+    },
+    "materials": [
+      {
+        "material_id": "steel-galvanized",
+        "objects": [
+          "gen-bike-rack-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "An inverted-U shaped steel tube bicycle parking hoop, single hoop, galvanised grey finish, standing on the ground.",
+        "image_task_id": "01a09788-35cb-70ce-aabe-731f4ae38e2e",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978e-0b68-73de-83cd-43a250b2dbc2",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 999.999985
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "landscape",
+        "streetscape"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "site_plan",
+        "elevation",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.545,
+      "triangle_count": 4179,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product.",
+        "Measured width/depth differs from the prompt target by more than 25%."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "647481662778EF71418F857A37D4E0A5CC4C269BFCB7C209E06230673D988411"
 }

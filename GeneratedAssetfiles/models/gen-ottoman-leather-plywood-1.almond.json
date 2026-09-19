@@ -12,9 +12,12 @@
     "height": 430.0
   },
   "spatial": {
+    "metadata_version": 1,
     "units": "mm",
     "anchor": "bottom_center",
     "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
     "local_aabb": {
       "min": [
         -351.7,
@@ -27,6 +30,24 @@
         430.0
       ]
     },
+    "footprint": [
+      [
+        -351.7,
+        -326.3
+      ],
+      [
+        351.7,
+        -326.3
+      ],
+      [
+        351.7,
+        326.3
+      ],
+      [
+        -351.7,
+        326.3
+      ]
+    ],
     "clearance_mm": {
       "front": 0,
       "back": 0,
@@ -45,5 +66,136 @@
     }
   ],
   "object_count": 1,
-  "license": "CC-BY-4.0"
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-ottoman-leather-plywood-1",
+    "library_id": "generated_assets",
+    "name": "Ottoman (matching leather ottoman on aluminium base)",
+    "category": "seating",
+    "tags": [
+      "ottoman",
+      "footstool",
+      "leather",
+      "mid-century"
+    ],
+    "dimensions_mm": {
+      "width": 703.4,
+      "depth": 652.6,
+      "height": 430.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 660.0,
+      "depth": 540.0,
+      "height": 430.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -351.7,
+          -326.3,
+          0.0
+        ],
+        "max": [
+          351.7,
+          326.3,
+          430.0
+        ]
+      },
+      "footprint": [
+        [
+          -351.7,
+          -326.3
+        ],
+        [
+          351.7,
+          -326.3
+        ],
+        [
+          351.7,
+          326.3
+        ],
+        [
+          -351.7,
+          326.3
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "secondary"
+    },
+    "materials": [
+      {
+        "material_id": "wood-walnut",
+        "objects": [
+          "gen-ottoman-leather-plywood-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "A rectangular ottoman with a single curved moulded rosewood plywood shell holding a thick tufted black leather cushion, on a four-star cast aluminium base, 1950s American mid-century design, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa91-49ea-7048-9c4c-58c716e6105c",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 781.81808
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "living_room"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.209,
+      "triangle_count": 3976,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "6F0F374835DF25039447F769AF9DC8FF0B36E6A27DDF12100EA853A30B5B866D"
 }

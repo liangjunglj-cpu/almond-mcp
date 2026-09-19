@@ -12,9 +12,12 @@
     "height": 900.0
   },
   "spatial": {
+    "metadata_version": 1,
     "units": "mm",
     "anchor": "bottom_center",
     "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
     "local_aabb": {
       "min": [
         -357.7,
@@ -27,6 +30,24 @@
         900.0
       ]
     },
+    "footprint": [
+      [
+        -357.7,
+        -363.85
+      ],
+      [
+        357.7,
+        -363.85
+      ],
+      [
+        357.7,
+        363.85
+      ],
+      [
+        -357.7,
+        363.85
+      ]
+    ],
     "clearance_mm": {
       "front": 1000,
       "back": 0,
@@ -45,5 +66,137 @@
     }
   ],
   "object_count": 1,
-  "license": "CC-BY-4.0"
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-kitchen-range-1",
+    "library_id": "generated_assets",
+    "name": "Kitchen range (freestanding cooker with oven)",
+    "category": "appliance",
+    "tags": [
+      "cooker",
+      "range",
+      "oven",
+      "hob",
+      "kitchen",
+      "appliance"
+    ],
+    "dimensions_mm": {
+      "width": 715.4,
+      "depth": 727.7,
+      "height": 900.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 600.0,
+      "depth": 600.0,
+      "height": 900.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -357.7,
+          -363.85,
+          0.0
+        ],
+        "max": [
+          357.7,
+          363.85,
+          900.0
+        ]
+      },
+      "footprint": [
+        [
+          -357.7,
+          -363.85
+        ],
+        [
+          357.7,
+          -363.85
+        ],
+        [
+          357.7,
+          363.85
+        ],
+        [
+          -357.7,
+          363.85
+        ]
+      ],
+      "clearance_mm": {
+        "front": 1000,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "fixed"
+    },
+    "materials": [
+      {
+        "material_id": "steel-galvanized",
+        "objects": [
+          "gen-kitchen-range-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "A freestanding stainless steel kitchen range cooker with a four-burner gas hob on top and a single oven door with handle, plain modern design.",
+        "image_task_id": "01a09788-f46c-7507-8a37-d715e3da5091",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978e-ee7e-750c-91f6-c5e4724b3c6c",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 1000.000026
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "kitchen"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.213,
+      "triangle_count": 2935,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "EFA0C0E3F07ACFD4A5237E3CE13C55374C015D80C633DADF096BC9645717ED57"
 }

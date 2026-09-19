@@ -12,7 +12,7 @@ The furniture, context, drawing, and diagram model files that Almond's
 manifests describe were downloaded from Trimble's
 [3D Warehouse](https://3dwarehouse.sketchup.com). The 3D Warehouse Terms of
 Use prohibit redistributing downloaded models as stand-alone items or
-aggregating them for redistribution, so **no model file is included in any
+aggregating them for redistribution, so **no downloaded 3D Warehouse model file is included in any
 distribution artifact** (PyPI wheel, sdist, Yak package, or git repository).
 
 What Almond distributes instead is its own factual metadata: manifests
@@ -25,7 +25,7 @@ missing and verifies checksums after download.
 ## Generated asset library — distributed (CC BY 4.0)
 
 The models in `GeneratedAssetfiles/models/` (people, trees, vehicles, site
-furniture, doors, windows, stairs, columns, sanitary fixtures, generic
+furniture, columns, balustrades, sanitary fixtures, generic
 furniture) were generated with [Meshy](https://www.meshy.ai) from prompts
 written for this project and normalised by `tools/build_generated_assets.py`.
 Output generated on a paid Meshy plan belongs to the generating account, and
@@ -104,3 +104,25 @@ IN THE SOFTWARE.
 `fastmcp`, `mcp`, `pydantic`, and `lxml` are declared dependencies installed
 by the user's package manager from PyPI; they are not vendored into any
 almond-mcp artifact.
+# Drafting runtime dependencies (0.6.0rc2)
+
+The optional use of architectural reference directories does not bundle their
+drawings. The drawing pilot is derived from Almond's generated CC BY 4.0 model
+pack and retains source attribution in every SVG and package manifest.
+
+Drafting uses NumPy (BSD-3-Clause), Shapely (BSD-3-Clause; its binary distributions
+also carry GEOS licensing notices) and ezdxf (MIT). These are installed as
+dependencies with their own notices; they are not relicensed as Almond code.
+
+Dense mesh drafting also uses Pillow (MIT-CMU) and ContourPy (BSD-3-Clause),
+installed with their own licence notices, to convert bounded projection masks
+into explicit vector contours.
+
+## Browser model viewer
+
+The local Object Archive vendors `@google/model-viewer` 4.3.1 from the official
+npm registry (https://www.npmjs.com/package/@google/model-viewer), under Apache
+License 2.0. Its original licence and package integrity record are included in
+`almond_mcp/library_ui/vendor/`. The distribution bundle retains embedded
+third-party notices. Full component licence texts and their retrieval records
+are also included in `THIRD-PARTY-LICENSES.txt` and `version.json` there.

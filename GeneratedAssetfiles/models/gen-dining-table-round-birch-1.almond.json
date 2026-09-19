@@ -12,9 +12,12 @@
     "height": 720.0
   },
   "spatial": {
+    "metadata_version": 1,
     "units": "mm",
     "anchor": "bottom_center",
     "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
     "local_aabb": {
       "min": [
         -558.55,
@@ -27,6 +30,24 @@
         720.0
       ]
     },
+    "footprint": [
+      [
+        -558.55,
+        -558.55
+      ],
+      [
+        558.55,
+        -558.55
+      ],
+      [
+        558.55,
+        558.55
+      ],
+      [
+        -558.55,
+        558.55
+      ]
+    ],
     "clearance_mm": {
       "front": 900,
       "back": 900,
@@ -45,5 +66,137 @@
     }
   ],
   "object_count": 1,
-  "license": "CC-BY-4.0"
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-dining-table-round-birch-1",
+    "library_id": "generated_assets",
+    "name": "Dining table (round white laminate top on four bent-birch L-legs)",
+    "category": "table",
+    "tags": [
+      "table",
+      "dining",
+      "round",
+      "birch",
+      "scandinavian"
+    ],
+    "dimensions_mm": {
+      "width": 1117.1,
+      "depth": 1117.1,
+      "height": 720.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 1250.0,
+      "depth": 1250.0,
+      "height": 720.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -558.55,
+          -558.55,
+          0.0
+        ],
+        "max": [
+          558.55,
+          558.55,
+          720.0
+        ]
+      },
+      "footprint": [
+        [
+          -558.55,
+          -558.55
+        ],
+        [
+          558.55,
+          -558.55
+        ],
+        [
+          558.55,
+          558.55
+        ],
+        [
+          -558.55,
+          558.55
+        ]
+      ],
+      "clearance_mm": {
+        "front": 900,
+        "back": 900,
+        "left": 900,
+        "right": 900
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "primary"
+    },
+    "materials": [
+      {
+        "material_id": "wood-birch-ply",
+        "objects": [
+          "gen-dining-table-round-birch-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "A round dining table with a plain white laminate top and a birch edge, standing on four solid birch L-shaped legs that curve smoothly from vertical into horizontal under the top, pale natural birch, Scandinavian functionalist design, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa91-03c7-7285-b20e-1b5ac1132a27",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 960.0
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "dining_room"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.106,
+      "triangle_count": 4288,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "617BB30EA7F78CD1B5EC9543A092516D5CB2128735835ED39CB5EC2028C68FBE"
 }

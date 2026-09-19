@@ -12,9 +12,12 @@
     "height": 680.0
   },
   "spatial": {
+    "metadata_version": 1,
     "units": "mm",
     "anchor": "bottom_center",
     "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
     "local_aabb": {
       "min": [
         -366.0,
@@ -27,6 +30,24 @@
         680.0
       ]
     },
+    "footprint": [
+      [
+        -366.0,
+        -415.45
+      ],
+      [
+        366.0,
+        -415.45
+      ],
+      [
+        366.0,
+        415.45
+      ],
+      [
+        -366.0,
+        415.45
+      ]
+    ],
     "clearance_mm": {
       "front": 500,
       "back": 0,
@@ -45,5 +66,137 @@
     }
   ],
   "object_count": 1,
-  "license": "CC-BY-4.0"
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-lounge-chair-molded-plywood-1",
+    "library_id": "generated_assets",
+    "name": "Lounge chair (moulded plywood lounge chair, low, wood legs)",
+    "category": "seating",
+    "tags": [
+      "lounge chair",
+      "moulded plywood",
+      "mid-century",
+      "walnut"
+    ],
+    "dimensions_mm": {
+      "width": 732.0,
+      "depth": 830.9,
+      "height": 680.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 560.0,
+      "depth": 610.0,
+      "height": 680.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -366.0,
+          -415.45,
+          0.0
+        ],
+        "max": [
+          366.0,
+          415.45,
+          680.0
+        ]
+      },
+      "footprint": [
+        [
+          -366.0,
+          -415.45
+        ],
+        [
+          366.0,
+          -415.45
+        ],
+        [
+          366.0,
+          415.45
+        ],
+        [
+          -366.0,
+          415.45
+        ]
+      ],
+      "clearance_mm": {
+        "front": 500,
+        "back": 0,
+        "left": 100,
+        "right": 100
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "primary"
+    },
+    "materials": [
+      {
+        "material_id": "wood-walnut",
+        "objects": [
+          "gen-lounge-chair-molded-plywood-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "A low lounge chair made of five separate pieces of moulded walnut plywood: a curved seat panel, a curved back panel, a bent spine and two bent plywood leg frames, joined by black rubber shock mounts, warm walnut veneer, 1940s American mid-century design, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa91-1d40-7618-b8d3-e353a136748f",
+        "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 906.719378
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "living_room"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.362,
+      "triangle_count": 79996,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product.",
+        "Measured width/depth differs from the prompt target by more than 25%."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "AE08448C3EE0201ACB9CC6FD85F0D38F2AF3F38772F6BEF2934EF6F55AF9F45E"
 }

@@ -12,9 +12,12 @@
     "height": 355.0
   },
   "spatial": {
+    "metadata_version": 1,
     "units": "mm",
     "anchor": "bottom_center",
     "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
     "local_aabb": {
       "min": [
         -899.8,
@@ -27,6 +30,24 @@
         355.0
       ]
     },
+    "footprint": [
+      [
+        -899.8,
+        -311.95
+      ],
+      [
+        899.8,
+        -311.95
+      ],
+      [
+        899.8,
+        311.95
+      ],
+      [
+        -899.8,
+        311.95
+      ]
+    ],
     "clearance_mm": {
       "front": 450,
       "back": 0,
@@ -45,5 +66,139 @@
     }
   ],
   "object_count": 1,
-  "license": "CC-BY-4.0"
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-bench-slatted-platform-1",
+    "library_id": "generated_assets",
+    "name": "Bench (slatted wood platform bench on ebonised frame)",
+    "category": "seating",
+    "tags": [
+      "bench",
+      "platform",
+      "slatted",
+      "mid-century",
+      "seating",
+      "table"
+    ],
+    "dimensions_mm": {
+      "width": 1799.6,
+      "depth": 623.9,
+      "height": 355.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 1830.0,
+      "depth": 470.0,
+      "height": 355.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -899.8,
+          -311.95,
+          0.0
+        ],
+        "max": [
+          899.8,
+          311.95,
+          355.0
+        ]
+      },
+      "footprint": [
+        [
+          -899.8,
+          -311.95
+        ],
+        [
+          899.8,
+          -311.95
+        ],
+        [
+          899.8,
+          311.95
+        ],
+        [
+          -899.8,
+          311.95
+        ]
+      ],
+      "clearance_mm": {
+        "front": 450,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "primary"
+    },
+    "materials": [
+      {
+        "material_id": "wood-walnut",
+        "objects": [
+          "gen-bench-slatted-platform-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "A long low platform bench made of narrow parallel maple wood slats with small gaps between them, on a simple black ebonised wood frame with two rectangular trestle-like supports, 1940s American mid-century design, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa91-6772-760d-9c3c-a799506e6a09",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 473.333333
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "living_room"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.327,
+      "triangle_count": 3581,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product.",
+        "Measured width/depth differs from the prompt target by more than 25%."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "5CB344DE2791FDE3C527D7BB372CEF662B42CCE95463A6DD6803B98B43F7A7AF"
 }

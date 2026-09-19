@@ -12,9 +12,12 @@
     "height": 3000.0
   },
   "spatial": {
+    "metadata_version": 1,
     "units": "mm",
     "anchor": "bottom_center",
     "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
     "local_aabb": {
       "min": [
         -235.85,
@@ -27,6 +30,24 @@
         3000.0
       ]
     },
+    "footprint": [
+      [
+        -235.85,
+        -248.3
+      ],
+      [
+        235.85,
+        -248.3
+      ],
+      [
+        235.85,
+        248.3
+      ],
+      [
+        -235.85,
+        248.3
+      ]
+    ],
     "clearance_mm": {
       "front": 0,
       "back": 0,
@@ -45,5 +66,137 @@
     }
   ],
   "object_count": 1,
-  "license": "CC-BY-4.0"
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-column-square-1",
+    "library_id": "generated_assets",
+    "name": "Square column (plain concrete)",
+    "category": "column",
+    "tags": [
+      "column",
+      "square",
+      "pillar",
+      "structure",
+      "component"
+    ],
+    "dimensions_mm": {
+      "width": 471.7,
+      "depth": 496.6,
+      "height": 3000.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 400.0,
+      "depth": 400.0,
+      "height": 3000.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -235.85,
+          -248.3,
+          0.0
+        ],
+        "max": [
+          235.85,
+          248.3,
+          3000.0
+        ]
+      },
+      "footprint": [
+        [
+          -235.85,
+          -248.3
+        ],
+        [
+          235.85,
+          -248.3
+        ],
+        [
+          235.85,
+          248.3
+        ],
+        [
+          -235.85,
+          248.3
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "fixed"
+    },
+    "materials": [
+      {
+        "material_id": "concrete-smooth",
+        "objects": [
+          "gen-column-square-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "A plain square-section concrete column, no capital or base, sharp edges, smooth matte finish, standing vertically on the ground.",
+        "image_task_id": "01a09788-a362-736d-a43d-cf3cc88ce046",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978e-9c7d-7753-81ab-fa258d35eb88",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 1000.0
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "architecture"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "elevation",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.242,
+      "triangle_count": 4258,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "659BCD5EA07672B49C10967F4C1EEB973EBB2D166D4461A9ABB3AE165A3E7C5A"
 }

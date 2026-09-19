@@ -39,7 +39,8 @@ REPO = Path(__file__).resolve().parents[1]
 if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 
-from almond_mcp import exchange  # noqa: E402
+from almond_mcp import __version__, exchange  # noqa: E402
+from almond_mcp.asset_passport import enrich_asset  # noqa: E402
 
 LIBRARY_DIR = REPO / "GeneratedAssetfiles"
 MATERIAL_MANIFEST = REPO / "Materialfiles" / "manifest.json"
@@ -402,6 +403,7 @@ def normalise(asset: dict, raw_path: Path, out_dir: Path, materials: dict[str, d
     }
     if "mount_height_mm" in asset:
         record["spatial"]["mount_height_mm"] = asset["mount_height_mm"]
+    enrich_asset(record, contract, glb_path, contract_path)
     return record
 
 
@@ -453,6 +455,8 @@ def main(argv: list[str] | None = None) -> int:
         records.append(record)
 
     manifest = {
+        "asset_pack_version": __version__,
+        "passport_schema_version": 1,
         "library_id": catalogue["library_id"],
         "library_name": catalogue["library_name"],
         "catalogue_region": "Generated (Meshy) - no vendor catalogue",

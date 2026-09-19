@@ -12,9 +12,12 @@
     "height": 640.0
   },
   "spatial": {
+    "metadata_version": 1,
     "units": "mm",
     "anchor": "bottom_center",
     "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
     "local_aabb": {
       "min": [
         -282.3,
@@ -27,6 +30,24 @@
         640.0
       ]
     },
+    "footprint": [
+      [
+        -282.3,
+        -455.35
+      ],
+      [
+        282.3,
+        -455.35
+      ],
+      [
+        282.3,
+        455.35
+      ],
+      [
+        -282.3,
+        455.35
+      ]
+    ],
     "clearance_mm": {
       "front": 500,
       "back": 0,
@@ -45,5 +66,137 @@
     }
   ],
   "object_count": 1,
-  "license": "CC-BY-4.0"
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-lounge-chair-bent-plywood-1",
+    "library_id": "generated_assets",
+    "name": "Lounge chair (cantilevered bent-plywood lounge chair, scroll seat)",
+    "category": "seating",
+    "tags": [
+      "lounge chair",
+      "armchair",
+      "cantilever",
+      "bent plywood",
+      "scandinavian"
+    ],
+    "dimensions_mm": {
+      "width": 564.6,
+      "depth": 910.7,
+      "height": 640.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 600.0,
+      "depth": 800.0,
+      "height": 640.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -282.3,
+          -455.35,
+          0.0
+        ],
+        "max": [
+          282.3,
+          455.35,
+          640.0
+        ]
+      },
+      "footprint": [
+        [
+          -282.3,
+          -455.35
+        ],
+        [
+          282.3,
+          -455.35
+        ],
+        [
+          282.3,
+          455.35
+        ],
+        [
+          -282.3,
+          455.35
+        ]
+      ],
+      "clearance_mm": {
+        "front": 500,
+        "back": 0,
+        "left": 100,
+        "right": 100
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "primary"
+    },
+    "materials": [
+      {
+        "material_id": "wood-birch-ply",
+        "objects": [
+          "gen-lounge-chair-bent-plywood-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "A cantilevered lounge chair whose frame is two closed loops of laminated bent birch on each side, with a single thin sheet of moulded plywood seat and back that curls into a scroll at the head and foot, pale birch frame, black lacquered seat, 1930s Scandinavian functionalist design, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa90-e5e2-7691-95e9-74574f2c643d",
+        "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 800.003535
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "living_room"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.138,
+      "triangle_count": 79999,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "D12302E5FFAC3FF25E16660FEF2C6DF0D6709EED0E6FCA4FD4E27D11E4A3302F"
 }

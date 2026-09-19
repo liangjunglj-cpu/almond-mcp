@@ -1,0 +1,225 @@
+{
+  "schema_version": 1,
+  "name": "Conifer tree",
+  "source": {
+    "asset_id": "gen-tree-conifer-1",
+    "geometry_sha256": "E154A8FFF1C48F44F320B6B6ADB69421E49ADA9C145B749499E126EE993AE8BC",
+    "model_sha256": "5759805D48BAFB55BE10C064DCDD2666A4B138D5C61D479D959D8DC0D79584C1",
+    "units": "mm",
+    "input_units": "mm",
+    "input_up_axis": "y",
+    "coordinate_transform": "X,-Z,Y",
+    "view_axes": {
+      "plan": "X,Y",
+      "front": "X,Z; looking +Y",
+      "right": "-Y,Z; looking -X"
+    },
+    "dimension_basis": "measured_mesh_geometry",
+    "engine_version": 2,
+    "method": "triangle_union_or_dense_mesh_raster_projection; see per-view method and resolution",
+    "source_references": [],
+    "reference_relationship_scope": "attached_to_this_drawing; not original mesh-generation inputs",
+    "created_at": "2026-09-19T02:00:36.020025+00:00",
+    "attribution": "Almond generated asset library",
+    "derived_asset_license": "CC-BY-4.0",
+    "generation_record": {
+      "asset_id": "gen-tree-conifer-1",
+      "name": "Conifer tree",
+      "model_file": "models/gen-tree-conifer-1.glb",
+      "model_sha256": "5759805D48BAFB55BE10C064DCDD2666A4B138D5C61D479D959D8DC0D79584C1",
+      "contract_file": "models/gen-tree-conifer-1.almond.json",
+      "contract_sha256": "1A93F5AF297C97FEA945563CE8EB1F0B16442923724C60E433F8D6307CB24D13",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "Architectural visualisation model of a tall conifer (Scots pine style) tree, about 9 metres tall: a straight trunk visible from the ground up through the crown, whorls of horizontal branches with layered flat needle foliage clusters, gaps between the layers showing trunk and branches, deep green needles, slightly irregular natural silhouette, narrow crown.",
+        "image_task_id": "01a097aa-f72a-71a9-b906-e9eecce976c0",
+        "image_model": "nano-banana-pro",
+        "mesh_task_id": "01a097ad-99ec-7424-8b6b-17b218a4c717",
+        "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+        "generated_at": "2026-09-13",
+        "orientation_correction": null,
+        "scale_applied": 450.807332
+      },
+      "recorded_task_history": {
+        "image_model": "nano-banana-pro",
+        "image_task_id": "01a097aa-f72a-71a9-b906-e9eecce976c0",
+        "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+        "mesh_task_id": "01a097ad-99ec-7424-8b6b-17b218a4c717",
+        "generated_at": "2026-09-13",
+        "supersedes": {
+          "image_task_id": "see git history",
+          "reason": "first pass (meshy-t2) foliage too blobby"
+        }
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "catalogue_image_stage_tool",
+        "id": "01a097aa-f72a-71a9-b906-e9eecce976c0",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": "high_detail",
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    "limitations": [
+      "Projected silhouettes only: internal visible/hidden edges and construction layers are not inferred.",
+      "Front is the declared coordinate direction, not a verified product front.",
+      "Dimensions describe mesh geometry, not a manufacturer-verified product."
+    ]
+  },
+  "triangle_count": 80000,
+  "scales": [
+    50,
+    100
+  ],
+  "representations": [
+    {
+      "view": "plan",
+      "bounds_mm": [
+        -1918.6774023628493,
+        -1858.4341746471991,
+        1918.6774023628495,
+        1858.434174647199
+      ],
+      "method": "raster_to_vector_silhouette",
+      "raster_pixel_mm": 1.877375149083023,
+      "approximation_note": "Subpixel openings/features can disappear; raster boundary plus simplification error is not independently measured",
+      "precision_grid_mm": null,
+      "simplification_tolerance_mm": 2.5,
+      "preserve_topology": false,
+      "area_mm2": 5839162.8611711385,
+      "deviation_basis": "raster_and_simplification_approximation",
+      "scale": 50,
+      "svg": "plan-1-50.svg",
+      "dxf": "plan-1-50.dxf"
+    },
+    {
+      "view": "front",
+      "bounds_mm": [
+        -1918.6774023628493,
+        0.0,
+        1918.6774023628495,
+        9000.0
+      ],
+      "method": "raster_to_vector_silhouette",
+      "raster_pixel_mm": 4.403131115459883,
+      "approximation_note": "Subpixel openings/features can disappear; raster boundary plus simplification error is not independently measured",
+      "precision_grid_mm": null,
+      "simplification_tolerance_mm": 2.5,
+      "preserve_topology": false,
+      "area_mm2": 9446498.282884344,
+      "deviation_basis": "raster_and_simplification_approximation",
+      "scale": 50,
+      "svg": "front-1-50.svg",
+      "dxf": "front-1-50.dxf"
+    },
+    {
+      "view": "right",
+      "bounds_mm": [
+        -1858.434174647199,
+        0.0,
+        1858.4341746471991,
+        9000.0
+      ],
+      "method": "raster_to_vector_silhouette",
+      "raster_pixel_mm": 4.403131115459883,
+      "approximation_note": "Subpixel openings/features can disappear; raster boundary plus simplification error is not independently measured",
+      "precision_grid_mm": null,
+      "simplification_tolerance_mm": 2.5,
+      "preserve_topology": false,
+      "area_mm2": 9464499.635705492,
+      "deviation_basis": "raster_and_simplification_approximation",
+      "scale": 50,
+      "svg": "right-1-50.svg",
+      "dxf": "right-1-50.dxf"
+    },
+    {
+      "view": "plan",
+      "bounds_mm": [
+        -1918.6774023628493,
+        -1858.4341746471991,
+        1918.6774023628495,
+        1858.434174647199
+      ],
+      "method": "raster_to_vector_silhouette",
+      "raster_pixel_mm": 1.877375149083023,
+      "approximation_note": "Subpixel openings/features can disappear; raster boundary plus simplification error is not independently measured",
+      "precision_grid_mm": null,
+      "simplification_tolerance_mm": 5.0,
+      "preserve_topology": false,
+      "area_mm2": 5915784.689352603,
+      "deviation_basis": "raster_and_simplification_approximation",
+      "scale": 100,
+      "svg": "plan-1-100.svg",
+      "dxf": "plan-1-100.dxf"
+    },
+    {
+      "view": "front",
+      "bounds_mm": [
+        -1918.6774023628493,
+        0.0,
+        1918.6774023628495,
+        9000.0
+      ],
+      "method": "raster_to_vector_silhouette",
+      "raster_pixel_mm": 4.403131115459883,
+      "approximation_note": "Subpixel openings/features can disappear; raster boundary plus simplification error is not independently measured",
+      "precision_grid_mm": null,
+      "simplification_tolerance_mm": 5.0,
+      "preserve_topology": false,
+      "area_mm2": 9542250.786243383,
+      "deviation_basis": "raster_and_simplification_approximation",
+      "scale": 100,
+      "svg": "front-1-100.svg",
+      "dxf": "front-1-100.dxf"
+    },
+    {
+      "view": "right",
+      "bounds_mm": [
+        -1858.434174647199,
+        0.0,
+        1858.4341746471991,
+        9000.0
+      ],
+      "method": "raster_to_vector_silhouette",
+      "raster_pixel_mm": 4.403131115459883,
+      "approximation_note": "Subpixel openings/features can disappear; raster boundary plus simplification error is not independently measured",
+      "precision_grid_mm": null,
+      "simplification_tolerance_mm": 5.0,
+      "preserve_topology": false,
+      "area_mm2": 9548920.85261993,
+      "deviation_basis": "raster_and_simplification_approximation",
+      "scale": 100,
+      "svg": "right-1-100.svg",
+      "dxf": "right-1-100.dxf"
+    }
+  ],
+  "files": {
+    "front-1-100.dxf": "A1F201E71B0A0573721807CA5ECEC37D2AB0E000BFD11DFBFC266362921DC80C",
+    "front-1-100.svg": "52DC480086187D3AD61A5B6E55E302647CA2D095B32BCF286922E6FB605E3BB9",
+    "front-1-50.dxf": "D52BBA48208558B240BBBE03891843DB9BDA9900B2F5596B3AFB04405036D280",
+    "front-1-50.svg": "124F147CEC9AF7E58139C6C7DC8AB7EA74C964ADB059E9373278443F3262F920",
+    "plan-1-100.dxf": "908A7A53EC44823A3243C6F192917E3EBE24453D44AFBA7A94A4A1678D3639CD",
+    "plan-1-100.svg": "0E26A9A88B7CF20073D44621E0ECAF772EE17965DEEAADFEC715B91C83B0422F",
+    "plan-1-50.dxf": "052518DBEC077970316826BD6061EABE3DDD2CCB839FA5AEA05D0261B1BF5F26",
+    "plan-1-50.svg": "473B825F6AF8CDCEECDDE8F31DCB3A6425DACC6B6171CB3840ABA6A0E5B2CC5E",
+    "right-1-100.dxf": "A05AF78BF2C305284FB4E0B0356F543DBF58FD39DCF01E6E73F69A76C45D0F4C",
+    "right-1-100.svg": "1D8B8B1983C0517596696BFE8DEC3A48794D1055FB68EADD76C81D68C2770118",
+    "right-1-50.dxf": "A33E6A6C4877DEEB5802792D23FC5E947555382DFE28B2AC88407919E1764009",
+    "right-1-50.svg": "4DAC98F3FCA899BBC06EDF4D25C2EAF4BCC7DA782B6024D13F686E69736E53D8",
+    "sheet-A3-1-100.svg": "F520BCE1B41A1F13646677CE987E2FB0547E04E6BED1F810FBEC83FC08A98A7F",
+    "sheet-A3-1-50.svg": "A35DE7A35B70B1156211EC84A518014890D7DF91BD75A95EBEDD82F9F4089A51",
+    "views.json": "B37A3B54B49AC2B3DD4B6A19CDBA7F63E260DB62B44FAD20CB34974A60F6C55B"
+  }
+}

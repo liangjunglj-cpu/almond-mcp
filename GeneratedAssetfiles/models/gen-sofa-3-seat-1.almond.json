@@ -12,9 +12,12 @@
     "height": 850.0
   },
   "spatial": {
+    "metadata_version": 1,
     "units": "mm",
     "anchor": "bottom_center",
     "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
     "local_aabb": {
       "min": [
         -1173.05,
@@ -27,6 +30,24 @@
         850.0
       ]
     },
+    "footprint": [
+      [
+        -1173.05,
+        -491.45
+      ],
+      [
+        1173.05,
+        -491.45
+      ],
+      [
+        1173.05,
+        491.45
+      ],
+      [
+        -1173.05,
+        491.45
+      ]
+    ],
     "clearance_mm": {
       "front": 450,
       "back": 0,
@@ -45,5 +66,137 @@
     }
   ],
   "object_count": 1,
-  "license": "CC-BY-4.0"
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-sofa-3-seat-1",
+    "library_id": "generated_assets",
+    "name": "Sofa (generic three-seat, fabric)",
+    "category": "seating",
+    "tags": [
+      "sofa",
+      "couch",
+      "seating",
+      "living room",
+      "furniture"
+    ],
+    "dimensions_mm": {
+      "width": 2346.1,
+      "depth": 982.9,
+      "height": 850.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 2100.0,
+      "depth": 900.0,
+      "height": 850.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -1173.05,
+          -491.45,
+          0.0
+        ],
+        "max": [
+          1173.05,
+          491.45,
+          850.0
+        ]
+      },
+      "footprint": [
+        [
+          -1173.05,
+          -491.45
+        ],
+        [
+          1173.05,
+          -491.45
+        ],
+        [
+          1173.05,
+          491.45
+        ],
+        [
+          -1173.05,
+          491.45
+        ]
+      ],
+      "clearance_mm": {
+        "front": 450,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "primary"
+    },
+    "materials": [
+      {
+        "material_id": "rubber-black",
+        "objects": [
+          "gen-sofa-3-seat-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "A generic modern three-seat sofa with square arms, three seat cushions and three back cushions, plain grey fabric upholstery, short legs.",
+        "image_task_id": "01a09789-0ef6-754a-b0cd-e3f54dfe4a6e",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978f-0a4a-7263-b015-501f0fd70df6",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 999.999937
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "living_room"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.117,
+      "triangle_count": 4087,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "EE978EF6EDFF09F7FB5CD2CF6DC8D81EB802487959BF6565BCB2CAEAE4C9FD12"
 }

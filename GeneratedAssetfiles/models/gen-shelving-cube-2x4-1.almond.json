@@ -12,9 +12,12 @@
     "height": 1470.0
   },
   "spatial": {
+    "metadata_version": 1,
     "units": "mm",
     "anchor": "bottom_center",
     "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
     "local_aabb": {
       "min": [
         -312.95,
@@ -27,6 +30,24 @@
         1470.0
       ]
     },
+    "footprint": [
+      [
+        -312.95,
+        -146.45
+      ],
+      [
+        312.95,
+        -146.45
+      ],
+      [
+        312.95,
+        146.45
+      ],
+      [
+        -312.95,
+        146.45
+      ]
+    ],
     "clearance_mm": {
       "front": 900,
       "back": 0,
@@ -45,5 +66,137 @@
     }
   ],
   "object_count": 1,
-  "license": "CC-BY-4.0"
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-shelving-cube-2x4-1",
+    "library_id": "generated_assets",
+    "name": "Shelving unit (open cube shelving, 2 by 4)",
+    "category": "storage",
+    "tags": [
+      "shelving",
+      "cube storage",
+      "bookcase",
+      "storage"
+    ],
+    "dimensions_mm": {
+      "width": 625.9,
+      "depth": 292.9,
+      "height": 1470.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 770.0,
+      "depth": 390.0,
+      "height": 1470.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -312.95,
+          -146.45,
+          0.0
+        ],
+        "max": [
+          312.95,
+          146.45,
+          1470.0
+        ]
+      },
+      "footprint": [
+        [
+          -312.95,
+          -146.45
+        ],
+        [
+          312.95,
+          -146.45
+        ],
+        [
+          312.95,
+          146.45
+        ],
+        [
+          -312.95,
+          146.45
+        ]
+      ],
+      "clearance_mm": {
+        "front": 900,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "primary"
+    },
+    "materials": [
+      {
+        "material_id": "wood-birch-ply",
+        "objects": [
+          "gen-shelving-cube-2x4-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "A tall open cube shelving unit made of thick white lacquered board, two cubes wide and four cubes high, all compartments open front and back, plain flat panels, standing on the floor, Scandinavian democratic design, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa91-c5d7-73c0-85d6-054ce86965ff",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 999.999981
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "living_room",
+        "office"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.249,
+      "triangle_count": 4203,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "8E2759C663FE9395A112E1A978C61513CCA37482F1A1C52E8FA024B62F871434"
 }

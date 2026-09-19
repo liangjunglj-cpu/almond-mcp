@@ -12,9 +12,12 @@
     "height": 7000.0
   },
   "spatial": {
+    "metadata_version": 1,
     "units": "mm",
     "anchor": "bottom_center",
     "support_plane": "ground",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
     "local_aabb": {
       "min": [
         -2603.45,
@@ -27,6 +30,24 @@
         7000.0
       ]
     },
+    "footprint": [
+      [
+        -2603.45,
+        -2442.15
+      ],
+      [
+        2603.45,
+        -2442.15
+      ],
+      [
+        2603.45,
+        2442.15
+      ],
+      [
+        -2603.45,
+        2442.15
+      ]
+    ],
     "clearance_mm": {
       "front": 0,
       "back": 0,
@@ -45,5 +66,138 @@
     }
   ],
   "object_count": 1,
-  "license": "CC-BY-4.0"
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-tree-deciduous-medium-1",
+    "library_id": "generated_assets",
+    "name": "Deciduous tree (medium, round crown)",
+    "category": "vegetation",
+    "tags": [
+      "tree",
+      "deciduous",
+      "landscape",
+      "site",
+      "entourage",
+      "vegetation"
+    ],
+    "dimensions_mm": {
+      "width": 5206.9,
+      "depth": 4884.3,
+      "height": 7000.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 5000.0,
+      "depth": 5000.0,
+      "height": 7000.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "ground",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -2603.45,
+          -2442.15,
+          0.0
+        ],
+        "max": [
+          2603.45,
+          2442.15,
+          7000.0
+        ]
+      },
+      "footprint": [
+        [
+          -2603.45,
+          -2442.15
+        ],
+        [
+          2603.45,
+          -2442.15
+        ],
+        [
+          2603.45,
+          2442.15
+        ],
+        [
+          -2603.45,
+          2442.15
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "accessory"
+    },
+    "materials": [
+      {
+        "material_id": "foliage-pine",
+        "objects": [
+          "gen-tree-deciduous-medium-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "Architectural visualisation model of a medium deciduous tree, about 7 metres tall: a clearly visible straight trunk splitting into four or five main branches, foliage arranged in several distinct rounded leaf clusters with gaps between them so branches show through, mid-green leaves with visible leaf texture, natural asymmetric silhouette.",
+        "image_task_id": "01a097aa-ecbb-76f3-92c4-f075fd9374d1",
+        "image_model": "nano-banana-pro",
+        "mesh_task_id": "01a097ad-8b27-7101-9f6f-dfaffbe34d12",
+        "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+        "generated_at": "2026-09-13",
+        "orientation_correction": null,
+        "scale_applied": 883.30428
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "landscape"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "site_plan",
+        "section",
+        "elevation",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.041,
+      "triangle_count": 80000,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "C1697107B3DEA02B17877DC53723B81F0CFB83BFD87691CB15D0BB7A2FE592BA"
 }

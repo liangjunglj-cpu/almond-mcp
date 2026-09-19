@@ -31,6 +31,17 @@ _MODEL_LIBRARIES = (
 )
 
 
+def cmd_audit_assets(args: argparse.Namespace) -> int:
+    """Verify the bundled generated pack, including embedded/sidecar agreement."""
+    from almond_mcp.asset_passport import audit_library
+    try:
+        result = audit_library(Path(paths.resolve_dir("RHINO_MCP_GENERATED_ASSET_DIR")))
+    except (OSError, ValueError, KeyError) as exc:
+        result = {"status": "error", "message": str(exc)}
+    print(json.dumps(result, indent=2))
+    return 0 if result["status"] == "success" else 1
+
+
 def _load_manifest(library_dir: Path) -> dict | None:
     manifest_path = library_dir / "manifest.json"
     if not manifest_path.is_file():
@@ -213,6 +224,11 @@ def cmd_serve(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_library(args: argparse.Namespace) -> int:
+    from almond_mcp.asset_repository import serve_library
+    return serve_library(args.port, args.open)
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(
         prog="almond-mcp",
@@ -236,6 +252,11 @@ def main(argv: list[str] | None = None) -> int:
     )
     sub.add_parser("doctor", help="check directories, manifests, DB, and bridge")
     sub.add_parser("paths", help="print resolved directories")
+    sub.add_parser("audit-assets", help="verify generated GLBs, embedded passports, contracts and previews offline")
+
+    library = sub.add_parser("library", help="open the unified model and drawing archive")
+    library.add_argument("--port", type=int, default=8767, help="loopback HTTP port (default: 8767)")
+    library.add_argument("--open", action="store_true", help="open the archive in your browser")
 
     args = parser.parse_args(argv)
     handlers = {
@@ -244,6 +265,8 @@ def main(argv: list[str] | None = None) -> int:
         "fetch-assets": cmd_fetch_assets,
         "doctor": cmd_doctor,
         "paths": cmd_paths,
+        "library": cmd_library,
+        "audit-assets": cmd_audit_assets,
     }
     return handlers[args.command](args)
 

@@ -63,11 +63,11 @@ the rest of the repository. Provenance is recorded per asset in the manifest
 (`geometry_source.parameters`: prompt, image task id, mesh task id, model,
 date) and in `GeneratedAssetfiles/provenance.json`.
 
-The models are kept out of the PyPI wheel to keep it small; the manifest
-ships in the wheel and `almond-mcp fetch-assets` downloads the GLB and
-contract for each asset from the repository's `download_url`. This is the
-only library `fetch-assets` downloads automatically - 3D Warehouse content
-stays manual because its terms forbid redistribution.
+Starting with 0.6.0rc1, the wheel includes the generated GLBs, MIT contracts,
+catalogue/provenance, passport schema and preview renders for offline use.
+The release verifier checks an explicit allowlist: no 3D Warehouse models,
+raw Meshy downloads, compiled bridge binaries or example projects. Earlier
+versions used repository download URLs. 3D Warehouse content stays manual.
 
 Raw Meshy downloads (`GeneratedAssetfiles/raw/`) are gitignored; the tracked
 normalised files are derived from them deterministically.

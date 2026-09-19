@@ -9,10 +9,11 @@ import bpy
 from mathutils import Vector
 
 argv = sys.argv[sys.argv.index("--") + 1:]
-MODELS = Path(argv[0])
-OUT = Path(argv[1])
+MODELS = Path(argv[0]).resolve()
+OUT = Path(argv[1]).resolve()
 OUT.mkdir(parents=True, exist_ok=True)
 SIZE = 640
+ARCHIVE_STYLE = "--archive" in argv[2:]
 
 
 def reset_scene():
@@ -29,6 +30,14 @@ def reset_scene():
     scene.render.resolution_y = SIZE
     scene.render.film_transparent = False
     scene.render.image_settings.file_format = "PNG"
+    if ARCHIVE_STYLE:
+        # Neutral geometry study for the archive; source materials are unchanged.
+        scene.display.shading.color_type = "SINGLE"
+        scene.display.shading.single_color = (0.65, 0.66, 0.62)
+        scene.display.shading.show_object_outline = False
+        scene.display.shading.studiolight_rotate_z = math.radians(25)
+        scene.render.film_transparent = True
+        scene.render.image_settings.color_mode = "RGBA"
     scene.world = bpy.data.worlds.new("World")
     scene.world.color = (0.86, 0.88, 0.90)
     return scene
@@ -51,12 +60,13 @@ def render(glb: Path):
     centre = (lo + hi) / 2
     radius = max((hi - lo).length / 2, 1e-3)
 
-    # ground plane at the model's base
-    bpy.ops.mesh.primitive_plane_add(size=radius * 8, location=(centre.x, centre.y, lo.z))
-    plane = bpy.context.active_object
-    mat = bpy.data.materials.new("ground")
-    mat.diffuse_color = (0.80, 0.82, 0.84, 1.0)
-    plane.data.materials.append(mat)
+    if not ARCHIVE_STYLE:
+        # ground plane at the model's base
+        bpy.ops.mesh.primitive_plane_add(size=radius * 8, location=(centre.x, centre.y, lo.z))
+        plane = bpy.context.active_object
+        mat = bpy.data.materials.new("ground")
+        mat.diffuse_color = (0.80, 0.82, 0.84, 1.0)
+        plane.data.materials.append(mat)
 
     cam_data = bpy.data.cameras.new("cam")
     cam_data.lens = 50

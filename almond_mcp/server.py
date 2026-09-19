@@ -11,6 +11,7 @@ import os
 import json
 import math
 import socket
+import struct
 import hashlib
 import re
 import sys
@@ -20,9 +21,10 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 from fastmcp import FastMCP
+from fastmcp.resources import ResourceContent, ResourceResult
 from almond_mcp.ghx_parser import GHParser, validate_capsule_manifest
 from almond_mcp.retrieval_store import AlmondStore
-from almond_mcp import conditioning, exchange, paths
+from almond_mcp import asset_passport, conditioning, exchange, paths, drafting
 
 # ── Constants ────────────────────────────────────────────────────────────────
 
@@ -33,6 +35,7 @@ DRAWING_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_DRAWING_ASSET_DIR")
 DIAGRAM_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_DIAGRAM_ASSET_DIR")
 GENERATED_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_GENERATED_ASSET_DIR")
 DRAWING_RECIPE_DIR = paths.resolve_dir("RHINO_MCP_DRAWING_RECIPE_DIR")
+DRAFTING_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_DRAFTING_DIR")
 CAPSULE_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_CAPSULE_DIR")
 MATERIAL_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_MATERIAL_DIR")
 CONSTRUCTION_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_CONSTRUCTION_DIR")
@@ -47,7 +50,17 @@ print(f"Chestnut publish target: {CHESTNUT_URL}", file=sys.stderr)
 
 # ── MCP Server ───────────────────────────────────────────────────────────────
 
-mcp = FastMCP("RhinoAI_Library")
+mcp = FastMCP("Almond", instructions=(
+    "Almond combines Rhino modelling with a semantic asset library. "
+    "For furnishing: recommend_generated_assets, inspect get_generated_asset_passport "
+    "and preview resources, evaluate_generated_asset_fit, then place_generated_asset. "
+    "For drawings: get_asset_drawing for pilot views or generate_asset_drawing_views "
+    "for a library/custom static GLB. Inspect get_generation_sources and audit_asset_drawing. "
+    "search_detail_sources returns candidate directories, not verified construction details. "
+    "Register placements in the scene ledger and validate_scene_layout. "
+    "Use measured dimensions, not nominal prompt targets. Usage suggestions are "
+    "heuristics and clearances are design allowances, not certified code compliance."
+))
 
 # ── Library Indexer ──────────────────────────────────────────────────────────
 
@@ -62,7 +75,7 @@ class LibraryIndexer:
         self._build_index()
 
     def _build_index(self):
-        print(f"Indexing library from: {self.directory}")
+        print(f"Indexing library from: {self.directory}", file=sys.stderr)
         for root, _, files in os.walk(self.directory):
             for file in files:
                 ext = file.rsplit('.', 1)[-1].lower() if '.' in file else ''
@@ -71,7 +84,7 @@ class LibraryIndexer:
                     if logic_id not in self.index:
                         self.index[logic_id] = {}
                     self.index[logic_id][ext] = os.path.join(root, file)
-        print(f"Indexed {len(self.index)} unique logic entities.")
+        print(f"Indexed {len(self.index)} unique logic entities.", file=sys.stderr)
 
     def list_ids(self) -> list[str]:
         """Return sorted list of all indexed logic IDs."""
@@ -885,8 +898,8 @@ def list_generated_assets(
 ) -> str:
     """
     Lists the redistributable generated asset library: 3D entourage (people,
-    trees, vehicles), site furniture, building components (doors, windows,
-    stairs, columns, balustrades), sanitary/kitchen fixtures, and unbranded
+    trees, vehicles), site furniture, columns, balustrades,
+    sanitary/kitchen fixtures, and unbranded
     furniture placeholders. Every asset is a GLB normalised to real-world
     millimetres with a measured spatial contract and an Almond material_id,
     so placement, collision checks and material restore work without any
@@ -928,6 +941,228 @@ def search_generated_assets(
         limit=limit,
         offset=offset,
     ))
+
+
+@mcp.tool(annotations={"readOnlyHint": True, "openWorldHint": False})
+def recommend_generated_assets(
+    query: str = "", category: str = "", room_type: str = "",
+    width_mm: float = 0, depth_mm: float = 0, height_mm: float = 0,
+    max_triangles: int = 0, include_clearances: bool = True, limit: int = 5,
+) -> dict:
+    """Shortlist available models with explicit reasons, quality notes and fit
+    options. Query matches product/variant/tags; room_type is an inferred usage
+    filter (e.g. living_room, dining_room, office, bathroom, landscape).
+    Supply width AND depth for rectangular fit at 0/90 degrees; height 0 is
+    unbounded. Authored clearances count by default. No Rhino connection needed.
+    """
+    try:
+        return asset_passport.recommend(
+            list(generated_asset_indexer.assets.values()), query, category, room_type,
+            width_mm, depth_mm, height_mm, max_triangles, include_clearances, limit)
+    except ValueError as exc:
+        return {"status": "error", "message": str(exc)}
+
+
+@mcp.tool(annotations={"readOnlyHint": True, "openWorldHint": False})
+def get_generated_asset_passport(asset_id: str) -> dict:
+    """Read portable asset metadata: measured vs nominal dimensions, provenance,
+    materials, spatial contract, usage suggestions, quality limits and rights."""
+    asset = generated_asset_indexer.get(asset_id)
+    if not asset:
+        return {"status": "error", "message": f"Unknown generated asset_id: {asset_id}"}
+    if not asset.get("passport"):
+        return {"status": "error", "message": "Library has no passport; upgrade the asset pack."}
+    return {"status": "success", "passport": asset["passport"],
+            "file_available": asset.get("file_available", False),
+            "preview_uri": f"almond://generated/{asset_id}/preview"}
+
+
+@mcp.tool(annotations={"readOnlyHint": True, "openWorldHint": False})
+def evaluate_generated_asset_fit(
+    asset_id: str, width_mm: float, depth_mm: float, height_mm: float = 0,
+    rotation_degrees: float = 0, include_clearances: bool = True,
+) -> dict:
+    """Check one model's rotated clearance envelope against a rectangle in mm.
+    This is a preflight size check, not obstacle detection or code certification.
+    Mounting heights and actual scene positions are not evaluated."""
+    asset = generated_asset_indexer.get(asset_id)
+    if not asset:
+        return {"status": "error", "message": f"Unknown generated asset_id: {asset_id}"}
+    try:
+        return {"status": "success", **asset_passport.evaluate_fit(
+            asset, width_mm, depth_mm, height_mm, rotation_degrees, include_clearances)}
+    except ValueError as exc:
+        return {"status": "error", "message": str(exc)}
+
+
+@mcp.tool(annotations={"readOnlyHint": True, "openWorldHint": False})
+def search_detail_sources(query: str = "") -> dict:
+    """Search six curated free architectural source directories offline.
+    Returns links, formats and rights notes; no external content is fetched.
+    Results are research candidates, not attributed inputs or certified details.
+    DETAIL subscription access is not required."""
+    data = json.loads((Path(DRAFTING_LIBRARY_DIR)/"sources.json").read_text(encoding="utf-8"))
+    terms = set(re.findall(r"[a-z0-9]+", query.lower()))
+    matches = []
+    for source in data["sources"]:
+        haystack = " ".join([source["title"], *source["tags"], *source["formats"]]).lower()
+        matched = sorted(t for t in terms if t in haystack)
+        if not terms or matched:
+            matches.append({**source, "matched_terms": matched})
+    matches.sort(key=lambda s: (-len(s["matched_terms"]), s["source_id"]))
+    return {"status": "success", "scope": data["scope"], "sources": matches}
+
+
+@mcp.tool(annotations={"readOnlyHint": True, "openWorldHint": False})
+def get_generation_sources(asset_id: str) -> dict:
+    """Get original recorded provider/task IDs, prompt, transformations and evidence gaps.
+    Includes Higgsfield image job IDs where recorded before the Meshy stage.
+    This is local evidence, not an independent provider/account verification."""
+    path = Path(GENERATED_LIBRARY_DIR)/"source-register.json"
+    if not path.exists():
+        return {"status": "error", "message": "Source register missing; update the asset pack"}
+    data = json.loads(path.read_text(encoding="utf-8"))
+    record = next((a for a in data["assets"] if a["asset_id"] == asset_id), None)
+    if not record:
+        return {"status": "error", "message": "Unknown generated asset ID"}
+    asset = generated_asset_indexer.get(asset_id)
+    if not asset or record["model_sha256"] != asset["sha256"]:
+        return {"status": "error", "message": "Source register is stale for this asset"}
+    return {"status": "success", "record": record}
+
+
+@mcp.tool(annotations={"readOnlyHint": True, "openWorldHint": False})
+def get_asset_drawing(asset_id: str) -> dict:
+    """Retrieve a bundled pilot drawing package: mm DXF, scaled SVG, A3 SVG sheets and provenance.
+    Ten models have precomputed views; use generate_asset_drawing_views for others."""
+    root = Path(DRAFTING_LIBRARY_DIR)
+    data = json.loads((root/"manifest.json").read_text(encoding="utf-8"))
+    record = next((a for a in data["assets"] if a["asset_id"] == asset_id), None)
+    if not record:
+        return {"status": "error", "message": "No bundled drawing for this asset; generate views on demand"}
+    package = (root/record["package"]).resolve()
+    package.relative_to(root.resolve())
+    manifest = json.loads((package/"drawing.json").read_text(encoding="utf-8"))
+    return {"status": "success", "package_dir": str(package), "manifest": manifest,
+            "plan_svg_uri": f"almond://generated/{asset_id}/drawing/plan/50"}
+
+
+@mcp.tool(annotations={"readOnlyHint": False, "destructiveHint": False, "openWorldHint": False})
+def generate_asset_drawing_views(asset_id: str = "", source_glb: str = "",
+                                 input_units: str = "", up_axis: str = "y",
+                                 scales: list[int] | None = None,
+                                 source_references: list[dict] | None = None) -> dict:
+    """Generate plan/front/right mesh silhouettes with source metadata, full-size DXF,
+    scaled SVG and A3 SVG sheets where they fit. Writes a NEW local drawing-runs folder.
+    Choose a library asset_id OR an absolute custom source_glb path. Custom files
+    REQUIRE input_units mm or m; up_axis y or z. Scales default to [50,100].
+    Supports static, uncompressed triangle GLBs only (max 100 MB/250k triangles).
+    No hidden lines, inferred construction or product-front recognition.
+    Optional item-level source_references require source_id/title/url/publisher/
+    locator/accessed_on/relationship/used_for/terms_url. They describe references
+    attached to this drawing, never retroactive generation inputs."""
+    try:
+        if bool(asset_id) == bool(source_glb):
+            raise ValueError("Choose exactly one asset_id or source_glb")
+        source_record = None
+        if asset_id:
+            asset = generated_asset_indexer.get(asset_id)
+            if not asset:
+                raise ValueError("Unknown generated asset ID")
+            model = (Path(GENERATED_LIBRARY_DIR)/asset["file"]).resolve()
+            model.relative_to(Path(GENERATED_LIBRARY_DIR).resolve())
+            if drafting.sha(model.read_bytes()) != asset["sha256"]:
+                raise ValueError("Source model checksum differs from catalogue")
+            record_result = get_generation_sources(asset_id)
+            if record_result["status"] != "success":
+                raise ValueError(record_result["message"])
+            source_record = record_result["record"]
+            name, units, up = asset["product"], "mm", "y"
+        else:
+            model = Path(source_glb)
+            if not model.is_absolute() or model.suffix.lower() != ".glb":
+                raise ValueError("Custom source must be an absolute .glb path")
+            if model.stat().st_size > 100_000_000:
+                raise ValueError("GLB exceeds 100 MB limit")
+            name, units, up = model.stem, input_units, up_axis
+            asset_id = "custom-" + drafting.sha(model.read_bytes())[:16].lower()
+            source_record = {"evidence_status": "user_supplied_mesh", "generation_history": "not_supplied"}
+        output = paths.user_data_dir()/"drawing-runs"/str(uuid.uuid4())
+        return drafting.create_package(model, output, asset_id=asset_id, name=name,
+            units=units, up_axis=up, scales=[50, 100] if scales is None else scales,
+            references=source_references or [], source_record=source_record)
+    except (OSError, ValueError, KeyError, IndexError, TypeError, struct.error) as exc:
+        return {"status": "error", "message": str(exc)}
+
+
+@mcp.tool(annotations={"readOnlyHint": True, "openWorldHint": False})
+def audit_asset_drawing(package_dir: str, source_glb: str = "") -> dict:
+    """Check exported files and whether source geometry changed. Custom packages
+    need the current source_glb to check staleness; library assets resolve automatically."""
+    try:
+        package = Path(package_dir)
+        if not package.is_absolute():
+            raise ValueError("Supply an absolute package directory")
+        manifest = json.loads((package/"drawing.json").read_text(encoding="utf-8"))
+        source = Path(source_glb) if source_glb else None
+        if source is not None and not source.is_absolute():
+            raise ValueError("Supply an absolute source GLB path")
+        if source is None:
+            asset = generated_asset_indexer.get(manifest["source"]["asset_id"])
+            if asset:
+                source = (Path(GENERATED_LIBRARY_DIR)/asset["file"]).resolve()
+                source.relative_to(Path(GENERATED_LIBRARY_DIR).resolve())
+        return drafting.audit_package(package, source)
+    except (OSError, ValueError, KeyError, IndexError, TypeError, struct.error) as exc:
+        return {"status": "error", "message": str(exc)}
+
+
+@mcp.resource("almond://generated/{asset_id}/sources", mime_type="application/json")
+def generation_sources_resource(asset_id: str) -> ResourceResult:
+    return ResourceResult([ResourceContent(get_generation_sources(asset_id), mime_type="application/json")])
+
+
+@mcp.resource("almond://generated/{asset_id}/drawing/{view}/{scale}", mime_type="image/svg+xml")
+def asset_drawing_resource(asset_id: str, view: str, scale: str) -> ResourceResult:
+    if view not in {"plan", "front", "right"} or scale not in {"50", "100"}:
+        raise ValueError("Unknown bundled view or scale")
+    result = get_asset_drawing(asset_id)
+    if result["status"] != "success":
+        raise ValueError(result["message"])
+    filename = f"{view}-1-{scale}.svg"
+    model = generated_asset_indexer.get(asset_id)
+    source = (Path(GENERATED_LIBRARY_DIR)/model["file"]).resolve() if model else None
+    checked = drafting.audit_package(Path(result["package_dir"]), source)
+    if checked["status"] != "success":
+        raise ValueError("Drawing package is modified or stale")
+    return ResourceResult([ResourceContent((Path(result["package_dir"])/filename).read_text(encoding="utf-8"), mime_type="image/svg+xml")])
+
+
+@mcp.resource("almond://generated/catalogue", mime_type="application/json")
+def generated_catalogue_resource() -> ResourceResult:
+    """Compact catalogue; retrieve individual passports/previews on demand."""
+    return ResourceResult([ResourceContent({"library_id": "generated_assets", "assets": [
+        {"asset_id": a["asset_id"], "product": a["product"], "category": a["category"],
+         "dimensions_mm": a["dimensions_mm"],
+         "passport_uri": f"almond://generated/{a['asset_id']}/passport",
+         "preview_uri": f"almond://generated/{a['asset_id']}/preview"}
+        for a in generated_asset_indexer.assets.values()]}, mime_type="application/json")])
+
+
+@mcp.resource("almond://generated/{asset_id}/passport", mime_type="application/json")
+def generated_passport_resource(asset_id: str) -> ResourceResult:
+    return ResourceResult([ResourceContent(get_generated_asset_passport(asset_id), mime_type="application/json")])
+
+
+@mcp.resource("almond://generated/{asset_id}/preview", mime_type="image/png")
+def generated_preview_resource(asset_id: str) -> ResourceResult:
+    """Existing Blender preview for a known catalogue id."""
+    if asset_id not in generated_asset_indexer.assets:
+        raise ValueError("Unknown generated asset id")
+    root = Path(GENERATED_LIBRARY_DIR).resolve()
+    preview = (root / "previews" / f"{asset_id}.png").resolve()
+    preview.relative_to(root)
+    return ResourceResult([ResourceContent(preview.read_bytes(), mime_type="image/png")])
 
 
 @mcp.tool()
@@ -2379,6 +2614,11 @@ def _restore_and_place_script(contract: dict, materials: dict[str, dict],
                repr(float(material["opacity"])))
         )
     anchor = contract["spatial"].get("anchor", "bottom_center")
+    passport_stamp = ""
+    if contract.get("passport"):
+        # C# verbatim string, so quotes/backslashes in provenance stay data.
+        encoded = json.dumps(contract["passport"], ensure_ascii=True).replace('"', '""')
+        passport_stamp = f'obj.Attributes.SetUserString("almond:passport", @"{encoded}");'
     return f"""
 using System;
 using System.Collections.Generic;
@@ -2471,6 +2711,7 @@ public class Script
             }}
             obj.Attributes.SetUserString("almond:asset_id", "{contract['asset_id']}");
             obj.Attributes.SetUserString("almond:source_app", "{contract.get('source_app', 'unknown')}");
+            {passport_stamp}
             obj.Attributes.LayerIndex = layerIndex;
             obj.CommitChanges();
         }}
@@ -3222,6 +3463,40 @@ def publish_to_chestnut(
         preserve_scale=True,
         mass=preset["mass"],
     )
+
+
+@mcp.tool()
+def search_asset_repository(query: str = "", kind: str = "all", drawing_ready: bool = False, limit: int = 20) -> dict:
+    """Search the unified model/drawing archive. kind: all, model or element.
+
+    Returns stable IDs, file availability, dimensions and MCP resource URIs.
+    Drawing-ready means a derived projection package is linked to the object.
+    """
+    from almond_mcp.asset_repository import AssetRepository
+    try:
+        return AssetRepository().search(query, kind, drawing_ready, limit)
+    except ValueError as exc:
+        return {"status": "error", "message": str(exc)}
+
+
+@mcp.resource("almond://repository/{asset_id}")
+def repository_asset_resource(asset_id: str) -> str:
+    """Unified object metadata, source evidence, representations and local files."""
+    from almond_mcp.asset_repository import AssetRepository
+    repository = AssetRepository()
+    record = repository.records.get(asset_id)
+    if not record:
+        raise ValueError("Unknown repository asset ID")
+    # HTTP URLs are relative to `almond-mcp library`; provide resolved locations
+    # for MCP clients that do not have a browser server running.
+    urls = {record["model"], record["preview"], record["contract"]}
+    if record["drawing"]:
+        urls.add(record["drawing"]["record"])
+        for view in record["drawing"]["views"]:
+            urls.update([view["svg"], view["dxf"]])
+        urls.update(sheet["svg"] for sheet in record["drawing"]["sheets"])
+    record["local_files"] = {url: str(repository.files[url][1]) for url in urls if url in repository.files}
+    return json.dumps(record)
 
 
 if __name__ == "__main__":

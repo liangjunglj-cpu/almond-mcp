@@ -12,9 +12,12 @@
     "height": 750.0
   },
   "spatial": {
+    "metadata_version": 1,
     "units": "mm",
     "anchor": "bottom_center",
     "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
     "local_aabb": {
       "min": [
         -768.0,
@@ -27,6 +30,24 @@
         750.0
       ]
     },
+    "footprint": [
+      [
+        -768.0,
+        -411.0
+      ],
+      [
+        768.0,
+        -411.0
+      ],
+      [
+        768.0,
+        411.0
+      ],
+      [
+        -768.0,
+        411.0
+      ]
+    ],
     "clearance_mm": {
       "front": 900,
       "back": 900,
@@ -45,5 +66,137 @@
     }
   ],
   "object_count": 1,
-  "license": "CC-BY-4.0"
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-dining-table-rect-1",
+    "library_id": "generated_assets",
+    "name": "Dining table (generic rectangular, timber)",
+    "category": "table",
+    "tags": [
+      "table",
+      "dining",
+      "furniture",
+      "kitchen",
+      "dining room"
+    ],
+    "dimensions_mm": {
+      "width": 1536.0,
+      "depth": 822.0,
+      "height": 750.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 1600.0,
+      "depth": 900.0,
+      "height": 750.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -768.0,
+          -411.0,
+          0.0
+        ],
+        "max": [
+          768.0,
+          411.0,
+          750.0
+        ]
+      },
+      "footprint": [
+        [
+          -768.0,
+          -411.0
+        ],
+        [
+          768.0,
+          -411.0
+        ],
+        [
+          768.0,
+          411.0
+        ],
+        [
+          -768.0,
+          411.0
+        ]
+      ],
+      "clearance_mm": {
+        "front": 900,
+        "back": 900,
+        "left": 900,
+        "right": 900
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "primary"
+    },
+    "materials": [
+      {
+        "material_id": "wood-oak",
+        "objects": [
+          "gen-dining-table-rect-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "A generic rectangular dining table with a plain timber top and four straight square legs, plain light oak.",
+        "image_task_id": "01a09789-1dd2-747e-b428-a89dce8ca12d",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978f-1858-713a-992e-8b1f307a53a1",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 1000.0
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "dining_room"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.087,
+      "triangle_count": 4362,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "16B13B2E0C53D1EE7C5B9B3E45DFF7B9E65BF6AEC79D26E65C260832859B10F8"
 }

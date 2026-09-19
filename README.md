@@ -1,5 +1,28 @@
 # Almond MCP for Rhino
 
+**0.6.0rc4 — Rhino distribution release candidate.** The prepared
+`almondbridge 0.6.0-rc.4` Yak bundles the generated collection and adds
+`AlmondLibrary`, which opens the offline archive without Python or an AI client.
+See the [release infrastructure](docs/release-0.6.md) and
+[Rhino quickstart](docs/rhino-archive-quickstart.md). Publication and the final
+in-Rhino smoke test are still pending.
+
+Run
+`almond-mcp library --open` for the local Neo Swiss interface: 47 Meshy models,
+7 drawing elements, linked SVG/DXF views, downloads, and source evidence in
+one searchable catalogue. The same index is exposed through the MCP tool
+`search_asset_repository` and `almond://repository/{asset_id}` resources.
+See the [Object Archive guide](docs/object-archive-0.6-rc3.md).
+
+All 47 generated
+models now carry embedded asset passports and ship with the Python package,
+including their sidecar contracts and previews. New MCP tools recommend assets
+with reasons and check rotated clearance envelopes before placement. See
+[the release guide](docs/semantic-assets-0.6.md) for the workflow, packaging,
+verification and remaining Rhino integration checks. The
+[drafting update](docs/drafting-0.6-rc2.md) adds a ten-model SVG/DXF pilot,
+custom GLB drawing generation, source discovery and drawing revision checks.
+
 <p align="center"><img src="assets/almond-icon.svg" width="120" alt="Almond"></p>
 
 Almond exposes Rhino 8 and a semantic design layer as MCP tools: curated
@@ -258,12 +281,11 @@ The IKEA and drawing libraries describe 3D Warehouse models that each user
 must download themselves. `GeneratedAssetfiles/` is different: 47 (and
 growing) architectural models generated with Meshy from Almond's own
 prompts, owned by the project and released under **CC BY 4.0**, so they ship
-with the repository and `almond-mcp fetch-assets` downloads them
-automatically on a wheel install. Categories:
+with the repository and the 0.6 wheel for offline use. Categories:
 
 | Group | Assets |
 | --- | --- |
-| Entourage | standing / walking / sitting person, deciduous and conifer tree, shrub, sedan car, bicycle |
+| Entourage | standing / walking / sitting person, deciduous and conifer tree, sedan car, bicycle |
 | Site furniture | park bench, street lamp, bollard, bike hoop, litter bin |
 | Building components | round and square column, glass balustrade (doors, windows and stairs are deliberately excluded: they need exact dimensions, so model them directly) |
 | Fixtures and appliances | toilet, pedestal basin, bathtub, shower enclosure, range cooker, fridge-freezer |
@@ -413,3 +435,15 @@ uv run almond-mcp doctor
 On OneDrive-synced folders set `UV_LINK_MODE=copy` (OneDrive rejects uv's
 hardlinks). Licensing: `LICENSE` (MIT), `THIRD-PARTY-NOTICES.md`, and
 `docs/licensing-audit.md` for what may and may not be distributed.
+# Drawing pilot — 0.6.0rc2
+
+Almond now exports traceable mesh silhouettes as scaled SVG, full-size DXF and
+A3 SVG sheets. Ten generated models have bundled plan/front/right views;
+other library models and custom static GLBs can be processed on demand.
+Generation evidence and geometry hashes travel with the drawings, and an audit
+detects changed outputs or stale source geometry. Six architectural reference
+directories are searchable without DETAIL access.
+
+See [drafting workflow and limits](docs/drafting-0.6-rc2.md) and open
+[the pilot gallery](Draftingfiles/index.html). These are mesh outlines for
+layout/entourage; section assemblies and hidden-line drafting remain future work.

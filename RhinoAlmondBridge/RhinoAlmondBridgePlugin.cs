@@ -39,6 +39,7 @@ namespace RhinoAlmondBridge
 
         protected override void OnShutdown()
         {
+            AlmondLibraryCommand.StopArchive();
             _server?.Stop();
             RhinoApp.WriteLine("RhinoAlmondBridge: Plugin shut down.");
             base.OnShutdown();
