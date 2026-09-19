@@ -44,7 +44,7 @@ namespace RhinoAlmondBridge
             {
                 // Start before opening so a missing bundle produces a useful command error.
                 string url = ArchiveUrl;
-                Rhino.UI.Panels.OpenPanel(AlmondLibraryPanel.PanelId, true);
+                OpenPanel(doc,"library");
                 RhinoApp.WriteLine("Almond Library panel opened. Drag its tab to dock it beside your viewport.");
                 return Result.Success;
             }
@@ -55,11 +55,34 @@ namespace RhinoAlmondBridge
                 return Result.Failure;
             }
         }
+        internal static void OpenPanel(RhinoDoc doc,string page)
+        {
+            string url=ArchiveUrl;
+            AlmondLibraryPanel.StartPage=page;
+            Rhino.UI.Panels.OpenPanel(AlmondLibraryPanel.PanelId,true);
+            Rhino.UI.Panels.GetPanel<AlmondLibraryPanel>(doc)?.ShowPage(page);
+        }
 
         internal static void StopArchive()
         {
             _archive?.Dispose();
             _archive = null;
+        }
+    }
+    public sealed class AlmondCommand : Command
+    {
+        public override string EnglishName => "Almond";
+        protected override Result RunCommand(RhinoDoc doc,RunMode mode) {
+            try { AlmondLibraryCommand.OpenPanel(doc,"home");return Result.Success; }
+            catch(Exception ex) {RhinoApp.WriteLine(ex.Message);return Result.Failure;}
+        }
+    }
+    public sealed class AlmondKarambaCommand : Command
+    {
+        public override string EnglishName => "AlmondKaramba";
+        protected override Result RunCommand(RhinoDoc doc,RunMode mode) {
+            try { AlmondLibraryCommand.OpenPanel(doc,"karamba");return Result.Success; }
+            catch(Exception ex) {RhinoApp.WriteLine(ex.Message);return Result.Failure;}
         }
     }
 

@@ -1,6 +1,6 @@
 # Almond 0.6 release infrastructure
 
-Candidate pair: **almondbridge 0.6.0-rc.6** and **almond-mcp 0.6.0rc6**.
+Candidate pair: **almondbridge 0.6.0-rc.7** and **almond-mcp 0.6.0rc7**.
 Both are unpublished candidates. The Yak targets **Rhino 8.0 / Windows**;
 RhinoCommon remains pinned to 8.0.23304.9001. Plugin identity stays
 `c337dbb8-394a-4593-9c2b-a3d7cfc91893`. No Rhino update is required.
@@ -48,10 +48,10 @@ syncs a live MCP environment, installs into Rhino, or falls back to an old RHP.
 It runs the Python suite and real .NET HTTP-host integration tests, checks source
 records, builds/audits wheel and sdist, performs an isolated wheel installation
 and MCP smoke, builds a Windows Yak, and audits its allowlist and model hashes.
-It creates `dist/release-0.6.0rc6/` with:
+It creates `dist/release-0.6.0rc7/` with:
 
 - Python wheel and sdist.
-- `almondbridge-0.6.0-rc.6-rh8_0-win.yak`.
+- `almondbridge-0.6.0-rc.7-rh8_0-win.yak`.
 - Food4Rhino ZIP wrapper, listing text and quickstart guide.
 - JUnit test results, clean-install and Yak reports, and `SHA256SUMS.txt`.
 
@@ -95,12 +95,12 @@ claim this in-process smoke passed based only on the automated build report.
    exact revision. Retain artifacts and the successful Rhino smoke record.
 2. Publish the Python wheel/sdist to PyPI using the project's maintainer account
    (prefer PyPI Trusted Publishing for later CI automation). Verify the pinned
-   `uvx --from almond-mcp==0.6.0rc6 almond-mcp --version` on a clean machine.
+   `uvx --from almond-mcp==0.6.0rc7 almond-mcp --version` on a clean machine.
 3. Authenticate the maintainer's Yak account, then push the exact tested artifact:
 
    ```powershell
    & 'C:/Program Files/Rhino 8/System/Yak.exe' login
-   & 'C:/Program Files/Rhino 8/System/Yak.exe' push ./dist/release-0.6.0rc6/almondbridge-0.6.0-rc.6-rh8_0-win.yak
+   & 'C:/Program Files/Rhino 8/System/Yak.exe' push ./dist/release-0.6.0rc7/almondbridge-0.6.0-rc.7-rh8_0-win.yak
    & 'C:/Program Files/Rhino 8/System/Yak.exe' search --all --prerelease almondbridge
    ```
 
@@ -159,4 +159,36 @@ Before publication, manually check: held-mouse drag/release, outside release,
 Esc, Place with object snaps, Light versus Original on a heavy tree, repeated
 block reuse, material appearance, units (mm/m/in), current layer, Undo/Redo,
 save/reopen metadata, and placement after editing a previous block. These
-native checks are pending; a browser test is not evidence of viewport placement.
+viewport dragging was confirmed by the user on rc.6; the remaining native checks
+still need explicit acceptance. A browser test is not evidence of viewport placement.
+
+## rc.7 Almond menu and Karamba workspace
+
+The stable panel GUID is retained and its title becomes Almond. Commands:
+Almond (home), AlmondLibrary (Models), AlmondKaramba (Karamba Validation).
+The Neo Swiss home has two workspaces and links to sources/about. Existing model
+placement remains intact. The active IKEA index, four supplier MCP tools,
+legacy placement bridge action and shipped source catalogue are retired;
+local historical records and downloads are preserved.
+
+Karamba actions use the existing per-panel session capability and a fixed native
+command. The HTTP host still has no analysis/write/execution endpoint. Settings
+are bounded and allowlisted. Selection is limited to 200 structural objects,
+10,000 faces per shell mesh and 200 faces per brep. Geometry and document-unit
+fingerprints prevent stale selection use. The direct API supports explicit
+self-weight and support restraint choices and a CHS section override. The panel
+requires that API; missing solver metrics yield incomplete, never pass. Existing
+MCP fallback pathways remain labelled, and nondefault options require the API.
+
+The SVG diagram uses conditioned geometry, actual solver support/load locations,
+and reported mapped utilization. The initial example is explicitly illustrative.
+View/overlay toggles do not invalidate results; setup changes do. JSON exports
+contain selected GUIDs, geometry snapshot, settings, warnings, result method and
+timestamp. No simulated displacement field or unmeasured result is displayed.
+
+Acceptance after restart: open all three commands, switch pages and return to
+Models; confirm placement; check engine detection, selection/cancel, a supported
+beam/frame and a mechanism, selected support points, self-weight on/off,
+fixed/pinned restraint, section override, missing-metric handling, mapped colours,
+worst-member selection, JSON export/cancel, edited geometry rejection and a
+second document. Native solver and WebView callback acceptance remains pending.

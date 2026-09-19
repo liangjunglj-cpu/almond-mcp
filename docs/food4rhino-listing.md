@@ -9,7 +9,7 @@ Use the Rhino Account that owns the existing app / Yak package.
 | Field | Prepared value |
 | --- | --- |
 | App name | Almond MCP |
-| Release | almondbridge 0.6.0-rc.6 / almond-mcp 0.6.0rc6 (prerelease) |
+| Release | almondbridge 0.6.0-rc.7 / almond-mcp 0.6.0rc7 (prerelease) |
 | Platform | Rhino 8 for Windows only |
 | GUID | c337dbb8-394a-4593-9c2b-a3d7cfc91893 |
 | Code licence | MIT |
@@ -64,16 +64,16 @@ Karamba3D. Karamba and downloaded community model files are not bundled.
 
 ## Downloads
 
-Primary file: `almondbridge-0.6.0-rc.6-rh8_0-win.yak`.
-Optional upload wrapper: `almondbridge-0.6.0-rc.6-food4rhino.zip` containing the
-same Yak and quickstart guide. Both are in `dist/release-0.6.0rc6/` after preparation.
+Primary file: `almondbridge-0.6.0-rc.7-rh8_0-win.yak`.
+Optional upload wrapper: `almondbridge-0.6.0-rc.7-food4rhino.zip` containing the
+same Yak and quickstart guide. Both are in `dist/release-0.6.0rc7/` after preparation.
 Use the current form's supported upload type; do not rename an extension.
 If the existing listing is linked to Yak, update the matching package rather
 than creating a duplicate app. The permanent GUID remains unchanged.
 
 Download title: **Almond 0.6 release candidate - Rhino 8 Windows + Object Archive**.
 Description: Install through Rhino Package Manager (Include pre-releases) or use
-the provided Yak package. Restart Rhino, then run AlmondLibrary. The 47 generated
+the provided Yak package. Restart Rhino, then run Almond. The 47 generated
 models are included. See GETTING-STARTED.md for optional MCP setup.
 
 ## Release notes
@@ -95,9 +95,16 @@ Checked 19 September 2026: [Food4Rhino FAQ](https://www.food4rhino.com/en/faq),
 and [Rhino plugin installation](https://www.rhino3d.com/en/docs/guides/scripts-plugins/how-to-use/).
 Food4Rhino account access and any listing review remain separate from local builds.
 
-### rc.6 additions awaiting native acceptance
+### rc.6 placement and rc.7 workspace
 
 Compact model tiles, thumbnail-to-viewport placement, a keyboard-accessible
 Place action, shared blocks, optional lighter meshes and embedded derivation
-records. Keep this listing a draft until the native placement checklist in
+records. Viewport dragging was confirmed by the user on rc.6. Keep this listing a draft until the remaining native checklist in
 release-0.6.md passes. Public publishing has not been performed.
+
+The rc.7 menu separates Models and Karamba Validation. The analysis workspace
+shows assumptions, support/load diagrams, view toggles, mapped utilization,
+deflection limits and exportable analysis records. Karamba installation and
+licensing are separate. This is first-order screening, not full code verification.
+The active IKEA catalogue and supplier links/tools have been retired. Native
+acceptance of the new Karamba workspace is pending.

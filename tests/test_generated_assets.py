@@ -131,11 +131,6 @@ def test_server_indexes_and_searches_generated_library():
     assert one["status"] == "success"
     assert one["asset"]["dimensions_mm"]["height"] == 800
 
-    # generated assets never leak into the IKEA search
-    ikea = json.loads(server.search_ikea_furniture(query="bench"))
-    assert all(not row["asset_id"].startswith("gen-")
-               for row in ikea["assets"])
-
     status = json.loads(server.get_retrieval_status())
     assert status["generated_asset_index"]["total"] == expected
 

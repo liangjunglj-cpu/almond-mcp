@@ -1,11 +1,11 @@
-# Almond Object Archive for Rhino 8
+# Almond workspace for Rhino 8
 
 For this prepared release candidate, install the supplied
-**almondbridge-0.6.0-rc.6-rh8_0-win.yak**, save your work, restart Rhino,
-and run **AlmondLibrary**. This candidate has not yet been published to the
+**almondbridge-0.6.0-rc.7-rh8_0-win.yak**, save your work, restart Rhino,
+and run **Almond**. This candidate has not yet been published to the
 public Package Manager. The package targets Windows / Rhino 8.0+.
 
-The Neo Swiss archive opens in a dockable **Almond Library** panel inside Rhino.
+The Neo Swiss archive opens in a dockable **Almond** panel inside Rhino.
 Drag the panel tab beside Layers or Properties, or float it on another monitor.
 Rhino remembers its docking position. Use **Open in browser** in the panel or
 the **`AlmondLibraryBrowser`** command for the full-size browser view.
@@ -46,9 +46,9 @@ Placement is available for the 47 included generated GLBs, inside the Rhino
 panel. Browser downloads and the seven community catalogue entries do not have
 native placement. Imported models use the current Rhino layer.
 
-The native pointer handoff, reduction, block reuse and undo still require
-an interactive Rhino smoke check for this release candidate; the decoder and
-browser layout have automated/standalone verification.
+Viewport dragging was confirmed in Rhino by the user on rc.6. The new Karamba
+workspace requires native acceptance on this candidate; automated and browser
+checks do not establish solver correctness.
 
 Each record includes dimensions, an asset ID, source evidence, generation task
 IDs, declared licence and known evidence gaps. Dimensions describe generated
@@ -64,13 +64,50 @@ Saved selections are browser-local. The Rhino archive uses a fresh loopback
 port when it starts, so saved selections are not guaranteed across Rhino restarts.
 The separately installed Python archive uses a stable configurable port.
 
+## Karamba Validation
+
+Choose **Karamba** from the Almond menu, or run **AlmondKaramba** directly.
+The models area remains available through **AlmondLibrary**.
+
+1. Select structural curves, shell surfaces/meshes and optional Rhino point
+   objects for supports. Click **Use Rhino selection**. Placed visual model
+   blocks are not structural analysis models.
+2. Set material, total downward load, self-weight and fixed/pinned restraints.
+   Selected points define support locations; without points the lowest nodes
+   are used. Choose **Require selected points** to disallow that inference.
+3. Review sections. The default beam is CHS 114.3 × 4 mm and shell thickness
+   is 100 mm. Inferred sections need review. A CHS override uses millimetres
+   independently of document units. Truss assemblies retain beam elements;
+   axial-only releases are not applied.
+4. Use Axonometric, Front or Top and the Members, Supports and Loads toggles.
+   Before solving, the diagram is a provisional preview. With no selection it
+   is a labelled illustrative frame, with no analysis results.
+5. Click **Run Karamba analysis**. The workspace requires the existing direct
+   Karamba API and never replaces an unavailable solve with a rule estimate.
+   Installation and licence availability are checked in the running Rhino.
+6. Read maximum deflection against the indicative L/250 limit and utilization
+   against 100%. Missing metrics display as unavailable and cannot pass.
+   Toggle utilization colouring, select the highest-utilization source members,
+   or save a JSON report containing input IDs, settings, geometry snapshot,
+   warnings, result method and timestamp.
+
+Changing analysis settings marks results stale. Recapture after changing Rhino
+geometry or document units; the native bridge rejects stale selections. Results
+are snapshots, not live monitoring. Overlay/view toggles do not rerun analysis.
+Only actual support/load positions and reported utilization are shown after a
+solve; no displacement field is returned, so no deformed shape is drawn.
+
+This is first-order analysis of the stated idealisation, not full project-specific
+code verification. Review solver warnings and inferred assumptions. The existing
+MCP validation tool remains available, with explicitly labelled fallback methods.
+
 ## Optional AI/MCP workflow
 
 Install [uv](https://docs.astral.sh/uv/getting-started/installation/). Configure
 your MCP client with command `uvx` and these arguments:
 
 ```json
-["--from", "almond-mcp==0.6.0rc6", "almond-mcp"]
+["--from", "almond-mcp==0.6.0rc7", "almond-mcp"]
 ```
 
 This pinned command becomes available after the matching Python release is

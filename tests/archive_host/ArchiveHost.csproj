@@ -3,4 +3,5 @@
   <ItemGroup><PackageReference Include="Newtonsoft.Json" Version="13.0.3" /></ItemGroup>
   <ItemGroup><Compile Include="../../RhinoAlmondBridge/ArchiveHttpServer.cs" Link="ArchiveHttpServer.cs" /></ItemGroup>
   <ItemGroup><Compile Include="../../RhinoAlmondBridge/ArchiveMeshData.cs" Link="ArchiveMeshData.cs" /></ItemGroup>
+  <ItemGroup><Compile Include="../../RhinoAlmondBridge/AnalysisSettings.cs" Link="AnalysisSettings.cs" /></ItemGroup>
 </Project>

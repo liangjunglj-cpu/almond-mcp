@@ -1,12 +1,19 @@
 # Almond MCP for Rhino
 
-**0.6.0rc6 — Rhino distribution release candidate.** The prepared
-`almondbridge 0.6.0-rc.6` Yak bundles the generated collection and adds
-`AlmondLibrary`, which opens the offline archive in a dockable Rhino side panel
-without Python or an AI client. `AlmondLibraryBrowser` opens its full browser view.
-See the [release infrastructure](docs/release-0.6.md) and
-[Rhino quickstart](docs/rhino-archive-quickstart.md). Publication and the final
-in-Rhino smoke test are still pending.
+**0.6.0rc7 — Almond workspace release candidate.** Run **Almond** in Rhino
+for a dockable Neo Swiss menu with **Models** and **Karamba Validation**.
+**AlmondLibrary** opens models directly; **AlmondKaramba** opens the analysis
+workspace. Models retain compact tiles, Light/Original detail and shared-block
+viewport placement. Karamba adds selection capture, explicit assumptions,
+support/load diagram toggles, mapped utilization and an exportable result record.
+
+The active IKEA catalogue, source links and four supplier-specific MCP tools
+are retired. Existing local downloads and historical scene records are retained.
+Karamba and the generated model/source libraries remain available.
+See the [Rhino quickstart](docs/rhino-archive-quickstart.md) and
+[release infrastructure](docs/release-0.6.md). Viewport dragging was confirmed
+by the user on rc.6. Native acceptance of the new Karamba panel and public
+publication remain pending.
 
 Run
 `almond-mcp library --open` for the local Neo Swiss interface: 47 Meshy models,
@@ -122,7 +129,7 @@ and a Claude that supports MCP (Claude Desktop or Claude Code).
 
    - *Claude Code:* `claude mcp add Almond -- uvx almond-mcp`
 4. **Restart Claude.** The Almond tools (`execute_rhino_script`,
-   `search_ikea_furniture`, `create_design_scene`, …) appear in the tool
+   `search_generated_assets`, `create_design_scene`, …) appear in the tool
    list. First run creates `%LOCALAPPDATA%\Almond` with the library
    manifests and the scene database.
 5. **Check the plumbing** (Rhino open):
@@ -164,7 +171,6 @@ locations:
 | Environment variable | Default folder |
 | --- | --- |
 | `RHINO_MCP_LIBRARY_DIR` | `Grasshopperfiles` (your GH/Karamba definitions) |
-| `RHINO_MCP_FURNITURE_DIR` | `IkeaFurniturefiles` |
 | `RHINO_MCP_DRAWING_ASSET_DIR` | `DrawingAssetfiles` |
 | `RHINO_MCP_DIAGRAM_ASSET_DIR` | `DiagramAssetfiles` |
 | `RHINO_MCP_DRAWING_RECIPE_DIR` | `DrawingRecipes` |
@@ -220,37 +226,11 @@ $env:CHESTNUT_URL = "http://127.0.0.1:3000"
 almond-mcp
 ```
 
-## IKEA furniture library
-
-Almond exposes a controlled IKEA Singapore furniture library:
-
-```text
-list_ikea_furniture(category="chair")
-search_ikea_furniture(
-  query="compact living room sofa",
-  max_width_mm=2000,
-  exact_dimensions_only=true
-)
-place_ikea_furniture(
-  asset_id="ikea-sg-klippan-s49010615",
-  x=0,
-  y=0,
-  z=0,
-  rotation_degrees=90
-)
-```
-
-SketchUp files are resolved from the furniture library's `manifest.json`.
-Claude cannot provide arbitrary import paths. Rhino imports each asset once
-as a block definition and creates lightweight instances for subsequent
-placements. Almond is not affiliated with Inter IKEA Systems B.V.; product
-names identify the real products whose catalogue dimensions the manifest
-records.
 
 ## Architectural drawing asset library
 
 Representation-only entourage and graphic proxies live in the independent
-drawing asset library. They never appear in IKEA searches:
+drawing asset library. They have a dedicated search:
 
 ```text
 search_drawing_assets(query="landscape tree")
@@ -278,7 +258,7 @@ create_generation_plan(
 
 ## Generated asset library (open, redistributable)
 
-The IKEA and drawing libraries describe 3D Warehouse models that each user
+The optional drawing library describes community models that each user
 must download themselves. `GeneratedAssetfiles/` is different: 47 (and
 growing) architectural models generated with Meshy from Almond's own
 prompts, owned by the project and released under **CC BY 4.0**, so they ship
@@ -393,7 +373,7 @@ The database provides:
 
 Search and list tools return compact asset cards. Full provenance,
 footprints, clearances, and source metadata are returned only by
-`get_ikea_furniture`. Geometry and Grasshopper files remain local.
+`get_generated_asset`. Geometry and Grasshopper files remain local.
 
 Useful tools:
 
@@ -408,7 +388,7 @@ upsert_design_room(
 register_scene_instance(
   scene_id="scene_...",
   room_id="room_...",
-  asset_id="ikea-sg-klippan-s49010615",
+  asset_id="gen-sofa-3-seat-1",
   x_mm=3000,
   y_mm=3900
 )
@@ -449,7 +429,7 @@ See [drafting workflow and limits](docs/drafting-0.6-rc2.md) and open
 [the pilot gallery](Draftingfiles/index.html). These are mesh outlines for
 layout/entourage; section assemblies and hidden-line drafting remain future work.
 
-### Compact Rhino library placement (0.6.0rc6)
+### Compact Rhino library placement (0.6.0rc7)
 
 The docked archive now uses small, two-column thumbnails. Drag a model into a
 viewport, or choose Place and pick an insertion point. Light detail targets

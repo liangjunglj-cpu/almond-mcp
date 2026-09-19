@@ -127,13 +127,12 @@ function renderSources() {
   $('source-list').innerHTML = data.sources.map((s,i) => `<article class="source-row"><span>${String(i+1).padStart(2,'0')}</span><div><h2>${esc(s.title)}</h2><p class="source-meta">${esc(s.formats.join(' / ').toUpperCase())}</p></div><div><p>${esc(s.notes)}</p><p class="source-meta">ACCESS / ${esc(s.access)}<br>REUSE / ${esc(s.redistribution)}</p></div><div class="source-links">${external(s.url) ? `<a href="${esc(external(s.url))}" target="_blank" rel="noopener noreferrer">Visit source ↗</a>` : ''}${external(s.terms_url) ? `<a href="${esc(external(s.terms_url))}" target="_blank" rel="noopener noreferrer">Source terms ↗</a>` : ''}</div></article>`).join('');
 }
 function route() {
-  if(!data) return;
-  const hash = location.hash.slice(1), page = ['sources','about'].includes(hash) ? hash : 'library';
-  for(const name of ['library','sources','about']) $(name+'-page').hidden = name !== page;
+  const hash = location.hash.slice(1), page = ['home','library','karamba','sources','about'].includes(hash) ? hash : hash.startsWith('asset=') || hash === 'collection' ? 'library' : 'home';
+  for(const name of ['home','library','karamba','sources','about']) $(name+'-page').hidden = name !== page;
   document.querySelectorAll('[data-page]').forEach(a => { if(a.dataset.page === page) a.setAttribute('aria-current','page');else a.removeAttribute('aria-current'); });
-  if(hash.startsWith('asset=')) { let id;try{id=decodeURIComponent(hash.slice(6));}catch{return;}openObject(id); }
+  if(data && hash.startsWith('asset=')) { let id;try{id=decodeURIComponent(hash.slice(6));}catch{return;}openObject(id); }
   else if($('object-dialog').open) $('object-dialog').close();
-  if(['library','sources','about'].includes(hash)) window.scrollTo(0,0);
+  if(['home','library','karamba','sources','about'].includes(hash)) window.scrollTo(0,0);
 }
 async function load() {
   $('load-error').hidden=true;
@@ -195,4 +194,5 @@ $('reset-filters').addEventListener('click',()=>{$('search').value='';$('categor
 $('retry').addEventListener('click',load);
 document.addEventListener('keydown',e=>{if(e.key==='/'&&!['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)&&!$('object-dialog').open){e.preventDefault();location.hash='collection';$('search').focus();}});
 window.addEventListener('hashchange',route);
+route();
 load();

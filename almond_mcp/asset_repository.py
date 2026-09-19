@@ -155,7 +155,7 @@ def create_server(port=8767, repository: AssetRepository | None = None):
                     root, path = repo.files[route]
                 if path and path.resolve().is_relative_to(root) and path.is_file():
                     content = path.read_bytes()
-                    mime = {".js": "text/javascript", ".glb": "model/gltf-binary", ".svg": "image/svg+xml", ".dxf": "application/dxf"}.get(path.suffix, mimetypes.guess_type(path.name)[0] or "application/octet-stream")
+                    mime = {".js": "text/javascript", ".mjs": "text/javascript", ".glb": "model/gltf-binary", ".svg": "image/svg+xml", ".dxf": "application/dxf"}.get(path.suffix, mimetypes.guess_type(path.name)[0] or "application/octet-stream")
                     filename = path.name
             if content is None:
                 self.send_error(404)

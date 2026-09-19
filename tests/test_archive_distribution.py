@@ -55,8 +55,9 @@ def test_real_dotnet_host_http_and_integrity(bundle):
         status,headers,body=request("/api/catalogue")
         assert status==200 and json.loads(body)["counts"]["models"]==47
         assert "wasm-unsafe-eval" in headers["Content-Security-Policy"]
-        for route in ["/", "/app.js", "/vendor/model-viewer.min.js", "/files/generated/models/gen-office-chair-1.glb", "/files/drafting/pilot/gen-office-chair-1/plan-1-50.dxf"]:
+        for route in ["/", "/app.js", "/karamba.js", "/analysis-view.mjs", "/vendor/model-viewer.min.js", "/files/generated/models/gen-office-chair-1.glb", "/files/drafting/pilot/gen-office-chair-1/plan-1-50.dxf"]:
             assert request(route)[0]==200
+        assert request("/analysis-view.mjs")[1]["Content-Type"].startswith("text/javascript")
         status,headers,body=request("/files/generated/models/gen-office-chair-1.glb?download=1")
         assert status==200 and body[:4]==b"glTF" and "attachment" in headers["Content-Disposition"]
         assert request("/../LICENSE")[0]==404

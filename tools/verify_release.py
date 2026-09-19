@@ -21,6 +21,7 @@ def verify(wheel: Path) -> dict:
             path = Path(name)
             if (path.is_absolute() or ".." in path.parts
                     or path.suffix.lower() in {".skp", ".3dm", ".gh", ".ghx", ".gha", ".dll", ".pdb", ".sqlite3"}
+                    or "/IkeaFurniturefiles/" in name
                     or "/raw/" in name or "/examples/" in name
                     or any(f"/{lib}/models/" in name for lib in ("IkeaFurniturefiles", "DrawingAssetfiles", "DiagramAssetfiles"))):
                 forbidden.append(name)
@@ -59,7 +60,7 @@ def verify(wheel: Path) -> dict:
             counts = archive_catalogue.catalogue()["counts"]
             if counts != {"assets":54, "models":47, "elements":7, "drawing_packages":10, "views":60}:
                 raise ValueError(f"Unified archive coverage changed: {counts}")
-            for filename in ("index.html", "style.css", "app.js", "favicon.svg", "vendor/model-viewer.min.js", "vendor/LICENSE", "vendor/THIRD-PARTY-LICENSES.txt", "vendor/version.json"):
+            for filename in ("index.html", "style.css", "app.js", "karamba.js", "analysis-view.mjs", "favicon.svg", "vendor/model-viewer.min.js", "vendor/LICENSE", "vendor/THIRD-PARTY-LICENSES.txt", "vendor/version.json"):
                 if "almond_mcp/library_ui/" + filename not in names:
                     raise ValueError(f"Archive UI file missing: {filename}")
             if any(a["available"] for a in archive_catalogue.records.values() if a["kind"] == "element"):

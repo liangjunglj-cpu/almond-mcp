@@ -30,7 +30,7 @@ server = create_server(0, repository)
 thread = threading.Thread(target=server.serve_forever, daemon=True)
 thread.start()
 try:
-    for route in ["/", "/app.js", "/vendor/model-viewer.min.js", "/vendor/THIRD-PARTY-LICENSES.txt",
+    for route in ["/", "/app.js", "/karamba.js", "/analysis-view.mjs", "/vendor/model-viewer.min.js", "/vendor/THIRD-PARTY-LICENSES.txt",
                   "/api/catalogue", repository.records["gen-office-chair-1"]["model"]]:
         with urllib.request.urlopen(f"http://127.0.0.1:{server.server_port}{route}") as response:
             assert response.status == 200 and response.read()
@@ -45,6 +45,8 @@ async def main():
                                env=dict(os.environ), cwd=str(Path(sys.prefix)))
     async with Client(transport, timeout=60) as client:
         tools = await client.list_tools()
+        assert "validate_structure" in {t.name for t in tools}
+        assert not any("ikea" in t.name.lower() for t in tools)
         result = await client.call_tool("search_asset_repository", {"query":"office chair", "drawing_ready":True})
         payload = result.structured_content
         assert payload["total"] == 1, payload

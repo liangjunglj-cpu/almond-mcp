@@ -56,7 +56,7 @@ def build_bundle(destination: Path):
     for path in sorted(UI_ROOT.rglob("*")):
         if path.is_file():
             relative = path.relative_to(UI_ROOT).as_posix()
-            mime = {".html":"text/html; charset=utf-8", ".css":"text/css; charset=utf-8", ".js":"text/javascript; charset=utf-8", ".json":"application/json", ".svg":"image/svg+xml"}.get(path.suffix,"text/plain; charset=utf-8")
+            mime = {".html":"text/html; charset=utf-8", ".css":"text/css; charset=utf-8", ".js":"text/javascript; charset=utf-8", ".mjs":"text/javascript; charset=utf-8", ".json":"application/json", ".svg":"image/svg+xml"}.get(path.suffix,"text/plain; charset=utf-8")
             write("/"+relative, "ui/"+relative, path.read_bytes(), mime)
     routes["/"] = routes["/index.html"]
     write("/api/materials", "api/materials.json", (ROOT/"Materialfiles/manifest.json").read_bytes(), "application/json")

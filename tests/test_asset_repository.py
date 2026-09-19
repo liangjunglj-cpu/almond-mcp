@@ -61,7 +61,7 @@ def test_http_downloads_and_file_boundary():
         return response.status, dict(response.getheaders()), response.read()
     try:
         status, headers, content = request("/")
-        assert status == 200 and b"Object Archive" in content
+        assert status == 200 and b"Almond" in content and b"karamba-page" in content
         assert "charset=utf-8" in headers["Content-Type"]
         status, headers, content = request("/api/catalogue?download=1")
         assert status == 200 and json.loads(content)["counts"]["assets"] == 54

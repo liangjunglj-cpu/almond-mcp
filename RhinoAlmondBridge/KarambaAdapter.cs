@@ -35,6 +35,8 @@ namespace RhinoAlmondBridge
 
         /// <summary>Total imposed load in kN, split across free nodes, acting in -Z.</summary>
         public double ImposedLoadKN { get; set; } = 10.0;
+        public bool IncludeSelfWeight { get; set; } = true;
+        public bool FixedRotations { get; set; } = true;
     }
 
     /// <summary>Per-element utilization with Rhino GUID lineage.</summary>
@@ -54,6 +56,10 @@ namespace RhinoAlmondBridge
         public string FailureReason { get; set; }
 
         public double MaxDisplacementMM { get; set; }
+        public bool DisplacementAvailable { get; set; }
+        public bool UtilizationAvailable { get; set; }
+        public List<double[]> SupportPointsM { get; set; } = new List<double[]>();
+        public List<double[]> LoadedPointsM { get; set; } = new List<double[]>();
 
         /// <summary>Utilization per analyzed element, keyed to source Rhino GUIDs.</summary>
         public List<ElementUtilization> PerElementUtilization { get; set; } = new List<ElementUtilization>();
@@ -894,7 +900,8 @@ namespace RhinoAlmondBridge
             var supportFactory = GetFactory(k3d, "Support");
             var supportType = FindType("Karamba.Supports.Support");
             var supportObjs = new List<object>();
-            var fullyFixed = new List<bool> { true, true, true, true, true, true };
+            var fullyFixed = new List<bool> { true, true, true, spec.FixedRotations, spec.FixedRotations, spec.FixedRotations };
+            res.SupportPointsM = supportPtsM.Select(p => new[] {p.X,p.Y,p.Z}).ToList();
 
             foreach (var p in supportPtsM)
             {
@@ -920,6 +927,8 @@ namespace RhinoAlmondBridge
             // karambaCommon 3.1: Karamba.Loads.GravityLoad(Vector3 direction)
             // (also reachable via Karamba.Factories.FactoryLoad.GravityLoad).
             // Direction (0,0,-1) = self weight acting downward.
+            if (spec.IncludeSelfWeight)
+            {
             object gravity;
             try
             {
@@ -933,6 +942,7 @@ namespace RhinoAlmondBridge
                 gravity = Activator.CreateInstance(gravityType, NewVector3(0, 0, -1));
             }
             loadObjs.Add(gravity);
+            }
 
             // Imposed load: total ImposedLoadKN split evenly over free
             // (non-support) nodes; if every node is a support, use all nodes.
@@ -943,6 +953,7 @@ namespace RhinoAlmondBridge
 
             if (spec.ImposedLoadKN > 0 && freeNodes.Count > 0)
             {
+                res.LoadedPointsM = freeNodes.Select(p => new[] {p.X,p.Y,p.Z}).ToList();
                 double perNodeKN = spec.ImposedLoadKN / freeNodes.Count;
                 foreach (var p in freeNodes)
                 {
@@ -1015,25 +1026,9 @@ namespace RhinoAlmondBridge
                 if (doubles.Count > 0)
                 {
                     maxDispM = doubles.Max(Math.Abs);
-                    dispFound = true;
+                    dispFound = doubles.All(d => !double.IsNaN(d) && !double.IsInfinity(d));
                 }
                 break;
-            }
-            if (!dispFound)
-            {
-                // Fall back to any out param that flattens to doubles.
-                foreach (var kv in analyzeOuts)
-                {
-                    var doubles = FlattenDoubles(kv.Value).ToList();
-                    if (doubles.Count > 0)
-                    {
-                        maxDispM = doubles.Max(Math.Abs);
-                        dispFound = true;
-                        res.Warnings.Add("Displacement read from out param '" + kv.Key +
-                            "' by shape, not name.");
-                        break;
-                    }
-                }
             }
             foreach (var kv in analyzeOuts)
             {
@@ -1042,9 +1037,10 @@ namespace RhinoAlmondBridge
             }
             if (!dispFound)
                 res.Warnings.Add("AnalyzeThI returned no displacement out param; " +
-                    "MaxDisplacementMM reported as 0.");
+                    "displacement is unavailable.");
 
             res.MaxDisplacementMM = maxDispM * Units.MetersToMillimeters;
+            res.DisplacementAvailable = dispFound && !double.IsNaN(res.MaxDisplacementMM) && !double.IsInfinity(res.MaxDisplacementMM);
 
             // ── Per-element utilization ──────────────────────────────────────
             var utils = TryComputeUtilization(analyzed, res.Warnings);
@@ -1062,6 +1058,7 @@ namespace RhinoAlmondBridge
                         Utilization = Math.Abs(utils[i]),
                     });
                 }
+                res.UtilizationAvailable = utils.Count == elementGuids.Count && utils.All(u => !double.IsNaN(u) && !double.IsInfinity(u));
             }
             else
             {
@@ -1075,7 +1072,7 @@ namespace RhinoAlmondBridge
             res.MaxStressMPa = maxUtil * matDef.YieldMPa;
 
             // Reactions from vertical equilibrium (documented in Units block).
-            res.ReactionsKN = massKg * Units.GravityMS2 / 1000.0 + spec.ImposedLoadKN;
+            res.ReactionsKN = (spec.IncludeSelfWeight ? massKg * Units.GravityMS2 / 1000.0 : 0) + spec.ImposedLoadKN;
         }
 
         private static object BuildBeamCroSec(object croSecFactory, SectionSpec section,

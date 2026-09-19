@@ -29,7 +29,7 @@ namespace RhinoAlmondBridge
 
         internal static void Request(string id, bool drag, bool light)
         {
-            if (Busy) return;
+            if (Busy || AnalysisWorkspace.Busy) return;
             var doc = RhinoDoc.ActiveDoc;
             if (doc == null || doc.InCommand(false) > 0)
             {

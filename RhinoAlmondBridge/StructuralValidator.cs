@@ -59,6 +59,19 @@ namespace RhinoAlmondBridge
                 Material = request.Material,
             };
 
+            try {
+                AnalysisSettings.Parse(new JObject {
+                    ["structure"]=request.StructureType.ToLowerInvariant(),["material"]=request.Material,
+                    ["load_kn"]=request.LoadKN,["self_weight"]=request.IncludeSelfWeight,
+                    ["fixed_rotations"]=request.FixedRotations,["explicit_supports"]=request.ExplicitSupports,
+                    ["diameter_mm"]=request.BeamDiameterMM,["wall_mm"]=request.BeamWallMM
+                }.ToString());
+            }
+            catch(Exception ex) { result.Status="error";result.Verdict=ex.Message;return result; }
+            // Optional settings are only implemented by the direct API pathway.
+            bool requireApi=request.RequireKaramba || !request.IncludeSelfWeight || !request.FixedRotations ||
+                request.ExplicitSupports || request.BeamDiameterMM.HasValue;
+
             var doc = RhinoDoc.ActiveDoc;
             if (doc == null)
             {
@@ -69,6 +82,20 @@ namespace RhinoAlmondBridge
 
             // 1. Condition the geometry (weld nodes, split members, classify).
             var conditioned = _conditioner.Condition(doc, request.Guids);
+            try
+            {
+            if (request.ExplicitSupports && conditioned.AnchorPoints.Count == 0)
+            {
+                result.Verdict = "Select Rhino point objects to declare supports.";
+                return result;
+            }
+            if (request.BeamDiameterMM.HasValue)
+            {
+                double toDoc = RhinoMath.UnitScale(UnitSystem.Millimeters, doc.ModelUnitSystem);
+                foreach (var beam in conditioned.Beams)
+                    beam.Section = new SectionSpec { Shape="circular_hollow", Source="user",
+                        Diameter=request.BeamDiameterMM.Value*toDoc, WallThickness=request.BeamWallMM.Value*toDoc };
+            }
             result.Warnings.AddRange(conditioned.Warnings);
 
             if (conditioned.Beams.Count == 0 && conditioned.Shells.Count == 0)
@@ -97,6 +124,12 @@ namespace RhinoAlmondBridge
 
             // 2. Pathway A: direct Karamba 3.1 API.
             bool solved = TryApiPath(request, conditioned, result);
+            if (!solved && requireApi)
+            {
+                result.Status = "unavailable";
+                result.Verdict = "Karamba could not solve this setup. See the engine message; no estimate was substituted.";
+                return result;
+            }
 
             // 3. Pathway B: audited template capsule.
             if (!solved)
@@ -121,6 +154,14 @@ namespace RhinoAlmondBridge
             result.Results.YieldStressMPa = yieldStress;
             result.Results.SpanM = spanM;
             result.Results.SpanBasis = spanBasis;
+            if (result.Results.AnalysisMethod == "api" &&
+                (!result.Results.DisplacementAvailable || !result.Results.UtilizationAvailable))
+            {
+                result.Status = "incomplete";
+                result.Passed = false;
+                result.Verdict = "Karamba returned incomplete metrics. Missing values cannot establish a pass.";
+                return result;
+            }
 
             var failures = new List<string>();
             var suggestions = new List<string>();
@@ -149,7 +190,7 @@ namespace RhinoAlmondBridge
 
             string prefix = MethodPrefix(result.Results.AnalysisMethod);
             result.Verdict = prefix + (result.Passed
-                ? $"PASSED: All structural checks OK. Deflection {result.Results.MaxDeflectionMM:F1}mm (limit {deflectionLimit:F1}mm), Utilization {result.Results.UtilizationRatio:F2}"
+                ? $"PASSED: Configured checks satisfied. Deflection {result.Results.MaxDeflectionMM:F1}mm (limit {deflectionLimit:F1}mm), Utilization {result.Results.UtilizationRatio:F2}"
                 : $"FAILED: {string.Join("; ", failures)}");
             result.Suggestions = suggestions;
 
@@ -162,6 +203,8 @@ namespace RhinoAlmondBridge
                 .ToList();
 
             return result;
+            }
+            finally { foreach(var b in conditioned.Beams)b.Axis.Dispose();foreach(var s in conditioned.Shells)s.Mesh.Dispose(); }
         }
 
         private static string MethodPrefix(string analysisMethod)
@@ -188,6 +231,8 @@ namespace RhinoAlmondBridge
                 Conditioned = conditioned,
                 MaterialName = request.Material,
                 ImposedLoadKN = request.LoadKN,
+                IncludeSelfWeight = request.IncludeSelfWeight,
+                FixedRotations = request.FixedRotations,
             };
 
             KarambaResults karamba;
@@ -219,6 +264,10 @@ namespace RhinoAlmondBridge
                 MaxStressMPa = karamba.MaxStressMPa,
                 ReactionsKN = karamba.ReactionsKN,
                 AnalysisMethod = "api",
+                DisplacementAvailable = karamba.DisplacementAvailable,
+                UtilizationAvailable = karamba.UtilizationAvailable,
+                SupportPointsM = karamba.SupportPointsM,
+                LoadedPointsM = karamba.LoadedPointsM,
                 PerElementUtilization = karamba.PerElementUtilization
                     .Select(u => new PerElementUtilizationEntry
                     {
@@ -547,6 +596,18 @@ namespace RhinoAlmondBridge
 
         [JsonProperty("material")]
         public string Material { get; set; } = "Steel";
+        [JsonProperty("require_karamba")]
+        public bool RequireKaramba { get; set; }
+        [JsonProperty("self_weight")]
+        public bool IncludeSelfWeight { get; set; } = true;
+        [JsonProperty("fixed_rotations")]
+        public bool FixedRotations { get; set; } = true;
+        [JsonProperty("explicit_supports")]
+        public bool ExplicitSupports { get; set; }
+        [JsonProperty("beam_diameter_mm")]
+        public double? BeamDiameterMM { get; set; }
+        [JsonProperty("beam_wall_mm")]
+        public double? BeamWallMM { get; set; }
     }
 
     public class ValidationResult
@@ -590,6 +651,14 @@ namespace RhinoAlmondBridge
     {
         [JsonProperty("max_deflection_mm")]
         public double MaxDeflectionMM { get; set; }
+        [JsonProperty("displacement_available")]
+        public bool DisplacementAvailable { get; set; }
+        [JsonProperty("utilization_available")]
+        public bool UtilizationAvailable { get; set; }
+        [JsonProperty("support_points_m")]
+        public List<double[]> SupportPointsM { get; set; } = new List<double[]>();
+        [JsonProperty("loaded_points_m")]
+        public List<double[]> LoadedPointsM { get; set; } = new List<double[]>();
 
         [JsonProperty("deflection_limit_mm")]
         public double DeflectionLimitMM { get; set; }

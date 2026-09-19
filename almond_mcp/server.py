@@ -30,7 +30,6 @@ from almond_mcp import asset_passport, conditioning, exchange, paths, drafting
 
 DELIMITER = b'\n<<EOF>>\n'
 LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_LIBRARY_DIR")
-FURNITURE_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_FURNITURE_DIR")
 DRAWING_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_DRAWING_ASSET_DIR")
 DIAGRAM_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_DIAGRAM_ASSET_DIR")
 GENERATED_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_GENERATED_ASSET_DIR")
@@ -222,11 +221,6 @@ class DrawingRecipeIndexer:
 
 # Build index once on startup
 indexer = LibraryIndexer(LIBRARY_DIR)
-furniture_indexer = AssetLibraryIndexer(
-    FURNITURE_LIBRARY_DIR,
-    library_id="ikea",
-    label="IKEA",
-)
 drawing_asset_indexer = AssetLibraryIndexer(
     DRAWING_LIBRARY_DIR,
     library_id="drawing_assets",
@@ -489,10 +483,9 @@ retrieval_store.sync_assets(
     list(drawing_asset_indexer.assets.values()),
     library_id="drawing_assets",
 )
-retrieval_store.sync_assets(
-    list(furniture_indexer.assets.values()),
-    library_id="ikea",
-)
+# Retire the legacy supplier catalogue from searchable cache; local files and
+# scene history are retained.
+retrieval_store.sync_assets([], library_id="ikea")
 retrieval_store.sync_assets(
     list(diagram_asset_indexer.assets.values()),
     library_id="diagram_assets",
@@ -762,72 +755,10 @@ def get_logic_by_id(logic_id: str) -> str:
         return json.dumps({"error": f"Failed to parse '{target_file}': {str(e)}"})
 
 
-@mcp.tool()
-def list_ikea_furniture(
-    category: str = "",
-    limit: int = 20,
-    offset: int = 0,
-) -> str:
-    """
-    Lists furniture in the controlled IKEA Singapore model library.
-
-    Args:
-        category: Optional exact category filter such as "chair", "sofa", or "storage".
-    Returns:
-        Compact paginated asset cards. Use get_ikea_furniture only for a
-        selected asset that needs full metadata.
-    """
-    page = retrieval_store.search_assets(
-        library_id="ikea",
-        category=category,
-        limit=limit,
-        offset=offset,
-    )
-    return json.dumps({
-        "catalogue_region": furniture_indexer.catalogue_region,
-        "catalogue_checked": furniture_indexer.catalogue_checked,
-        **page,
-    })
 
 
-@mcp.tool()
-def search_ikea_furniture(
-    query: str = "",
-    category: str = "",
-    max_width_mm: float = 0,
-    max_depth_mm: float = 0,
-    max_height_mm: float = 0,
-    exact_dimensions_only: bool = False,
-    limit: int = 10,
-    offset: int = 0,
-) -> str:
-    """
-    Searches IKEA furniture by product language and room-fit dimensions.
-
-    Use this before placing furniture. Prefer exact-dimension matches for final layouts;
-    series-only matches are useful for concept design but are labelled as such.
-    """
-    page = retrieval_store.search_assets(
-        query=query,
-        library_id="ikea",
-        category=category,
-        max_width_mm=max_width_mm,
-        max_depth_mm=max_depth_mm,
-        max_height_mm=max_height_mm,
-        exact_dimensions_only=exact_dimensions_only,
-        limit=limit,
-        offset=offset,
-    )
-    return json.dumps(page)
 
 
-@mcp.tool()
-def get_ikea_furniture(asset_id: str) -> str:
-    """Returns one IKEA furniture asset's dimensions, provenance, and availability."""
-    asset = retrieval_store.get_asset(asset_id, library_id="ikea")
-    if not asset:
-        return json.dumps({"status": "error", "message": f"Unknown furniture asset_id: {asset_id}"})
-    return json.dumps({"status": "success", "asset": asset})
 
 
 @mcp.tool()
@@ -839,7 +770,7 @@ def list_drawing_assets(
     """
     Lists representation-only entourage and graphic proxy assets.
 
-    Drawing assets are intentionally isolated from IKEA product search and do
+    Drawing assets are representation elements and do
     not participate in room collision checks unless explicitly registered.
     """
     page = retrieval_store.search_assets(
@@ -1215,7 +1146,6 @@ def get_retrieval_status() -> str:
         "status": "ready",
         "database": STATE_DB_PATH,
         "asset_index": retrieval_store.asset_stats(),
-        "ikea_index": retrieval_store.asset_stats("ikea"),
         "drawing_asset_index": retrieval_store.asset_stats("drawing_assets"),
         "generated_asset_index": retrieval_store.asset_stats("generated_assets"),
         "drawing_recipes": len(drawing_recipe_indexer.recipes),
@@ -1415,89 +1345,6 @@ def update_generation_step(
         return json.dumps({"status": "error", "message": str(exc)})
 
 
-@mcp.tool()
-def place_ikea_furniture(
-    asset_id: str,
-    x: float = 0,
-    y: float = 0,
-    z: float = 0,
-    rotation_degrees: float = 0,
-    scale: float = 1,
-) -> str:
-    """
-    Imports an indexed IKEA SketchUp model into Rhino 8 as a reusable block and places an instance.
-
-    The asset is imported only when its block definition does not already exist. Subsequent calls
-    create lightweight instances. Position uses the active Rhino document units; rotation is around
-    world Z. The tool never accepts an arbitrary file path.
-    """
-    asset = furniture_indexer.get(asset_id)
-    if not asset:
-        return json.dumps({"status": "error", "message": f"Unknown furniture asset_id: {asset_id}"})
-    if not asset.get("file_available"):
-        return json.dumps({"status": "error", "message": f"Furniture file is missing for {asset_id}."})
-    if asset.get("geometry_status") == "defective":
-        return json.dumps({
-            "status": "error",
-            "message": f"{asset_id} has known-defective source geometry and is "
-                       f"excluded from placement: {asset.get('geometry_note', 'see manifest')}",
-        })
-
-    numeric_values = [x, y, z, rotation_degrees, scale]
-    if not all(isinstance(value, (int, float)) and abs(value) != float("inf") and value == value for value in numeric_values):
-        return json.dumps({"status": "error", "message": "Placement values must be finite numbers."})
-    if scale <= 0 or scale > 100:
-        return json.dumps({"status": "error", "message": "scale must be greater than 0 and no more than 100."})
-
-    payload = json.dumps({
-        "type": "place_furniture",
-        "asset_id": asset_id,
-        "file_path": asset["_resolved_file"],
-        "name": f"{asset.get('series', '')} {asset.get('product', '')}".strip(),
-        "position": [x, y, z],
-        "rotation_degrees": rotation_degrees,
-        "scale": scale,
-        "metadata": {
-            "series": asset.get("series"),
-            "product": asset.get("product"),
-            "variant": asset.get("variant"),
-            "category": asset.get("category"),
-            "dimensions_mm": asset.get("dimensions_mm"),
-            "ikea_product_id": asset.get("ikea_product_id"),
-            "ikea_url": asset.get("ikea_url"),
-            "warehouse_url": asset.get("warehouse_url"),
-            "warehouse_status": asset.get("warehouse_status"),
-            "match_status": asset.get("match_status"),
-        },
-    }).encode("utf-8")
-
-    try:
-        response = _send_and_receive(payload, timeout=90.0)
-    except socket.timeout:
-        return json.dumps({"status": "error", "message": "Rhino furniture import timed out."})
-    except ConnectionRefusedError:
-        return json.dumps({"status": "error", "message": "Rhino bridge is unavailable. Start RhinoAlmondBridge first."})
-    except Exception as exc:
-        return json.dumps({"status": "error", "message": f"Furniture placement failed: {exc}"})
-
-    # Post-import QA: compare the real placed bounds against the catalogue
-    # dimensions, and apply any manifest-declared geometry correction.
-    try:
-        result = json.loads(response)
-    except (TypeError, ValueError):
-        return response
-    if not isinstance(result, dict) or result.get("status") != "success":
-        return response
-    check = _dimension_check(asset, result.get("bounds"), scale)
-    if check:
-        result["dimension_check"] = check
-    correction = asset.get("import_correction") or {}
-    rotate_x = float(correction.get("rotate_x_degrees", 0) or 0)
-    if rotate_x and result.get("object_guid"):
-        result["import_correction_applied"] = _apply_import_correction(
-            result["object_guid"], rotate_x, z
-        )
-    return json.dumps(result)
 
 
 def _dimension_check(asset: dict, bounds: dict | None, scale: float) -> dict | None:
@@ -2054,7 +1901,7 @@ def place_drawing_asset(
     Places an indexed representation asset as a reusable Rhino block.
 
     Drawing assets are placed on ALMOND-DRAW::ASSETS and remain distinct from
-    IKEA product blocks. The tool accepts only files resolved from the
+    generated model blocks. The tool accepts only files resolved from the
     controlled DrawingAssetfiles manifest.
     """
     asset = drawing_asset_indexer.get(asset_id)

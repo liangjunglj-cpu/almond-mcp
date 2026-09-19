@@ -24,7 +24,6 @@ BRIDGE_PORT = 5000
 
 # Libraries whose manifests reference downloadable model files.
 _MODEL_LIBRARIES = (
-    ("RHINO_MCP_FURNITURE_DIR", "IKEA furniture"),
     ("RHINO_MCP_DRAWING_ASSET_DIR", "drawing assets"),
     ("RHINO_MCP_DIAGRAM_ASSET_DIR", "diagram assets"),
     ("RHINO_MCP_GENERATED_ASSET_DIR", "generated assets"),

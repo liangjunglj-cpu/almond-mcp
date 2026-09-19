@@ -27,7 +27,6 @@ APP_NAME = "Almond"
 # bundled almond_mcp/data/<name>, and the user data directory.
 LIBRARY_DIRS = {
     "RHINO_MCP_LIBRARY_DIR": "Grasshopperfiles",
-    "RHINO_MCP_FURNITURE_DIR": "IkeaFurniturefiles",
     "RHINO_MCP_DRAWING_ASSET_DIR": "DrawingAssetfiles",
     "RHINO_MCP_DIAGRAM_ASSET_DIR": "DiagramAssetfiles",
     "RHINO_MCP_GENERATED_ASSET_DIR": "GeneratedAssetfiles",

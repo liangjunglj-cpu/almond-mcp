@@ -8,6 +8,12 @@ class Program
 {
     static void Main(string[] args)
     {
+        if (args[0] == "--settings")
+        {
+            try { Console.WriteLine(AnalysisSettings.Parse(File.ReadAllText(args[1])).ToJson().ToString(Formatting.None)); }
+            catch(Exception ex) { Console.Error.WriteLine(ex.Message); Environment.ExitCode=1; }
+            return;
+        }
         if (args[0] == "--mesh")
         {
             try
