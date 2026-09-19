@@ -69,3 +69,11 @@ This is a documentation template, not a new validated passport schema. Complete 
 Every distributed asset should resolve to its evidence record and output hash. Include public attribution and permitted metadata with the pack; retain restricted documents privately. A drawing sheet should identify its source/model revision, units, scale, and whether dimensions are generated, measured, declared or source-verified. Unknown rights or missing critical evidence must remain visible in review, not be converted into an assumed open licence.
 
 The current automated check detects missing legacy generation fields, inconsistent task history, prompt disagreements and stale source-register content. New source relationships and item-level rights still require review and future schema validation. Run the source check whenever the generated catalogue changes and before building a release.
+
+## Existing project imports
+
+ProjectY2K adds five text-to-3D derivatives. Their image stages are not applicable;
+unknown submitted prompts remain null. The source checker uses the explicit
+`existing_project_import` evidence type, compares manifest/history/passport data,
+and requires source-file checksums and owner authorization. It does not invent
+legacy image task IDs to satisfy the earlier image-to-3D record shape.

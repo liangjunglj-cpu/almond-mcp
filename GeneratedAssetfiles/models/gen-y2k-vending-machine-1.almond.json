@@ -1,0 +1,241 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-y2k-vending-machine-1",
+  "library_id": "generated_assets",
+  "name": "Vending machine (Y2K vending unit; simplified material study)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-y2k-vending-machine-1.glb",
+  "dimensions_mm": {
+    "width": 973.1,
+    "depth": 973.6,
+    "height": 2400.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -486.55,
+        -486.8,
+        0.0
+      ],
+      "max": [
+        486.55,
+        486.8,
+        2400.0
+      ]
+    },
+    "footprint": [
+      [
+        -486.55,
+        -486.8
+      ],
+      [
+        486.55,
+        -486.8
+      ],
+      [
+        486.55,
+        486.8
+      ],
+      [
+        -486.55,
+        486.8
+      ]
+    ],
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "accessory"
+  },
+  "materials": [
+    {
+      "material_id": "steel-painted-vermilion",
+      "objects": [
+        "gen-y2k-vending-machine-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-y2k-vending-machine-1",
+    "library_id": "generated_assets",
+    "name": "Vending machine (Y2K vending unit; simplified material study)",
+    "category": "appliance",
+    "tags": [
+      "ProjectY2K",
+      "Meshy",
+      "imported",
+      "concept",
+      "vending machine"
+    ],
+    "dimensions_mm": {
+      "width": 973.1,
+      "depth": 973.6,
+      "height": 2400.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 973.1,
+      "depth": 973.6,
+      "height": 2400.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -486.55,
+          -486.8,
+          0.0
+        ],
+        "max": [
+          486.55,
+          486.8,
+          2400.0
+        ]
+      },
+      "footprint": [
+        [
+          -486.55,
+          -486.8
+        ],
+        [
+          486.55,
+          -486.8
+        ],
+        [
+          486.55,
+          486.8
+        ],
+        [
+          -486.55,
+          486.8
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "accessory"
+    },
+    "materials": [
+      {
+        "material_id": "steel-painted-vermilion",
+        "objects": [
+          "gen-y2k-vending-machine-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": null,
+        "image_task_id": null,
+        "image_model": null,
+        "mesh_task_id": "01a07476-48e0",
+        "mesh_model": "meshy-6 text-to-3d preview/refine; source remesh history partial",
+        "generated_at": "2026-09-06",
+        "orientation_correction": null,
+        "scale_applied": 1333.757178,
+        "evidence_type": "existing_project_import",
+        "import_record": {
+          "project": "ProjectY2K / Twofronts",
+          "source_documents": [
+            {
+              "path": "twofronts/meshy/README.md",
+              "sha256": "0341ce0977df6eaef9244bc80314493d00909ad11d3d64290b609fd9332aa45b"
+            },
+            {
+              "path": "twofronts/world/assets.json",
+              "sha256": "4876b94afc5ca40b70a652ee00dbe8ab9ecbee03647c893e84dd303fc6845ff9"
+            }
+          ],
+          "conversion": {
+            "asset_id": "gen-y2k-vending-machine-1",
+            "source_file": "twofronts/meshy/models/vending/model.obj",
+            "source_sha256": "05e4952d5d9df06c057820273495565ce3b3496b4b25f7d80fd42a38f6dc5caa",
+            "source_bytes": 107902170,
+            "source_triangles": 622174,
+            "output_triangles": 19797,
+            "converted_sha256": "b362d10208fd0dca2bd06864683ee5472bf1b7c5e7bd8d170bc515ede4dcca3d",
+            "converter": "Blender 5.1.2",
+            "triangle_target": 20000,
+            "coordinate_transform": "OBJ Y-up to Blender Z-up; exported glTF Y-up",
+            "material_derivation": "Source texture atlases omitted; assigned Almond semantic material, not original textured appearance"
+          },
+          "task_id_status": "prefix_only",
+          "source_remesh_task_recorded": null,
+          "import_date": "2026-09-19",
+          "prompt_status": "unknown; original submitted prompt not retained in reviewed project records",
+          "image_stage": "not_applicable; text-to-3d generation",
+          "dimension_basis": "Height is an authored project placement value from twofronts/world/assets.json, not a verified physical measurement. Width/depth preserve source proportions.",
+          "rights": {
+            "model_license": "CC-BY-4.0",
+            "authorization_date": "2026-09-19",
+            "basis": "Project owner authorized inclusion in Almond's downloadable plugin after being asked about the public CC BY 4.0 asset pack.",
+            "provider_account_entitlement": "not_independently_verified"
+          },
+          "intended_role": "Lobby, station and streetscape amenity layouts"
+        }
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "kitchen"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "exterior_perspective",
+        "axonometric",
+        "concept_layout"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.0,
+      "triangle_count": 19797,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "86D43FB16D45ED339CD85E2C35A7319A0CC6D8672CA9EF66016F5A85D99E1631"
+}

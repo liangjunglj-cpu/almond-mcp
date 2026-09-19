@@ -24,8 +24,8 @@ def bundle(tmp_path_factory):
 
 def test_distributed_archive_excludes_community_files_and_keeps_evidence(bundle):
     catalogue=json.loads((bundle/"api/catalogue.json").read_text())
-    assert catalogue["counts"]["assets"]==54
-    assert len(list(bundle.rglob("*.glb")))==47
+    assert catalogue["counts"]["assets"]==59
+    assert len(list(bundle.rglob("*.glb")))==52
     assert not list(bundle.rglob("*.skp"))
     assert all(not a["available"] for a in catalogue["assets"] if a["kind"]=="element")
     for a in catalogue["assets"]:
@@ -53,7 +53,7 @@ def test_real_dotnet_host_http_and_integrity(bundle):
             connection.close()
             return result
         status,headers,body=request("/api/catalogue")
-        assert status==200 and json.loads(body)["counts"]["models"]==47
+        assert status==200 and json.loads(body)["counts"]["models"]==52
         assert "wasm-unsafe-eval" in headers["Content-Security-Policy"]
         for route in ["/", "/app.js", "/karamba.js", "/analysis-view.mjs", "/vendor/model-viewer.min.js", "/files/generated/models/gen-office-chair-1.glb", "/files/drafting/pilot/gen-office-chair-1/plan-1-50.dxf"]:
             assert request(route)[0]==200

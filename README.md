@@ -1,6 +1,6 @@
 # Almond MCP for Rhino
 
-**0.6.0rc9 — Almond workspace release candidate.** Run **Almond** in Rhino
+**0.6.0rc10 — Almond workspace release candidate.** Run **Almond** in Rhino
 for a dockable Neo Swiss menu with **Models** and **Karamba Validation**.
 **AlmondLibrary** opens models directly; **AlmondKaramba** opens the analysis
 workspace. Models retain compact tiles, Light/Original detail and shared-block
@@ -16,13 +16,13 @@ by the user on rc.6. Native acceptance of the new Karamba panel and public
 publication remain pending.
 
 Run
-`almond-mcp library --open` for the local Neo Swiss interface: 47 Meshy models,
+`almond-mcp library --open` for the local Neo Swiss interface: 52 Meshy models,
 7 drawing elements, linked SVG/DXF views, downloads, and source evidence in
 one searchable catalogue. The same index is exposed through the MCP tool
 `search_asset_repository` and `almond://repository/{asset_id}` resources.
 See the [Object Archive guide](docs/object-archive-0.6-rc3.md).
 
-All 47 generated
+All 52 generated
 models now carry embedded asset passports and ship with the Python package,
 including their sidecar contracts and previews. New MCP tools recommend assets
 with reasons and check rotated clearance envelopes before placement. See
@@ -429,7 +429,7 @@ See [drafting workflow and limits](docs/drafting-0.6-rc2.md) and open
 [the pilot gallery](Draftingfiles/index.html). These are mesh outlines for
 layout/entourage; section assemblies and hidden-line drafting remain future work.
 
-### Compact Rhino library placement (0.6.0rc9)
+### Compact Rhino library placement (0.6.0rc10)
 
 The docked archive now uses small, two-column thumbnails. Drag a model into a
 viewport, or choose Place and pick an insertion point. Light detail targets

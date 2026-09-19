@@ -1,0 +1,14 @@
+{
+  "schema_version": 1,
+  "project": "ProjectY2K / Twofronts",
+  "generation_date": "2026-09-06",
+  "evidence": ["twofronts/meshy/README.md", "twofronts/world/assets.json"],
+  "rights": {"model_license": "CC-BY-4.0", "authorization_date": "2026-09-19", "basis": "Project owner authorized inclusion in Almond's downloadable plugin after being asked about the public CC BY 4.0 asset pack.", "provider_account_entitlement": "not_independently_verified"},
+  "assets": [
+    {"asset_id":"gen-y2k-planter-pod-1","product":"Planter pod","category":"site_furniture","source":"twofronts/meshy/models/planter_lp/model.obj","height_mm":1100,"material":"ceramic-teal","role":"Landscape and public-space planter studies","task":"01a07476-f3a8","task_id_status":"prefix_only","remesh_task":"01a0747d-18ce","variant":"Y2K rounded planter; simplified material study"},
+    {"asset_id":"gen-y2k-kiosk-1","product":"Street kiosk","category":"site_furniture","source":"twofronts/meshy/models/kiosk_lp/model.obj","height_mm":2600,"material":"plaster-white","role":"Street kiosks and public-space amenity layouts","task":"01a0744f-7c05-75ea-a522-1ef91eed3537","task_id_status":"full_refine_id; source remesh task unknown","remesh_task":null,"variant":"Y2K capsule kiosk; simplified material study"},
+    {"asset_id":"gen-y2k-vending-machine-1","product":"Vending machine","category":"appliance","source":"twofronts/meshy/models/vending/model.obj","height_mm":2400,"material":"steel-painted-vermilion","role":"Lobby, station and streetscape amenity layouts","task":"01a07476-48e0","task_id_status":"prefix_only","remesh_task":null,"variant":"Y2K vending unit; simplified material study"},
+    {"asset_id":"gen-y2k-sign-pod-1","product":"Freestanding sign pod","category":"site_furniture","source":"twofronts/meshy/models/holosign/model.obj","height_mm":3400,"material":"aluminium-anodized","role":"Wayfinding, signage and exhibition concept layouts","task":"01a07476-3d50","task_id_status":"prefix_only","remesh_task":null,"variant":"Y2K sign pod; simplified material study"},
+    {"asset_id":"gen-y2k-organic-pavilion-1","product":"Organic pavilion","category":"architecture","source":"twofronts/meshy/models/pod_building_lp/model.obj","height_mm":14000,"material":"plaster-white","role":"Conceptual pavilion and organic-building massing studies","task":"01a0744f-710d-77f0-adb3-5afbc107a29d","task_id_status":"full_refine_id; source remesh task unknown","remesh_task":null,"variant":"Y2K pod building; conceptual exterior, not construction geometry"}
+  ]
+}

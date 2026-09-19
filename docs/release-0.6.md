@@ -1,6 +1,6 @@
 # Almond 0.6 release infrastructure
 
-Candidate pair: **almondbridge 0.6.0-rc.9** and **almond-mcp 0.6.0rc9**.
+Candidate pair: **almondbridge 0.6.0-rc.10** and **almond-mcp 0.6.0rc10**.
 Both are unpublished candidates. The Yak targets **Rhino 8.0 / Windows**;
 RhinoCommon remains pinned to 8.0.23304.9001. Plugin identity stays
 `c337dbb8-394a-4593-9c2b-a3d7cfc91893`. No Rhino update is required.
@@ -8,7 +8,7 @@ RhinoCommon remains pinned to 8.0.23304.9001. Plugin identity stays
 ## What users receive
 
 The Yak contains the compiled bridge, runtime dependencies, a complete read-only
-Object Archive, 47 generated GLBs, contracts, 47 previews, source evidence,
+Object Archive, 52 generated GLBs, contracts, 52 previews, source evidence,
 10 drawing packages, attribution and licences. `AlmondLibrary` opens a dockable
 Eto panel using Rhino 8's embedded web view and a loopback server hosted inside
 the plugin; it requires neither Python nor an AI client. `AlmondLibraryBrowser`
@@ -48,10 +48,10 @@ syncs a live MCP environment, installs into Rhino, or falls back to an old RHP.
 It runs the Python suite and real .NET HTTP-host integration tests, checks source
 records, builds/audits wheel and sdist, performs an isolated wheel installation
 and MCP smoke, builds a Windows Yak, and audits its allowlist and model hashes.
-It creates `dist/release-0.6.0rc9/` with:
+It creates `dist/release-0.6.0rc10/` with:
 
 - Python wheel and sdist.
-- `almondbridge-0.6.0-rc.9-rh8_0-win.yak`.
+- `almondbridge-0.6.0-rc.10-rh8_0-win.yak`.
 - Food4Rhino ZIP wrapper, listing text and quickstart guide.
 - JUnit test results, clean-install and Yak reports, and `SHA256SUMS.txt`.
 
@@ -95,12 +95,12 @@ claim this in-process smoke passed based only on the automated build report.
    exact revision. Retain artifacts and the successful Rhino smoke record.
 2. Publish the Python wheel/sdist to PyPI using the project's maintainer account
    (prefer PyPI Trusted Publishing for later CI automation). Verify the pinned
-   `uvx --from almond-mcp==0.6.0rc9 almond-mcp --version` on a clean machine.
+   `uvx --from almond-mcp==0.6.0rc10 almond-mcp --version` on a clean machine.
 3. Authenticate the maintainer's Yak account, then push the exact tested artifact:
 
    ```powershell
    & 'C:/Program Files/Rhino 8/System/Yak.exe' login
-   & 'C:/Program Files/Rhino 8/System/Yak.exe' push ./dist/release-0.6.0rc9/almondbridge-0.6.0-rc.9-rh8_0-win.yak
+   & 'C:/Program Files/Rhino 8/System/Yak.exe' push ./dist/release-0.6.0rc10/almondbridge-0.6.0-rc.10-rh8_0-win.yak
    & 'C:/Program Files/Rhino 8/System/Yak.exe' search --all --prerelease almondbridge
    ```
 
@@ -220,3 +220,20 @@ RhinoApp.AppSettingsChanged. The subscription is removed on panel disposal.
 Validate native theme switching after restart, including retained search/input
 state and closing/reopening the panel. Browser checks cannot prove native theme
 event delivery.
+
+## Karamba explainers and ProjectY2K imports (rc.10)
+
+Six small question-mark buttons explain the workflow, engine, selection, setup,
+diagram and results. They expand inline, support keyboard activation and Escape,
+and do not change solver inputs. Fixed/pinned and diagram-symbol sketches are
+illustrative.
+
+Five Meshy assets from ProjectY2K are included for public CC BY 4.0 distribution
+with owner authorization recorded on 2026-09-19: planter pod, street kiosk,
+vending machine, freestanding sign pod and organic pavilion. Each is reduced to
+about 20k triangles and assigned an Almond material. Source texture atlases are
+not included in these geometry studies. Original OBJ and evidence-file hashes,
+known full or partial task IDs, reduction counts, project-authored heights and
+unknown prompts/settings are embedded in the passport and source register.
+They add no claims of structural validity or manufacturer accuracy. The original
+Y2K project and the original 47 GLBs/previews remain unchanged.

@@ -72,6 +72,8 @@ def build_bundle(destination: Path):
         shutil.copyfile(generated/name,target)
     shutil.copyfile(ROOT/"THIRD-PARTY-NOTICES.md",destination/"THIRD-PARTY-NOTICES.md")
     shutil.copyfile(generated/"previews/render-record.json",destination/"evidence/preview-render-record.json")
+    if (generated/"imports").is_dir():
+        shutil.copytree(generated/"imports",destination/"evidence/imports")
     (destination/"ATTRIBUTION.txt").write_text("Generated 3D models and derived drawings: Almond generated asset library.\nDeclared licence: CC BY 4.0 — https://creativecommons.org/licenses/by/4.0/\nRetain attribution, link the licence, and indicate modifications.\nAlmond code: MIT. Viewer and dependencies: see ui/vendor/ licences.\nGeneration source records and documented gaps: evidence/source-register.json.\nCommunity drawing models are metadata-only here, with separate source terms.\n", encoding="utf-8")
     manifest = {"schema_version":1, "version":__version__, "counts":catalogue["counts"], "routes":routes}
     (destination/"bundle.json").write_text(json.dumps(manifest,indent=2)+"\n",encoding="utf-8")

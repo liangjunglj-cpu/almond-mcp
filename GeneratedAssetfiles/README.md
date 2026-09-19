@@ -2,11 +2,12 @@
 
 Open, redistributable 3D architectural assets for [Almond MCP](../README.md):
 entourage, site furniture, fixtures and unbranded
-furniture placeholders. **47 assets**, all generated with
-[Meshy](https://www.meshy.ai) from prompts written for this project and
+furniture placeholders. **52 assets**, all generated with
+[Meshy](https://www.meshy.ai), including five owner-authorized ProjectY2K imports, and
 normalised to real-world millimetres with an authored Almond spatial
-contract. Unlike the IKEA / drawing libraries (3D Warehouse content that
-each user downloads), these files ship with the repository.
+contract. Original Y2K prompts are not retained in the reviewed evidence;
+known task identifiers and source checksums are recorded instead. These files
+ship with the repository; optional community drawing binaries do not.
 
 - **License:** models are released under
   [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/) - attribute as
@@ -44,7 +45,7 @@ get_generated_asset(asset_id="gen-street-lamp-1")
 place_generated_asset(asset_id="gen-street-lamp-1", x_mm=0, y_mm=0)
 ```
 
-Version 0.6 bundles all 47 models, contracts and previews in the wheel.
+Version 0.6 bundles all 52 models, contracts and previews in the wheel.
 Run `almond-mcp audit-assets` to check checksums and agreement between embedded,
 sidecar and manifest passports. Wheel installs use a versioned user-data pack;
 explicit library directory overrides continue to take precedence.
@@ -163,7 +164,7 @@ build log; the measured values are what the manifest stores.
 
 ### Coloured archive previews (rc.8)
 
-The 47 individual thumbnails now use the embedded GLB material base colours,
+The 52 individual thumbnails now use the embedded GLB material base colours,
 with paint.sl studio lighting and a transparent background. They are material
 studies, not photographic textures or full PBR renders. Model geometry,
 materials, embedded passports and derived drawings are unchanged. Existing
@@ -172,6 +173,28 @@ contact sheets are legacy renders.
 Regenerate with `blender --factory-startup -b --python tools/render_generated_previews.py -- GeneratedAssetfiles/models GeneratedAssetfiles/previews --archive`.
 `--clay` is an optional neutral study; `--asset <asset_id>` renders a single
 inspection sample into a separate output folder. The full archive needs all
-47 records. `previews/render-record.json` records Blender/version/settings,
+52 records. `previews/render-record.json` records Blender/version/settings,
 script checksum (LF-normalized), and each source GLB and rendered PNG checksum.
 This is a post-generation preview derivation, not a change to Meshy history.
+
+## ProjectY2K additions
+
+Five existing Meshy-generated architectural props were imported on 2026-09-19
+with the project owner's permission for public CC BY 4.0 distribution. Search
+`ProjectY2K` in the library. Their nominal heights come from the project's
+authored scene placements, not physical product measurements.
+
+| Asset | Use | Height | Triangles |
+| --- | --- | --- | --- |
+| Planter pod | Landscape/streetscape studies | 1.1 m | 19,798 |
+| Street kiosk | Public-space amenities | 2.6 m | 19,799 |
+| Vending machine | Station/lobby amenities | 2.4 m | 19,797 |
+| Freestanding sign pod | Wayfinding/exhibition concepts | 3.4 m | 19,799 |
+| Organic pavilion | Organic-building massing concept | 14 m | 19,799 |
+
+These geometry editions use Almond materials, not the original texture atlases.
+The original OBJ files and textures remain in ProjectY2K. Source file/evidence
+hashes, known full or abbreviated Meshy task IDs, decimation counts and
+uncertainties are included in each embedded passport and `source-register.json`.
+The import specification and owner authorization are in `imports/projecty2k.json`.
+Original submitted prompts, seeds and complete remesh histories are unknown.

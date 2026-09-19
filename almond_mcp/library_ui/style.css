@@ -79,6 +79,15 @@
 .rhino-placement [data-drag]:active{cursor:grabbing}
 @media(min-width:500px){.rhino-panel .grid{grid-template-columns:repeat(3,minmax(0,1fr))}}
 .sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0)}
+.has-help{position:relative;padding-right:28px!important}
+.help-button{position:absolute;right:0;top:0;width:22px;height:22px;border:1px solid var(--line);border-radius:50%;font:12px/1 Arial,sans-serif;letter-spacing:0;color:var(--muted);padding:0;display:grid;place-items:center;background:var(--paper)}
+.engine-line>.help-button{top:50%;transform:translateY(-50%)}
+.help-button:hover,.help-button[aria-expanded=true]{color:var(--ink);border-color:var(--muted);background:var(--panel)}
+.help-panel{border:1px solid var(--line);border-left:3px solid var(--red);border-radius:3px;background:var(--panel);padding:10px 12px;margin:8px 0 14px;font:12px/1.55 Arial,sans-serif;letter-spacing:0}
+.help-panel h3{font-size:13px;margin:0 0 7px;letter-spacing:0;font-weight:600}
+.analysis-page .help-panel p{font-size:12px;margin:6px 0}.help-panel ol{padding-left:18px;margin:8px 0 0}.help-panel li+li{margin-top:6px}
+.help-panel svg{width:100%;max-width:300px;height:auto;margin:7px 0}.help-panel svg text{font:12px Arial,sans-serif;fill:var(--ink)}
+.rhino-panel .help-panel{font-family:var(--ui-font,"Segoe UI"),Arial,sans-serif}
 .workbench-home{padding:40px 0;max-width:940px;margin:auto}
 .workbench-home h1{font-size:clamp(48px,7vw,100px);line-height:.95;letter-spacing:-.065em;margin:18px 0}
 .home-intro{font-size:20px;line-height:1.45;margin:22px 0}

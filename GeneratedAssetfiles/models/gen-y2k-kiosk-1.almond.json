@@ -1,0 +1,242 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-y2k-kiosk-1",
+  "library_id": "generated_assets",
+  "name": "Street kiosk (Y2K capsule kiosk; simplified material study)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-y2k-kiosk-1.glb",
+  "dimensions_mm": {
+    "width": 1375.3,
+    "depth": 1466.4,
+    "height": 2600.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -687.65,
+        -733.2,
+        0.0
+      ],
+      "max": [
+        687.65,
+        733.2,
+        2600.0
+      ]
+    },
+    "footprint": [
+      [
+        -687.65,
+        -733.2
+      ],
+      [
+        687.65,
+        -733.2
+      ],
+      [
+        687.65,
+        733.2
+      ],
+      [
+        -687.65,
+        733.2
+      ]
+    ],
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "accessory"
+  },
+  "materials": [
+    {
+      "material_id": "plaster-white",
+      "objects": [
+        "gen-y2k-kiosk-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-y2k-kiosk-1",
+    "library_id": "generated_assets",
+    "name": "Street kiosk (Y2K capsule kiosk; simplified material study)",
+    "category": "site_furniture",
+    "tags": [
+      "ProjectY2K",
+      "Meshy",
+      "imported",
+      "concept",
+      "street kiosk"
+    ],
+    "dimensions_mm": {
+      "width": 1375.3,
+      "depth": 1466.4,
+      "height": 2600.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 1375.3,
+      "depth": 1466.4,
+      "height": 2600.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -687.65,
+          -733.2,
+          0.0
+        ],
+        "max": [
+          687.65,
+          733.2,
+          2600.0
+        ]
+      },
+      "footprint": [
+        [
+          -687.65,
+          -733.2
+        ],
+        [
+          687.65,
+          -733.2
+        ],
+        [
+          687.65,
+          733.2
+        ],
+        [
+          -687.65,
+          733.2
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "accessory"
+    },
+    "materials": [
+      {
+        "material_id": "plaster-white",
+        "objects": [
+          "gen-y2k-kiosk-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": null,
+        "image_task_id": null,
+        "image_model": null,
+        "mesh_task_id": "01a0744f-7c05-75ea-a522-1ef91eed3537",
+        "mesh_model": "meshy-6 text-to-3d preview/refine; source remesh history partial",
+        "generated_at": "2026-09-06",
+        "orientation_correction": null,
+        "scale_applied": 999.999827,
+        "evidence_type": "existing_project_import",
+        "import_record": {
+          "project": "ProjectY2K / Twofronts",
+          "source_documents": [
+            {
+              "path": "twofronts/meshy/README.md",
+              "sha256": "0341ce0977df6eaef9244bc80314493d00909ad11d3d64290b609fd9332aa45b"
+            },
+            {
+              "path": "twofronts/world/assets.json",
+              "sha256": "4876b94afc5ca40b70a652ee00dbe8ab9ecbee03647c893e84dd303fc6845ff9"
+            }
+          ],
+          "conversion": {
+            "asset_id": "gen-y2k-kiosk-1",
+            "source_file": "twofronts/meshy/models/kiosk_lp/model.obj",
+            "source_sha256": "ca599722fdbb26cff18042210697a9c87f9bd3fc6bdf7b529a1f554291b58a2d",
+            "source_bytes": 2025936,
+            "source_triangles": 20192,
+            "output_triangles": 19799,
+            "converted_sha256": "c7e95cff51a43a74b1725926655556e5f0c4bd972384ece4f15c2a6e103d5b06",
+            "converter": "Blender 5.1.2",
+            "triangle_target": 20000,
+            "coordinate_transform": "OBJ Y-up to Blender Z-up; exported glTF Y-up",
+            "material_derivation": "Source texture atlases omitted; assigned Almond semantic material, not original textured appearance"
+          },
+          "task_id_status": "full_refine_id; source remesh task unknown",
+          "source_remesh_task_recorded": null,
+          "import_date": "2026-09-19",
+          "prompt_status": "unknown; original submitted prompt not retained in reviewed project records",
+          "image_stage": "not_applicable; text-to-3d generation",
+          "dimension_basis": "Height is an authored project placement value from twofronts/world/assets.json, not a verified physical measurement. Width/depth preserve source proportions.",
+          "rights": {
+            "model_license": "CC-BY-4.0",
+            "authorization_date": "2026-09-19",
+            "basis": "Project owner authorized inclusion in Almond's downloadable plugin after being asked about the public CC BY 4.0 asset pack.",
+            "provider_account_entitlement": "not_independently_verified"
+          },
+          "intended_role": "Street kiosks and public-space amenity layouts"
+        }
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "landscape",
+        "streetscape"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "exterior_perspective",
+        "axonometric",
+        "concept_layout"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.0,
+      "triangle_count": 19799,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "CF1BF40380D803CA92C71A97842D8202EC399F225D2CC1CD6DFFE3FE1D16D3D9"
+}
