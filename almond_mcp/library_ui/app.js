@@ -2,6 +2,13 @@ const $ = (id) => document.getElementById(id);
 // The Rhino panel uses the same catalogue and viewer in a compact workspace.
 const panelMode = new URLSearchParams(location.search).get('panel') === '1';
 if (panelMode) document.documentElement.classList.add('rhino-panel');
+if (panelMode) {
+  document.querySelector('.panel-tools').hidden = false;
+  $('panel-reload').addEventListener('click', () => location.reload());
+  const browserLink = () => { $('panel-browser').href = '/' + location.hash; };
+  window.addEventListener('hashchange', browserLink);
+  browserLink();
+}
 const bridge = new URLSearchParams(location.search).get('bridge') || '';
 const nativePlacement = panelMode && /^[a-f0-9]{32}$/.test(bridge);
 if (nativePlacement) document.documentElement.classList.add('rhino-placement');

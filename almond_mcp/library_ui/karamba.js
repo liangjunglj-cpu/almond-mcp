@@ -112,18 +112,18 @@ function draw() {
   if(el('toggle-members').checked) {
     segments.forEach(s=>{const a=xy(s.a),b=xy(s.b);if(!a||!b)return;
       const value=report&&!dirty&&m.utilization_available?utilizationFor(s.guids||[],m.per_element_utilization):null;
-      const colour=el('toggle-utilization').checked?utilizationColour(value):'#333b36';
+      const colour=el('toggle-utilization').checked?utilizationColour(value):'var(--diagram-member,#333b36)';
       svg.push('<line x1="'+a[0]+'" y1="'+a[1]+'" x2="'+b[0]+'" y2="'+b[1]+'" stroke="'+colour+'" stroke-width="4"><title>'+esc(value==null?'Member axis':(value*100).toFixed(1)+'% · maximum mapped utilization')+'</title></line>');
     });
-    (source.shell_outlines||[]).forEach(r=>svg.push('<polyline points="'+r.map(xy).filter(Boolean).map(p=>p.join(',')).join(' ')+'" fill="none" stroke="#69776e" stroke-width="2"/>'));
+    (source.shell_outlines||[]).forEach(r=>svg.push('<polyline points="'+r.map(xy).filter(Boolean).map(p=>p.join(',')).join(' ')+'" fill="none" stroke="var(--diagram-shell,#69776e)" stroke-width="2"/>'));
   }
   const unique=ps=>[...new Map(ps.map(p=>[p.join(','),p])).values()];
   if(el('toggle-supports').checked)unique(supports).forEach(p=>{const q=xy(p);if(!q)return;const [x,y]=q;
-    svg.push(input.fixed_rotations?'<path d="M '+(x-7)+' '+(y+3)+' h 14 v 7 h -14 Z" fill="#237963"/>':
-      '<path d="M '+x+' '+(y+2)+' l -7 11 h 14 Z" fill="none" stroke="#237963" stroke-width="2"/>');
+    svg.push(input.fixed_rotations?'<path d="M '+(x-7)+' '+(y+3)+' h 14 v 7 h -14 Z" fill="var(--diagram-support,#237963)"/>':
+      '<path d="M '+x+' '+(y+2)+' l -7 11 h 14 Z" fill="none" stroke="var(--diagram-support,#237963)" stroke-width="2"/>');
   });
   if(el('toggle-loads').checked)unique(loads).slice(0,80).forEach(p=>{const q=xy(p);if(!q)return;const [x,y]=q;
-    svg.push('<path d="M '+x+' '+(y-27)+' v 22 m -4 -5 l 4 5 l 4 -5" fill="none" stroke="#df432c" stroke-width="2"/>');
+    svg.push('<path d="M '+x+' '+(y-27)+' v 22 m -4 -5 l 4 5 l 4 -5" fill="none" stroke="var(--diagram-load,#df432c)" stroke-width="2"/>');
   });
   el('analysis-diagram').innerHTML=svg.join('');
   el('diagram-caption').textContent=!model?'Illustrative frame · no analysis results':report&&!dirty&&m.analysis_method==='api'?

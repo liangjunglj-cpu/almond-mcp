@@ -6,6 +6,8 @@
   <title>Almond — Models &amp; Karamba</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/panel.css">
+  <script src="/panel-theme.js"></script>
   <script type="module" src="/vendor/model-viewer.min.js"></script>
   <script type="module" src="/app.js"></script>
   <script type="module" src="/karamba.js"></script>
@@ -16,6 +18,7 @@
   <a class="wordmark" href="#home" aria-label="Almond home"><span class="brand-mark" aria-hidden="true">a</span>almond<span class="wordmark-dot">↗</span></a>
   <div class="mast-label">OBJECT ARCHIVE<br>MODELS & DRAWING ELEMENTS</div>
   <nav aria-label="Main"><a href="#library" data-page="library">Models</a><a href="#karamba" data-page="karamba">Karamba</a></nav>
+  <div class="panel-tools" hidden><a id="panel-browser" href="/" target="_blank" rel="noopener" title="Open in browser" aria-label="Open in browser">↗</a><button id="panel-reload" type="button" title="Reload Almond" aria-label="Reload Almond">↻</button></div>
   <span class="local-label"><i></i> LOCAL COLLECTION</span>
 </header>
 <main>
@@ -33,7 +36,7 @@
   <div class="workspace-links"><a href="#sources">Sources ↗</a><a href="#about">About Almond ↗</a></div>
 </section>
 <section id="karamba-page" class="analysis-page" hidden>
-  <p class="eyebrow">02 / STRUCTURAL WORKSPACE</p><h1>Karamba<br>Validation<span class="red">.</span></h1>
+  <p class="eyebrow">02 / STRUCTURAL WORKSPACE</p><h1>Karamba <br>Validation<span class="red">.</span></h1>
   <div class="engine-line"><span id="engine-state">Engine not checked</span><button type="button" data-analysis="status">Check engine ↗</button></div>
   <p id="analysis-native-note" class="analysis-note">Open <strong>AlmondKaramba</strong> in Rhino to connect this workspace to your geometry.</p>
   <form id="analysis-form">

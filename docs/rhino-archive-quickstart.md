@@ -1,13 +1,14 @@
 # Almond workspace for Rhino 8
 
 For this prepared release candidate, install the supplied
-**almondbridge-0.6.0-rc.8-rh8_0-win.yak**, save your work, restart Rhino,
+**almondbridge-0.6.0-rc.9-rh8_0-win.yak**, save your work, restart Rhino,
 and run **Almond**. This candidate has not yet been published to the
 public Package Manager. The package targets Windows / Rhino 8.0+.
 
-The Neo Swiss archive opens in a dockable **Almond** panel inside Rhino.
+The archive opens in a dockable **Almond** panel inside Rhino. Its background,
+text, controls and font follow Rhino appearance settings, including theme changes.
 Drag the panel tab beside Layers or Properties, or float it on another monitor.
-Rhino remembers its docking position. Use **Open in browser** in the panel or
+Rhino remembers its docking position. Use the **Open in browser** arrow in the compact header or
 the **`AlmondLibraryBrowser`** command for the full-size browser view.
 The panel has compact search, coloured model cards and full-width object details.
 Thumbnails use the models' assigned material colours, not photographic textures.
@@ -108,7 +109,7 @@ Install [uv](https://docs.astral.sh/uv/getting-started/installation/). Configure
 your MCP client with command `uvx` and these arguments:
 
 ```json
-["--from", "almond-mcp==0.6.0rc8", "almond-mcp"]
+["--from", "almond-mcp==0.6.0rc9", "almond-mcp"]
 ```
 
 This pinned command becomes available after the matching Python release is

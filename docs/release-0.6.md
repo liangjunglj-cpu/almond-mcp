@@ -1,6 +1,6 @@
 # Almond 0.6 release infrastructure
 
-Candidate pair: **almondbridge 0.6.0-rc.8** and **almond-mcp 0.6.0rc8**.
+Candidate pair: **almondbridge 0.6.0-rc.9** and **almond-mcp 0.6.0rc9**.
 Both are unpublished candidates. The Yak targets **Rhino 8.0 / Windows**;
 RhinoCommon remains pinned to 8.0.23304.9001. Plugin identity stays
 `c337dbb8-394a-4593-9c2b-a3d7cfc91893`. No Rhino update is required.
@@ -48,10 +48,10 @@ syncs a live MCP environment, installs into Rhino, or falls back to an old RHP.
 It runs the Python suite and real .NET HTTP-host integration tests, checks source
 records, builds/audits wheel and sdist, performs an isolated wheel installation
 and MCP smoke, builds a Windows Yak, and audits its allowlist and model hashes.
-It creates `dist/release-0.6.0rc8/` with:
+It creates `dist/release-0.6.0rc9/` with:
 
 - Python wheel and sdist.
-- `almondbridge-0.6.0-rc.8-rh8_0-win.yak`.
+- `almondbridge-0.6.0-rc.9-rh8_0-win.yak`.
 - Food4Rhino ZIP wrapper, listing text and quickstart guide.
 - JUnit test results, clean-install and Yak reports, and `SHA256SUMS.txt`.
 
@@ -95,12 +95,12 @@ claim this in-process smoke passed based only on the automated build report.
    exact revision. Retain artifacts and the successful Rhino smoke record.
 2. Publish the Python wheel/sdist to PyPI using the project's maintainer account
    (prefer PyPI Trusted Publishing for later CI automation). Verify the pinned
-   `uvx --from almond-mcp==0.6.0rc8 almond-mcp --version` on a clean machine.
+   `uvx --from almond-mcp==0.6.0rc9 almond-mcp --version` on a clean machine.
 3. Authenticate the maintainer's Yak account, then push the exact tested artifact:
 
    ```powershell
    & 'C:/Program Files/Rhino 8/System/Yak.exe' login
-   & 'C:/Program Files/Rhino 8/System/Yak.exe' push ./dist/release-0.6.0rc8/almondbridge-0.6.0-rc.8-rh8_0-win.yak
+   & 'C:/Program Files/Rhino 8/System/Yak.exe' push ./dist/release-0.6.0rc9/almondbridge-0.6.0-rc.9-rh8_0-win.yak
    & 'C:/Program Files/Rhino 8/System/Yak.exe' search --all --prerelease almondbridge
    ```
 
@@ -204,3 +204,19 @@ the record under archive/evidence/preview-render-record.json.
 
 No phototexturing is introduced. Neutral materials remain neutral. Geometry,
 material definitions, source passports, placement and Karamba code are unchanged.
+
+## Rhino appearance integration (rc.9)
+
+The embedded workspace reads Rhino panel, text, button and edit-box colours and
+its default UI font. Appearance changes update CSS in place without reloading
+the catalogue, selection or analysis settings. A compact header replaces the
+separate browser/reload toolbar. Controls use consistent spacing and borders;
+preview tiles retain neutral backgrounds and original material colours. Karamba
+member/support/load diagrams adapt to the host palette. The full browser archive
+retains its Neo Swiss layout. No Rhino appearance settings are modified.
+
+Uses Rhino 8.0 GA APIs: AppearanceSettings.GetPaintColor, DefaultFontFaceName and
+RhinoApp.AppSettingsChanged. The subscription is removed on panel disposal.
+Validate native theme switching after restart, including retained search/input
+state and closing/reopening the panel. Browser checks cannot prove native theme
+event delivery.

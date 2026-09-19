@@ -4,6 +4,7 @@ using System.Text.RegularExpressions;
 using Eto.Drawing;
 using Eto.Forms;
 using Rhino;
+using Rhino.ApplicationSettings;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 
@@ -22,6 +23,8 @@ namespace RhinoAlmondBridge
         internal static string StartPage = "home";
         private string _page = StartPage;
         private readonly AnalysisWorkspace _analysis;
+        private bool _disposed;
+        private string _lastPalette;
 
         public AlmondLibraryPanel()
         {
@@ -30,15 +33,47 @@ namespace RhinoAlmondBridge
                     JsonConvert.SerializeObject(reply,new JsonSerializerSettings{StringEscapeHandling=StringEscapeHandling.EscapeHtml}) + ");");
             });
             MinimumSize = new Size(280, 240);
-            var browser = new Button { Text = "Open in browser" };
-            browser.Click += (s, e) => OpenExternal(null);
-            var reload = new Button { Text = "Reload" };
-            reload.Click += (s, e) => { if (_view == null) LoadArchive(); else _view.Reload(); };
-            var layout = new DynamicLayout { Padding = new Padding(0), Spacing = new Size(0, 0) };
-            layout.AddSeparateRow(browser, null, reload);
-            layout.Add(_body, yscale: true);
-            Content = layout;
+            Content = _body;
+            RhinoApp.AppSettingsChanged += AppearanceChanged;
             LoadArchive();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            _disposed = true;
+            if (disposing) RhinoApp.AppSettingsChanged -= AppearanceChanged;
+            base.Dispose(disposing);
+        }
+
+        private string Palette()
+        {
+            Func<PaintColor,string> colour = key => {
+                var c = AppearanceSettings.GetPaintColor(key, true);
+                return $"#{c.R:X2}{c.G:X2}{c.B:X2}";
+            };
+            var background = AppearanceSettings.GetPaintColor(PaintColor.PanelBackground, true);
+            BackgroundColor = _body.BackgroundColor = Color.FromArgb(background.R, background.G, background.B);
+            return JsonConvert.SerializeObject(new {
+                paper = colour(PaintColor.PanelBackground), ink = colour(PaintColor.TextEnabled),
+                control = colour(PaintColor.NormalStart), field = colour(PaintColor.EditBoxBackground),
+                line = colour(PaintColor.NormalBorder), hover = colour(PaintColor.HotStart),
+                font = AppearanceSettings.DefaultFontFaceName
+            }, new JsonSerializerSettings { StringEscapeHandling = StringEscapeHandling.EscapeHtml });
+        }
+
+        private Uri PanelUrl() => new Uri(_archive, "?panel=1&bridge=" + _session +
+            "&palette=" + Uri.EscapeDataString(Palette()) + "#" + _page);
+
+        private void AppearanceChanged(object sender, EventArgs e)
+        {
+            // Defer until Rhino has applied its colours. No global appearance is changed.
+            Application.Instance.AsyncInvoke(() => {
+                if (_disposed || !_ready || _view == null) return;
+                var palette = Palette();
+                if (palette == _lastPalette) return;
+                _view.ExecuteScript("window.almondThemeReceive && window.almondThemeReceive(" + palette + ");");
+                _lastPalette = palette;
+            });
         }
 
         private void LoadArchive()
@@ -48,7 +83,10 @@ namespace RhinoAlmondBridge
                 _archive = new Uri(AlmondLibraryCommand.ArchiveUrl);
                 _ready = false;
                 var view = new WebView(); // Rhino 8 supplies its Edge WebView2 handler.
-                view.DocumentLoaded += (s, e) => _ready = e.Uri != null && e.Uri.Authority == _archive.Authority && e.Uri.AbsolutePath == "/";
+                view.DocumentLoaded += (s, e) => {
+                    _ready = e.Uri != null && e.Uri.Scheme == _archive.Scheme && e.Uri.Authority == _archive.Authority && e.Uri.AbsolutePath == "/";
+                    if (_ready) { _lastPalette = null; AppearanceChanged(s, EventArgs.Empty); }
+                };
                 view.DocumentLoading += (s, e) =>
                 {
                     if (!e.IsMainFrame || e.Uri == null) return;
@@ -80,13 +118,20 @@ namespace RhinoAlmondBridge
                 view.OpenNewWindow += (s, e) => { if (e.Uri != null) OpenExternal(e.Uri.AbsoluteUri); };
                 _body.Content = view;
                 _view = view;
-                view.Url = new Uri(_archive, "?panel=1&bridge=" + _session + "#" + _page);
+                view.Url = PanelUrl();
             }
             catch (Exception ex)
             {
                 _view?.Dispose();
                 _view = null;
-                _body.Content = new Label { Text = "The embedded archive could not start. Use Reload or Open in browser.\n\n" + ex.Message, Wrap = WrapMode.Word };
+                var fallback = new DynamicLayout { Padding = new Padding(8), Spacing = new Size(4, 4) };
+                var browser = new Button { Text = "Open in browser" };
+                browser.Click += (s, e) => OpenExternal(null);
+                var reload = new Button { Text = "Reload" };
+                reload.Click += (s, e) => LoadArchive();
+                fallback.AddSeparateRow(browser, reload);
+                fallback.Add(new Label { Text = "The embedded archive could not start.\n\n" + ex.Message, Wrap = WrapMode.Word });
+                _body.Content = fallback;
                 RhinoApp.WriteLine("Almond Library panel: {0}", ex.Message);
             }
         }
@@ -95,7 +140,7 @@ namespace RhinoAlmondBridge
             if (page!="home" && page!="library" && page!="karamba") return;
             _page=page;
             if(_ready) _view.ExecuteScript("location.hash="+JsonConvert.SerializeObject(page)+";");
-            else if(_view!=null) _view.Url=new Uri(_archive,"?panel=1&bridge="+_session+"#"+page);
+            else if(_view!=null) _view.Url=PanelUrl();
         }
 
         private void OpenExternal(string url)

@@ -46,3 +46,11 @@ def test_analysis_result_presentation():
     run = subprocess.run([node, "--test", str(ROOT / "tests/analysis_view.test.mjs")],
                          capture_output=True, text=True, timeout=30)
     assert run.returncode == 0, run.stdout + run.stderr
+
+
+def test_rhino_panel_theme_boundary():
+    node = shutil.which("node")
+    assert node, "Node is required for panel appearance checks"
+    run = subprocess.run([node, "--test", str(ROOT / "tests/panel_theme.test.mjs")],
+                         capture_output=True, text=True, timeout=30)
+    assert run.returncode == 0, run.stdout + run.stderr
