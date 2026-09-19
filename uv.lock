@@ -16,7 +16,7 @@ wheels = [
 
 [[package]]
 name = "almond-mcp"
-version = "0.6.0rc4"
+version = "0.6.0rc5"
 source = { editable = "." }
 dependencies = [
     { name = "contourpy" },

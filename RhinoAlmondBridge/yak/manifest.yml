@@ -1,11 +1,12 @@
 name: almondbridge
-version: 0.6.0-rc.4
+version: 0.6.0-rc.5
 authors:
   - LiangJung
 description: >
   Almond for Rhino 8: an offline architectural Object Archive and an MCP
   bridge for AI-assisted modelling. Run AlmondLibrary to open the Neo Swiss
-  archive in your browser. Browsing requires no Python or AI client.
+  archive in a dockable Rhino side panel. AlmondLibraryBrowser opens the full
+  browser view. Browsing requires no Python or AI client.
 
   Includes 47 generated GLB models with embedded metadata and source records,
   10 linked drawing packages (60 SVG/DXF view-scale pairs and 20 A3 SVG sheets),
@@ -19,7 +20,7 @@ description: >
   from their original sources under the applicable terms.
 
   The MCP bridge listens on 127.0.0.1:5000. For AI workflows, install uv and
-  register uvx --from almond-mcp==0.6.0rc4 almond-mcp with your MCP client.
+  register uvx --from almond-mcp==0.6.0rc5 almond-mcp with your MCP client.
   This prerelease requires Include pre-releases in Rhino Package Manager.
   Windows only; supports Rhino 8.0 and later Rhino 8 service releases.
 url: https://github.com/liangjunglj-cpu/almond-mcp

@@ -1,8 +1,9 @@
 # Almond MCP for Rhino
 
-**0.6.0rc4 — Rhino distribution release candidate.** The prepared
-`almondbridge 0.6.0-rc.4` Yak bundles the generated collection and adds
-`AlmondLibrary`, which opens the offline archive without Python or an AI client.
+**0.6.0rc5 — Rhino distribution release candidate.** The prepared
+`almondbridge 0.6.0-rc.5` Yak bundles the generated collection and adds
+`AlmondLibrary`, which opens the offline archive in a dockable Rhino side panel
+without Python or an AI client. `AlmondLibraryBrowser` opens its full browser view.
 See the [release infrastructure](docs/release-0.6.md) and
 [Rhino quickstart](docs/rhino-archive-quickstart.md). Publication and the final
 in-Rhino smoke test are still pending.

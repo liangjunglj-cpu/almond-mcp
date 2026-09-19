@@ -2,9 +2,14 @@
 
 Install **almondbridge** from Rhino's `_PackageManager`, restart Rhino, and run
 **`AlmondLibrary`**. For this release candidate, enable **Include pre-releases**
-and select **0.6.0-rc.4**. The package is prepared for Windows / Rhino 8.0+.
+and select **0.6.0-rc.5**. The package is prepared for Windows / Rhino 8.0+.
 
-The Neo Swiss archive opens in your browser. It runs locally while Rhino stays
+The Neo Swiss archive opens in a dockable **Almond Library** panel inside Rhino.
+Drag the panel tab beside Layers or Properties, or float it on another monitor.
+Rhino remembers its docking position. Use **Open in browser** in the panel or
+the **`AlmondLibraryBrowser`** command for the full-size browser view.
+The panel has compact search, model cards and full-width object details.
+Source links and download links open in your browser. The archive runs locally while Rhino stays
 open; no Python, Meshy login, AI subscription or Internet connection is needed
 to browse the included files after installation. Rhino's licence is separate.
 
@@ -36,7 +41,7 @@ Install [uv](https://docs.astral.sh/uv/getting-started/installation/). Configure
 your MCP client with command `uvx` and these arguments:
 
 ```json
-["--from", "almond-mcp==0.6.0rc4", "almond-mcp"]
+["--from", "almond-mcp==0.6.0rc5", "almond-mcp"]
 ```
 
 This pinned command becomes available after the matching Python release is

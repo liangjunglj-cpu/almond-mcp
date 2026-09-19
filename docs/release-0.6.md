@@ -1,6 +1,6 @@
 # Almond 0.6 release infrastructure
 
-Candidate pair: **almondbridge 0.6.0-rc.4** and **almond-mcp 0.6.0rc4**.
+Candidate pair: **almondbridge 0.6.0-rc.5** and **almond-mcp 0.6.0rc5**.
 Both are unpublished candidates. The Yak targets **Rhino 8.0 / Windows**;
 RhinoCommon remains pinned to 8.0.23304.9001. Plugin identity stays
 `c337dbb8-394a-4593-9c2b-a3d7cfc91893`. No Rhino update is required.
@@ -9,8 +9,10 @@ RhinoCommon remains pinned to 8.0.23304.9001. Plugin identity stays
 
 The Yak contains the compiled bridge, runtime dependencies, a complete read-only
 Object Archive, 47 generated GLBs, contracts, 47 previews, source evidence,
-10 drawing packages, attribution and licences. `AlmondLibrary` opens a loopback
-server hosted inside the plugin; it requires neither Python nor an AI client.
+10 drawing packages, attribution and licences. `AlmondLibrary` opens a dockable
+Eto panel using Rhino 8's embedded web view and a loopback server hosted inside
+the plugin; it requires neither Python nor an AI client. `AlmondLibraryBrowser`
+opens the browser view. No Eto, Rhino UI or WebView2 runtime DLL is redistributed.
 The archive closes with Rhino. No external CDN is used for included models.
 
 The Python wheel independently includes the same generated asset collection and
@@ -45,10 +47,10 @@ syncs a live MCP environment, installs into Rhino, or falls back to an old RHP.
 It runs the Python suite and real .NET HTTP-host integration tests, checks source
 records, builds/audits wheel and sdist, performs an isolated wheel installation
 and MCP smoke, builds a Windows Yak, and audits its allowlist and model hashes.
-It creates `dist/release-0.6.0rc4/` with:
+It creates `dist/release-0.6.0rc5/` with:
 
 - Python wheel and sdist.
-- `almondbridge-0.6.0-rc.4-rh8_0-win.yak`.
+- `almondbridge-0.6.0-rc.5-rh8_0-win.yak`.
 - Food4Rhino ZIP wrapper, listing text and quickstart guide.
 - JUnit test results, clean-install and Yak reports, and `SHA256SUMS.txt`.
 
@@ -69,7 +71,9 @@ exact Yak in a disposable Windows/Rhino 8 profile or test machine:
 1. Record the package SHA-256, Windows version and Rhino service release.
 2. Install the local candidate using the Package Manager/local package flow;
    restart Rhino and confirm the same plugin GUID and candidate version.
-3. Run `AlmondLibrary`; verify the browser opens without Python on PATH.
+3. Run `AlmondLibrary`; verify the dockable panel opens without Python on PATH.
+   Dock, float, close and reopen it. Verify 3D rotation, the compact layout,
+   `AlmondLibraryBrowser`, external source links and download links.
 4. Open a GLB and a plan/front view, download GLB/DXF/record JSON, and inspect
    source metadata. Confirm optional community models remain unavailable.
 5. Import a downloaded DXF into a millimetre document and compare a known mesh
@@ -90,12 +94,12 @@ claim this in-process smoke passed based only on the automated build report.
    exact revision. Retain artifacts and the successful Rhino smoke record.
 2. Publish the Python wheel/sdist to PyPI using the project's maintainer account
    (prefer PyPI Trusted Publishing for later CI automation). Verify the pinned
-   `uvx --from almond-mcp==0.6.0rc4 almond-mcp --version` on a clean machine.
+   `uvx --from almond-mcp==0.6.0rc5 almond-mcp --version` on a clean machine.
 3. Authenticate the maintainer's Yak account, then push the exact tested artifact:
 
    ```powershell
    & 'C:/Program Files/Rhino 8/System/Yak.exe' login
-   & 'C:/Program Files/Rhino 8/System/Yak.exe' push ./dist/release-0.6.0rc4/almondbridge-0.6.0-rc.4-rh8_0-win.yak
+   & 'C:/Program Files/Rhino 8/System/Yak.exe' push ./dist/release-0.6.0rc5/almondbridge-0.6.0-rc.5-rh8_0-win.yak
    & 'C:/Program Files/Rhino 8/System/Yak.exe' search --all --prerelease almondbridge
    ```
 

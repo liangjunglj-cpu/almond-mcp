@@ -1,8 +1,11 @@
 const $ = (id) => document.getElementById(id);
+// The Rhino panel uses the same catalogue and viewer in a compact workspace.
+const panelMode = new URLSearchParams(location.search).get('panel') === '1';
+if (panelMode) document.documentElement.classList.add('rhino-panel');
 const esc = (value) => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const human = (value) => String(value || '').replaceAll('_', ' ');
 const external = (url) => { try { const u = new URL(url); return ['http:', 'https:'].includes(u.protocol) ? u.href : ''; } catch { return ''; } };
-const link = (url, title, cls = '') => url ? `<a class="download ${cls}" href="${esc(url)}?download=1" download>${esc(title)} ↙</a>` : '';
+const link = (url, title, cls = '') => url ? `<a class="download ${cls}" href="${esc(url)}?download=1" ${panelMode ? 'target="_blank" rel="noopener"' : 'download'}>${esc(title)} ↙</a>` : '';
 let data, selected, currentView = '3d', filter = 'all';
 let saved;
 try { saved = new Set(JSON.parse(localStorage.getItem('almond.saved') || '[]')); } catch { saved = new Set(); }
@@ -122,7 +125,7 @@ async function load() {
     const response = await fetch('/api/catalogue');
     if(!response.ok) throw new Error(`Archive responded with ${response.status}.`);
     data = await response.json();
-    if(data.distribution === 'rhino') document.querySelector('.technical').textContent = 'Run AlmondLibrary in Rhino to reopen this archive. Browsing the included models needs no Python or AI client. Keep Rhino open while using the archive. Saved selections are local to this browser address; the address changes when Rhino restarts.';
+    if(data.distribution === 'rhino') document.querySelector('.technical').textContent = 'Run AlmondLibrary in Rhino to open the dockable panel, or AlmondLibraryBrowser for the browser view. Browsing the included models needs no Python or AI client. Keep Rhino open while using the archive. Saved selections are local to this browser address; the address changes when Rhino restarts.';
     $('asset-count').textContent=String(data.counts.assets).padStart(3,'0');
     $('all-total').textContent=data.counts.assets;
     $('model-count').textContent=String(data.counts.models).padStart(2,'0');
