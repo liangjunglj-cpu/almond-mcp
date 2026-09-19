@@ -3336,7 +3336,7 @@ def repository_asset_resource(asset_id: str) -> str:
         raise ValueError("Unknown repository asset ID")
     # HTTP URLs are relative to `almond-mcp library`; provide resolved locations
     # for MCP clients that do not have a browser server running.
-    urls = {record["model"], record["preview"], record["contract"]}
+    urls = {record["model"], record["preview"], record["contract"], record.get("generation_image")}
     if record["drawing"]:
         urls.add(record["drawing"]["record"])
         for view in record["drawing"]["views"]:

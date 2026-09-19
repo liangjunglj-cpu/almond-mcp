@@ -52,10 +52,10 @@ def verify(path):
                 raise ValueError(f"Checksum mismatch: {route}")
         catalogue = json.loads(archive.read("archive/api/catalogue.json"))
         counts = catalogue["counts"]
-        if counts != {"assets":54,"models":47,"elements":7,"drawing_packages":10,"views":60}:
+        if counts != {"assets":57,"models":50,"elements":7,"drawing_packages":10,"views":60}:
             raise ValueError(f"Unexpected catalogue: {counts}")
         glbs = [n for n in names if n.endswith(".glb")]
-        if len(glbs) != 47 or any(not n.startswith("archive/files/generated/models/") for n in glbs):
+        if len(glbs) != 50 or any(not n.startswith("archive/files/generated/models/") for n in glbs):
             raise ValueError("Generated-model pack is incomplete")
         evidence = json.loads(archive.read("archive/evidence/source-register.json"))
         sources = {a["asset_id"]:a for a in evidence["assets"]}
@@ -67,6 +67,11 @@ def verify(path):
             model = archive.read("archive/" + bundle["routes"][record["model"]]["path"])
             if hashlib.sha256(model).hexdigest().upper() != sources[record["id"]]["model_sha256"]:
                 raise ValueError("Source evidence does not match bundled model")
+            captured = sources[record["id"]]["recorded_generation"].get("captured_generation")
+            if captured:
+                image_path = "archive/" + bundle["routes"][record["generation_image"]]["path"]
+                if hashlib.sha256(archive.read(image_path)).hexdigest() != captured["image"]["output_sha256"]:
+                    raise ValueError("Captured generation image is missing or changed")
             if record["drawing"]:
                 drawing_path = "archive/" + bundle["routes"][record["drawing"]["record"]]["path"]
                 drawing = json.loads(archive.read(drawing_path))

@@ -9,7 +9,7 @@ Use the Rhino Account that owns the existing app / Yak package.
 | Field | Prepared value |
 | --- | --- |
 | App name | Almond MCP |
-| Release | almondbridge 0.6.0-rc.11 / almond-mcp 0.6.0rc11 (prerelease) |
+| Release | almondbridge 0.6.0-rc.12 / almond-mcp 0.6.0rc12 (prerelease) |
 | Platform | Rhino 8 for Windows only |
 | GUID | c337dbb8-394a-4593-9c2b-a3d7cfc91893 |
 | Code licence | MIT |
@@ -22,7 +22,7 @@ Use the Rhino Account that owns the existing app / Yak package.
 
 ## Short description
 
-Almond for Rhino 8: browse 47 generated 3D models and linked SVG/DXF drawings in an offline Object Archive, with embedded metadata and source records. Includes an optional MCP bridge for AI-assisted modelling. Windows; free and open source.
+Almond for Rhino 8: browse 50 generated 3D models and linked SVG/DXF drawings in an offline Object Archive, with embedded metadata and source records. Includes an optional MCP bridge for AI-assisted modelling. Windows; free and open source.
 
 ## Description
 
@@ -32,7 +32,7 @@ its compact library in a dockable side panel that follows Rhino appearance setti
 for full-size browsing. Browsing the included collection needs no
 Python installation, Meshy account or AI subscription.
 
-The package includes 47 generated GLB models with embedded Almond passports,
+The package includes 50 generated GLB models with embedded Almond passports,
 spatial contracts, measured mesh dimensions, neutral previews and source records.
 Ten models have linked drawing packages: 60 plan/front/right view-scale pairs
 in SVG and DXF, plus 20 A3 SVG sheets at 1:50 and 1:100. Search the collection,
@@ -64,22 +64,22 @@ Karamba3D. Karamba and downloaded community model files are not bundled.
 
 ## Downloads
 
-Primary file: `almondbridge-0.6.0-rc.11-rh8_0-win.yak`.
-Optional upload wrapper: `almondbridge-0.6.0-rc.11-food4rhino.zip` containing the
-same Yak and quickstart guide. Both are in `dist/release-0.6.0rc11/` after preparation.
+Primary file: `almondbridge-0.6.0-rc.12-rh8_0-win.yak`.
+Optional upload wrapper: `almondbridge-0.6.0-rc.12-food4rhino.zip` containing the
+same Yak and quickstart guide. Both are in `dist/release-0.6.0rc12/` after preparation.
 Use the current form's supported upload type; do not rename an extension.
 If the existing listing is linked to Yak, update the matching package rather
 than creating a duplicate app. The permanent GUID remains unchanged.
 
 Download title: **Almond 0.6 release candidate - Rhino 8 Windows + Object Archive**.
 Description: Install through Rhino Package Manager (Include pre-releases) or use
-the provided Yak package. Restart Rhino, then run Almond. The 47 generated
+the provided Yak package. Restart Rhino, then run Almond. The 50 generated
 models are included. See GETTING-STARTED.md for optional MCP setup.
 
 ## Release notes
 
 - Adds AlmondLibrary and the bundled offline Neo Swiss Object Archive.
-- Includes 47 generated models, metadata, source evidence and previews.
+- Includes 50 generated models, metadata, source evidence and previews.
 - Links 10 drawing packages with SVG, DXF and A3 sheets.
 - Adds a shared MCP repository search and per-object resources.
 - Adds compact Karamba help buttons with setup guidance and support diagrams.

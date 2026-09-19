@@ -1,3 +1,3 @@
 """Almond — MCP server for Rhino 8 with a semantic scene layer."""
 
-__version__ = "0.6.0rc11"
+__version__ = "0.6.0rc12"

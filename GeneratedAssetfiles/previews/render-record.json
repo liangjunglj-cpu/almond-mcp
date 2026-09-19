@@ -392,6 +392,57 @@
       "material_names": [
         "ALMOND::ceramic-teal"
       ]
+    },
+    {
+      "asset_id": "gen-driftwood-1",
+      "model_sha256": "8ef9739184c5dc381eb1762c1c6c57f10b54fed6d38b961b42bbac887ef521f8",
+      "preview_sha256": "a92064fba40b5d092013553bf053cb9f0471ac5ed4911c0f0069648e2f9246a4",
+      "material_names": [
+        "ALMOND::wood-oak"
+      ]
+    },
+    {
+      "asset_id": "gen-folded-throw-1",
+      "model_sha256": "0ac47e5c67cf1fc5bc38e29a8e968527021af549811db215fc156bbcb9cd4f6b",
+      "preview_sha256": "ddfa7b6ac84a14e60fbc42bc80ab2cffdccbf2cc5722c3ad53e0c537f36b3986",
+      "material_names": [
+        "ALMOND::fabric-linen"
+      ]
+    },
+    {
+      "asset_id": "gen-weathered-boulder-1",
+      "model_sha256": "bd01322a935e5002c2dea31a0a6accaa2eae58ee2242ba506788b9bc3b376061",
+      "preview_sha256": "f48a70855bf7e5ce531a1a72b643fc1382aeed48352aafe82c673edf85dc41e2",
+      "material_names": [
+        "ALMOND::stone-granite-paving"
+      ]
+    }
+  ],
+  "additional_batches": [
+    {
+      "schema_version": 1,
+      "created_at": "2026-09-19T16:42:11.809511+00:00",
+      "renderer": "Blender 5.1.2",
+      "engine": "BLENDER_WORKBENCH",
+      "script": "tools/render_generated_previews.py",
+      "script_sha256_lf": "0d7a86154a5cf8143512eaead6085ff5f6c4635bb511362b543fc665a730e058",
+      "colour_mode": "embedded_material_base_colour",
+      "transparent_background": true,
+      "resolution": [
+        640,
+        640
+      ],
+      "view_transform": "Standard",
+      "look": "None",
+      "studio_light": "paint.sl",
+      "studio_light_intensity": 1.0,
+      "notes": "Preview-only derivation from the unchanged GLBs. Studio shading of assigned material colours; not photographic textures or a full PBR render.",
+      "batch_id": "organic-2026-09",
+      "asset_ids": [
+        "gen-driftwood-1",
+        "gen-folded-throw-1",
+        "gen-weathered-boulder-1"
+      ]
     }
   ]
 }

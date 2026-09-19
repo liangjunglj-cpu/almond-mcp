@@ -1,6 +1,6 @@
 # Almond 0.6 release infrastructure
 
-Candidate pair: **almondbridge 0.6.0-rc.11** and **almond-mcp 0.6.0rc11**.
+Candidate pair: **almondbridge 0.6.0-rc.12** and **almond-mcp 0.6.0rc12**.
 Both are unpublished candidates. The Yak targets **Rhino 8.0 / Windows**;
 RhinoCommon remains pinned to 8.0.23304.9001. Plugin identity stays
 `c337dbb8-394a-4593-9c2b-a3d7cfc91893`. No Rhino update is required.
@@ -8,7 +8,7 @@ RhinoCommon remains pinned to 8.0.23304.9001. Plugin identity stays
 ## What users receive
 
 The Yak contains the compiled bridge, runtime dependencies, a complete read-only
-Object Archive, 47 generated GLBs, contracts, 47 previews, source evidence,
+Object Archive, 50 generated GLBs, contracts, 50 previews, source evidence,
 10 drawing packages, attribution and licences. `AlmondLibrary` opens a dockable
 Eto panel using Rhino 8's embedded web view and a loopback server hosted inside
 the plugin; it requires neither Python nor an AI client. `AlmondLibraryBrowser`
@@ -48,10 +48,10 @@ syncs a live MCP environment, installs into Rhino, or falls back to an old RHP.
 It runs the Python suite and real .NET HTTP-host integration tests, checks source
 records, builds/audits wheel and sdist, performs an isolated wheel installation
 and MCP smoke, builds a Windows Yak, and audits its allowlist and model hashes.
-It creates `dist/release-0.6.0rc11/` with:
+It creates `dist/release-0.6.0rc12/` with:
 
 - Python wheel and sdist.
-- `almondbridge-0.6.0-rc.11-rh8_0-win.yak`.
+- `almondbridge-0.6.0-rc.12-rh8_0-win.yak`.
 - Food4Rhino ZIP wrapper, listing text and quickstart guide.
 - JUnit test results, clean-install and Yak reports, and `SHA256SUMS.txt`.
 
@@ -95,12 +95,12 @@ claim this in-process smoke passed based only on the automated build report.
    exact revision. Retain artifacts and the successful Rhino smoke record.
 2. Publish the Python wheel/sdist to PyPI using the project's maintainer account
    (prefer PyPI Trusted Publishing for later CI automation). Verify the pinned
-   `uvx --from almond-mcp==0.6.0rc11 almond-mcp --version` on a clean machine.
+   `uvx --from almond-mcp==0.6.0rc12 almond-mcp --version` on a clean machine.
 3. Authenticate the maintainer's Yak account, then push the exact tested artifact:
 
    ```powershell
    & 'C:/Program Files/Rhino 8/System/Yak.exe' login
-   & 'C:/Program Files/Rhino 8/System/Yak.exe' push ./dist/release-0.6.0rc11/almondbridge-0.6.0-rc.11-rh8_0-win.yak
+   & 'C:/Program Files/Rhino 8/System/Yak.exe' push ./dist/release-0.6.0rc12/almondbridge-0.6.0-rc.12-rh8_0-win.yak
    & 'C:/Program Files/Rhino 8/System/Yak.exe' search --all --prerelease almondbridge
    ```
 
@@ -152,7 +152,7 @@ are distributed. Light placement calls Rhino Mesh.Reduce for meshes above
 Definitions are keyed by source/record/material/detail/units and reused only
 while their geometry fingerprint still matches. Edited blocks remain intact.
 
-Validation: compare every triangle of all 47 models against the independent
+Validation: compare every triangle of all 50 models against the independent
 Python drafting decoder, verify supplied normal lengths, and reject malformed
 identity/buffer/accessor/animation/cycle cases. Build against Rhino 8.0 GA.
 Before publication, manually check: held-mouse drag/release, outside release,
@@ -228,7 +228,21 @@ diagram and results. They expand inline, support keyboard activation and Escape,
 and do not change solver inputs. Fixed/pinned and diagram-symbol sketches are
 illustrative.
 
-The included collection remains 47 general-purpose models. The five futuristic
+The rc.11 collection retained 47 general-purpose models. The five futuristic
 ProjectY2K imports considered in the unpublished rc.10 candidate are excluded
 from rc.11 at the owner's request. No original ProjectY2K files were modified.
 See [selection review](projecty2k-selection.md) for the scope and source inventory.
+
+## Organic library additions (rc.12)
+
+Adds three newly generated neutral organic models: weathered boulder, driftwood
+and folded throw. These are new Meshy jobs,
+not imports from Y2K. Library derivatives target 80k–120k triangles; dense
+provider originals remain locally retained. Source requests, generation images,
+hashes and mesh checks accompany the models. Object details expose mesh counts
+and link to the actual generated input image. Use Original placement for the
+full library detail; Light still makes an optional smaller copy.
+
+The broad-frond plant and ornamental grass trials are excluded from this
+candidate: the former did not pass cleanup/visual review, and the latter had no
+completed model at selection cutoff. No new Y2K or simple primitive assets are added.

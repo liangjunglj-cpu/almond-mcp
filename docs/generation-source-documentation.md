@@ -69,3 +69,18 @@ This is a documentation template, not a new validated passport schema. Complete 
 Every distributed asset should resolve to its evidence record and output hash. Include public attribution and permitted metadata with the pack; retain restricted documents privately. A drawing sheet should identify its source/model revision, units, scale, and whether dimensions are generated, measured, declared or source-verified. Unknown rights or missing critical evidence must remain visible in review, not be converted into an assumed open licence.
 
 The current automated check detects missing legacy generation fields, inconsistent task history, prompt disagreements and stale source-register content. New source relationships and item-level rights still require review and future schema validation. Run the source check whenever the generated catalogue changes and before building a release.
+
+## Captured organic batch
+
+The rc.12 organic batch retains exact image and mesh request bodies, linked task
+IDs, timestamps and SHA-256 hashes in `captured_generation`. Generated reference
+images are shipped with the public evidence; expiring provider URLs and account
+credentials are excluded. The source checker verifies the prompt, task chain,
+image bytes, source-mesh hash chain and packaged triangle count. Legacy assets
+keep their historical gaps instead of inheriting this batch's stronger evidence.
+
+`run_meshy_batch.py` records an intent before each paid POST and never retries an
+uncertain submission automatically. Review generated images before submitting
+the mesh stage. `prepare_organic_meshes.py` preserves dense originals and derives
+library geometry with recorded checks; `import_organic_batch.py` links that
+evidence to the catalogue and embedded passports.

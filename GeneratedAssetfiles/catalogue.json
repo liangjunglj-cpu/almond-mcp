@@ -1792,6 +1792,96 @@
       "lod": "medium",
       "design_idiom": null,
       "batch": 2
+    },
+    {
+      "asset_id": "gen-weathered-boulder-1",
+      "category": "landscape",
+      "product": "Weathered boulder",
+      "variant": "Organic form; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 1700,
+        "depth": 1300,
+        "height": 1000
+      },
+      "render_material_id": "stone-granite-paving",
+      "prompt": "One realistic large irregular weathered limestone boulder, about 1 metre high and 1.7 metres wide, an asymmetrical rounded mass with layered erosion, shallow fissures, softened fractured edges and subtle surface pits. Broad natural resting underside, readable sculptural silhouette, substantial solid stone. Neutral landscaping object. No moss, no crystals, no pedestal, no surrounding pebbles, no ground plane. Entire object visible with generous margin, isolated on pure white, three-quarter view from slightly above, soft even studio lighting, detailed physical geometry, no text, no cast shadow.",
+      "tags": [
+        "organic",
+        "detailed",
+        "meshy",
+        "organic-2026-09",
+        "weathered boulder"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "floor",
+      "placement_priority": "accessory",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-driftwood-1",
+      "category": "landscape",
+      "product": "Weathered driftwood",
+      "variant": "Organic form; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 1600,
+        "depth": 650,
+        "height": 550
+      },
+      "render_material_id": "wood-oak",
+      "prompt": "One realistic weathered driftwood log resting horizontally, about 1.6 metres long, with a naturally twisting trunk, three short broken branch stubs, deep flowing grain channels, eroded knots and irregular split ends. Substantial connected wood, gently curved silhouette, no thin twigs, no leaves, no roots spreading onto a ground plane. Neutral object for landscape and interior display studies. Entire log visible with generous margin, isolated on pure white, three-quarter view from slightly above, soft even studio lighting, crisp sculptural physical geometry, no text, no cast shadow.",
+      "tags": [
+        "organic",
+        "detailed",
+        "meshy",
+        "organic-2026-09",
+        "weathered driftwood"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "floor",
+      "placement_priority": "accessory",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-folded-throw-1",
+      "category": "textile",
+      "product": "Loosely folded throw",
+      "variant": "Organic form; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 750,
+        "depth": 550,
+        "height": 180
+      },
+      "render_material_id": "fabric-linen",
+      "prompt": "One realistic plain linen throw blanket loosely folded into a low irregular stack, about 75 by 55 centimetres and 18 centimetres high, with several large soft cascading folds, rounded creases, a gently rumpled top and visible layered fabric edges. Natural weight and substantial cloth thickness. Unbranded neutral warm beige textile for architectural interiors. No tassels, no furniture, no person, no support stand, no ground plane. Entire object visible with margin, isolated on pure white, three-quarter view from slightly above, soft even studio lighting, physical folds rather than printed patterns, no text, no cast shadow.",
+      "tags": [
+        "organic",
+        "detailed",
+        "meshy",
+        "organic-2026-09",
+        "loosely folded throw"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "floor",
+      "placement_priority": "accessory",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
     }
   ],
   "retired": [

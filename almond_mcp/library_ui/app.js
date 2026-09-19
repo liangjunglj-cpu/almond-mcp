@@ -70,6 +70,13 @@ function render() {
   }, {once:true}));
 }
 
+function meshEvidence(a) {
+  const captured = a.provenance?.recorded_generation?.captured_generation;
+  if (!captured) return '';
+  const d = captured.derivation, q = d.quality;
+  const count = n => Number(n).toLocaleString('en');
+  return `<details open><summary>Mesh detail</summary><dl><dt>Library triangles</dt><dd>${count(q.triangles)}</dd><dt>Source triangles</dt><dd>${count(d.source_triangles)}</dd><dt>Connected parts</dt><dd>${count(q.connected_components)}</dd><dt>Open boundary edges</dt><dd>${count(q.boundary_edges)}</dd><dt>Other non-manifold edges</dt><dd>${count(q.nonmanifold_edges_excluding_boundary)}</dd></dl><p>Choose Original for the full library mesh. Light creates a smaller placement copy.</p><p>Geometry edition with Almond material colours. Fine woven, bark or leaf textures are not included. Self-intersections have not been tested.</p><p>${esc(captured.reference_review)}</p>${link(a.generation_image,'Generated reference image')}</details>`;
+}
 function evidence(a) {
   const p = a.provenance;
   const g = p?.recorded_generation || {};
@@ -92,7 +99,7 @@ function openObject(id) {
   $('object-tags').innerHTML = a.tags.map(t => `<span>${esc(t)}</span>`).join('');
   $('dimensions').innerHTML = ['width','depth','height'].map(k => `<div><b>${a.dimensions_mm[k] == null ? '—' : Number(a.dimensions_mm[k]).toLocaleString('en', {maximumFractionDigits:1})}</b><span>${k.toUpperCase()} / MM</span></div>`).join('');
   $('dimension-basis').textContent = human(a.dimension_basis) + '. ' + (a.kind === 'model' ? 'Mesh dimensions; not a product specification.' : 'Verify scale before placement.');
-  $('object-evidence').innerHTML = evidence(a);
+  $('object-evidence').innerHTML = meshEvidence(a) + evidence(a);
   $('scale').value = '50';
   $('view-tabs').innerHTML = [[currentView, currentView === '3d' ? '3D model' : a.format === 'svg' ? '2D element' : 'File'], ...(a.drawing ? [['plan','Plan'],['front','Front'],['right','Right'],['sheet','A3 sheet']] : [])].map(([id,title]) => `<button data-view="${id}" aria-pressed="false">${title}</button>`).join('');
   updateSaveButton(); renderViewer();

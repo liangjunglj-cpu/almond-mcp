@@ -1,0 +1,282 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-weathered-boulder-1",
+  "library_id": "generated_assets",
+  "name": "Weathered boulder (Organic form; detailed geometry edition)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-weathered-boulder-1.glb",
+  "dimensions_mm": {
+    "width": 1551.4,
+    "depth": 1208.6,
+    "height": 1000.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -775.7,
+        -604.3,
+        0.0
+      ],
+      "max": [
+        775.7,
+        604.3,
+        1000.0
+      ]
+    },
+    "footprint": [
+      [
+        -775.7,
+        -604.3
+      ],
+      [
+        775.7,
+        -604.3
+      ],
+      [
+        775.7,
+        604.3
+      ],
+      [
+        -775.7,
+        604.3
+      ]
+    ],
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "accessory"
+  },
+  "materials": [
+    {
+      "material_id": "stone-granite-paving",
+      "objects": [
+        "gen-weathered-boulder-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-weathered-boulder-1",
+    "library_id": "generated_assets",
+    "name": "Weathered boulder (Organic form; detailed geometry edition)",
+    "category": "landscape",
+    "tags": [
+      "organic",
+      "detailed",
+      "meshy",
+      "organic-2026-09",
+      "weathered boulder"
+    ],
+    "dimensions_mm": {
+      "width": 1551.4,
+      "depth": 1208.6,
+      "height": 1000.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 1700.0,
+      "depth": 1300.0,
+      "height": 1000.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -775.7,
+          -604.3,
+          0.0
+        ],
+        "max": [
+          775.7,
+          604.3,
+          1000.0
+        ]
+      },
+      "footprint": [
+        [
+          -775.7,
+          -604.3
+        ],
+        [
+          775.7,
+          -604.3
+        ],
+        [
+          775.7,
+          604.3
+        ],
+        [
+          -775.7,
+          604.3
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "accessory"
+    },
+    "materials": [
+      {
+        "material_id": "stone-granite-paving",
+        "objects": [
+          "gen-weathered-boulder-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "One realistic large irregular weathered limestone boulder, about 1 metre high and 1.7 metres wide, an asymmetrical rounded mass with layered erosion, shallow fissures, softened fractured edges and subtle surface pits. Broad natural resting underside, readable sculptural silhouette, substantial solid stone. Neutral landscaping object. No moss, no crystals, no pedestal, no surrounding pebbles, no ground plane. Entire object visible with generous margin, isolated on pure white, three-quarter view from slightly above, soft even studio lighting, detailed physical geometry, no text, no cast shadow.",
+        "image_task_id": "01a0ba79-11c2-74a1-bafd-23b60c640fb8",
+        "image_model": "nano-banana-pro",
+        "mesh_task_id": "01a0ba7a-5241-73de-8d55-68f049cb5405",
+        "mesh_model": "meshy-7.1",
+        "generated_at": "2026-09-19",
+        "orientation_correction": "rotated_90_about_vertical",
+        "scale_applied": 815.702556,
+        "captured_generation": {
+          "batch_id": "organic-2026-09",
+          "image": {
+            "asset_id": "gen-weathered-boulder-1",
+            "endpoint": "/openapi/v1/text-to-image",
+            "submitted_at": "2026-09-19T16:21:32.709470+00:00",
+            "request": {
+              "ai_model": "nano-banana-pro",
+              "aspect_ratio": "1:1",
+              "generate_multi_view": false,
+              "prompt": "One realistic large irregular weathered limestone boulder, about 1 metre high and 1.7 metres wide, an asymmetrical rounded mass with layered erosion, shallow fissures, softened fractured edges and subtle surface pits. Broad natural resting underside, readable sculptural silhouette, substantial solid stone. Neutral landscaping object. No moss, no crystals, no pedestal, no surrounding pebbles, no ground plane. Entire object visible with generous margin, isolated on pure white, three-quarter view from slightly above, soft even studio lighting, detailed physical geometry, no text, no cast shadow."
+            },
+            "status": "SUCCEEDED",
+            "task_id": "01a0ba79-11c2-74a1-bafd-23b60c640fb8",
+            "output_file": "gen-weathered-boulder-1.png",
+            "output_sha256": "e47fb6b599abe6363963c3b103831c056775ca69e364e2789d31b77803458f17",
+            "finished_at": 1789834910324,
+            "seed": null,
+            "consumed_credits": 9,
+            "provider_created_at": 1789834891722,
+            "provider_started_at": 1789834891729
+          },
+          "mesh": {
+            "asset_id": "gen-weathered-boulder-1",
+            "endpoint": "/openapi/v1/image-to-3d",
+            "submitted_at": "2026-09-19T16:22:54.759996+00:00",
+            "request": {
+              "ai_model": "meshy-7.1",
+              "model_type": "standard",
+              "geometry_resolution": "4k",
+              "should_texture": false,
+              "should_remesh": false,
+              "image_enhancement": false,
+              "target_formats": [
+                "glb"
+              ],
+              "auto_size": false,
+              "input_task_id": "01a0ba79-11c2-74a1-bafd-23b60c640fb8"
+            },
+            "status": "SUCCEEDED",
+            "task_id": "01a0ba7a-5241-73de-8d55-68f049cb5405",
+            "output_file": "gen-weathered-boulder-1.glb",
+            "output_sha256": "6e062619e8ba3995053005fb65ca9cfe619ecf231e9cd355c6203e576bbfd234",
+            "finished_at": 1789835142765,
+            "seed": null,
+            "consumed_credits": 25,
+            "provider_created_at": 1789834974757,
+            "provider_started_at": 1789834974763
+          },
+          "derivation": {
+            "asset_id": "gen-weathered-boulder-1",
+            "source_sha256": "6e062619e8ba3995053005fb65ca9cfe619ecf231e9cd355c6203e576bbfd234",
+            "source_triangles": 662802,
+            "target_triangles": 80000,
+            "prepared_sha256": "ad937d83adc6a8d941024955ddb0bae427567240d6241b554bd7a2a08af071f4",
+            "software": "Blender 5.1.2",
+            "method": "Weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target; triangulate. Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.9017977714538573e-07,
+            "quality": {
+              "vertices": 40002,
+              "triangles": 80000,
+              "boundary_edges": 0,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 1,
+              "largest_component_vertices": 40002,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                2.1240279454494915e-05,
+                8.073495891418e-05,
+                0.0001962674559380534
+              ]
+            }
+          },
+          "input_image_file": "batches/organic-2026-09/gen-weathered-boulder-1.png",
+          "external_reference_status": "Original descriptive prompts; no external images or design references submitted.",
+          "external_reference_ids": [],
+          "dimension_basis": "Authored nominal height for architectural studies; width and depth measured after uniform normalization. Not a physical survey.",
+          "reference_review": "Reference image visually reviewed for neutral architectural use.",
+          "rights": "Generated for the Almond library using the owner-configured Meshy account; public pack distribution authorized by owner. CC BY 4.0. API balance verified; subscription contract not independently audited."
+        }
+      }
+    },
+    "usage": {
+      "suggested_rooms": [],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.087,
+      "triangle_count": 80000,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "BD01322A935E5002C2DEA31A0A6ACCAA2EAE58EE2242BA506788B9BC3B376061"
+}

@@ -1,5 +1,6 @@
 """Verify a built wheel's contents and complete offline generated asset pack."""
 import argparse
+import hashlib
 import json
 import sys
 import tempfile
@@ -31,8 +32,8 @@ def verify(wheel: Path) -> dict:
         if prefix + "previews/render-record.json" not in names:
             raise ValueError("Preview derivation record missing")
         glbs = [n for n in names if n.endswith(".glb")]
-        if len(glbs) != 47 or any(not n.startswith(prefix + "models/") for n in glbs):
-            raise ValueError("Wheel must contain exactly the 47 generated GLBs")
+        if len(glbs) != 50 or any(not n.startswith(prefix + "models/") for n in glbs):
+            raise ValueError("Wheel must contain exactly the 50 generated GLBs")
         with tempfile.TemporaryDirectory(prefix="almond-release-audit-") as tmp:
             archive.extractall(tmp)
             result = audit_library(Path(tmp) / prefix)
@@ -44,6 +45,11 @@ def verify(wheel: Path) -> dict:
             for record in sources["assets"]:
                 if record["model_sha256"] != assets[record["asset_id"]]["sha256"]:
                     raise ValueError("Source register does not match packaged models")
+                captured = record["recorded_generation"].get("captured_generation")
+                if captured:
+                    source_image = (generated / captured["input_image_file"]).resolve()
+                    if not source_image.is_relative_to(generated.resolve()) or hashlib.sha256(source_image.read_bytes()).hexdigest() != captured["image"]["output_sha256"]:
+                        raise ValueError("Captured generation image is missing or changed")
             drafts = Path(tmp) / "almond_mcp/data/Draftingfiles"
             pilot = json.loads((drafts / "manifest.json").read_text())
             drawing_audits = []
@@ -60,7 +66,7 @@ def verify(wheel: Path) -> dict:
             archive_catalogue = AssetRepository({"generated": generated, "drafting": drafts,
                                                 "drawing": Path(tmp) / "almond_mcp/data/DrawingAssetfiles"})
             counts = archive_catalogue.catalogue()["counts"]
-            if counts != {"assets":54, "models":47, "elements":7, "drawing_packages":10, "views":60}:
+            if counts != {"assets":57, "models":50, "elements":7, "drawing_packages":10, "views":60}:
                 raise ValueError(f"Unified archive coverage changed: {counts}")
             for filename in ("index.html", "style.css", "app.js", "karamba.js", "karamba-help.js", "panel-theme.js", "panel.css", "analysis-view.mjs", "favicon.svg", "vendor/model-viewer.min.js", "vendor/LICENSE", "vendor/THIRD-PARTY-LICENSES.txt", "vendor/version.json"):
                 if "almond_mcp/library_ui/" + filename not in names:

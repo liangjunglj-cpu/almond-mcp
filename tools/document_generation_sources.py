@@ -1,5 +1,6 @@
 """Document recorded evidence without inventing missing generation history."""
 import argparse
+import hashlib
 import json
 from pathlib import Path
 
@@ -72,6 +73,30 @@ def build_register(library: Path) -> dict:
             "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
             "missing_recorded_fields": missing,
         })
+        captured = generation.get("captured_generation")
+        if captured:
+            if captured != history.get("captured_generation"):
+                errors.append(f"{aid}: captured requests differ from provenance")
+            image, mesh = captured["image"], captured["mesh"]
+            if image["request"].get("prompt") != brief.get("prompt"):
+                errors.append(f"{aid}: submitted image prompt differs from catalogue")
+            if image["task_id"] != image_id or mesh["task_id"] != generation["mesh_task_id"] or mesh["request"].get("input_task_id") != image_id:
+                errors.append(f"{aid}: captured task chain differs")
+            image_path = (library / captured["input_image_file"]).resolve()
+            if not image_path.is_relative_to(library.resolve()) or not image_path.is_file() or hashlib.sha256(image_path.read_bytes()).hexdigest() != image["output_sha256"]:
+                errors.append(f"{aid}: retained input image checksum mismatch")
+            derivation = captured["derivation"]
+            if derivation["source_sha256"] != mesh["output_sha256"] or derivation["quality"]["triangles"] != asset["triangle_count"]:
+                errors.append(f"{aid}: mesh derivation differs from recorded output")
+            records[-1].update(
+                recipe_evidence="Exact submitted API requests and downloaded input-image checksum retained in captured_generation.",
+                external_reference_status=captured["external_reference_status"],
+                evidence_gaps=["Provider seed was not returned where null.",
+                               "Dimensions are authored study sizes, not verified physical measurements.",
+                               "Mesh self-intersections and fabrication suitability have not been certified."],
+                rights_evidence=captured["rights"],
+            )
+            records[-1]["image_generation"].update(input_file=captured["input_image_file"], sha256=image["output_sha256"])
     return {
         "schema_version": 1,
         "library_id": manifest["library_id"],

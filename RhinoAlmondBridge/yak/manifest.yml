@@ -1,5 +1,5 @@
 name: almondbridge
-version: 0.6.0-rc.11
+version: 0.6.0-rc.12
 authors:
   - LiangJung
 description: >
@@ -12,7 +12,7 @@ description: >
   browser view. Compact thumbnails offer native placement as shared blocks,
   with optional lighter meshes. Browsing and placement require no Python or AI client.
 
-  Includes 47 generated GLB models with embedded metadata and source records,
+  Includes 50 generated GLB models with embedded metadata and source records,
   10 linked drawing packages (60 SVG/DXF view-scale pairs and 20 A3 SVG sheets),
   and an offline interactive 3D viewer. Models and derived drawings are
   attributed to Almond generated asset library under CC BY 4.0; code is MIT.
@@ -24,7 +24,7 @@ description: >
   from their original sources under the applicable terms.
 
   The MCP bridge listens on 127.0.0.1:5000. For AI workflows, install uv and
-  register uvx --from almond-mcp==0.6.0rc11 almond-mcp with your MCP client.
+  register uvx --from almond-mcp==0.6.0rc12 almond-mcp with your MCP client.
   This prerelease requires Include pre-releases in Rhino Package Manager.
   Windows only; supports Rhino 8.0 and later Rhino 8 service releases.
 url: https://github.com/liangjunglj-cpu/almond-mcp

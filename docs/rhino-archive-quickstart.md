@@ -1,7 +1,7 @@
 # Almond workspace for Rhino 8
 
 For this prepared release candidate, install the supplied
-**almondbridge-0.6.0-rc.11-rh8_0-win.yak**, save your work, restart Rhino,
+**almondbridge-0.6.0-rc.12-rh8_0-win.yak**, save your work, restart Rhino,
 and run **Almond**. This candidate has not yet been published to the
 public Package Manager. The package targets Windows / Rhino 8.0+.
 
@@ -16,7 +16,7 @@ Source links and download links open in your browser. The archive runs locally w
 open; no Python, Meshy login, AI subscription or Internet connection is needed
 to browse the included files after installation. Rhino's licence is separate.
 
-Search and rotate 47 generated models, inspect the 10 linked drawing packages,
+Search and rotate 50 generated models, inspect the 10 linked drawing packages,
 and download GLB, SVG, DXF and A3 SVG sheets. Choose 1:50 or 1:100 drawing views;
 DXF geometry uses full-size millimetres. Viewports fit drawings to the screen,
 so screen size is not print scale. Import downloaded DXFs into Rhino using
@@ -44,7 +44,7 @@ records, original checksums, full passports and a derivation record containing
 actual triangle counts, geometry fingerprint, units and reduction method.
 Undo removes a placement. Use Explode only when you need independent geometry.
 
-Placement is available for the 47 included generated GLBs, inside the Rhino
+Placement is available for the 50 included generated GLBs, inside the Rhino
 panel. Browser downloads and the seven community catalogue entries do not have
 native placement. Imported models use the current Rhino layer.
 
@@ -109,7 +109,7 @@ Install [uv](https://docs.astral.sh/uv/getting-started/installation/). Configure
 your MCP client with command `uvx` and these arguments:
 
 ```json
-["--from", "almond-mcp==0.6.0rc11", "almond-mcp"]
+["--from", "almond-mcp==0.6.0rc12", "almond-mcp"]
 ```
 
 This pinned command becomes available after the matching Python release is
@@ -135,3 +135,9 @@ Support: <https://github.com/liangjunglj-cpu/almond-mcp/issues>.
 In Karamba, press the small **?** beside a heading for guidance. Press it again
 or use Escape to close it. The diagrams explain supports and display symbols;
 opening help does not change analysis inputs.
+
+Search **organic** for the three detailed natural/textile additions. Choose
+**Original** before dragging if you want the complete library mesh. Object
+details show actual triangle counts, topology checks and the generated reference
+image. Preview colours are Almond materials; source-image textures are not baked
+into these geometry editions.

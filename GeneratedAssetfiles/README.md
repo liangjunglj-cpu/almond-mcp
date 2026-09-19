@@ -2,7 +2,7 @@
 
 Open, redistributable 3D architectural assets for [Almond MCP](../README.md):
 entourage, site furniture, fixtures and unbranded
-furniture placeholders. **47 assets**, all generated with
+furniture placeholders. **50 assets**, all generated with
 [Meshy](https://www.meshy.ai) from prompts written for this project and
 normalised to real-world millimetres with an authored Almond spatial
 contract. Unlike the IKEA / drawing libraries (3D Warehouse content that
@@ -44,7 +44,7 @@ get_generated_asset(asset_id="gen-street-lamp-1")
 place_generated_asset(asset_id="gen-street-lamp-1", x_mm=0, y_mm=0)
 ```
 
-Version 0.6 bundles all 47 models, contracts and previews in the wheel.
+Version 0.6 bundles all 50 models, contracts and previews in the wheel.
 Run `almond-mcp audit-assets` to check checksums and agreement between embedded,
 sidecar and manifest passports. Wheel installs use a versioned user-data pack;
 explicit library directory overrides continue to take precedence.
@@ -172,6 +172,36 @@ contact sheets are legacy renders.
 Regenerate with `blender --factory-startup -b --python tools/render_generated_previews.py -- GeneratedAssetfiles/models GeneratedAssetfiles/previews --archive`.
 `--clay` is an optional neutral study; `--asset <asset_id>` renders a single
 inspection sample into a separate output folder. The full archive needs all
-47 records. `previews/render-record.json` records Blender/version/settings,
+50 records. `previews/render-record.json` records Blender/version/settings,
 script checksum (LF-normalized), and each source GLB and rendered PNG checksum.
 This is a post-generation preview derivation, not a change to Meshy history.
+
+## Organic detail batch (rc.12)
+
+Three approved neutral assets cover forms that are inconvenient to build from
+primitives: a weathered boulder, driftwood and a loosely folded throw. The public collection contains geometry
+editions with Almond material colours, not photographic texture atlases.
+
+The batch uses Meshy's nano-banana-pro reference images and Meshy 7.1 standard
+generation at 4k geometry resolution, with provider remeshing disabled. Dense
+source GLBs remain in the local, gitignored `raw/organic-2026-09/` directory.
+Blender derives library versions targeting 80k–120k triangles without
+subdivision. Select **Original** in Rhino to place that full library mesh;
+**Light** remains an optional 20k placement target.
+
+`batches/organic-2026-09.json` preserves the original prompts and requested
+settings. Per-asset records and retained generated input images live under
+`batches/organic-2026-09/`. Embedded passports retain task IDs, timestamps,
+input/output hashes, actual triangle counts and derivation/topology checks.
+Unknown seeds remain null. No external design images were submitted. Heights
+are authored study sizes; dimensions are not product specifications. Foliage
+is generic entourage, not a certified botanical reconstruction.
+
+Quality records report boundary and non-manifold edges, zero-area faces,
+connected components and bounds changes. Visual inspection complements these
+checks; self-intersections and fabrication suitability are not certified.
+
+Five concepts were attempted in this batch. Only the three reviewed assets above
+are included. The broad-frond plant failed the mesh/visual quality review; the
+grass task was still processing at selection cutoff. Their trial files remain
+in the local raw directory and are not part of the public pack.

@@ -524,6 +524,27 @@
         "landscape"
       ],
       "description": "Bright meadow grass ground cover."
+    },
+    {
+      "material_id": "fabric-linen",
+      "name": "Linen - warm natural",
+      "category": "textile",
+      "base_color": [
+        190,
+        178,
+        153
+      ],
+      "metallic": 0.0,
+      "roughness": 0.92,
+      "opacity": 1.0,
+      "ue_material_slot": "M_Fabric_Linen",
+      "tags": [
+        "linen",
+        "textile",
+        "natural",
+        "upholstery"
+      ],
+      "description": "Plain natural linen material study; no woven texture or product certification."
     }
   ]
 }

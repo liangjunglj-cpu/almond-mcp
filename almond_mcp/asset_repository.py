@@ -76,6 +76,9 @@ class AssetRepository:
                     "drawing": None, "uri": f"almond://repository/{aid}",
                     "record_url": "/api/assets/" + quote(aid, safe="") + ".json",
                 }
+                captured = ((asset.get("geometry_source") or {}).get("parameters") or {}).get("captured_generation")
+                if captured and library == "generated":
+                    record["generation_image"] = self.file(library, captured.get("input_image_file"))
                 if aid in drawings:
                     package = drawings[aid]["package"]
                     drawing_url = self.file("drafting", package + "/drawing.json")
