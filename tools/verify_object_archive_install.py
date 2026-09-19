@@ -24,8 +24,8 @@ from fastmcp.client.transports import StdioTransport
 assert Path(almond_mcp.__file__).is_relative_to(Path(sys.prefix)), "Must use an installed wheel"
 repository = AssetRepository()
 catalogue = repository.catalogue()
-assert catalogue["counts"]["assets"] == 59
-assert sum(a["available"] for a in catalogue["assets"]) == 52
+assert catalogue["counts"]["assets"] == 54
+assert sum(a["available"] for a in catalogue["assets"]) == 47
 server = create_server(0, repository)
 thread = threading.Thread(target=server.serve_forever, daemon=True)
 thread.start()
@@ -54,16 +54,10 @@ async def main():
         assert len(record["local_files"]) == 18
         assert record["provenance"]["recorded_generation"]["mesh_task_id"]
         assert all(Path(p).is_file() for p in record["local_files"].values())
-        imported = (await client.call_tool("search_asset_repository", {"query":"ProjectY2K"})).structured_content
-        assert imported["total"] == 5, imported
-        for asset in imported["assets"]:
-            detail = json.loads((await client.read_resource(asset["uri"]))[0].text)
-            assert detail["provenance"]["recorded_generation"]["import_record"]["conversion"]["source_sha256"]
-            assert all(Path(p).is_file() for p in detail["local_files"].values())
         return {"version":almond_mcp.__version__, "mcp_tools":len(tools),
-                "object_archive":catalogue["counts"], "fresh_install_available":52,
+                "object_archive":catalogue["counts"], "fresh_install_available":47,
                 "optional_elements_uninstalled":7, "installed_http":"passed",
-                "installed_mcp_search_resource":"passed", "project_y2k_models":5, "installed_path":almond_mcp.__file__}
+                "installed_mcp_search_resource":"passed", "installed_path":almond_mcp.__file__}
 
 
 if __name__ == "__main__":

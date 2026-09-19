@@ -17,7 +17,7 @@ def repository():
 
 def test_catalogue_joins_models_drawings_and_evidence():
     repo = repository()
-    assert repo.catalogue()["counts"] == {"assets":59, "models":52, "elements":7, "drawing_packages":10, "views":60}
+    assert repo.catalogue()["counts"] == {"assets":54, "models":47, "elements":7, "drawing_packages":10, "views":60}
     record = repo.records["gen-office-chair-1"]
     assert record["available"] and record["provenance"]["recorded_generation"]["mesh_task_id"]
     assert record["drawing"]["source"]["asset_id"] == record["id"]
@@ -64,7 +64,7 @@ def test_http_downloads_and_file_boundary():
         assert status == 200 and b"Almond" in content and b"karamba-page" in content
         assert "charset=utf-8" in headers["Content-Type"]
         status, headers, content = request("/api/catalogue?download=1")
-        assert status == 200 and json.loads(content)["counts"]["assets"] == 59
+        assert status == 200 and json.loads(content)["counts"]["assets"] == 54
         assert "attachment" in headers["Content-Disposition"]
         record = repo.records["gen-office-chair-1"]
         for route in [record["model"], record["record_url"], record["drawing"]["views"][0]["dxf"], "/vendor/model-viewer.min.js"]:

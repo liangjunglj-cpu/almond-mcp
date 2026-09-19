@@ -23,7 +23,7 @@ def asset():
 def test_all_shipped_assets_have_consistent_verified_passports():
     result = ap.audit_library(LIBRARY)
     assert result["status"] == "success", result
-    assert result["checked"] == 52
+    assert result["checked"] == 47
 
 
 def test_audit_detects_tampering_and_contract_load_rejects_model_changes(asset, tmp_path):

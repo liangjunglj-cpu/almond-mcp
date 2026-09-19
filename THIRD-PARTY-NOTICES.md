@@ -126,12 +126,3 @@ License 2.0. Its original licence and package integrity record are included in
 `almond_mcp/library_ui/vendor/`. The distribution bundle retains embedded
 third-party notices. Full component licence texts and their retrieval records
 are also included in `THIRD-PARTY-LICENSES.txt` and `version.json` there.
-
-### ProjectY2K architectural derivatives
-
-Five Meshy-generated assets from ProjectY2K / Twofronts are included with the
-project owner's authorization under CC BY 4.0. Attribute Almond generated asset
-library / ProjectY2K. Modified for this distribution: reduced geometry,
-bottom-centre placement, project-authored scale and Almond material assignment.
-Source textures are omitted. Item-level source checksums and incomplete
-generation history are recorded in the embedded passports and source register.

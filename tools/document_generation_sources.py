@@ -1,7 +1,6 @@
 """Document recorded evidence without inventing missing generation history."""
 import argparse
 import json
-import re
 from pathlib import Path
 
 REPO = Path(__file__).resolve().parents[1]
@@ -24,43 +23,6 @@ def build_register(library: Path) -> dict:
         brief = briefs.get(aid, {})
         generation = asset.get("geometry_source", {}).get("parameters", {})
         history = provenance.get("assets", {}).get(aid, {})
-        if generation.get("evidence_type") == "existing_project_import":
-            imported = generation.get("import_record", {})
-            conversion = imported.get("conversion", {})
-            if imported != history.get("import_record"):
-                errors.append(f"{aid}: import history differs from manifest")
-            if brief.get("prompt") != generation.get("prompt") or not brief:
-                errors.append(f"{aid}: catalogue prompt differs from imported evidence")
-            for key in ("image_task_id", "image_model", "mesh_task_id", "mesh_model", "generated_at"):
-                if history.get(key) != generation.get(key):
-                    errors.append(f"{aid}: provenance {key} differs from manifest")
-            if asset.get("passport", {}).get("provenance") != asset.get("geometry_source"):
-                errors.append(f"{aid}: embedded-passport record differs from geometry source")
-            if not imported.get("source_documents") or not conversion.get("source_file") or not imported.get("rights", {}).get("authorization_date"):
-                errors.append(f"{aid}: missing import source or rights evidence")
-            hashes = [conversion.get("source_sha256"), conversion.get("converted_sha256")]
-            hashes += [d.get("sha256") for d in imported.get("source_documents", [])]
-            if any(not re.fullmatch(r"[a-f0-9]{64}", h or "") for h in hashes):
-                errors.append(f"{aid}: invalid import evidence checksum")
-            records.append({
-                "asset_id":aid, "name":asset["product"], "model_file":asset["file"],
-                "model_sha256":asset["sha256"], "contract_file":asset["contract_file"],
-                "contract_sha256":asset["contract_sha256"], "generator":"meshy",
-                "recorded_generation":generation, "recorded_task_history":history,
-                "image_generation":{"provider":None,"id":None,"status":"not_applicable_text_to_3d"},
-                "external_reference_status":"not_recorded_in_reviewed_project_evidence", "external_reference_ids":[],
-                "evidence_gaps":[
-                    imported.get("prompt_status", "Original prompt unknown."),
-                    "Task ID evidence: " + imported.get("task_id_status", "unknown"),
-                    "Exact submitted settings, seed and complete remesh chain are not retained in reviewed evidence.",
-                    conversion.get("material_derivation", "Material derivation unknown."),
-                    imported.get("dimension_basis", "Original units and scale unverified."),
-                ],
-                "declared_license":asset.get("license"),
-                "rights_evidence":asset.get("license_note"),
-                "missing_recorded_fields":["original_submitted_prompt","complete_generation_settings"],
-            })
-            continue
         image_id = generation.get("image_task_id") or history.get("image_job_id")
         missing = [key for key in (
             "prompt", "image_model", "mesh_task_id",

@@ -95,13 +95,3 @@ Re-run this audit if any of these change:
 - Almond starts shipping generated geometry derived from 3D Warehouse meshes
   (bounding boxes computed from a mesh are fine; simplified copies of the
   mesh are not).
-
-## ProjectY2K imports (2026-09-19)
-
-The project owner authorized including the five selected Meshy assets in the
-public Almond plugin after being asked about CC BY 4.0 distribution. The import
-record preserves that authorization and separately marks provider account
-entitlement as not independently verified. Source project files are not
-redistributed wholesale. The pack contains compact geometry derivatives with
-Almond materials, public provenance and source checksums; no source texture
-atlases, account data, credentials or unrelated game assets are included.

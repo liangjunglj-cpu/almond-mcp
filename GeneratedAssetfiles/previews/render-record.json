@@ -392,60 +392,6 @@
       "material_names": [
         "ALMOND::ceramic-teal"
       ]
-    },
-    {
-      "asset_id": "gen-y2k-kiosk-1",
-      "model_sha256": "cf1bf40380d803ca92c71a97842d8202ec399f225d2cc1cd6dffe3fe1d16d3d9",
-      "preview_sha256": "fc3d56da24ef445a5b45dd13eedf785383ba1485bd37fa35126ead4316522094",
-      "material_names": [
-        "ALMOND::plaster-white"
-      ]
-    },
-    {
-      "asset_id": "gen-y2k-organic-pavilion-1",
-      "model_sha256": "d4aa5de64984b081e0bc435bc93efb0bca32c30bb2316bcb33ebdfc475f0227f",
-      "preview_sha256": "057fbf9e28af2019c58d89d207c408d0d3d72a2eb996a39ff292552a6381c4fa",
-      "material_names": [
-        "ALMOND::plaster-white"
-      ]
-    },
-    {
-      "asset_id": "gen-y2k-planter-pod-1",
-      "model_sha256": "2f91e0fb6be30f45fdf4ee656e0526803b619428947b207c6ef139ed83194524",
-      "preview_sha256": "3859dab3e1c296f3516f4b28bb2b971573aad06cc2501febfbc04a002ef9e512",
-      "material_names": [
-        "ALMOND::ceramic-teal"
-      ]
-    },
-    {
-      "asset_id": "gen-y2k-sign-pod-1",
-      "model_sha256": "936337dd00089a4b871fda4688bab5a078084c929b1bc73432b3b7b68ac8cf77",
-      "preview_sha256": "7ff6b364779aa7e52db446a5e280cab2f187e1b111a7bb3e6689de1bf8786e50",
-      "material_names": [
-        "ALMOND::aluminium-anodized"
-      ]
-    },
-    {
-      "asset_id": "gen-y2k-vending-machine-1",
-      "model_sha256": "86d43fb16d45ed339cd85e2c35a7319a0cc6d8672ca9ef66016f5a85d99e1631",
-      "preview_sha256": "c985f3eb827cfc961f2fc0017e255b9655d49a16bd447558252d33aa52c8ba78",
-      "material_names": [
-        "ALMOND::steel-painted-vermilion"
-      ]
-    }
-  ],
-  "additional_batches": [
-    {
-      "asset_ids": [
-        "gen-y2k-kiosk-1",
-        "gen-y2k-organic-pavilion-1",
-        "gen-y2k-planter-pod-1",
-        "gen-y2k-sign-pod-1",
-        "gen-y2k-vending-machine-1"
-      ],
-      "created_at": "2026-09-19T15:43:52.052546+00:00",
-      "renderer": "Blender 5.1.2",
-      "script_sha256_lf": "0d7a86154a5cf8143512eaead6085ff5f6c4635bb511362b543fc665a730e058"
     }
   ]
 }

@@ -1,6 +1,6 @@
 [project]
 name = "almond-mcp"
-version = "0.6.0rc10"
+version = "0.6.0rc11"
 description = "Almond - MCP server for Rhino 8 with a semantic scene layer: curated furniture/drawing/diagram libraries, audited Karamba capsules, structured retrieval (SQLite FTS5 + R-tree scene ledger), and a TCP bridge into Rhino (RhinoAlmondBridge, port 5000)"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -56,7 +56,6 @@ packages = ["almond_mcp"]
 "GeneratedAssetfiles/catalogue.json" = "almond_mcp/data/GeneratedAssetfiles/catalogue.json"
 "GeneratedAssetfiles/provenance.json" = "almond_mcp/data/GeneratedAssetfiles/provenance.json"
 "GeneratedAssetfiles/source-register.json" = "almond_mcp/data/GeneratedAssetfiles/source-register.json"
-"GeneratedAssetfiles/imports" = "almond_mcp/data/GeneratedAssetfiles/imports"
 "DrawingRecipes" = "almond_mcp/data/DrawingRecipes"
 "Draftingfiles" = "almond_mcp/data/Draftingfiles"
 "capsules" = "almond_mcp/data/capsules"
@@ -76,7 +75,6 @@ include = [
     "/Materialfiles/manifest.json", "/Constructionfiles/manifest.json", "/Historyfiles/manifest.json",
     "/tools/build_generated_assets.py", "/tools/enrich_generated_assets.py",
     "/tools/document_generation_sources.py",
-    "/tools/convert_project_meshes.py", "/tools/import_project_meshes.py", "/GeneratedAssetfiles/imports",
     "/tools/build_archive_bundle.py", "/tools/verify_object_archive_install.py",
     "/tools/render_generated_previews.py", "/tools/verify_release.py",
     "/README.md", "/AGENTS.md", "/LICENSE", "/THIRD-PARTY-NOTICES.md",

@@ -13,7 +13,7 @@ def test_shipped_source_register_matches_evidence():
     library = ROOT / "GeneratedAssetfiles"
     result = source_doc.build_register(library)
     assert not result["errors"]
-    assert result["asset_count"] == 52
+    assert result["asset_count"] == 47
     assert result == json.loads((library / "source-register.json").read_text())
     assert all(a["external_reference_ids"] == [] and a["evidence_gaps"] for a in result["assets"])
     higgsfield = [a for a in result["assets"] if a["image_generation"]["provider"] == "higgsfield"]
