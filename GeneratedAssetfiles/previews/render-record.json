@@ -1,0 +1,397 @@
+{
+  "schema_version": 1,
+  "created_at": "2026-09-19T15:01:20.212881+00:00",
+  "renderer": "Blender 5.1.2",
+  "engine": "BLENDER_WORKBENCH",
+  "script": "tools/render_generated_previews.py",
+  "script_sha256_lf": "0d7a86154a5cf8143512eaead6085ff5f6c4635bb511362b543fc665a730e058",
+  "colour_mode": "embedded_material_base_colour",
+  "transparent_background": true,
+  "resolution": [
+    640,
+    640
+  ],
+  "view_transform": "Standard",
+  "look": "None",
+  "studio_light": "paint.sl",
+  "studio_light_intensity": 1.0,
+  "notes": "Preview-only derivation from the unchanged GLBs. Studio shading of assigned material colours; not photographic textures or a full PBR render.",
+  "assets": [
+    {
+      "asset_id": "gen-armchair-bent-birch-webbed-1",
+      "model_sha256": "269f986fb6cb249db9adeb844b9d6cd7a18fc2b5c51e8095b8d9a610eb4fb8a0",
+      "preview_sha256": "6b50a90f09505fea2e5386b74725ace009719365aef9edf2061998821f570696",
+      "material_names": [
+        "ALMOND::wood-birch-ply"
+      ]
+    },
+    {
+      "asset_id": "gen-armchair-cantilever-bentwood-1",
+      "model_sha256": "e5132c71829989c1e0ab8602803dd3a3b844f924999b52f3a58b56f2f8a5eb3d",
+      "preview_sha256": "0b73aa84c371d6fb92e39fe79aba8b43ccc8e2da0422834903d1c40ef11d98ad",
+      "material_names": [
+        "ALMOND::wood-birch-ply"
+      ]
+    },
+    {
+      "asset_id": "gen-balustrade-glass-1",
+      "model_sha256": "237028ea3e3ff1837785cff514b68b6c39965536c8df5f392d06cab3c3fa7533",
+      "preview_sha256": "e27f28a37d82bd47a35bb91fa4e8fa8a2ee2f1bf08dfa7aa1f6506aa1520a80a",
+      "material_names": [
+        "ALMOND::glass-clear"
+      ]
+    },
+    {
+      "asset_id": "gen-bathtub-1",
+      "model_sha256": "dbc1f583b3874aeabe3a63a8617c8ded767190c21897a977e4b7661d8dc6989a",
+      "preview_sha256": "9ecbe2ba99039211552ed22572af5fb3c8ae33b2fb17ad131af07bf6ec5aec3c",
+      "material_names": [
+        "ALMOND::ceramic-teal"
+      ]
+    },
+    {
+      "asset_id": "gen-bed-double-1",
+      "model_sha256": "85d34b7a12a85b70a8e85f2010199c32e00862240a2e8461310c8a65cef09b29",
+      "preview_sha256": "3fd1703d5373beaa3f45146ff5eb185a53245b95683ce06f4a2f9a583edbc852",
+      "material_names": [
+        "ALMOND::wood-oak"
+      ]
+    },
+    {
+      "asset_id": "gen-bench-slatted-platform-1",
+      "model_sha256": "5cb344de2791fde3c527d7bb372cef662b42cce95463a6dd6803b98b43f7a7af",
+      "preview_sha256": "f13fd4eee26ae6706b5fef63a169965ffbdd893c923342b9d6c4dbfefb66e663",
+      "material_names": [
+        "ALMOND::wood-walnut"
+      ]
+    },
+    {
+      "asset_id": "gen-bicycle-1",
+      "model_sha256": "adc73d4f610cf6368f90bd00c78f3bb6681acdc27b05caba7befabf3e86b6cb8",
+      "preview_sha256": "a8ab3373911c644ba4d82b271b24ed3fa84216792caa80191e45808a9df1ef6b",
+      "material_names": [
+        "ALMOND::steel-painted-charcoal"
+      ]
+    },
+    {
+      "asset_id": "gen-bike-rack-1",
+      "model_sha256": "647481662778ef71418f857a37d4e0a5cc4c269bfcb7c209e06230673d988411",
+      "preview_sha256": "b18b8aa1db6e4ad14f95e586980eedb582da76fdba97894727fa56b1abe5a1d7",
+      "material_names": [
+        "ALMOND::steel-galvanized"
+      ]
+    },
+    {
+      "asset_id": "gen-bollard-1",
+      "model_sha256": "b6b33feca43e660d5f2f03b82c5c7f16514c48d1d79e426efc5485ef6dc44c55",
+      "preview_sha256": "2145972a3031423a863cf017cf0ed975a401b8773076cf97536715e64075a745",
+      "material_names": [
+        "ALMOND::steel-painted-charcoal"
+      ]
+    },
+    {
+      "asset_id": "gen-car-sedan-1",
+      "model_sha256": "10e9753dda82f4ab66b81c0c002495d07a77918b4cd39eebcc79f3cd8b8d2936",
+      "preview_sha256": "24cfaee7b90792cc688ea43a2936f23ff07ae332e780972eadbdbd481b54b9f3",
+      "material_names": [
+        "ALMOND::steel-painted-charcoal"
+      ]
+    },
+    {
+      "asset_id": "gen-coffee-table-freeform-glass-1",
+      "model_sha256": "9fe6f68f84c135ff4ec8127b37507dd544ad931d2f398c915f60d3fbb67cb739",
+      "preview_sha256": "a4a78c4a1530bbe131b7cf8d43a19d7d2a9d0795044191217ccbcd31c69de09b",
+      "material_names": [
+        "ALMOND::wood-walnut"
+      ]
+    },
+    {
+      "asset_id": "gen-column-round-1",
+      "model_sha256": "a35797e6f5d21407c4cb686ee6bf4257fd0931617c25fcd4739550a63df9fca4",
+      "preview_sha256": "3b33d5dc39774efe20bbcb1c60c0111caa388fb59e904fc6cc08423eacc423f4",
+      "material_names": [
+        "ALMOND::concrete-smooth"
+      ]
+    },
+    {
+      "asset_id": "gen-column-square-1",
+      "model_sha256": "659bcd5ea07672b49c10967f4c1eeb973ebb2d166d4461a9abb3ae165a3e7c5a",
+      "preview_sha256": "eb9435b5dfb65c2c05864b73d121383a6a5dd67e83727f8b19e28dbd30daec6e",
+      "material_names": [
+        "ALMOND::concrete-smooth"
+      ]
+    },
+    {
+      "asset_id": "gen-desk-1",
+      "model_sha256": "b02de4245f24d78de86516ddc6380676b384649abe2190d75b65d691bdbe3933",
+      "preview_sha256": "bc2c2ae5b8976589ad5decc684518672e69069fcfa98c7ef771e303decc72eea",
+      "material_names": [
+        "ALMOND::wood-birch-ply"
+      ]
+    },
+    {
+      "asset_id": "gen-dining-chair-1",
+      "model_sha256": "0bbdcdcb7f1889f9c92eb4b1858f7a73ac03c0fd3e27520a57dca39a21b6a7ed",
+      "preview_sha256": "ae6c64e4baf70dbec309c77713dcf20795c79f9214e2af6f126a234662fbe2ef",
+      "material_names": [
+        "ALMOND::wood-oak"
+      ]
+    },
+    {
+      "asset_id": "gen-dining-table-rect-1",
+      "model_sha256": "16b13b2e0c53d1ee7c5b9b3e45dff7b9e65bf6aec79d26e65c260832859b10f8",
+      "preview_sha256": "534058b1f88117cb3ff7b6d4e79cb13c5a5073ec75395d64c529084e39649744",
+      "material_names": [
+        "ALMOND::wood-oak"
+      ]
+    },
+    {
+      "asset_id": "gen-dining-table-round-birch-1",
+      "model_sha256": "617bb30ea7f78cd1b5ec9543a092516d5cb2128735835ed39cb5ec2028c68fbe",
+      "preview_sha256": "777f0bfa00837e24fb41687a2245930f030e9490d03b81e43d66cef35db9d068",
+      "material_names": [
+        "ALMOND::wood-birch-ply"
+      ]
+    },
+    {
+      "asset_id": "gen-floor-lamp-arc-1",
+      "model_sha256": "08b6118de5e33c98ed5c6996a6f8cab830b95b8240347f3e73d67a0b7833bfdd",
+      "preview_sha256": "5519582bc68a8afa52ca09e49019a0fc6634f9590259019b1da14d27dcd483ef",
+      "material_names": [
+        "ALMOND::steel-galvanized"
+      ]
+    },
+    {
+      "asset_id": "gen-kitchen-range-1",
+      "model_sha256": "efa0c0e3f07acfd4a5237e3ce13c55374c015d80c633dadf096bc9645717ed57",
+      "preview_sha256": "6b3997e478ee3971fec66fe70f1404fc02f8d9e0301f1935139009b2e2d41559",
+      "material_names": [
+        "ALMOND::steel-galvanized"
+      ]
+    },
+    {
+      "asset_id": "gen-litter-bin-1",
+      "model_sha256": "c0e2ac5423affd229ede7551263cbcba8963d5c857c9332dab63d6a92ef9570b",
+      "preview_sha256": "0a265f98b6e7724869c423132947c51d284874947ed6e7cfcce22e22d93f4b77",
+      "material_names": [
+        "ALMOND::steel-painted-charcoal"
+      ]
+    },
+    {
+      "asset_id": "gen-lounge-chair-bent-plywood-1",
+      "model_sha256": "d12302e5ffac3ff25e16660fef2c6df0d6709eed0e6fca4fd4e27d11e4a3302f",
+      "preview_sha256": "2999c7552d355bbf5efed8ffaf079ba25b77a47dce2a59af08d5578b58ad6885",
+      "material_names": [
+        "ALMOND::wood-birch-ply"
+      ]
+    },
+    {
+      "asset_id": "gen-lounge-chair-leather-plywood-1",
+      "model_sha256": "c81fdc45d5f2b720e433eedddb7094d4768e338d249078f83435134354a9e0e1",
+      "preview_sha256": "512b662df8fd617715672c2657aa02899ec84fc8e0ae024f3faa9dba34b33d47",
+      "material_names": [
+        "ALMOND::wood-walnut"
+      ]
+    },
+    {
+      "asset_id": "gen-lounge-chair-molded-plywood-1",
+      "model_sha256": "ae08448c3ee0201acb9cc6fd85f0d38f2af3f38772f6bef2934ef6f55af9f45e",
+      "preview_sha256": "46ec337fa80f70a9a9efde58efece8bda25688e9b2b3f927927c076d0483b963",
+      "material_names": [
+        "ALMOND::wood-walnut"
+      ]
+    },
+    {
+      "asset_id": "gen-office-chair-1",
+      "model_sha256": "290b51b30e4db2da0405d71aa7c08a93cce42eb9df33dd70f76d863d82f02cb3",
+      "preview_sha256": "cc3a9a821c312d292e5787fdcd75631eb516057d4c876761996b584a1d19fbcb",
+      "material_names": [
+        "ALMOND::rubber-black"
+      ]
+    },
+    {
+      "asset_id": "gen-ottoman-leather-plywood-1",
+      "model_sha256": "6f0f374835df25039447f769af9dc8ff0b36e6a27ddf12100ea853a30b5b866d",
+      "preview_sha256": "0382bf0d45baab315ff38aebaff7fc9b075724c37d9ccff64f0b707977362623",
+      "material_names": [
+        "ALMOND::wood-walnut"
+      ]
+    },
+    {
+      "asset_id": "gen-park-bench-1",
+      "model_sha256": "8cfe4aeadc89741cd1d87e2682c6403dbb200c91f1efbfc3262492a5e5cd6b19",
+      "preview_sha256": "a91fdd09a0192cc7cd4b07a2e16b4f9cfa7c605d770339618a32055f631a0809",
+      "material_names": [
+        "ALMOND::wood-oak"
+      ]
+    },
+    {
+      "asset_id": "gen-pendant-lamp-sphere-1",
+      "model_sha256": "83e8ef197fa17c8fadcca8f2bd2596488e84941184ce3d4d2fba59a45cdc7e44",
+      "preview_sha256": "72ea7d2b7ace6d6195504126041882fbbc20c72ccaa08d7f2a035cf60470c3f6",
+      "material_names": [
+        "ALMOND::polycarbonate-opal"
+      ]
+    },
+    {
+      "asset_id": "gen-person-sitting-1",
+      "model_sha256": "a4bca08aa841e213eb59494b48a2e57fc90794a940ee78e7db4b67717a7d23d2",
+      "preview_sha256": "815ae12e255b69bf411315f124ec42c1e60d5cb808a68075bd7e15615fb920f2",
+      "material_names": [
+        "ALMOND::plaster-white"
+      ]
+    },
+    {
+      "asset_id": "gen-person-standing-1",
+      "model_sha256": "a297ad2ae6c0bf367cbc259d34f2c97ca579fecbb9932428e087a2ecdef6d13b",
+      "preview_sha256": "85d98e94d2f50462c9275fde1bc69c2e570fddc2112cb650a196f689b87d0015",
+      "material_names": [
+        "ALMOND::plaster-white"
+      ]
+    },
+    {
+      "asset_id": "gen-person-walking-1",
+      "model_sha256": "d384c2c5c8d60fb940e91a2c0b10b73c21716e78b5588292efa359aeaef60dd4",
+      "preview_sha256": "725c4eac8b876a85b2baedfd9cc92b09b7ee3fa04912a19881f0e44dbf509c5a",
+      "material_names": [
+        "ALMOND::plaster-white"
+      ]
+    },
+    {
+      "asset_id": "gen-refrigerator-1",
+      "model_sha256": "fe8c7e47bc899c6dcd820bf4c5e0f80363020565211d6dba9b698b21fdb9ef8c",
+      "preview_sha256": "c706ccaebe8a4fe986d0111f693e64c081e46cf43c4cbf807057eeedace2aba4",
+      "material_names": [
+        "ALMOND::steel-galvanized"
+      ]
+    },
+    {
+      "asset_id": "gen-shelving-cube-2x4-1",
+      "model_sha256": "8e2759c663fe9395a112e1a978c61513cca37482f1a1c52e8fa024b62f871434",
+      "preview_sha256": "8eb8646342d0ee9f5bd2f9e44d168f550826ccefe187571040584656820a98e9",
+      "material_names": [
+        "ALMOND::wood-birch-ply"
+      ]
+    },
+    {
+      "asset_id": "gen-shelving-modular-track-1",
+      "model_sha256": "cc44de0d75a543b9b21c43db58b690f4e326c5d4a90d45dfe3a6a57060db8b13",
+      "preview_sha256": "e517f867b618b23f5328384ad7addab44054d13a04957079156ccc8dc9b8427f",
+      "material_names": [
+        "ALMOND::aluminium-anodized"
+      ]
+    },
+    {
+      "asset_id": "gen-shower-enclosure-1",
+      "model_sha256": "e53e3c7219de324827776a59d6c224411739f1317398085a4274075f9aa4645b",
+      "preview_sha256": "95109c9698e749319e379a9a395299759c24bbc7f7bc539ee18f8ba0d18e7a67",
+      "material_names": [
+        "ALMOND::glass-clear"
+      ]
+    },
+    {
+      "asset_id": "gen-side-chair-shell-wire-base-1",
+      "model_sha256": "e5ee00e5ad4719d780f5210f3a24b5341aa6c7bb5512707695983592e8f37b41",
+      "preview_sha256": "1a1c525cc2a6568bdad2eef4e1349149dfe8ba51249b45c09d31981c68d7e639",
+      "material_names": [
+        "ALMOND::plaster-white"
+      ]
+    },
+    {
+      "asset_id": "gen-side-table-wire-1",
+      "model_sha256": "575153f2964bdc8e7ea2c414eda3a420f773410d7c518b5ef69d612ef1f14662",
+      "preview_sha256": "7adb8bae6940f848bb9cea05151164ec3c2c5d4896e3984c4e75b984561e8bc4",
+      "material_names": [
+        "ALMOND::steel-painted-charcoal"
+      ]
+    },
+    {
+      "asset_id": "gen-sofa-2-seat-loose-cover-1",
+      "model_sha256": "11b717522276dd8d2211525728dbfc835c58dfc3018e03a02030e2fbc664d885",
+      "preview_sha256": "41061c299949abf701a848a327b466b86bc6d9b04d0d2b15129d3ff0869676af",
+      "material_names": [
+        "ALMOND::rubber-black"
+      ]
+    },
+    {
+      "asset_id": "gen-sofa-3-seat-1",
+      "model_sha256": "ee978ef6edff09f7fb5cd2cf6dc8d81eb802487959bf6565bcb2caeae4c9fd12",
+      "preview_sha256": "12b38aa027504df522730077b341c93026965d8692fa0e81f90791b446ba1777",
+      "material_names": [
+        "ALMOND::rubber-black"
+      ]
+    },
+    {
+      "asset_id": "gen-stool-bent-birch-3leg-1",
+      "model_sha256": "9d3c6a08d31706b954ef7ec1719ae46a8213bea025025ac80e23fc5576da6c83",
+      "preview_sha256": "6507a257ef2012bd0eb1b455d19436dead8ba4d80af0b9302e5cff3d5dfa1d80",
+      "material_names": [
+        "ALMOND::wood-birch-ply"
+      ]
+    },
+    {
+      "asset_id": "gen-street-lamp-1",
+      "model_sha256": "d1d33284969b2470c2c65e4cd569b208fbbc331061c162943509ab6aabc956e7",
+      "preview_sha256": "7f031571e94f168ce4f632381e612fe525f8010dcabca03d981d83ea361e50eb",
+      "material_names": [
+        "ALMOND::steel-painted-charcoal"
+      ]
+    },
+    {
+      "asset_id": "gen-task-chair-mesh-ergonomic-1",
+      "model_sha256": "0bee21d47506d5f044fb69e484826d6b6c105277515f971fbbbd1ea1f0af9352",
+      "preview_sha256": "355fc3d7296e1a7c15d3a4f37b7ffe9f1bc4083944490cdc34f980fa3d9b4e9e",
+      "material_names": [
+        "ALMOND::rubber-black"
+      ]
+    },
+    {
+      "asset_id": "gen-task-lamp-balanced-arm-1",
+      "model_sha256": "caac2a41ac48038d7ba89a37828d40f621f540780ee35ff6867e4c945b09e41f",
+      "preview_sha256": "9217c9ed3ed56e796a0c22856a70219ccddb21927b0dbb1bc8071b861cb689f1",
+      "material_names": [
+        "ALMOND::aluminium-anodized"
+      ]
+    },
+    {
+      "asset_id": "gen-tea-trolley-bent-birch-1",
+      "model_sha256": "0b8506240712f7538e6f837f67c1ef363b5638810a8768176ac85e5bfa3f813c",
+      "preview_sha256": "bc164f61c7a03222d24c46b779fcf9dbefec681fbf93dfb3e2c915a3f43c678f",
+      "material_names": [
+        "ALMOND::wood-birch-ply"
+      ]
+    },
+    {
+      "asset_id": "gen-toilet-1",
+      "model_sha256": "4619e273b07329f33f200f9593a7d1fb8580db41c64b60ff40e7fc1723a0fb1b",
+      "preview_sha256": "8628a2b94ac8bf357fdde3584c166afb5c3d6841be617efedfd93b4319f74e77",
+      "material_names": [
+        "ALMOND::ceramic-teal"
+      ]
+    },
+    {
+      "asset_id": "gen-tree-conifer-1",
+      "model_sha256": "5759805d48bafb55be10c064dcdd2666a4b138d5c61d479d959d8dc0d79584c1",
+      "preview_sha256": "7a4205858eb4adcd7642d0a785ac5eed6593fcbdd5bc89e47bbda8b70296f546",
+      "material_names": [
+        "ALMOND::foliage-pine"
+      ]
+    },
+    {
+      "asset_id": "gen-tree-deciduous-medium-1",
+      "model_sha256": "c1697107b3dea02b17877dc53723b81f0cfb83bfd87691cb15d0bb7a2fe592ba",
+      "preview_sha256": "ca41de625a087a92484a020d88da32d90e7848e8a4c1c8237327b77f9625d276",
+      "material_names": [
+        "ALMOND::foliage-pine"
+      ]
+    },
+    {
+      "asset_id": "gen-washbasin-pedestal-1",
+      "model_sha256": "b176d7d9d55defda373b2ed7ae10d883ce5c5089844463f3346adf61588e2dc3",
+      "preview_sha256": "1655c6d01f8267b4c8378d6a5393049fe175525010bdaa19a46c6ac1a3587bfc",
+      "material_names": [
+        "ALMOND::ceramic-teal"
+      ]
+    }
+  ]
+}

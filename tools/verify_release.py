@@ -28,6 +28,8 @@ def verify(wheel: Path) -> dict:
         if forbidden:
             raise ValueError(f"Forbidden archive members: {forbidden}")
         prefix = "almond_mcp/data/GeneratedAssetfiles/"
+        if prefix + "previews/render-record.json" not in names:
+            raise ValueError("Preview derivation record missing")
         glbs = [n for n in names if n.endswith(".glb")]
         if len(glbs) != 47 or any(not n.startswith(prefix + "models/") for n in glbs):
             raise ValueError("Wheel must contain exactly the 47 generated GLBs")

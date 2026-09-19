@@ -33,7 +33,7 @@ each user downloads), these files ship with the repository.
 | `models/<id>.glb` | Normalised mesh |
 | `models/<id>.almond.json` | Asset contract (dimensions, anchor, clearances, material groups) |
 | `raw/` | Raw Meshy downloads (gitignored) |
-| `previews/` | 320 px renders per asset and per-group contact sheets (Blender workbench) |
+| `previews/` | 640 px material-colour archive thumbnails, render provenance and legacy contact sheets (Blender Workbench) |
 
 ## Using the library
 
@@ -160,3 +160,18 @@ triangles; the two trees are meshy-7 ultra output decimated to 80k triangles (se
 `tools/decimate_glb.py`) - right for entourage, plans, sections and massing, not for
 close-up renders. Plan-dimension deviations above 25% are flagged in the
 build log; the measured values are what the manifest stores.
+
+### Coloured archive previews (rc.8)
+
+The 47 individual thumbnails now use the embedded GLB material base colours,
+with paint.sl studio lighting and a transparent background. They are material
+studies, not photographic textures or full PBR renders. Model geometry,
+materials, embedded passports and derived drawings are unchanged. Existing
+contact sheets are legacy renders.
+
+Regenerate with `blender --factory-startup -b --python tools/render_generated_previews.py -- GeneratedAssetfiles/models GeneratedAssetfiles/previews --archive`.
+`--clay` is an optional neutral study; `--asset <asset_id>` renders a single
+inspection sample into a separate output folder. The full archive needs all
+47 records. `previews/render-record.json` records Blender/version/settings,
+script checksum (LF-normalized), and each source GLB and rendered PNG checksum.
+This is a post-generation preview derivation, not a change to Meshy history.

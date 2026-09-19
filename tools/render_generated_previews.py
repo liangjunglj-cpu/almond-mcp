@@ -1,26 +1,40 @@
 """Blender headless: render every generated asset from a 3/4 view.
-Run: blender -b --python render_assets.py -- <models_dir> <out_dir>
+Run: blender -b --python tools/render_generated_previews.py -- <models_dir> <out_dir> --archive
 """
+import argparse
+import hashlib
+import json
 import math
 import sys
+from datetime import datetime, timezone
 from pathlib import Path
 
 import bpy
 from mathutils import Vector
 
-argv = sys.argv[sys.argv.index("--") + 1:]
-MODELS = Path(argv[0]).resolve()
-OUT = Path(argv[1]).resolve()
+parser = argparse.ArgumentParser(description=__doc__)
+parser.add_argument("models_dir", type=Path)
+parser.add_argument("out_dir", type=Path)
+parser.add_argument("--archive", action="store_true", help="Transparent background for library cards")
+parser.add_argument("--clay", action="store_true", help="Optional neutral geometry study instead of source material colours")
+parser.add_argument("--asset", help="Render one asset ID for inspection")
+args = parser.parse_args(sys.argv[sys.argv.index("--") + 1:])
+MODELS = args.models_dir.resolve()
+OUT = args.out_dir.resolve()
 OUT.mkdir(parents=True, exist_ok=True)
 SIZE = 640
-ARCHIVE_STYLE = "--archive" in argv[2:]
+ARCHIVE_STYLE = args.archive
 
 
 def reset_scene():
     bpy.ops.wm.read_factory_settings(use_empty=True)
     scene = bpy.context.scene
     scene.render.engine = "BLENDER_WORKBENCH"
+    scene.view_settings.view_transform = "Standard"
+    scene.view_settings.look = "None"
     scene.display.shading.light = "STUDIO"
+    scene.display.shading.studio_light = "paint.sl"
+    scene.display.shading.studiolight_intensity = 1.0
     scene.display.shading.color_type = "MATERIAL"
     scene.display.shading.show_shadows = True
     scene.display.shading.show_cavity = True
@@ -31,13 +45,13 @@ def reset_scene():
     scene.render.film_transparent = False
     scene.render.image_settings.file_format = "PNG"
     if ARCHIVE_STYLE:
-        # Neutral geometry study for the archive; source materials are unchanged.
-        scene.display.shading.color_type = "SINGLE"
-        scene.display.shading.single_color = (0.65, 0.66, 0.62)
         scene.display.shading.show_object_outline = False
         scene.display.shading.studiolight_rotate_z = math.radians(25)
         scene.render.film_transparent = True
         scene.render.image_settings.color_mode = "RGBA"
+    if args.clay:
+        scene.display.shading.color_type = "SINGLE"
+        scene.display.shading.single_color = (0.65, 0.66, 0.62)
     scene.world = bpy.data.worlds.new("World")
     scene.world.color = (0.86, 0.88, 0.90)
     return scene
@@ -48,8 +62,7 @@ def render(glb: Path):
     bpy.ops.import_scene.gltf(filepath=str(glb))
     meshes = [o for o in scene.objects if o.type == "MESH"]
     if not meshes:
-        print("NO MESH", glb.name)
-        return
+        raise ValueError("No mesh in " + glb.name)
     lo = Vector((math.inf,) * 3)
     hi = Vector((-math.inf,) * 3)
     for o in meshes:
@@ -84,7 +97,23 @@ def render(glb: Path):
     scene.render.filepath = str(OUT / (glb.stem + ".png"))
     bpy.ops.render.render(write_still=True)
     print("RENDERED", glb.stem)
+    return {"asset_id":glb.stem,
+            "model_sha256":hashlib.sha256(glb.read_bytes()).hexdigest(),
+            "preview_sha256":hashlib.sha256(Path(scene.render.filepath).read_bytes()).hexdigest(),
+            "material_names":sorted({m.name for obj in meshes for m in obj.data.materials if m})}
 
 
-for glb in sorted(MODELS.glob("gen-*.glb")):
-    render(glb)
+models = [p for p in sorted(MODELS.glob("gen-*.glb")) if not args.asset or p.stem == args.asset]
+if not models:
+    raise ValueError("No matching generated models")
+records = [render(glb) for glb in models]
+record = {"schema_version":1,"created_at":datetime.now(timezone.utc).isoformat(),
+          "renderer":"Blender " + bpy.app.version_string,"engine":"BLENDER_WORKBENCH",
+          "script":"tools/render_generated_previews.py",
+          "script_sha256_lf":hashlib.sha256(Path(__file__).read_text(encoding="utf-8").encode()).hexdigest(),
+          "colour_mode":"neutral_clay" if args.clay else "embedded_material_base_colour",
+          "transparent_background":ARCHIVE_STYLE,"resolution":[SIZE,SIZE],
+          "view_transform":"Standard","look":"None","studio_light":"paint.sl","studio_light_intensity":1.0,
+          "notes":"Preview-only derivation from the unchanged GLBs. Studio shading of assigned material colours; not photographic textures or a full PBR render.",
+          "assets":records}
+(OUT / "render-record.json").write_text(json.dumps(record,indent=2)+"\n",encoding="utf-8",newline="\n")

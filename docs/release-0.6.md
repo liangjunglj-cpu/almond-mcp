@@ -1,6 +1,6 @@
 # Almond 0.6 release infrastructure
 
-Candidate pair: **almondbridge 0.6.0-rc.7** and **almond-mcp 0.6.0rc7**.
+Candidate pair: **almondbridge 0.6.0-rc.8** and **almond-mcp 0.6.0rc8**.
 Both are unpublished candidates. The Yak targets **Rhino 8.0 / Windows**;
 RhinoCommon remains pinned to 8.0.23304.9001. Plugin identity stays
 `c337dbb8-394a-4593-9c2b-a3d7cfc91893`. No Rhino update is required.
@@ -48,10 +48,10 @@ syncs a live MCP environment, installs into Rhino, or falls back to an old RHP.
 It runs the Python suite and real .NET HTTP-host integration tests, checks source
 records, builds/audits wheel and sdist, performs an isolated wheel installation
 and MCP smoke, builds a Windows Yak, and audits its allowlist and model hashes.
-It creates `dist/release-0.6.0rc7/` with:
+It creates `dist/release-0.6.0rc8/` with:
 
 - Python wheel and sdist.
-- `almondbridge-0.6.0-rc.7-rh8_0-win.yak`.
+- `almondbridge-0.6.0-rc.8-rh8_0-win.yak`.
 - Food4Rhino ZIP wrapper, listing text and quickstart guide.
 - JUnit test results, clean-install and Yak reports, and `SHA256SUMS.txt`.
 
@@ -95,12 +95,12 @@ claim this in-process smoke passed based only on the automated build report.
    exact revision. Retain artifacts and the successful Rhino smoke record.
 2. Publish the Python wheel/sdist to PyPI using the project's maintainer account
    (prefer PyPI Trusted Publishing for later CI automation). Verify the pinned
-   `uvx --from almond-mcp==0.6.0rc7 almond-mcp --version` on a clean machine.
+   `uvx --from almond-mcp==0.6.0rc8 almond-mcp --version` on a clean machine.
 3. Authenticate the maintainer's Yak account, then push the exact tested artifact:
 
    ```powershell
    & 'C:/Program Files/Rhino 8/System/Yak.exe' login
-   & 'C:/Program Files/Rhino 8/System/Yak.exe' push ./dist/release-0.6.0rc7/almondbridge-0.6.0-rc.7-rh8_0-win.yak
+   & 'C:/Program Files/Rhino 8/System/Yak.exe' push ./dist/release-0.6.0rc8/almondbridge-0.6.0-rc.8-rh8_0-win.yak
    & 'C:/Program Files/Rhino 8/System/Yak.exe' search --all --prerelease almondbridge
    ```
 
@@ -192,3 +192,15 @@ beam/frame and a mechanism, selected support points, self-weight on/off,
 fixed/pinned restraint, section override, missing-metric handling, mapped colours,
 worst-member selection, JSON export/cancel, edited geometry rejection and a
 second document. Native solver and WebView callback acceptance remains pending.
+
+## rc.8 material-colour thumbnails
+
+Regenerates all 47 model thumbnails from the unchanged GLBs using their embedded
+material base colours, transparent backgrounds and paint.sl studio lighting.
+The gallery stays lightweight: static PNGs, with the interactive viewer loaded
+only for an opened object. Preview derivation records link every PNG to its GLB
+and renderer settings; the library audit rejects stale previews. The Yak includes
+the record under archive/evidence/preview-render-record.json.
+
+No phototexturing is introduced. Neutral materials remain neutral. Geometry,
+material definitions, source passports, placement and Karamba code are unchanged.

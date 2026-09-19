@@ -136,6 +136,13 @@ def audit_library(library: Path) -> dict:
     """Offline release/install check; report every broken model, never download."""
     manifest = json.loads((library / "manifest.json").read_text(encoding="utf-8"))
     failures = []
+    render_path = library / "previews" / "render-record.json"
+    render_records = None
+    if render_path.is_file():
+        records = json.loads(render_path.read_text(encoding="utf-8"))["assets"]
+        render_records = {r["asset_id"]: r for r in records}
+        if len(records) != len(render_records) or set(render_records) != {a["asset_id"] for a in manifest["assets"]}:
+            failures.append({"asset_id":"preview-records", "error":"Preview record coverage mismatch"})
     ids = set()
     for asset in manifest["assets"]:
         asset_id = asset["asset_id"]
@@ -164,6 +171,12 @@ def audit_library(library: Path) -> dict:
             preview = library / "previews" / f"{asset_id}.png"
             if not preview.read_bytes().startswith(b"\x89PNG\r\n\x1a\n"):
                 raise ValueError("Preview is not PNG")
+            if render_records is not None:
+                render = render_records[asset_id]
+                if render["model_sha256"].upper() != model_hash:
+                    raise ValueError("Preview source model has changed")
+                if render["preview_sha256"] != hashlib.sha256(preview.read_bytes()).hexdigest():
+                    raise ValueError("Preview checksum mismatch")
         except (OSError, ValueError, KeyError) as exc:
             failures.append({"asset_id": asset_id, "error": str(exc)})
     return {"status": "error" if failures else "success",

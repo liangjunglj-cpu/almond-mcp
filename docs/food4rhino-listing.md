@@ -9,7 +9,7 @@ Use the Rhino Account that owns the existing app / Yak package.
 | Field | Prepared value |
 | --- | --- |
 | App name | Almond MCP |
-| Release | almondbridge 0.6.0-rc.7 / almond-mcp 0.6.0rc7 (prerelease) |
+| Release | almondbridge 0.6.0-rc.8 / almond-mcp 0.6.0rc8 (prerelease) |
 | Platform | Rhino 8 for Windows only |
 | GUID | c337dbb8-394a-4593-9c2b-a3d7cfc91893 |
 | Code licence | MIT |
@@ -64,9 +64,9 @@ Karamba3D. Karamba and downloaded community model files are not bundled.
 
 ## Downloads
 
-Primary file: `almondbridge-0.6.0-rc.7-rh8_0-win.yak`.
-Optional upload wrapper: `almondbridge-0.6.0-rc.7-food4rhino.zip` containing the
-same Yak and quickstart guide. Both are in `dist/release-0.6.0rc7/` after preparation.
+Primary file: `almondbridge-0.6.0-rc.8-rh8_0-win.yak`.
+Optional upload wrapper: `almondbridge-0.6.0-rc.8-food4rhino.zip` containing the
+same Yak and quickstart guide. Both are in `dist/release-0.6.0rc8/` after preparation.
 Use the current form's supported upload type; do not rename an extension.
 If the existing listing is linked to Yak, update the matching package rather
 than creating a duplicate app. The permanent GUID remains unchanged.
