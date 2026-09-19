@@ -1,0 +1,202 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-shower-enclosure-1",
+  "library_id": "generated_assets",
+  "name": "Shower enclosure (square, glass, low tray)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-shower-enclosure-1.glb",
+  "dimensions_mm": {
+    "width": 1035.2,
+    "depth": 1035.2,
+    "height": 2000.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -517.6,
+        -517.6,
+        0.0
+      ],
+      "max": [
+        517.6,
+        517.6,
+        2000.0
+      ]
+    },
+    "footprint": [
+      [
+        -517.6,
+        -517.6
+      ],
+      [
+        517.6,
+        -517.6
+      ],
+      [
+        517.6,
+        517.6
+      ],
+      [
+        -517.6,
+        517.6
+      ]
+    ],
+    "clearance_mm": {
+      "front": 700,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "fixed"
+  },
+  "materials": [
+    {
+      "material_id": "glass-clear",
+      "objects": [
+        "gen-shower-enclosure-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-shower-enclosure-1",
+    "library_id": "generated_assets",
+    "name": "Shower enclosure (square, glass, low tray)",
+    "category": "sanitary",
+    "tags": [
+      "shower",
+      "enclosure",
+      "cubicle",
+      "bathroom",
+      "sanitary",
+      "fixture"
+    ],
+    "dimensions_mm": {
+      "width": 1035.2,
+      "depth": 1035.2,
+      "height": 2000.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 900.0,
+      "depth": 900.0,
+      "height": 2000.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -517.6,
+          -517.6,
+          0.0
+        ],
+        "max": [
+          517.6,
+          517.6,
+          2000.0
+        ]
+      },
+      "footprint": [
+        [
+          -517.6,
+          -517.6
+        ],
+        [
+          517.6,
+          -517.6
+        ],
+        [
+          517.6,
+          517.6
+        ],
+        [
+          -517.6,
+          517.6
+        ]
+      ],
+      "clearance_mm": {
+        "front": 700,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "fixed"
+    },
+    "materials": [
+      {
+        "material_id": "glass-clear",
+        "objects": [
+          "gen-shower-enclosure-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "A square shower enclosure with a low white tray, two clear glass sides with slim chrome frame and a hinged glass door, wall-mounted shower head and mixer.",
+        "image_task_id": "01a09788-e678-710f-8a5a-72838507090a",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978e-e0ce-7335-a72e-c933cb1e0723",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 1111.111141
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "bathroom"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.15,
+      "triangle_count": 3870,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "E53E3C7219DE324827776A59D6C224411739F1317398085A4274075F9AA4645B"
+}

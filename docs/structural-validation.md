@@ -12,10 +12,26 @@ validate_structure(guids, structure_type, load_kn, material)
         ▼
 RhinoAlmondBridge.StructuralValidator
   1. resolve the Rhino objects, extract member axis segments (unit-scaled to meters)
-  2. detect span (max extent; defaults to 5.0 m when undeterminable)
+  2. detect span, type-aware (bridge >= 0.5.2; results carry span_basis):
+       beam/frame → longest single member ("member") — members run support
+                    to support, so a multi-bay set reads its bay span, not
+                    the building length
+       truss/shell/canopy/gridshell/membrane/highrise → overall bounding
+                    extent ("extent") — segments are shorter than the span
+                    they form
+       undeterminable → 5.0 m ("default")
   3. choose an analysis pathway, in strict order of confidence:
        api        → Karamba 3.1 solve via KarambaAdapter (real FEA)   confidence: high
        template   → audited capsule .ghx (karamba_*_v1)               confidence: medium
+                    karamba_frame_v1 and karamba_truss_v1 are harnessed and
+                    audited (2026-08-29; the truss capsule runs
+                    01_InputCurvesAsTruss.ghx, which node-merges input lines):
+                    frames that make the native solver throw now get a real
+                    Karamba solve through the template instead of falling to
+                    rule_based. Bridge >= 0.5.3 unit-scales bound geometry to
+                    the port's declared units and feeds the conditioned
+                    support nodes (declared anchors, else lowest-Z) into
+                    ALMOND_IN_SUPPORTS-style point ports.
        rule_based → heuristic UDL formulas                            confidence: low
   4. pass/fail checks (same criteria for every pathway)
   5. record the run in the state DB → export_structural_report renders Markdown
@@ -62,6 +78,27 @@ self-weight, with the self-weight delta scaling with member length); the
 solver returns Karamba's own topology-specific diagnostics (rigid-body
 modes); a defective model makes the native engine throw rather than answer;
 and the two pathways give different numbers for identical geometry.
+
+## Verified template pathway (2026-08-29, live, bridge 0.5.3)
+
+| Test geometry | Members | Pathway | Result | Key output |
+| --- | --- | --- | --- | --- |
+| Portal frame 8x4 m, 2 base points, via run_gh_definition | 3 | **capsule direct** | ok | disp 2.34 mm, mass 1413 kg, no rigid-body modes |
+| Connected 2-story 2-bay frame | 10 | **api** | PASS | connected frames solve on the api path (high confidence) |
+| Frame slice with offset girder axes (members not touching) | 14 | **template** | FAIL (honest) | api threw; capsule solved and reported 16 rigid-body modes — real Karamba diagnostics instead of a rule-based guess |
+| Connected 3-story 3-bay frame | 21 | rule_based | fallback | both paths hit Karamba's TRIAL limit; the template surfaced it explicitly (see below) |
+| Warren truss 6x0.9 m, 25 kN/node, via run_gh_definition (truss capsule) | 7 | **capsule direct** | ok | disp 5.0 mm (~L/1200), mass 310 kg; geometry auto-scaled mm→m by bridge 0.5.3; planar-truss rigid-mode warning matches the api diagnosis |
+| Same Warren truss via validate_structure | 7 | **api** | PASS | span 6.0 (extent basis), reactions 25.0 kN balancing the applied load |
+
+**Root cause of historical "AnalyzeThI failed" events:** the Karamba
+**trial version caps models at 20 beam elements**. The api path throws an
+opaque reflection error at the cap; the template path surfaces Karamba's
+own message ("The maximum number of beam elements in the trial-version of
+Karamba3D is 20"). Disconnected member axes (e.g. girder centerlines that
+don't touch column axes) are the other historical thrower — the template
+diagnoses those too, as rigid-body-mode warnings. With a licensed Karamba,
+both pathways scale past 20 elements. Practical rule: validate per span
+group / frame line and keep sets ≤ 20 elements on a trial license.
 
 ## Known gaps (issue #6)
 

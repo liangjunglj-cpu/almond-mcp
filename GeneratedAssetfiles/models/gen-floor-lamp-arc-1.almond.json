@@ -1,0 +1,203 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-floor-lamp-arc-1",
+  "library_id": "generated_assets",
+  "name": "Floor lamp (arc floor lamp on a marble base)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-floor-lamp-arc-1.glb",
+  "dimensions_mm": {
+    "width": 2179.7,
+    "depth": 621.1,
+    "height": 2400.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -1089.85,
+        -310.55,
+        0.0
+      ],
+      "max": [
+        1089.85,
+        310.55,
+        2400.0
+      ]
+    },
+    "footprint": [
+      [
+        -1089.85,
+        -310.55
+      ],
+      [
+        1089.85,
+        -310.55
+      ],
+      [
+        1089.85,
+        310.55
+      ],
+      [
+        -1089.85,
+        310.55
+      ]
+    ],
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "accessory"
+  },
+  "materials": [
+    {
+      "material_id": "steel-galvanized",
+      "objects": [
+        "gen-floor-lamp-arc-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-floor-lamp-arc-1",
+    "library_id": "generated_assets",
+    "name": "Floor lamp (arc floor lamp on a marble base)",
+    "category": "lighting",
+    "tags": [
+      "floor lamp",
+      "arc lamp",
+      "lighting",
+      "marble",
+      "italian"
+    ],
+    "dimensions_mm": {
+      "width": 2179.7,
+      "depth": 621.1,
+      "height": 2400.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 2200.0,
+      "depth": 400.0,
+      "height": 2400.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -1089.85,
+          -310.55,
+          0.0
+        ],
+        "max": [
+          1089.85,
+          310.55,
+          2400.0
+        ]
+      },
+      "footprint": [
+        [
+          -1089.85,
+          -310.55
+        ],
+        [
+          1089.85,
+          -310.55
+        ],
+        [
+          1089.85,
+          310.55
+        ],
+        [
+          -1089.85,
+          310.55
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "accessory"
+    },
+    "materials": [
+      {
+        "material_id": "steel-galvanized",
+        "objects": [
+          "gen-floor-lamp-arc-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "An arc floor lamp with a heavy rectangular white marble block base, a long slender stainless steel stem that rises and arcs far outward, ending in a perforated polished aluminium dome shade hanging over the floor, 1960s Italian design, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa91-e41b-7350-bea3-c9dcefe96f1e",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 1200.0
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "interior"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.553,
+      "triangle_count": 4271,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product.",
+        "Measured width/depth differs from the prompt target by more than 25%."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "08B6118DE5E33C98ED5C6996A6F8CAB830B95B8240347F3E73D67A0B7833BFDD"
+}

@@ -1,0 +1,202 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-car-sedan-1",
+  "library_id": "generated_assets",
+  "name": "Car (generic mid-size sedan)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-car-sedan-1.glb",
+  "dimensions_mm": {
+    "width": 2056.6,
+    "depth": 5050.3,
+    "height": 1450.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "ground",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -1028.3,
+        -2525.15,
+        0.0
+      ],
+      "max": [
+        1028.3,
+        2525.15,
+        1450.0
+      ]
+    },
+    "footprint": [
+      [
+        -1028.3,
+        -2525.15
+      ],
+      [
+        1028.3,
+        -2525.15
+      ],
+      [
+        1028.3,
+        2525.15
+      ],
+      [
+        -1028.3,
+        2525.15
+      ]
+    ],
+    "clearance_mm": {
+      "front": 1000,
+      "back": 1000,
+      "left": 600,
+      "right": 600
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "movable"
+  },
+  "materials": [
+    {
+      "material_id": "steel-painted-charcoal",
+      "objects": [
+        "gen-car-sedan-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-car-sedan-1",
+    "library_id": "generated_assets",
+    "name": "Car (generic mid-size sedan)",
+    "category": "vehicle",
+    "tags": [
+      "car",
+      "vehicle",
+      "sedan",
+      "parking",
+      "site",
+      "entourage"
+    ],
+    "dimensions_mm": {
+      "width": 2056.6,
+      "depth": 5050.3,
+      "height": 1450.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 1800.0,
+      "depth": 4600.0,
+      "height": 1450.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "ground",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -1028.3,
+          -2525.15,
+          0.0
+        ],
+        "max": [
+          1028.3,
+          2525.15,
+          1450.0
+        ]
+      },
+      "footprint": [
+        [
+          -1028.3,
+          -2525.15
+        ],
+        [
+          1028.3,
+          -2525.15
+        ],
+        [
+          1028.3,
+          2525.15
+        ],
+        [
+          -1028.3,
+          2525.15
+        ]
+      ],
+      "clearance_mm": {
+        "front": 1000,
+        "back": 1000,
+        "left": 600,
+        "right": 600
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "movable"
+    },
+    "materials": [
+      {
+        "material_id": "steel-painted-charcoal",
+        "objects": [
+          "gen-car-sedan-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "A generic modern mid-size four-door sedan car, no brand badges, plain matte grey body, wheels touching the ground.",
+        "image_task_id": "01a09787-f336-72a4-8574-307a3c02979f",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978d-bbcd-726c-9c1c-d5c85d139dc7",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": "rotated_90_about_vertical",
+        "scale_applied": 999.999967
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "streetscape"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "site_plan",
+        "elevation",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.143,
+      "triangle_count": 4198,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "10E9753DDA82F4AB66B81C0C002495D07A77918B4CD39EEBCC79F3CD8B8D2936"
+}

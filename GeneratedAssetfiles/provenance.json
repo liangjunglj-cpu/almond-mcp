@@ -1,0 +1,678 @@
+{
+  "library_id": "generated_assets",
+  "assets": {
+    "gen-person-standing-1": {
+      "image_task_id": "01a09787-a448-7360-939a-ab919d08398e",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978d-653f-734a-8edf-ce2ffc1bda07",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-person-walking-1": {
+      "image_task_id": "01a09787-b24a-7035-9f02-e9e209cc99e3",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978d-73c0-710c-9a02-fdb87841247f",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-person-sitting-1": {
+      "image_task_id": "01a09787-bec7-77ba-bc26-f0c50c9def2a",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978d-8188-779f-ae9f-bf62075e5983",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-tree-deciduous-medium-1": {
+      "image_task_id": "01a097aa-ecbb-76f3-92c4-f075fd9374d1",
+      "image_model": "nano-banana-pro",
+      "mesh_task_id": "01a097ad-8b27-7101-9f6f-dfaffbe34d12",
+      "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+      "generated_at": "2026-09-13",
+      "supersedes": {
+        "image_task_id": "see git history",
+        "reason": "first pass (meshy-t2) foliage too blobby"
+      }
+    },
+    "gen-tree-conifer-1": {
+      "image_task_id": "01a097aa-f72a-71a9-b906-e9eecce976c0",
+      "image_model": "nano-banana-pro",
+      "mesh_task_id": "01a097ad-99ec-7424-8b6b-17b218a4c717",
+      "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+      "generated_at": "2026-09-13",
+      "supersedes": {
+        "image_task_id": "see git history",
+        "reason": "first pass (meshy-t2) foliage too blobby"
+      }
+    },
+    "gen-car-sedan-1": {
+      "image_task_id": "01a09787-f336-72a4-8574-307a3c02979f",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978d-bbcd-726c-9c1c-d5c85d139dc7",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-bicycle-1": {
+      "image_task_id": "01a09788-0028-73c1-b138-5be23b86a987",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978d-c97d-77f6-a39b-31bb45348599",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-park-bench-1": {
+      "image_task_id": "01a09788-0f5c-7679-ad0c-e716a5c3c118",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978d-e43a-708f-be6d-e8de89fde6f9",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-street-lamp-1": {
+      "image_task_id": "01a09788-1b92-70f7-9723-f979b9bd5d8f",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978d-f18b-75a9-841a-5f4713d5d66f",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-bollard-1": {
+      "image_task_id": "01a09788-29cb-7622-915a-8f9095238de7",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978d-fee4-72c7-9cc1-f2bbf76bb25b",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-bike-rack-1": {
+      "image_task_id": "01a09788-35cb-70ce-aabe-731f4ae38e2e",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978e-0b68-73de-83cd-43a250b2dbc2",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-litter-bin-1": {
+      "image_task_id": "01a09788-425a-7555-99e9-3ffc46471c5b",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978e-1a0e-7798-b364-8d700fccf022",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-column-round-1": {
+      "image_task_id": "01a09788-95fb-758f-891c-de0ce066dad6",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978e-8ea9-7486-adee-fc9950ee7c89",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-column-square-1": {
+      "image_task_id": "01a09788-a362-736d-a43d-cf3cc88ce046",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978e-9c7d-7753-81ab-fa258d35eb88",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-balustrade-glass-1": {
+      "image_task_id": "01a09788-b03a-778e-bfd7-bfb576737cf3",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978e-aa4a-771f-ab26-dba2f725530e",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-toilet-1": {
+      "image_task_id": "01a09788-bf8b-74b2-be55-75e578e73068",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978e-b787-7347-afc4-29e5a6b44b90",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-washbasin-pedestal-1": {
+      "image_task_id": "01a09788-cd24-7133-b6bf-24be3b9e982d",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978e-c613-7771-a80e-de66c4d484d3",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-bathtub-1": {
+      "image_task_id": "01a09788-d970-7010-a926-a5bbfece1492",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978e-d36f-7288-892f-fbd07b26f425",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-shower-enclosure-1": {
+      "image_task_id": "01a09788-e678-710f-8a5a-72838507090a",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978e-e0ce-7335-a72e-c933cb1e0723",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-kitchen-range-1": {
+      "image_task_id": "01a09788-f46c-7507-8a37-d715e3da5091",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978e-ee7e-750c-91f6-c5e4724b3c6c",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-refrigerator-1": {
+      "image_task_id": "01a09789-01b0-7012-a2f8-f58cadfeb3f4",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978e-fc89-71c4-985b-8599687baf80",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-sofa-3-seat-1": {
+      "image_task_id": "01a09789-0ef6-754a-b0cd-e3f54dfe4a6e",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978f-0a4a-7263-b015-501f0fd70df6",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-dining-table-rect-1": {
+      "image_task_id": "01a09789-1dd2-747e-b428-a89dce8ca12d",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978f-1858-713a-992e-8b1f307a53a1",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-dining-chair-1": {
+      "image_task_id": "01a09789-2b97-72fd-8906-ed90e2d6402d",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978f-2694-77ef-92e9-19a4597946d2",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-bed-double-1": {
+      "image_task_id": "01a09789-3c20-75e3-98cb-9bc2f6445c39",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978f-3449-76fe-9462-d31daf954c53",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-desk-1": {
+      "image_task_id": "01a09789-49cf-751a-91c2-e35703aadf86",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978f-411c-776c-b0dd-45ba52352c11",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-office-chair-1": {
+      "image_task_id": "01a09789-5785-7773-8dcc-ed507a95c80a",
+      "image_model": "nano-banana",
+      "generated_at": "2026-09-12",
+      "mesh_task_id": "01a0978f-4e8d-707c-a258-c9b3897bfcad",
+      "mesh_model": "meshy-t2 smart-topology (untextured)"
+    },
+    "gen-stool-bent-birch-3leg-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "38c416c0-6cda-4997-a11f-3f943433f1bf",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130155_38c416c0-6cda-4997-a11f-3f943433f1bf.png",
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa90-d6d6-738a-bbbd-8a010748356c",
+      "mesh_model": "meshy-t2 smart-topology (untextured)",
+      "mesh_provider": "meshy"
+    },
+    "gen-lounge-chair-bent-plywood-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "a06b9eba-bd31-4b55-8e95-bb1c948be748",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130155_a06b9eba-bd31-4b55-8e95-bb1c948be748.png",
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa90-e5e2-7691-95e9-74574f2c643d",
+      "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+      "mesh_provider": "meshy"
+    },
+    "gen-tea-trolley-bent-birch-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "e52e2554-1c6d-4934-8530-5dec0a5cfc18",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130223_e52e2554-1c6d-4934-8530-5dec0a5cfc18.png",
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa90-f4d7-7161-b2ce-917ab0a4412c",
+      "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+      "mesh_provider": "meshy"
+    },
+    "gen-dining-table-round-birch-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "e846e622-3e25-4311-a535-bcfaafe84fbf",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130155_e846e622-3e25-4311-a535-bcfaafe84fbf.png",
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa91-03c7-7285-b20e-1b5ac1132a27",
+      "mesh_model": "meshy-t2 smart-topology (untextured)",
+      "mesh_provider": "meshy"
+    },
+    "gen-armchair-bent-birch-webbed-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "845f0055-de6b-4052-8a58-b82168c8caef",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130155_845f0055-de6b-4052-8a58-b82168c8caef.png",
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa91-1266-74dc-bbcb-55739329bcf8",
+      "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+      "mesh_provider": "meshy"
+    },
+    "gen-lounge-chair-molded-plywood-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "1bf40e69-0c3e-4c59-9980-7081e4de0cd7",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130156_1bf40e69-0c3e-4c59-9980-7081e4de0cd7.png",
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa91-1d40-7618-b8d3-e353a136748f",
+      "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+      "mesh_provider": "meshy"
+    },
+    "gen-side-chair-shell-wire-base-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "176a5471-bc89-4810-85f1-c6298bc82474",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130156_176a5471-bc89-4810-85f1-c6298bc82474.png",
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa91-2bb3-70e6-b947-8c7b42459e59",
+      "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+      "mesh_provider": "meshy"
+    },
+    "gen-lounge-chair-leather-plywood-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "96ffbed7-b3a9-4fd0-80e4-2203892d1579",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130156_96ffbed7-b3a9-4fd0-80e4-2203892d1579.png",
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa91-3b31-761a-bcc4-8ef82294e54f",
+      "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+      "mesh_provider": "meshy"
+    },
+    "gen-ottoman-leather-plywood-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "9ee68080-35d4-4726-9d51-6b136e9fdb32",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130155_9ee68080-35d4-4726-9d51-6b136e9fdb32.png",
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa91-49ea-7048-9c4c-58c716e6105c",
+      "mesh_model": "meshy-t2 smart-topology (untextured)",
+      "mesh_provider": "meshy"
+    },
+    "gen-coffee-table-freeform-glass-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "6e3f65ab-3d6f-4e85-a57c-78af69e49a97",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130155_6e3f65ab-3d6f-4e85-a57c-78af69e49a97.png",
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa91-591a-7750-88c8-0977b4dafd51",
+      "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+      "mesh_provider": "meshy"
+    },
+    "gen-bench-slatted-platform-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "fdb8a13f-6a48-4d6c-b4ca-1b6cdcf1e42b",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130156_fdb8a13f-6a48-4d6c-b4ca-1b6cdcf1e42b.png",
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa91-6772-760d-9c3c-a799506e6a09",
+      "mesh_model": "meshy-t2 smart-topology (untextured)",
+      "mesh_provider": "meshy"
+    },
+    "gen-pendant-lamp-sphere-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "289186b1-08c4-45be-92d0-888ea36956fc",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130155_289186b1-08c4-45be-92d0-888ea36956fc.png",
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa91-75ea-76ce-b117-2d68dd0efc3f",
+      "mesh_model": "meshy-t2 smart-topology (untextured)",
+      "mesh_provider": "meshy"
+    },
+    "gen-task-chair-mesh-ergonomic-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "6a5646d9-2e30-4392-ae0c-2a263434fb08",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130209_6a5646d9-2e30-4392-ae0c-2a263434fb08.png",
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa91-851f-7501-a0c8-9d5e9a7267e5",
+      "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+      "mesh_provider": "meshy"
+    },
+    "gen-armchair-cantilever-bentwood-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "981e3ff2-9022-43a9-a659-63be2f57d3cd",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130209_981e3ff2-9022-43a9-a659-63be2f57d3cd.png",
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa91-a9c8-71fd-bffd-5ac11306c735",
+      "mesh_model": "meshy-t2 smart-topology (untextured)",
+      "mesh_provider": "meshy"
+    },
+    "gen-sofa-2-seat-loose-cover-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "1ac90e4a-3ffc-4be5-9921-6b289294b6f6",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130209_1ac90e4a-3ffc-4be5-9921-6b289294b6f6.png",
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa91-b517-743a-8a06-09e099492995",
+      "mesh_model": "meshy-t2 smart-topology (untextured)",
+      "mesh_provider": "meshy"
+    },
+    "gen-shelving-cube-2x4-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "044fa7b2-ce46-4841-9088-272c4c08de09",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130209_044fa7b2-ce46-4841-9088-272c4c08de09.png",
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa91-c5d7-73c0-85d6-054ce86965ff",
+      "mesh_model": "meshy-t2 smart-topology (untextured)",
+      "mesh_provider": "meshy"
+    },
+    "gen-shelving-modular-track-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "b0f5d87b-2a6c-4cf8-b1b5-e69d47048959",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130209_b0f5d87b-2a6c-4cf8-b1b5-e69d47048959.png",
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa91-d506-742f-969d-309284858542",
+      "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+      "mesh_provider": "meshy"
+    },
+    "gen-floor-lamp-arc-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "78879a5e-4099-4b02-8366-2071d63054be",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130209_78879a5e-4099-4b02-8366-2071d63054be.png",
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa91-e41b-7350-bea3-c9dcefe96f1e",
+      "mesh_model": "meshy-t2 smart-topology (untextured)",
+      "mesh_provider": "meshy"
+    },
+    "gen-task-lamp-balanced-arm-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "a4941f59-8e5d-4c56-98b5-d51a863153b9",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130209_a4941f59-8e5d-4c56-98b5-d51a863153b9.png",
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa92-2a21-71f4-9798-7d07610f78ef",
+      "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+      "mesh_provider": "meshy"
+    },
+    "gen-side-table-wire-1": {
+      "image_provider": "higgsfield",
+      "image_model": "nano_banana",
+      "image_job_id": "91d5c06c-6c11-43f7-9437-e92cb03389f6",
+      "image_url": "https://d8j0ntlcm91z4.cloudfront.net/user_3HV5cA6PON4KDpuZNIQXtFQGJf0/hf_20260916_130209_91d5c06c-6c11-43f7-9437-e92cb03389f6.png",
+      "generated_at": "2026-09-16",
+      "mesh_task_id": "01a0aa92-37e0-71b6-9452-48d949d658dd",
+      "mesh_model": "meshy-t2 smart-topology (untextured)",
+      "mesh_provider": "meshy"
+    },
+    "gen-weathered-boulder-1": {
+      "image_provider": "meshy",
+      "image_task_id": "01a0ba79-11c2-74a1-bafd-23b60c640fb8",
+      "image_model": "nano-banana-pro",
+      "mesh_provider": "meshy",
+      "mesh_task_id": "01a0ba7a-5241-73de-8d55-68f049cb5405",
+      "mesh_model": "meshy-7.1",
+      "generated_at": "2026-09-19",
+      "captured_generation": {
+        "batch_id": "organic-2026-09",
+        "image": {
+          "asset_id": "gen-weathered-boulder-1",
+          "endpoint": "/openapi/v1/text-to-image",
+          "submitted_at": "2026-09-19T16:21:32.709470+00:00",
+          "request": {
+            "ai_model": "nano-banana-pro",
+            "aspect_ratio": "1:1",
+            "generate_multi_view": false,
+            "prompt": "One realistic large irregular weathered limestone boulder, about 1 metre high and 1.7 metres wide, an asymmetrical rounded mass with layered erosion, shallow fissures, softened fractured edges and subtle surface pits. Broad natural resting underside, readable sculptural silhouette, substantial solid stone. Neutral landscaping object. No moss, no crystals, no pedestal, no surrounding pebbles, no ground plane. Entire object visible with generous margin, isolated on pure white, three-quarter view from slightly above, soft even studio lighting, detailed physical geometry, no text, no cast shadow."
+          },
+          "status": "SUCCEEDED",
+          "task_id": "01a0ba79-11c2-74a1-bafd-23b60c640fb8",
+          "output_file": "gen-weathered-boulder-1.png",
+          "output_sha256": "e47fb6b599abe6363963c3b103831c056775ca69e364e2789d31b77803458f17",
+          "finished_at": 1789834910324,
+          "seed": null,
+          "consumed_credits": 9,
+          "provider_created_at": 1789834891722,
+          "provider_started_at": 1789834891729
+        },
+        "mesh": {
+          "asset_id": "gen-weathered-boulder-1",
+          "endpoint": "/openapi/v1/image-to-3d",
+          "submitted_at": "2026-09-19T16:22:54.759996+00:00",
+          "request": {
+            "ai_model": "meshy-7.1",
+            "model_type": "standard",
+            "geometry_resolution": "4k",
+            "should_texture": false,
+            "should_remesh": false,
+            "image_enhancement": false,
+            "target_formats": [
+              "glb"
+            ],
+            "auto_size": false,
+            "input_task_id": "01a0ba79-11c2-74a1-bafd-23b60c640fb8"
+          },
+          "status": "SUCCEEDED",
+          "task_id": "01a0ba7a-5241-73de-8d55-68f049cb5405",
+          "output_file": "gen-weathered-boulder-1.glb",
+          "output_sha256": "6e062619e8ba3995053005fb65ca9cfe619ecf231e9cd355c6203e576bbfd234",
+          "finished_at": 1789835142765,
+          "seed": null,
+          "consumed_credits": 25,
+          "provider_created_at": 1789834974757,
+          "provider_started_at": 1789834974763
+        },
+        "derivation": {
+          "asset_id": "gen-weathered-boulder-1",
+          "source_sha256": "6e062619e8ba3995053005fb65ca9cfe619ecf231e9cd355c6203e576bbfd234",
+          "source_triangles": 662802,
+          "target_triangles": 80000,
+          "prepared_sha256": "ad937d83adc6a8d941024955ddb0bae427567240d6241b554bd7a2a08af071f4",
+          "software": "Blender 5.1.2",
+          "method": "Weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target; triangulate. Never subdivide to inflate counts.",
+          "weld_tolerance_source_units": 1.9017977714538573e-07,
+          "quality": {
+            "vertices": 40002,
+            "triangles": 80000,
+            "boundary_edges": 0,
+            "nonmanifold_edges_excluding_boundary": 0,
+            "zero_area_faces": 0,
+            "connected_components": 1,
+            "largest_component_vertices": 40002,
+            "nonfinite_coordinates": 0,
+            "self_intersections": "not_tested",
+            "use": "Visual entourage; not certified for fabrication or structural analysis",
+            "bounds_relative_change": [
+              2.1240279454494915e-05,
+              8.073495891418e-05,
+              0.0001962674559380534
+            ]
+          }
+        },
+        "input_image_file": "batches/organic-2026-09/gen-weathered-boulder-1.png",
+        "external_reference_status": "Original descriptive prompts; no external images or design references submitted.",
+        "external_reference_ids": [],
+        "dimension_basis": "Authored nominal height for architectural studies; width and depth measured after uniform normalization. Not a physical survey.",
+        "reference_review": "Reference image visually reviewed for neutral architectural use.",
+        "rights": "Generated for the Almond library using the owner-configured Meshy account; public pack distribution authorized by owner. CC BY 4.0. API balance verified; subscription contract not independently audited."
+      }
+    },
+    "gen-driftwood-1": {
+      "image_provider": "meshy",
+      "image_task_id": "01a0ba79-1273-71dc-b270-3aa5d518be5e",
+      "image_model": "nano-banana-pro",
+      "mesh_provider": "meshy",
+      "mesh_task_id": "01a0ba7a-5725-7567-ae8f-1616c4aecf80",
+      "mesh_model": "meshy-7.1",
+      "generated_at": "2026-09-19",
+      "captured_generation": {
+        "batch_id": "organic-2026-09",
+        "image": {
+          "asset_id": "gen-driftwood-1",
+          "endpoint": "/openapi/v1/text-to-image",
+          "submitted_at": "2026-09-19T16:21:32.885556+00:00",
+          "request": {
+            "ai_model": "nano-banana-pro",
+            "aspect_ratio": "1:1",
+            "generate_multi_view": false,
+            "prompt": "One realistic weathered driftwood log resting horizontally, about 1.6 metres long, with a naturally twisting trunk, three short broken branch stubs, deep flowing grain channels, eroded knots and irregular split ends. Substantial connected wood, gently curved silhouette, no thin twigs, no leaves, no roots spreading onto a ground plane. Neutral object for landscape and interior display studies. Entire log visible with generous margin, isolated on pure white, three-quarter view from slightly above, soft even studio lighting, crisp sculptural physical geometry, no text, no cast shadow."
+          },
+          "status": "SUCCEEDED",
+          "task_id": "01a0ba79-1273-71dc-b270-3aa5d518be5e",
+          "output_file": "gen-driftwood-1.png",
+          "output_sha256": "14fae4a33eb47ad22fe47cb1492d2aa2607cf5ed4ac3ba77f678d7eaabf3be36",
+          "finished_at": 1789834916650,
+          "seed": null,
+          "consumed_credits": 9,
+          "provider_created_at": 1789834891902,
+          "provider_started_at": 1789834891910
+        },
+        "mesh": {
+          "asset_id": "gen-driftwood-1",
+          "endpoint": "/openapi/v1/image-to-3d",
+          "submitted_at": "2026-09-19T16:22:56.010640+00:00",
+          "request": {
+            "ai_model": "meshy-7.1",
+            "model_type": "standard",
+            "geometry_resolution": "4k",
+            "should_texture": false,
+            "should_remesh": false,
+            "image_enhancement": false,
+            "target_formats": [
+              "glb"
+            ],
+            "auto_size": false,
+            "input_task_id": "01a0ba79-1273-71dc-b270-3aa5d518be5e"
+          },
+          "status": "SUCCEEDED",
+          "task_id": "01a0ba7a-5725-7567-ae8f-1616c4aecf80",
+          "output_file": "gen-driftwood-1.glb",
+          "output_sha256": "3886c2be926ea7e7babd1f0f88774f46f3c21227589b765d36b3d2b2f5bd9ce9",
+          "finished_at": 1789835057614,
+          "seed": null,
+          "consumed_credits": 25,
+          "provider_created_at": 1789834975647,
+          "provider_started_at": 1789834975657
+        },
+        "derivation": {
+          "asset_id": "gen-driftwood-1",
+          "source_sha256": "3886c2be926ea7e7babd1f0f88774f46f3c21227589b765d36b3d2b2f5bd9ce9",
+          "source_triangles": 550090,
+          "target_triangles": 120000,
+          "prepared_sha256": "48fc482ce3e5f0bbb9dadb5268f6b966924a8d9637217efc77bb53330c84e3de",
+          "software": "Blender 5.1.2",
+          "method": "Weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target; triangulate. Never subdivide to inflate counts.",
+          "weld_tolerance_source_units": 1.9018785953521728e-07,
+          "quality": {
+            "vertices": 60002,
+            "triangles": 120000,
+            "boundary_edges": 0,
+            "nonmanifold_edges_excluding_boundary": 0,
+            "zero_area_faces": 0,
+            "connected_components": 1,
+            "largest_component_vertices": 60002,
+            "nonfinite_coordinates": 0,
+            "self_intersections": "not_tested",
+            "use": "Visual entourage; not certified for fabrication or structural analysis",
+            "bounds_relative_change": [
+              8.900525594840302e-06,
+              0.00012256649643177056,
+              0.00034433022702023963
+            ]
+          }
+        },
+        "input_image_file": "batches/organic-2026-09/gen-driftwood-1.png",
+        "external_reference_status": "Original descriptive prompts; no external images or design references submitted.",
+        "external_reference_ids": [],
+        "dimension_basis": "Authored nominal height for architectural studies; width and depth measured after uniform normalization. Not a physical survey.",
+        "reference_review": "Reference image visually reviewed for neutral architectural use.",
+        "rights": "Generated for the Almond library using the owner-configured Meshy account; public pack distribution authorized by owner. CC BY 4.0. API balance verified; subscription contract not independently audited."
+      }
+    },
+    "gen-folded-throw-1": {
+      "image_provider": "meshy",
+      "image_task_id": "01a0ba79-1327-7650-8b3f-b579a41bf87e",
+      "image_model": "nano-banana-pro",
+      "mesh_provider": "meshy",
+      "mesh_task_id": "01a0ba7a-5b3c-75e4-b117-88f5db00caec",
+      "mesh_model": "meshy-7.1",
+      "generated_at": "2026-09-19",
+      "captured_generation": {
+        "batch_id": "organic-2026-09",
+        "image": {
+          "asset_id": "gen-folded-throw-1",
+          "endpoint": "/openapi/v1/text-to-image",
+          "submitted_at": "2026-09-19T16:21:33.066538+00:00",
+          "request": {
+            "ai_model": "nano-banana-pro",
+            "aspect_ratio": "1:1",
+            "generate_multi_view": false,
+            "prompt": "One realistic plain linen throw blanket loosely folded into a low irregular stack, about 75 by 55 centimetres and 18 centimetres high, with several large soft cascading folds, rounded creases, a gently rumpled top and visible layered fabric edges. Natural weight and substantial cloth thickness. Unbranded neutral warm beige textile for architectural interiors. No tassels, no furniture, no person, no support stand, no ground plane. Entire object visible with margin, isolated on pure white, three-quarter view from slightly above, soft even studio lighting, physical folds rather than printed patterns, no text, no cast shadow."
+          },
+          "status": "SUCCEEDED",
+          "task_id": "01a0ba79-1327-7650-8b3f-b579a41bf87e",
+          "output_file": "gen-folded-throw-1.png",
+          "output_sha256": "4f6230fccc0b670f132ea702d1aaa41880214cf5257c420cc708ff2a7716f552",
+          "finished_at": 1789834909471,
+          "seed": null,
+          "consumed_credits": 9,
+          "provider_created_at": 1789834892086,
+          "provider_started_at": 1789834892094
+        },
+        "mesh": {
+          "asset_id": "gen-folded-throw-1",
+          "endpoint": "/openapi/v1/image-to-3d",
+          "submitted_at": "2026-09-19T16:22:57.057894+00:00",
+          "request": {
+            "ai_model": "meshy-7.1",
+            "model_type": "standard",
+            "geometry_resolution": "4k",
+            "should_texture": false,
+            "should_remesh": false,
+            "image_enhancement": false,
+            "target_formats": [
+              "glb"
+            ],
+            "auto_size": false,
+            "input_task_id": "01a0ba79-1327-7650-8b3f-b579a41bf87e"
+          },
+          "status": "SUCCEEDED",
+          "task_id": "01a0ba7a-5b3c-75e4-b117-88f5db00caec",
+          "output_file": "gen-folded-throw-1.glb",
+          "output_sha256": "3f60eda83261f80da04ebf204eb6ce9a7926e2c014495cc80b9a1831144d1c8e",
+          "finished_at": 1789835185342,
+          "seed": null,
+          "consumed_credits": 25,
+          "provider_created_at": 1789834976787,
+          "provider_started_at": 1789834976796
+        },
+        "derivation": {
+          "asset_id": "gen-folded-throw-1",
+          "source_sha256": "3f60eda83261f80da04ebf204eb6ce9a7926e2c014495cc80b9a1831144d1c8e",
+          "source_triangles": 330388,
+          "target_triangles": 100000,
+          "prepared_sha256": "54f4889d487a003a63666d5cadf14065c7e3ff10623a2bd8a02579289da09f8f",
+          "software": "Blender 5.1.2",
+          "method": "Weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target; triangulate. Never subdivide to inflate counts.",
+          "weld_tolerance_source_units": 1.9016218185424803e-07,
+          "quality": {
+            "vertices": 50002,
+            "triangles": 100000,
+            "boundary_edges": 0,
+            "nonmanifold_edges_excluding_boundary": 0,
+            "zero_area_faces": 0,
+            "connected_components": 1,
+            "largest_component_vertices": 50002,
+            "nonfinite_coordinates": 0,
+            "self_intersections": "not_tested",
+            "use": "Visual entourage; not certified for fabrication or structural analysis",
+            "bounds_relative_change": [
+              2.8084323180349e-05,
+              4.9347966877985946e-05,
+              0.00013677518705012528
+            ]
+          }
+        },
+        "input_image_file": "batches/organic-2026-09/gen-folded-throw-1.png",
+        "external_reference_status": "Original descriptive prompts; no external images or design references submitted.",
+        "external_reference_ids": [],
+        "dimension_basis": "Authored nominal height for architectural studies; width and depth measured after uniform normalization. Not a physical survey.",
+        "reference_review": "Reference image visually reviewed for neutral architectural use.",
+        "rights": "Generated for the Almond library using the owner-configured Meshy account; public pack distribution authorized by owner. CC BY 4.0. API balance verified; subscription contract not independently audited."
+      }
+    }
+  }
+}

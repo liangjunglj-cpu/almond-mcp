@@ -5,6 +5,7 @@ using System.Linq;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Rhino;
+using Rhino.Geometry;
 
 namespace RhinoAlmondBridge
 {
@@ -58,6 +59,19 @@ namespace RhinoAlmondBridge
                 Material = request.Material,
             };
 
+            try {
+                AnalysisSettings.Parse(new JObject {
+                    ["structure"]=request.StructureType.ToLowerInvariant(),["material"]=request.Material,
+                    ["load_kn"]=request.LoadKN,["self_weight"]=request.IncludeSelfWeight,
+                    ["fixed_rotations"]=request.FixedRotations,["explicit_supports"]=request.ExplicitSupports,
+                    ["diameter_mm"]=request.BeamDiameterMM,["wall_mm"]=request.BeamWallMM
+                }.ToString());
+            }
+            catch(Exception ex) { result.Status="error";result.Verdict=ex.Message;return result; }
+            // Optional settings are only implemented by the direct API pathway.
+            bool requireApi=request.RequireKaramba || !request.IncludeSelfWeight || !request.FixedRotations ||
+                request.ExplicitSupports || request.BeamDiameterMM.HasValue;
+
             var doc = RhinoDoc.ActiveDoc;
             if (doc == null)
             {
@@ -68,6 +82,20 @@ namespace RhinoAlmondBridge
 
             // 1. Condition the geometry (weld nodes, split members, classify).
             var conditioned = _conditioner.Condition(doc, request.Guids);
+            try
+            {
+            if (request.ExplicitSupports && conditioned.AnchorPoints.Count == 0)
+            {
+                result.Verdict = "Select Rhino point objects to declare supports.";
+                return result;
+            }
+            if (request.BeamDiameterMM.HasValue)
+            {
+                double toDoc = RhinoMath.UnitScale(UnitSystem.Millimeters, doc.ModelUnitSystem);
+                foreach (var beam in conditioned.Beams)
+                    beam.Section = new SectionSpec { Shape="circular_hollow", Source="user",
+                        Diameter=request.BeamDiameterMM.Value*toDoc, WallThickness=request.BeamWallMM.Value*toDoc };
+            }
             result.Warnings.AddRange(conditioned.Warnings);
 
             if (conditioned.Beams.Count == 0 && conditioned.Shells.Count == 0)
@@ -77,15 +105,35 @@ namespace RhinoAlmondBridge
                 return result;
             }
 
+            // Beam and frame members each run support to support, so their
+            // structural span is the longest single member - a multi-bay set
+            // must not read as one building-length span. Trusses, shells and
+            // the other assembly types genuinely span their overall extent
+            // (their segments are shorter than the span they form).
             double spanM = conditioned.MaxSpan * conditioned.UnitScaleToMeters;
-            if (spanM < 0.001) spanM = 5.0; // default 5 m when undeterminable
+            string spanBasis = "extent";
+            bool perMemberSpan =
+                string.Equals(request.StructureType, "beam", StringComparison.OrdinalIgnoreCase) ||
+                string.Equals(request.StructureType, "frame", StringComparison.OrdinalIgnoreCase);
+            if (perMemberSpan && conditioned.MaxMemberSpan > 0.001)
+            {
+                spanM = conditioned.MaxMemberSpan * conditioned.UnitScaleToMeters;
+                spanBasis = "member";
+            }
+            if (spanM < 0.001) { spanM = 5.0; spanBasis = "default"; } // 5 m when undeterminable
 
             // 2. Pathway A: direct Karamba 3.1 API.
             bool solved = TryApiPath(request, conditioned, result);
+            if (!solved && requireApi)
+            {
+                result.Status = "unavailable";
+                result.Verdict = "Karamba could not solve this setup. See the engine message; no estimate was substituted.";
+                return result;
+            }
 
             // 3. Pathway B: audited template capsule.
             if (!solved)
-                solved = TryTemplatePath(request, result);
+                solved = TryTemplatePath(request, conditioned, result);
 
             // 4. Pathway C: rule-based estimate. Never silent about it.
             if (!solved)
@@ -105,6 +153,15 @@ namespace RhinoAlmondBridge
             result.Results.DeflectionLimitMM = deflectionLimit;
             result.Results.YieldStressMPa = yieldStress;
             result.Results.SpanM = spanM;
+            result.Results.SpanBasis = spanBasis;
+            if (result.Results.AnalysisMethod == "api" &&
+                (!result.Results.DisplacementAvailable || !result.Results.UtilizationAvailable))
+            {
+                result.Status = "incomplete";
+                result.Passed = false;
+                result.Verdict = "Karamba returned incomplete metrics. Missing values cannot establish a pass.";
+                return result;
+            }
 
             var failures = new List<string>();
             var suggestions = new List<string>();
@@ -133,7 +190,7 @@ namespace RhinoAlmondBridge
 
             string prefix = MethodPrefix(result.Results.AnalysisMethod);
             result.Verdict = prefix + (result.Passed
-                ? $"PASSED: All structural checks OK. Deflection {result.Results.MaxDeflectionMM:F1}mm (limit {deflectionLimit:F1}mm), Utilization {result.Results.UtilizationRatio:F2}"
+                ? $"PASSED: Configured checks satisfied. Deflection {result.Results.MaxDeflectionMM:F1}mm (limit {deflectionLimit:F1}mm), Utilization {result.Results.UtilizationRatio:F2}"
                 : $"FAILED: {string.Join("; ", failures)}");
             result.Suggestions = suggestions;
 
@@ -146,6 +203,8 @@ namespace RhinoAlmondBridge
                 .ToList();
 
             return result;
+            }
+            finally { foreach(var b in conditioned.Beams)b.Axis.Dispose();foreach(var s in conditioned.Shells)s.Mesh.Dispose(); }
         }
 
         private static string MethodPrefix(string analysisMethod)
@@ -172,6 +231,8 @@ namespace RhinoAlmondBridge
                 Conditioned = conditioned,
                 MaterialName = request.Material,
                 ImposedLoadKN = request.LoadKN,
+                IncludeSelfWeight = request.IncludeSelfWeight,
+                FixedRotations = request.FixedRotations,
             };
 
             KarambaResults karamba;
@@ -203,6 +264,10 @@ namespace RhinoAlmondBridge
                 MaxStressMPa = karamba.MaxStressMPa,
                 ReactionsKN = karamba.ReactionsKN,
                 AnalysisMethod = "api",
+                DisplacementAvailable = karamba.DisplacementAvailable,
+                UtilizationAvailable = karamba.UtilizationAvailable,
+                SupportPointsM = karamba.SupportPointsM,
+                LoadedPointsM = karamba.LoadedPointsM,
                 PerElementUtilization = karamba.PerElementUtilization
                     .Select(u => new PerElementUtilizationEntry
                     {
@@ -217,7 +282,47 @@ namespace RhinoAlmondBridge
 
         // ── Pathway B: audited capsule template ─────────────────────────────
 
-        private bool TryTemplatePath(ValidationRequest request, ValidationResult result)
+        /// <summary>Support node positions in document units: declared anchor
+        /// points when present, else the lowest-Z member endpoints (the same
+        /// convention the api pathway uses for auto-pinning).</summary>
+        private static List<Point3d> CollectSupportPoints(ConditionedModel conditioned)
+        {
+            if (conditioned.AnchorPoints.Count > 0)
+                return new List<Point3d>(conditioned.AnchorPoints);
+
+            var pts = new List<Point3d>();
+            foreach (var b in conditioned.Beams)
+            {
+                pts.Add(b.Axis.PointAtStart);
+                pts.Add(b.Axis.PointAtEnd);
+            }
+            if (pts.Count == 0) return pts;
+
+            double minZ = pts.Min(p => p.Z);
+            double tol = Math.Max(conditioned.Tolerance * 10.0, 1e-6);
+            var basePts = new List<Point3d>();
+            foreach (var p in pts.Where(p => p.Z - minZ <= tol))
+            {
+                if (!basePts.Any(q => q.DistanceTo(p) <= tol))
+                    basePts.Add(p);
+            }
+            return basePts;
+        }
+
+        /// <summary>Doc-units → port-units factor for the template inputs.</summary>
+        private static double SupportUnitScale(ConditionedModel conditioned, string units)
+        {
+            switch ((units ?? "m").Trim().ToLowerInvariant())
+            {
+                case "m": return conditioned.UnitScaleToMeters;
+                case "cm": return conditioned.UnitScaleToMeters * 100.0;
+                case "mm": return conditioned.UnitScaleToMeters * 1000.0;
+                default: return conditioned.UnitScaleToMeters;
+            }
+        }
+
+        private bool TryTemplatePath(ValidationRequest request,
+            ConditionedModel conditioned, ValidationResult result)
         {
             var runner = new GhDefinitionRunner(_templateDir, _capsuleDir);
 
@@ -252,7 +357,17 @@ namespace RhinoAlmondBridge
                 string baseType = (port.Type ?? "").Replace("[]", "");
                 string nameUpper = (port.Name ?? "").ToUpperInvariant();
 
-                if (baseType == "curve" || baseType == "mesh" ||
+                if (baseType == "point" &&
+                    (nameUpper.Contains("SUPPORT") || nameUpper.Contains("ANCHOR")))
+                {
+                    // Feed the conditioned support nodes (declared anchors, or
+                    // the auto-pinned lowest-Z nodes) in the port's units.
+                    double s = SupportUnitScale(conditioned, port.Units);
+                    var basePts = CollectSupportPoints(conditioned);
+                    inputs[port.Name] = new JArray(basePts.Select(p =>
+                        new JArray(p.X * s, p.Y * s, p.Z * s)));
+                }
+                else if (baseType == "curve" || baseType == "mesh" ||
                     baseType == "brep" || baseType == "point")
                 {
                     inputs[port.Name] = new JObject
@@ -481,6 +596,18 @@ namespace RhinoAlmondBridge
 
         [JsonProperty("material")]
         public string Material { get; set; } = "Steel";
+        [JsonProperty("require_karamba")]
+        public bool RequireKaramba { get; set; }
+        [JsonProperty("self_weight")]
+        public bool IncludeSelfWeight { get; set; } = true;
+        [JsonProperty("fixed_rotations")]
+        public bool FixedRotations { get; set; } = true;
+        [JsonProperty("explicit_supports")]
+        public bool ExplicitSupports { get; set; }
+        [JsonProperty("beam_diameter_mm")]
+        public double? BeamDiameterMM { get; set; }
+        [JsonProperty("beam_wall_mm")]
+        public double? BeamWallMM { get; set; }
     }
 
     public class ValidationResult
@@ -524,6 +651,14 @@ namespace RhinoAlmondBridge
     {
         [JsonProperty("max_deflection_mm")]
         public double MaxDeflectionMM { get; set; }
+        [JsonProperty("displacement_available")]
+        public bool DisplacementAvailable { get; set; }
+        [JsonProperty("utilization_available")]
+        public bool UtilizationAvailable { get; set; }
+        [JsonProperty("support_points_m")]
+        public List<double[]> SupportPointsM { get; set; } = new List<double[]>();
+        [JsonProperty("loaded_points_m")]
+        public List<double[]> LoadedPointsM { get; set; } = new List<double[]>();
 
         [JsonProperty("deflection_limit_mm")]
         public double DeflectionLimitMM { get; set; }
@@ -539,6 +674,12 @@ namespace RhinoAlmondBridge
 
         [JsonProperty("span_m")]
         public double SpanM { get; set; }
+
+        /// <summary>How span_m was determined: "member" (longest single
+        /// member; beam/frame), "extent" (overall bounding extent; truss,
+        /// shell and other assembly types), or "default" (5 m fallback).</summary>
+        [JsonProperty("span_basis")]
+        public string SpanBasis { get; set; } = "extent";
 
         [JsonProperty("analysis_method")]
         public string AnalysisMethod { get; set; } = "rule_based";

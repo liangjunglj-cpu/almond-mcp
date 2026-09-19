@@ -18,6 +18,10 @@ IkeaFurniturefiles/models/
 DrawingAssetfiles/models/
 DiagramAssetfiles/models/
 
+# Raw Meshy downloads before normalisation; the normalised
+# GeneratedAssetfiles/models/ ARE tracked (CC BY 4.0, ours to ship).
+GeneratedAssetfiles/raw/
+
 # Grasshopper example library (Karamba/Kangaroo examples, not redistributable)
 Grasshopperfiles/
 
@@ -28,4 +32,7 @@ Grasshopperfiles/
 # .NET build output
 bin/
 obj/
+
+# Superseded local drawing pilot previews (never packaged)
+.drafting-dev-archive-*/
 

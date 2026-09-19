@@ -25,9 +25,9 @@ namespace RhinoAlmondBridge
 
         public FurnitureAssetManager(
             string libraryRoot,
-            string layerPath = "IKEA Furniture",
-            string blockPrefix = "IKEA",
-            string assetType = "ikea_furniture",
+            string layerPath = "ALMOND-ASSETS",
+            string blockPrefix = "ALMOND",
+            string assetType = "library_asset",
             string displayName = "furniture",
             IEnumerable<string> allowedExtensions = null)
         {

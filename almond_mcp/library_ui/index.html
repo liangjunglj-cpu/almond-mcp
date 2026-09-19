@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#efeee8">
+  <title>Almond — Models &amp; Karamba</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/style.css">
+  <link rel="stylesheet" href="/panel.css">
+  <script src="/panel-theme.js"></script>
+  <script type="module" src="/vendor/model-viewer.min.js"></script>
+  <script type="module" src="/app.js"></script>
+  <script type="module" src="/karamba.js"></script>
+  <script type="module" src="/karamba-help.js"></script>
+</head>
+<body>
+<a class="skip" href="#collection">Skip to collection</a>
+<header class="masthead">
+  <a class="wordmark" href="#home" aria-label="Almond home"><span class="brand-mark" aria-hidden="true">a</span>almond<span class="wordmark-dot">↗</span></a>
+  <div class="mast-label">OBJECT ARCHIVE<br>MODELS & DRAWING ELEMENTS</div>
+  <nav aria-label="Main"><a href="#library" data-page="library">Models</a><a href="#karamba" data-page="karamba">Karamba</a></nav>
+  <div class="panel-tools" hidden><a id="panel-browser" href="/" target="_blank" rel="noopener" title="Open in browser" aria-label="Open in browser">↗</a><button id="panel-reload" type="button" title="Reload Almond" aria-label="Reload Almond">↻</button></div>
+  <span class="local-label"><i></i> LOCAL COLLECTION</span>
+</header>
+<main>
+<section id="home-page" class="workbench-home">
+  <p class="eyebrow">ALMOND / WORKSPACE</p><h1>Make.<br>Understand.</h1>
+  <p class="home-intro">Models for your scene.<br>Analysis for your structure.</p>
+  <a class="workspace-card" href="#library"><span class="workspace-number">01</span>
+    <svg viewBox="0 0 240 100" aria-hidden="true"><path d="M50 70V32l40-20 40 20v38L90 90Zm0-38 40 20 40-20M90 52v38" fill="none" stroke="currentColor" stroke-width="2"/><path d="M155 75V50l28-14 28 14v25l-28 14Zm0-25 28 14 28-14M183 64v25" fill="none" stroke="#e94329" stroke-width="2"/></svg>
+    <span class="workspace-title">Models <span>↗</span></span><span class="workspace-copy">Browse, inspect and drag into Rhino.</span><span id="home-model-count" class="workspace-meta">MODELS · LINKED DRAWINGS · SOURCE RECORDS</span>
+  </a>
+  <a class="workspace-card" href="#karamba"><span class="workspace-number">02</span>
+    <svg viewBox="0 0 240 100" aria-hidden="true"><path d="M55 83V30h130v53M55 30l130 53M185 30 55 83" fill="none" stroke="currentColor" stroke-width="2"/><path d="M90 5v20m-4-5 4 5 4-5M150 5v20m-4-5 4 5 4-5" fill="none" stroke="#e94329" stroke-width="2"/><path d="M48 88h14M178 88h14" stroke="#237963" stroke-width="5"/></svg>
+    <span class="workspace-title">Karamba Validation <span>↗</span></span><span class="workspace-copy">Set up, analyse and read the response.</span><span class="workspace-meta">SUPPORTS · LOADS · RESULTS</span>
+  </a>
+  <div class="workspace-links"><a href="#sources">Sources ↗</a><a href="#about">About Almond ↗</a></div>
+</section>
+<section id="karamba-page" class="analysis-page" hidden>
+  <p class="eyebrow">02 / STRUCTURAL WORKSPACE</p><h1>Karamba <br>Validation<span class="red">.</span></h1>
+  <div class="engine-line"><span id="engine-state">Engine not checked</span><button type="button" data-analysis="status">Check engine ↗</button></div>
+  <p id="analysis-native-note" class="analysis-note">Open <strong>AlmondKaramba</strong> in Rhino to connect this workspace to your geometry.</p>
+  <form id="analysis-form">
+    <section class="analysis-step"><h2><span>01</span> Select the structure</h2>
+      <p>Use member axes, shell surfaces or meshes. Include point objects for declared supports.</p>
+      <button class="analysis-button" type="button" data-analysis="capture">Use Rhino selection ↗</button>
+      <p id="selection-summary" class="analysis-meta">No geometry captured.</p>
+    </section>
+    <fieldset id="analysis-settings"><legend class="sr-only">Analysis settings</legend>
+      <section class="analysis-step"><h2><span>02</span> Define the setup</h2>
+        <div class="analysis-fields"><label>Structure<select id="analysis-type"><option value="frame">Frame</option><option value="beam">Beam</option><option value="truss">Truss assembly</option><option value="shell">Shell</option></select></label>
+        <label>Material<select id="analysis-material"><option value="Steel">Steel / S235</option><option value="S355">Steel / S355</option><option value="Concrete">Concrete / C30/37</option><option value="Wood">Wood / C24</option><option value="Aluminium">Aluminium</option></select></label></div>
+        <label>Total imposed load <span class="unit-label">kN / downward −Z</span><input id="analysis-load" type="number" min="0" max="100000" step="any" value="10" required></label>
+        <p class="field-help">Split across free nodes. If all nodes are supported, the imposed load acts on all nodes.</p>
+        <label class="analysis-toggle"><input id="self-weight" type="checkbox" checked><span>Include self-weight</span></label>
+        <div class="analysis-fields"><label>Support locations<select id="support-source"><option value="auto">Points, else lowest nodes</option><option value="points">Require selected points</option></select></label>
+        <label>Restraint<select id="support-restraint"><option value="fixed">Fixed</option><option value="pinned">Pinned</option></select></label></div>
+        <p class="field-help">Fixed restrains translation and rotation. Pinned restrains translation only.</p>
+        <label class="analysis-toggle"><input id="section-override" type="checkbox"><span>Override beam section / CHS</span></label>
+        <div id="section-fields" class="analysis-fields" hidden><label>Diameter / mm<input id="section-diameter" type="number" value="114.3" min="1" max="5000" step="any" required></label><label>Wall / mm<input id="section-wall" type="number" value="4" min="0.1" max="2499" step="any" required></label></div>
+        <details class="analysis-details"><summary>Section assumptions</summary><p id="section-summary">Sections are inferred where supported. Otherwise beams use CHS 114.3 × 4 mm and shells use 100 mm thickness.</p><p>Truss assemblies use beam elements in this workspace. Axial-only member releases are not applied.</p></details>
+      </section>
+    </fieldset>
+    <section class="analysis-step diagram-step"><h2><span>03</span> Read the model</h2>
+      <label class="diagram-view">View<select id="analysis-view" data-analysis-view><option value="axon">Axonometric</option><option value="front">Front</option><option value="top">Top</option></select></label>
+      <svg id="analysis-diagram" viewBox="0 0 320 240" role="img" aria-label="Structural model with toggled support, load and utilization overlays"></svg>
+      <p id="diagram-caption" class="analysis-meta"></p>
+      <div class="diagram-toggles"><label><input id="toggle-members" data-analysis-view type="checkbox" checked>Members</label><label><input id="toggle-supports" data-analysis-view type="checkbox" checked>Supports</label><label><input id="toggle-loads" data-analysis-view type="checkbox" checked>Loads</label><label><input id="toggle-utilization" data-analysis-view type="checkbox" disabled>Utilization</label></div>
+      <p id="diagram-load-note" class="field-help"></p>
+      <div id="result-legend" class="result-legend" hidden><span>≤80%</span><span>80–100%</span><span>&gt;100%</span><span>No data</span></div>
+      <p class="field-help">Colours show the maximum utilization mapped to each source member. Arrows show direction; lengths are symbolic. Up to 80 imposed-load symbols are shown. Self-weight acts throughout the model.</p>
+      <button class="analysis-button primary" type="submit" data-analysis="analyze">Run Karamba analysis ↗</button>
+      <p id="analysis-message" role="status" aria-live="polite"></p>
+    </section>
+  </form>
+  <section id="analysis-results" class="analysis-step" hidden><h2><span>04</span> Results</h2>
+    <p id="analysis-stale" class="analysis-note" hidden>Inputs changed — rerun required.</p>
+    <p id="analysis-method" class="analysis-meta"></p><h3 id="analysis-outcome"></h3>
+    <div class="metric-block"><span>Maximum deflection</span><strong id="deflection-value">—</strong><meter id="deflection-meter" min="0" max="2" low="0.8" high="1" optimum="0" value="0" aria-label="Deflection relative to limit"></meter><small id="deflection-basis"></small></div>
+    <div class="metric-block"><span>Maximum utilization</span><strong id="utilization-value">—</strong><meter id="utilization-meter" min="0" max="2" low="0.8" high="1" optimum="0" value="0" aria-label="Utilization relative to 100 percent"></meter><small>100% is the configured utilization threshold.</small></div>
+    <p class="field-help">Bars are capped visually at 200%; numerical values remain uncapped. Maximum deflection is shown numerically. A deformed shape is unavailable.</p>
+    <details class="analysis-details"><summary>Solver verdict &amp; suggestions</summary><p id="analysis-verdict"></p><ul id="analysis-suggestions"></ul></details>
+    <details class="analysis-details" open><summary>Warnings &amp; missing evidence</summary><ul id="analysis-warnings"></ul></details>
+    <div class="analysis-fields"><button type="button" class="analysis-button" data-analysis="highlight">Select worst members</button><button type="button" class="analysis-button" data-analysis="export">Save analysis JSON</button></div>
+    <p id="analysis-snapshot" class="analysis-meta"></p>
+  </section>
+  <details class="analysis-details"><summary>Method &amp; engine details</summary><p>First-order analysis of an idealised model. L/250 is an indicative deflection screen. This workspace does not establish full project-specific code compliance.</p><p id="engine-detail">Check the engine inside Rhino. Karamba installation and licensing are managed separately.</p><a href="https://manual.karamba3d.com/3-in-depth-component-reference/3.6-results/3.7.1-general-results/3.6.1-modelview" target="_blank" rel="noopener noreferrer">Karamba ModelView documentation ↗</a></details>
+</section>
+<section id="library-page" hidden>
+  <div class="hero">
+    <div><p class="eyebrow">A WORKING LIBRARY FOR ARCHITECTURE</p><h1>Objects, in<br> every dimension<span class="red">.</span></h1></div>
+    <div class="hero-aside"><div class="edition"><span>COLLECTION / 001</span><span id="edition-version">ALMOND</span></div><div class="hero-count" id="asset-count">—</div><div class="count-caption">OBJECTS. ONE PLACE.</div><p>From spatial models to the lines on a page.<br>Explore, draw, and trace every source.</p><a class="text-link" href="#collection">Explore the collection <span>↙</span></a></div>
+  </div>
+  <div class="collection-bar"><span><b id="model-count">—</b> MESHY MODELS</span><span><b id="element-count">—</b> DRAWING ELEMENTS</span><span><b id="view-count">—</b> ORTHOGRAPHIC VIEWS</span><span class="bar-note">3D / 2D / METADATA / PROVENANCE</span></div>
+  <section id="collection" aria-label="Object collection">
+    <div class="search-row"><label class="search-wrap"><span aria-hidden="true">⌕</span><input id="search" type="search" placeholder="Find an object, material, or drawing role…" aria-label="Search objects" autocomplete="off"><kbd>/</kbd></label><label class="sort-label">SORT BY<select id="sort" aria-label="Sort objects"><option value="curated">Curated order</option><option value="az">Name A–Z</option><option value="za">Name Z–A</option></select></label></div>
+    <div class="filter-row"><div class="filters" aria-label="Filter collection"><button class="active" data-filter="all" aria-pressed="true">All objects <span id="all-total"></span></button><button data-filter="model" aria-pressed="false">3D models</button><button data-filter="ready" aria-pressed="false">Drawing-ready</button><button data-filter="element" aria-pressed="false">Drawing elements</button><button data-filter="saved" aria-pressed="false">Saved <span id="saved-total">0</span></button></div><select id="category" aria-label="Filter by category"><option value="all">All categories</option></select></div>
+    <div class="results-line"><p id="result-count" role="status" aria-live="polite">Loading the archive…</p><span>SELECT AN OBJECT TO EXPLORE ↗</span></div>
+    <div id="placement-tools" class="placement-tools" hidden><span>Drag a thumbnail into Rhino</span><label>Detail <select id="placement-detail" aria-label="Placement detail"><option value="light">Light · 20k target</option><option value="original">Original</option></select></label></div>
+    <div class="preview-controls"><label>Preview <select id="preview-display" aria-label="Preview display mode"><option value="auto">Follow Rhino viewport</option><option value="material">Material colours</option><option value="rendered">Rendered</option><option value="ghosted">Ghosted</option><option value="arctic">Arctic</option><option value="shaded">Shaded</option></select></label><span id="preview-display-status" role="status"></span><details><summary aria-label="About preview display modes">?</summary><p>Previews approximate the display mode of the active Rhino viewport. Arctic uses white surfaces and soft shadows; Ghosted uses translucent surfaces; Shaded uses neutral surfaces; Rendered uses the model's material colours.</p><p>Scene lighting, backgrounds, edge settings, custom modes and ray tracing are not reproduced. Unsupported modes use material colours. Thumbnails use simplified styling while their 3D previews load. Placed objects use Rhino's actual display mode.</p></details></div>
+    <div id="grid" class="grid"></div>
+    <div id="empty" class="empty" hidden><span>Ø</span><h2>No objects found.</h2><p>Try a broader search or another category.</p><button id="reset-filters" class="solid-button">Reset filters ↗</button></div>
+    <div id="load-error" class="empty" hidden><h2>The archive could not load.</h2><p id="error-message"></p><button id="retry" class="solid-button">Try again ↗</button></div>
+  </section>
+  <aside class="archive-note"><span class="eyebrow">A MODEL IS ONLY THE BEGINNING.</span><p>Geometry, drawings, and the story behind them.<br>Open any object to see what is recorded.</p><a href="#sources">Explore source directories ↗</a></aside>
+</section>
+<section id="sources-page" class="secondary-page" hidden><p class="eyebrow">02 / REFERENCE DESK</p><h1>Know the<br>source<span class="red">.</span></h1><p class="page-intro">A directory for architectural details and drafting references. These are research leads; they are not recorded inputs to the existing Meshy models. Each object carries its own source history.</p><div id="source-list"></div><p class="footnote">Access and reuse vary by source. The directory links to external resources; their drawings are not bundled in this archive.</p></section>
+<section id="about-page" class="secondary-page" hidden><p class="eyebrow">03 / ABOUT THE ARCHIVE</p><h1>One object.<br>A connected record<span class="red">.</span></h1><div class="about-grid"><p class="page-intro">Almond brings generated 3D models, architectural drawing elements, and derived linework together. A stable object ID connects every representation to its dimensions, metadata, and source evidence.</p><div><h2>Built for a working practice.</h2><p>Search by name, category, tag, or drawing role. Rotate a model, inspect available plan and elevation silhouettes, then take a GLB, SVG, DXF, or A3 sheet into your workflow.</p><h2>Evidence stays with the object.</h2><p>Generated GLBs embed an Almond passport. Object records include generation prompts, task identifiers, measured bounds, and known evidence gaps. Reference directories remain separate from actual generation inputs.</p><h2>Local, and connected to MCP.</h2><p>The archive reads the canonical Almond libraries on this computer. Saved objects stay in this browser. The MCP repository search uses the same catalogue, and drawings remain linked to their source mesh.</p><p class="technical">Run <code>almond-mcp library --open</code> to open the archive. Restart the server after adding assets to the manifests.</p><h2>Representation has limits.</h2><p>Generated geometry is a design aid. Derived views are projected silhouettes; they do not establish construction assemblies, product specifications, or internal and hidden edges. Drawing elements may have estimated dimensions and separate source terms.</p><a href="/api/catalogue?download=1" download="almond-object-archive.json" class="solid-button">Download catalogue JSON ↙</a></div></div></section>
+</main>
+<footer><a class="footer-brand" href="#library">almond</a><span>AN ARCHIVE FOR MAKING SPACE.</span><span id="footer-version">OBJECT ARCHIVE</span><a href="#library">BACK TO COLLECTION ↑</a></footer>
+<dialog id="object-dialog" aria-labelledby="object-title"><div class="dialog-head"><span id="object-number" class="eyebrow"></span><button id="close-dialog" aria-label="Close object">CLOSE <span>×</span></button></div><div class="object-layout"><div class="object-visual"><div id="view-tabs" class="view-tabs" aria-label="Object representations"></div><p id="object-preview-status" class="small-note"></p><div id="viewer" class="viewer"></div><div class="viewer-bottom"><p id="viewer-caption" role="status"></p><label id="scale-wrap" hidden>DRAWING SCALE <select id="scale" aria-label="Drawing scale"><option value="50">1:50</option><option value="100">1:100</option></select></label></div></div><div class="object-info"><p id="object-kind" class="eyebrow"></p><h2 id="object-title"></h2><p id="object-variant"></p><div id="object-tags" class="tags"></div><div id="dimensions" class="dimensions"></div><p id="dimension-basis" class="small-note"></p><div id="downloads" class="downloads"></div><button id="save-object" class="save-object" aria-pressed="false">Save object +</button><div id="object-evidence"></div></div></div></dialog>
+</body></html>

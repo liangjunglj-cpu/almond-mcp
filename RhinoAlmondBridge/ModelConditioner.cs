@@ -105,8 +105,15 @@ namespace RhinoAlmondBridge
         /// <summary>Scale factor from document units to meters.</summary>
         public double UnitScaleToMeters { get; set; } = 1.0;
 
-        /// <summary>Largest span found (document units), for L/250 checks.</summary>
+        /// <summary>Largest span found (document units), for L/250 checks:
+        /// max of longest member and overall bounding extent.</summary>
         public double MaxSpan { get; set; }
+
+        /// <summary>Longest single conditioned member (document units). For
+        /// beam and frame analysis each member runs support to support, so
+        /// this - not the overall extent - is the structural span; a
+        /// multi-bay member set must not read as one building-length span.</summary>
+        public double MaxMemberSpan { get; set; }
     }
 
     /// <summary>
@@ -158,7 +165,9 @@ namespace RhinoAlmondBridge
                 model.Beams.AddRange(split);
             }
 
-            // Longest single member = span estimate; fall back to bbox diagonal.
+            // Longest single member = per-member span estimate; the overall
+            // extent folds in afterwards for assembly types (trusses etc.)
+            // whose segments are shorter than the structural span.
             double span = 0;
             var bbox = BoundingBox.Empty;
             foreach (var b in model.Beams)
@@ -166,6 +175,7 @@ namespace RhinoAlmondBridge
                 span = Math.Max(span, b.Axis.GetLength());
                 bbox.Union(b.Axis.GetBoundingBox(true));
             }
+            model.MaxMemberSpan = span;
             foreach (var s in model.Shells)
                 bbox.Union(s.Mesh.GetBoundingBox(true));
             if (bbox.IsValid)

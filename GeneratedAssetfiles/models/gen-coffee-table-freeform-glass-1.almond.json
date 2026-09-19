@@ -1,0 +1,204 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-coffee-table-freeform-glass-1",
+  "library_id": "generated_assets",
+  "name": "Coffee table (freeform glass top on two-piece sculptural wood base)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-coffee-table-freeform-glass-1.glb",
+  "dimensions_mm": {
+    "width": 1438.8,
+    "depth": 1274.4,
+    "height": 400.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -719.4,
+        -637.2,
+        0.0
+      ],
+      "max": [
+        719.4,
+        637.2,
+        400.0
+      ]
+    },
+    "footprint": [
+      [
+        -719.4,
+        -637.2
+      ],
+      [
+        719.4,
+        -637.2
+      ],
+      [
+        719.4,
+        637.2
+      ],
+      [
+        -719.4,
+        637.2
+      ]
+    ],
+    "clearance_mm": {
+      "front": 450,
+      "back": 450,
+      "left": 450,
+      "right": 450
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "primary"
+  },
+  "materials": [
+    {
+      "material_id": "wood-walnut",
+      "objects": [
+        "gen-coffee-table-freeform-glass-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-coffee-table-freeform-glass-1",
+    "library_id": "generated_assets",
+    "name": "Coffee table (freeform glass top on two-piece sculptural wood base)",
+    "category": "table",
+    "tags": [
+      "coffee table",
+      "glass",
+      "sculptural",
+      "mid-century",
+      "walnut"
+    ],
+    "dimensions_mm": {
+      "width": 1438.8,
+      "depth": 1274.4,
+      "height": 400.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 1280.0,
+      "depth": 930.0,
+      "height": 400.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -719.4,
+          -637.2,
+          0.0
+        ],
+        "max": [
+          719.4,
+          637.2,
+          400.0
+        ]
+      },
+      "footprint": [
+        [
+          -719.4,
+          -637.2
+        ],
+        [
+          719.4,
+          -637.2
+        ],
+        [
+          719.4,
+          637.2
+        ],
+        [
+          -719.4,
+          637.2
+        ]
+      ],
+      "clearance_mm": {
+        "front": 450,
+        "back": 450,
+        "left": 450,
+        "right": 450
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "primary"
+    },
+    "materials": [
+      {
+        "material_id": "wood-walnut",
+        "objects": [
+          "gen-coffee-table-freeform-glass-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "A low coffee table with a thick freeform organic-shaped clear glass top resting on a base made of two identical curved sculptural solid walnut pieces interlocked at right angles, 1940s American mid-century design, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa91-591a-7750-88c8-0977b4dafd51",
+        "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 1000.00006
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "living_room",
+        "dining_room"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.37,
+      "triangle_count": 57260,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product.",
+        "Measured width/depth differs from the prompt target by more than 25%."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "9FE6F68F84C135FF4EC8127B37507DD544AD931D2F398C915F60D3FBB67CB739"
+}

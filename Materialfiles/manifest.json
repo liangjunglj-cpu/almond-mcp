@@ -8,205 +8,543 @@
       "material_id": "steel-painted-sage",
       "name": "Painted steel - sage green",
       "category": "metal",
-      "base_color": [150, 170, 120],
+      "base_color": [
+        150,
+        170,
+        120
+      ],
       "metallic": 0.85,
       "roughness": 0.45,
       "opacity": 1.0,
       "ue_material_slot": "M_Steel_Painted_Sage",
-      "tags": ["steel", "painted", "structure", "green"],
+      "tags": [
+        "steel",
+        "painted",
+        "structure",
+        "green"
+      ],
       "description": "Shop-painted structural steel, satin finish."
     },
     {
       "material_id": "steel-galvanized",
       "name": "Galvanized steel",
       "category": "metal",
-      "base_color": [168, 172, 175],
+      "base_color": [
+        168,
+        172,
+        175
+      ],
       "metallic": 1.0,
       "roughness": 0.55,
       "opacity": 1.0,
       "ue_material_slot": "M_Steel_Galvanized",
-      "tags": ["steel", "zinc", "spangle"],
+      "tags": [
+        "steel",
+        "zinc",
+        "spangle"
+      ],
       "description": "Hot-dip galvanized steel with mild spangle."
     },
     {
       "material_id": "steel-mesh",
       "name": "Steel mesh / grating",
       "category": "metal",
-      "base_color": [128, 148, 100],
+      "base_color": [
+        128,
+        148,
+        100
+      ],
       "metallic": 0.9,
       "roughness": 0.6,
       "opacity": 1.0,
       "ue_material_slot": "M_Steel_Mesh",
-      "tags": ["mesh", "grating", "walkway"],
+      "tags": [
+        "mesh",
+        "grating",
+        "walkway"
+      ],
       "description": "Painted steel mesh plate; model opacity via masked material in UE."
     },
     {
       "material_id": "aluminium-anodized",
       "name": "Anodized aluminium",
       "category": "metal",
-      "base_color": [200, 202, 205],
+      "base_color": [
+        200,
+        202,
+        205
+      ],
       "metallic": 1.0,
       "roughness": 0.35,
       "opacity": 1.0,
       "ue_material_slot": "M_Aluminium_Anodized",
-      "tags": ["aluminium", "blinds", "frame"],
+      "tags": [
+        "aluminium",
+        "blinds",
+        "frame"
+      ],
       "description": "Clear-anodized aluminium, satin."
     },
     {
       "material_id": "metal-corrugated",
       "name": "Corrugated metal sheet",
       "category": "metal",
-      "base_color": [105, 125, 82],
+      "base_color": [
+        105,
+        125,
+        82
+      ],
       "metallic": 0.95,
       "roughness": 0.5,
       "opacity": 1.0,
       "ue_material_slot": "M_Metal_Corrugated",
-      "tags": ["roof", "cladding", "trapezoidal"],
+      "tags": [
+        "roof",
+        "cladding",
+        "trapezoidal"
+      ],
       "description": "Painted trapezoidal-profile sheet metal."
     },
     {
       "material_id": "polycarbonate-clear",
       "name": "Polycarbonate - clear",
       "category": "plastic",
-      "base_color": [225, 232, 215],
+      "base_color": [
+        225,
+        232,
+        215
+      ],
       "metallic": 0.0,
       "roughness": 0.15,
       "opacity": 0.35,
       "ue_material_slot": "M_Polycarbonate_Clear",
-      "tags": ["translucent", "facade", "screen"],
+      "tags": [
+        "translucent",
+        "facade",
+        "screen"
+      ],
       "description": "Clear multiwall polycarbonate; translucent blend mode in UE."
     },
     {
       "material_id": "polycarbonate-opal",
       "name": "Polycarbonate - opal",
       "category": "plastic",
-      "base_color": [235, 240, 228],
+      "base_color": [
+        235,
+        240,
+        228
+      ],
       "metallic": 0.0,
       "roughness": 0.3,
       "opacity": 0.6,
       "ue_material_slot": "M_Polycarbonate_Opal",
-      "tags": ["translucent", "diffusing", "facade"],
+      "tags": [
+        "translucent",
+        "diffusing",
+        "facade"
+      ],
       "description": "Opal diffusing polycarbonate sheet."
     },
     {
       "material_id": "glass-clear",
       "name": "Glass - clear",
       "category": "glass",
-      "base_color": [190, 212, 200],
+      "base_color": [
+        190,
+        212,
+        200
+      ],
       "metallic": 0.0,
       "roughness": 0.05,
       "opacity": 0.15,
       "ue_material_slot": "M_Glass_Clear",
-      "tags": ["glazing", "window"],
+      "tags": [
+        "glazing",
+        "window"
+      ],
       "description": "Clear float glass."
     },
     {
       "material_id": "glass-laminated",
       "name": "Glass - laminated",
       "category": "glass",
-      "base_color": [185, 208, 198],
+      "base_color": [
+        185,
+        208,
+        198
+      ],
       "metallic": 0.0,
       "roughness": 0.08,
       "opacity": 0.25,
       "ue_material_slot": "M_Glass_Laminated",
-      "tags": ["glazing", "safety", "sliding-door"],
+      "tags": [
+        "glazing",
+        "safety",
+        "sliding-door"
+      ],
       "description": "Laminated safety glass with slight green cast."
     },
     {
       "material_id": "wood-oak",
       "name": "Oak",
       "category": "wood",
-      "base_color": [200, 170, 130],
+      "base_color": [
+        200,
+        170,
+        130
+      ],
       "metallic": 0.0,
       "roughness": 0.65,
       "opacity": 1.0,
       "ue_material_slot": "M_Wood_Oak",
-      "tags": ["flooring", "furniture"],
+      "tags": [
+        "flooring",
+        "furniture"
+      ],
       "description": "Oiled oak, warm mid tone."
     },
     {
       "material_id": "wood-birch-ply",
       "name": "Birch plywood",
       "category": "wood",
-      "base_color": [214, 190, 152],
+      "base_color": [
+        214,
+        190,
+        152
+      ],
       "metallic": 0.0,
       "roughness": 0.6,
       "opacity": 1.0,
       "ue_material_slot": "M_Wood_BirchPly",
-      "tags": ["panel", "furniture", "interior"],
+      "tags": [
+        "panel",
+        "furniture",
+        "interior"
+      ],
       "description": "Sanded birch ply, clear sealed."
     },
     {
       "material_id": "wood-walnut",
       "name": "Walnut",
       "category": "wood",
-      "base_color": [120, 80, 50],
+      "base_color": [
+        120,
+        80,
+        50
+      ],
       "metallic": 0.0,
       "roughness": 0.55,
       "opacity": 1.0,
       "ue_material_slot": "M_Wood_Walnut",
-      "tags": ["furniture", "dark"],
+      "tags": [
+        "furniture",
+        "dark"
+      ],
       "description": "Oiled walnut, dark."
     },
     {
       "material_id": "concrete-smooth",
       "name": "Concrete - smooth cast",
       "category": "mineral",
-      "base_color": [200, 200, 198],
+      "base_color": [
+        200,
+        200,
+        198
+      ],
       "metallic": 0.0,
       "roughness": 0.75,
       "opacity": 1.0,
       "ue_material_slot": "M_Concrete_Smooth",
-      "tags": ["plinth", "slab"],
+      "tags": [
+        "plinth",
+        "slab"
+      ],
       "description": "Steel-formed smooth concrete."
     },
     {
       "material_id": "concrete-boardformed",
       "name": "Concrete - board-formed",
       "category": "mineral",
-      "base_color": [190, 188, 182],
+      "base_color": [
+        190,
+        188,
+        182
+      ],
       "metallic": 0.0,
       "roughness": 0.85,
       "opacity": 1.0,
       "ue_material_slot": "M_Concrete_BoardFormed",
-      "tags": ["wall", "texture"],
+      "tags": [
+        "wall",
+        "texture"
+      ],
       "description": "Board-formed concrete with timber grain."
     },
     {
       "material_id": "plaster-white",
       "name": "Plaster - white",
       "category": "mineral",
-      "base_color": [240, 240, 238],
+      "base_color": [
+        240,
+        240,
+        238
+      ],
       "metallic": 0.0,
       "roughness": 0.9,
       "opacity": 1.0,
       "ue_material_slot": "M_Plaster_White",
-      "tags": ["interior", "wall", "ceiling"],
+      "tags": [
+        "interior",
+        "wall",
+        "ceiling"
+      ],
       "description": "Matte white plaster."
     },
     {
       "material_id": "brick-red",
       "name": "Brick - red",
       "category": "mineral",
-      "base_color": [158, 84, 66],
+      "base_color": [
+        158,
+        84,
+        66
+      ],
       "metallic": 0.0,
       "roughness": 0.9,
       "opacity": 1.0,
       "ue_material_slot": "M_Brick_Red",
-      "tags": ["masonry", "wall"],
+      "tags": [
+        "masonry",
+        "wall"
+      ],
       "description": "Common red brick."
     },
     {
       "material_id": "rubber-black",
       "name": "Rubber - black",
       "category": "polymer",
-      "base_color": [35, 35, 35],
+      "base_color": [
+        35,
+        35,
+        35
+      ],
       "metallic": 0.0,
       "roughness": 0.95,
       "opacity": 1.0,
       "ue_material_slot": "M_Rubber_Black",
-      "tags": ["flooring", "gasket"],
+      "tags": [
+        "flooring",
+        "gasket"
+      ],
       "description": "Matte black rubber."
+    },
+    {
+      "material_id": "steel-painted-vermilion",
+      "name": "Painted steel - vermilion",
+      "category": "metal",
+      "base_color": [
+        214,
+        76,
+        22
+      ],
+      "metallic": 0.55,
+      "roughness": 0.5,
+      "opacity": 1.0,
+      "ue_material_slot": "M_Steel_Painted_Vermilion",
+      "tags": [
+        "steel",
+        "painted",
+        "accent",
+        "orange",
+        "vermilion"
+      ],
+      "description": "Shop-painted structural steel, vermilion accent panels."
+    },
+    {
+      "material_id": "steel-painted-charcoal",
+      "name": "Painted steel - charcoal",
+      "category": "metal",
+      "base_color": [
+        46,
+        50,
+        54
+      ],
+      "metallic": 0.7,
+      "roughness": 0.45,
+      "opacity": 1.0,
+      "ue_material_slot": "M_Steel_Painted_Charcoal",
+      "tags": [
+        "steel",
+        "painted",
+        "dark",
+        "panel"
+      ],
+      "description": "Dark gunmetal panel steel, satin finish."
+    },
+    {
+      "material_id": "stone-granite-paving",
+      "name": "Granite paving",
+      "category": "mineral",
+      "base_color": [
+        168,
+        168,
+        164
+      ],
+      "metallic": 0.0,
+      "roughness": 0.6,
+      "opacity": 1.0,
+      "ue_material_slot": "M_Stone_Granite_Paving",
+      "tags": [
+        "stone",
+        "granite",
+        "paving",
+        "landscape"
+      ],
+      "description": "Flame-finished granite paving slabs."
+    },
+    {
+      "material_id": "gravel-raked",
+      "name": "Raked gravel",
+      "category": "mineral",
+      "base_color": [
+        150,
+        144,
+        132
+      ],
+      "metallic": 0.0,
+      "roughness": 0.95,
+      "opacity": 1.0,
+      "ue_material_slot": "M_Gravel_Raked",
+      "tags": [
+        "gravel",
+        "karesansui",
+        "landscape"
+      ],
+      "description": "Fine raked gravel field, karesansui garden."
+    },
+    {
+      "material_id": "water-still",
+      "name": "Still water",
+      "category": "water",
+      "base_color": [
+        18,
+        28,
+        36
+      ],
+      "metallic": 0.0,
+      "roughness": 0.03,
+      "opacity": 0.9,
+      "ue_material_slot": "M_Water_Still",
+      "tags": [
+        "water",
+        "pond",
+        "landscape"
+      ],
+      "description": "Still dark pond water, near-mirror surface."
+    },
+    {
+      "material_id": "foliage-pine",
+      "name": "Pine foliage",
+      "category": "vegetation",
+      "base_color": [
+        52,
+        82,
+        48
+      ],
+      "metallic": 0.0,
+      "roughness": 0.85,
+      "opacity": 1.0,
+      "ue_material_slot": "M_Foliage_Pine",
+      "tags": [
+        "pine",
+        "niwaki",
+        "landscape",
+        "tree"
+      ],
+      "description": "Clipped pine foliage, niwaki garden trees."
+    },
+    {
+      "material_id": "brass-polished",
+      "name": "Polished brass",
+      "category": "metal",
+      "base_color": [
+        212,
+        168,
+        90
+      ],
+      "metallic": 1.0,
+      "roughness": 0.3,
+      "opacity": 1.0,
+      "ue_material_slot": "M_Brass_Polished",
+      "tags": [
+        "brass",
+        "gold",
+        "trim",
+        "ornament"
+      ],
+      "description": "Polished brass trim, warm gold tone."
+    },
+    {
+      "material_id": "ceramic-teal",
+      "name": "Glazed teal ceramic",
+      "category": "mineral",
+      "base_color": [
+        42,
+        108,
+        118
+      ],
+      "metallic": 0.0,
+      "roughness": 0.35,
+      "opacity": 1.0,
+      "ue_material_slot": "M_Ceramic_Teal",
+      "tags": [
+        "ceramic",
+        "glazed",
+        "roof",
+        "teal"
+      ],
+      "description": "Glazed ceramic roof tile, deep teal."
+    },
+    {
+      "material_id": "grass-meadow",
+      "name": "Meadow grass",
+      "category": "vegetation",
+      "base_color": [
+        116,
+        166,
+        96
+      ],
+      "metallic": 0.0,
+      "roughness": 0.9,
+      "opacity": 1.0,
+      "ue_material_slot": "M_Grass_Meadow",
+      "tags": [
+        "grass",
+        "meadow",
+        "landscape"
+      ],
+      "description": "Bright meadow grass ground cover."
+    },
+    {
+      "material_id": "fabric-linen",
+      "name": "Linen - warm natural",
+      "category": "textile",
+      "base_color": [
+        190,
+        178,
+        153
+      ],
+      "metallic": 0.0,
+      "roughness": 0.92,
+      "opacity": 1.0,
+      "ue_material_slot": "M_Fabric_Linen",
+      "tags": [
+        "linen",
+        "textile",
+        "natural",
+        "upholstery"
+      ],
+      "description": "Plain natural linen material study; no woven texture or product certification."
     }
   ]
 }

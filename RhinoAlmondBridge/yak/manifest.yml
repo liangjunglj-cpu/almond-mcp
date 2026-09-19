@@ -1,40 +1,39 @@
 name: almondbridge
-version: 0.5.0
+version: 0.6.0-rc.13
 authors:
   - LiangJung
 description: >
-  Rhino-side bridge for Almond, an MCP server that lets Claude (or any MCP
-  client) drive Rhino 8. This plugin listens on 127.0.0.1:5000 (local only)
-  and starts automatically with Rhino; commands AlmondMCPStart / AlmondMCPStop
-  / AlmondMCPStatus control it manually.
+  Almond for Rhino 8: an offline architectural Object Archive and an MCP
+  bridge for AI-assisted modelling. Run Almond for the Neo Swiss Models and
+  Karamba Validation menu. AlmondLibrary opens Models; AlmondKaramba opens
+  analysis controls, support/load diagrams and result records. Karamba requires
+  a separate installation/licence; checks are first-order screening.
+  AlmondLibraryBrowser opens the full
+  browser view. Compact thumbnails offer native placement as shared blocks,
+  with optional lighter meshes. Browsing and placement require no Python or AI client.
 
-  Capabilities: compiles and runs C# RhinoCommon scripts sent by the server;
-  runs Grasshopper definitions headlessly; imports curated furniture and
-  drawing assets as block instances; applies drawing-style layer recipes
-  (plot weights, linetypes); exports selected objects as GLB; runs Karamba3D
-  structural checks when Karamba 3.1 is installed (bound at runtime via
-  reflection - Karamba is never bundled).
+  Includes 50 generated GLB models with embedded metadata and source records,
+  10 linked drawing packages (60 SVG/DXF view-scale pairs and 20 A3 SVG sheets),
+  and an offline interactive 3D viewer. Models and derived drawings are
+  attributed to Almond generated asset library under CC BY 4.0; code is MIT.
+  Generated geometry and silhouette drawings are design aids, not verified
+  manufacturer products or construction details.
 
-  This package contains NO 3D models. The Almond furniture and drawing
-  libraries ship as metadata manifests only (product dimensions, spatial
-  contracts, source URLs, checksums); each user downloads the model files
-  from their original 3D Warehouse pages with "almond-mcp fetch-assets",
-  which verifies checksums. Not affiliated with Inter IKEA Systems,
-  Trimble, or Karamba3D GmbH.
+  Seven optional drawing elements are indexed as metadata and source links.
+  Third-party community model files are not bundled. Download them separately
+  from their original sources under the applicable terms.
 
-  REQUIRED SETUP beyond this plugin: install uv (docs.astral.sh/uv), add
-  {"command": "uvx", "args": ["almond-mcp"]} as an MCP server in your Claude
-  Desktop or Claude Code config, restart Claude, then optionally run
-  "uvx almond-mcp fetch-assets --open" for the asset libraries and
-  "uvx almond-mcp doctor" to verify. Full guide in the repository README.
+  The MCP bridge listens on 127.0.0.1:5000. For AI workflows, install uv and
+  register uvx --from almond-mcp==0.6.0rc13 almond-mcp with your MCP client.
+  This prerelease requires Include pre-releases in Rhino Package Manager.
+  Windows only; supports Rhino 8.0 and later Rhino 8 service releases.
 url: https://github.com/liangjunglj-cpu/almond-mcp
 icon: icon.png
 keywords:
-  - mcp
-  - claude
-  - ai
   - almond
-  - bridge
-  - karamba
+  - mcp
+  - architecture
+  - models
+  - drawing
+  - meshy
   - grasshopper
-  - automation

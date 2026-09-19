@@ -27,6 +27,7 @@ namespace RhinoAlmondBridge
         protected override LoadReturnCode OnLoad(ref string errorMessage)
         {
             RhinoApp.WriteLine("RhinoAlmondBridge: Loading MCP Bridge plugin...");
+            Rhino.UI.Panels.RegisterPanel(this, typeof(AlmondLibraryPanel), "Almond", null);
 
             _server = new BridgeServer(port: 5000);
             _server.Start();
@@ -39,6 +40,7 @@ namespace RhinoAlmondBridge
 
         protected override void OnShutdown()
         {
+            AlmondLibraryCommand.StopArchive();
             _server?.Stop();
             RhinoApp.WriteLine("RhinoAlmondBridge: Plugin shut down.");
             base.OnShutdown();

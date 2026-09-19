@@ -1,0 +1,202 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-armchair-cantilever-bentwood-1",
+  "library_id": "generated_assets",
+  "name": "Armchair (cantilevered bent-wood armchair with thick cushion)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-armchair-cantilever-bentwood-1.glb",
+  "dimensions_mm": {
+    "width": 691.4,
+    "depth": 912.1,
+    "height": 1000.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -345.7,
+        -456.05,
+        0.0
+      ],
+      "max": [
+        345.7,
+        456.05,
+        1000.0
+      ]
+    },
+    "footprint": [
+      [
+        -345.7,
+        -456.05
+      ],
+      [
+        345.7,
+        -456.05
+      ],
+      [
+        345.7,
+        456.05
+      ],
+      [
+        -345.7,
+        456.05
+      ]
+    ],
+    "clearance_mm": {
+      "front": 500,
+      "back": 0,
+      "left": 100,
+      "right": 100
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "primary"
+  },
+  "materials": [
+    {
+      "material_id": "wood-birch-ply",
+      "objects": [
+        "gen-armchair-cantilever-bentwood-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-armchair-cantilever-bentwood-1",
+    "library_id": "generated_assets",
+    "name": "Armchair (cantilevered bent-wood armchair with thick cushion)",
+    "category": "seating",
+    "tags": [
+      "armchair",
+      "cantilever",
+      "bentwood",
+      "cushion",
+      "scandinavian"
+    ],
+    "dimensions_mm": {
+      "width": 691.4,
+      "depth": 912.1,
+      "height": 1000.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 680.0,
+      "depth": 820.0,
+      "height": 1000.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -345.7,
+          -456.05,
+          0.0
+        ],
+        "max": [
+          345.7,
+          456.05,
+          1000.0
+        ]
+      },
+      "footprint": [
+        [
+          -345.7,
+          -456.05
+        ],
+        [
+          345.7,
+          -456.05
+        ],
+        [
+          345.7,
+          456.05
+        ],
+        [
+          -345.7,
+          456.05
+        ]
+      ],
+      "clearance_mm": {
+        "front": 500,
+        "back": 0,
+        "left": 100,
+        "right": 100
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "primary"
+    },
+    "materials": [
+      {
+        "material_id": "wood-birch-ply",
+        "objects": [
+          "gen-armchair-cantilever-bentwood-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "A cantilevered armchair with a frame of two bent laminated birch loops forming the armrests and the springy base, and a thick single cushion in natural beige fabric running up seat and high back, pale birch, 1970s Scandinavian democratic design, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa91-a9c8-71fd-bffd-5ac11306c735",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 1000.0
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "living_room"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.112,
+      "triangle_count": 4368,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "E5132C71829989C1E0AB8602803DD3A3B844F924999B52F3A58B56F2F8A5EB3D"
+}

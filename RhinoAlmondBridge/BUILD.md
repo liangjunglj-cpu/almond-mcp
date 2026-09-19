@@ -1,5 +1,11 @@
 # Building RhinoAlmondBridge
 
+For the 0.6 archive release, use `tools/prepare_release.ps1` from the repository
+root. It produces fresh Windows Yak and Python distributions with the bundled
+Object Archive. See [the release guide](../docs/release-0.6.md). Copying only an
+RHP will not provide the archive; `AlmondLibrary` needs the adjacent `archive`
+payload assembled by `tools/build_yak.ps1`.
+
 ## Prerequisites
 
 1. Visual Studio 2022 (any edition) with the ".NET desktop development" workload.

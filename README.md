@@ -1,5 +1,36 @@
 # Almond MCP for Rhino
 
+**0.6.0rc13 — Almond workspace release candidate.** Run **Almond** in Rhino
+for a dockable Neo Swiss menu with **Models** and **Karamba Validation**.
+**AlmondLibrary** opens models directly; **AlmondKaramba** opens the analysis
+workspace. Models retain compact tiles, Light/Original detail and shared-block
+viewport placement. Karamba adds selection capture, explicit assumptions,
+support/load diagram toggles, mapped utilization and an exportable result record.
+
+The active IKEA catalogue, source links and four supplier-specific MCP tools
+are retired. Existing local downloads and historical scene records are retained.
+Karamba and the generated model/source libraries remain available.
+See the [Rhino quickstart](docs/rhino-archive-quickstart.md) and
+[release infrastructure](docs/release-0.6.md). Viewport dragging was confirmed
+by the user on rc.6. Native acceptance of the new Karamba panel and public
+publication remain pending.
+
+Run
+`almond-mcp library --open` for the local Neo Swiss interface: 47 Meshy models,
+7 drawing elements, linked SVG/DXF views, downloads, and source evidence in
+one searchable catalogue. The same index is exposed through the MCP tool
+`search_asset_repository` and `almond://repository/{asset_id}` resources.
+See the [Object Archive guide](docs/object-archive-0.6-rc3.md).
+
+All 50 generated
+models now carry embedded asset passports and ship with the Python package,
+including their sidecar contracts and previews. New MCP tools recommend assets
+with reasons and check rotated clearance envelopes before placement. See
+[the release guide](docs/semantic-assets-0.6.md) for the workflow, packaging,
+verification and remaining Rhino integration checks. The
+[drafting update](docs/drafting-0.6-rc2.md) adds a ten-model SVG/DXF pilot,
+custom GLB drawing generation, source discovery and drawing revision checks.
+
 <p align="center"><img src="assets/almond-icon.svg" width="120" alt="Almond"></p>
 
 Almond exposes Rhino 8 and a semantic design layer as MCP tools: curated
@@ -98,7 +129,7 @@ and a Claude that supports MCP (Claude Desktop or Claude Code).
 
    - *Claude Code:* `claude mcp add Almond -- uvx almond-mcp`
 4. **Restart Claude.** The Almond tools (`execute_rhino_script`,
-   `search_ikea_furniture`, `create_design_scene`, …) appear in the tool
+   `search_generated_assets`, `create_design_scene`, …) appear in the tool
    list. First run creates `%LOCALAPPDATA%\Almond` with the library
    manifests and the scene database.
 5. **Check the plumbing** (Rhino open):
@@ -140,10 +171,10 @@ locations:
 | Environment variable | Default folder |
 | --- | --- |
 | `RHINO_MCP_LIBRARY_DIR` | `Grasshopperfiles` (your GH/Karamba definitions) |
-| `RHINO_MCP_FURNITURE_DIR` | `IkeaFurniturefiles` |
 | `RHINO_MCP_DRAWING_ASSET_DIR` | `DrawingAssetfiles` |
 | `RHINO_MCP_DIAGRAM_ASSET_DIR` | `DiagramAssetfiles` |
 | `RHINO_MCP_DRAWING_RECIPE_DIR` | `DrawingRecipes` |
+| `RHINO_MCP_GENERATED_ASSET_DIR` | `GeneratedAssetfiles` |
 | `RHINO_MCP_CAPSULE_DIR` | `capsules` |
 | `RHINO_MCP_STATE_DB` | `%LOCALAPPDATA%\Almond\almond_state.sqlite3` |
 
@@ -195,37 +226,11 @@ $env:CHESTNUT_URL = "http://127.0.0.1:3000"
 almond-mcp
 ```
 
-## IKEA furniture library
-
-Almond exposes a controlled IKEA Singapore furniture library:
-
-```text
-list_ikea_furniture(category="chair")
-search_ikea_furniture(
-  query="compact living room sofa",
-  max_width_mm=2000,
-  exact_dimensions_only=true
-)
-place_ikea_furniture(
-  asset_id="ikea-sg-klippan-s49010615",
-  x=0,
-  y=0,
-  z=0,
-  rotation_degrees=90
-)
-```
-
-SketchUp files are resolved from the furniture library's `manifest.json`.
-Claude cannot provide arbitrary import paths. Rhino imports each asset once
-as a block definition and creates lightweight instances for subsequent
-placements. Almond is not affiliated with Inter IKEA Systems B.V.; product
-names identify the real products whose catalogue dimensions the manifest
-records.
 
 ## Architectural drawing asset library
 
 Representation-only entourage and graphic proxies live in the independent
-drawing asset library. They never appear in IKEA searches:
+drawing asset library. They have a dedicated search:
 
 ```text
 search_drawing_assets(query="landscape tree")
@@ -251,6 +256,45 @@ create_generation_plan(
 )
 ```
 
+## Generated asset library (open, redistributable)
+
+The optional drawing library describes community models that each user
+must download themselves. `GeneratedAssetfiles/` is different: 47 (and
+growing) architectural models generated with Meshy from Almond's own
+prompts, owned by the project and released under **CC BY 4.0**, so they ship
+with the repository and the 0.6 wheel for offline use. Categories:
+
+| Group | Assets |
+| --- | --- |
+| Entourage | standing / walking / sitting person, deciduous and conifer tree, sedan car, bicycle |
+| Site furniture | park bench, street lamp, bollard, bike hoop, litter bin |
+| Building components | round and square column, glass balustrade (doors, windows and stairs are deliberately excluded: they need exact dimensions, so model them directly) |
+| Fixtures and appliances | toilet, pedestal basin, bathtub, shower enclosure, range cooker, fridge-freezer |
+| Generic furniture | three-seat sofa, dining table and chair, double bed, desk, office chair |
+| Design-idiom furniture | bent-birch stool, table, trolley, webbed and cantilevered armchairs; moulded-plywood, shell and leather lounge chairs with ottoman; freeform coffee table, slatted bench, mesh task chair; loose-cover sofa, cube and track shelving, wire side table |
+| Lighting | spherical pendant, arc floor lamp, balanced-arm task lamp |
+
+Every GLB is normalised by `tools/build_generated_assets.py`: scaled to its
+catalogue height, bottom-centre on the origin, measured (never nominal)
+bounds in the manifest, one `ALMOND::<material_id>` material so
+`import_asset_contract`'s restore step gives it the canonical Almond
+material, and a `.almond.json` contract beside it.
+
+```text
+search_generated_assets(query="bench", max_height_mm=1000)
+get_generated_asset(asset_id="gen-park-bench-1")
+place_generated_asset(asset_id="gen-park-bench-1", x_mm=2400, y_mm=800, rotation_degrees=90)
+register_scene_instance(scene_id=..., asset_id="gen-park-bench-1", ...)  # then validate_scene_layout
+```
+
+To extend the library, add an entry to `GeneratedAssetfiles/catalogue.json`
+(prompt, nominal size, material, clearances), generate it with Meshy
+(the recipe is recorded in the catalogue: nano-banana concept image →
+meshy-t2 smart-topology mesh, untextured), save the GLB as
+`GeneratedAssetfiles/raw/<asset_id>.glb`, record the task ids in
+`provenance.json`, and run the build script. Provenance and licensing are
+documented in `docs/licensing-audit.md`.
+
 ## Structural validation with reports
 
 `validate_structure(guids, structure_type, load_kn, material)` checks
@@ -263,12 +307,27 @@ Every run is recorded in the local state database;
 (inputs, pathway, span/deflection/utilization/reactions, warnings,
 PASS/FAIL). Details: `docs/structural-validation.md`.
 
+On top of the solver, a **construction knowledge layer**
+(`get_construction_guidance`, `Constructionfiles/manifest.json`) grounds
+generated structures in real building assemblies: 23 curated systems (wood
+joist floors to precast tees, platform framing to steel rigid frames) with
+span ranges, depth rules of thumb, member spacings, and element roles
+distilled from Ching's *Building Construction Illustrated* (4th ed.). Call
+it before generating to pick a system and size members like a builder
+would; `validate_structure` then appends a `construction_check` that flags
+spans no real system covers — so geometry that merely solves numerically
+but could not be constructed as drawn is caught too. Details:
+`docs/construction-guidance.md`.
+
 ## Materials and cross-application exchange
 
 Almond carries a curated PBR material library (`list_materials`) and stamps
 geometry with machine-readable material metadata (`assign_material`): a
 physically-based Rhino material plus `almond:*` user text (material_id,
-`ue_material_slot`, base colour, metallic, roughness, opacity). GLB export
+`ue_material_slot`, base colour, metallic, roughness, opacity — and, for
+structural members, `structural_role` / `construction_system` /
+`structural_material`, declaring in construction terms what each object
+is). GLB export
 then carries real PBR channels, and Datasmith imports the user text as
 Unreal asset metadata — so imports remap to your master materials by slot
 name instead of being guessed from display colours.
@@ -314,7 +373,7 @@ The database provides:
 
 Search and list tools return compact asset cards. Full provenance,
 footprints, clearances, and source metadata are returned only by
-`get_ikea_furniture`. Geometry and Grasshopper files remain local.
+`get_generated_asset`. Geometry and Grasshopper files remain local.
 
 Useful tools:
 
@@ -329,7 +388,7 @@ upsert_design_room(
 register_scene_instance(
   scene_id="scene_...",
   room_id="room_...",
-  asset_id="ikea-sg-klippan-s49010615",
+  asset_id="gen-sofa-3-seat-1",
   x_mm=3000,
   y_mm=3900
 )
@@ -357,3 +416,25 @@ uv run almond-mcp doctor
 On OneDrive-synced folders set `UV_LINK_MODE=copy` (OneDrive rejects uv's
 hardlinks). Licensing: `LICENSE` (MIT), `THIRD-PARTY-NOTICES.md`, and
 `docs/licensing-audit.md` for what may and may not be distributed.
+# Drawing pilot — 0.6.0rc2
+
+Almond now exports traceable mesh silhouettes as scaled SVG, full-size DXF and
+A3 SVG sheets. Ten generated models have bundled plan/front/right views;
+other library models and custom static GLBs can be processed on demand.
+Generation evidence and geometry hashes travel with the drawings, and an audit
+detects changed outputs or stale source geometry. Six architectural reference
+directories are searchable without DETAIL access.
+
+See [drafting workflow and limits](docs/drafting-0.6-rc2.md) and open
+[the pilot gallery](Draftingfiles/index.html). These are mesh outlines for
+layout/entourage; section assemblies and hidden-line drafting remain future work.
+
+### Compact Rhino library placement (0.6.0rc13)
+
+The docked archive now uses small, two-column thumbnails. Drag a model into a
+viewport, or choose Place and pick an insertion point. Light detail targets
+20,000 triangles on heavier models; Original retains the source mesh.
+Repeated objects share Rhino blocks and materials. Source records and
+transformation/reduction metadata stay attached to each placed object.
+The prepared candidate requires an interactive Rhino placement check before
+publication; see docs/rhino-archive-quickstart.md.

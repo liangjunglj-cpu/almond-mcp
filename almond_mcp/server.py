@@ -9,7 +9,9 @@ Exposes tools for Claude to:
 """
 import os
 import json
+import math
 import socket
+import struct
 import hashlib
 import re
 import sys
@@ -19,20 +21,23 @@ import urllib.error
 import urllib.request
 from pathlib import Path
 from fastmcp import FastMCP
+from fastmcp.resources import ResourceContent, ResourceResult
 from almond_mcp.ghx_parser import GHParser, validate_capsule_manifest
 from almond_mcp.retrieval_store import AlmondStore
-from almond_mcp import exchange, paths
+from almond_mcp import asset_passport, conditioning, exchange, paths, drafting
 
 # ── Constants ────────────────────────────────────────────────────────────────
 
 DELIMITER = b'\n<<EOF>>\n'
 LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_LIBRARY_DIR")
-FURNITURE_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_FURNITURE_DIR")
 DRAWING_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_DRAWING_ASSET_DIR")
 DIAGRAM_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_DIAGRAM_ASSET_DIR")
+GENERATED_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_GENERATED_ASSET_DIR")
 DRAWING_RECIPE_DIR = paths.resolve_dir("RHINO_MCP_DRAWING_RECIPE_DIR")
+DRAFTING_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_DRAFTING_DIR")
 CAPSULE_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_CAPSULE_DIR")
 MATERIAL_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_MATERIAL_DIR")
+CONSTRUCTION_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_CONSTRUCTION_DIR")
 STATE_DB_PATH = paths.resolve_state_db()
 BRIDGE_HOST = '127.0.0.1'
 BRIDGE_PORT = 5000
@@ -44,7 +49,17 @@ print(f"Chestnut publish target: {CHESTNUT_URL}", file=sys.stderr)
 
 # ── MCP Server ───────────────────────────────────────────────────────────────
 
-mcp = FastMCP("RhinoAI_Library")
+mcp = FastMCP("Almond", instructions=(
+    "Almond combines Rhino modelling with a semantic asset library. "
+    "For furnishing: recommend_generated_assets, inspect get_generated_asset_passport "
+    "and preview resources, evaluate_generated_asset_fit, then place_generated_asset. "
+    "For drawings: get_asset_drawing for pilot views or generate_asset_drawing_views "
+    "for a library/custom static GLB. Inspect get_generation_sources and audit_asset_drawing. "
+    "search_detail_sources returns candidate directories, not verified construction details. "
+    "Register placements in the scene ledger and validate_scene_layout. "
+    "Use measured dimensions, not nominal prompt targets. Usage suggestions are "
+    "heuristics and clearances are design allowances, not certified code compliance."
+))
 
 # ── Library Indexer ──────────────────────────────────────────────────────────
 
@@ -59,7 +74,7 @@ class LibraryIndexer:
         self._build_index()
 
     def _build_index(self):
-        print(f"Indexing library from: {self.directory}")
+        print(f"Indexing library from: {self.directory}", file=sys.stderr)
         for root, _, files in os.walk(self.directory):
             for file in files:
                 ext = file.rsplit('.', 1)[-1].lower() if '.' in file else ''
@@ -68,7 +83,7 @@ class LibraryIndexer:
                     if logic_id not in self.index:
                         self.index[logic_id] = {}
                     self.index[logic_id][ext] = os.path.join(root, file)
-        print(f"Indexed {len(self.index)} unique logic entities.")
+        print(f"Indexed {len(self.index)} unique logic entities.", file=sys.stderr)
 
     def list_ids(self) -> list[str]:
         """Return sorted list of all indexed logic IDs."""
@@ -206,11 +221,6 @@ class DrawingRecipeIndexer:
 
 # Build index once on startup
 indexer = LibraryIndexer(LIBRARY_DIR)
-furniture_indexer = AssetLibraryIndexer(
-    FURNITURE_LIBRARY_DIR,
-    library_id="ikea",
-    label="IKEA",
-)
 drawing_asset_indexer = AssetLibraryIndexer(
     DRAWING_LIBRARY_DIR,
     library_id="drawing_assets",
@@ -220,6 +230,11 @@ diagram_asset_indexer = AssetLibraryIndexer(
     DIAGRAM_LIBRARY_DIR,
     library_id="diagram_assets",
     label="diagram",
+)
+generated_asset_indexer = AssetLibraryIndexer(
+    GENERATED_LIBRARY_DIR,
+    library_id="generated_assets",
+    label="generated",
 )
 drawing_recipe_indexer = DrawingRecipeIndexer(DRAWING_RECIPE_DIR)
 
@@ -269,19 +284,215 @@ class MaterialLibrary:
         return results
 
 
+class ConstructionLibrary:
+    """Curated construction-system guidance (Constructionfiles/manifest.json).
+
+    Parameters distilled from Ching, Building Construction Illustrated
+    (4th ed.): span ranges, depth rules of thumb, member spacing, and
+    assembly notes per construction system, keyed to validate_structure's
+    structure_type/material vocabulary and to Materialfiles material_ids."""
+
+    REQUIRED = ("system_id", "name", "category", "structural_material",
+                "structure_types", "span_range_m")
+
+    # validate_structure accepts S355 as a steel grade; guidance treats it as Steel.
+    MATERIAL_ALIASES = {"s355": "Steel", "steel": "Steel", "concrete": "Concrete",
+                        "wood": "Wood", "timber": "Wood", "aluminium": "Aluminium",
+                        "aluminum": "Aluminium"}
+
+    def __init__(self, directory: str):
+        self.directory = Path(directory)
+        self.systems: dict[str, dict] = {}
+        self.reference: dict = {}
+        self.source = ""
+        manifest_path = self.directory / "manifest.json"
+        if not manifest_path.is_file():
+            print(f"Construction manifest missing: {manifest_path}", file=sys.stderr)
+            return
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as exc:
+            print(f"Construction manifest unreadable: {exc}", file=sys.stderr)
+            return
+        self.reference = manifest.get("reference", {})
+        self.source = manifest.get("source", "")
+        for system in manifest.get("systems", []):
+            if not all(key in system for key in self.REQUIRED):
+                continue
+            self.systems[system["system_id"]] = system
+        print(f"Indexed {len(self.systems)} construction systems.", file=sys.stderr)
+
+    def get(self, system_id: str) -> dict | None:
+        return self.systems.get(system_id)
+
+    def normalize_material(self, material: str) -> str:
+        return self.MATERIAL_ALIASES.get(material.strip().lower(), material.strip())
+
+    def list(self, category: str = "", query: str = "", material: str = "",
+             structure_type: str = "") -> list[dict]:
+        needle = query.strip().lower()
+        wanted_material = self.normalize_material(material) if material else ""
+        wanted_type = structure_type.strip().lower()
+        results = []
+        for system in self.systems.values():
+            if category and system["category"] != category:
+                continue
+            if wanted_material and system["structural_material"] != wanted_material:
+                continue
+            if wanted_type and wanted_type not in system["structure_types"]:
+                continue
+            if needle:
+                haystack = " ".join([
+                    system["system_id"], system["name"], system["category"],
+                    system.get("structural_material", ""),
+                    " ".join(system.get("tags", [])),
+                    " ".join(note for note in system.get("construction_notes", [])),
+                    " ".join(element.get("role", "") + " " + element.get("note", "")
+                             for element in system.get("elements", [])),
+                ]).lower()
+                if needle not in haystack:
+                    continue
+            results.append(system)
+        return results
+
+    def assess_span(self, structure_type: str, material: str,
+                    span_m: float | None) -> dict:
+        """Constructibility cross-check for a validate_structure run: which
+        curated systems cover this structure_type/material, does the span sit
+        inside a real system's range, and what member depth would it imply."""
+        wanted_material = self.normalize_material(material)
+        wanted_type = structure_type.strip().lower()
+        candidates = [s for s in self.systems.values()
+                      if wanted_type in s["structure_types"]
+                      and s["structural_material"] == wanted_material]
+        check: dict = {
+            "source": "Ching, Building Construction Illustrated (4th ed.) - preliminary sizing guidance",
+            "matching_systems": [],
+            "warnings": [],
+        }
+        if not candidates:
+            check["warnings"].append(
+                f"No curated construction system covers structure_type "
+                f"'{structure_type}' in {wanted_material}; span plausibility "
+                f"not assessed.")
+            return check
+        span_known = span_m is not None and span_m > 0
+        fitting = []
+        for system in candidates:
+            lo, hi = system["span_range_m"]
+            entry = {
+                "system_id": system["system_id"],
+                "name": system["name"],
+                "span_range_m": [lo, hi],
+                "bci_ref": system.get("bci_ref", []),
+            }
+            if span_known and hi > 0:
+                entry["fits_span"] = bool(lo <= span_m <= hi)
+                depths = []
+                for rule in system.get("depth_rules", []):
+                    ratio = rule.get("span_ratio", 0)
+                    if ratio:
+                        depths.append({
+                            "element": rule["element"],
+                            "suggested_depth_mm": round(span_m * 1000 / ratio),
+                            "rule": f"span/{ratio}",
+                        })
+                if depths:
+                    entry["depth_guidance"] = depths
+                if entry["fits_span"]:
+                    fitting.append(system)
+            check["matching_systems"].append(entry)
+        if span_known and not fitting:
+            spans = ", ".join(
+                f"{s['system_id']} ({s['span_range_m'][0]}-{s['span_range_m'][1]} m)"
+                for s in candidates if s["span_range_m"][1] > 0)
+            check["warnings"].append(
+                f"Span {span_m:g} m is outside the typical range of every "
+                f"curated {wanted_material} system for '{structure_type}': "
+                f"{spans}. The structure may still solve numerically, but as "
+                f"drawn it does not correspond to a standard construction "
+                f"system - consider a different system, material, or "
+                f"intermediate supports.")
+        return check
+
+
+class HistoryLibrary:
+    """Curated architectural typology narratives (Historyfiles/manifest.json).
+
+    Distilled from Ching, Jarzombek & Prakash, A Global History of
+    Architecture. NARRATION ONLY: entries feed project storytelling and
+    typology context; they never drive geometry, sizing, or structural
+    decisions - those belong to the construction library."""
+
+    REQUIRED = ("typology_id", "name", "era", "narrative", "gha_ref")
+
+    def __init__(self, directory: str):
+        self.directory = Path(directory)
+        self.entries: dict[str, dict] = {}
+        self.source = ""
+        manifest_path = self.directory / "manifest.json"
+        if not manifest_path.is_file():
+            print(f"History manifest missing: {manifest_path}", file=sys.stderr)
+            return
+        try:
+            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError) as exc:
+            print(f"History manifest unreadable: {exc}", file=sys.stderr)
+            return
+        self.source = manifest.get("source", "")
+        for entry in manifest.get("entries", []):
+            if not all(key in entry for key in self.REQUIRED):
+                continue
+            self.entries[entry["typology_id"]] = entry
+        print(f"Indexed {len(self.entries)} typology narratives.", file=sys.stderr)
+
+    def get(self, typology_id: str) -> dict | None:
+        return self.entries.get(typology_id)
+
+    def list(self, query: str = "", construction_system: str = "",
+             structure_type: str = "") -> list[dict]:
+        needle = query.strip().lower()
+        wanted_type = structure_type.strip().lower()
+        results = []
+        for entry in self.entries.values():
+            if construction_system and construction_system not in \
+                    entry.get("related_construction_systems", []):
+                continue
+            if wanted_type and wanted_type not in entry.get("structure_types", []):
+                continue
+            if needle:
+                haystack = " ".join([
+                    entry["typology_id"], entry["name"], entry["era"],
+                    entry.get("region", ""), entry["narrative"],
+                    entry.get("urban_role", ""),
+                    " ".join(entry.get("tags", [])),
+                    " ".join(p.get("name", "") + " " + p.get("place", "")
+                             for p in entry.get("precedents", [])),
+                ]).lower()
+                if needle not in haystack:
+                    continue
+            results.append(entry)
+        return results
+
+
 material_library = MaterialLibrary(MATERIAL_LIBRARY_DIR)
+construction_library = ConstructionLibrary(CONSTRUCTION_LIBRARY_DIR)
+history_library = HistoryLibrary(paths.resolve_dir("RHINO_MCP_HISTORY_DIR"))
 retrieval_store = AlmondStore(STATE_DB_PATH)
 retrieval_store.sync_assets(
     list(drawing_asset_indexer.assets.values()),
     library_id="drawing_assets",
 )
-retrieval_store.sync_assets(
-    list(furniture_indexer.assets.values()),
-    library_id="ikea",
-)
+# Retire the legacy supplier catalogue from searchable cache; local files and
+# scene history are retained.
+retrieval_store.sync_assets([], library_id="ikea")
 retrieval_store.sync_assets(
     list(diagram_asset_indexer.assets.values()),
     library_id="diagram_assets",
+)
+retrieval_store.sync_assets(
+    list(generated_asset_indexer.assets.values()),
+    library_id="generated_assets",
 )
 
 
@@ -544,72 +755,10 @@ def get_logic_by_id(logic_id: str) -> str:
         return json.dumps({"error": f"Failed to parse '{target_file}': {str(e)}"})
 
 
-@mcp.tool()
-def list_ikea_furniture(
-    category: str = "",
-    limit: int = 20,
-    offset: int = 0,
-) -> str:
-    """
-    Lists furniture in the controlled IKEA Singapore model library.
-
-    Args:
-        category: Optional exact category filter such as "chair", "sofa", or "storage".
-    Returns:
-        Compact paginated asset cards. Use get_ikea_furniture only for a
-        selected asset that needs full metadata.
-    """
-    page = retrieval_store.search_assets(
-        library_id="ikea",
-        category=category,
-        limit=limit,
-        offset=offset,
-    )
-    return json.dumps({
-        "catalogue_region": furniture_indexer.catalogue_region,
-        "catalogue_checked": furniture_indexer.catalogue_checked,
-        **page,
-    })
 
 
-@mcp.tool()
-def search_ikea_furniture(
-    query: str = "",
-    category: str = "",
-    max_width_mm: float = 0,
-    max_depth_mm: float = 0,
-    max_height_mm: float = 0,
-    exact_dimensions_only: bool = False,
-    limit: int = 10,
-    offset: int = 0,
-) -> str:
-    """
-    Searches IKEA furniture by product language and room-fit dimensions.
-
-    Use this before placing furniture. Prefer exact-dimension matches for final layouts;
-    series-only matches are useful for concept design but are labelled as such.
-    """
-    page = retrieval_store.search_assets(
-        query=query,
-        library_id="ikea",
-        category=category,
-        max_width_mm=max_width_mm,
-        max_depth_mm=max_depth_mm,
-        max_height_mm=max_height_mm,
-        exact_dimensions_only=exact_dimensions_only,
-        limit=limit,
-        offset=offset,
-    )
-    return json.dumps(page)
 
 
-@mcp.tool()
-def get_ikea_furniture(asset_id: str) -> str:
-    """Returns one IKEA furniture asset's dimensions, provenance, and availability."""
-    asset = retrieval_store.get_asset(asset_id, library_id="ikea")
-    if not asset:
-        return json.dumps({"status": "error", "message": f"Unknown furniture asset_id: {asset_id}"})
-    return json.dumps({"status": "success", "asset": asset})
 
 
 @mcp.tool()
@@ -621,7 +770,7 @@ def list_drawing_assets(
     """
     Lists representation-only entourage and graphic proxy assets.
 
-    Drawing assets are intentionally isolated from IKEA product search and do
+    Drawing assets are representation elements and do
     not participate in room collision checks unless explicitly registered.
     """
     page = retrieval_store.search_assets(
@@ -673,6 +822,294 @@ def get_drawing_asset(asset_id: str) -> str:
 
 
 @mcp.tool()
+def list_generated_assets(
+    category: str = "",
+    limit: int = 20,
+    offset: int = 0,
+) -> str:
+    """
+    Lists the redistributable generated asset library: 3D entourage (people,
+    trees, vehicles), site furniture, columns, balustrades,
+    sanitary/kitchen fixtures, and unbranded
+    furniture placeholders. Every asset is a GLB normalised to real-world
+    millimetres with a measured spatial contract and an Almond material_id,
+    so placement, collision checks and material restore work without any
+    third-party download. Place with place_generated_asset.
+    """
+    page = retrieval_store.search_assets(
+        library_id="generated_assets",
+        category=category,
+        limit=limit,
+        offset=offset,
+    )
+    return json.dumps({
+        "library_id": "generated_assets",
+        "purpose": "redistributable generated entourage, components and fixtures",
+        "license": "CC-BY-4.0",
+        **page,
+    })
+
+
+@mcp.tool()
+def search_generated_assets(
+    query: str = "",
+    category: str = "",
+    max_width_mm: float = 0,
+    max_depth_mm: float = 0,
+    max_height_mm: float = 0,
+    limit: int = 10,
+    offset: int = 0,
+) -> str:
+    """Searches only the generated asset library (FTS over product, variant,
+    category and tags; dimension filters use the measured GLB bounds)."""
+    return json.dumps(retrieval_store.search_assets(
+        query=query,
+        library_id="generated_assets",
+        category=category,
+        max_width_mm=max_width_mm,
+        max_depth_mm=max_depth_mm,
+        max_height_mm=max_height_mm,
+        limit=limit,
+        offset=offset,
+    ))
+
+
+@mcp.tool(annotations={"readOnlyHint": True, "openWorldHint": False})
+def recommend_generated_assets(
+    query: str = "", category: str = "", room_type: str = "",
+    width_mm: float = 0, depth_mm: float = 0, height_mm: float = 0,
+    max_triangles: int = 0, include_clearances: bool = True, limit: int = 5,
+) -> dict:
+    """Shortlist available models with explicit reasons, quality notes and fit
+    options. Query matches product/variant/tags; room_type is an inferred usage
+    filter (e.g. living_room, dining_room, office, bathroom, landscape).
+    Supply width AND depth for rectangular fit at 0/90 degrees; height 0 is
+    unbounded. Authored clearances count by default. No Rhino connection needed.
+    """
+    try:
+        return asset_passport.recommend(
+            list(generated_asset_indexer.assets.values()), query, category, room_type,
+            width_mm, depth_mm, height_mm, max_triangles, include_clearances, limit)
+    except ValueError as exc:
+        return {"status": "error", "message": str(exc)}
+
+
+@mcp.tool(annotations={"readOnlyHint": True, "openWorldHint": False})
+def get_generated_asset_passport(asset_id: str) -> dict:
+    """Read portable asset metadata: measured vs nominal dimensions, provenance,
+    materials, spatial contract, usage suggestions, quality limits and rights."""
+    asset = generated_asset_indexer.get(asset_id)
+    if not asset:
+        return {"status": "error", "message": f"Unknown generated asset_id: {asset_id}"}
+    if not asset.get("passport"):
+        return {"status": "error", "message": "Library has no passport; upgrade the asset pack."}
+    return {"status": "success", "passport": asset["passport"],
+            "file_available": asset.get("file_available", False),
+            "preview_uri": f"almond://generated/{asset_id}/preview"}
+
+
+@mcp.tool(annotations={"readOnlyHint": True, "openWorldHint": False})
+def evaluate_generated_asset_fit(
+    asset_id: str, width_mm: float, depth_mm: float, height_mm: float = 0,
+    rotation_degrees: float = 0, include_clearances: bool = True,
+) -> dict:
+    """Check one model's rotated clearance envelope against a rectangle in mm.
+    This is a preflight size check, not obstacle detection or code certification.
+    Mounting heights and actual scene positions are not evaluated."""
+    asset = generated_asset_indexer.get(asset_id)
+    if not asset:
+        return {"status": "error", "message": f"Unknown generated asset_id: {asset_id}"}
+    try:
+        return {"status": "success", **asset_passport.evaluate_fit(
+            asset, width_mm, depth_mm, height_mm, rotation_degrees, include_clearances)}
+    except ValueError as exc:
+        return {"status": "error", "message": str(exc)}
+
+
+@mcp.tool(annotations={"readOnlyHint": True, "openWorldHint": False})
+def search_detail_sources(query: str = "") -> dict:
+    """Search six curated free architectural source directories offline.
+    Returns links, formats and rights notes; no external content is fetched.
+    Results are research candidates, not attributed inputs or certified details.
+    DETAIL subscription access is not required."""
+    data = json.loads((Path(DRAFTING_LIBRARY_DIR)/"sources.json").read_text(encoding="utf-8"))
+    terms = set(re.findall(r"[a-z0-9]+", query.lower()))
+    matches = []
+    for source in data["sources"]:
+        haystack = " ".join([source["title"], *source["tags"], *source["formats"]]).lower()
+        matched = sorted(t for t in terms if t in haystack)
+        if not terms or matched:
+            matches.append({**source, "matched_terms": matched})
+    matches.sort(key=lambda s: (-len(s["matched_terms"]), s["source_id"]))
+    return {"status": "success", "scope": data["scope"], "sources": matches}
+
+
+@mcp.tool(annotations={"readOnlyHint": True, "openWorldHint": False})
+def get_generation_sources(asset_id: str) -> dict:
+    """Get original recorded provider/task IDs, prompt, transformations and evidence gaps.
+    Includes Higgsfield image job IDs where recorded before the Meshy stage.
+    This is local evidence, not an independent provider/account verification."""
+    path = Path(GENERATED_LIBRARY_DIR)/"source-register.json"
+    if not path.exists():
+        return {"status": "error", "message": "Source register missing; update the asset pack"}
+    data = json.loads(path.read_text(encoding="utf-8"))
+    record = next((a for a in data["assets"] if a["asset_id"] == asset_id), None)
+    if not record:
+        return {"status": "error", "message": "Unknown generated asset ID"}
+    asset = generated_asset_indexer.get(asset_id)
+    if not asset or record["model_sha256"] != asset["sha256"]:
+        return {"status": "error", "message": "Source register is stale for this asset"}
+    return {"status": "success", "record": record}
+
+
+@mcp.tool(annotations={"readOnlyHint": True, "openWorldHint": False})
+def get_asset_drawing(asset_id: str) -> dict:
+    """Retrieve a bundled pilot drawing package: mm DXF, scaled SVG, A3 SVG sheets and provenance.
+    Ten models have precomputed views; use generate_asset_drawing_views for others."""
+    root = Path(DRAFTING_LIBRARY_DIR)
+    data = json.loads((root/"manifest.json").read_text(encoding="utf-8"))
+    record = next((a for a in data["assets"] if a["asset_id"] == asset_id), None)
+    if not record:
+        return {"status": "error", "message": "No bundled drawing for this asset; generate views on demand"}
+    package = (root/record["package"]).resolve()
+    package.relative_to(root.resolve())
+    manifest = json.loads((package/"drawing.json").read_text(encoding="utf-8"))
+    return {"status": "success", "package_dir": str(package), "manifest": manifest,
+            "plan_svg_uri": f"almond://generated/{asset_id}/drawing/plan/50"}
+
+
+@mcp.tool(annotations={"readOnlyHint": False, "destructiveHint": False, "openWorldHint": False})
+def generate_asset_drawing_views(asset_id: str = "", source_glb: str = "",
+                                 input_units: str = "", up_axis: str = "y",
+                                 scales: list[int] | None = None,
+                                 source_references: list[dict] | None = None) -> dict:
+    """Generate plan/front/right mesh silhouettes with source metadata, full-size DXF,
+    scaled SVG and A3 SVG sheets where they fit. Writes a NEW local drawing-runs folder.
+    Choose a library asset_id OR an absolute custom source_glb path. Custom files
+    REQUIRE input_units mm or m; up_axis y or z. Scales default to [50,100].
+    Supports static, uncompressed triangle GLBs only (max 100 MB/250k triangles).
+    No hidden lines, inferred construction or product-front recognition.
+    Optional item-level source_references require source_id/title/url/publisher/
+    locator/accessed_on/relationship/used_for/terms_url. They describe references
+    attached to this drawing, never retroactive generation inputs."""
+    try:
+        if bool(asset_id) == bool(source_glb):
+            raise ValueError("Choose exactly one asset_id or source_glb")
+        source_record = None
+        if asset_id:
+            asset = generated_asset_indexer.get(asset_id)
+            if not asset:
+                raise ValueError("Unknown generated asset ID")
+            model = (Path(GENERATED_LIBRARY_DIR)/asset["file"]).resolve()
+            model.relative_to(Path(GENERATED_LIBRARY_DIR).resolve())
+            if drafting.sha(model.read_bytes()) != asset["sha256"]:
+                raise ValueError("Source model checksum differs from catalogue")
+            record_result = get_generation_sources(asset_id)
+            if record_result["status"] != "success":
+                raise ValueError(record_result["message"])
+            source_record = record_result["record"]
+            name, units, up = asset["product"], "mm", "y"
+        else:
+            model = Path(source_glb)
+            if not model.is_absolute() or model.suffix.lower() != ".glb":
+                raise ValueError("Custom source must be an absolute .glb path")
+            if model.stat().st_size > 100_000_000:
+                raise ValueError("GLB exceeds 100 MB limit")
+            name, units, up = model.stem, input_units, up_axis
+            asset_id = "custom-" + drafting.sha(model.read_bytes())[:16].lower()
+            source_record = {"evidence_status": "user_supplied_mesh", "generation_history": "not_supplied"}
+        output = paths.user_data_dir()/"drawing-runs"/str(uuid.uuid4())
+        return drafting.create_package(model, output, asset_id=asset_id, name=name,
+            units=units, up_axis=up, scales=[50, 100] if scales is None else scales,
+            references=source_references or [], source_record=source_record)
+    except (OSError, ValueError, KeyError, IndexError, TypeError, struct.error) as exc:
+        return {"status": "error", "message": str(exc)}
+
+
+@mcp.tool(annotations={"readOnlyHint": True, "openWorldHint": False})
+def audit_asset_drawing(package_dir: str, source_glb: str = "") -> dict:
+    """Check exported files and whether source geometry changed. Custom packages
+    need the current source_glb to check staleness; library assets resolve automatically."""
+    try:
+        package = Path(package_dir)
+        if not package.is_absolute():
+            raise ValueError("Supply an absolute package directory")
+        manifest = json.loads((package/"drawing.json").read_text(encoding="utf-8"))
+        source = Path(source_glb) if source_glb else None
+        if source is not None and not source.is_absolute():
+            raise ValueError("Supply an absolute source GLB path")
+        if source is None:
+            asset = generated_asset_indexer.get(manifest["source"]["asset_id"])
+            if asset:
+                source = (Path(GENERATED_LIBRARY_DIR)/asset["file"]).resolve()
+                source.relative_to(Path(GENERATED_LIBRARY_DIR).resolve())
+        return drafting.audit_package(package, source)
+    except (OSError, ValueError, KeyError, IndexError, TypeError, struct.error) as exc:
+        return {"status": "error", "message": str(exc)}
+
+
+@mcp.resource("almond://generated/{asset_id}/sources", mime_type="application/json")
+def generation_sources_resource(asset_id: str) -> ResourceResult:
+    return ResourceResult([ResourceContent(get_generation_sources(asset_id), mime_type="application/json")])
+
+
+@mcp.resource("almond://generated/{asset_id}/drawing/{view}/{scale}", mime_type="image/svg+xml")
+def asset_drawing_resource(asset_id: str, view: str, scale: str) -> ResourceResult:
+    if view not in {"plan", "front", "right"} or scale not in {"50", "100"}:
+        raise ValueError("Unknown bundled view or scale")
+    result = get_asset_drawing(asset_id)
+    if result["status"] != "success":
+        raise ValueError(result["message"])
+    filename = f"{view}-1-{scale}.svg"
+    model = generated_asset_indexer.get(asset_id)
+    source = (Path(GENERATED_LIBRARY_DIR)/model["file"]).resolve() if model else None
+    checked = drafting.audit_package(Path(result["package_dir"]), source)
+    if checked["status"] != "success":
+        raise ValueError("Drawing package is modified or stale")
+    return ResourceResult([ResourceContent((Path(result["package_dir"])/filename).read_text(encoding="utf-8"), mime_type="image/svg+xml")])
+
+
+@mcp.resource("almond://generated/catalogue", mime_type="application/json")
+def generated_catalogue_resource() -> ResourceResult:
+    """Compact catalogue; retrieve individual passports/previews on demand."""
+    return ResourceResult([ResourceContent({"library_id": "generated_assets", "assets": [
+        {"asset_id": a["asset_id"], "product": a["product"], "category": a["category"],
+         "dimensions_mm": a["dimensions_mm"],
+         "passport_uri": f"almond://generated/{a['asset_id']}/passport",
+         "preview_uri": f"almond://generated/{a['asset_id']}/preview"}
+        for a in generated_asset_indexer.assets.values()]}, mime_type="application/json")])
+
+
+@mcp.resource("almond://generated/{asset_id}/passport", mime_type="application/json")
+def generated_passport_resource(asset_id: str) -> ResourceResult:
+    return ResourceResult([ResourceContent(get_generated_asset_passport(asset_id), mime_type="application/json")])
+
+
+@mcp.resource("almond://generated/{asset_id}/preview", mime_type="image/png")
+def generated_preview_resource(asset_id: str) -> ResourceResult:
+    """Existing Blender preview for a known catalogue id."""
+    if asset_id not in generated_asset_indexer.assets:
+        raise ValueError("Unknown generated asset id")
+    root = Path(GENERATED_LIBRARY_DIR).resolve()
+    preview = (root / "previews" / f"{asset_id}.png").resolve()
+    preview.relative_to(root)
+    return ResourceResult([ResourceContent(preview.read_bytes(), mime_type="image/png")])
+
+
+@mcp.tool()
+def get_generated_asset(asset_id: str) -> str:
+    """Returns one generated asset's measured dimensions, spatial contract,
+    material, generation provenance (Meshy task ids, prompt) and availability."""
+    asset = retrieval_store.get_asset(asset_id, library_id="generated_assets")
+    if not asset:
+        return json.dumps({
+            "status": "error",
+            "message": f"Unknown generated asset_id: {asset_id}",
+        })
+    return json.dumps({"status": "success", "asset": asset})
+
+
+@mcp.tool()
 def list_drawing_recipes() -> str:
     """Lists compact audited layer, lineweight, projection, and export recipes."""
     recipes = []
@@ -709,8 +1146,8 @@ def get_retrieval_status() -> str:
         "status": "ready",
         "database": STATE_DB_PATH,
         "asset_index": retrieval_store.asset_stats(),
-        "ikea_index": retrieval_store.asset_stats("ikea"),
         "drawing_asset_index": retrieval_store.asset_stats("drawing_assets"),
+        "generated_asset_index": retrieval_store.asset_stats("generated_assets"),
         "drawing_recipes": len(drawing_recipe_indexer.recipes),
         "retrieval": ["sqlite", "fts5", "rtree"],
         "embedding_adapter": "not_configured",
@@ -908,89 +1345,6 @@ def update_generation_step(
         return json.dumps({"status": "error", "message": str(exc)})
 
 
-@mcp.tool()
-def place_ikea_furniture(
-    asset_id: str,
-    x: float = 0,
-    y: float = 0,
-    z: float = 0,
-    rotation_degrees: float = 0,
-    scale: float = 1,
-) -> str:
-    """
-    Imports an indexed IKEA SketchUp model into Rhino 8 as a reusable block and places an instance.
-
-    The asset is imported only when its block definition does not already exist. Subsequent calls
-    create lightweight instances. Position uses the active Rhino document units; rotation is around
-    world Z. The tool never accepts an arbitrary file path.
-    """
-    asset = furniture_indexer.get(asset_id)
-    if not asset:
-        return json.dumps({"status": "error", "message": f"Unknown furniture asset_id: {asset_id}"})
-    if not asset.get("file_available"):
-        return json.dumps({"status": "error", "message": f"Furniture file is missing for {asset_id}."})
-    if asset.get("geometry_status") == "defective":
-        return json.dumps({
-            "status": "error",
-            "message": f"{asset_id} has known-defective source geometry and is "
-                       f"excluded from placement: {asset.get('geometry_note', 'see manifest')}",
-        })
-
-    numeric_values = [x, y, z, rotation_degrees, scale]
-    if not all(isinstance(value, (int, float)) and abs(value) != float("inf") and value == value for value in numeric_values):
-        return json.dumps({"status": "error", "message": "Placement values must be finite numbers."})
-    if scale <= 0 or scale > 100:
-        return json.dumps({"status": "error", "message": "scale must be greater than 0 and no more than 100."})
-
-    payload = json.dumps({
-        "type": "place_furniture",
-        "asset_id": asset_id,
-        "file_path": asset["_resolved_file"],
-        "name": f"{asset.get('series', '')} {asset.get('product', '')}".strip(),
-        "position": [x, y, z],
-        "rotation_degrees": rotation_degrees,
-        "scale": scale,
-        "metadata": {
-            "series": asset.get("series"),
-            "product": asset.get("product"),
-            "variant": asset.get("variant"),
-            "category": asset.get("category"),
-            "dimensions_mm": asset.get("dimensions_mm"),
-            "ikea_product_id": asset.get("ikea_product_id"),
-            "ikea_url": asset.get("ikea_url"),
-            "warehouse_url": asset.get("warehouse_url"),
-            "warehouse_status": asset.get("warehouse_status"),
-            "match_status": asset.get("match_status"),
-        },
-    }).encode("utf-8")
-
-    try:
-        response = _send_and_receive(payload, timeout=90.0)
-    except socket.timeout:
-        return json.dumps({"status": "error", "message": "Rhino furniture import timed out."})
-    except ConnectionRefusedError:
-        return json.dumps({"status": "error", "message": "Rhino bridge is unavailable. Start RhinoAlmondBridge first."})
-    except Exception as exc:
-        return json.dumps({"status": "error", "message": f"Furniture placement failed: {exc}"})
-
-    # Post-import QA: compare the real placed bounds against the catalogue
-    # dimensions, and apply any manifest-declared geometry correction.
-    try:
-        result = json.loads(response)
-    except (TypeError, ValueError):
-        return response
-    if not isinstance(result, dict) or result.get("status") != "success":
-        return response
-    check = _dimension_check(asset, result.get("bounds"), scale)
-    if check:
-        result["dimension_check"] = check
-    correction = asset.get("import_correction") or {}
-    rotate_x = float(correction.get("rotate_x_degrees", 0) or 0)
-    if rotate_x and result.get("object_guid"):
-        result["import_correction_applied"] = _apply_import_correction(
-            result["object_guid"], rotate_x, z
-        )
-    return json.dumps(result)
 
 
 def _dimension_check(asset: dict, bounds: dict | None, scale: float) -> dict | None:
@@ -1066,7 +1420,8 @@ public class Script
 
 
 def _material_script(material: dict, guid_list: list[str],
-                     apply_render_material: bool, attach_metadata: bool) -> str:
+                     apply_render_material: bool, attach_metadata: bool,
+                     extra_strings: dict[str, str] | None = None) -> str:
     """C# for the bridge: create/reuse a PBR doc material, assign it to the
     objects, and write almond:* user strings (Datasmith metadata in Unreal)."""
     r, g, b = (int(v) for v in material["base_color"])
@@ -1085,6 +1440,8 @@ def _material_script(material: dict, guid_list: list[str],
         "almond:roughness": f"{roughness:g}",
         "almond:opacity": f"{opacity:g}",
     }
+    if extra_strings:
+        user_strings.update(extra_strings)
     set_strings = "\n                ".join(
         f'obj.Attributes.SetUserString("{key}", "{value.replace(chr(34), "")}");'
         for key, value in user_strings.items()
@@ -1163,15 +1520,286 @@ def list_materials(category: str = "", query: str = "") -> str:
 
 
 @mcp.tool()
+def get_construction_guidance(
+    query: str = "",
+    category: str = "",
+    material: str = "",
+    structure_type: str = "",
+    span_m: float = 0.0,
+    include_reference_data: bool = False,
+) -> str:
+    """
+    Curated construction-system guidance for generating structures that are
+    built the way real buildings are built - not arbitrary members in space.
+    Parameters are distilled from Ching's Building Construction Illustrated
+    (4th ed.): per-system span ranges, depth rules of thumb (depth = span/N),
+    member spacing, element roles, and assembly notes.
+
+    Call this BEFORE generating structural geometry: pick a system, size and
+    space members from its rules, then generate and run validate_structure
+    (which cross-checks the result against this same library). Each system
+    names its structural_material (validate_structure vocabulary) and
+    render_material_ids (assign_material vocabulary), so the declared
+    construction material flows through analysis AND appears on the Rhino
+    objects.
+
+    Args:
+        query: Free-text filter (e.g. "glulam", "longspan", "bearing wall").
+        category: "floor", "wall", "roof", "foundation" (empty = all).
+        material: "Wood", "Steel", "Concrete" - validate_structure names.
+        structure_type: validate_structure type ("beam", "truss", "shell",
+            "frame", "canopy", "gridshell", "membrane", "highrise").
+        span_m: If > 0, each returned system reports fits_span and
+            suggested member depths from its span-ratio rules.
+        include_reference_data: Also return occupancy live loads (kPa) and
+            material densities (kg/m3) for choosing load_kn inputs.
+    Returns:
+        JSON: {total, systems: [...], reference?} - for wall systems
+        span_range_m is the unsupported height range (span_axis "vertical").
+    """
+    systems = construction_library.list(
+        category=category, query=query, material=material,
+        structure_type=structure_type)
+    payload: dict = {
+        "total": len(systems),
+        "source": construction_library.source,
+        "systems": [],
+    }
+    for system in systems:
+        card = dict(system)
+        if span_m > 0:
+            lo, hi = system["span_range_m"]
+            if hi > 0:
+                card["fits_span"] = bool(lo <= span_m <= hi)
+                depths = [
+                    {"element": rule["element"],
+                     "suggested_depth_mm": round(span_m * 1000 / rule["span_ratio"]),
+                     "rule": f"span/{rule['span_ratio']}"}
+                    for rule in system.get("depth_rules", [])
+                    if rule.get("span_ratio")
+                ]
+                if depths:
+                    card["depth_guidance"] = depths
+        payload["systems"].append(card)
+    if include_reference_data:
+        payload["reference"] = construction_library.reference
+    if not systems:
+        payload["hint"] = ("No system matched. Loosen the filters, or call "
+                          "with no arguments to list all systems.")
+    return json.dumps(payload)
+
+
+@mcp.tool()
+def get_typology_narrative(
+    query: str = "",
+    construction_system: str = "",
+    structure_type: str = "",
+    limit: int = 5,
+) -> str:
+    """
+    Architectural typology narratives for project storytelling - precedents,
+    eras, and urban roles distilled from Ching, Jarzombek & Prakash's
+    A Global History of Architecture, with page references (gha_ref).
+
+    NARRATION ONLY: use these entries to caption, contextualize and narrate
+    a design (which tradition a courtyard block belongs to, what a truss
+    hall's civic ancestors are). They must NEVER drive geometry, member
+    sizing, or structural decisions - that is get_construction_guidance's
+    job. A natural pairing: after building with a construction system, call
+    this with construction_system=<that system_id> to fetch the lineage for
+    the project description.
+
+    Args:
+        query: Free text (e.g. "courtyard", "skyscraper", "timber hall").
+        construction_system: Filter to entries related to a construction
+            library system_id (e.g. "steel-column-frame").
+        structure_type: Filter by validate_structure type ("shell",
+            "truss", "frame", "membrane", ...).
+        limit: Maximum entries returned (default 5).
+    Returns:
+        JSON: {total, entries: [{typology_id, name, era, region, narrative,
+        precedents, related_construction_systems, urban_role, gha_ref,
+        tags}], source}.
+    """
+    entries = history_library.list(query=query,
+                                   construction_system=construction_system,
+                                   structure_type=structure_type)
+    return json.dumps({
+        "total": len(entries),
+        "entries": entries[:max(1, limit)],
+        "source": history_library.source,
+    })
+
+
+@mcp.tool()
+def check_egress(
+    plate_bounds_mm: list[float],
+    exits: list[dict],
+    occupancy: str = "business",
+    stories: int = 1,
+    sprinklered: bool = True,
+    net_area_m2: float = 0.0,
+    travel_distances_m: list[float] = [],
+    dead_end_m: float = 0.0,
+) -> str:
+    """
+    Checks a floor plate's means of egress against the construction library's
+    egress rules (BCI A.10-A.13 framework + IBC-typical numeric factors -
+    always verify against the governing code; the response repeats this).
+
+    Call AFTER laying out cores/exits and BEFORE detailing: it verifies exit
+    count, exit separation, egress width, travel distances and dead ends in
+    one pass, and names the failing requirement so the layout can be fixed
+    (add an exit, move a core, widen a stair) instead of guessed at.
+
+    Args:
+        plate_bounds_mm: Floor plate [min_x, min_y, max_x, max_y] in mm
+            (sets gross area and the diagonal used for exit separation).
+        exits: One entry per exit (stair door or exterior exit door):
+            {"name": str, "x_mm": float, "y_mm": float, "width_mm": float}.
+            Positions are the door centers; width is the clear egress width.
+        occupancy: Occupant-load key: business, mercantile, assembly_
+            unconcentrated, classroom, residential, storage.
+        stories: Stories served. Above 1, at least two exits are required
+            and exit width demand uses the stair factor (7.6 mm/occupant)
+            instead of the door factor (5.1).
+        sprinklered: Sprinklered throughout (affects separation fraction,
+            travel-distance and dead-end limits).
+        net_area_m2: Override the occupied area; 0 uses the gross plate area.
+        travel_distances_m: Measured worst-case travel distances (e.g. from
+            drawn egress paths); empty skips the travel check.
+        dead_end_m: Longest dead-end corridor in metres; 0 skips the check.
+    Returns:
+        JSON: {passed, occupant_load, checks: [{check, required, provided,
+        passed, basis}], warnings, source_note}.
+    """
+    rules = construction_library.reference.get("egress_rules")
+    if not rules:
+        return json.dumps({"status": "error",
+                           "message": "egress_rules missing from the construction manifest."})
+    if len(plate_bounds_mm) != 4:
+        return json.dumps({"status": "error",
+                           "message": "plate_bounds_mm must be [min_x, min_y, max_x, max_y]."})
+    if not exits:
+        return json.dumps({"status": "error", "message": "exits must not be empty."})
+
+    import math as _math
+    x0, y0, x1, y1 = plate_bounds_mm
+    width_m, depth_m = abs(x1 - x0) / 1000, abs(y1 - y0) / 1000
+    gross_m2 = width_m * depth_m
+    area_m2 = net_area_m2 if net_area_m2 > 0 else gross_m2
+    diagonal_m = _math.hypot(width_m, depth_m)
+
+    factors = rules["occupant_load_m2_per_person"]
+    if occupancy not in factors:
+        return json.dumps({"status": "error",
+                           "message": f"Unknown occupancy '{occupancy}'. "
+                                      f"Known: {', '.join(sorted(factors))}"})
+    occupant_load = _math.ceil(area_m2 / factors[occupancy])
+
+    checks, warnings = [], []
+
+    def add(check, required, provided, passed, basis):
+        checks.append({"check": check, "required": required,
+                       "provided": provided, "passed": bool(passed), "basis": basis})
+
+    # 1. number of exits
+    exits_required = 4
+    for tier in rules["exits_required_by_occupant_load"]:
+        cap = tier["max_occupants"]
+        if cap is None or occupant_load <= cap:
+            exits_required = tier["exits"]
+            break
+    if stories > 1:
+        exits_required = max(exits_required, 2)
+    add("exit_count", exits_required, len(exits), len(exits) >= exits_required,
+        "occupant-load tiers; multi-story business needs two (IBC-typical)")
+
+    # 2. exit separation (straight line between the two most remote exits)
+    frac = rules["exit_separation_fraction_of_diagonal"][
+        "sprinklered" if sprinklered else "unsprinklered"]
+    sep_req_m = diagonal_m * frac
+    sep_m = 0.0
+    for i in range(len(exits)):
+        for j in range(i + 1, len(exits)):
+            d = _math.hypot(exits[i]["x_mm"] - exits[j]["x_mm"],
+                            exits[i]["y_mm"] - exits[j]["y_mm"]) / 1000
+            sep_m = max(sep_m, d)
+    if len(exits) >= 2:
+        add("exit_separation_m", round(sep_req_m, 2), round(sep_m, 2),
+            sep_m >= sep_req_m,
+            f"diagonal {diagonal_m:.1f} m x {frac:g} ({'sprinklered' if sprinklered else 'unsprinklered'})")
+
+    # 3. egress width: total, and per-exit minimum
+    per_occ = rules["egress_width_mm_per_occupant"][
+        "stairs" if stories > 1 else "doors_corridors"]
+    total_req = occupant_load * per_occ
+    total_prov = sum(float(e.get("width_mm", 0)) for e in exits)
+    add("total_egress_width_mm", round(total_req), round(total_prov),
+        total_prov >= total_req,
+        f"{occupant_load} occupants x {per_occ} mm ({'stair' if stories > 1 else 'door'} factor)")
+    min_w = (rules["min_widths_mm"]["exit_stair"] if occupant_load >= 50
+             else rules["min_widths_mm"]["stair_serving_under_50"]) if stories > 1 \
+        else rules["min_widths_mm"]["door_clear"]
+    narrow = [e.get("name", "?") for e in exits if float(e.get("width_mm", 0)) < min_w]
+    add("min_exit_width_mm", min_w,
+        min(float(e.get("width_mm", 0)) for e in exits),
+        not narrow, "BCI 9.04 stair width" if stories > 1 else "door clear width")
+    if narrow:
+        warnings.append(f"Exits below minimum width: {', '.join(narrow)}.")
+
+    # 4. travel distance
+    if travel_distances_m:
+        limit = rules["max_travel_distance_m"][
+            "business_sprinklered" if sprinklered else "business_unsprinklered"]
+        worst = max(travel_distances_m)
+        basis = "business limits (IBC-typical)"
+        if occupancy != "business":
+            basis += f"; no {occupancy}-specific limit in the library - verify"
+            warnings.append(f"Travel-distance limit uses business values for "
+                            f"'{occupancy}' occupancy; verify the governing code.")
+        add("max_travel_distance_m", limit, round(worst, 1), worst <= limit, basis)
+
+    # 5. dead-end corridor
+    if dead_end_m > 0:
+        limit = rules["max_dead_end_corridor_m"][
+            "sprinklered_business" if sprinklered else "default"]
+        add("max_dead_end_m", limit, round(dead_end_m, 1), dead_end_m <= limit,
+            "sprinklered" if sprinklered else "unsprinklered default")
+
+    return json.dumps({
+        "passed": all(c["passed"] for c in checks),
+        "occupancy": occupancy,
+        "occupant_load": occupant_load,
+        "area_m2": round(area_m2, 1),
+        "gross_area_m2": round(gross_m2, 1),
+        "checks": checks,
+        "warnings": warnings,
+        "source_note": rules.get("source_note", ""),
+    })
+
+
+@mcp.tool()
 def assign_material(
     guids: list[str],
     material_id: str,
     apply_render_material: bool = True,
     attach_metadata: bool = True,
+    structural_role: str = "",
+    construction_system: str = "",
 ) -> str:
     """
     Assigns a curated PBR material to Rhino objects and stamps them with
     machine-readable material metadata for downstream pipelines (Unreal).
+
+    For structural members, also declare what the object IS in construction
+    terms: structural_role (e.g. "joist", "girder", "stud", "truss_chord")
+    and construction_system (a system_id from get_construction_guidance).
+    These are written as almond:structural_role / almond:construction_system
+    user text on the objects, so the stated construction intent lives on the
+    Rhino geometry itself and survives export. If the chosen material_id is
+    not a typical finish for the declared system, the response carries a
+    warning (it still applies).
 
     Two effects, independently switchable:
     - apply_render_material: creates/reuses a physically-based Rhino
@@ -1206,7 +1834,30 @@ def assign_material(
     if not guid_list:
         return json.dumps({"status": "error", "message": "guids must not be empty."})
 
-    script = _material_script(material, guid_list, apply_render_material, attach_metadata)
+    warnings = []
+    extra_strings: dict[str, str] = {}
+    if structural_role:
+        extra_strings["almond:structural_role"] = structural_role
+    if construction_system:
+        system = construction_library.get(construction_system)
+        if system is None:
+            known = ", ".join(sorted(construction_library.systems)) or "none loaded"
+            return json.dumps({
+                "status": "error",
+                "message": f"Unknown construction_system: {construction_system}. "
+                           f"Known: {known}",
+            })
+        extra_strings["almond:construction_system"] = construction_system
+        extra_strings["almond:structural_material"] = system["structural_material"]
+        typical = system.get("render_material_ids", [])
+        if typical and material_id not in typical:
+            warnings.append(
+                f"Material '{material_id}' is not a typical finish for "
+                f"{construction_system} (typical: {', '.join(typical)}). "
+                f"Applied anyway.")
+
+    script = _material_script(material, guid_list, apply_render_material,
+                              attach_metadata, extra_strings)
     payload = json.dumps({"type": "execute", "script": script}).encode("utf-8")
     try:
         response = json.loads(_send_and_receive(payload, timeout=60.0))
@@ -1217,7 +1868,7 @@ def assign_material(
     if response.get("status") != "success":
         return json.dumps(response)
     applied = response.get("guids") or []
-    return json.dumps({
+    result = {
         "status": "success",
         "material_id": material_id,
         "rhino_material_name": "ALMOND::" + material_id,
@@ -1227,7 +1878,14 @@ def assign_material(
         "applied_guids": applied,
         "metadata_attached": attach_metadata,
         "render_material_applied": apply_render_material,
-    })
+    }
+    if structural_role:
+        result["structural_role"] = structural_role
+    if construction_system:
+        result["construction_system"] = construction_system
+    if warnings:
+        result["warnings"] = warnings
+    return json.dumps(result)
 
 
 @mcp.tool()
@@ -1243,7 +1901,7 @@ def place_drawing_asset(
     Places an indexed representation asset as a reusable Rhino block.
 
     Drawing assets are placed on ALMOND-DRAW::ASSETS and remain distinct from
-    IKEA product blocks. The tool accepts only files resolved from the
+    generated model blocks. The tool accepts only files resolved from the
     controlled DrawingAssetfiles manifest.
     """
     asset = drawing_asset_indexer.get(asset_id)
@@ -1523,6 +2181,55 @@ def execute_rhino_script(script: str) -> str:
 
 
 @mcp.tool()
+def capture_conditioning_pass(
+    shot: str,
+    out_dir: str,
+    width: int = 832,
+    height: int = 480,
+    passes: str = "rgb,edge,depth",
+    fps: int = 16,
+    chunk: int = 16,
+    rgb_mode: str = "Rendered",
+    edge_mode: str = "Technical",
+    invert_depth: bool = False,
+) -> str:
+    """
+    Capture RGB + edge (line drawing) + depth frames along a camera path from the LIVE Rhino
+    document, as conditioning for geometry-guided video generation (Wan VACE / ControlNet).
+    Depth and edges are read from the model itself, not estimated, and every frame's camera is
+    recorded so the generated video can be re-projected against the source geometry.
+
+    shot: JSON string describing the camera path (model units, usually mm). One of:
+      {"type":"orbit","center":[x,y,z],"radius":r,"height":z,"frames":81,
+       "start_deg":0,"end_deg":90,"lens":35,"target_height":z}
+      {"type":"track","cam0":[x,y,z],"cam1":[..],"target0":[..],"target1":[..],"frames":81,"lens":35}
+      {"type":"keyframes","keyframes":[{"camera":[..],"target":[..],"lens":35}, ...],"frames":81}
+    Use 4n+1 frames for Wan models (17, 33, 49, 65, 81). 81 frames = 5 s at 16 fps.
+
+    Writes to out_dir: rgb/ edge/ depth/ (f0000.png ...), rgb.mp4 / edge.mp4 / depth.mp4
+    (when ffmpeg is available), camera.json (per-frame camera receipt, schema building0.camera/0.1),
+    zrange.csv (per-frame depth range), doc.json, summary.json. Depth is grayscale with near = bright
+    (Rhino's native convention, what Wan/ControlNet depth expects); set invert_depth for near = dark.
+    The user's viewport camera is restored when the pass finishes. Returns the summary JSON.
+    """
+    try:
+        shot_dict = json.loads(shot)
+        frames = conditioning.build_path(shot_dict)
+    except (ValueError, KeyError, TypeError) as e:
+        return json.dumps({"status": "error", "message": f"Bad shot description: {e}"})
+    pass_list = tuple(p.strip() for p in passes.split(",") if p.strip())
+    try:
+        summary = conditioning.capture_conditioning_pass(
+            frames, out_dir, _send_and_receive, width=width, height=height, passes=pass_list,
+            rgb_mode=rgb_mode, edge_mode=edge_mode, invert_depth=invert_depth, chunk=chunk, fps=fps)
+    except ConnectionRefusedError:
+        return json.dumps({"status": "error", "message": "Connection refused. Is the RhinoAlmondBridge plugin loaded in Rhino?"})
+    except Exception as e:  # noqa: BLE001
+        return json.dumps({"status": "error", "message": f"Conditioning pass failed: {e}"})
+    return json.dumps(summary)
+
+
+@mcp.tool()
 def validate_structure(
     guids: list[str],
     structure_type: str = "beam",
@@ -1560,8 +2267,15 @@ def validate_structure(
             "highrise"   — high-rise structural systems
         load_kn: Applied load in kN (default 10.0).
         material: Material type: "Steel", "S355", "Concrete", "Wood", "Aluminium" (default "Steel").
+    Prefer calling get_construction_guidance BEFORE generating the geometry:
+    pick a real construction system and size members from its depth/spacing
+    rules. This tool cross-checks the analyzed span against that same library
+    and appends a "construction_check" object (matching_systems with
+    fits_span and suggested member depths, plus warnings when the span falls
+    outside every curated system's range for this structure_type/material).
+
     Returns:
-        JSON passed through untouched from the bridge. Top-level fields: status
+        JSON from the bridge plus the construction_check. Top-level fields: status
         ("pass"|"fail"|"error"), passed (bool), verdict (text), suggestions,
         confidence ("high"|"medium"|"low"), warnings, and worst_member_guids
         (up to 5 Rhino GUIDs of the most over-utilized members — edit those
@@ -1590,12 +2304,28 @@ def validate_structure(
     except Exception as e:
         return json.dumps({"status": "error", "message": f"Bridge error: {e}"})
 
-    # Persist the run in the state DB so export_structural_report can render
-    # an auditable history. Recording must never break validation itself.
+    # Attach the constructibility cross-check (curated construction-system
+    # span/depth guidance), then persist the run in the state DB so
+    # export_structural_report can render an auditable history. Neither step
+    # may ever break validation itself.
     try:
         result = json.loads(response)
         if isinstance(result, dict) and result.get("status") in ("pass", "fail"):
+            span_m = None
+            results_block = result.get("results")
+            if isinstance(results_block, dict):
+                span_m = results_block.get("span_m")
+            try:
+                check = construction_library.assess_span(
+                    structure_type, material, span_m)
+                result["construction_check"] = check
+                if check.get("warnings"):
+                    result.setdefault("warnings", [])
+                    result["warnings"].extend(check["warnings"])
+            except Exception:
+                pass
             retrieval_store.record_validation_run(request, result, guids)
+            return json.dumps(result)
     except Exception:
         pass
     return response
@@ -1731,6 +2461,11 @@ def _restore_and_place_script(contract: dict, materials: dict[str, dict],
                repr(float(material["opacity"])))
         )
     anchor = contract["spatial"].get("anchor", "bottom_center")
+    passport_stamp = ""
+    if contract.get("passport"):
+        # C# verbatim string, so quotes/backslashes in provenance stay data.
+        encoded = json.dumps(contract["passport"], ensure_ascii=True).replace('"', '""')
+        passport_stamp = f'obj.Attributes.SetUserString("almond:passport", @"{encoded}");'
     return f"""
 using System;
 using System.Collections.Generic;
@@ -1823,6 +2558,7 @@ public class Script
             }}
             obj.Attributes.SetUserString("almond:asset_id", "{contract['asset_id']}");
             obj.Attributes.SetUserString("almond:source_app", "{contract.get('source_app', 'unknown')}");
+            {passport_stamp}
             obj.Attributes.LayerIndex = layerIndex;
             obj.CommitChanges();
         }}
@@ -2028,7 +2764,14 @@ def import_asset_contract(
         contract = exchange.load_contract(contract_path)
     except Exception as exc:
         return json.dumps({"status": "error", "message": str(exc)})
+    return json.dumps(_receive_contract(contract, x_mm, y_mm, z_mm, rotation_degrees, layer))
 
+
+def _receive_contract(contract: dict, x_mm: float, y_mm: float, z_mm: float,
+                      rotation_degrees: float, layer: str) -> dict:
+    """Import a loaded contract's GLB into Rhino, restore materials and
+    metadata, place it per the contract anchor, and report the dimension
+    check. Shared by import_asset_contract and place_generated_asset."""
     import_script = """
 using System;
 using System.Collections.Generic;
@@ -2054,15 +2797,15 @@ public class Script
             json.dumps({"type": "execute", "script": import_script}).encode("utf-8"),
             timeout=120.0))
     except ConnectionRefusedError:
-        return json.dumps({"status": "error", "message": "Rhino bridge is unavailable."})
+        return {"status": "error", "message": "Rhino bridge is unavailable."}
     except Exception as exc:
-        return json.dumps({"status": "error", "message": f"Import failed: {exc}"})
+        return {"status": "error", "message": f"Import failed: {exc}"}
     if result.get("status") != "success":
-        return json.dumps(result)
+        return result
     imported = result.get("guids") or []
     if not imported:
-        return json.dumps({"status": "error",
-                           "message": "Rhino imported no objects from the GLB."})
+        return {"status": "error",
+                           "message": "Rhino imported no objects from the GLB."}
 
     contract["_imported_guids"] = imported
     needed = {row["material_id"] for row in contract.get("materials", [])}
@@ -2077,12 +2820,12 @@ public class Script
             json.dumps({"type": "execute", "script": script}).encode("utf-8"),
             timeout=120.0))
     except Exception as exc:
-        return json.dumps({"status": "error",
+        return {"status": "error",
                            "message": f"Imported, but restore/place failed: {exc}",
-                           "imported_guids": imported})
+                           "imported_guids": imported}
     if restore.get("status") != "success":
-        return json.dumps({"status": "error", "message": restore.get("message", "restore failed"),
-                           "imported_guids": imported})
+        return {"status": "error", "message": restore.get("message", "restore failed"),
+                           "imported_guids": imported}
 
     report_path = Path(tempfile.gettempdir()) / "almond_import_report.json"
     report = {}
@@ -2092,7 +2835,7 @@ public class Script
         except ValueError:
             report = {}
     check = exchange.dimension_report(contract, report) if report else {"status": "unknown"}
-    return json.dumps({
+    return {
         "status": "success",
         "asset_id": contract["asset_id"],
         "source_app": contract.get("source_app", "unknown"),
@@ -2103,7 +2846,65 @@ public class Script
         "dimension_check": check,
         "layer": layer,
         "imported_guids": imported,
-    })
+    }
+
+
+@mcp.tool()
+def place_generated_asset(
+    asset_id: str,
+    x_mm: float = 0,
+    y_mm: float = 0,
+    z_mm: float = 0,
+    rotation_degrees: float = 0,
+    layer: str = "ALMOND-GEN",
+) -> str:
+    """
+    Imports a generated-library asset into the open Rhino document and places
+    it at a point (contract anchor = bottom centre, mm), restoring its Almond
+    material and almond:* metadata and verifying the landed size against the
+    contract. Use search_generated_assets to choose an asset_id; afterwards
+    call register_scene_instance so the scene ledger and layout validation
+    know about it.
+
+    Args:
+        asset_id: e.g. "gen-park-bench-1".
+        x_mm, y_mm, z_mm: placement point in millimetres.
+        rotation_degrees: rotation about world Z.
+        layer: destination layer, created if absent.
+    """
+    asset = generated_asset_indexer.get(asset_id)
+    if not asset:
+        return json.dumps({"status": "error",
+                           "message": f"Unknown generated asset_id: {asset_id}"})
+    if not asset.get("file_available"):
+        return json.dumps({"status": "error",
+                           "message": f"Model file missing for {asset_id}; run "
+                                      "almond-mcp fetch-assets to download it."})
+    values = [x_mm, y_mm, z_mm, rotation_degrees]
+    if not all(isinstance(v, (int, float)) and math.isfinite(v) for v in values):
+        return json.dumps({"status": "error", "message": "Placement values must be finite numbers."})
+    contract_rel = str(asset.get("contract_file") or "").strip()
+    if not contract_rel:
+        return json.dumps({"status": "error", "message": f"{asset_id} has no contract_file."})
+    library_root = Path(GENERATED_LIBRARY_DIR).resolve()
+    contract_path = (library_root / contract_rel).resolve()
+    try:
+        contract_path.relative_to(library_root)
+        contract = exchange.load_contract(contract_path)
+    except Exception as exc:
+        return json.dumps({"status": "error", "message": str(exc)})
+    result = _receive_contract(contract, x_mm, y_mm, z_mm, rotation_degrees, layer)
+    if result.get("status") == "success":
+        result.update({
+            "library_id": "generated_assets",
+            "product": asset.get("product"),
+            "dimensions_mm": asset.get("dimensions_mm"),
+            "clearance_mm": (asset.get("spatial") or {}).get("clearance_mm"),
+            "render_material_id": asset.get("render_material_id"),
+            "next_step": "register_scene_instance(scene_id, asset_id=..., x, y, rotation) "
+                         "so validate_scene_layout can see this placement.",
+        })
+    return json.dumps(result)
 
 
 @mcp.tool()
@@ -2509,6 +3310,40 @@ def publish_to_chestnut(
         preserve_scale=True,
         mass=preset["mass"],
     )
+
+
+@mcp.tool()
+def search_asset_repository(query: str = "", kind: str = "all", drawing_ready: bool = False, limit: int = 20) -> dict:
+    """Search the unified model/drawing archive. kind: all, model or element.
+
+    Returns stable IDs, file availability, dimensions and MCP resource URIs.
+    Drawing-ready means a derived projection package is linked to the object.
+    """
+    from almond_mcp.asset_repository import AssetRepository
+    try:
+        return AssetRepository().search(query, kind, drawing_ready, limit)
+    except ValueError as exc:
+        return {"status": "error", "message": str(exc)}
+
+
+@mcp.resource("almond://repository/{asset_id}")
+def repository_asset_resource(asset_id: str) -> str:
+    """Unified object metadata, source evidence, representations and local files."""
+    from almond_mcp.asset_repository import AssetRepository
+    repository = AssetRepository()
+    record = repository.records.get(asset_id)
+    if not record:
+        raise ValueError("Unknown repository asset ID")
+    # HTTP URLs are relative to `almond-mcp library`; provide resolved locations
+    # for MCP clients that do not have a browser server running.
+    urls = {record["model"], record["preview"], record["contract"], record.get("generation_image")}
+    if record["drawing"]:
+        urls.add(record["drawing"]["record"])
+        for view in record["drawing"]["views"]:
+            urls.update([view["svg"], view["dxf"]])
+        urls.update(sheet["svg"] for sheet in record["drawing"]["sheets"])
+    record["local_files"] = {url: str(repository.files[url][1]) for url in urls if url in repository.files}
+    return json.dumps(record)
 
 
 if __name__ == "__main__":

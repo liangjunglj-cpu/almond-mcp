@@ -1,0 +1,106 @@
+{
+  "schema_version": 1,
+  "asset_pack_version": "0.6.0rc12",
+  "assets": [
+    {
+      "asset_id": "gen-park-bench-1",
+      "name": "Park bench",
+      "package": "pilot/gen-park-bench-1",
+      "scales": [
+        50,
+        100
+      ],
+      "geometry_sha256": "0EA479981979D8D32C2FC82C785A79FD5494E12B4665E7A2B562378A3325C812"
+    },
+    {
+      "asset_id": "gen-office-chair-1",
+      "name": "Office chair",
+      "package": "pilot/gen-office-chair-1",
+      "scales": [
+        50,
+        100
+      ],
+      "geometry_sha256": "7C5A999A2362B83642D6808286D1753C4E805B0DDC0B9469996F594AFBB20180"
+    },
+    {
+      "asset_id": "gen-dining-table-rect-1",
+      "name": "Dining table",
+      "package": "pilot/gen-dining-table-rect-1",
+      "scales": [
+        50,
+        100
+      ],
+      "geometry_sha256": "66EEBD49285E2C19D571DE85799F72A063EE044AC537A24C42B715929DFA8CC0"
+    },
+    {
+      "asset_id": "gen-sofa-3-seat-1",
+      "name": "Sofa",
+      "package": "pilot/gen-sofa-3-seat-1",
+      "scales": [
+        50,
+        100
+      ],
+      "geometry_sha256": "1BF8C78D975EF51BF9757A3F51DA0C1AA26A4991BC170FD0784F5B2208220EB1"
+    },
+    {
+      "asset_id": "gen-bed-double-1",
+      "name": "Double bed",
+      "package": "pilot/gen-bed-double-1",
+      "scales": [
+        50,
+        100
+      ],
+      "geometry_sha256": "62CD062DA041613D4F2791340B59307D20651F34E18971EB171CC40DD42C96D6"
+    },
+    {
+      "asset_id": "gen-washbasin-pedestal-1",
+      "name": "Washbasin",
+      "package": "pilot/gen-washbasin-pedestal-1",
+      "scales": [
+        50,
+        100
+      ],
+      "geometry_sha256": "F6ECB5818557BB59F2BB92E5B633657DFE8ACB84C8349294C4E4D096ACBA4F0F"
+    },
+    {
+      "asset_id": "gen-street-lamp-1",
+      "name": "Street lamp",
+      "package": "pilot/gen-street-lamp-1",
+      "scales": [
+        50,
+        100
+      ],
+      "geometry_sha256": "C28C2A5280E565120E1D26DAD33A39044D57BE6D15DE3CC26CA5934D8D912B62"
+    },
+    {
+      "asset_id": "gen-tree-conifer-1",
+      "name": "Conifer tree",
+      "package": "pilot/gen-tree-conifer-1",
+      "scales": [
+        50,
+        100
+      ],
+      "geometry_sha256": "E154A8FFF1C48F44F320B6B6ADB69421E49ADA9C145B749499E126EE993AE8BC"
+    },
+    {
+      "asset_id": "gen-person-standing-1",
+      "name": "Person standing",
+      "package": "pilot/gen-person-standing-1",
+      "scales": [
+        50,
+        100
+      ],
+      "geometry_sha256": "17AFD6870F8A3147EB5EB5E9E1B2B166AC1F359BE0F0938C23FD86BA9190429D"
+    },
+    {
+      "asset_id": "gen-stool-bent-birch-3leg-1",
+      "name": "Stool",
+      "package": "pilot/gen-stool-bent-birch-3leg-1",
+      "scales": [
+        50,
+        100
+      ],
+      "geometry_sha256": "2E27D08D5B2B362828C308322EE7D49FB1776A3DFE65E875757B06A4CC253F09"
+    }
+  ]
+}

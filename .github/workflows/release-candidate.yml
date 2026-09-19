@@ -1,0 +1,38 @@
+name: Build and verify release candidate
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  windows-release:
+    runs-on: windows-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.8.22'
+          enable-cache: true
+      - name: Get pinned standalone Yak from McNeel
+        shell: pwsh
+        run: |
+          Invoke-WebRequest https://files.mcneel.com/yak/tools/0.15.1/win-x64/yak.exe -OutFile "$env:RUNNER_TEMP/yak.exe"
+          $hash = (Get-FileHash "$env:RUNNER_TEMP/yak.exe" -Algorithm SHA256).Hash
+          if ($hash -ne '9A4356BB1D95E2C7FD6131818E1FB817AFF51249F4D27FC5ABA34DBE8BA7B52E') {
+            throw 'Pinned Yak binary checksum mismatch.'
+          }
+      - name: Build, test, audit, and assemble distributions
+        shell: pwsh
+        run: ./tools/prepare_release.ps1 -YakExecutable "$env:RUNNER_TEMP/yak.exe"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: almond-release-candidate
+          path: dist/release-*/
+          if-no-files-found: error
+          retention-days: 30
+# Deliberately build-only. See docs/release-0.6.md for the publication procedure.
+# No PyPI, Yak or GitHub write credentials are needed by this workflow.
