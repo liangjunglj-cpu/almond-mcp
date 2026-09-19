@@ -25,6 +25,8 @@ namespace RhinoAlmondBridge
         private readonly AnalysisWorkspace _analysis;
         private bool _disposed;
         private string _lastPalette;
+        private string _lastDisplay;
+        private readonly UITimer _displayTimer;
 
         public AlmondLibraryPanel()
         {
@@ -35,13 +37,22 @@ namespace RhinoAlmondBridge
             MinimumSize = new Size(280, 240);
             Content = _body;
             RhinoApp.AppSettingsChanged += AppearanceChanged;
+            // Eto's UI timer also catches detail-viewport activation and document switches.
+            // Read only: never change a viewport, document material, or render settings.
+            _displayTimer = new UITimer { Interval = 0.5 };
+            _displayTimer.Elapsed += (s, e) => SendDisplayMode();
+            _displayTimer.Start();
             LoadArchive();
         }
 
         protected override void Dispose(bool disposing)
         {
             _disposed = true;
-            if (disposing) RhinoApp.AppSettingsChanged -= AppearanceChanged;
+            if (disposing) {
+                RhinoApp.AppSettingsChanged -= AppearanceChanged;
+                _displayTimer.Stop();
+                _displayTimer.Dispose();
+            }
             base.Dispose(disposing);
         }
 
@@ -64,6 +75,28 @@ namespace RhinoAlmondBridge
         private Uri PanelUrl() => new Uri(_archive, "?panel=1&bridge=" + _session +
             "&palette=" + Uri.EscapeDataString(Palette()) + "#" + _page);
 
+        private void SendDisplayMode()
+        {
+            if (_disposed || !_ready || _view == null || !Visible) return;
+            var viewport = RhinoDoc.ActiveDoc?.Views.ActiveView?.ActiveViewport;
+            var mode = viewport?.DisplayMode;
+            string style = "material";
+            bool supported = false;
+            if (mode != null) {
+                if (mode.Id == Rhino.Display.DisplayModeDescription.GhostedId) { style = "ghosted"; supported = true; }
+                else if (mode.Id == Rhino.Display.DisplayModeDescription.AmbientOcclusionId) { style = "arctic"; supported = true; }
+                else if (mode.Id == Rhino.Display.DisplayModeDescription.RenderedId || mode.Id == Rhino.Display.DisplayModeDescription.RenderedShadowsId) { style = "rendered"; supported = true; }
+                else if (mode.Id == Rhino.Display.DisplayModeDescription.ShadedId) { style = "shaded"; supported = true; }
+            }
+            var payload = JsonConvert.SerializeObject(new {
+                style, supported, name = mode?.LocalName ?? "No active viewport",
+                id = mode?.Id.ToString() ?? "", viewport = viewport?.Id.ToString() ?? ""
+            }, new JsonSerializerSettings { StringEscapeHandling = StringEscapeHandling.EscapeHtml });
+            if (payload == _lastDisplay) return;
+            _view.ExecuteScript("window.almondDisplayReceive && window.almondDisplayReceive(" + payload + ");");
+            _lastDisplay = payload;
+        }
+
         private void AppearanceChanged(object sender, EventArgs e)
         {
             // Defer until Rhino has applied its colours. No global appearance is changed.
@@ -85,7 +118,7 @@ namespace RhinoAlmondBridge
                 var view = new WebView(); // Rhino 8 supplies its Edge WebView2 handler.
                 view.DocumentLoaded += (s, e) => {
                     _ready = e.Uri != null && e.Uri.Scheme == _archive.Scheme && e.Uri.Authority == _archive.Authority && e.Uri.AbsolutePath == "/";
-                    if (_ready) { _lastPalette = null; AppearanceChanged(s, EventArgs.Empty); }
+                    if (_ready) { _lastPalette = null; _lastDisplay = null; AppearanceChanged(s, EventArgs.Empty); SendDisplayMode(); }
                 };
                 view.DocumentLoading += (s, e) =>
                 {

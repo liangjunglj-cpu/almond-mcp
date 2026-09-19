@@ -1,6 +1,6 @@
 # Almond MCP for Rhino
 
-**0.6.0rc12 — Almond workspace release candidate.** Run **Almond** in Rhino
+**0.6.0rc13 — Almond workspace release candidate.** Run **Almond** in Rhino
 for a dockable Neo Swiss menu with **Models** and **Karamba Validation**.
 **AlmondLibrary** opens models directly; **AlmondKaramba** opens the analysis
 workspace. Models retain compact tiles, Light/Original detail and shared-block
@@ -429,7 +429,7 @@ See [drafting workflow and limits](docs/drafting-0.6-rc2.md) and open
 [the pilot gallery](Draftingfiles/index.html). These are mesh outlines for
 layout/entourage; section assemblies and hidden-line drafting remain future work.
 
-### Compact Rhino library placement (0.6.0rc12)
+### Compact Rhino library placement (0.6.0rc13)
 
 The docked archive now uses small, two-column thumbnails. Drag a model into a
 viewport, or choose Place and pick an insertion point. Light detail targets

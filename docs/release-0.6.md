@@ -1,6 +1,6 @@
 # Almond 0.6 release infrastructure
 
-Candidate pair: **almondbridge 0.6.0-rc.12** and **almond-mcp 0.6.0rc12**.
+Candidate pair: **almondbridge 0.6.0-rc.13** and **almond-mcp 0.6.0rc13**.
 Both are unpublished candidates. The Yak targets **Rhino 8.0 / Windows**;
 RhinoCommon remains pinned to 8.0.23304.9001. Plugin identity stays
 `c337dbb8-394a-4593-9c2b-a3d7cfc91893`. No Rhino update is required.
@@ -48,10 +48,10 @@ syncs a live MCP environment, installs into Rhino, or falls back to an old RHP.
 It runs the Python suite and real .NET HTTP-host integration tests, checks source
 records, builds/audits wheel and sdist, performs an isolated wheel installation
 and MCP smoke, builds a Windows Yak, and audits its allowlist and model hashes.
-It creates `dist/release-0.6.0rc12/` with:
+It creates `dist/release-0.6.0rc13/` with:
 
 - Python wheel and sdist.
-- `almondbridge-0.6.0-rc.12-rh8_0-win.yak`.
+- `almondbridge-0.6.0-rc.13-rh8_0-win.yak`.
 - Food4Rhino ZIP wrapper, listing text and quickstart guide.
 - JUnit test results, clean-install and Yak reports, and `SHA256SUMS.txt`.
 
@@ -95,12 +95,12 @@ claim this in-process smoke passed based only on the automated build report.
    exact revision. Retain artifacts and the successful Rhino smoke record.
 2. Publish the Python wheel/sdist to PyPI using the project's maintainer account
    (prefer PyPI Trusted Publishing for later CI automation). Verify the pinned
-   `uvx --from almond-mcp==0.6.0rc12 almond-mcp --version` on a clean machine.
+   `uvx --from almond-mcp==0.6.0rc13 almond-mcp --version` on a clean machine.
 3. Authenticate the maintainer's Yak account, then push the exact tested artifact:
 
    ```powershell
    & 'C:/Program Files/Rhino 8/System/Yak.exe' login
-   & 'C:/Program Files/Rhino 8/System/Yak.exe' push ./dist/release-0.6.0rc12/almondbridge-0.6.0-rc.12-rh8_0-win.yak
+   & 'C:/Program Files/Rhino 8/System/Yak.exe' push ./dist/release-0.6.0rc13/almondbridge-0.6.0-rc.13-rh8_0-win.yak
    & 'C:/Program Files/Rhino 8/System/Yak.exe' search --all --prerelease almondbridge
    ```
 
@@ -246,3 +246,28 @@ full library detail; Light still makes an optional smaller copy.
 The broad-frond plant and ornamental grass trials are excluded from this
 candidate: the former did not pass cleanup/visual review, and the latter had no
 completed model at selection cutoff. No new Y2K or simple primitive assets are added.
+
+## Viewport-aware item previews (rc.13)
+
+The Rhino panel defaults to **Preview → Follow Rhino viewport**. The active
+viewport (including a layout detail) is read every half second on the UI thread.
+Ghosted gives translucent surfaces, Arctic gives white surfaces and soft shadows,
+Shaded gives neutral surfaces, and Rendered uses the original material colours.
+Switching the active viewport updates the thumbnails and an open 3D viewer.
+The selector can also hold a fixed preview style or use Material colours.
+
+These are approximate web previews, not Rhino viewport captures. Document lighting,
+backgrounds, edge settings, custom display modes and ray tracing are not reproduced.
+Unsupported modes explicitly fall back to material colours. Placed objects use
+Rhino's actual display pipeline; no document geometry, materials, or display settings
+are changed by preview selection. Drawing views are unaffected.
+
+Only visible styled thumbnails load live models (up to eight); scrolling away or
+opening the enlarged viewer releases their elements. Loading or failed thumbnails
+use simplified image styling. Rendered/material thumbnails reuse the existing
+coloured PNGs. Material overrides are restored when returning to coloured previews.
+
+Validation: pinned Rhino 8 GA SDK build, material round-trip tests, packaged module
+routes, and browser checks of thumbnails, enlarged models and narrow sidebar layout.
+Native viewport switching must still be checked after saving work and restarting
+Rhino into rc.13. No public release is performed by preparation or local installation.

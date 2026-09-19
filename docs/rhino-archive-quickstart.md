@@ -1,7 +1,7 @@
 # Almond workspace for Rhino 8
 
 For this prepared release candidate, install the supplied
-**almondbridge-0.6.0-rc.12-rh8_0-win.yak**, save your work, restart Rhino,
+**almondbridge-0.6.0-rc.13-rh8_0-win.yak**, save your work, restart Rhino,
 and run **Almond**. This candidate has not yet been published to the
 public Package Manager. The package targets Windows / Rhino 8.0+.
 
@@ -109,7 +109,7 @@ Install [uv](https://docs.astral.sh/uv/getting-started/installation/). Configure
 your MCP client with command `uvx` and these arguments:
 
 ```json
-["--from", "almond-mcp==0.6.0rc12", "almond-mcp"]
+["--from", "almond-mcp==0.6.0rc13", "almond-mcp"]
 ```
 
 This pinned command becomes available after the matching Python release is
@@ -141,3 +141,11 @@ Search **organic** for the three detailed natural/textile additions. Choose
 details show actual triangle counts, topology checks and the generated reference
 image. Preview colours are Almond materials; source-image textures are not baked
 into these geometry editions.
+
+### Preview display mode
+
+The Preview selector defaults to Follow Rhino viewport inside Rhino. Ghosted,
+Arctic, Shaded and Rendered are approximated in the thumbnails and enlarged 3D
+preview. Choose Material colours to keep colour previews. Custom/unsupported modes
+fall back to material colours. Scene lighting and edge settings are not reproduced;
+placed objects use Rhino’s actual display mode.

@@ -155,3 +155,22 @@
 .rhino-panel .analysis-step select,.rhino-panel .analysis-step input[type=number]{padding:8px 4px;font-size:11px}
 .rhino-panel .analysis-meta{font-size:9px!important}
 .rhino-panel .analysis-button{font-size:11px;padding:10px 8px}
+
+/* Viewport-aware previews: only model cards are styled, never drawing sheets. */
+.preview-controls{display:flex;align-items:center;flex-wrap:wrap;gap:4px 12px;margin:0 0 12px;font-size:11px;position:relative}
+.preview-controls label{display:flex;align-items:center;gap:8px;min-width:0}
+.preview-controls select{font-size:11px;padding:4px;max-width:190px}
+#preview-display-status{font-size:10px;color:var(--muted);overflow-wrap:anywhere}
+.preview-controls details{padding:0;border:0;margin-left:auto}
+.preview-controls summary{width:19px;height:19px;border:1px solid var(--line);border-radius:50%;text-align:center;list-style:none;line-height:17px}
+.preview-controls details[open]{flex-basis:100%;margin:0}
+.preview-controls details p{margin:8px 0}
+.card-model-preview{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;opacity:0}
+.live-preview-ready .card-model-preview{opacity:1}
+.live-preview-ready>img{visibility:hidden}
+[data-preview-style="arctic"] .card-stage[data-asset-id],[data-preview-style="arctic"] #viewer:not(.drawing-view){background:#dededb!important}
+[data-preview-style="arctic"] .card-stage[data-asset-id]>img{filter:grayscale(1) brightness(1.7);mix-blend-mode:normal}
+[data-preview-style="ghosted"] .card-stage[data-asset-id]>img{filter:grayscale(1);opacity:.35}
+[data-preview-style="shaded"] .card-stage[data-asset-id]>img{filter:grayscale(1)}
+.card-stage .card-format,.card-stage .card-status{z-index:1}
+#object-preview-status{margin:6px 0 8px}

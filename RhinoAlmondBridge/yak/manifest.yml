@@ -1,5 +1,5 @@
 name: almondbridge
-version: 0.6.0-rc.12
+version: 0.6.0-rc.13
 authors:
   - LiangJung
 description: >
@@ -24,7 +24,7 @@ description: >
   from their original sources under the applicable terms.
 
   The MCP bridge listens on 127.0.0.1:5000. For AI workflows, install uv and
-  register uvx --from almond-mcp==0.6.0rc12 almond-mcp with your MCP client.
+  register uvx --from almond-mcp==0.6.0rc13 almond-mcp with your MCP client.
   This prerelease requires Include pre-releases in Rhino Package Manager.
   Windows only; supports Rhino 8.0 and later Rhino 8 service releases.
 url: https://github.com/liangjunglj-cpu/almond-mcp

@@ -1,3 +1,4 @@
+import './preview-display.js';
 const $ = (id) => document.getElementById(id);
 // The Rhino panel uses the same catalogue and viewer in a compact workspace.
 const panelMode = new URLSearchParams(location.search).get('panel') === '1';
@@ -62,12 +63,13 @@ function render() {
   $('grid').innerHTML = assets.map(a => `<article class="card">
     <button class="card-save" data-save="${esc(a.id)}" aria-label="${saved.has(a.id) ? 'Unsave' : 'Save'} ${esc(a.name)}" aria-pressed="${saved.has(a.id)}">${saved.has(a.id) ? '−' : '+'}</button>
     <button class="card-open" data-open="${esc(a.id)}" aria-label="Explore ${esc(a.name)}">
-      <div class="card-stage" ${canPlace(a) ? `data-drag="${esc(a.id)}" title="Drag into a Rhino viewport; Esc cancels"` : ''}><span class="card-index">${String(data.assets.indexOf(a)+1).padStart(3,'0')}</span>${a.preview ? `<img src="${esc(a.preview)}" alt="${esc(a.name)}" loading="lazy" draggable="false">` : `<div class="placeholder">${esc(a.format.toUpperCase())}<small>${a.available ? 'LOCAL FILE' : 'FILE NOT INSTALLED'}</small></div>`}<span class="card-format">${esc(a.format.toUpperCase())}</span>${a.drawing ? '<span class="card-status">DRAWING-READY</span>' : ''}</div>
+      <div class="card-stage" ${a.kind === 'model' ? `data-asset-id="${esc(a.id)}"` : ''} ${canPlace(a) ? `data-drag="${esc(a.id)}" title="Drag into a Rhino viewport; Esc cancels"` : ''}><span class="card-index">${String(data.assets.indexOf(a)+1).padStart(3,'0')}</span>${a.preview ? `<img src="${esc(a.preview)}" alt="${esc(a.name)}" loading="lazy" draggable="false">` : `<div class="placeholder">${esc(a.format.toUpperCase())}<small>${a.available ? 'LOCAL FILE' : 'FILE NOT INSTALLED'}</small></div>`}<span class="card-format">${esc(a.format.toUpperCase())}</span>${a.drawing ? '<span class="card-status">DRAWING-READY</span>' : ''}</div>
       <div class="card-name"><span>${esc(a.name)}</span><span aria-hidden="true">↗</span></div><div class="card-sub"><span>${esc(human(a.category))}</span><span>${a.kind === 'model' ? 'MESHY / 3D' : 'DRAWING ELEMENT'}</span></div>
     </button>${placementButton(a)}</article>`).join('');
   $('grid').querySelectorAll('img').forEach(img => img.addEventListener('error', () => {
     img.replaceWith(Object.assign(document.createElement('span'), {className:'placeholder', textContent:'No preview'}));
   }, {once:true}));
+  window.almondPreviewCards(assets);
 }
 
 function meshEvidence(a) {
@@ -111,6 +113,7 @@ function renderViewer() {
   const isDrawing = !['3d','preview'].includes(currentView);
   const rep = a.drawing?.views.find(v => v.view === currentView && v.scale === scale);
   const sheet = a.drawing?.sheets.find(s => s.scale === scale);
+  $('object-preview-status').hidden = currentView !== '3d';
   viewer.replaceChildren();
   viewer.classList.toggle('drawing-view', isDrawing || a.format === 'svg');
   $('scale-wrap').hidden = !isDrawing;
@@ -127,6 +130,7 @@ function renderViewer() {
     model.addEventListener('load',() => { if(currentView === '3d') $('viewer-caption').textContent='DRAG TO ORBIT · SCROLL TO ZOOM'; },{once:true});
     model.addEventListener('error',() => { if(currentView === '3d') { const notice=document.createElement('p');notice.className='viewer-notice';notice.textContent='3D preview unavailable. You can still download the GLB.';viewer.append(notice);$('viewer-caption').textContent='Preview unavailable'; } },{once:true});
     viewer.append(model);
+    window.almondPreviewModel(model);
   } else {
     const url = isDrawing ? (currentView === 'sheet' ? sheet?.svg : rep?.svg) : a.preview;
     if(url) { const img=document.createElement('img');img.src=url;img.alt=`${a.name} — ${currentView === 'preview' ? 'drawing element' : currentView}, ${isDrawing ? '1:'+scale : ''}`;viewer.append(img); }
