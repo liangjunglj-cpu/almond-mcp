@@ -2,6 +2,22 @@ const $ = (id) => document.getElementById(id);
 // The Rhino panel uses the same catalogue and viewer in a compact workspace.
 const panelMode = new URLSearchParams(location.search).get('panel') === '1';
 if (panelMode) document.documentElement.classList.add('rhino-panel');
+const bridge = new URLSearchParams(location.search).get('bridge') || '';
+const nativePlacement = panelMode && /^[a-f0-9]{32}$/.test(bridge);
+if (nativePlacement) document.documentElement.classList.add('rhino-placement');
+const canPlace = a => nativePlacement && a.kind === 'model' && a.format === 'glb' && a.available;
+function placementButton(a) {
+  return canPlace(a) ? '<button class="place-model" data-place="' + esc(a.id) + '" aria-label="Place ' + esc(a.name) + ' in Rhino">Place ↗</button>' : '';
+}
+function placeModel(id, drag = false) {
+  const a = data?.assets.find(a => a.id === id);
+  if (!a || !canPlace(a)) return;
+  if ($('object-dialog').open) $('object-dialog').close();
+  const quality = $('placement-detail').value === 'original' ? 'original' : 'light';
+  // Only the dock panel intercepts this navigation; no HTTP write API.
+  location.href = '/almond-action/' + bridge + '/' + (drag ? 'drag' : 'place') + '/' + quality + '/' + encodeURIComponent(id);
+}
+
 const esc = (value) => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const human = (value) => String(value || '').replaceAll('_', ' ');
 const external = (url) => { try { const u = new URL(url); return ['http:', 'https:'].includes(u.protocol) ? u.href : ''; } catch { return ''; } };
@@ -39,9 +55,9 @@ function render() {
   $('grid').innerHTML = assets.map(a => `<article class="card">
     <button class="card-save" data-save="${esc(a.id)}" aria-label="${saved.has(a.id) ? 'Unsave' : 'Save'} ${esc(a.name)}" aria-pressed="${saved.has(a.id)}">${saved.has(a.id) ? '−' : '+'}</button>
     <button class="card-open" data-open="${esc(a.id)}" aria-label="Explore ${esc(a.name)}">
-      <div class="card-stage"><span class="card-index">${String(data.assets.indexOf(a)+1).padStart(3,'0')}</span>${a.preview ? `<img src="${esc(a.preview)}" alt="${esc(a.name)}" loading="lazy">` : `<div class="placeholder">${esc(a.format.toUpperCase())}<small>${a.available ? 'LOCAL FILE' : 'FILE NOT INSTALLED'}</small></div>`}<span class="card-format">${esc(a.format.toUpperCase())}</span>${a.drawing ? '<span class="card-status">DRAWING-READY</span>' : ''}</div>
+      <div class="card-stage" ${canPlace(a) ? `data-drag="${esc(a.id)}" title="Drag into a Rhino viewport; Esc cancels"` : ''}><span class="card-index">${String(data.assets.indexOf(a)+1).padStart(3,'0')}</span>${a.preview ? `<img src="${esc(a.preview)}" alt="${esc(a.name)}" loading="lazy" draggable="false">` : `<div class="placeholder">${esc(a.format.toUpperCase())}<small>${a.available ? 'LOCAL FILE' : 'FILE NOT INSTALLED'}</small></div>`}<span class="card-format">${esc(a.format.toUpperCase())}</span>${a.drawing ? '<span class="card-status">DRAWING-READY</span>' : ''}</div>
       <div class="card-name"><span>${esc(a.name)}</span><span aria-hidden="true">↗</span></div><div class="card-sub"><span>${esc(human(a.category))}</span><span>${a.kind === 'model' ? 'MESHY / 3D' : 'DRAWING ELEMENT'}</span></div>
-    </button></article>`).join('');
+    </button>${placementButton(a)}</article>`).join('');
   $('grid').querySelectorAll('img').forEach(img => img.addEventListener('error', () => {
     img.replaceWith(Object.assign(document.createElement('span'), {className:'placeholder', textContent:'No preview'}));
   }, {once:true}));
@@ -104,7 +120,7 @@ function renderViewer() {
     $('viewer-caption').textContent = isDrawing ? `${currentView.toUpperCase()} / 1:${scale} · FITTED PREVIEW${rep?.method === 'raster_projection' ? ' · APPROXIMATED' : ''}` : a.preview ? 'DRAWING ELEMENT · FITTED PREVIEW' : 'No browser preview for this file.';
   }
   const drawingLinks = isDrawing ? (currentView === 'sheet' ? link(sheet?.svg,`A3 sheet 1:${scale}`,'primary') : link(rep?.svg,`${human(currentView)} SVG`,'primary')+link(rep?.dxf,`${human(currentView)} DXF`)) : '';
-  $('downloads').innerHTML = drawingLinks + link(a.model,`Download ${a.format.toUpperCase()}`,isDrawing ? '' : 'primary') + link(a.record_url,'Record JSON') + (!a.available ? '<p class="small-note">Model file is not installed. See the original source below.</p>' : '');
+  $('downloads').innerHTML = placementButton(a) + drawingLinks + link(a.model,`Download ${a.format.toUpperCase()}`,isDrawing ? '' : 'primary') + link(a.record_url,'Record JSON') + (!a.available ? '<p class="small-note">Model file is not installed. See the original source below.</p>' : '');
 }
 
 function renderSources() {
@@ -134,6 +150,13 @@ async function load() {
     $('edition-version').textContent='V. '+data.version.toUpperCase();
     $('footer-version').textContent='ALMOND / '+data.version.toUpperCase();
     $('category').innerHTML='<option value="all">All categories</option>'+[...new Set(data.assets.map(a=>a.category))].sort().map(c=>`<option value="${esc(c)}">${esc(human(c))}</option>`).join('');
+    $('placement-tools').hidden = !nativePlacement;
+    if (panelMode) {
+      $('search').placeholder = 'Search models & drawings…';
+      document.querySelector('[data-filter="model"]').textContent = '3D';
+      document.querySelector('[data-filter="ready"]').textContent = 'With views';
+      document.querySelector('[data-filter="element"]').textContent = '2D';
+    }
     persistSaved();render();renderSources();route();
   } catch(error) { $('load-error').hidden=false;$('error-message').textContent=error.message;$('result-count').textContent='Archive unavailable'; }
 }
@@ -141,7 +164,28 @@ $('search').addEventListener('input',render);
 $('category').addEventListener('change',render);
 $('sort').addEventListener('change',render);
 document.querySelector('.filters').addEventListener('click',e=> {const b=e.target.closest('[data-filter]');if(!b)return;filter=b.dataset.filter;document.querySelectorAll('[data-filter]').forEach(x=>{x.classList.toggle('active',x===b);x.setAttribute('aria-pressed',x===b);});render();});
-$('grid').addEventListener('click',e=>{const save=e.target.closest('[data-save]');if(save){toggleSaved(save.dataset.save);return;}const open=e.target.closest('[data-open]');if(open)location.hash='asset='+encodeURIComponent(open.dataset.open);});
+let dragCandidate = null, suppressClickUntil = 0;
+$('grid').addEventListener('pointerdown', e => {
+  const target = e.target.closest('[data-drag]');
+  if (e.button === 0 && target) dragCandidate = {id:target.dataset.drag,x:e.clientX,y:e.clientY};
+});
+document.addEventListener('pointermove', e => {
+  if (!dragCandidate) return;
+  if (!(e.buttons & 1)) { dragCandidate = null; return; }
+  if (Math.hypot(e.clientX-dragCandidate.x,e.clientY-dragCandidate.y) < 6) return;
+  const id = dragCandidate.id; dragCandidate = null; suppressClickUntil = Date.now()+800;
+  e.preventDefault(); placeModel(id, true);
+});
+document.addEventListener('pointerup', () => { dragCandidate = null; });
+document.addEventListener('pointercancel', () => { dragCandidate = null; });
+$('grid').addEventListener('dragstart', e => e.preventDefault());
+$('grid').addEventListener('click',e=>{
+  if (Date.now() < suppressClickUntil) { e.preventDefault(); return; }
+  const place=e.target.closest('[data-place]');if(place){placeModel(place.dataset.place);return;}
+  const save=e.target.closest('[data-save]');if(save){toggleSaved(save.dataset.save);return;}
+  const open=e.target.closest('[data-open]');if(open)location.hash='asset='+encodeURIComponent(open.dataset.open);
+});
+$('downloads').addEventListener('click', e => { const b=e.target.closest('[data-place]');if(b)placeModel(b.dataset.place); });
 $('view-tabs').addEventListener('click',e=>{const b=e.target.closest('[data-view]');if(b){currentView=b.dataset.view;renderViewer();}});
 $('scale').addEventListener('change',renderViewer);
 $('save-object').addEventListener('click',()=>toggleSaved(selected.id));

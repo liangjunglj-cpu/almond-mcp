@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using System.Text.RegularExpressions;
 using Eto.Drawing;
 using Eto.Forms;
 using Rhino;
@@ -14,6 +15,8 @@ namespace RhinoAlmondBridge
         private WebView _view;
         private readonly Panel _body = new Panel();
         private Uri _archive;
+        private readonly string _session = Guid.NewGuid().ToString("N");
+        private bool _ready;
 
         public AlmondLibraryPanel()
         {
@@ -34,11 +37,23 @@ namespace RhinoAlmondBridge
             try
             {
                 _archive = new Uri(AlmondLibraryCommand.ArchiveUrl);
+                _ready = false;
                 var view = new WebView(); // Rhino 8 supplies its Edge WebView2 handler.
+                view.DocumentLoaded += (s, e) => _ready = e.Uri != null && e.Uri.Authority == _archive.Authority && e.Uri.AbsolutePath == "/";
                 view.DocumentLoading += (s, e) =>
                 {
                     if (!e.IsMainFrame || e.Uri == null) return;
                     bool local = e.Uri.Scheme == _archive.Scheme && e.Uri.Authority == _archive.Authority;
+                    if (local && e.Uri.AbsolutePath.StartsWith("/almond-action/", StringComparison.Ordinal))
+                    {
+                        e.Cancel = true;
+                        // The capability exists only in this panel's URL; the HTTP host
+                        // has no placement endpoint and continues to accept GET/HEAD only.
+                        var action = Regex.Match(e.Uri.AbsolutePath, "^/almond-action/" + _session + "/(drag|place)/(light|original)/(gen-[a-z0-9-]{1,100})$");
+                        if (_ready && action.Success)
+                            LibraryPlacement.Request(action.Groups[3].Value, action.Groups[1].Value == "drag", action.Groups[2].Value == "light");
+                        return;
+                    }
                     // Keep the archive in the panel. Downloads and source pages use the browser.
                     if (local && e.Uri.AbsolutePath == "/") return;
                     e.Cancel = true;
@@ -47,7 +62,7 @@ namespace RhinoAlmondBridge
                 view.OpenNewWindow += (s, e) => { if (e.Uri != null) OpenExternal(e.Uri.AbsoluteUri); };
                 _body.Content = view;
                 _view = view;
-                view.Url = new Uri(_archive, "?panel=1");
+                view.Url = new Uri(_archive, "?panel=1&bridge=" + _session);
             }
             catch (Exception ex)
             {

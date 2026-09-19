@@ -2,4 +2,5 @@
   <PropertyGroup><OutputType>Exe</OutputType><TargetFramework>net48</TargetFramework><LangVersion>latest</LangVersion></PropertyGroup>
   <ItemGroup><PackageReference Include="Newtonsoft.Json" Version="13.0.3" /></ItemGroup>
   <ItemGroup><Compile Include="../../RhinoAlmondBridge/ArchiveHttpServer.cs" Link="ArchiveHttpServer.cs" /></ItemGroup>
+  <ItemGroup><Compile Include="../../RhinoAlmondBridge/ArchiveMeshData.cs" Link="ArchiveMeshData.cs" /></ItemGroup>
 </Project>

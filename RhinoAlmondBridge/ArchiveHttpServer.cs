@@ -21,6 +21,16 @@ namespace RhinoAlmondBridge
         private volatile bool _running;
         public string Url { get; private set; }
 
+        internal byte[] ReadVerified(string route)
+        {
+            if (!_routes.TryGetValue(route, out JObject entry)) throw new InvalidDataException("Asset is not in this archive.");
+            byte[] data = File.ReadAllBytes(Resolve((string)entry["path"]));
+            using (var sha = SHA256.Create())
+                if (!string.Equals(BitConverter.ToString(sha.ComputeHash(data)).Replace("-", ""), (string)entry["sha256"], StringComparison.OrdinalIgnoreCase))
+                    throw new InvalidDataException("Archive file changed; reinstall this release.");
+            return data;
+        }
+
         public ArchiveHttpServer(string directory)
         {
             _root = Path.GetFullPath(directory).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;

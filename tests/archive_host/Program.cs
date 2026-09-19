@@ -1,11 +1,23 @@
 using System;
 using System.Threading;
+using System.IO;
+using Newtonsoft.Json;
 using RhinoAlmondBridge;
 
 class Program
 {
     static void Main(string[] args)
     {
+        if (args[0] == "--mesh")
+        {
+            try
+            {
+                var mesh = ArchiveMeshData.Decode(File.ReadAllBytes(args[1]), args[2]);
+                Console.WriteLine(JsonConvert.SerializeObject(mesh));
+            }
+            catch (Exception ex) { Console.Error.WriteLine(ex.Message); Environment.ExitCode = 1; }
+            return;
+        }
         using (var server = new ArchiveHttpServer(args[0]))
         {
             server.Start();

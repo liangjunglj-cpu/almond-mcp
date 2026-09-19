@@ -1,8 +1,9 @@
 # Almond Object Archive for Rhino 8
 
-Install **almondbridge** from Rhino's `_PackageManager`, restart Rhino, and run
-**`AlmondLibrary`**. For this release candidate, enable **Include pre-releases**
-and select **0.6.0-rc.5**. The package is prepared for Windows / Rhino 8.0+.
+For this prepared release candidate, install the supplied
+**almondbridge-0.6.0-rc.6-rh8_0-win.yak**, save your work, restart Rhino,
+and run **AlmondLibrary**. This candidate has not yet been published to the
+public Package Manager. The package targets Windows / Rhino 8.0+.
 
 The Neo Swiss archive opens in a dockable **Almond Library** panel inside Rhino.
 Drag the panel tab beside Layers or Properties, or float it on another monitor.
@@ -18,8 +19,36 @@ and download GLB, SVG, DXF and A3 SVG sheets. Choose 1:50 or 1:100 drawing views
 DXF geometry uses full-size millimetres. Viewports fit drawings to the screen,
 so screen size is not print scale. Import downloaded DXFs into Rhino using
 millimetres. GLB downloads retain the original Almond numeric-mm convention
-and Y-up coordinates; use Almond's MCP placement workflow for spatial-contract
-handling. The archive does not automatically place objects into the Rhino scene.
+and Y-up coordinates; use the panel's Place action or Almond's MCP placement
+workflow for unit and anchor handling.
+
+## Place a model
+
+Drag a thumbnail into a Rhino viewport and release at the insertion point.
+An orange bounding outline previews the model's size. Press Esc to cancel;
+releasing outside a viewport cancels after a short timeout. You can also click
+**Place** and then pick a point, which supports keyboard access and object snaps.
+Finish other Rhino commands before placement. The model stays aligned to world
+axes with its bottom centre at the chosen point; use Rhino Rotate afterwards.
+
+**Light** targets 20,000 triangles for heavier models, preserving the full mesh
+for smaller objects. **Original** keeps the source triangle geometry.
+Reduction can alter fine features and silhouette; it is a display approximation.
+The original GLB and its derived drawings remain unchanged. A first heavy
+placement can take a moment to prepare after you pick the point.
+
+Repeated placements reuse a block definition and material. Objects carry source
+records, original checksums, full passports and a derivation record containing
+actual triangle counts, geometry fingerprint, units and reduction method.
+Undo removes a placement. Use Explode only when you need independent geometry.
+
+Placement is available for the 47 included generated GLBs, inside the Rhino
+panel. Browser downloads and the seven community catalogue entries do not have
+native placement. Imported models use the current Rhino layer.
+
+The native pointer handoff, reduction, block reuse and undo still require
+an interactive Rhino smoke check for this release candidate; the decoder and
+browser layout have automated/standalone verification.
 
 Each record includes dimensions, an asset ID, source evidence, generation task
 IDs, declared licence and known evidence gaps. Dimensions describe generated
@@ -41,7 +70,7 @@ Install [uv](https://docs.astral.sh/uv/getting-started/installation/). Configure
 your MCP client with command `uvx` and these arguments:
 
 ```json
-["--from", "almond-mcp==0.6.0rc5", "almond-mcp"]
+["--from", "almond-mcp==0.6.0rc6", "almond-mcp"]
 ```
 
 This pinned command becomes available after the matching Python release is

@@ -9,7 +9,7 @@ Use the Rhino Account that owns the existing app / Yak package.
 | Field | Prepared value |
 | --- | --- |
 | App name | Almond MCP |
-| Release | almondbridge 0.6.0-rc.5 / almond-mcp 0.6.0rc5 (prerelease) |
+| Release | almondbridge 0.6.0-rc.6 / almond-mcp 0.6.0rc6 (prerelease) |
 | Platform | Rhino 8 for Windows only |
 | GUID | c337dbb8-394a-4593-9c2b-a3d7cfc91893 |
 | Code licence | MIT |
@@ -38,7 +38,8 @@ Ten models have linked drawing packages: 60 plan/front/right view-scale pairs
 in SVG and DXF, plus 20 A3 SVG sheets at 1:50 and 1:100. Search the collection,
 rotate a model, inspect its drawings and download the representation you need.
 DXFs use full-size millimetres; SVG sheets retain their declared paper scale.
-The archive does not automatically insert objects into the Rhino document.
+The docked panel also offers Place and thumbnail dragging into the viewport,
+with shared blocks and a Light detail option for heavier generated models.
 
 Source histories include recorded generation prompts, provider task IDs,
 checksums, attribution and known evidence gaps. Generated geometry is a design
@@ -63,9 +64,9 @@ Karamba3D. Karamba and downloaded community model files are not bundled.
 
 ## Downloads
 
-Primary file: `almondbridge-0.6.0-rc.5-rh8_0-win.yak`.
-Optional upload wrapper: `almondbridge-0.6.0-rc.5-food4rhino.zip` containing the
-same Yak and quickstart guide. Both are in `dist/release-0.6.0rc5/` after preparation.
+Primary file: `almondbridge-0.6.0-rc.6-rh8_0-win.yak`.
+Optional upload wrapper: `almondbridge-0.6.0-rc.6-food4rhino.zip` containing the
+same Yak and quickstart guide. Both are in `dist/release-0.6.0rc6/` after preparation.
 Use the current form's supported upload type; do not rename an extension.
 If the existing listing is linked to Yak, update the matching package rather
 than creating a duplicate app. The permanent GUID remains unchanged.
@@ -93,3 +94,10 @@ Checked 19 September 2026: [Food4Rhino FAQ](https://www.food4rhino.com/en/faq),
 [McNeel package publishing](https://developer.rhino3d.com/guides/yak/pushing-a-package-to-the-server/),
 and [Rhino plugin installation](https://www.rhino3d.com/en/docs/guides/scripts-plugins/how-to-use/).
 Food4Rhino account access and any listing review remain separate from local builds.
+
+### rc.6 additions awaiting native acceptance
+
+Compact model tiles, thumbnail-to-viewport placement, a keyboard-accessible
+Place action, shared blocks, optional lighter meshes and embedded derivation
+records. Keep this listing a draft until the native placement checklist in
+release-0.6.md passes. Public publishing has not been performed.

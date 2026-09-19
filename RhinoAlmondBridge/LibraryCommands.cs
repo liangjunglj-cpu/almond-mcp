@@ -10,6 +10,11 @@ namespace RhinoAlmondBridge
     {
         public override string EnglishName => "AlmondLibrary";
         private static ArchiveHttpServer _archive;
+        internal static byte[] ReadArchive(string route)
+        {
+            string url = ArchiveUrl;
+            return _archive.ReadVerified(route);
+        }
 
         internal static string ArchiveUrl
         {

@@ -1,7 +1,7 @@
 # Almond MCP for Rhino
 
-**0.6.0rc5 — Rhino distribution release candidate.** The prepared
-`almondbridge 0.6.0-rc.5` Yak bundles the generated collection and adds
+**0.6.0rc6 — Rhino distribution release candidate.** The prepared
+`almondbridge 0.6.0-rc.6` Yak bundles the generated collection and adds
 `AlmondLibrary`, which opens the offline archive in a dockable Rhino side panel
 without Python or an AI client. `AlmondLibraryBrowser` opens its full browser view.
 See the [release infrastructure](docs/release-0.6.md) and
@@ -448,3 +448,13 @@ directories are searchable without DETAIL access.
 See [drafting workflow and limits](docs/drafting-0.6-rc2.md) and open
 [the pilot gallery](Draftingfiles/index.html). These are mesh outlines for
 layout/entourage; section assemblies and hidden-line drafting remain future work.
+
+### Compact Rhino library placement (0.6.0rc6)
+
+The docked archive now uses small, two-column thumbnails. Drag a model into a
+viewport, or choose Place and pick an insertion point. Light detail targets
+20,000 triangles on heavier models; Original retains the source mesh.
+Repeated objects share Rhino blocks and materials. Source records and
+transformation/reduction metadata stay attached to each placed object.
+The prepared candidate requires an interactive Rhino placement check before
+publication; see docs/rhino-archive-quickstart.md.

@@ -1,6 +1,6 @@
 # Almond 0.6 release infrastructure
 
-Candidate pair: **almondbridge 0.6.0-rc.5** and **almond-mcp 0.6.0rc5**.
+Candidate pair: **almondbridge 0.6.0-rc.6** and **almond-mcp 0.6.0rc6**.
 Both are unpublished candidates. The Yak targets **Rhino 8.0 / Windows**;
 RhinoCommon remains pinned to 8.0.23304.9001. Plugin identity stays
 `c337dbb8-394a-4593-9c2b-a3d7cfc91893`. No Rhino update is required.
@@ -26,7 +26,8 @@ The .NET host serves only manifest-listed routes, binds an ephemeral loopback
 port, rejects foreign Host headers and write methods, and checks each response
 file against the bundled SHA-256. It never exposes filesystem browsing or an
 execution/upload endpoint. Saved browser selections are scoped to that port.
-This payload does not yet include a Rhino-scene placement button.
+The panel adds a native Place action and thumbnail drag gesture; both enter a
+fixed Rhino command rather than using an HTTP write endpoint.
 
 ## Reproduce the release
 
@@ -47,10 +48,10 @@ syncs a live MCP environment, installs into Rhino, or falls back to an old RHP.
 It runs the Python suite and real .NET HTTP-host integration tests, checks source
 records, builds/audits wheel and sdist, performs an isolated wheel installation
 and MCP smoke, builds a Windows Yak, and audits its allowlist and model hashes.
-It creates `dist/release-0.6.0rc5/` with:
+It creates `dist/release-0.6.0rc6/` with:
 
 - Python wheel and sdist.
-- `almondbridge-0.6.0-rc.5-rh8_0-win.yak`.
+- `almondbridge-0.6.0-rc.6-rh8_0-win.yak`.
 - Food4Rhino ZIP wrapper, listing text and quickstart guide.
 - JUnit test results, clean-install and Yak reports, and `SHA256SUMS.txt`.
 
@@ -94,12 +95,12 @@ claim this in-process smoke passed based only on the automated build report.
    exact revision. Retain artifacts and the successful Rhino smoke record.
 2. Publish the Python wheel/sdist to PyPI using the project's maintainer account
    (prefer PyPI Trusted Publishing for later CI automation). Verify the pinned
-   `uvx --from almond-mcp==0.6.0rc5 almond-mcp --version` on a clean machine.
+   `uvx --from almond-mcp==0.6.0rc6 almond-mcp --version` on a clean machine.
 3. Authenticate the maintainer's Yak account, then push the exact tested artifact:
 
    ```powershell
    & 'C:/Program Files/Rhino 8/System/Yak.exe' login
-   & 'C:/Program Files/Rhino 8/System/Yak.exe' push ./dist/release-0.6.0rc5/almondbridge-0.6.0-rc.5-rh8_0-win.yak
+   & 'C:/Program Files/Rhino 8/System/Yak.exe' push ./dist/release-0.6.0rc6/almondbridge-0.6.0-rc.6-rh8_0-win.yak
    & 'C:/Program Files/Rhino 8/System/Yak.exe' search --all --prerelease almondbridge
    ```
 
@@ -130,3 +131,32 @@ Rebuild and retest; do not rename prerelease binaries as a stable release.
 Official documentation checked 19 September 2026. No package account, live
 listing, active Rhino plugin registration, or MCP configuration is changed by
 the local preparation process.
+
+## rc.6 compact placement workspace
+
+The panel removes the landing-page hero and uses two thumbnail columns down to
+280 CSS pixels. The browser retains the full archive layout. Thumbnails remain
+static lazy-loaded images; the 3D viewer is created only for an open object.
+
+Native panel gestures invoke a fixed Rhino command through a per-panel random
+capability in intercepted same-origin navigation. The HTTP server remains
+read-only and has no placement or execution endpoint. Only installed catalogue
+GLBs can be selected; catalogue, materials and model bytes are hash-verified.
+No file path or Rhino script can be supplied by the web UI.
+
+A bounded C# GLB decoder reads the existing payload directly, preserving indices
+and supplied normals, handling the archive's positive uniform transforms and
+converting numeric millimetres/Y-up to Rhino's units/Z-up. No extra mesh copies
+are distributed. Light placement calls Rhino Mesh.Reduce for meshes above
+20,000 faces; actual results and source history are recorded on the Rhino block.
+Definitions are keyed by source/record/material/detail/units and reused only
+while their geometry fingerprint still matches. Edited blocks remain intact.
+
+Validation: compare every triangle of all 47 models against the independent
+Python drafting decoder, verify supplied normal lengths, and reject malformed
+identity/buffer/accessor/animation/cycle cases. Build against Rhino 8.0 GA.
+Before publication, manually check: held-mouse drag/release, outside release,
+Esc, Place with object snaps, Light versus Original on a heavy tree, repeated
+block reuse, material appearance, units (mm/m/in), current layer, Undo/Redo,
+save/reopen metadata, and placement after editing a previous block. These
+native checks are pending; a browser test is not evidence of viewport placement.

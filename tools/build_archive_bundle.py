@@ -59,6 +59,7 @@ def build_bundle(destination: Path):
             mime = {".html":"text/html; charset=utf-8", ".css":"text/css; charset=utf-8", ".js":"text/javascript; charset=utf-8", ".json":"application/json", ".svg":"image/svg+xml"}.get(path.suffix,"text/plain; charset=utf-8")
             write("/"+relative, "ui/"+relative, path.read_bytes(), mime)
     routes["/"] = routes["/index.html"]
+    write("/api/materials", "api/materials.json", (ROOT/"Materialfiles/manifest.json").read_bytes(), "application/json")
     catalogue = repo.catalogue()
     catalogue["distribution"] = "rhino"
     catalogue["indexed_at"] = "release-build"
