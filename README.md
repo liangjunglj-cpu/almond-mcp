@@ -1,6 +1,6 @@
 # Almond MCP for Rhino
 
-**0.6.0rc13 — Almond workspace release candidate.** Run **Almond** in Rhino
+**0.6.0 — Almond workspace release.** Run **Almond** in Rhino
 for a dockable Neo Swiss menu with **Models** and **Karamba Validation**.
 **AlmondLibrary** opens models directly; **AlmondKaramba** opens the analysis
 workspace. Models retain compact tiles, Light/Original detail and shared-block
@@ -12,8 +12,8 @@ are retired. Existing local downloads and historical scene records are retained.
 Karamba and the generated model/source libraries remain available.
 See the [Rhino quickstart](docs/rhino-archive-quickstart.md) and
 [release infrastructure](docs/release-0.6.md). Viewport dragging was confirmed
-by the user on rc.6. Native acceptance of the new Karamba panel and public
-publication remain pending.
+by the user on rc.6. Stable 0.6.0 is prepared; its native Rhino smoke test and
+publication to Yak, PyPI and Food4Rhino remain pending.
 
 Run
 `almond-mcp library --open` for the local Neo Swiss interface: 47 Meshy models,

@@ -1,9 +1,8 @@
-# Food4Rhino listing - Almond 0.6 release candidate
+# Food4Rhino listing - Almond 0.6.0
 
-The Yak prerelease is live in Rhino Package Manager. The existing
-[Food4Rhino listing](https://www.food4rhino.com/en/app/almond-mcp) was updated
-on 19 September 2026, with rc.13 first in downloads. The optional matching
-PyPI release awaits publishing credentials.
+Prepared for the stable 0.6.0 release (not yet published). The existing
+[Food4Rhino listing](https://www.food4rhino.com/en/app/almond-mcp) currently
+offers rc.13 first in downloads; add 0.6.0 above it after the Yak push.
 Update the existing Almond MCP listing, preserving the permanent plugin GUID.
 Use the Rhino Account that owns the existing app / Yak package.
 
@@ -12,7 +11,7 @@ Use the Rhino Account that owns the existing app / Yak package.
 | Field | Prepared value |
 | --- | --- |
 | App name | Almond MCP |
-| Release | almondbridge 0.6.0-rc.13 / almond-mcp 0.6.0rc13 (prerelease) |
+| Release | almondbridge 0.6.0 / almond-mcp 0.6.0 |
 | Platform | Rhino 8 for Windows only |
 | GUID | c337dbb8-394a-4593-9c2b-a3d7cfc91893 |
 | Code licence | MIT |
@@ -69,22 +68,25 @@ Karamba3D. Karamba and downloaded community model files are not bundled.
 
 ## Downloads
 
-Primary file: `almondbridge-0.6.0-rc.13-rh8_0-win.yak`.
-Optional upload wrapper: `almondbridge-0.6.0-rc.13-food4rhino.zip` containing the
-same Yak and quickstart guide. Both are in `dist/release-0.6.0rc13/` after preparation.
+Primary file: `almondbridge-0.6.0-rh8_0-win.yak`.
+Optional upload wrapper: `almondbridge-0.6.0-food4rhino.zip` containing the
+same Yak and quickstart guide. Both are in `dist/release-0.6.0/` after preparation.
 Use the current form's supported upload type; do not rename an extension.
 If the existing listing is linked to Yak, update the matching package rather
 than creating a duplicate app. The permanent GUID remains unchanged.
 
-Download title: **Almond 0.6 release candidate - Rhino 8 Windows + Object Archive**.
-Description: Install through Rhino Package Manager (Include pre-releases) or use
+Download title: **Almond 0.6.0 - Rhino 8 Windows + Object Archive**.
+Description: Install through Rhino Package Manager (search almondbridge) or use
 the provided Yak package. Restart Rhino, then run Almond. The 50 generated
-models are included. See rhino-archive-quickstart.md for optional MCP setup. The matching PyPI
-prerelease is pending; the supplied local Python wheel is available for testing.
+models are included. See rhino-archive-quickstart.md for optional MCP setup
+with almond-mcp 0.6.0 from PyPI.
 
 ## Release notes
 
+- First stable 0.6 release: no longer requires Include pre-releases.
 - Adds AlmondLibrary and the bundled offline Neo Swiss Object Archive.
+- Drag thumbnails from the docked panel into a viewport, or Place with snaps.
+- Previews can follow the active Rhino viewport display mode.
 - Includes 50 generated models, metadata, source evidence and previews.
 - Links 10 drawing packages with SVG, DXF and A3 sheets.
 - Adds a shared MCP repository search and per-object resources.

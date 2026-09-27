@@ -12740,6 +12740,6 @@
       "license_note": "Generated for the Almond library using the owner-configured Meshy account; public pack distribution authorized by owner. CC BY 4.0. API balance verified; subscription contract not independently audited."
     }
   ],
-  "asset_pack_version": "0.6.0rc12",
+  "asset_pack_version": "0.6.0",
   "passport_schema_version": 1
 }

@@ -1,8 +1,9 @@
 # Almond 0.6 release infrastructure
 
-Candidate pair: **almondbridge 0.6.0-rc.13** and **almond-mcp 0.6.0rc13**.
-The Yak prerelease was published on 19 September 2026. The matching Python
-package is prepared but its PyPI publication awaits maintainer credentials. The Yak targets **Rhino 8.0 / Windows**;
+Stable pair: **almondbridge 0.6.0** and **almond-mcp 0.6.0**, prepared from the
+rc.13 source with version changes only. Neither is published yet; see
+[Stable 0.6.0 preparation](#stable-060-preparation). The last published build is
+the rc.13 Yak prerelease (19 September 2026). The Yak targets **Rhino 8.0 / Windows**;
 RhinoCommon remains pinned to 8.0.23304.9001. Plugin identity stays
 `c337dbb8-394a-4593-9c2b-a3d7cfc91893`. No Rhino update is required.
 
@@ -49,10 +50,10 @@ syncs a live MCP environment, installs into Rhino, or falls back to an old RHP.
 It runs the Python suite and real .NET HTTP-host integration tests, checks source
 records, builds/audits wheel and sdist, performs an isolated wheel installation
 and MCP smoke, builds a Windows Yak, and audits its allowlist and model hashes.
-It creates `dist/release-0.6.0rc13/` with:
+It creates `dist/release-<version>/` (for stable: `dist/release-0.6.0/`) with:
 
 - Python wheel and sdist.
-- `almondbridge-0.6.0-rc.13-rh8_0-win.yak`.
+- `almondbridge-0.6.0-rh8_0-win.yak`.
 - Food4Rhino ZIP wrapper, listing text and quickstart guide.
 - JUnit test results, clean-install and Yak reports, and `SHA256SUMS.txt`.
 
@@ -96,13 +97,13 @@ claim this in-process smoke passed based only on the automated build report.
    exact revision. Retain artifacts and the successful Rhino smoke record.
 2. Publish the Python wheel/sdist to PyPI using the project's maintainer account
    (prefer PyPI Trusted Publishing for later CI automation). Verify the pinned
-   `uvx --from almond-mcp==0.6.0rc13 almond-mcp --version` on a clean machine.
+   `uvx --from almond-mcp==0.6.0 almond-mcp --version` on a clean machine.
 3. Authenticate the maintainer's Yak account, then push the exact tested artifact:
 
    ```powershell
    & 'C:/Program Files/Rhino 8/System/Yak.exe' login
-   & 'C:/Program Files/Rhino 8/System/Yak.exe' push ./dist/release-0.6.0rc13/almondbridge-0.6.0-rc.13-rh8_0-win.yak
-   & 'C:/Program Files/Rhino 8/System/Yak.exe' search --all --prerelease almondbridge
+   & 'C:/Program Files/Rhino 8/System/Yak.exe' push ./dist/release-0.6.0/almondbridge-0.6.0-rh8_0-win.yak
+   & 'C:/Program Files/Rhino 8/System/Yak.exe' search almondbridge
    ```
 
    A test-server push is optional before production; it is still an external
@@ -295,3 +296,36 @@ Rhino into rc.13. No public release is performed by preparation or local install
   supplied local wheel until the matching PyPI prerelease is available.
 
 The published Yak is immutable. Documentation/status updates do not replace it.
+
+## Stable 0.6.0 preparation — 27 September 2026
+
+Prepared, **not published**. Source is the rc.13 revision
+(`d5610cb`) with version changes only: Python package, lockfile, both asset-pack
+manifests, bridge csproj and Yak manifest move to `0.6.0`; the Yak description
+drops the Include pre-releases note and pins `almond-mcp==0.6.0`; the bundled
+quickstart and Food4Rhino text describe the stable package. No code, models or
+UI changed, so the rc.13 behaviour (including viewport dragging) is unchanged.
+
+`tools/prepare_release.ps1` passed on this machine: 185 tests, source check,
+wheel/sdist audit, clean isolated install with HTTP and MCP search smoke, bridge
+build (0 warnings) and Yak audit of 388 routes / 50 models / 10 drawing packages.
+Artifacts are in `dist/release-0.6.0/`:
+
+- `almondbridge-0.6.0-rh8_0-win.yak` —
+  SHA-256 `d1f2a623a0c682ecb447691b367ab7e9aff7203a961017752500b4fd12fd1306`.
+- `almond_mcp-0.6.0-py3-none-any.whl` —
+  SHA-256 `5f95b570945863936c290406d390830f4e84d286f7dd231a47a0373d723b6c1c`.
+- `almond_mcp-0.6.0.tar.gz` —
+  SHA-256 `71d3f0d38ef7c32847bff7cc97f762192c66dc8b06779980fd142f9880f55fa7`.
+- `almondbridge-0.6.0-food4rhino.zip` and `SHA256SUMS.txt` for the rest.
+
+Remaining gates before the operator publication sequence above:
+
+1. Commit these changes; record the commit as the source revision.
+2. Run the [required Rhino smoke test](#required-final-rhino-smoke-test) against
+   this exact Yak hash and record pass/fail here. The stable release promotes
+   rc.13 to every Package Manager user, so this checklist is no longer optional.
+3. Publish `almond-mcp 0.6.0` to PyPI **before** pushing the Yak: the immutable
+   Yak description tells users to run `uvx --from almond-mcp==0.6.0`.
+4. Push the Yak, confirm plain `Yak.exe search almondbridge` returns `0.6.0`,
+   then add the ZIP to the Food4Rhino listing above rc.13.

@@ -1,13 +1,12 @@
 # Almond workspace for Rhino 8
 
-Install **almondbridge 0.6.0-rc.13** from Rhino's Package Manager with
-**Include pre-releases** enabled, or install the supplied
-**almondbridge-0.6.0-rc.13-rh8_0-win.yak**. Save your work, restart Rhino,
-and run **Almond**. This prerelease is published for Windows / Rhino 8.0+.
+Install **almondbridge 0.6.0** from Rhino's Package Manager (search
+`almondbridge`), or install the supplied **almondbridge-0.6.0-rh8_0-win.yak**.
+Save your work, restart Rhino, and run **Almond**. Windows / Rhino 8.0+.
 
-The optional matching Python/MCP package is not yet on PyPI. Use the supplied
-local wheel for that workflow until publication completes. Browsing and placing
-the included library models need neither Python nor an MCP client.
+Browsing and placing the included library models need neither Python nor an
+MCP client. The optional AI workflow uses the matching `almond-mcp 0.6.0`
+Python package (see below).
 
 The archive opens in a dockable **Almond** panel inside Rhino. Its background,
 text, controls and font follow Rhino appearance settings, including theme changes.
@@ -52,9 +51,8 @@ Placement is available for the 50 included generated GLBs, inside the Rhino
 panel. Browser downloads and the seven community catalogue entries do not have
 native placement. Imported models use the current Rhino layer.
 
-Viewport dragging was confirmed in Rhino by the user on rc.6. The new Karamba
-workspace requires native acceptance on this candidate; automated and browser
-checks do not establish solver correctness.
+Karamba results come from your own Karamba installation; Almond's automated
+and browser checks do not establish solver correctness.
 
 Each record includes dimensions, an asset ID, source evidence, generation task
 IDs, declared licence and known evidence gaps. Dimensions describe generated
@@ -113,11 +111,9 @@ Install [uv](https://docs.astral.sh/uv/getting-started/installation/). Configure
 your MCP client with command `uvx` and these arguments:
 
 ```json
-["--from", "almond-mcp==0.6.0rc13", "almond-mcp"]
+["--from", "almond-mcp==0.6.0", "almond-mcp"]
 ```
 
-This pinned command becomes available after the matching Python release is
-published. Use the provided local wheel for prerelease testing beforehand.
 The MCP client launches its own stdio server. It connects to the Rhino bridge
 on 127.0.0.1:5000; browsing the archive itself does not require this connection.
 Do not use the older developer-oriented `AlmondMCPStart` command to configure
