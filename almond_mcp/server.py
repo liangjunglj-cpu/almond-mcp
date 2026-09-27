@@ -2454,13 +2454,16 @@ def _restore_and_place_script(contract: dict, materials: dict[str, dict],
     for material_id, material in materials.items():
         r, g, b = (int(v) for v in material["base_color"])
         lib_rows.append(
-            '{{ "%s", new object[] {{ "%s", "%s", "%s", "%s", %d, %d, %d, %s, %s, %s }} }}'
+            '{ "%s", new object[] { "%s", "%s", "%s", "%s", %d, %d, %d, %s, %s, %s } }'
             % (exchange.material_name(material_id), material_id, material["name"],
                material["category"], material["ue_material_slot"], r, g, b,
                repr(float(material["metallic"])), repr(float(material["roughness"])),
                repr(float(material["opacity"])))
         )
     anchor = contract["spatial"].get("anchor", "bottom_center")
+    # Library GLBs hold numeric millimetres, but Rhino's glTF import reads metres.
+    convention = (contract.get("passport") or {}).get("coordinate_convention") or {}
+    glb_scale = 0.001 if convention.get("glb_numeric_units") == "mm" else 1.0
     passport_stamp = ""
     if contract.get("passport"):
         # C# verbatim string, so quotes/backslashes in provenance stay data.
@@ -2565,14 +2568,17 @@ public class Script
 
         // 4. place per the contract anchor, in this document's units
         double toDoc = RhinoMath.UnitScale(UnitSystem.Millimeters, doc.ModelUnitSystem);
+        var scale = Transform.Scale(Point3d.Origin, {glb_scale!r});
         var bb = BoundingBox.Empty;
         foreach (var o in imported) bb.Union(o.Geometry.GetBoundingBox(true));
+        bb.Transform(scale);
         var anchorPt = new Point3d((bb.Min.X + bb.Max.X) / 2, (bb.Min.Y + bb.Max.Y) / 2,
             "{anchor}" == "center" ? (bb.Min.Z + bb.Max.Z) / 2 : bb.Min.Z);
         var target = new Point3d({x_mm} * toDoc, {y_mm} * toDoc, {z_mm} * toDoc);
         var xform = Transform.Translation(target - anchorPt);
         if (Math.Abs({rotation_degrees}) > 1e-9)
             xform = xform * Transform.Rotation(RhinoMath.ToRadians({rotation_degrees}), Vector3d.ZAxis, anchorPt);
+        xform = xform * scale;
         foreach (var o in imported) doc.Objects.Transform(o.Id, xform, true);
 
         // 5. measure what actually landed, for the contract dimension check

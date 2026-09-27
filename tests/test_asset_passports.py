@@ -152,6 +152,34 @@ def test_rhino_restore_script_contains_portable_metadata(asset):
     assert '""schema_version"": 1' in script
 
 
+def test_rhino_restore_script_material_rows_are_valid_csharp(asset):
+    # The rows are %-formatted then spliced into an f-string, so doubled
+    # braces reach Roslyn verbatim and the placement script fails to compile.
+    server = load_server_module()
+    contract = json.loads((LIBRARY / asset["contract_file"]).read_text(encoding="utf-8"))
+    contract["_imported_guids"] = []
+    materials = {row["material_id"]: server.material_library.get(row["material_id"])
+                 for row in contract["materials"]}
+    materials = {mid: spec for mid, spec in materials.items() if spec}
+    assert materials
+    script = server._restore_and_place_script(contract, materials, 0, 0, 0, 0, "TEST")
+    assert "{{" not in script
+    assert 'new object[] { "' in script
+
+
+def test_rhino_restore_script_scales_numeric_mm_glbs(asset):
+    # Rhino's glTF import reads metres; library GLBs are numeric millimetres.
+    server = load_server_module()
+    contract = json.loads((LIBRARY / asset["contract_file"]).read_text(encoding="utf-8"))
+    contract["_imported_guids"] = []
+    assert contract["passport"]["coordinate_convention"]["glb_numeric_units"] == "mm"
+    script = server._restore_and_place_script(contract, {}, 0, 0, 0, 0, "TEST")
+    assert "Transform.Scale(Point3d.Origin, 0.001)" in script
+    contract.pop("passport")
+    script = server._restore_and_place_script(contract, {}, 0, 0, 0, 0, "TEST")
+    assert "Transform.Scale(Point3d.Origin, 1.0)" in script
+
+
 def test_startup_diagnostics_do_not_pollute_mcp_stdout(capsys):
     load_server_module()
     assert capsys.readouterr().out == ""

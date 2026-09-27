@@ -297,35 +297,68 @@ Rhino into rc.13. No public release is performed by preparation or local install
 
 The published Yak is immutable. Documentation/status updates do not replace it.
 
-## Stable 0.6.0 preparation — 27 September 2026
+## Stable 0.6.0 preparation
 
-Prepared, **not published**. Source is the rc.13 revision
-(`d5610cb`) with version changes only: Python package, lockfile, both asset-pack
-manifests, bridge csproj and Yak manifest move to `0.6.0`; the Yak description
-drops the Include pre-releases note and pins `almond-mcp==0.6.0`; the bundled
-quickstart and Food4Rhino text describe the stable package. No code, models or
-UI changed, so the rc.13 behaviour (including viewport dragging) is unchanged.
+Prepared 27 September 2026, **not published**. Source is the rc.13 revision
+(`d5610cb`) with version changes (`10acd31`) and two Python fixes found by the
+MCP smoke test below. Python package, lockfile, both asset-pack manifests,
+bridge csproj and Yak manifest move to `0.6.0`; the Yak description drops the
+Include pre-releases note and pins `almond-mcp==0.6.0`; the bundled quickstart
+and Food4Rhino text describe the stable package. No C#, models or UI changed,
+so the rc.13 panel behaviour (including viewport dragging) is unchanged.
 
-`tools/prepare_release.ps1` passed on this machine: 185 tests, source check,
-wheel/sdist audit, clean isolated install with HTTP and MCP search smoke, bridge
-build (0 warnings) and Yak audit of 388 routes / 50 models / 10 drawing packages.
-Artifacts are in `dist/release-0.6.0/`:
+### MCP smoke findings (step 7), 27 September 2026
+
+Run against live Rhino 8 with almondbridge 0.6.0 installed, from a stdio MCP
+client, first with the locked dependencies and then with fresh resolution
+(`mcp` SDK 2.2.0). `almond-mcp doctor` passed on the first build, but the
+server itself did not start, and placement had two defects dating from v0.5.0:
+
+- **Server crash on upgrade.** Retiring the IKEA catalogue syncs it empty; the
+  prune deleted asset rows still referenced by recorded scene instances, so any
+  state database with IKEA placements failed with `FOREIGN KEY constraint failed`
+  at import time. Referenced rows are now kept under library `retired`, out of
+  search; unreferenced rows are still deleted. Replayed on a copy of a real
+  database: 13 instances kept, 9 assets retired, 7 removed, no FK violations.
+- **`place_generated_asset` could not compile.** Material rows were %-formatted
+  with doubled braces and then spliced into an f-string, so Roslyn received
+  `{{ ... }}`. Any asset with a known material failed after import.
+- **Models landed 1000× too large.** Library GLBs are numeric millimetres
+  (passport `coordinate_convention.glb_numeric_units: "mm"`), but Rhino's glTF
+  import reads metres. Placement now applies 0.001 for such contracts; exchange
+  GLBs exported by Rhino stay unscaled. The dimension check compares sorted
+  extents, so per-axis size was checked in Rhino separately.
+
+After the fixes, dining chair and bent-plywood lounge chair placed at exact
+catalogue width × depth × height (0.0 relative error), upright, bottom-centre
+at the origin, on the requested layer with asset ID and passport. Repository
+search returned generated models. Regression tests cover all three.
+
+### Artifacts
+
+`tools/prepare_release.ps1` passed on the fixed source: 188 tests, source check,
+wheel/sdist audit, clean isolated install (54 MCP tools) with HTTP and MCP search
+smoke, bridge build (0 warnings) and Yak audit of 388 routes / 50 models / 10
+drawing packages. Artifacts are in `dist/release-0.6.0/`:
 
 - `almondbridge-0.6.0-rh8_0-win.yak` —
   SHA-256 `d1f2a623a0c682ecb447691b367ab7e9aff7203a961017752500b4fd12fd1306`.
+  This is the first build, the one under the native smoke test. The Yak carries
+  no Python; the rebuild differed only in the recompiled `RhinoAlmondBridge.rhp`
+  (unchanged C# source), so the tested package was retained with its ZIP.
 - `almond_mcp-0.6.0-py3-none-any.whl` —
-  SHA-256 `5f95b570945863936c290406d390830f4e84d286f7dd231a47a0373d723b6c1c`.
+  SHA-256 `2abac20c4aaeeefd2ce8c805db997acd5197acbbb7d3a0a081839a959aa2330c`.
 - `almond_mcp-0.6.0.tar.gz` —
-  SHA-256 `71d3f0d38ef7c32847bff7cc97f762192c66dc8b06779980fd142f9880f55fa7`.
+  SHA-256 `def1d191942992b3af699c05666eea047efa87977c0b808d3a5ead8f1afd8f3f`.
 - `almondbridge-0.6.0-food4rhino.zip` and `SHA256SUMS.txt` for the rest.
 
 Remaining gates before the operator publication sequence above:
 
-1. Commit these changes; record the commit as the source revision.
-2. Run the [required Rhino smoke test](#required-final-rhino-smoke-test) against
-   this exact Yak hash and record pass/fail here. The stable release promotes
-   rc.13 to every Package Manager user, so this checklist is no longer optional.
-3. Publish `almond-mcp 0.6.0` to PyPI **before** pushing the Yak: the immutable
+1. Finish the [required Rhino smoke test](#required-final-rhino-smoke-test)
+   against this exact Yak hash and record pass/fail here. Step 7 (MCP) passed
+   after the fixes above. The stable release promotes rc.13 to every Package
+   Manager user, so this checklist is no longer optional.
+2. Publish `almond-mcp 0.6.0` to PyPI **before** pushing the Yak: the immutable
    Yak description tells users to run `uvx --from almond-mcp==0.6.0`.
-4. Push the Yak, confirm plain `Yak.exe search almondbridge` returns `0.6.0`,
+3. Push the Yak, confirm plain `Yak.exe search almondbridge` returns `0.6.0`,
    then add the ZIP to the Food4Rhino listing above rc.13.
