@@ -352,13 +352,24 @@ drawing packages. Artifacts are in `dist/release-0.6.0/`:
   SHA-256 `def1d191942992b3af699c05666eea047efa87977c0b808d3a5ead8f1afd8f3f`.
 - `almondbridge-0.6.0-food4rhino.zip` and `SHA256SUMS.txt` for the rest.
 
+### Rhino smoke record, 27 September 2026
+
+[Required Rhino smoke test](#required-final-rhino-smoke-test) run on Windows 11
+Home 10.0.26200 with Rhino 8.34.26223.11001, almondbridge 0.6.0 installed from
+the Yak with SHA-256 `d1f2a623a0c682ecb447691b367ab7e9aff7203a961017752500b4fd12fd1306`
+(hash and installed version checked). **Result: pass.**
+
+- Step 7 (MCP): passed after the fixes above, checked by the agent from a
+  stdio client against the live bridge.
+- Remaining steps (panel, drag/Place/Esc/Light/block reuse/units/Undo/save,
+  viewport-following previews, drawings/DXF/downloads, Karamba solve and
+  export, lifecycle, 0.5.0 upgrade path): reported passed by the user, who ran
+  them in Rhino against the pass criteria. Individual step results were not
+  itemised.
+
 Remaining gates before the operator publication sequence above:
 
-1. Finish the [required Rhino smoke test](#required-final-rhino-smoke-test)
-   against this exact Yak hash and record pass/fail here. Step 7 (MCP) passed
-   after the fixes above. The stable release promotes rc.13 to every Package
-   Manager user, so this checklist is no longer optional.
-2. Publish `almond-mcp 0.6.0` to PyPI **before** pushing the Yak: the immutable
+1. Publish `almond-mcp 0.6.0` to PyPI **before** pushing the Yak: the immutable
    Yak description tells users to run `uvx --from almond-mcp==0.6.0`.
-3. Push the Yak, confirm plain `Yak.exe search almondbridge` returns `0.6.0`,
+2. Push the Yak, confirm plain `Yak.exe search almondbridge` returns `0.6.0`,
    then add the ZIP to the Food4Rhino listing above rc.13.
