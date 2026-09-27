@@ -379,5 +379,7 @@ Machine-readable record: [publication-0.6.0.json](publication-0.6.0.json).
   longer need **Include pre-releases**.
 - [CI](https://github.com/liangjunglj-cpu/almond-mcp/actions/runs/36333172315) passed
   on the fixed source `1fa18ca`.
-- **Food4Rhino: pending.** Upload `almondbridge-0.6.0-food4rhino.zip` above rc.13
-  on the existing listing using `food4rhino-listing.md`.
+- **Food4Rhino: published** on the [existing listing](https://www.food4rhino.com/en/app/almond-mcp):
+  0.6.0 is first in downloads above rc.13, and the description no longer mentions
+  pre-releases or a pending PyPI upload. The hosted ZIP was re-downloaded and
+  matches `96792996d987415ddce3ec04be952982501169b46ca2a064b962c457b271cc7b`.

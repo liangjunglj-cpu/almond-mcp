@@ -27,9 +27,12 @@
       "published_date": "2026-09-27"
     },
     "food4rhino": {
-      "status": "pending",
-      "upload": "almondbridge-0.6.0-food4rhino.zip",
-      "uploaded_zip_sha256": "96792996d987415ddce3ec04be952982501169b46ca2a064b962c457b271cc7b"
+      "status": "published",
+      "listing_url": "https://www.food4rhino.com/en/app/almond-mcp",
+      "download_url": "https://www.food4rhino.com/en/system/files/users-files/liang-jung/app/almondbridge-060-food4rhino.zip",
+      "uploaded_zip_sha256": "96792996d987415ddce3ec04be952982501169b46ca2a064b962c457b271cc7b",
+      "verification": "Listing saved; 0.6.0 is first in downloads (Rhino 8 for Win) above rc.13. Hosted ZIP re-downloaded (50778400 bytes) and its SHA-256 matches SHA256SUMS. Description updated to drop prerelease and pending-PyPI wording; rc.13 entry marked superseded.",
+      "published_date": "2026-09-27"
     }
   },
   "native_acceptance": "Required Rhino smoke test on the published Yak hash: MCP step verified by agent after fixes; remaining steps reported passed by the user (not itemised). Rhino 8.34.26223.11001, Windows 11 10.0.26200."
