@@ -12,8 +12,8 @@ are retired. Existing local downloads and historical scene records are retained.
 Karamba and the generated model/source libraries remain available.
 See the [Rhino quickstart](docs/rhino-archive-quickstart.md) and
 [release infrastructure](docs/release-0.6.md). Viewport dragging was confirmed
-by the user on rc.6. Stable 0.6.0 is prepared; its native Rhino smoke test and
-publication to Yak, PyPI and Food4Rhino remain pending.
+by the user on rc.6. Stable 0.6.0 passed its Rhino smoke test and is published
+on Rhino Package Manager (`almondbridge`) and PyPI (`almond-mcp`).
 
 Run
 `almond-mcp library --open` for the local Neo Swiss interface: 47 Meshy models,

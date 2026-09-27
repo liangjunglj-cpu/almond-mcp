@@ -1,8 +1,8 @@
 # Food4Rhino listing - Almond 0.6.0
 
-Prepared for the stable 0.6.0 release (not yet published). The existing
-[Food4Rhino listing](https://www.food4rhino.com/en/app/almond-mcp) currently
-offers rc.13 first in downloads; add 0.6.0 above it after the Yak push.
+almondbridge 0.6.0 and almond-mcp 0.6.0 were published to Yak and PyPI on
+27 September 2026. The existing [Food4Rhino listing](https://www.food4rhino.com/en/app/almond-mcp)
+still offers rc.13 first in downloads; add 0.6.0 above it.
 Update the existing Almond MCP listing, preserving the permanent plugin GUID.
 Use the Rhino Account that owns the existing app / Yak package.
 
