@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "name": "Office chair",
+  "source": {
+    "asset_id": "gen-office-chair-1",
+    "geometry_sha256": "7C5A999A2362B83642D6808286D1753C4E805B0DDC0B9469996F594AFBB20180",
+    "model_sha256": "290B51B30E4DB2DA0405D71AA7C08A93CCE42EB9DF33DD70F76D863D82F02CB3",
+    "units": "mm",
+    "input_units": "mm",
+    "input_up_axis": "y",
+    "coordinate_transform": "X,-Z,Y",
+    "view_axes": {
+      "plan": "X,Y",
+      "front": "X,Z; looking +Y",
+      "right": "-Y,Z; looking -X"
+    },
+    "dimension_basis": "measured_mesh_geometry",
+    "engine_version": 2,
+    "method": "triangle_union_or_dense_mesh_raster_projection; see per-view method and resolution",
+    "source_references": [],
+    "reference_relationship_scope": "attached_to_this_drawing; not original mesh-generation inputs",
+    "created_at": "2026-09-19T01:55:25.064404+00:00",
+    "attribution": "Almond generated asset library",
+    "derived_asset_license": "CC-BY-4.0",
+    "generation_record": {
+      "asset_id": "gen-office-chair-1",
+      "name": "Office chair",
+      "model_file": "models/gen-office-chair-1.glb",
+      "model_sha256": "290B51B30E4DB2DA0405D71AA7C08A93CCE42EB9DF33DD70F76D863D82F02CB3",
+      "contract_file": "models/gen-office-chair-1.almond.json",
+      "contract_sha256": "8F76CAB0E56EFBD881A627C23370B282F2D2AF7D6793F94DB682811E6848C66B",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A generic black swivel office task chair with a padded seat, mesh backrest, armrests and a five-star base on castors.",
+        "image_task_id": "01a09789-5785-7773-8dcc-ed507a95c80a",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978f-4e8d-707c-a258-c9b3897bfcad",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 1100.0
+      },
+      "recorded_task_history": {
+        "image_model": "nano-banana",
+        "image_task_id": "01a09789-5785-7773-8dcc-ed507a95c80a",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0978f-4e8d-707c-a258-c9b3897bfcad",
+        "generated_at": "2026-09-12"
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "catalogue_image_stage_tool",
+        "id": "01a09789-5785-7773-8dcc-ed507a95c80a",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    "limitations": [
+      "Projected silhouettes only: internal visible/hidden edges and construction layers are not inferred.",
+      "Front is the declared coordinate direction, not a verified product front.",
+      "Dimensions describe mesh geometry, not a manufacturer-verified product."
+    ]
+  },
+  "triangle_count": 4101,
+  "scales": [
+    50,
+    100
+  ],
+  "representations": [
+    {
+      "view": "plan",
+      "bounds_mm": [
+        -439.35546875,
+        -415.72265625,
+        439.35546875,
+        415.72265625
+      ],
+      "method": "projected_triangle_union",
+      "raster_pixel_mm": null,
+      "approximation_note": null,
+      "precision_grid_mm": 0.01,
+      "simplification_tolerance_mm": 2.5,
+      "area_mm2": 480424.6765500001,
+      "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+      "scale": 50,
+      "svg": "plan-1-50.svg",
+      "dxf": "plan-1-50.dxf"
+    },
+    {
+      "view": "front",
+      "bounds_mm": [
+        -439.35546875,
+        0.0,
+        439.35546875,
+        1100.0
+      ],
+      "method": "projected_triangle_union",
+      "raster_pixel_mm": null,
+      "approximation_note": null,
+      "precision_grid_mm": 0.01,
+      "simplification_tolerance_mm": 2.5,
+      "area_mm2": 480456.6278500001,
+      "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+      "scale": 50,
+      "svg": "front-1-50.svg",
+      "dxf": "front-1-50.dxf"
+    },
+    {
+      "view": "right",
+      "bounds_mm": [
+        -415.72265625,
+        0.0,
+        415.72265625,
+        1100.0
+      ],
+      "method": "projected_triangle_union",
+      "raster_pixel_mm": null,
+      "approximation_note": null,
+      "precision_grid_mm": 0.01,
+      "simplification_tolerance_mm": 2.5,
+      "area_mm2": 214937.55325000006,
+      "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+      "scale": 50,
+      "svg": "right-1-50.svg",
+      "dxf": "right-1-50.dxf"
+    },
+    {
+      "view": "plan",
+      "bounds_mm": [
+        -439.35546875,
+        -415.72265625,
+        439.35546875,
+        415.72265625
+      ],
+      "method": "projected_triangle_union",
+      "raster_pixel_mm": null,
+      "approximation_note": null,
+      "precision_grid_mm": 0.01,
+      "simplification_tolerance_mm": 5.0,
+      "area_mm2": 479191.9292500002,
+      "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+      "scale": 100,
+      "svg": "plan-1-100.svg",
+      "dxf": "plan-1-100.dxf"
+    },
+    {
+      "view": "front",
+      "bounds_mm": [
+        -439.35546875,
+        0.0,
+        439.35546875,
+        1100.0
+      ],
+      "method": "projected_triangle_union",
+      "raster_pixel_mm": null,
+      "approximation_note": null,
+      "precision_grid_mm": 0.01,
+      "simplification_tolerance_mm": 5.0,
+      "area_mm2": 479517.62379999994,
+      "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+      "scale": 100,
+      "svg": "front-1-100.svg",
+      "dxf": "front-1-100.dxf"
+    },
+    {
+      "view": "right",
+      "bounds_mm": [
+        -415.72265625,
+        0.0,
+        415.72265625,
+        1100.0
+      ],
+      "method": "projected_triangle_union",
+      "raster_pixel_mm": null,
+      "approximation_note": null,
+      "precision_grid_mm": 0.01,
+      "simplification_tolerance_mm": 5.0,
+      "area_mm2": 213726.5172,
+      "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+      "scale": 100,
+      "svg": "right-1-100.svg",
+      "dxf": "right-1-100.dxf"
+    }
+  ],
+  "files": {
+    "front-1-100.dxf": "A2421F33973E8231E383C5D7F03697362EB496D2E4ABA793A2DBE4E63A3F1A14",
+    "front-1-100.svg": "669580CF0BDE832C10869398580B301459B665937AE5E12957EAA98905A743EA",
+    "front-1-50.dxf": "B45B839EC1546401C4FB0C22BF67F817EEA9CC2207667F682BC73205160A3BDC",
+    "front-1-50.svg": "FAEE2DDF79015466E469FD767595BF5123291DDCC60EC7EC5BD7556FD709AD5F",
+    "plan-1-100.dxf": "1F562D09F07E4CD6D8C876CF643063AAE5F971138F0C6189115410E0EDB90E82",
+    "plan-1-100.svg": "AFE94979E398A05FED96D0A45277DB031D2B124444CF42EA2A5876A1027C76E9",
+    "plan-1-50.dxf": "04F24569460DAF9B8AC25C633133D87D995B2BC711FA0220B7311319B714A77A",
+    "plan-1-50.svg": "FC33B8C4580BD26C3155BC9EE77477B97434889B2F9DDDDAB12C1434D908267F",
+    "right-1-100.dxf": "B7F3FCBDACBE52B207BF1FB2DAAF34935A86563CAEDAB366F51FD29A8748067A",
+    "right-1-100.svg": "AB8D8B737C3CFEA16786D69031246CA5117700F9EAEDCC69BD7A9FD9DF0CC1DD",
+    "right-1-50.dxf": "0A385F6651B8C4A27CB2B0905BC35045C5E09E456D88769A2E638BB0A3EF7C3D",
+    "right-1-50.svg": "1E321BF2D81B246F8AF5B3D937789CE3D69A05CCAD7A065D72F970A83700C42F",
+    "sheet-A3-1-100.svg": "67B68CB11E4E9CA4F779A6624FD393DD015421BA6EE9692E3B647FF7553B8AE1",
+    "sheet-A3-1-50.svg": "04FFD7245F3C0AEB40C0AB44320759E543D862C70E8AA425D6C222771FE398EE",
+    "views.json": "74D7F664A2EC0DDDA168E88B771F3EDBB02E91F8913489FC3F5BD2E454774142"
+  }
+}

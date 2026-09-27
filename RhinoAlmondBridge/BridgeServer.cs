@@ -31,7 +31,6 @@ namespace RhinoAlmondBridge
         private volatile bool _running;
         private StructuralValidator _validator;
         private GhDefinitionRunner _definitionRunner;
-        private FurnitureAssetManager _furnitureManager;
         private FurnitureAssetManager _drawingAssetManager;
         private DrawingStyleManager _drawingStyleManager;
 
@@ -52,9 +51,6 @@ namespace RhinoAlmondBridge
                 ?? FindCapsuleDirectory();
             _validator = new StructuralValidator(libDir, capsuleDir);
             _definitionRunner = new GhDefinitionRunner(libDir, capsuleDir);
-            string furnitureDir = Environment.GetEnvironmentVariable("RHINO_MCP_FURNITURE_DIR")
-                ?? FindFurnitureDirectory();
-            _furnitureManager = new FurnitureAssetManager(furnitureDir);
             string drawingAssetDir = Environment.GetEnvironmentVariable("RHINO_MCP_DRAWING_ASSET_DIR")
                 ?? FindDrawingAssetDirectory();
             _drawingAssetManager = new FurnitureAssetManager(
@@ -106,7 +102,6 @@ namespace RhinoAlmondBridge
 
         private string FindLibraryDirectory() => FindDataDirectory("Grasshopperfiles", "");
 
-        private string FindFurnitureDirectory() => FindDataDirectory("IkeaFurniturefiles", "mcp-rhino-plugin");
 
         private string FindCapsuleDirectory() => FindDataDirectory("capsules", "mcp-rhino-plugin");
 
@@ -223,12 +218,6 @@ namespace RhinoAlmondBridge
 
                 switch (requestType.ToLower())
                 {
-                    case "place_furniture":
-                        RhinoApp.WriteLine("RhinoAlmondBridge: Placing indexed IKEA furniture...");
-                        var furnitureRequest = jobj.ToObject<FurniturePlacementRequest>();
-                        var furnitureResult = _furnitureManager.Place(furnitureRequest);
-                        return JsonConvert.SerializeObject(furnitureResult);
-
                     case "place_drawing_asset":
                         RhinoApp.WriteLine("RhinoAlmondBridge: Placing indexed drawing asset...");
                         var drawingAssetRequest = jobj.ToObject<FurniturePlacementRequest>();

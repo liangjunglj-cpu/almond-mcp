@@ -1,0 +1,204 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-stool-bent-birch-3leg-1",
+  "library_id": "generated_assets",
+  "name": "Stool (three-legged bent-birch stool, round seat)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-stool-bent-birch-3leg-1.glb",
+  "dimensions_mm": {
+    "width": 488.7,
+    "depth": 488.7,
+    "height": 440.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -244.35,
+        -244.35,
+        0.0
+      ],
+      "max": [
+        244.35,
+        244.35,
+        440.0
+      ]
+    },
+    "footprint": [
+      [
+        -244.35,
+        -244.35
+      ],
+      [
+        244.35,
+        -244.35
+      ],
+      [
+        244.35,
+        244.35
+      ],
+      [
+        -244.35,
+        244.35
+      ]
+    ],
+    "clearance_mm": {
+      "front": 300,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "secondary"
+  },
+  "materials": [
+    {
+      "material_id": "wood-birch-ply",
+      "objects": [
+        "gen-stool-bent-birch-3leg-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-stool-bent-birch-3leg-1",
+    "library_id": "generated_assets",
+    "name": "Stool (three-legged bent-birch stool, round seat)",
+    "category": "seating",
+    "tags": [
+      "stool",
+      "seating",
+      "birch",
+      "bentwood",
+      "scandinavian",
+      "stackable"
+    ],
+    "dimensions_mm": {
+      "width": 488.7,
+      "depth": 488.7,
+      "height": 440.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 380.0,
+      "depth": 380.0,
+      "height": 440.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -244.35,
+          -244.35,
+          0.0
+        ],
+        "max": [
+          244.35,
+          244.35,
+          440.0
+        ]
+      },
+      "footprint": [
+        [
+          -244.35,
+          -244.35
+        ],
+        [
+          244.35,
+          -244.35
+        ],
+        [
+          244.35,
+          244.35
+        ],
+        [
+          -244.35,
+          244.35
+        ]
+      ],
+      "clearance_mm": {
+        "front": 300,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "secondary"
+    },
+    "materials": [
+      {
+        "material_id": "wood-birch-ply",
+        "objects": [
+          "gen-stool-bent-birch-3leg-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "A three-legged wooden stool: a plain round birch seat on three L-shaped legs made of solid birch that bend in a smooth right-angle curve at the top and screw directly under the seat, pale natural birch, Scandinavian functionalist design from the 1930s, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa90-d6d6-738a-bbbd-8a010748356c",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 977.777804
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "living_room"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.286,
+      "triangle_count": 4125,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product.",
+        "Measured width/depth differs from the prompt target by more than 25%."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "9D3C6A08D31706B954EF7EC1719AE46A8213BEA025025AC80E23FC5576DA6C83"
+}

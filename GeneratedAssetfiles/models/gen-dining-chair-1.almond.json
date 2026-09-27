@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-dining-chair-1",
+  "library_id": "generated_assets",
+  "name": "Dining chair (generic timber, armless)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-dining-chair-1.glb",
+  "dimensions_mm": {
+    "width": 462.3,
+    "depth": 566.0,
+    "height": 900.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -231.15,
+        -283.0,
+        0.0
+      ],
+      "max": [
+        231.15,
+        283.0,
+        900.0
+      ]
+    },
+    "footprint": [
+      [
+        -231.15,
+        -283.0
+      ],
+      [
+        231.15,
+        -283.0
+      ],
+      [
+        231.15,
+        283.0
+      ],
+      [
+        -231.15,
+        283.0
+      ]
+    ],
+    "clearance_mm": {
+      "front": 0,
+      "back": 500,
+      "left": 100,
+      "right": 100
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "secondary"
+  },
+  "materials": [
+    {
+      "material_id": "wood-oak",
+      "objects": [
+        "gen-dining-chair-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-dining-chair-1",
+    "library_id": "generated_assets",
+    "name": "Dining chair (generic timber, armless)",
+    "category": "seating",
+    "tags": [
+      "chair",
+      "dining",
+      "seating",
+      "furniture"
+    ],
+    "dimensions_mm": {
+      "width": 462.3,
+      "depth": 566.0,
+      "height": 900.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 450.0,
+      "depth": 520.0,
+      "height": 900.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -231.15,
+          -283.0,
+          0.0
+        ],
+        "max": [
+          231.15,
+          283.0,
+          900.0
+        ]
+      },
+      "footprint": [
+        [
+          -231.15,
+          -283.0
+        ],
+        [
+          231.15,
+          -283.0
+        ],
+        [
+          231.15,
+          283.0
+        ],
+        [
+          -231.15,
+          283.0
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 500,
+        "left": 100,
+        "right": 100
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "secondary"
+    },
+    "materials": [
+      {
+        "material_id": "wood-oak",
+        "objects": [
+          "gen-dining-chair-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "A generic armless timber dining chair with four straight legs, a flat seat and a simple slatted backrest, plain light oak.",
+        "image_task_id": "01a09789-2b97-72fd-8906-ed90e2d6402d",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978f-2694-77ef-92e9-19a4597946d2",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 1000.000026
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "dining_room"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.088,
+      "triangle_count": 4337,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "0BBDCDCB7F1889F9C92EB4B1858F7A73AC03C0FD3E27520A57DCA39A21B6A7ED"
+}

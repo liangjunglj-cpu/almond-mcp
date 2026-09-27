@@ -1,0 +1,83 @@
+{
+  "batch_id": "organic-2026-09",
+  "image": {
+    "asset_id": "gen-folded-throw-1",
+    "endpoint": "/openapi/v1/text-to-image",
+    "submitted_at": "2026-09-19T16:21:33.066538+00:00",
+    "request": {
+      "ai_model": "nano-banana-pro",
+      "aspect_ratio": "1:1",
+      "generate_multi_view": false,
+      "prompt": "One realistic plain linen throw blanket loosely folded into a low irregular stack, about 75 by 55 centimetres and 18 centimetres high, with several large soft cascading folds, rounded creases, a gently rumpled top and visible layered fabric edges. Natural weight and substantial cloth thickness. Unbranded neutral warm beige textile for architectural interiors. No tassels, no furniture, no person, no support stand, no ground plane. Entire object visible with margin, isolated on pure white, three-quarter view from slightly above, soft even studio lighting, physical folds rather than printed patterns, no text, no cast shadow."
+    },
+    "status": "SUCCEEDED",
+    "task_id": "01a0ba79-1327-7650-8b3f-b579a41bf87e",
+    "output_file": "gen-folded-throw-1.png",
+    "output_sha256": "4f6230fccc0b670f132ea702d1aaa41880214cf5257c420cc708ff2a7716f552",
+    "finished_at": 1789834909471,
+    "seed": null,
+    "consumed_credits": 9,
+    "provider_created_at": 1789834892086,
+    "provider_started_at": 1789834892094
+  },
+  "mesh": {
+    "asset_id": "gen-folded-throw-1",
+    "endpoint": "/openapi/v1/image-to-3d",
+    "submitted_at": "2026-09-19T16:22:57.057894+00:00",
+    "request": {
+      "ai_model": "meshy-7.1",
+      "model_type": "standard",
+      "geometry_resolution": "4k",
+      "should_texture": false,
+      "should_remesh": false,
+      "image_enhancement": false,
+      "target_formats": [
+        "glb"
+      ],
+      "auto_size": false,
+      "input_task_id": "01a0ba79-1327-7650-8b3f-b579a41bf87e"
+    },
+    "status": "SUCCEEDED",
+    "task_id": "01a0ba7a-5b3c-75e4-b117-88f5db00caec",
+    "output_file": "gen-folded-throw-1.glb",
+    "output_sha256": "3f60eda83261f80da04ebf204eb6ce9a7926e2c014495cc80b9a1831144d1c8e",
+    "finished_at": 1789835185342,
+    "seed": null,
+    "consumed_credits": 25,
+    "provider_created_at": 1789834976787,
+    "provider_started_at": 1789834976796
+  },
+  "derivation": {
+    "asset_id": "gen-folded-throw-1",
+    "source_sha256": "3f60eda83261f80da04ebf204eb6ce9a7926e2c014495cc80b9a1831144d1c8e",
+    "source_triangles": 330388,
+    "target_triangles": 100000,
+    "prepared_sha256": "54f4889d487a003a63666d5cadf14065c7e3ff10623a2bd8a02579289da09f8f",
+    "software": "Blender 5.1.2",
+    "method": "Weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target; triangulate. Never subdivide to inflate counts.",
+    "weld_tolerance_source_units": 1.9016218185424803e-07,
+    "quality": {
+      "vertices": 50002,
+      "triangles": 100000,
+      "boundary_edges": 0,
+      "nonmanifold_edges_excluding_boundary": 0,
+      "zero_area_faces": 0,
+      "connected_components": 1,
+      "largest_component_vertices": 50002,
+      "nonfinite_coordinates": 0,
+      "self_intersections": "not_tested",
+      "use": "Visual entourage; not certified for fabrication or structural analysis",
+      "bounds_relative_change": [
+        2.8084323180349e-05,
+        4.9347966877985946e-05,
+        0.00013677518705012528
+      ]
+    }
+  },
+  "input_image_file": "batches/organic-2026-09/gen-folded-throw-1.png",
+  "external_reference_status": "Original descriptive prompts; no external images or design references submitted.",
+  "external_reference_ids": [],
+  "dimension_basis": "Authored nominal height for architectural studies; width and depth measured after uniform normalization. Not a physical survey.",
+  "reference_review": "Reference image visually reviewed for neutral architectural use.",
+  "rights": "Generated for the Almond library using the owner-configured Meshy account; public pack distribution authorized by owner. CC BY 4.0. API balance verified; subscription contract not independently audited."
+}

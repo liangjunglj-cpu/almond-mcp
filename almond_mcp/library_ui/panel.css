@@ -1,0 +1,70 @@
+/* Embedded workspace only. Colours are read from Rhino, not a separate app theme. */
+.rhino-panel{font-family:var(--ui-font,"Segoe UI"),Arial,sans-serif;font-size:12px;--mono:var(--ui-font,"Segoe UI"),Arial,sans-serif;scrollbar-color:var(--line) var(--paper)}
+.rhino-panel body{background:var(--paper);color:var(--ink)}
+.rhino-panel button:focus-visible,.rhino-panel a:focus-visible,.rhino-panel input:focus-visible,.rhino-panel select:focus-visible,.rhino-panel summary:focus-visible{outline-offset:1px}
+.rhino-panel .masthead{position:sticky;top:0;z-index:4;min-height:38px;margin:0;padding:4px 8px;gap:6px;background:var(--paper);border-color:var(--line)}
+.rhino-panel .wordmark{font-size:16px;letter-spacing:-.7px;gap:5px}
+.rhino-panel .brand-mark{font-family:Arial,sans-serif;font-size:18px;width:16px;height:20px;background:#e94329;color:white;padding-bottom:3px}
+.rhino-panel .masthead nav{font-size:12px;gap:2px}
+.rhino-panel .masthead nav a{padding:5px 7px;border:1px solid transparent;border-radius:3px}
+.rhino-panel .masthead nav a[aria-current]{background:var(--control);border-color:var(--line);color:var(--ink)}
+.rhino-panel .panel-tools{display:flex;gap:2px;border-left:1px solid var(--line);padding-left:4px}
+.rhino-panel .panel-tools a,.rhino-panel .panel-tools button{display:grid;place-items:center;width:24px;height:26px;padding:0;font-size:17px;border-radius:3px}
+.rhino-panel .panel-tools a:hover,.rhino-panel .panel-tools button:hover,.rhino-panel .masthead nav a:hover{background:var(--hover);color:var(--ink)}
+.rhino-panel main{margin:0 8px}
+.rhino-panel #collection{gap:6px 8px;padding-top:8px;scroll-margin-top:44px}
+.rhino-panel .search-wrap{gap:6px;border:1px solid var(--line);border-radius:3px;background:var(--field);padding:0 7px}
+.rhino-panel .search-wrap>span{font-size:24px}
+.rhino-panel .search-wrap input{height:30px;font-size:12px}
+.rhino-panel .search-wrap input::placeholder{color:var(--muted);opacity:1}
+.rhino-panel .filter-row{margin-top:0}
+.rhino-panel .filters{gap:3px}
+.rhino-panel .filters button{padding:5px 7px;font-size:11px;border:1px solid var(--line);border-radius:3px;background:var(--control)}
+.rhino-panel .filters .active{background:var(--hover);color:var(--ink);box-shadow:inset 0 -2px var(--red)}
+.rhino-panel select,.rhino-panel .analysis-step input[type=number]{background:var(--field);border:1px solid var(--line);border-radius:3px;padding:5px 3px;font-family:inherit;font-size:11px;color:var(--ink)}
+.rhino-panel select option{background:var(--field);color:var(--ink)}
+.rhino-panel .sort-label select{width:110px;font-family:inherit;font-size:11px}
+.rhino-panel #category{font:11px var(--ui-font,"Segoe UI"),Arial,sans-serif;padding:5px 3px}
+.rhino-panel .results-line{padding:2px 0;color:var(--muted);font-size:10px;letter-spacing:0}
+.rhino-panel .placement-tools{margin:0 0 3px;gap:3px;font-size:11px;color:var(--muted)}
+.rhino-panel .placement-tools label{gap:4px}
+.rhino-panel .grid{gap:10px 8px}
+.rhino-panel .card-stage{border-color:var(--line);border-radius:3px;background:var(--preview);color:var(--preview-ink)}
+.rhino-panel .card-stage img{mix-blend-mode:normal}
+.rhino-panel .card-index,.rhino-panel .card-format{font-size:9px;color:var(--preview-ink)}
+.rhino-panel .card-name{font-size:12px;line-height:1.35;margin:6px 0 3px;min-height:0;letter-spacing:0}
+.rhino-panel .card-sub{font-size:10px;padding:0 0 4px;border:0;letter-spacing:0}
+.rhino-panel .card-save{border-radius:3px;color:var(--preview-ink);background:var(--preview)}
+.rhino-panel .place-model,.rhino-panel .analysis-button,.rhino-panel .download,.rhino-panel .view-tabs button,.rhino-panel .solid-button{border:1px solid var(--line);border-radius:3px;background:var(--control);color:var(--ink);font-size:12px;padding:6px 8px}
+.rhino-panel .place-model:hover,.rhino-panel .analysis-button:hover:enabled,.rhino-panel .download:hover,.rhino-panel .view-tabs button:hover{background:var(--hover);color:var(--ink);border-color:var(--muted)}
+.rhino-panel .view-tabs button.active{box-shadow:inset 0 -2px var(--red)}
+.rhino-panel .analysis-button.primary{font-weight:600;border-color:var(--muted)}
+.rhino-panel .workbench-home,.rhino-panel .analysis-page{padding:12px 0 24px}
+.rhino-panel .workbench-home>.eyebrow,.rhino-panel .workbench-home>h1,.rhino-panel .workbench-home>.home-intro,.rhino-panel .analysis-page>.eyebrow{display:none}
+.rhino-panel .workspace-card{background:var(--panel);border:1px solid var(--line);border-radius:3px;padding:12px;margin-bottom:8px;gap:6px;grid-template-columns:16px 1fr}
+.rhino-panel .workspace-card svg{height:64px}
+.rhino-panel .workspace-title{font-size:17px;letter-spacing:0}
+.rhino-panel .workspace-meta{font-size:10px;letter-spacing:0}
+.rhino-panel .workspace-links{border-color:var(--line);font-size:12px}
+.rhino-panel .analysis-page h1{font-size:18px;font-weight:600;letter-spacing:0;line-height:1.4;margin:0 0 10px}
+.rhino-panel .analysis-page h1 br{display:none}.rhino-panel .analysis-page h1 br:after{content:' '}
+.rhino-panel .analysis-page h1 .red{display:none}
+.rhino-panel .engine-line{border-color:var(--line);font-size:12px;padding:8px 0}
+.rhino-panel .analysis-step{padding:12px 0}
+.rhino-panel .analysis-page h2{font-size:13px;font-weight:600;letter-spacing:0;margin-bottom:8px}
+.rhino-panel .analysis-page h2>span{font-size:11px;margin-right:8px}
+.rhino-panel .analysis-step p,.rhino-panel .analysis-details p{font-size:12px}
+.rhino-panel .analysis-meta{font-size:11px!important}
+.rhino-panel .analysis-step select,.rhino-panel .analysis-step input[type=number]{font-size:12px;padding:5px}
+.rhino-panel .analysis-step label{margin:8px 0}
+.rhino-panel .analysis-toggle{padding:3px 0}
+.rhino-panel .analysis-step .field-help,.rhino-panel .field-help{font-size:11px;color:var(--muted)}
+.rhino-panel #analysis-diagram{border:1px solid var(--line);border-radius:3px}
+.rhino-panel #analysis-outcome[data-state=pass]{color:var(--diagram-support)}
+.rhino-panel #analysis-outcome[data-state=fail]{color:var(--diagram-load)}
+.rhino-panel .secondary-page h1,.rhino-panel .object-info h2{font-size:24px;letter-spacing:-.02em}
+.rhino-panel .dialog-head{background:var(--paper);border-color:var(--line);font-size:12px}
+.rhino-panel .technical,.rhino-panel .tags{font-size:11px;letter-spacing:0}
+/* Linework is an intentionally light drawing sheet; material previews use the host surface. */
+.rhino-panel .view-image{background:#f3f3ef}
+@media(max-width:330px){.rhino-panel .wordmark{font-size:0;gap:0}.rhino-panel .masthead nav{margin-left:0;flex:1}.rhino-panel .filters button{padding:5px;font-size:10px}.rhino-panel .placement-tools{flex-wrap:wrap}}

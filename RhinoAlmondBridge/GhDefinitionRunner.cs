@@ -434,17 +434,34 @@ namespace RhinoAlmondBridge
         /// Forms: {"guids": [...]} resolve from RhinoDoc; raw number; string;
         /// bool; [numbers]. Returns null when conversion is impossible.
         /// </summary>
+        /// <summary>Scale factor from document units to a port's declared
+        /// length units ("m", "cm", "mm"); 1.0 for anything else.</summary>
+        private static double PortLengthScale(RhinoDoc doc, string units)
+        {
+            switch ((units ?? "").Trim().ToLowerInvariant())
+            {
+                case "m": return RhinoMath.UnitScale(doc.ModelUnitSystem, UnitSystem.Meters);
+                case "cm": return RhinoMath.UnitScale(doc.ModelUnitSystem, UnitSystem.Centimeters);
+                case "mm": return RhinoMath.UnitScale(doc.ModelUnitSystem, UnitSystem.Millimeters);
+                default: return 1.0;
+            }
+        }
+
         private List<IGH_Goo> ConvertInputValue(JToken value, CapsulePort port,
             List<string> warnings)
         {
             string baseType = (port.Type ?? "number").Replace("[]", "");
 
-            // GUID reference form.
+            // GUID reference form. Geometry is duplicated and scaled from the
+            // document's unit system into the port's declared units, so a
+            // definition built for metres receives metres from an mm document.
             if (value.Type == JTokenType.Object && value["guids"] != null)
             {
                 var doc = RhinoDoc.ActiveDoc;
                 if (doc == null) return null;
 
+                double scale = PortLengthScale(doc, port.Units);
+                bool scaled = Math.Abs(scale - 1.0) > 1e-12;
                 var goos = new List<IGH_Goo>();
                 foreach (var g in (JArray)value["guids"])
                 {
@@ -460,9 +477,18 @@ namespace RhinoAlmondBridge
                         warnings.Add($"Input '{port.Name}': GUID {g} not in document.");
                         continue;
                     }
-                    var goo = GeometryToGoo(obj.Geometry, baseType, warnings, port.Name);
+                    var geom = obj.Geometry;
+                    if (scaled)
+                    {
+                        geom = geom.Duplicate();
+                        geom.Transform(Transform.Scale(Point3d.Origin, scale));
+                    }
+                    var goo = GeometryToGoo(geom, baseType, warnings, port.Name);
                     if (goo != null) goos.AddRange(goo);
                 }
+                if (scaled && goos.Count > 0)
+                    warnings.Add($"Input '{port.Name}': geometry scaled x{scale:G4} " +
+                        $"from document units to {port.Units} per the manifest.");
                 return goos.Count > 0 ? goos : null;
             }
 
@@ -496,15 +522,28 @@ namespace RhinoAlmondBridge
                         return new List<IGH_Goo> { new GH_Boolean(value.Value<bool>()) };
 
                     case "point":
-                        // Accept [x,y,z] arrays for point ports.
-                        if (value.Type == JTokenType.Array && ((JArray)value).Count == 3)
+                        // Accept [x,y,z] or [[x,y,z], ...] arrays for point
+                        // ports; coordinates are taken as already being in the
+                        // port's declared units.
+                        if (value.Type == JTokenType.Array)
                         {
-                            var a = (JArray)value;
-                            return new List<IGH_Goo>
-                            {
-                                new GH_Point(new Point3d(a[0].Value<double>(),
-                                    a[1].Value<double>(), a[2].Value<double>()))
-                            };
+                            var arr = (JArray)value;
+                            if (arr.Count > 0 && arr[0].Type == JTokenType.Array)
+                                return arr
+                                    .Select(t =>
+                                    {
+                                        var a = (JArray)t;
+                                        return (IGH_Goo)new GH_Point(new Point3d(
+                                            a[0].Value<double>(), a[1].Value<double>(),
+                                            a[2].Value<double>()));
+                                    })
+                                    .ToList();
+                            if (arr.Count == 3)
+                                return new List<IGH_Goo>
+                                {
+                                    new GH_Point(new Point3d(arr[0].Value<double>(),
+                                        arr[1].Value<double>(), arr[2].Value<double>()))
+                                };
                         }
                         return null;
 

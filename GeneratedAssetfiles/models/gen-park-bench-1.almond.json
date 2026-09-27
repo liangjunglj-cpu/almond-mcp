@@ -1,0 +1,204 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-park-bench-1",
+  "library_id": "generated_assets",
+  "name": "Park bench (timber slats, steel frame)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-park-bench-1.glb",
+  "dimensions_mm": {
+    "width": 1330.9,
+    "depth": 565.4,
+    "height": 850.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "ground",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -665.45,
+        -282.7,
+        0.0
+      ],
+      "max": [
+        665.45,
+        282.7,
+        850.0
+      ]
+    },
+    "footprint": [
+      [
+        -665.45,
+        -282.7
+      ],
+      [
+        665.45,
+        -282.7
+      ],
+      [
+        665.45,
+        282.7
+      ],
+      [
+        -665.45,
+        282.7
+      ]
+    ],
+    "clearance_mm": {
+      "front": 600,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "movable"
+  },
+  "materials": [
+    {
+      "material_id": "wood-oak",
+      "objects": [
+        "gen-park-bench-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-park-bench-1",
+    "library_id": "generated_assets",
+    "name": "Park bench (timber slats, steel frame)",
+    "category": "site_furniture",
+    "tags": [
+      "bench",
+      "seating",
+      "park",
+      "street furniture",
+      "site",
+      "outdoor"
+    ],
+    "dimensions_mm": {
+      "width": 1330.9,
+      "depth": 565.4,
+      "height": 850.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 1800.0,
+      "depth": 600.0,
+      "height": 850.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "ground",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -665.45,
+          -282.7,
+          0.0
+        ],
+        "max": [
+          665.45,
+          282.7,
+          850.0
+        ]
+      },
+      "footprint": [
+        [
+          -665.45,
+          -282.7
+        ],
+        [
+          665.45,
+          -282.7
+        ],
+        [
+          665.45,
+          282.7
+        ],
+        [
+          -665.45,
+          282.7
+        ]
+      ],
+      "clearance_mm": {
+        "front": 600,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "movable"
+    },
+    "materials": [
+      {
+        "material_id": "wood-oak",
+        "objects": [
+          "gen-park-bench-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "A public park bench with horizontal timber slats for seat and backrest on two cast steel side frames, plain simple design.",
+        "image_task_id": "01a09788-0f5c-7679-ad0c-e716a5c3c118",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978d-e43a-708f-be6d-e8de89fde6f9",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 1000.000007
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "landscape",
+        "streetscape"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "site_plan",
+        "section",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.261,
+      "triangle_count": 3990,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product.",
+        "Measured width/depth differs from the prompt target by more than 25%."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "8CFE4AEADC89741CD1D87E2682C6403DBB200C91F1EFBFC3262492A5E5CD6B19"
+}

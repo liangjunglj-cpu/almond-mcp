@@ -1,50 +1,45 @@
-# Assemble and build the AlmondBridge Yak package.
-#
-# Prerequisites: a Release build of RhinoAlmondBridge (see
-# RhinoAlmondBridge\BUILD.md) and Rhino 8 installed (for yak.exe).
-#
-# Usage:  powershell -File tools\build_yak.ps1
-# Output: dist\yak\almondbridge-<version>-rh8_0-any.yak
-
+# Fresh isolated build. Does not install or publish anything.
+[CmdletBinding()]
+param(
+    [string]$PythonExecutable = "python",
+    [string]$YakExecutable = "C:\Program Files\Rhino 8\System\Yak.exe"
+)
 $ErrorActionPreference = "Stop"
 $repo = Split-Path -Parent $PSScriptRoot
-$stage = Join-Path $repo "dist\yak"
-$yak = "C:\Program Files\Rhino 8\System\Yak.exe"
-
-# Prefer a fresh Release build; fall back to the staged binaries checked
-# into dist\bridge when building from a clean checkout.
-$bin = Join-Path $repo "RhinoAlmondBridge\bin\Release\net48"
-if (-not (Test-Path (Join-Path $bin "RhinoAlmondBridge.rhp"))) {
-    $bin = Join-Path $repo "dist\bridge"
-}
-if (-not (Test-Path (Join-Path $bin "RhinoAlmondBridge.rhp"))) {
-    throw "No RhinoAlmondBridge.rhp in bin\Release\net48 or dist\bridge - build the plugin first (RhinoAlmondBridge\BUILD.md)."
-}
-if (-not (Test-Path $yak)) {
-    throw "Yak.exe not found at $yak - is Rhino 8 installed?"
-}
-
-if (Test-Path $stage) { Remove-Item $stage -Recurse -Force -Confirm:$false }
-New-Item -ItemType Directory -Force $stage | Out-Null
-
-# Plugin + runtime dependencies (root-level DLLs only; Roslyn satellite
-# resource folders are skipped to keep the package small).
-Copy-Item (Join-Path $bin "RhinoAlmondBridge.rhp") $stage
-Copy-Item (Join-Path $bin "*.dll") $stage
-# The .rhp IS the plugin assembly; don't ship the same assembly twice.
-Remove-Item (Join-Path $stage "RhinoAlmondBridge.dll") -ErrorAction SilentlyContinue
-
-# Package metadata. THIRD-PARTY-NOTICES.md must ship with the compiled
-# bridge (Newtonsoft.Json / Roslyn notices).
-Copy-Item (Join-Path $repo "RhinoAlmondBridge\yak\manifest.yml") $stage
-Copy-Item (Join-Path $repo "assets\almond-icon-48.png") (Join-Path $stage "icon.png")
-Copy-Item (Join-Path $repo "THIRD-PARTY-NOTICES.md") $stage
-Copy-Item (Join-Path $repo "LICENSE") $stage
-
-Push-Location $stage
+$stageRoot = Join-Path ([IO.Path]::GetTempPath()) ("almond-yak-" + [guid]::NewGuid().ToString("N"))
+$stage = Join-Path $stageRoot "package"
+$bin = Join-Path $stageRoot "build"
+New-Item -ItemType Directory -Path $stage -Force | Out-Null
+if (-not (Test-Path -LiteralPath $YakExecutable)) { throw "Yak executable not found: $YakExecutable" }
+Push-Location $repo
 try {
-    & $yak build
-    Get-ChildItem *.yak | ForEach-Object { Write-Host "Built $($_.FullName)" }
-} finally {
-    Pop-Location
-}
+    & $PythonExecutable tools/document_generation_sources.py --check
+    if ($LASTEXITCODE -ne 0) { throw "Source documentation check failed." }
+    & dotnet build RhinoAlmondBridge/RhinoAlmondBridge.csproj -c Release -o $bin
+    if ($LASTEXITCODE -ne 0) { throw "Bridge build failed." }
+    Copy-Item -LiteralPath (Join-Path $bin "RhinoAlmondBridge.dll") -Destination (Join-Path $stage "RhinoAlmondBridge.rhp")
+    Get-ChildItem -LiteralPath $bin -Filter *.dll | Where-Object Name -ne "RhinoAlmondBridge.dll" | ForEach-Object {
+        if ($_.Name -match '^(RhinoCommon|Grasshopper|GH_IO|Karamba|Kangaroo)') { throw "Forbidden runtime dependency: $($_.Name)" }
+        Copy-Item -LiteralPath $_.FullName -Destination $stage
+    }
+    & $PythonExecutable tools/build_archive_bundle.py (Join-Path $stage "archive")
+    if ($LASTEXITCODE -ne 0) { throw "Archive bundle build failed." }
+    Copy-Item -LiteralPath (Join-Path $repo "RhinoAlmondBridge/yak/manifest.yml") -Destination $stage
+    Copy-Item -LiteralPath (Join-Path $repo "assets/almond-icon-48.png") -Destination (Join-Path $stage "icon.png")
+    foreach ($file in @("LICENSE", "THIRD-PARTY-NOTICES.md")) { Copy-Item -LiteralPath (Join-Path $repo $file) -Destination $stage }
+    Copy-Item -LiteralPath (Join-Path $repo "docs/rhino-archive-quickstart.md") -Destination (Join-Path $stage "GETTING-STARTED.md")
+    Push-Location $stage
+    try {
+        & $YakExecutable build --platform win
+        if ($LASTEXITCODE -ne 0) { throw "Yak build failed." }
+    } finally { Pop-Location }
+    $packages = @(Get-ChildItem -LiteralPath $stage -Filter *.yak)
+    if ($packages.Count -ne 1 -or $packages[0].Name -notmatch '-rh8_0-win\.yak$') { throw "Expected one Rhino 8.0 Windows Yak package." }
+    & $PythonExecutable tools/verify_yak.py $packages[0].FullName
+    if ($LASTEXITCODE -ne 0) { throw "Yak contents verification failed." }
+    $output = Join-Path $repo "dist/yak"
+    New-Item -ItemType Directory -Path $output -Force | Out-Null
+    Copy-Item -LiteralPath $packages[0].FullName -Destination $output
+    Write-Host "Built and verified: $(Join-Path $output $packages[0].Name)"
+    Write-Host "Unpublished staging folder: $stage"
+} finally { Pop-Location }

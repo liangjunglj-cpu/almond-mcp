@@ -67,6 +67,13 @@ You are setting up **Almond MCP** — this specific project, not a generic
 
 ## For agents working in this repo (development)
 
+- For generated models and derived drawings, follow
+  `docs/generation-source-documentation.md`: record item-level sources and
+  actual generation inputs, preserve unknowns, and distinguish later
+  references from original inputs. Refresh `GeneratedAssetfiles/source-register.json`
+  after catalogue edits and run `tools/document_generation_sources.py --check`
+  before packaging.
+
 - Python ≥3.12, `uv run pytest` (set `UV_LINK_MODE=copy` on OneDrive paths;
   never sync the checkout's `.venv` while a live MCP server runs from it —
   use `UV_PROJECT_ENVIRONMENT` pointing to a scratch dir instead).

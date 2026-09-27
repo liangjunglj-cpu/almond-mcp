@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-toilet-1",
+  "library_id": "generated_assets",
+  "name": "Toilet (close-coupled floor mounted)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-toilet-1.glb",
+  "dimensions_mm": {
+    "width": 448.4,
+    "depth": 670.3,
+    "height": 800.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -224.2,
+        -335.15,
+        0.0
+      ],
+      "max": [
+        224.2,
+        335.15,
+        800.0
+      ]
+    },
+    "footprint": [
+      [
+        -224.2,
+        -335.15
+      ],
+      [
+        224.2,
+        -335.15
+      ],
+      [
+        224.2,
+        335.15
+      ],
+      [
+        -224.2,
+        335.15
+      ]
+    ],
+    "clearance_mm": {
+      "front": 600,
+      "back": 0,
+      "left": 200,
+      "right": 200
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "fixed"
+  },
+  "materials": [
+    {
+      "material_id": "ceramic-teal",
+      "objects": [
+        "gen-toilet-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-toilet-1",
+    "library_id": "generated_assets",
+    "name": "Toilet (close-coupled floor mounted)",
+    "category": "sanitary",
+    "tags": [
+      "toilet",
+      "wc",
+      "bathroom",
+      "sanitary",
+      "fixture"
+    ],
+    "dimensions_mm": {
+      "width": 448.4,
+      "depth": 670.3,
+      "height": 800.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 380.0,
+      "depth": 700.0,
+      "height": 800.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -224.2,
+          -335.15,
+          0.0
+        ],
+        "max": [
+          224.2,
+          335.15,
+          800.0
+        ]
+      },
+      "footprint": [
+        [
+          -224.2,
+          -335.15
+        ],
+        [
+          224.2,
+          -335.15
+        ],
+        [
+          224.2,
+          335.15
+        ],
+        [
+          -224.2,
+          335.15
+        ]
+      ],
+      "clearance_mm": {
+        "front": 600,
+        "back": 0,
+        "left": 200,
+        "right": 200
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "fixed"
+    },
+    "materials": [
+      {
+        "material_id": "ceramic-teal",
+        "objects": [
+          "gen-toilet-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "A close-coupled floor-mounted white ceramic toilet with cistern and closed seat lid, plain modern design.",
+        "image_task_id": "01a09788-bf8b-74b2-be55-75e578e73068",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978e-b787-7347-afc4-29e5a6b44b90",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 999.999985
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "bathroom"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.18,
+      "triangle_count": 4216,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "4619E273B07329F33F200F9593A7D1FB8580DB41C64B60FF40E7FC1723A0FB1B"
+}

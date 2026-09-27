@@ -1,0 +1,128 @@
+{
+  "$defs": {
+    "Dimensions": {
+      "additionalProperties": false,
+      "properties": {
+        "width": {
+          "exclusiveMinimum": 0,
+          "title": "Width",
+          "type": "number"
+        },
+        "depth": {
+          "exclusiveMinimum": 0,
+          "title": "Depth",
+          "type": "number"
+        },
+        "height": {
+          "exclusiveMinimum": 0,
+          "title": "Height",
+          "type": "number"
+        }
+      },
+      "required": [
+        "width",
+        "depth",
+        "height"
+      ],
+      "title": "Dimensions",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "description": "Schema for glTF asset.extras.almond.passport and sidecar passport.",
+  "properties": {
+    "schema_version": {
+      "default": 1,
+      "maximum": 1,
+      "minimum": 1,
+      "title": "Schema Version",
+      "type": "integer"
+    },
+    "asset_id": {
+      "pattern": "^[A-Za-z0-9._-]{1,80}$",
+      "title": "Asset Id",
+      "type": "string"
+    },
+    "library_id": {
+      "default": "generated_assets",
+      "title": "Library Id",
+      "type": "string"
+    },
+    "name": {
+      "title": "Name",
+      "type": "string"
+    },
+    "category": {
+      "title": "Category",
+      "type": "string"
+    },
+    "tags": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Tags",
+      "type": "array"
+    },
+    "dimensions_mm": {
+      "$ref": "#/$defs/Dimensions"
+    },
+    "nominal_dimensions_mm": {
+      "$ref": "#/$defs/Dimensions"
+    },
+    "coordinate_convention": {
+      "additionalProperties": true,
+      "title": "Coordinate Convention",
+      "type": "object"
+    },
+    "spatial": {
+      "additionalProperties": true,
+      "title": "Spatial",
+      "type": "object"
+    },
+    "materials": {
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Materials",
+      "type": "array"
+    },
+    "provenance": {
+      "additionalProperties": true,
+      "title": "Provenance",
+      "type": "object"
+    },
+    "usage": {
+      "additionalProperties": true,
+      "title": "Usage",
+      "type": "object"
+    },
+    "quality": {
+      "additionalProperties": true,
+      "title": "Quality",
+      "type": "object"
+    },
+    "rights": {
+      "additionalProperties": true,
+      "title": "Rights",
+      "type": "object"
+    }
+  },
+  "required": [
+    "asset_id",
+    "name",
+    "category",
+    "tags",
+    "dimensions_mm",
+    "nominal_dimensions_mm",
+    "coordinate_convention",
+    "spatial",
+    "materials",
+    "provenance",
+    "usage",
+    "quality",
+    "rights"
+  ],
+  "title": "AssetPassport",
+  "type": "object"
+}

@@ -1,0 +1,2624 @@
+{
+  "schema_version": 1,
+  "library_id": "generated_assets",
+  "evidence_basis": [
+    "manifest.json",
+    "catalogue.json",
+    "provenance.json"
+  ],
+  "scope": "Audit of local records, not verification with Meshy or proof of complete generation history.",
+  "status": "consistent_with_documented_gaps",
+  "asset_count": 50,
+  "errors": [],
+  "assets": [
+    {
+      "asset_id": "gen-person-standing-1",
+      "name": "Person standing",
+      "model_file": "models/gen-person-standing-1.glb",
+      "model_sha256": "A297AD2AE6C0BF367CBC259D34F2C97CA579FECBB9932428E087A2ECDEF6D13B",
+      "contract_file": "models/gen-person-standing-1.almond.json",
+      "contract_sha256": "F48A11C8B2BD86C1097CE219973BAE41AEF76E01B0E9944B502D544D6100CBF0",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A full-body adult person standing upright in a relaxed pose, casual everyday clothing, arms at sides, plain matte grey clay-like appearance.",
+        "image_task_id": "01a09787-a448-7360-939a-ab919d08398e",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978d-653f-734a-8edf-ce2ffc1bda07",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 1029.411736
+      },
+      "recorded_task_history": {
+        "image_model": "nano-banana",
+        "image_task_id": "01a09787-a448-7360-939a-ab919d08398e",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0978d-653f-734a-8edf-ce2ffc1bda07",
+        "generated_at": "2026-09-12"
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "catalogue_image_stage_tool",
+        "id": "01a09787-a448-7360-939a-ab919d08398e",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-person-walking-1",
+      "name": "Person walking",
+      "model_file": "models/gen-person-walking-1.glb",
+      "model_sha256": "D384C2C5C8D60FB940E91A2C0B10B73C21716E78B5588292EFA359AEAEF60DD4",
+      "contract_file": "models/gen-person-walking-1.almond.json",
+      "contract_sha256": "684DF154521BBDAEB2F8BB8E9623DEFBC00EF3389AC665ECB8590C7C7134FDD7",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A full-body adult person walking, mid-stride, casual clothing, one arm swinging forward, plain matte grey clay-like appearance.",
+        "image_task_id": "01a09787-b24a-7035-9f02-e9e209cc99e3",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978d-73c0-710c-9a02-fdb87841247f",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 1000.0
+      },
+      "recorded_task_history": {
+        "image_model": "nano-banana",
+        "image_task_id": "01a09787-b24a-7035-9f02-e9e209cc99e3",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0978d-73c0-710c-9a02-fdb87841247f",
+        "generated_at": "2026-09-12"
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "catalogue_image_stage_tool",
+        "id": "01a09787-b24a-7035-9f02-e9e209cc99e3",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-person-sitting-1",
+      "name": "Person sitting",
+      "model_file": "models/gen-person-sitting-1.glb",
+      "model_sha256": "A4BCA08AA841E213EB59494B48A2E57FC90794A940EE78E7DB4B67717A7D23D2",
+      "contract_file": "models/gen-person-sitting-1.almond.json",
+      "contract_sha256": "2614DFF73E6A8F59AF0BC45DC11E9502024AC58D2BD2BD1868D18B8300173CF4",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A full-body adult person sitting on a plain simple stool, hands resting on knees, casual clothing, plain matte grey clay-like appearance.",
+        "image_task_id": "01a09787-bec7-77ba-bc26-f0c50c9def2a",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978d-8188-779f-ae9f-bf62075e5983",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 742.857143
+      },
+      "recorded_task_history": {
+        "image_model": "nano-banana",
+        "image_task_id": "01a09787-bec7-77ba-bc26-f0c50c9def2a",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0978d-8188-779f-ae9f-bf62075e5983",
+        "generated_at": "2026-09-12"
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "catalogue_image_stage_tool",
+        "id": "01a09787-bec7-77ba-bc26-f0c50c9def2a",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-tree-deciduous-medium-1",
+      "name": "Deciduous tree",
+      "model_file": "models/gen-tree-deciduous-medium-1.glb",
+      "model_sha256": "C1697107B3DEA02B17877DC53723B81F0CFB83BFD87691CB15D0BB7A2FE592BA",
+      "contract_file": "models/gen-tree-deciduous-medium-1.almond.json",
+      "contract_sha256": "283F83C96E9A28939D1F02C5AFF33C329F4859A37059C24D47F769CE32200EC6",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "Architectural visualisation model of a medium deciduous tree, about 7 metres tall: a clearly visible straight trunk splitting into four or five main branches, foliage arranged in several distinct rounded leaf clusters with gaps between them so branches show through, mid-green leaves with visible leaf texture, natural asymmetric silhouette.",
+        "image_task_id": "01a097aa-ecbb-76f3-92c4-f075fd9374d1",
+        "image_model": "nano-banana-pro",
+        "mesh_task_id": "01a097ad-8b27-7101-9f6f-dfaffbe34d12",
+        "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+        "generated_at": "2026-09-13",
+        "orientation_correction": null,
+        "scale_applied": 883.30428
+      },
+      "recorded_task_history": {
+        "image_model": "nano-banana-pro",
+        "image_task_id": "01a097aa-ecbb-76f3-92c4-f075fd9374d1",
+        "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+        "mesh_task_id": "01a097ad-8b27-7101-9f6f-dfaffbe34d12",
+        "generated_at": "2026-09-13",
+        "supersedes": {
+          "image_task_id": "see git history",
+          "reason": "first pass (meshy-t2) foliage too blobby"
+        }
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "catalogue_image_stage_tool",
+        "id": "01a097aa-ecbb-76f3-92c4-f075fd9374d1",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": "high_detail",
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-tree-conifer-1",
+      "name": "Conifer tree",
+      "model_file": "models/gen-tree-conifer-1.glb",
+      "model_sha256": "5759805D48BAFB55BE10C064DCDD2666A4B138D5C61D479D959D8DC0D79584C1",
+      "contract_file": "models/gen-tree-conifer-1.almond.json",
+      "contract_sha256": "1A93F5AF297C97FEA945563CE8EB1F0B16442923724C60E433F8D6307CB24D13",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "Architectural visualisation model of a tall conifer (Scots pine style) tree, about 9 metres tall: a straight trunk visible from the ground up through the crown, whorls of horizontal branches with layered flat needle foliage clusters, gaps between the layers showing trunk and branches, deep green needles, slightly irregular natural silhouette, narrow crown.",
+        "image_task_id": "01a097aa-f72a-71a9-b906-e9eecce976c0",
+        "image_model": "nano-banana-pro",
+        "mesh_task_id": "01a097ad-99ec-7424-8b6b-17b218a4c717",
+        "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+        "generated_at": "2026-09-13",
+        "orientation_correction": null,
+        "scale_applied": 450.807332
+      },
+      "recorded_task_history": {
+        "image_model": "nano-banana-pro",
+        "image_task_id": "01a097aa-f72a-71a9-b906-e9eecce976c0",
+        "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+        "mesh_task_id": "01a097ad-99ec-7424-8b6b-17b218a4c717",
+        "generated_at": "2026-09-13",
+        "supersedes": {
+          "image_task_id": "see git history",
+          "reason": "first pass (meshy-t2) foliage too blobby"
+        }
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "catalogue_image_stage_tool",
+        "id": "01a097aa-f72a-71a9-b906-e9eecce976c0",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": "high_detail",
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-car-sedan-1",
+      "name": "Car",
+      "model_file": "models/gen-car-sedan-1.glb",
+      "model_sha256": "10E9753DDA82F4AB66B81C0C002495D07A77918B4CD39EEBCC79F3CD8B8D2936",
+      "contract_file": "models/gen-car-sedan-1.almond.json",
+      "contract_sha256": "0A78B16047FE351679BD2AC9C5AE22524F35EC0D659856D98004E26A19B55492",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A generic modern mid-size four-door sedan car, no brand badges, plain matte grey body, wheels touching the ground.",
+        "image_task_id": "01a09787-f336-72a4-8574-307a3c02979f",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978d-bbcd-726c-9c1c-d5c85d139dc7",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": "rotated_90_about_vertical",
+        "scale_applied": 999.999967
+      },
+      "recorded_task_history": {
+        "image_model": "nano-banana",
+        "image_task_id": "01a09787-f336-72a4-8574-307a3c02979f",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0978d-bbcd-726c-9c1c-d5c85d139dc7",
+        "generated_at": "2026-09-12"
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "catalogue_image_stage_tool",
+        "id": "01a09787-f336-72a4-8574-307a3c02979f",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-bicycle-1",
+      "name": "Bicycle",
+      "model_file": "models/gen-bicycle-1.glb",
+      "model_sha256": "ADC73D4F610CF6368F90BD00C78F3BB6681ACDC27B05CABA7BEFABF3E86B6CB8",
+      "contract_file": "models/gen-bicycle-1.almond.json",
+      "contract_sha256": "7E6DFBFF85BBF1E3A54ED63DCFCA482F5520222A5541F2056DFD0760AD0F8B5B",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A generic city bicycle standing upright, simple diamond frame, two wheels, handlebars and saddle, plain matte grey.",
+        "image_task_id": "01a09788-0028-73c1-b138-5be23b86a987",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978d-c97d-77f6-a39b-31bb45348599",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": "rotated_90_about_vertical",
+        "scale_applied": 1050.0
+      },
+      "recorded_task_history": {
+        "image_model": "nano-banana",
+        "image_task_id": "01a09788-0028-73c1-b138-5be23b86a987",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0978d-c97d-77f6-a39b-31bb45348599",
+        "generated_at": "2026-09-12"
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "catalogue_image_stage_tool",
+        "id": "01a09788-0028-73c1-b138-5be23b86a987",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-park-bench-1",
+      "name": "Park bench",
+      "model_file": "models/gen-park-bench-1.glb",
+      "model_sha256": "8CFE4AEADC89741CD1D87E2682C6403DBB200C91F1EFBFC3262492A5E5CD6B19",
+      "contract_file": "models/gen-park-bench-1.almond.json",
+      "contract_sha256": "F7CA48B2CC4B6CD48548B73AA79913B4EDBEDD85D56E26DCAA0C5D4C9B1DC6E2",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A public park bench with horizontal timber slats for seat and backrest on two cast steel side frames, plain simple design.",
+        "image_task_id": "01a09788-0f5c-7679-ad0c-e716a5c3c118",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978d-e43a-708f-be6d-e8de89fde6f9",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 1000.000007
+      },
+      "recorded_task_history": {
+        "image_model": "nano-banana",
+        "image_task_id": "01a09788-0f5c-7679-ad0c-e716a5c3c118",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0978d-e43a-708f-be6d-e8de89fde6f9",
+        "generated_at": "2026-09-12"
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "catalogue_image_stage_tool",
+        "id": "01a09788-0f5c-7679-ad0c-e716a5c3c118",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-street-lamp-1",
+      "name": "Street lamp",
+      "model_file": "models/gen-street-lamp-1.glb",
+      "model_sha256": "D1D33284969B2470C2C65E4CD569B208FBBC331061C162943509AB6AABC956E7",
+      "contract_file": "models/gen-street-lamp-1.almond.json",
+      "contract_sha256": "E12B90820DBD8137BB26A9C2E96A8C14921DDE5A33FA0E36FCDE485C8E341377",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A modern single-arm street lamp post, tall slender cylindrical pole with a flat LED luminaire on a short horizontal arm at the top, small base plate, plain matte dark grey.",
+        "image_task_id": "01a09788-1b92-70f7-9723-f979b9bd5d8f",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978d-f18b-75a9-841a-5f4713d5d66f",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": "rotated_90_about_vertical",
+        "scale_applied": 2647.058749
+      },
+      "recorded_task_history": {
+        "image_model": "nano-banana",
+        "image_task_id": "01a09788-1b92-70f7-9723-f979b9bd5d8f",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0978d-f18b-75a9-841a-5f4713d5d66f",
+        "generated_at": "2026-09-12"
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "catalogue_image_stage_tool",
+        "id": "01a09788-1b92-70f7-9723-f979b9bd5d8f",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-bollard-1",
+      "name": "Bollard",
+      "model_file": "models/gen-bollard-1.glb",
+      "model_sha256": "B6B33FECA43E660D5F2F03B82C5C7F16514C48D1D79E426EFC5485EF6DC44C55",
+      "contract_file": "models/gen-bollard-1.almond.json",
+      "contract_sha256": "5ECA8FC3400804DF9F2F014ED7BCAF884A2BF4E26D762BE3495922883E8CD867",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A simple cylindrical steel street bollard with a slightly domed top, plain matte dark grey, standing on the ground.",
+        "image_task_id": "01a09788-29cb-7622-915a-8f9095238de7",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978d-fee4-72c7-9cc1-f2bbf76bb25b",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 5999.999762
+      },
+      "recorded_task_history": {
+        "image_model": "nano-banana",
+        "image_task_id": "01a09788-29cb-7622-915a-8f9095238de7",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0978d-fee4-72c7-9cc1-f2bbf76bb25b",
+        "generated_at": "2026-09-12"
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "catalogue_image_stage_tool",
+        "id": "01a09788-29cb-7622-915a-8f9095238de7",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-bike-rack-1",
+      "name": "Bike rack",
+      "model_file": "models/gen-bike-rack-1.glb",
+      "model_sha256": "647481662778EF71418F857A37D4E0A5CC4C269BFCB7C209E06230673D988411",
+      "contract_file": "models/gen-bike-rack-1.almond.json",
+      "contract_sha256": "09F0376B3E0A03296471FC78A560D4EE2FC2DACE1FCE29F2D208E99D6DE7ADE4",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "An inverted-U shaped steel tube bicycle parking hoop, single hoop, galvanised grey finish, standing on the ground.",
+        "image_task_id": "01a09788-35cb-70ce-aabe-731f4ae38e2e",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978e-0b68-73de-83cd-43a250b2dbc2",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 999.999985
+      },
+      "recorded_task_history": {
+        "image_model": "nano-banana",
+        "image_task_id": "01a09788-35cb-70ce-aabe-731f4ae38e2e",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0978e-0b68-73de-83cd-43a250b2dbc2",
+        "generated_at": "2026-09-12"
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "catalogue_image_stage_tool",
+        "id": "01a09788-35cb-70ce-aabe-731f4ae38e2e",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-litter-bin-1",
+      "name": "Litter bin",
+      "model_file": "models/gen-litter-bin-1.glb",
+      "model_sha256": "C0E2AC5423AFFD229EDE7551263CBCBA8963D5C857C9332DAB63D6A92EF9570B",
+      "contract_file": "models/gen-litter-bin-1.almond.json",
+      "contract_sha256": "4E0C0C573F4F148A7D498AF65FE9C026200DD354A117D1C9AA9779610EEBEE7F",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A cylindrical public street litter bin with a small hooded top opening, plain matte dark grey metal, standing on the ground.",
+        "image_task_id": "01a09788-425a-7555-99e9-3ffc46471c5b",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978e-1a0e-7798-b364-8d700fccf022",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 1666.6666
+      },
+      "recorded_task_history": {
+        "image_model": "nano-banana",
+        "image_task_id": "01a09788-425a-7555-99e9-3ffc46471c5b",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0978e-1a0e-7798-b364-8d700fccf022",
+        "generated_at": "2026-09-12"
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "catalogue_image_stage_tool",
+        "id": "01a09788-425a-7555-99e9-3ffc46471c5b",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-column-round-1",
+      "name": "Round column",
+      "model_file": "models/gen-column-round-1.glb",
+      "model_sha256": "A35797E6F5D21407C4CB686EE6BF4257FD0931617C25FCD4739550A63DF9FCA4",
+      "contract_file": "models/gen-column-round-1.almond.json",
+      "contract_sha256": "CB9F640F2738B5CCDED4EA815CB073E0B16E6C007977AF47CEDDF23F637D5C62",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A plain cylindrical concrete column, no capital or base, smooth matte finish, standing vertically on the ground.",
+        "image_task_id": "01a09788-95fb-758f-891c-de0ce066dad6",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978e-8ea9-7486-adee-fc9950ee7c89",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 1000.0
+      },
+      "recorded_task_history": {
+        "image_model": "nano-banana",
+        "image_task_id": "01a09788-95fb-758f-891c-de0ce066dad6",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0978e-8ea9-7486-adee-fc9950ee7c89",
+        "generated_at": "2026-09-12"
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "catalogue_image_stage_tool",
+        "id": "01a09788-95fb-758f-891c-de0ce066dad6",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-column-square-1",
+      "name": "Square column",
+      "model_file": "models/gen-column-square-1.glb",
+      "model_sha256": "659BCD5EA07672B49C10967F4C1EEB973EBB2D166D4461A9ABB3AE165A3E7C5A",
+      "contract_file": "models/gen-column-square-1.almond.json",
+      "contract_sha256": "C1472566C8F60992F6E1A76D22861F8D8D4E61F8AAD511070C6B9C6989CD1484",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A plain square-section concrete column, no capital or base, sharp edges, smooth matte finish, standing vertically on the ground.",
+        "image_task_id": "01a09788-a362-736d-a43d-cf3cc88ce046",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978e-9c7d-7753-81ab-fa258d35eb88",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 1000.0
+      },
+      "recorded_task_history": {
+        "image_model": "nano-banana",
+        "image_task_id": "01a09788-a362-736d-a43d-cf3cc88ce046",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0978e-9c7d-7753-81ab-fa258d35eb88",
+        "generated_at": "2026-09-12"
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "catalogue_image_stage_tool",
+        "id": "01a09788-a362-736d-a43d-cf3cc88ce046",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-balustrade-glass-1",
+      "name": "Glass balustrade",
+      "model_file": "models/gen-balustrade-glass-1.glb",
+      "model_sha256": "237028EA3E3FF1837785CFF514B68B6C39965536C8DF5F392D06CAB3C3FA7533",
+      "contract_file": "models/gen-balustrade-glass-1.almond.json",
+      "contract_sha256": "1B0625D056B95641DEB558A3A315BC696895BDB2EE466427439C4AE249B794C1",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A straight two-metre segment of frameless clear glass balustrade with a slim round stainless steel top handrail and a low base channel.",
+        "image_task_id": "01a09788-b03a-778e-bfd7-bfb576737cf3",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978e-aa4a-771f-ab26-dba2f725530e",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 1222.222255
+      },
+      "recorded_task_history": {
+        "image_model": "nano-banana",
+        "image_task_id": "01a09788-b03a-778e-bfd7-bfb576737cf3",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0978e-aa4a-771f-ab26-dba2f725530e",
+        "generated_at": "2026-09-12"
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "catalogue_image_stage_tool",
+        "id": "01a09788-b03a-778e-bfd7-bfb576737cf3",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-toilet-1",
+      "name": "Toilet",
+      "model_file": "models/gen-toilet-1.glb",
+      "model_sha256": "4619E273B07329F33F200F9593A7D1FB8580DB41C64B60FF40E7FC1723A0FB1B",
+      "contract_file": "models/gen-toilet-1.almond.json",
+      "contract_sha256": "3B8EB2CA52866B8F29DF6DC06EB8BDFC38D9957D4ADF1E091986ED36AB114F42",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A close-coupled floor-mounted white ceramic toilet with cistern and closed seat lid, plain modern design.",
+        "image_task_id": "01a09788-bf8b-74b2-be55-75e578e73068",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978e-b787-7347-afc4-29e5a6b44b90",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 999.999985
+      },
+      "recorded_task_history": {
+        "image_model": "nano-banana",
+        "image_task_id": "01a09788-bf8b-74b2-be55-75e578e73068",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0978e-b787-7347-afc4-29e5a6b44b90",
+        "generated_at": "2026-09-12"
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "catalogue_image_stage_tool",
+        "id": "01a09788-bf8b-74b2-be55-75e578e73068",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-washbasin-pedestal-1",
+      "name": "Washbasin",
+      "model_file": "models/gen-washbasin-pedestal-1.glb",
+      "model_sha256": "B176D7D9D55DEFDA373B2ED7AE10D883CE5C5089844463F3346ADF61588E2DC3",
+      "contract_file": "models/gen-washbasin-pedestal-1.almond.json",
+      "contract_sha256": "B69AAB64E63E5476BB822F5CF127C8C9F4F2574A9524F1D2F5E8341060CE7CDB",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A white ceramic pedestal washbasin with a single chrome mixer tap, plain modern design.",
+        "image_task_id": "01a09788-cd24-7133-b6bf-24be3b9e982d",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978e-c613-7771-a80e-de66c4d484d3",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 944.444469
+      },
+      "recorded_task_history": {
+        "image_model": "nano-banana",
+        "image_task_id": "01a09788-cd24-7133-b6bf-24be3b9e982d",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0978e-c613-7771-a80e-de66c4d484d3",
+        "generated_at": "2026-09-12"
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "catalogue_image_stage_tool",
+        "id": "01a09788-cd24-7133-b6bf-24be3b9e982d",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-bathtub-1",
+      "name": "Bathtub",
+      "model_file": "models/gen-bathtub-1.glb",
+      "model_sha256": "DBC1F583B3874AEABE3A63A8617C8DED767190C21897A977E4B7661D8DC6989A",
+      "contract_file": "models/gen-bathtub-1.almond.json",
+      "contract_sha256": "45D7C48BEFE347DB3334311478ED4D3506ADFA388484FF6E81CE34E5F2C33308",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A rectangular white built-in bathtub with a plain front panel and a wall mixer tap at one end.",
+        "image_task_id": "01a09788-d970-7010-a926-a5bbfece1492",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978e-d36f-7288-892f-fbd07b26f425",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 1054.545432
+      },
+      "recorded_task_history": {
+        "image_model": "nano-banana",
+        "image_task_id": "01a09788-d970-7010-a926-a5bbfece1492",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0978e-d36f-7288-892f-fbd07b26f425",
+        "generated_at": "2026-09-12"
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "catalogue_image_stage_tool",
+        "id": "01a09788-d970-7010-a926-a5bbfece1492",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-shower-enclosure-1",
+      "name": "Shower enclosure",
+      "model_file": "models/gen-shower-enclosure-1.glb",
+      "model_sha256": "E53E3C7219DE324827776A59D6C224411739F1317398085A4274075F9AA4645B",
+      "contract_file": "models/gen-shower-enclosure-1.almond.json",
+      "contract_sha256": "4A58AC7EA31F62B1EAFAFF9C206F3D4789A7B38CF3A97493D842D730E7FED776",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A square shower enclosure with a low white tray, two clear glass sides with slim chrome frame and a hinged glass door, wall-mounted shower head and mixer.",
+        "image_task_id": "01a09788-e678-710f-8a5a-72838507090a",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978e-e0ce-7335-a72e-c933cb1e0723",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 1111.111141
+      },
+      "recorded_task_history": {
+        "image_model": "nano-banana",
+        "image_task_id": "01a09788-e678-710f-8a5a-72838507090a",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0978e-e0ce-7335-a72e-c933cb1e0723",
+        "generated_at": "2026-09-12"
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "catalogue_image_stage_tool",
+        "id": "01a09788-e678-710f-8a5a-72838507090a",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-kitchen-range-1",
+      "name": "Kitchen range",
+      "model_file": "models/gen-kitchen-range-1.glb",
+      "model_sha256": "EFA0C0E3F07ACFD4A5237E3CE13C55374C015D80C633DADF096BC9645717ED57",
+      "contract_file": "models/gen-kitchen-range-1.almond.json",
+      "contract_sha256": "3C9209521617B406D0384B5537DA463F3D01FB19AD4E875C77C398D752490EFC",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A freestanding stainless steel kitchen range cooker with a four-burner gas hob on top and a single oven door with handle, plain modern design.",
+        "image_task_id": "01a09788-f46c-7507-8a37-d715e3da5091",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978e-ee7e-750c-91f6-c5e4724b3c6c",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 1000.000026
+      },
+      "recorded_task_history": {
+        "image_model": "nano-banana",
+        "image_task_id": "01a09788-f46c-7507-8a37-d715e3da5091",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0978e-ee7e-750c-91f6-c5e4724b3c6c",
+        "generated_at": "2026-09-12"
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "catalogue_image_stage_tool",
+        "id": "01a09788-f46c-7507-8a37-d715e3da5091",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-refrigerator-1",
+      "name": "Refrigerator",
+      "model_file": "models/gen-refrigerator-1.glb",
+      "model_sha256": "FE8C7E47BC899C6DCD820BF4C5E0F80363020565211D6DBA9B698B21FDB9EF8C",
+      "contract_file": "models/gen-refrigerator-1.almond.json",
+      "contract_sha256": "3BF1F242CB9A2A273E34F5926738DE3D68ECF6A4EC4B7EC72DF209249F320892",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A freestanding tall stainless steel fridge-freezer with two vertical doors and long handles, plain modern design.",
+        "image_task_id": "01a09789-01b0-7012-a2f8-f58cadfeb3f4",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978e-fc89-71c4-985b-8599687baf80",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 1000.000026
+      },
+      "recorded_task_history": {
+        "image_model": "nano-banana",
+        "image_task_id": "01a09789-01b0-7012-a2f8-f58cadfeb3f4",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0978e-fc89-71c4-985b-8599687baf80",
+        "generated_at": "2026-09-12"
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "catalogue_image_stage_tool",
+        "id": "01a09789-01b0-7012-a2f8-f58cadfeb3f4",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-sofa-3-seat-1",
+      "name": "Sofa",
+      "model_file": "models/gen-sofa-3-seat-1.glb",
+      "model_sha256": "EE978EF6EDFF09F7FB5CD2CF6DC8D81EB802487959BF6565BCB2CAEAE4C9FD12",
+      "contract_file": "models/gen-sofa-3-seat-1.almond.json",
+      "contract_sha256": "A4EED8FE76AEC23A8FEEF4C7B8442A1D436DFFC771CE8FAC1D04AC076A7FADB9",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A generic modern three-seat sofa with square arms, three seat cushions and three back cushions, plain grey fabric upholstery, short legs.",
+        "image_task_id": "01a09789-0ef6-754a-b0cd-e3f54dfe4a6e",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978f-0a4a-7263-b015-501f0fd70df6",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 999.999937
+      },
+      "recorded_task_history": {
+        "image_model": "nano-banana",
+        "image_task_id": "01a09789-0ef6-754a-b0cd-e3f54dfe4a6e",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0978f-0a4a-7263-b015-501f0fd70df6",
+        "generated_at": "2026-09-12"
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "catalogue_image_stage_tool",
+        "id": "01a09789-0ef6-754a-b0cd-e3f54dfe4a6e",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-dining-table-rect-1",
+      "name": "Dining table",
+      "model_file": "models/gen-dining-table-rect-1.glb",
+      "model_sha256": "16B13B2E0C53D1EE7C5B9B3E45DFF7B9E65BF6AEC79D26E65C260832859B10F8",
+      "contract_file": "models/gen-dining-table-rect-1.almond.json",
+      "contract_sha256": "E066C1895C618B774E6E17C4EAE9EA0476E6BC10308E42C2657C16709BBD3F22",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A generic rectangular dining table with a plain timber top and four straight square legs, plain light oak.",
+        "image_task_id": "01a09789-1dd2-747e-b428-a89dce8ca12d",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978f-1858-713a-992e-8b1f307a53a1",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 1000.0
+      },
+      "recorded_task_history": {
+        "image_model": "nano-banana",
+        "image_task_id": "01a09789-1dd2-747e-b428-a89dce8ca12d",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0978f-1858-713a-992e-8b1f307a53a1",
+        "generated_at": "2026-09-12"
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "catalogue_image_stage_tool",
+        "id": "01a09789-1dd2-747e-b428-a89dce8ca12d",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-dining-chair-1",
+      "name": "Dining chair",
+      "model_file": "models/gen-dining-chair-1.glb",
+      "model_sha256": "0BBDCDCB7F1889F9C92EB4B1858F7A73AC03C0FD3E27520A57DCA39A21B6A7ED",
+      "contract_file": "models/gen-dining-chair-1.almond.json",
+      "contract_sha256": "4ABC506B5A4DBC2EBD268931D7D8D99015D098FF605C709639ABEDF8F66FD664",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A generic armless timber dining chair with four straight legs, a flat seat and a simple slatted backrest, plain light oak.",
+        "image_task_id": "01a09789-2b97-72fd-8906-ed90e2d6402d",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978f-2694-77ef-92e9-19a4597946d2",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 1000.000026
+      },
+      "recorded_task_history": {
+        "image_model": "nano-banana",
+        "image_task_id": "01a09789-2b97-72fd-8906-ed90e2d6402d",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0978f-2694-77ef-92e9-19a4597946d2",
+        "generated_at": "2026-09-12"
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "catalogue_image_stage_tool",
+        "id": "01a09789-2b97-72fd-8906-ed90e2d6402d",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-bed-double-1",
+      "name": "Double bed",
+      "model_file": "models/gen-bed-double-1.glb",
+      "model_sha256": "85D34B7A12A85B70A8E85F2010199C32E00862240A2E8461310C8A65CEF09B29",
+      "contract_file": "models/gen-bed-double-1.almond.json",
+      "contract_sha256": "C3027AC4E5157F51833CADA75BE5FF8B580B5E8D40066206624E615ADB931B7B",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A generic double platform bed with a low timber frame, a plain mattress with a folded duvet and two pillows, and a simple rectangular headboard, plain light oak and white bedding.",
+        "image_task_id": "01a09789-3c20-75e3-98cb-9bc2f6445c39",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978f-3449-76fe-9462-d31daf954c53",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 950.000057
+      },
+      "recorded_task_history": {
+        "image_model": "nano-banana",
+        "image_task_id": "01a09789-3c20-75e3-98cb-9bc2f6445c39",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0978f-3449-76fe-9462-d31daf954c53",
+        "generated_at": "2026-09-12"
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "catalogue_image_stage_tool",
+        "id": "01a09789-3c20-75e3-98cb-9bc2f6445c39",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-desk-1",
+      "name": "Desk",
+      "model_file": "models/gen-desk-1.glb",
+      "model_sha256": "B02DE4245F24D78DE86516DDC6380676B384649ABE2190D75B65D691BDBE3933",
+      "contract_file": "models/gen-desk-1.almond.json",
+      "contract_sha256": "EDDEC65962739A6B98FD3AB50B633354D906F6817B4E449470616804451F825D",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A generic minimal writing desk with a plain rectangular light plywood top on four slim black steel legs, no drawers.",
+        "image_task_id": "01a09789-49cf-751a-91c2-e35703aadf86",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978f-411c-776c-b0dd-45ba52352c11",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 1000.0
+      },
+      "recorded_task_history": {
+        "image_model": "nano-banana",
+        "image_task_id": "01a09789-49cf-751a-91c2-e35703aadf86",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0978f-411c-776c-b0dd-45ba52352c11",
+        "generated_at": "2026-09-12"
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "catalogue_image_stage_tool",
+        "id": "01a09789-49cf-751a-91c2-e35703aadf86",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-office-chair-1",
+      "name": "Office chair",
+      "model_file": "models/gen-office-chair-1.glb",
+      "model_sha256": "290B51B30E4DB2DA0405D71AA7C08A93CCE42EB9DF33DD70F76D863D82F02CB3",
+      "contract_file": "models/gen-office-chair-1.almond.json",
+      "contract_sha256": "8F76CAB0E56EFBD881A627C23370B282F2D2AF7D6793F94DB682811E6848C66B",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A generic black swivel office task chair with a padded seat, mesh backrest, armrests and a five-star base on castors.",
+        "image_task_id": "01a09789-5785-7773-8dcc-ed507a95c80a",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978f-4e8d-707c-a258-c9b3897bfcad",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 1100.0
+      },
+      "recorded_task_history": {
+        "image_model": "nano-banana",
+        "image_task_id": "01a09789-5785-7773-8dcc-ed507a95c80a",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0978f-4e8d-707c-a258-c9b3897bfcad",
+        "generated_at": "2026-09-12"
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "catalogue_image_stage_tool",
+        "id": "01a09789-5785-7773-8dcc-ed507a95c80a",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-stool-bent-birch-3leg-1",
+      "name": "Stool",
+      "model_file": "models/gen-stool-bent-birch-3leg-1.glb",
+      "model_sha256": "9D3C6A08D31706B954EF7EC1719AE46A8213BEA025025AC80E23FC5576DA6C83",
+      "contract_file": "models/gen-stool-bent-birch-3leg-1.almond.json",
+      "contract_sha256": "4C04EB4017BE5B382962FD403813690917ACE4DB63FC66109F5F2BE460328929",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A three-legged wooden stool: a plain round birch seat on three L-shaped legs made of solid birch that bend in a smooth right-angle curve at the top and screw directly under the seat, pale natural birch, Scandinavian functionalist design from the 1930s, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa90-d6d6-738a-bbbd-8a010748356c",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 977.777804
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "nano_banana",
+        "image_job_id": "38c416c0-6cda-4997-a11f-3f943433f1bf",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0aa90-d6d6-738a-bbbd-8a010748356c",
+        "generated_at": "2026-09-16"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "38c416c0-6cda-4997-a11f-3f943433f1bf",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": true,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-lounge-chair-bent-plywood-1",
+      "name": "Lounge chair",
+      "model_file": "models/gen-lounge-chair-bent-plywood-1.glb",
+      "model_sha256": "D12302E5FFAC3FF25E16660FEF2C6DF0D6709EED0E6FCA4FD4E27D11E4A3302F",
+      "contract_file": "models/gen-lounge-chair-bent-plywood-1.almond.json",
+      "contract_sha256": "A983D20716A01CEAA4F6D3BD3A1913C8987D2922912FBB277C7BB1963C0A3AB0",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A cantilevered lounge chair whose frame is two closed loops of laminated bent birch on each side, with a single thin sheet of moulded plywood seat and back that curls into a scroll at the head and foot, pale birch frame, black lacquered seat, 1930s Scandinavian functionalist design, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa90-e5e2-7691-95e9-74574f2c643d",
+        "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 800.003535
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "nano_banana",
+        "image_job_id": "a06b9eba-bd31-4b55-8e95-bb1c948be748",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+        "mesh_task_id": "01a0aa90-e5e2-7691-95e9-74574f2c643d",
+        "generated_at": "2026-09-16"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "a06b9eba-bd31-4b55-8e95-bb1c948be748",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": true,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": "high_detail",
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-tea-trolley-bent-birch-1",
+      "name": "Tea trolley",
+      "model_file": "models/gen-tea-trolley-bent-birch-1.glb",
+      "model_sha256": "0B8506240712F7538E6F837F67C1EF363B5638810A8768176AC85E5BFA3F813C",
+      "contract_file": "models/gen-tea-trolley-bent-birch-1.almond.json",
+      "contract_sha256": "4B70DBA2D9C5BC1A47148EB2DDA89AA4E9DC303E106F138508A29186CE99E516",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A tea trolley with a continuous bent birch frame forming the handles and legs, two large solid plywood disc wheels with black rubber rims at one end, a white tiled top shelf and a woven rattan basket hanging below, pale birch, 1930s Scandinavian design, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa90-f4d7-7161-b2ce-917ab0a4412c",
+        "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 648.408569
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "nano_banana",
+        "image_job_id": "e52e2554-1c6d-4934-8530-5dec0a5cfc18",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+        "mesh_task_id": "01a0aa90-f4d7-7161-b2ce-917ab0a4412c",
+        "generated_at": "2026-09-16"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "e52e2554-1c6d-4934-8530-5dec0a5cfc18",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": true,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": "high_detail",
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-dining-table-round-birch-1",
+      "name": "Dining table",
+      "model_file": "models/gen-dining-table-round-birch-1.glb",
+      "model_sha256": "617BB30EA7F78CD1B5EC9543A092516D5CB2128735835ED39CB5EC2028C68FBE",
+      "contract_file": "models/gen-dining-table-round-birch-1.almond.json",
+      "contract_sha256": "5870AF83E40559D2633B85047FAE1AC308F57E7450BCA0D6A56AE3664BE7D6AC",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A round dining table with a plain white laminate top and a birch edge, standing on four solid birch L-shaped legs that curve smoothly from vertical into horizontal under the top, pale natural birch, Scandinavian functionalist design, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa91-03c7-7285-b20e-1b5ac1132a27",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 960.0
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "nano_banana",
+        "image_job_id": "e846e622-3e25-4311-a535-bcfaafe84fbf",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0aa91-03c7-7285-b20e-1b5ac1132a27",
+        "generated_at": "2026-09-16"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "e846e622-3e25-4311-a535-bcfaafe84fbf",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": true,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-armchair-bent-birch-webbed-1",
+      "name": "Armchair",
+      "model_file": "models/gen-armchair-bent-birch-webbed-1.glb",
+      "model_sha256": "269F986FB6CB249DB9ADEB844B9D6CD7A18FC2B5C51E8095B8D9A610EB4FB8A0",
+      "contract_file": "models/gen-armchair-bent-birch-webbed-1.almond.json",
+      "contract_sha256": "239A91C8AE88B80F8797626DDBE05CD7C4FD04F5A633D5E1A50AA476CE76CA35",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "An armchair whose frame is a continuous closed loop of laminated bent birch on each side, forming armrest, front leg and back leg in one curve, with a seat and back of natural linen webbing straps woven across the frame, pale birch, 1930s Scandinavian design, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa91-1266-74dc-bbcb-55739329bcf8",
+        "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 1001.313667
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "nano_banana",
+        "image_job_id": "845f0055-de6b-4052-8a58-b82168c8caef",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+        "mesh_task_id": "01a0aa91-1266-74dc-bbcb-55739329bcf8",
+        "generated_at": "2026-09-16"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "845f0055-de6b-4052-8a58-b82168c8caef",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": true,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": "high_detail",
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-lounge-chair-molded-plywood-1",
+      "name": "Lounge chair",
+      "model_file": "models/gen-lounge-chair-molded-plywood-1.glb",
+      "model_sha256": "AE08448C3EE0201ACB9CC6FD85F0D38F2AF3F38772F6BEF2934EF6F55AF9F45E",
+      "contract_file": "models/gen-lounge-chair-molded-plywood-1.almond.json",
+      "contract_sha256": "928A71F18E66A38A199A6D3F019A3D9C049E4C3FF1C2955060AA28C1FF2CE04C",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A low lounge chair made of five separate pieces of moulded walnut plywood: a curved seat panel, a curved back panel, a bent spine and two bent plywood leg frames, joined by black rubber shock mounts, warm walnut veneer, 1940s American mid-century design, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa91-1d40-7618-b8d3-e353a136748f",
+        "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 906.719378
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "nano_banana",
+        "image_job_id": "1bf40e69-0c3e-4c59-9980-7081e4de0cd7",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+        "mesh_task_id": "01a0aa91-1d40-7618-b8d3-e353a136748f",
+        "generated_at": "2026-09-16"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "1bf40e69-0c3e-4c59-9980-7081e4de0cd7",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": true,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": "high_detail",
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-side-chair-shell-wire-base-1",
+      "name": "Side chair",
+      "model_file": "models/gen-side-chair-shell-wire-base-1.glb",
+      "model_sha256": "E5EE00E5AD4719D780F5210F3A24B5341AA6C7BB5512707695983592E8F37B41",
+      "contract_file": "models/gen-side-chair-shell-wire-base-1.almond.json",
+      "contract_sha256": "C3182ED3DE41FB33C6A5A151EE8369607CA6E55CA15867AA0D19BC571D9F3E35",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A side chair with a single moulded white fibreglass shell seat with slightly rolled edges, sitting on a base of thin welded black steel wire rods forming a lattice tower with four splayed legs, 1950s American mid-century design, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa91-2bb3-70e6-b947-8c7b42459e59",
+        "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 987.481058
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "nano_banana",
+        "image_job_id": "176a5471-bc89-4810-85f1-c6298bc82474",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+        "mesh_task_id": "01a0aa91-2bb3-70e6-b947-8c7b42459e59",
+        "generated_at": "2026-09-16"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "176a5471-bc89-4810-85f1-c6298bc82474",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": true,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": "high_detail",
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-lounge-chair-leather-plywood-1",
+      "name": "Lounge chair",
+      "model_file": "models/gen-lounge-chair-leather-plywood-1.glb",
+      "model_sha256": "C81FDC45D5F2B720E433EEDDDB7094D4768E338D249078F83435134354A9E0E1",
+      "contract_file": "models/gen-lounge-chair-leather-plywood-1.almond.json",
+      "contract_sha256": "AFBC83FB41E5E9CBE7528BF28B7D037992ABCDDF040C8345176657315EE96DF2",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A deep lounge chair made of three separate curved moulded rosewood plywood shells - headrest, back and seat - each holding thick tufted black leather cushions, on a five-star cast aluminium swivel base, 1950s American mid-century design, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa91-3b31-761a-bcc4-8ef82294e54f",
+        "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 1000.023942
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "nano_banana",
+        "image_job_id": "96ffbed7-b3a9-4fd0-80e4-2203892d1579",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+        "mesh_task_id": "01a0aa91-3b31-761a-bcc4-8ef82294e54f",
+        "generated_at": "2026-09-16"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "96ffbed7-b3a9-4fd0-80e4-2203892d1579",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": true,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": "high_detail",
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-ottoman-leather-plywood-1",
+      "name": "Ottoman",
+      "model_file": "models/gen-ottoman-leather-plywood-1.glb",
+      "model_sha256": "6F0F374835DF25039447F769AF9DC8FF0B36E6A27DDF12100EA853A30B5B866D",
+      "contract_file": "models/gen-ottoman-leather-plywood-1.almond.json",
+      "contract_sha256": "5DD7593F546F1E9862AA5DDE337B6B19ABEB36EEE26BD58486C3942B3E5415A7",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A rectangular ottoman with a single curved moulded rosewood plywood shell holding a thick tufted black leather cushion, on a four-star cast aluminium base, 1950s American mid-century design, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa91-49ea-7048-9c4c-58c716e6105c",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 781.81808
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "nano_banana",
+        "image_job_id": "9ee68080-35d4-4726-9d51-6b136e9fdb32",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0aa91-49ea-7048-9c4c-58c716e6105c",
+        "generated_at": "2026-09-16"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "9ee68080-35d4-4726-9d51-6b136e9fdb32",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": true,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-coffee-table-freeform-glass-1",
+      "name": "Coffee table",
+      "model_file": "models/gen-coffee-table-freeform-glass-1.glb",
+      "model_sha256": "9FE6F68F84C135FF4EC8127B37507DD544AD931D2F398C915F60D3FBB67CB739",
+      "contract_file": "models/gen-coffee-table-freeform-glass-1.almond.json",
+      "contract_sha256": "0F8C3F24885DB132E10FBEF2EF2BBEA19D6954D06B9BECEC79FF36BF9B67FAAA",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A low coffee table with a thick freeform organic-shaped clear glass top resting on a base made of two identical curved sculptural solid walnut pieces interlocked at right angles, 1940s American mid-century design, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa91-591a-7750-88c8-0977b4dafd51",
+        "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 1000.00006
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "nano_banana",
+        "image_job_id": "6e3f65ab-3d6f-4e85-a57c-78af69e49a97",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+        "mesh_task_id": "01a0aa91-591a-7750-88c8-0977b4dafd51",
+        "generated_at": "2026-09-16"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "6e3f65ab-3d6f-4e85-a57c-78af69e49a97",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": true,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": "high_detail",
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-bench-slatted-platform-1",
+      "name": "Bench",
+      "model_file": "models/gen-bench-slatted-platform-1.glb",
+      "model_sha256": "5CB344DE2791FDE3C527D7BB372CEF662B42CCE95463A6DD6803B98B43F7A7AF",
+      "contract_file": "models/gen-bench-slatted-platform-1.almond.json",
+      "contract_sha256": "CFC07CC1FE6B800EC67CE153B49B6095E8D5DC5345A3732F5DF3D6C0695DDB05",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A long low platform bench made of narrow parallel maple wood slats with small gaps between them, on a simple black ebonised wood frame with two rectangular trestle-like supports, 1940s American mid-century design, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa91-6772-760d-9c3c-a799506e6a09",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 473.333333
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "nano_banana",
+        "image_job_id": "fdb8a13f-6a48-4d6c-b4ca-1b6cdcf1e42b",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0aa91-6772-760d-9c3c-a799506e6a09",
+        "generated_at": "2026-09-16"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "fdb8a13f-6a48-4d6c-b4ca-1b6cdcf1e42b",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": true,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-pendant-lamp-sphere-1",
+      "name": "Pendant lamp",
+      "model_file": "models/gen-pendant-lamp-sphere-1.glb",
+      "model_sha256": "83E8EF197FA17C8FADCCA8F2BD2596488E84941184CE3D4D2FBA59A45CDC7E44",
+      "contract_file": "models/gen-pendant-lamp-sphere-1.almond.json",
+      "contract_sha256": "F39471721D7CC3E36262161F94B0FB5994972C2F2619505F5273C5E7D2F04FA7",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A large spherical pendant lamp shade made of a translucent white plastic web sprayed over a thin steel wire frame, with a small metal top fitting and a cord, glowing soft white, 1950s American mid-century design, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa91-75ea-76ce-b117-2d68dd0efc3f",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 2133.333249
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "nano_banana",
+        "image_job_id": "289186b1-08c4-45be-92d0-888ea36956fc",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0aa91-75ea-76ce-b117-2d68dd0efc3f",
+        "generated_at": "2026-09-16"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "289186b1-08c4-45be-92d0-888ea36956fc",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": true,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-task-chair-mesh-ergonomic-1",
+      "name": "Office chair",
+      "model_file": "models/gen-task-chair-mesh-ergonomic-1.glb",
+      "model_sha256": "0BEE21D47506D5F044FB69E484826D6B6C105277515F971FBBBD1EA1F0AF9352",
+      "contract_file": "models/gen-task-chair-mesh-ergonomic-1.almond.json",
+      "contract_sha256": "E7F4F84A31CFE617B383BE682B76623160D5AF1DF0A62CE2FD765DEDB1501B70",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "An ergonomic office task chair with a suspended breathable black mesh seat and high mesh back on a curved graphite frame, adjustable padded armrests, a tilt mechanism and a five-star base on castors, 1990s American design, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa91-851f-7501-a0c8-9d5e9a7267e5",
+        "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 1080.207063
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "nano_banana",
+        "image_job_id": "6a5646d9-2e30-4392-ae0c-2a263434fb08",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+        "mesh_task_id": "01a0aa91-851f-7501-a0c8-9d5e9a7267e5",
+        "generated_at": "2026-09-16"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "6a5646d9-2e30-4392-ae0c-2a263434fb08",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": true,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": "high_detail",
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-armchair-cantilever-bentwood-1",
+      "name": "Armchair",
+      "model_file": "models/gen-armchair-cantilever-bentwood-1.glb",
+      "model_sha256": "E5132C71829989C1E0AB8602803DD3A3B844F924999B52F3A58B56F2F8A5EB3D",
+      "contract_file": "models/gen-armchair-cantilever-bentwood-1.almond.json",
+      "contract_sha256": "C81D940E7968F45817854E6F3AD853DFC9FE4507D7BED1148F16518A6266AE01",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A cantilevered armchair with a frame of two bent laminated birch loops forming the armrests and the springy base, and a thick single cushion in natural beige fabric running up seat and high back, pale birch, 1970s Scandinavian democratic design, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa91-a9c8-71fd-bffd-5ac11306c735",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 1000.0
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "nano_banana",
+        "image_job_id": "981e3ff2-9022-43a9-a659-63be2f57d3cd",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0aa91-a9c8-71fd-bffd-5ac11306c735",
+        "generated_at": "2026-09-16"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "981e3ff2-9022-43a9-a659-63be2f57d3cd",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": true,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-sofa-2-seat-loose-cover-1",
+      "name": "Sofa",
+      "model_file": "models/gen-sofa-2-seat-loose-cover-1.glb",
+      "model_sha256": "11B717522276DD8D2211525728DBFC835C58DFC3018E03A02030E2FBC664D885",
+      "contract_file": "models/gen-sofa-2-seat-loose-cover-1.almond.json",
+      "contract_sha256": "6B8B3A527E50E37CD2A0F47381EB29468AF12408154D7359FDD3ED947DDA4C28",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A compact boxy two-seat sofa with a straight low back, straight square arms of the same height as the back, two seat cushions, all wrapped in a loose light grey fabric cover, sitting close to the floor, 1980s Scandinavian democratic design, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa91-b517-743a-8a06-09e099492995",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 776.470566
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "nano_banana",
+        "image_job_id": "1ac90e4a-3ffc-4be5-9921-6b289294b6f6",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0aa91-b517-743a-8a06-09e099492995",
+        "generated_at": "2026-09-16"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "1ac90e4a-3ffc-4be5-9921-6b289294b6f6",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": true,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-shelving-cube-2x4-1",
+      "name": "Shelving unit",
+      "model_file": "models/gen-shelving-cube-2x4-1.glb",
+      "model_sha256": "8E2759C663FE9395A112E1A978C61513CCA37482F1A1C52E8FA024B62F871434",
+      "contract_file": "models/gen-shelving-cube-2x4-1.almond.json",
+      "contract_sha256": "19ACD6243A0F159056B4B56EEF91B20FC2F1765C84958D8841FED9C1FEFE4967",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A tall open cube shelving unit made of thick white lacquered board, two cubes wide and four cubes high, all compartments open front and back, plain flat panels, standing on the floor, Scandinavian democratic design, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa91-c5d7-73c0-85d6-054ce86965ff",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 999.999981
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "nano_banana",
+        "image_job_id": "044fa7b2-ce46-4841-9088-272c4c08de09",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0aa91-c5d7-73c0-85d6-054ce86965ff",
+        "generated_at": "2026-09-16"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "044fa7b2-ce46-4841-9088-272c4c08de09",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": true,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-shelving-modular-track-1",
+      "name": "Shelving system",
+      "model_file": "models/gen-shelving-modular-track-1.glb",
+      "model_sha256": "CC44DE0D75A543B9B21C43DB58B690F4E326C5D4A90D45DFE3A6A57060DB8B13",
+      "contract_file": "models/gen-shelving-modular-track-1.almond.json",
+      "contract_sha256": "76E4823D4027D4FFB662A1B9D452FB720BBAC5EF0B75E7A859F5C7B79F4D9F95",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A wall-mounted modular shelving system: three vertical slotted aluminium tracks, thin powder-coated aluminium shelves of different depths hooked in at several heights, one closed cabinet box with sliding doors, silver anodised aluminium and off-white panels, 1960s British modernist design, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa91-d506-742f-969d-309284858542",
+        "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 998.24357
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "nano_banana",
+        "image_job_id": "b0f5d87b-2a6c-4cf8-b1b5-e69d47048959",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+        "mesh_task_id": "01a0aa91-d506-742f-969d-309284858542",
+        "generated_at": "2026-09-16"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "b0f5d87b-2a6c-4cf8-b1b5-e69d47048959",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": true,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": "high_detail",
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-floor-lamp-arc-1",
+      "name": "Floor lamp",
+      "model_file": "models/gen-floor-lamp-arc-1.glb",
+      "model_sha256": "08B6118DE5E33C98ED5C6996A6F8CAB830B95B8240347F3E73D67A0B7833BFDD",
+      "contract_file": "models/gen-floor-lamp-arc-1.almond.json",
+      "contract_sha256": "C31F60A2338D2EA2229DA108B5FDDEF1E55136EE0A39AD12AF6A8FB1AF58C0E0",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "An arc floor lamp with a heavy rectangular white marble block base, a long slender stainless steel stem that rises and arcs far outward, ending in a perforated polished aluminium dome shade hanging over the floor, 1960s Italian design, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa91-e41b-7350-bea3-c9dcefe96f1e",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 1200.0
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "nano_banana",
+        "image_job_id": "78879a5e-4099-4b02-8366-2071d63054be",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0aa91-e41b-7350-bea3-c9dcefe96f1e",
+        "generated_at": "2026-09-16"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "78879a5e-4099-4b02-8366-2071d63054be",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": true,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-task-lamp-balanced-arm-1",
+      "name": "Task lamp",
+      "model_file": "models/gen-task-lamp-balanced-arm-1.glb",
+      "model_sha256": "CAAC2A41AC48038D7BA89A37828D40F621F540780EE35FF6867E4C945B09E41F",
+      "contract_file": "models/gen-task-lamp-balanced-arm-1.almond.json",
+      "contract_sha256": "3E5B546333CBA8D7C435E06A38961F21A11C0C9EB1D3F75DBD123BCD16380F7F",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A desk task lamp with two slender polished aluminium arms joined by a balanced hinge with exposed springs and cables, a small round base, and a conical aluminium shade with a knurled swivel, 1980s Italian design, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa92-2a21-71f4-9798-7d07610f78ef",
+        "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": "rotated_90_about_vertical",
+        "scale_applied": 899.941195
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "nano_banana",
+        "image_job_id": "a4941f59-8e5d-4c56-98b5-d51a863153b9",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+        "mesh_task_id": "01a0aa92-2a21-71f4-9798-7d07610f78ef",
+        "generated_at": "2026-09-16"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "a4941f59-8e5d-4c56-98b5-d51a863153b9",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": true,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": "high_detail",
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-side-table-wire-1",
+      "name": "Side table",
+      "model_file": "models/gen-side-table-wire-1.glb",
+      "model_sha256": "575153F2964BDC8E7EA2C414EDA3A420F773410D7C518B5EF69D612EF1F14662",
+      "contract_file": "models/gen-side-table-wire-1.almond.json",
+      "contract_sha256": "1CC02955E697405330CA2D171A1D92986DDECC1670917907C39B1083D91F24AE",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A small round stacking side table made entirely of thin powder-coated steel wire: a flat round wire-mesh top on a tapered cage of vertical wires that flare out to a wire ring foot, matte charcoal, 1950s design, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa92-37e0-71b6-9452-48d949d658dd",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 1111.111141
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "nano_banana",
+        "image_job_id": "91d5c06c-6c11-43f7-9437-e92cb03389f6",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0aa92-37e0-71b6-9452-48d949d658dd",
+        "generated_at": "2026-09-16"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "91d5c06c-6c11-43f7-9437-e92cb03389f6",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": true,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-weathered-boulder-1",
+      "name": "Weathered boulder",
+      "model_file": "models/gen-weathered-boulder-1.glb",
+      "model_sha256": "BD01322A935E5002C2DEA31A0A6ACCAA2EAE58EE2242BA506788B9BC3B376061",
+      "contract_file": "models/gen-weathered-boulder-1.almond.json",
+      "contract_sha256": "154678CACDF390D30EFC88E0F593F55B9B415774A6257AE6AB2A07462E8930BC",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "One realistic large irregular weathered limestone boulder, about 1 metre high and 1.7 metres wide, an asymmetrical rounded mass with layered erosion, shallow fissures, softened fractured edges and subtle surface pits. Broad natural resting underside, readable sculptural silhouette, substantial solid stone. Neutral landscaping object. No moss, no crystals, no pedestal, no surrounding pebbles, no ground plane. Entire object visible with generous margin, isolated on pure white, three-quarter view from slightly above, soft even studio lighting, detailed physical geometry, no text, no cast shadow.",
+        "image_task_id": "01a0ba79-11c2-74a1-bafd-23b60c640fb8",
+        "image_model": "nano-banana-pro",
+        "mesh_task_id": "01a0ba7a-5241-73de-8d55-68f049cb5405",
+        "mesh_model": "meshy-7.1",
+        "generated_at": "2026-09-19",
+        "orientation_correction": "rotated_90_about_vertical",
+        "scale_applied": 815.702556,
+        "captured_generation": {
+          "batch_id": "organic-2026-09",
+          "image": {
+            "asset_id": "gen-weathered-boulder-1",
+            "endpoint": "/openapi/v1/text-to-image",
+            "submitted_at": "2026-09-19T16:21:32.709470+00:00",
+            "request": {
+              "ai_model": "nano-banana-pro",
+              "aspect_ratio": "1:1",
+              "generate_multi_view": false,
+              "prompt": "One realistic large irregular weathered limestone boulder, about 1 metre high and 1.7 metres wide, an asymmetrical rounded mass with layered erosion, shallow fissures, softened fractured edges and subtle surface pits. Broad natural resting underside, readable sculptural silhouette, substantial solid stone. Neutral landscaping object. No moss, no crystals, no pedestal, no surrounding pebbles, no ground plane. Entire object visible with generous margin, isolated on pure white, three-quarter view from slightly above, soft even studio lighting, detailed physical geometry, no text, no cast shadow."
+            },
+            "status": "SUCCEEDED",
+            "task_id": "01a0ba79-11c2-74a1-bafd-23b60c640fb8",
+            "output_file": "gen-weathered-boulder-1.png",
+            "output_sha256": "e47fb6b599abe6363963c3b103831c056775ca69e364e2789d31b77803458f17",
+            "finished_at": 1789834910324,
+            "seed": null,
+            "consumed_credits": 9,
+            "provider_created_at": 1789834891722,
+            "provider_started_at": 1789834891729
+          },
+          "mesh": {
+            "asset_id": "gen-weathered-boulder-1",
+            "endpoint": "/openapi/v1/image-to-3d",
+            "submitted_at": "2026-09-19T16:22:54.759996+00:00",
+            "request": {
+              "ai_model": "meshy-7.1",
+              "model_type": "standard",
+              "geometry_resolution": "4k",
+              "should_texture": false,
+              "should_remesh": false,
+              "image_enhancement": false,
+              "target_formats": [
+                "glb"
+              ],
+              "auto_size": false,
+              "input_task_id": "01a0ba79-11c2-74a1-bafd-23b60c640fb8"
+            },
+            "status": "SUCCEEDED",
+            "task_id": "01a0ba7a-5241-73de-8d55-68f049cb5405",
+            "output_file": "gen-weathered-boulder-1.glb",
+            "output_sha256": "6e062619e8ba3995053005fb65ca9cfe619ecf231e9cd355c6203e576bbfd234",
+            "finished_at": 1789835142765,
+            "seed": null,
+            "consumed_credits": 25,
+            "provider_created_at": 1789834974757,
+            "provider_started_at": 1789834974763
+          },
+          "derivation": {
+            "asset_id": "gen-weathered-boulder-1",
+            "source_sha256": "6e062619e8ba3995053005fb65ca9cfe619ecf231e9cd355c6203e576bbfd234",
+            "source_triangles": 662802,
+            "target_triangles": 80000,
+            "prepared_sha256": "ad937d83adc6a8d941024955ddb0bae427567240d6241b554bd7a2a08af071f4",
+            "software": "Blender 5.1.2",
+            "method": "Weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target; triangulate. Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.9017977714538573e-07,
+            "quality": {
+              "vertices": 40002,
+              "triangles": 80000,
+              "boundary_edges": 0,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 1,
+              "largest_component_vertices": 40002,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                2.1240279454494915e-05,
+                8.073495891418e-05,
+                0.0001962674559380534
+              ]
+            }
+          },
+          "input_image_file": "batches/organic-2026-09/gen-weathered-boulder-1.png",
+          "external_reference_status": "Original descriptive prompts; no external images or design references submitted.",
+          "external_reference_ids": [],
+          "dimension_basis": "Authored nominal height for architectural studies; width and depth measured after uniform normalization. Not a physical survey.",
+          "reference_review": "Reference image visually reviewed for neutral architectural use.",
+          "rights": "Generated for the Almond library using the owner-configured Meshy account; public pack distribution authorized by owner. CC BY 4.0. API balance verified; subscription contract not independently audited."
+        }
+      },
+      "recorded_task_history": {
+        "image_provider": "meshy",
+        "image_model": "nano-banana-pro",
+        "image_task_id": "01a0ba79-11c2-74a1-bafd-23b60c640fb8",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-7.1",
+        "mesh_task_id": "01a0ba7a-5241-73de-8d55-68f049cb5405",
+        "generated_at": "2026-09-19"
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "provenance",
+        "id": "01a0ba79-11c2-74a1-bafd-23b60c640fb8",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here.",
+        "input_file": "batches/organic-2026-09/gen-weathered-boulder-1.png",
+        "sha256": "e47fb6b599abe6363963c3b103831c056775ca69e364e2789d31b77803458f17"
+      },
+      "catalogue_recipe_override": "captured_organic_batch",
+      "recipe_evidence": "Exact submitted API requests and downloaded input-image checksum retained in captured_generation.",
+      "external_reference_status": "Original descriptive prompts; no external images or design references submitted.",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Provider seed was not returned where null.",
+        "Dimensions are authored study sizes, not verified physical measurements.",
+        "Mesh self-intersections and fabrication suitability have not been certified."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Generated for the Almond library using the owner-configured Meshy account; public pack distribution authorized by owner. CC BY 4.0. API balance verified; subscription contract not independently audited.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-driftwood-1",
+      "name": "Weathered driftwood",
+      "model_file": "models/gen-driftwood-1.glb",
+      "model_sha256": "8EF9739184C5DC381EB1762C1C6C57F10B54FED6D38B961B42BBAC887EF521F8",
+      "contract_file": "models/gen-driftwood-1.almond.json",
+      "contract_sha256": "9FE6855DC7554496D2F24DA8EA05380A0EDAF0A345C6298679B4F4C7F9C79249",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "One realistic weathered driftwood log resting horizontally, about 1.6 metres long, with a naturally twisting trunk, three short broken branch stubs, deep flowing grain channels, eroded knots and irregular split ends. Substantial connected wood, gently curved silhouette, no thin twigs, no leaves, no roots spreading onto a ground plane. Neutral object for landscape and interior display studies. Entire log visible with generous margin, isolated on pure white, three-quarter view from slightly above, soft even studio lighting, crisp sculptural physical geometry, no text, no cast shadow.",
+        "image_task_id": "01a0ba79-1273-71dc-b270-3aa5d518be5e",
+        "image_model": "nano-banana-pro",
+        "mesh_task_id": "01a0ba7a-5725-7567-ae8f-1616c4aecf80",
+        "mesh_model": "meshy-7.1",
+        "generated_at": "2026-09-19",
+        "orientation_correction": null,
+        "scale_applied": 1074.857111,
+        "captured_generation": {
+          "batch_id": "organic-2026-09",
+          "image": {
+            "asset_id": "gen-driftwood-1",
+            "endpoint": "/openapi/v1/text-to-image",
+            "submitted_at": "2026-09-19T16:21:32.885556+00:00",
+            "request": {
+              "ai_model": "nano-banana-pro",
+              "aspect_ratio": "1:1",
+              "generate_multi_view": false,
+              "prompt": "One realistic weathered driftwood log resting horizontally, about 1.6 metres long, with a naturally twisting trunk, three short broken branch stubs, deep flowing grain channels, eroded knots and irregular split ends. Substantial connected wood, gently curved silhouette, no thin twigs, no leaves, no roots spreading onto a ground plane. Neutral object for landscape and interior display studies. Entire log visible with generous margin, isolated on pure white, three-quarter view from slightly above, soft even studio lighting, crisp sculptural physical geometry, no text, no cast shadow."
+            },
+            "status": "SUCCEEDED",
+            "task_id": "01a0ba79-1273-71dc-b270-3aa5d518be5e",
+            "output_file": "gen-driftwood-1.png",
+            "output_sha256": "14fae4a33eb47ad22fe47cb1492d2aa2607cf5ed4ac3ba77f678d7eaabf3be36",
+            "finished_at": 1789834916650,
+            "seed": null,
+            "consumed_credits": 9,
+            "provider_created_at": 1789834891902,
+            "provider_started_at": 1789834891910
+          },
+          "mesh": {
+            "asset_id": "gen-driftwood-1",
+            "endpoint": "/openapi/v1/image-to-3d",
+            "submitted_at": "2026-09-19T16:22:56.010640+00:00",
+            "request": {
+              "ai_model": "meshy-7.1",
+              "model_type": "standard",
+              "geometry_resolution": "4k",
+              "should_texture": false,
+              "should_remesh": false,
+              "image_enhancement": false,
+              "target_formats": [
+                "glb"
+              ],
+              "auto_size": false,
+              "input_task_id": "01a0ba79-1273-71dc-b270-3aa5d518be5e"
+            },
+            "status": "SUCCEEDED",
+            "task_id": "01a0ba7a-5725-7567-ae8f-1616c4aecf80",
+            "output_file": "gen-driftwood-1.glb",
+            "output_sha256": "3886c2be926ea7e7babd1f0f88774f46f3c21227589b765d36b3d2b2f5bd9ce9",
+            "finished_at": 1789835057614,
+            "seed": null,
+            "consumed_credits": 25,
+            "provider_created_at": 1789834975647,
+            "provider_started_at": 1789834975657
+          },
+          "derivation": {
+            "asset_id": "gen-driftwood-1",
+            "source_sha256": "3886c2be926ea7e7babd1f0f88774f46f3c21227589b765d36b3d2b2f5bd9ce9",
+            "source_triangles": 550090,
+            "target_triangles": 120000,
+            "prepared_sha256": "48fc482ce3e5f0bbb9dadb5268f6b966924a8d9637217efc77bb53330c84e3de",
+            "software": "Blender 5.1.2",
+            "method": "Weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target; triangulate. Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.9018785953521728e-07,
+            "quality": {
+              "vertices": 60002,
+              "triangles": 120000,
+              "boundary_edges": 0,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 1,
+              "largest_component_vertices": 60002,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                8.900525594840302e-06,
+                0.00012256649643177056,
+                0.00034433022702023963
+              ]
+            }
+          },
+          "input_image_file": "batches/organic-2026-09/gen-driftwood-1.png",
+          "external_reference_status": "Original descriptive prompts; no external images or design references submitted.",
+          "external_reference_ids": [],
+          "dimension_basis": "Authored nominal height for architectural studies; width and depth measured after uniform normalization. Not a physical survey.",
+          "reference_review": "Reference image visually reviewed for neutral architectural use.",
+          "rights": "Generated for the Almond library using the owner-configured Meshy account; public pack distribution authorized by owner. CC BY 4.0. API balance verified; subscription contract not independently audited."
+        }
+      },
+      "recorded_task_history": {
+        "image_provider": "meshy",
+        "image_model": "nano-banana-pro",
+        "image_task_id": "01a0ba79-1273-71dc-b270-3aa5d518be5e",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-7.1",
+        "mesh_task_id": "01a0ba7a-5725-7567-ae8f-1616c4aecf80",
+        "generated_at": "2026-09-19"
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "provenance",
+        "id": "01a0ba79-1273-71dc-b270-3aa5d518be5e",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here.",
+        "input_file": "batches/organic-2026-09/gen-driftwood-1.png",
+        "sha256": "14fae4a33eb47ad22fe47cb1492d2aa2607cf5ed4ac3ba77f678d7eaabf3be36"
+      },
+      "catalogue_recipe_override": "captured_organic_batch",
+      "recipe_evidence": "Exact submitted API requests and downloaded input-image checksum retained in captured_generation.",
+      "external_reference_status": "Original descriptive prompts; no external images or design references submitted.",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Provider seed was not returned where null.",
+        "Dimensions are authored study sizes, not verified physical measurements.",
+        "Mesh self-intersections and fabrication suitability have not been certified."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Generated for the Almond library using the owner-configured Meshy account; public pack distribution authorized by owner. CC BY 4.0. API balance verified; subscription contract not independently audited.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-folded-throw-1",
+      "name": "Loosely folded throw",
+      "model_file": "models/gen-folded-throw-1.glb",
+      "model_sha256": "0AC47E5C67CF1FC5BC38E29A8E968527021AF549811DB215FC156BBCB9CD4F6B",
+      "contract_file": "models/gen-folded-throw-1.almond.json",
+      "contract_sha256": "8526E234EF85DF1C1BEE377E290303E8F660673751E98E0236217427482A2071",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "One realistic plain linen throw blanket loosely folded into a low irregular stack, about 75 by 55 centimetres and 18 centimetres high, with several large soft cascading folds, rounded creases, a gently rumpled top and visible layered fabric edges. Natural weight and substantial cloth thickness. Unbranded neutral warm beige textile for architectural interiors. No tassels, no furniture, no person, no support stand, no ground plane. Entire object visible with margin, isolated on pure white, three-quarter view from slightly above, soft even studio lighting, physical folds rather than printed patterns, no text, no cast shadow.",
+        "image_task_id": "01a0ba79-1327-7650-8b3f-b579a41bf87e",
+        "image_model": "nano-banana-pro",
+        "mesh_task_id": "01a0ba7a-5b3c-75e4-b117-88f5db00caec",
+        "mesh_model": "meshy-7.1",
+        "generated_at": "2026-09-19",
+        "orientation_correction": null,
+        "scale_applied": 242.935734,
+        "captured_generation": {
+          "batch_id": "organic-2026-09",
+          "image": {
+            "asset_id": "gen-folded-throw-1",
+            "endpoint": "/openapi/v1/text-to-image",
+            "submitted_at": "2026-09-19T16:21:33.066538+00:00",
+            "request": {
+              "ai_model": "nano-banana-pro",
+              "aspect_ratio": "1:1",
+              "generate_multi_view": false,
+              "prompt": "One realistic plain linen throw blanket loosely folded into a low irregular stack, about 75 by 55 centimetres and 18 centimetres high, with several large soft cascading folds, rounded creases, a gently rumpled top and visible layered fabric edges. Natural weight and substantial cloth thickness. Unbranded neutral warm beige textile for architectural interiors. No tassels, no furniture, no person, no support stand, no ground plane. Entire object visible with margin, isolated on pure white, three-quarter view from slightly above, soft even studio lighting, physical folds rather than printed patterns, no text, no cast shadow."
+            },
+            "status": "SUCCEEDED",
+            "task_id": "01a0ba79-1327-7650-8b3f-b579a41bf87e",
+            "output_file": "gen-folded-throw-1.png",
+            "output_sha256": "4f6230fccc0b670f132ea702d1aaa41880214cf5257c420cc708ff2a7716f552",
+            "finished_at": 1789834909471,
+            "seed": null,
+            "consumed_credits": 9,
+            "provider_created_at": 1789834892086,
+            "provider_started_at": 1789834892094
+          },
+          "mesh": {
+            "asset_id": "gen-folded-throw-1",
+            "endpoint": "/openapi/v1/image-to-3d",
+            "submitted_at": "2026-09-19T16:22:57.057894+00:00",
+            "request": {
+              "ai_model": "meshy-7.1",
+              "model_type": "standard",
+              "geometry_resolution": "4k",
+              "should_texture": false,
+              "should_remesh": false,
+              "image_enhancement": false,
+              "target_formats": [
+                "glb"
+              ],
+              "auto_size": false,
+              "input_task_id": "01a0ba79-1327-7650-8b3f-b579a41bf87e"
+            },
+            "status": "SUCCEEDED",
+            "task_id": "01a0ba7a-5b3c-75e4-b117-88f5db00caec",
+            "output_file": "gen-folded-throw-1.glb",
+            "output_sha256": "3f60eda83261f80da04ebf204eb6ce9a7926e2c014495cc80b9a1831144d1c8e",
+            "finished_at": 1789835185342,
+            "seed": null,
+            "consumed_credits": 25,
+            "provider_created_at": 1789834976787,
+            "provider_started_at": 1789834976796
+          },
+          "derivation": {
+            "asset_id": "gen-folded-throw-1",
+            "source_sha256": "3f60eda83261f80da04ebf204eb6ce9a7926e2c014495cc80b9a1831144d1c8e",
+            "source_triangles": 330388,
+            "target_triangles": 100000,
+            "prepared_sha256": "54f4889d487a003a63666d5cadf14065c7e3ff10623a2bd8a02579289da09f8f",
+            "software": "Blender 5.1.2",
+            "method": "Weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target; triangulate. Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.9016218185424803e-07,
+            "quality": {
+              "vertices": 50002,
+              "triangles": 100000,
+              "boundary_edges": 0,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 1,
+              "largest_component_vertices": 50002,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                2.8084323180349e-05,
+                4.9347966877985946e-05,
+                0.00013677518705012528
+              ]
+            }
+          },
+          "input_image_file": "batches/organic-2026-09/gen-folded-throw-1.png",
+          "external_reference_status": "Original descriptive prompts; no external images or design references submitted.",
+          "external_reference_ids": [],
+          "dimension_basis": "Authored nominal height for architectural studies; width and depth measured after uniform normalization. Not a physical survey.",
+          "reference_review": "Reference image visually reviewed for neutral architectural use.",
+          "rights": "Generated for the Almond library using the owner-configured Meshy account; public pack distribution authorized by owner. CC BY 4.0. API balance verified; subscription contract not independently audited."
+        }
+      },
+      "recorded_task_history": {
+        "image_provider": "meshy",
+        "image_model": "nano-banana-pro",
+        "image_task_id": "01a0ba79-1327-7650-8b3f-b579a41bf87e",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-7.1",
+        "mesh_task_id": "01a0ba7a-5b3c-75e4-b117-88f5db00caec",
+        "generated_at": "2026-09-19"
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "provenance",
+        "id": "01a0ba79-1327-7650-8b3f-b579a41bf87e",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here.",
+        "input_file": "batches/organic-2026-09/gen-folded-throw-1.png",
+        "sha256": "4f6230fccc0b670f132ea702d1aaa41880214cf5257c420cc708ff2a7716f552"
+      },
+      "catalogue_recipe_override": "captured_organic_batch",
+      "recipe_evidence": "Exact submitted API requests and downloaded input-image checksum retained in captured_generation.",
+      "external_reference_status": "Original descriptive prompts; no external images or design references submitted.",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Provider seed was not returned where null.",
+        "Dimensions are authored study sizes, not verified physical measurements.",
+        "Mesh self-intersections and fabrication suitability have not been certified."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Generated for the Almond library using the owner-configured Meshy account; public pack distribution authorized by owner. CC BY 4.0. API balance verified; subscription contract not independently audited.",
+      "missing_recorded_fields": []
+    }
+  ]
+}

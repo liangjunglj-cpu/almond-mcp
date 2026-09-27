@@ -1,0 +1,39 @@
+{
+  "version": "0.6.0",
+  "commit": "1fa18ca6024b4976b8ec0e93a0aefe3bd5cc1783",
+  "yak_source_commit": "10acd31580d8cf60c6d9b305a37bc0c161283f15",
+  "tests_passed": 188,
+  "installed_files_verified": 421,
+  "models": 50,
+  "ci_url": "https://github.com/liangjunglj-cpu/almond-mcp/actions/runs/36333172315",
+  "ci_status": "success",
+  "public_publication": true,
+  "publication": {
+    "pypi": {
+      "status": "published",
+      "version": "0.6.0",
+      "published_by": "maintainer (uv publish, project-scoped API token)",
+      "wheel_sha256": "2abac20c4aaeeefd2ce8c805db997acd5197acbbb7d3a0a081839a959aa2330c",
+      "sdist_sha256": "def1d191942992b3af699c05666eea047efa87977c0b808d3a5ead8f1afd8f3f",
+      "verified": "PyPI JSON digests match SHA256SUMS; clean uvx --from almond-mcp==0.6.0 reports 0.6.0 and doctor passes against live Rhino",
+      "published_date": "2026-09-27"
+    },
+    "yak": {
+      "status": "published",
+      "version": "0.6.0",
+      "source": "https://yak.rhino3d.com/",
+      "sha256": "d1f2a623a0c682ecb447691b367ab7e9aff7203a961017752500b4fd12fd1306",
+      "verified": "Plain Yak search (no --prerelease) lists almondbridge 0.6.0",
+      "published_date": "2026-09-27"
+    },
+    "food4rhino": {
+      "status": "published",
+      "listing_url": "https://www.food4rhino.com/en/app/almond-mcp",
+      "download_url": "https://www.food4rhino.com/en/system/files/users-files/liang-jung/app/almondbridge-060-food4rhino.zip",
+      "uploaded_zip_sha256": "96792996d987415ddce3ec04be952982501169b46ca2a064b962c457b271cc7b",
+      "verification": "Listing saved; 0.6.0 is first in downloads (Rhino 8 for Win) above rc.13. Hosted ZIP re-downloaded (50778400 bytes) and its SHA-256 matches SHA256SUMS. Description updated to drop prerelease and pending-PyPI wording; rc.13 entry marked superseded.",
+      "published_date": "2026-09-27"
+    }
+  },
+  "native_acceptance": "Required Rhino smoke test on the published Yak hash: MCP step verified by agent after fixes; remaining steps reported passed by the user (not itemised). Rhino 8.34.26223.11001, Windows 11 10.0.26200."
+}

@@ -1,0 +1,91 @@
+{
+  "batch_id": "organic-2026-09",
+  "purpose": "Neutral organic architectural entourage that is difficult to construct from primitives.",
+  "external_reference_ids": [],
+  "external_reference_status": "Original descriptive prompts; no external images or design references submitted.",
+  "image_settings": {
+    "ai_model": "nano-banana-pro",
+    "aspect_ratio": "1:1",
+    "generate_multi_view": false
+  },
+  "mesh_settings": {
+    "ai_model": "meshy-7.1",
+    "model_type": "standard",
+    "geometry_resolution": "4k",
+    "should_texture": false,
+    "should_remesh": false,
+    "image_enhancement": false,
+    "target_formats": [
+      "glb"
+    ],
+    "auto_size": false
+  },
+  "estimated_credits": 170,
+  "assets": [
+    {
+      "asset_id": "gen-fern-cluster-1",
+      "product": "Broad-frond plant",
+      "category": "vegetation",
+      "height_mm": 800,
+      "width_hint_mm": 1100,
+      "depth_hint_mm": 1000,
+      "target_triangles": 150000,
+      "material": "foliage-pine",
+      "prompt": "One realistic mature fern plant, about 80 cm tall, with 12 to 16 gracefully arching fronds emerging from one compact basal crown. Clearly separated broad pinnate leaflets with gently curled tips, irregular natural growth, layered fronds and visible stems. A useful neutral architectural landscape asset. No pot, no soil mound, no ground plane, no flowers. Entire plant visible with generous margin, isolated on pure white, three-quarter view slightly from above, soft even studio lighting, crisp physical geometry, no text, no cast shadow.",
+      "reference_review": "Accepted as generic broad-frond foliage. Image is cycad-like rather than a botanically accurate fern; do not label as a verified species."
+    },
+    {
+      "asset_id": "gen-ornamental-grass-1",
+      "product": "Ornamental grass clump",
+      "category": "vegetation",
+      "height_mm": 1200,
+      "width_hint_mm": 1000,
+      "depth_hint_mm": 900,
+      "target_triangles": 150000,
+      "material": "grass-meadow",
+      "prompt": "One realistic ornamental fountain grass clump, about 1.2 metres tall, with a dense but readable basal crown, many broad ribbon-like arching leaves and six softly tapered seed heads on slender upright stems. Natural irregular silhouette and visibly separated substantial leaves, not hair, not a flat billboard. Neutral planting asset for gardens and public space. No pot, no ground, no soil disk. Entire plant visible with generous margin, isolated on pure white, three-quarter view from slightly above, soft even studio lighting, crisp physical geometry, no text, no cast shadow."
+    },
+    {
+      "asset_id": "gen-weathered-boulder-1",
+      "product": "Weathered boulder",
+      "category": "landscape",
+      "height_mm": 1000,
+      "width_hint_mm": 1700,
+      "depth_hint_mm": 1300,
+      "target_triangles": 80000,
+      "material": "stone-granite-paving",
+      "prompt": "One realistic large irregular weathered limestone boulder, about 1 metre high and 1.7 metres wide, an asymmetrical rounded mass with layered erosion, shallow fissures, softened fractured edges and subtle surface pits. Broad natural resting underside, readable sculptural silhouette, substantial solid stone. Neutral landscaping object. No moss, no crystals, no pedestal, no surrounding pebbles, no ground plane. Entire object visible with generous margin, isolated on pure white, three-quarter view from slightly above, soft even studio lighting, detailed physical geometry, no text, no cast shadow."
+    },
+    {
+      "asset_id": "gen-driftwood-1",
+      "product": "Weathered driftwood",
+      "category": "landscape",
+      "height_mm": 550,
+      "width_hint_mm": 1600,
+      "depth_hint_mm": 650,
+      "target_triangles": 120000,
+      "material": "wood-oak",
+      "prompt": "One realistic weathered driftwood log resting horizontally, about 1.6 metres long, with a naturally twisting trunk, three short broken branch stubs, deep flowing grain channels, eroded knots and irregular split ends. Substantial connected wood, gently curved silhouette, no thin twigs, no leaves, no roots spreading onto a ground plane. Neutral object for landscape and interior display studies. Entire log visible with generous margin, isolated on pure white, three-quarter view from slightly above, soft even studio lighting, crisp sculptural physical geometry, no text, no cast shadow."
+    },
+    {
+      "asset_id": "gen-folded-throw-1",
+      "product": "Loosely folded throw",
+      "category": "textile",
+      "height_mm": 180,
+      "width_hint_mm": 750,
+      "depth_hint_mm": 550,
+      "target_triangles": 100000,
+      "material": "fabric-linen",
+      "prompt": "One realistic plain linen throw blanket loosely folded into a low irregular stack, about 75 by 55 centimetres and 18 centimetres high, with several large soft cascading folds, rounded creases, a gently rumpled top and visible layered fabric edges. Natural weight and substantial cloth thickness. Unbranded neutral warm beige textile for architectural interiors. No tassels, no furniture, no person, no support stand, no ground plane. Entire object visible with margin, isolated on pure white, three-quarter view from slightly above, soft even studio lighting, physical folds rather than printed patterns, no text, no cast shadow."
+    }
+  ],
+  "release_assets": [
+    "gen-weathered-boulder-1",
+    "gen-driftwood-1",
+    "gen-folded-throw-1"
+  ],
+  "review_notes": {
+    "gen-fern-cluster-1": "Not included: first derivative showed crumpled leaf surfaces and export validation warning; retain source for further cleanup.",
+    "gen-ornamental-grass-1": "Not included: provider mesh task still processing at selection cutoff; no geometry reviewed."
+  }
+}

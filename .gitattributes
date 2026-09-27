@@ -1,0 +1,10 @@
+# Contract hashes must survive Windows checkouts and release builds.
+GeneratedAssetfiles/models/*.almond.json text eol=lf
+GeneratedAssetfiles/models/*.glb binary
+# Generated drawing hashes cover original bytes (including DXF/SVG line endings).
+Draftingfiles/pilot/** -text whitespace=cr-at-eol
+Draftingfiles/pilot/**/*.dxf -diff linguist-generated=true
+Draftingfiles/pilot/**/*.svg linguist-generated=true
+# Preserve the vendored upstream bundle and its recorded integrity on checkout.
+almond_mcp/library_ui/vendor/** -text whitespace=cr-at-eol linguist-vendored=true
+almond_mcp/library_ui/vendor/model-viewer.min.js -diff

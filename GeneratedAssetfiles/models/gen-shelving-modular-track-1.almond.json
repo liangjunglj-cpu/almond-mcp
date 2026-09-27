@@ -1,0 +1,206 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-shelving-modular-track-1",
+  "library_id": "generated_assets",
+  "name": "Shelving system (wall-mounted modular shelving on aluminium tracks)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-shelving-modular-track-1.glb",
+  "dimensions_mm": {
+    "width": 1966.4,
+    "depth": 313.1,
+    "height": 2000.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "wall",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -983.2,
+        -156.55,
+        0.0
+      ],
+      "max": [
+        983.2,
+        156.55,
+        2000.0
+      ]
+    },
+    "footprint": [
+      [
+        -983.2,
+        -156.55
+      ],
+      [
+        983.2,
+        -156.55
+      ],
+      [
+        983.2,
+        156.55
+      ],
+      [
+        -983.2,
+        156.55
+      ]
+    ],
+    "clearance_mm": {
+      "front": 600,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "fixed",
+    "mount_height_mm": 0
+  },
+  "materials": [
+    {
+      "material_id": "aluminium-anodized",
+      "objects": [
+        "gen-shelving-modular-track-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-shelving-modular-track-1",
+    "library_id": "generated_assets",
+    "name": "Shelving system (wall-mounted modular shelving on aluminium tracks)",
+    "category": "storage",
+    "tags": [
+      "shelving",
+      "modular",
+      "wall-mounted",
+      "aluminium",
+      "modernist"
+    ],
+    "dimensions_mm": {
+      "width": 1966.4,
+      "depth": 313.1,
+      "height": 2000.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 1330.0,
+      "depth": 360.0,
+      "height": 2000.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "wall",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -983.2,
+          -156.55,
+          0.0
+        ],
+        "max": [
+          983.2,
+          156.55,
+          2000.0
+        ]
+      },
+      "footprint": [
+        [
+          -983.2,
+          -156.55
+        ],
+        [
+          983.2,
+          -156.55
+        ],
+        [
+          983.2,
+          156.55
+        ],
+        [
+          -983.2,
+          156.55
+        ]
+      ],
+      "clearance_mm": {
+        "front": 600,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "fixed",
+      "mount_height_mm": 0
+    },
+    "materials": [
+      {
+        "material_id": "aluminium-anodized",
+        "objects": [
+          "gen-shelving-modular-track-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "A wall-mounted modular shelving system: three vertical slotted aluminium tracks, thin powder-coated aluminium shelves of different depths hooked in at several heights, one closed cabinet box with sliding doors, silver anodised aluminium and off-white panels, 1960s British modernist design, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa91-d506-742f-969d-309284858542",
+        "mesh_model": "meshy-7 ultra (untextured, 60k target polycount)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 998.24357
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "living_room",
+        "office"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.478,
+      "triangle_count": 79999,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product.",
+        "Measured width/depth differs from the prompt target by more than 25%."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "CC44DE0D75A543B9B21C43DB58B690F4E326C5D4A90D45DFE3A6A57060DB8B13"
+}

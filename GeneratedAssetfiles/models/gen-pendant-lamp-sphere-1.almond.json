@@ -1,0 +1,205 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-pendant-lamp-sphere-1",
+  "library_id": "generated_assets",
+  "name": "Pendant lamp (spherical white pendant, spun web shade)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-pendant-lamp-sphere-1.glb",
+  "dimensions_mm": {
+    "width": 473.8,
+    "depth": 471.2,
+    "height": 640.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "ceiling",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -236.9,
+        -235.6,
+        0.0
+      ],
+      "max": [
+        236.9,
+        235.6,
+        640.0
+      ]
+    },
+    "footprint": [
+      [
+        -236.9,
+        -235.6
+      ],
+      [
+        236.9,
+        -235.6
+      ],
+      [
+        236.9,
+        235.6
+      ],
+      [
+        -236.9,
+        235.6
+      ]
+    ],
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "accessory",
+    "mount_height_mm": 1900
+  },
+  "materials": [
+    {
+      "material_id": "polycarbonate-opal",
+      "objects": [
+        "gen-pendant-lamp-sphere-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-pendant-lamp-sphere-1",
+    "library_id": "generated_assets",
+    "name": "Pendant lamp (spherical white pendant, spun web shade)",
+    "category": "lighting",
+    "tags": [
+      "pendant",
+      "lamp",
+      "lighting",
+      "sphere",
+      "mid-century"
+    ],
+    "dimensions_mm": {
+      "width": 473.8,
+      "depth": 471.2,
+      "height": 640.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 640.0,
+      "depth": 640.0,
+      "height": 640.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "ceiling",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -236.9,
+          -235.6,
+          0.0
+        ],
+        "max": [
+          236.9,
+          235.6,
+          640.0
+        ]
+      },
+      "footprint": [
+        [
+          -236.9,
+          -235.6
+        ],
+        [
+          236.9,
+          -235.6
+        ],
+        [
+          236.9,
+          235.6
+        ],
+        [
+          -236.9,
+          235.6
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "accessory",
+      "mount_height_mm": 1900
+    },
+    "materials": [
+      {
+        "material_id": "polycarbonate-opal",
+        "objects": [
+          "gen-pendant-lamp-sphere-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "A large spherical pendant lamp shade made of a translucent white plastic web sprayed over a thin steel wire frame, with a small metal top fitting and a cord, glowing soft white, 1950s American mid-century design, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa91-75ea-76ce-b117-2d68dd0efc3f",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 2133.333249
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "interior"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "interior_axonometric",
+        "interior_perspective"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.264,
+      "triangle_count": 4153,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product.",
+        "Measured width/depth differs from the prompt target by more than 25%."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "83E8EF197FA17C8FADCCA8F2BD2596488E84941184CE3D4D2FBA59A45CDC7E44"
+}

@@ -1,0 +1,223 @@
+{
+  "schema_version": 1,
+  "name": "Stool",
+  "source": {
+    "asset_id": "gen-stool-bent-birch-3leg-1",
+    "geometry_sha256": "2E27D08D5B2B362828C308322EE7D49FB1776A3DFE65E875757B06A4CC253F09",
+    "model_sha256": "9D3C6A08D31706B954EF7EC1719AE46A8213BEA025025AC80E23FC5576DA6C83",
+    "units": "mm",
+    "input_units": "mm",
+    "input_up_axis": "y",
+    "coordinate_transform": "X,-Z,Y",
+    "view_axes": {
+      "plan": "X,Y",
+      "front": "X,Z; looking +Y",
+      "right": "-Y,Z; looking -X"
+    },
+    "dimension_basis": "measured_mesh_geometry",
+    "engine_version": 2,
+    "method": "triangle_union_or_dense_mesh_raster_projection; see per-view method and resolution",
+    "source_references": [],
+    "reference_relationship_scope": "attached_to_this_drawing; not original mesh-generation inputs",
+    "created_at": "2026-09-19T02:01:02.271066+00:00",
+    "attribution": "Almond generated asset library",
+    "derived_asset_license": "CC-BY-4.0",
+    "generation_record": {
+      "asset_id": "gen-stool-bent-birch-3leg-1",
+      "name": "Stool",
+      "model_file": "models/gen-stool-bent-birch-3leg-1.glb",
+      "model_sha256": "9D3C6A08D31706B954EF7EC1719AE46A8213BEA025025AC80E23FC5576DA6C83",
+      "contract_file": "models/gen-stool-bent-birch-3leg-1.almond.json",
+      "contract_sha256": "4C04EB4017BE5B382962FD403813690917ACE4DB63FC66109F5F2BE460328929",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A three-legged wooden stool: a plain round birch seat on three L-shaped legs made of solid birch that bend in a smooth right-angle curve at the top and screw directly under the seat, pale natural birch, Scandinavian functionalist design from the 1930s, no branding.",
+        "image_task_id": null,
+        "image_model": "nano_banana",
+        "mesh_task_id": "01a0aa90-d6d6-738a-bbbd-8a010748356c",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-16",
+        "orientation_correction": null,
+        "scale_applied": 977.777804
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "nano_banana",
+        "image_job_id": "38c416c0-6cda-4997-a11f-3f943433f1bf",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0aa90-d6d6-738a-bbbd-8a010748356c",
+        "generated_at": "2026-09-16"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "38c416c0-6cda-4997-a11f-3f943433f1bf",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": true,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    "limitations": [
+      "Projected silhouettes only: internal visible/hidden edges and construction layers are not inferred.",
+      "Front is the declared coordinate direction, not a verified product front.",
+      "Dimensions describe mesh geometry, not a manufacturer-verified product."
+    ]
+  },
+  "triangle_count": 4125,
+  "scales": [
+    50,
+    100
+  ],
+  "representations": [
+    {
+      "view": "plan",
+      "bounds_mm": [
+        -244.33839571047875,
+        -244.33839571047875,
+        244.33839571047875,
+        244.33839571047875
+      ],
+      "method": "projected_triangle_union",
+      "raster_pixel_mm": null,
+      "approximation_note": null,
+      "precision_grid_mm": 0.01,
+      "simplification_tolerance_mm": 2.5,
+      "preserve_topology": true,
+      "area_mm2": 122612.71295000003,
+      "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+      "scale": 50,
+      "svg": "plan-1-50.svg",
+      "dxf": "plan-1-50.dxf"
+    },
+    {
+      "view": "front",
+      "bounds_mm": [
+        -244.33839571047875,
+        0.0,
+        244.33839571047875,
+        440.0
+      ],
+      "method": "projected_triangle_union",
+      "raster_pixel_mm": null,
+      "approximation_note": null,
+      "precision_grid_mm": 0.01,
+      "simplification_tolerance_mm": 2.5,
+      "preserve_topology": true,
+      "area_mm2": 52327.29069999994,
+      "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+      "scale": 50,
+      "svg": "front-1-50.svg",
+      "dxf": "front-1-50.dxf"
+    },
+    {
+      "view": "right",
+      "bounds_mm": [
+        -244.33839571047875,
+        0.0,
+        244.33839571047875,
+        440.0
+      ],
+      "method": "projected_triangle_union",
+      "raster_pixel_mm": null,
+      "approximation_note": null,
+      "precision_grid_mm": 0.01,
+      "simplification_tolerance_mm": 2.5,
+      "preserve_topology": true,
+      "area_mm2": 53152.97059999997,
+      "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+      "scale": 50,
+      "svg": "right-1-50.svg",
+      "dxf": "right-1-50.dxf"
+    },
+    {
+      "view": "plan",
+      "bounds_mm": [
+        -244.33839571047875,
+        -244.33839571047875,
+        244.33839571047875,
+        244.33839571047875
+      ],
+      "method": "projected_triangle_union",
+      "raster_pixel_mm": null,
+      "approximation_note": null,
+      "precision_grid_mm": 0.01,
+      "simplification_tolerance_mm": 5.0,
+      "preserve_topology": true,
+      "area_mm2": 121488.99715000001,
+      "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+      "scale": 100,
+      "svg": "plan-1-100.svg",
+      "dxf": "plan-1-100.dxf"
+    },
+    {
+      "view": "front",
+      "bounds_mm": [
+        -244.33839571047875,
+        0.0,
+        244.33839571047875,
+        440.0
+      ],
+      "method": "projected_triangle_union",
+      "raster_pixel_mm": null,
+      "approximation_note": null,
+      "precision_grid_mm": 0.01,
+      "simplification_tolerance_mm": 5.0,
+      "preserve_topology": true,
+      "area_mm2": 52296.469599999975,
+      "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+      "scale": 100,
+      "svg": "front-1-100.svg",
+      "dxf": "front-1-100.dxf"
+    },
+    {
+      "view": "right",
+      "bounds_mm": [
+        -244.33839571047875,
+        0.0,
+        244.33839571047875,
+        440.0
+      ],
+      "method": "projected_triangle_union",
+      "raster_pixel_mm": null,
+      "approximation_note": null,
+      "precision_grid_mm": 0.01,
+      "simplification_tolerance_mm": 5.0,
+      "preserve_topology": true,
+      "area_mm2": 52646.81555000001,
+      "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+      "scale": 100,
+      "svg": "right-1-100.svg",
+      "dxf": "right-1-100.dxf"
+    }
+  ],
+  "files": {
+    "front-1-100.dxf": "6A537FE0602B20C337E2597E606FAA6F5C0328BE850AF91517CEC25353B27A0B",
+    "front-1-100.svg": "DA641B75D0A223111280F59B920565F7CEFDC869123ABD35128F0B960A64C28C",
+    "front-1-50.dxf": "BF2DFB10FBA733B1A94034D68EF02C84AF9E84C1D4F7FED4944C66D29AF14F07",
+    "front-1-50.svg": "7BA9F47CB23604CB5D85042B89285BB958724FCB4AD760AA9A06621E984ADEFF",
+    "plan-1-100.dxf": "0D87743CB416709401834C97DCD78F2C640834893EA4A93FCBD16896252ADF57",
+    "plan-1-100.svg": "C553508C45FBC45B3A174E28768EC52C315C46427AB98BA0216AFE22BB395D56",
+    "plan-1-50.dxf": "D58A7DF35179B878BDF28A6781014F51B4AD489C389E3B2FEE6999B6B5F2DB89",
+    "plan-1-50.svg": "7A9FF9DDCCA303181613781777974B4F45E96D9E3E737C1AAF6B56DBDF70D6AA",
+    "right-1-100.dxf": "793DFF0592232B5324AE9A2D08D7F37E0F97DA660FA158A6BAB8E941DD18ED1C",
+    "right-1-100.svg": "9E735988B6B3643FD26659FCE6C4C978BAD58588727FE797BE8ED8A252FF7D57",
+    "right-1-50.dxf": "DF111D74666FCA131C4305F84B0E4B0138D153686953E43E6B57CD2F43C9F81C",
+    "right-1-50.svg": "5935A283302DAB798655EF3EA21955CF48A055EAAA994F3ADD7EB37F73CCCA55",
+    "sheet-A3-1-100.svg": "F262AE20DD91A49126BE46728DF2BA611E6AD43F0F9E8FAEFB335CDD9C1D1B4F",
+    "sheet-A3-1-50.svg": "26A356935D61F17BD7C90D1D4D7949E054F6DA5B2A16EECEE225D0A978F2BEBD",
+    "views.json": "EE99A28C7FDB513E9AA7362790EBDBB7E74016508496A666C8D81270B5A7D302"
+  }
+}

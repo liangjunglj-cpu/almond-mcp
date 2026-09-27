@@ -1,0 +1,203 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-person-standing-1",
+  "library_id": "generated_assets",
+  "name": "Person standing (adult, casual clothing)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-person-standing-1.glb",
+  "dimensions_mm": {
+    "width": 577.6,
+    "depth": 284.5,
+    "height": 1750.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -288.8,
+        -142.25,
+        0.0
+      ],
+      "max": [
+        288.8,
+        142.25,
+        1750.0
+      ]
+    },
+    "footprint": [
+      [
+        -288.8,
+        -142.25
+      ],
+      [
+        288.8,
+        -142.25
+      ],
+      [
+        288.8,
+        142.25
+      ],
+      [
+        -288.8,
+        142.25
+      ]
+    ],
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "accessory"
+  },
+  "materials": [
+    {
+      "material_id": "plaster-white",
+      "objects": [
+        "gen-person-standing-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-person-standing-1",
+    "library_id": "generated_assets",
+    "name": "Person standing (adult, casual clothing)",
+    "category": "human_figure",
+    "tags": [
+      "person",
+      "human",
+      "scale figure",
+      "entourage",
+      "standing"
+    ],
+    "dimensions_mm": {
+      "width": 577.6,
+      "depth": 284.5,
+      "height": 1750.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 550.0,
+      "depth": 350.0,
+      "height": 1750.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -288.8,
+          -142.25,
+          0.0
+        ],
+        "max": [
+          288.8,
+          142.25,
+          1750.0
+        ]
+      },
+      "footprint": [
+        [
+          -288.8,
+          -142.25
+        ],
+        [
+          288.8,
+          -142.25
+        ],
+        [
+          288.8,
+          142.25
+        ],
+        [
+          -288.8,
+          142.25
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "accessory"
+    },
+    "materials": [
+      {
+        "material_id": "plaster-white",
+        "objects": [
+          "gen-person-standing-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "A full-body adult person standing upright in a relaxed pose, casual everyday clothing, arms at sides, plain matte grey clay-like appearance.",
+        "image_task_id": "01a09787-a448-7360-939a-ab919d08398e",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978d-653f-734a-8edf-ce2ffc1bda07",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 1029.411736
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "interior",
+        "streetscape"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "section",
+        "elevation",
+        "interior_perspective",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.187,
+      "triangle_count": 4383,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "A297AD2AE6C0BF367CBC259D34F2C97CA579FECBB9932428E087A2ECDEF6D13B"
+}

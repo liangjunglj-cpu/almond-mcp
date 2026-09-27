@@ -1,0 +1,204 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-person-walking-1",
+  "library_id": "generated_assets",
+  "name": "Person walking (adult, mid-stride)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-person-walking-1.glb",
+  "dimensions_mm": {
+    "width": 584.5,
+    "depth": 1032.2,
+    "height": 1750.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -292.25,
+        -516.1,
+        0.0
+      ],
+      "max": [
+        292.25,
+        516.1,
+        1750.0
+      ]
+    },
+    "footprint": [
+      [
+        -292.25,
+        -516.1
+      ],
+      [
+        292.25,
+        -516.1
+      ],
+      [
+        292.25,
+        516.1
+      ],
+      [
+        -292.25,
+        516.1
+      ]
+    ],
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "accessory"
+  },
+  "materials": [
+    {
+      "material_id": "plaster-white",
+      "objects": [
+        "gen-person-walking-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-person-walking-1",
+    "library_id": "generated_assets",
+    "name": "Person walking (adult, mid-stride)",
+    "category": "human_figure",
+    "tags": [
+      "person",
+      "human",
+      "scale figure",
+      "entourage",
+      "walking"
+    ],
+    "dimensions_mm": {
+      "width": 584.5,
+      "depth": 1032.2,
+      "height": 1750.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 500.0,
+      "depth": 750.0,
+      "height": 1750.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -292.25,
+          -516.1,
+          0.0
+        ],
+        "max": [
+          292.25,
+          516.1,
+          1750.0
+        ]
+      },
+      "footprint": [
+        [
+          -292.25,
+          -516.1
+        ],
+        [
+          292.25,
+          -516.1
+        ],
+        [
+          292.25,
+          516.1
+        ],
+        [
+          -292.25,
+          516.1
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "accessory"
+    },
+    "materials": [
+      {
+        "material_id": "plaster-white",
+        "objects": [
+          "gen-person-walking-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "A full-body adult person walking, mid-stride, casual clothing, one arm swinging forward, plain matte grey clay-like appearance.",
+        "image_task_id": "01a09787-b24a-7035-9f02-e9e209cc99e3",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978d-73c0-710c-9a02-fdb87841247f",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 1000.0
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "interior",
+        "streetscape"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "section",
+        "elevation",
+        "interior_perspective",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.376,
+      "triangle_count": 4270,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product.",
+        "Measured width/depth differs from the prompt target by more than 25%."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "D384C2C5C8D60FB940E91A2C0B10B73C21716E78B5588292EFA359AEAEF60DD4"
+}

@@ -1,0 +1,83 @@
+{
+  "batch_id": "organic-2026-09",
+  "image": {
+    "asset_id": "gen-driftwood-1",
+    "endpoint": "/openapi/v1/text-to-image",
+    "submitted_at": "2026-09-19T16:21:32.885556+00:00",
+    "request": {
+      "ai_model": "nano-banana-pro",
+      "aspect_ratio": "1:1",
+      "generate_multi_view": false,
+      "prompt": "One realistic weathered driftwood log resting horizontally, about 1.6 metres long, with a naturally twisting trunk, three short broken branch stubs, deep flowing grain channels, eroded knots and irregular split ends. Substantial connected wood, gently curved silhouette, no thin twigs, no leaves, no roots spreading onto a ground plane. Neutral object for landscape and interior display studies. Entire log visible with generous margin, isolated on pure white, three-quarter view from slightly above, soft even studio lighting, crisp sculptural physical geometry, no text, no cast shadow."
+    },
+    "status": "SUCCEEDED",
+    "task_id": "01a0ba79-1273-71dc-b270-3aa5d518be5e",
+    "output_file": "gen-driftwood-1.png",
+    "output_sha256": "14fae4a33eb47ad22fe47cb1492d2aa2607cf5ed4ac3ba77f678d7eaabf3be36",
+    "finished_at": 1789834916650,
+    "seed": null,
+    "consumed_credits": 9,
+    "provider_created_at": 1789834891902,
+    "provider_started_at": 1789834891910
+  },
+  "mesh": {
+    "asset_id": "gen-driftwood-1",
+    "endpoint": "/openapi/v1/image-to-3d",
+    "submitted_at": "2026-09-19T16:22:56.010640+00:00",
+    "request": {
+      "ai_model": "meshy-7.1",
+      "model_type": "standard",
+      "geometry_resolution": "4k",
+      "should_texture": false,
+      "should_remesh": false,
+      "image_enhancement": false,
+      "target_formats": [
+        "glb"
+      ],
+      "auto_size": false,
+      "input_task_id": "01a0ba79-1273-71dc-b270-3aa5d518be5e"
+    },
+    "status": "SUCCEEDED",
+    "task_id": "01a0ba7a-5725-7567-ae8f-1616c4aecf80",
+    "output_file": "gen-driftwood-1.glb",
+    "output_sha256": "3886c2be926ea7e7babd1f0f88774f46f3c21227589b765d36b3d2b2f5bd9ce9",
+    "finished_at": 1789835057614,
+    "seed": null,
+    "consumed_credits": 25,
+    "provider_created_at": 1789834975647,
+    "provider_started_at": 1789834975657
+  },
+  "derivation": {
+    "asset_id": "gen-driftwood-1",
+    "source_sha256": "3886c2be926ea7e7babd1f0f88774f46f3c21227589b765d36b3d2b2f5bd9ce9",
+    "source_triangles": 550090,
+    "target_triangles": 120000,
+    "prepared_sha256": "48fc482ce3e5f0bbb9dadb5268f6b966924a8d9637217efc77bb53330c84e3de",
+    "software": "Blender 5.1.2",
+    "method": "Weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target; triangulate. Never subdivide to inflate counts.",
+    "weld_tolerance_source_units": 1.9018785953521728e-07,
+    "quality": {
+      "vertices": 60002,
+      "triangles": 120000,
+      "boundary_edges": 0,
+      "nonmanifold_edges_excluding_boundary": 0,
+      "zero_area_faces": 0,
+      "connected_components": 1,
+      "largest_component_vertices": 60002,
+      "nonfinite_coordinates": 0,
+      "self_intersections": "not_tested",
+      "use": "Visual entourage; not certified for fabrication or structural analysis",
+      "bounds_relative_change": [
+        8.900525594840302e-06,
+        0.00012256649643177056,
+        0.00034433022702023963
+      ]
+    }
+  },
+  "input_image_file": "batches/organic-2026-09/gen-driftwood-1.png",
+  "external_reference_status": "Original descriptive prompts; no external images or design references submitted.",
+  "external_reference_ids": [],
+  "dimension_basis": "Authored nominal height for architectural studies; width and depth measured after uniform normalization. Not a physical survey.",
+  "reference_review": "Reference image visually reviewed for neutral architectural use.",
+  "rights": "Generated for the Almond library using the owner-configured Meshy account; public pack distribution authorized by owner. CC BY 4.0. API balance verified; subscription contract not independently audited."
+}

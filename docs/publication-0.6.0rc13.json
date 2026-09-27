@@ -1,0 +1,34 @@
+{
+  "version": "0.6.0rc13",
+  "commit": "f83fe392901ed49af38238466bb16809bcd4158e",
+  "tests_passed": 185,
+  "installed_files_verified": 421,
+  "models": 50,
+  "browser": "Arctic and Ghosted live thumbnails; enlarged Arctic and Rendered model; original colours restored; drawings unchanged; no console errors; no overflow at 360/280px",
+  "native_viewport_following": "pending after Rhino restart",
+  "ci_url": "https://github.com/liangjunglj-cpu/almond-mcp/actions/runs/35457176696",
+  "ci_status": "success",
+  "public_publication": true,
+  "publication": {
+    "yak": {
+      "status": "published",
+      "version": "0.6.0-rc.13",
+      "source": "https://yak.rhino3d.com/",
+      "sha256": "fa40abae6a630fb7fe6afba123ea51f829ca231e1ec57028488f265804a0fe42",
+      "verified": "Public Yak search lists 0.6.0-rc.13",
+      "published_date": "2026-09-19"
+    },
+    "food4rhino": {
+      "status": "published",
+      "listing_url": "https://www.food4rhino.com/en/app/almond-mcp",
+      "download_url": "https://www.food4rhino.com/en/system/files/users-files/liang-jung/app/almondbridge-060-rc13-food4rhino.zip",
+      "uploaded_zip_sha256": "05c109019951dae8e2c98850d33ba31c9b5924810193126810844d4122c0a762",
+      "verification": "Food4Rhino confirmed App Almond MCP has been updated; rc.13 appears first in downloads with Rhino 8 for Windows. Independent ZIP redownload/hash comparison not completed (anonymous request 403; browser download event not observed)."
+    },
+    "pypi": {
+      "status": "blocked_missing_publish_credentials",
+      "version": "0.6.0rc13"
+    }
+  },
+  "native_acceptance": "User reported looks good and authorized deployment; comprehensive in-process checklist not independently recorded."
+}

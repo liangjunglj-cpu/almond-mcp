@@ -1,0 +1,262 @@
+{
+  "library_id": "typology_narratives",
+  "library_name": "Almond architectural typology narratives",
+  "schema_version": 1,
+  "source": "Narratives distilled and paraphrased from Ching, Jarzombek & Prakash, A Global History of Architecture (Wiley); gha_ref gives PDF page numbers in that volume (see docs/reference/gha_toc.txt). NARRATION ONLY: this library feeds project storytelling and typology context. It never drives geometry, sizing, or structural decisions - those come from the construction library.",
+  "entries": [
+    {
+      "typology_id": "dense-roof-access-settlement",
+      "name": "Dense roof-access settlement",
+      "era": "7400-3000 BCE",
+      "region": "Anatolia",
+      "narrative": "At Catal Huyuk, rectangular flat-roofed mud-brick houses packed into a single architectural mass with no streets: circulation ran across the rooftops, and each dwelling was entered by ladder through its roof. Strikingly, party walls were doubled - every house kept its own walls - and the main room, around 5 by 6 metres with benches, ovens and plastered walls, doubled as the family shrine.",
+      "precedents": [{"name": "Catal Huyuk", "place": "near Konya, Turkey", "date": "from ca. 7400 BCE"}],
+      "related_construction_systems": ["cmu-reinforced-wall", "wood-joist-floor"],
+      "structure_types": ["frame"],
+      "urban_role": "The earliest lesson in extreme density: a housing fabric so continuous that the roofscape becomes the street.",
+      "gha_ref": [28, 29],
+      "tags": ["housing", "party-wall", "density", "mud-brick", "roofscape"]
+    },
+    {
+      "typology_id": "courtyard-house-city",
+      "name": "Inward courtyard-house city",
+      "era": "ca. 2500 BCE",
+      "region": "Indus Valley",
+      "narrative": "Mohenjo-Daro's neighborhoods turned inward: main streets ran between largely blank house walls, and dwellings - reached by alleys - faced open courtyards, the larger ones two stories with a timber upper level. Under the streets ran drains to accessible settling tanks, and the whole quarter stood on a brick flood platform; the colonnaded Great Bath at the crossing of the main streets anchored civic ritual.",
+      "precedents": [{"name": "Mohenjo-Daro", "place": "Sindh, Pakistan", "date": "ca. 2500 BCE"}],
+      "related_construction_systems": ["cmu-reinforced-wall", "concrete-shallow-foundation"],
+      "structure_types": ["frame"],
+      "urban_role": "The courtyard block: privacy to the street, life to the interior court - with city-scale infrastructure taken seriously from the start.",
+      "gha_ref": [47, 48],
+      "tags": ["courtyard", "housing", "urban-block", "brick", "infrastructure"]
+    },
+    {
+      "typology_id": "monolithic-dome",
+      "name": "Monolithic concrete dome",
+      "era": "126 CE",
+      "region": "Rome",
+      "narrative": "Hadrian's Pantheon put a bold domed rotunda where the dark classical cella had been: a half-spherical concrete dome whose oculus turns sunlight into the moving presence of the divine. Originally it was not a freestanding object but embedded in the urban fabric, approached through a long colonnaded forecourt.",
+      "precedents": [{"name": "Pantheon", "place": "Rome", "date": "126 CE"}],
+      "related_construction_systems": ["concrete-bearing-wall"],
+      "structure_types": ["shell"],
+      "urban_role": "The centralized room as civic monument - and a reminder that even icons once had street walls around them.",
+      "gha_ref": [223, 224],
+      "tags": ["dome", "concrete", "shell", "civic", "light"]
+    },
+    {
+      "typology_id": "vaulted-public-hall",
+      "name": "Vaulted public bath hall",
+      "era": "1st-4th c. CE",
+      "region": "Roman empire",
+      "narrative": "The thermae were state-owned bathing complexes covering whole city blocks, affordable to most free Romans, where the water itself occupied little of a vast interior of exercise courts, lounges, libraries and lecture halls. Their sequence of apodyterium, tepidarium, caldarium and frigidarium organized enormous vaulted halls into a social machine.",
+      "precedents": [
+        {"name": "Baths of Caracalla", "place": "Rome", "date": "212-216 CE"},
+        {"name": "Baths of Diocletian", "place": "Rome", "date": "298-306 CE"}
+      ],
+      "related_construction_systems": ["steel-truss-roof", "space-frame-roof"],
+      "structure_types": ["shell", "truss"],
+      "urban_role": "The big-span public interior: the ancestor of every community hall, market shed and sports hall that anchors a district.",
+      "gha_ref": [230, 231],
+      "tags": ["longspan", "civic", "vault", "public-program"]
+    },
+    {
+      "typology_id": "pendentive-dome-hall",
+      "name": "Dome on pendentives",
+      "era": "532-537 CE",
+      "region": "Byzantium",
+      "narrative": "At Hagia Sophia a 30-metre square of piers and arches carries, on pendentives, a ribbed dome whose ring of windows makes it seem to float - 'suspended from heaven,' as Procopius wrote. Thin brick vaults, half- and quarter-domes and massive piers share the work, while marble and mosaic were deployed so the structure would seem not to exist.",
+      "precedents": [{"name": "Hagia Sophia", "place": "Istanbul", "date": "532-537 CE"}],
+      "related_construction_systems": ["concrete-bearing-wall"],
+      "structure_types": ["shell"],
+      "urban_role": "Structural audacity as spatial drama: hierarchy of dome, half-domes and galleries shaping a single vast room.",
+      "gha_ref": [296, 297],
+      "tags": ["dome", "shell", "masonry", "light"]
+    },
+    {
+      "typology_id": "timber-renewal-shrine",
+      "name": "Periodically rebuilt timber shrine",
+      "era": "from 690 CE",
+      "region": "Japan",
+      "narrative": "Ise Jingu has been rebuilt identically every twenty years for some 1,500 years, in virgin old-growth timber - a building at once brand new and thirteen centuries old. The Shoden, modeled on a granary, is raised on columns set directly into the ground, three bays by two, built without nails under a deep thatched roof, with a freestanding pillar at each gable carrying the ridgepole.",
+      "precedents": [{"name": "Ise Jingu (Naiku)", "place": "Ise, Japan", "date": "from 690 CE; last rebuilt 2013"}],
+      "related_construction_systems": ["wood-plank-and-beam-floor", "wood-rafter-roof"],
+      "structure_types": ["frame", "beam"],
+      "urban_role": "Craft and renewal as the point: permanence achieved through cyclical reconstruction rather than durable material.",
+      "gha_ref": [313, 314],
+      "tags": ["timber", "craft", "renewal", "shrine"]
+    },
+    {
+      "typology_id": "timber-bracket-hall",
+      "name": "Bracketed timber hall in a courtyard precinct",
+      "era": "7th-9th c. CE",
+      "region": "China / Japan",
+      "narrative": "East Asian timber halls carry low-pitched roofs with deep eaves on dou-gong bracket sets - composite stacks of horizontal, vertical and diagonal members whose size and number encode the building's rank. At Horyu-ji the golden hall and pagoda balance each other inside a cloister instead of on an axis; at Foguang the seven-bay hall's columns divide inner and outer space in a format derived from palace architecture, the halls framed by colonnaded courtyards with north and south gates.",
+      "precedents": [
+        {"name": "Horyu-ji", "place": "Nara, Japan", "date": "late 7th c. CE"},
+        {"name": "Foguang Monastery", "place": "Wutaishan, Shanxi, China", "date": "857 CE"}
+      ],
+      "related_construction_systems": ["wood-plank-and-beam-floor", "wood-truss-roof"],
+      "structure_types": ["frame", "beam"],
+      "urban_role": "The hall-in-courtyard: buildings composed as walled precincts of courts and gates rather than freestanding objects.",
+      "gha_ref": [317, 318, 348, 349],
+      "tags": ["timber", "bracket", "courtyard", "hall", "precinct"]
+    },
+    {
+      "typology_id": "terraced-communal-housing",
+      "name": "Terraced communal housing with sunken commons",
+      "era": "920-1200 CE",
+      "region": "North America",
+      "narrative": "Pueblo Bonito's D-shaped plan stacked rows of rooms that stepped back storey by storey like a terraced amphitheater around two plazas, with circular semi-subterranean kivas - each the province of a social unit - as its communal rooms. Tens of thousands of pine beams for its walls and roofs were carried from a forest 90 kilometres away, and the layout registers the cycles of sun and moon.",
+      "precedents": [{"name": "Pueblo Bonito", "place": "Chaco Canyon, New Mexico", "date": "ca. 920-1200 CE"}],
+      "related_construction_systems": ["cmu-reinforced-wall", "wood-joist-floor"],
+      "structure_types": ["frame", "beam"],
+      "urban_role": "Housing as one legible collective form - terracing, shared plazas, and embedded communal rooms.",
+      "gha_ref": [376, 377],
+      "tags": ["housing", "terraced", "communal", "masonry", "plaza"]
+    },
+    {
+      "typology_id": "nomadic-lattice-tent",
+      "name": "Nomadic lattice tent (ger/yurt)",
+      "era": "steppe tradition; empire 13th c.",
+      "region": "Central Asia",
+      "narrative": "The Mongolian ger is an expanding wooden lattice forming circular walls, with roof poles rising to a compression ring and a rope band binding the wall head - easily transportable yet solid against ferocious steppe winds. Even ruling from cities, Kublai Khan kept resplendent tents inside his palace precinct, and a 6-by-5-kilometre quarter of Dadu was reserved for overlords camping in their yurts.",
+      "precedents": [{"name": "Mongolian ger", "place": "Central Asian steppe", "date": "traditional; documented 13th c."}],
+      "related_construction_systems": [],
+      "structure_types": ["membrane", "gridshell"],
+      "urban_role": "The original lightweight structure: tension skin, compression ring, demountable dwelling - ancestor of every membrane roof.",
+      "gha_ref": [442, 443],
+      "tags": ["membrane", "tension", "lightweight", "nomadic", "dwelling"]
+    },
+    {
+      "typology_id": "skeletal-masonry-cathedral",
+      "name": "Skeletal masonry cathedral",
+      "era": "12th-13th c.",
+      "region": "France",
+      "narrative": "Gothic naves dissolved the wall into a skeleton: compound piers - columnar bundles of colonettes running up into the vault ribs - carry thin rib vaults, with flying buttresses taking the thrust outside. Bourges slopes its buttresses with the roof to read as one unified form; Amiens pushes verticality with tall nave arches and four-part clerestory windows, its buttresses climbing higher to offset the weight.",
+      "precedents": [
+        {"name": "Bourges Cathedral", "place": "France", "date": "1195-1214"},
+        {"name": "Amiens Cathedral", "place": "France", "date": "1220-1235"},
+        {"name": "Notre-Dame of Reims", "place": "France", "date": "1211-1290"}
+      ],
+      "related_construction_systems": ["steel-column-frame"],
+      "structure_types": ["frame", "shell"],
+      "urban_role": "Structure made visible and vertical - the medieval ancestor of the expressed frame.",
+      "gha_ref": [459, 460],
+      "tags": ["gothic", "skeleton", "vault", "buttress", "verticality"]
+    },
+    {
+      "typology_id": "civic-hall-on-piazza",
+      "name": "Civic hall over a loggia on the piazza",
+      "era": "12th-13th c.",
+      "region": "Italy",
+      "narrative": "As the popolo - artisans, guildsmen, merchants - took over Italian city government, the town hall emerged: a large upper meeting hall with big windows and a proclamation balcony facing the campo, above a ground floor left open as a loggia where craftsmen and traders worked under the city's protection. For the first time in centuries, buildings and public space were conceived as one ensemble.",
+      "precedents": [
+        {"name": "Town halls of Brescia, Verona, Modena, Pavia, Bergamo", "place": "northern Italy", "date": "late 12th c."},
+        {"name": "Palazzo dei Consoli ensemble", "place": "Gubbio", "date": "13th-14th c."}
+      ],
+      "related_construction_systems": ["steel-truss-roof", "cmu-reinforced-wall"],
+      "structure_types": ["truss", "frame"],
+      "urban_role": "The civic anchor: hall + balcony + piazza as one political instrument.",
+      "gha_ref": [462],
+      "tags": ["civic", "piazza", "hall", "loggia", "ensemble"]
+    },
+    {
+      "typology_id": "axial-courtyard-palace",
+      "name": "Axial courtyard palace",
+      "era": "15th c.",
+      "region": "China",
+      "narrative": "The Forbidden City organizes power as a south-facing axial sequence of walled courts: halls in threes on stepped I-shaped marble platforms, the Hall of Supreme Harmony projecting its presence into the vast forecourt through the deep overhang of its roof, where grand spectacles were staged and supplicants kowtowed facing north. Bureaucracy filled the flanking corridors; gardens and lesser palaces filled the rest.",
+      "precedents": [{"name": "Forbidden City", "place": "Beijing", "date": "15th c."}],
+      "related_construction_systems": ["wood-plank-and-beam-floor", "wood-truss-roof"],
+      "structure_types": ["frame"],
+      "urban_role": "Planning by courts and thresholds: the courtyard sequence as both circulation and hierarchy.",
+      "gha_ref": [507, 508],
+      "tags": ["axial", "courtyard", "palace", "timber", "hierarchy"]
+    },
+    {
+      "typology_id": "proportioned-villa",
+      "name": "Proportioned working villa",
+      "era": "16th c.",
+      "region": "Veneto",
+      "narrative": "Palladio's villas for Venice's farming families had to be working agricultural buildings and dignified by antiquity at once - symmetrical, simply proportioned plans (rooms of 1:1, 2:3, 3:4), aligned doors and windows, temple-front porticos in cheap brick and stucco with stone saved for capitals. Villa Rotonda, symmetrical about both axes with four temple fronts around a central rotunda, became a model copied across Europe and the Americas.",
+      "precedents": [
+        {"name": "Villa Foscari (La Malcontenta)", "place": "Veneto", "date": "1560"},
+        {"name": "Villa Rotonda", "place": "near Vicenza", "date": "1566"}
+      ],
+      "related_construction_systems": ["cmu-reinforced-wall", "wood-joist-floor"],
+      "structure_types": ["frame", "beam"],
+      "urban_role": "Order on a budget: proportion and symmetry as the affordable dignity of ordinary building.",
+      "gha_ref": [555, 556],
+      "tags": ["proportion", "villa", "symmetry", "economy"]
+    },
+    {
+      "typology_id": "garden-city",
+      "name": "Garden city",
+      "era": "1898-1910s",
+      "region": "England",
+      "narrative": "Ebenezer Howard's garden city was neither suburb nor village but a mini-city of about 30,000 on 6,000 trust-held acres: a central park ringed by shops and a glass arcade, housing around it, factories fronting a circular railway at the edge, farms beyond - rents flowing back to the community corporation. It aimed to fuse the town's urbanity with the country's air in one controlled diagram.",
+      "precedents": [{"name": "Letchworth", "place": "England", "date": "from 1903"}],
+      "related_construction_systems": [],
+      "structure_types": [],
+      "urban_role": "The planned settlement diagram: green belt, sized population, land held in common - a recurring reference for every masterplan since.",
+      "gha_ref": [707, 708],
+      "tags": ["planning", "green-belt", "housing", "diagram"]
+    },
+    {
+      "typology_id": "steel-frame-tower",
+      "name": "Early steel-frame tower",
+      "era": "1890-1913",
+      "region": "United States",
+      "narrative": "The skyscraper synthesized improved steel - prefabricated frames erected with startling speed - with elevators, plumbing, heating and electricity integrated into one system; at the 1900 Paris Exposition the Americans exhibited a model whose plaster skin lifted off to reveal exactly that. Chicago's Reliance Building floated glassy floors over terra-cotta spandrels while New York's Gothic-clad Woolworth Building showed the frame dressed in old wealth.",
+      "precedents": [
+        {"name": "Reliance Building", "place": "Chicago", "date": "1894"},
+        {"name": "Wainwright Building", "place": "St. Louis", "date": "1890"},
+        {"name": "Woolworth Building", "place": "New York", "date": "1911-1913"}
+      ],
+      "related_construction_systems": ["steel-wide-flange-floor", "steel-column-frame"],
+      "structure_types": ["frame", "highrise"],
+      "urban_role": "Vertical real estate: the tower as investment vehicle, services machine, and skyline advertisement at once.",
+      "gha_ref": [709, 710],
+      "tags": ["skyscraper", "steel-frame", "elevator", "services", "tower"]
+    },
+    {
+      "typology_id": "modernist-siedlung",
+      "name": "Modernist housing estate (Siedlung)",
+      "era": "1927",
+      "region": "Germany",
+      "narrative": "The Weissenhof Siedlung presented an entire estate of avant-garde housing - rowhouses, duplexes, apartment blocks by Le Corbusier, Gropius, Oud, Scharoun, Taut and others - unified by mandatory flat roofs and white facades on an S-shaped road following the slope. Mies's apartment block used Europe's first structural steel in housing to free the plan, compressing stairs and all plumbing into a repeating service core.",
+      "precedents": [{"name": "Weissenhof Siedlung", "place": "Stuttgart", "date": "1927"}],
+      "related_construction_systems": ["steel-column-frame", "concrete-flat-plate"],
+      "structure_types": ["frame", "shell"],
+      "urban_role": "The estate as manifesto: shared formal rules across many architects and building types - and the invention of the modern service core.",
+      "gha_ref": [746, 747],
+      "tags": ["housing", "estate", "modernism", "core", "flat-roof"]
+    },
+    {
+      "typology_id": "shell-icon",
+      "name": "Expressive shell assembly",
+      "era": "1957-1973",
+      "region": "Australia",
+      "narrative": "Utzon's Sydney Opera House stacked interlocking tiled shells above a vast stepped platform at the water's edge - sails conjured through technological virtuosity, carried on 580 concrete piers sunk up to 25 metres below sea level, housing five performance spaces.",
+      "precedents": [{"name": "Sydney Opera House", "place": "Sydney", "date": "1957-1973"}],
+      "related_construction_systems": ["precast-tee-floor"],
+      "structure_types": ["shell", "gridshell"],
+      "urban_role": "The cultural building as landform-plus-sails: podium for the city, silhouette for the harbor.",
+      "gha_ref": [778],
+      "tags": ["shell", "precast", "icon", "podium"]
+    },
+    {
+      "typology_id": "glass-curtain-tower",
+      "name": "Steel-and-glass curtain-wall tower",
+      "era": "1958",
+      "region": "United States",
+      "narrative": "Mies van der Rohe's Seagram Building reset the skyscraper as a clean vertical box with sharp edges - the frame regularized, the skin a disciplined curtain - ending the early era of differentiated, historically clad towers.",
+      "precedents": [{"name": "Seagram Building", "place": "New York", "date": "1958"}],
+      "related_construction_systems": ["steel-column-frame", "steel-wide-flange-floor"],
+      "structure_types": ["frame", "highrise"],
+      "urban_role": "The tower-and-plaza formula that generations of business districts copied.",
+      "gha_ref": [780],
+      "tags": ["curtain-wall", "tower", "modernism", "plaza"]
+    }
+  ]
+}

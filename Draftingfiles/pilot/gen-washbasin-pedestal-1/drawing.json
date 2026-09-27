@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "name": "Washbasin",
+  "source": {
+    "asset_id": "gen-washbasin-pedestal-1",
+    "geometry_sha256": "F6ECB5818557BB59F2BB92E5B633657DFE8ACB84C8349294C4E4D096ACBA4F0F",
+    "model_sha256": "B176D7D9D55DEFDA373B2ED7AE10D883CE5C5089844463F3346ADF61588E2DC3",
+    "units": "mm",
+    "input_units": "mm",
+    "input_up_axis": "y",
+    "coordinate_transform": "X,-Z,Y",
+    "view_axes": {
+      "plan": "X,Y",
+      "front": "X,Z; looking +Y",
+      "right": "-Y,Z; looking -X"
+    },
+    "dimension_basis": "measured_mesh_geometry",
+    "engine_version": 2,
+    "method": "triangle_union_or_dense_mesh_raster_projection; see per-view method and resolution",
+    "source_references": [],
+    "reference_relationship_scope": "attached_to_this_drawing; not original mesh-generation inputs",
+    "created_at": "2026-09-19T01:55:46.186622+00:00",
+    "attribution": "Almond generated asset library",
+    "derived_asset_license": "CC-BY-4.0",
+    "generation_record": {
+      "asset_id": "gen-washbasin-pedestal-1",
+      "name": "Washbasin",
+      "model_file": "models/gen-washbasin-pedestal-1.glb",
+      "model_sha256": "B176D7D9D55DEFDA373B2ED7AE10D883CE5C5089844463F3346ADF61588E2DC3",
+      "contract_file": "models/gen-washbasin-pedestal-1.almond.json",
+      "contract_sha256": "B69AAB64E63E5476BB822F5CF127C8C9F4F2574A9524F1D2F5E8341060CE7CDB",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A white ceramic pedestal washbasin with a single chrome mixer tap, plain modern design.",
+        "image_task_id": "01a09788-cd24-7133-b6bf-24be3b9e982d",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978e-c613-7771-a80e-de66c4d484d3",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 944.444469
+      },
+      "recorded_task_history": {
+        "image_model": "nano-banana",
+        "image_task_id": "01a09788-cd24-7133-b6bf-24be3b9e982d",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0978e-c613-7771-a80e-de66c4d484d3",
+        "generated_at": "2026-09-12"
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "catalogue_image_stage_tool",
+        "id": "01a09788-cd24-7133-b6bf-24be3b9e982d",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    "limitations": [
+      "Projected silhouettes only: internal visible/hidden edges and construction layers are not inferred.",
+      "Front is the declared coordinate direction, not a verified product front.",
+      "Dimensions describe mesh geometry, not a manufacturer-verified product."
+    ]
+  },
+  "triangle_count": 3986,
+  "scales": [
+    50,
+    100
+  ],
+  "representations": [
+    {
+      "view": "plan",
+      "bounds_mm": [
+        -222.46094057853858,
+        -190.91796677093947,
+        222.46094057853858,
+        190.91796677093947
+      ],
+      "method": "projected_triangle_union",
+      "raster_pixel_mm": null,
+      "approximation_note": null,
+      "precision_grid_mm": 0.01,
+      "simplification_tolerance_mm": 2.5,
+      "area_mm2": 159258.55070000002,
+      "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+      "scale": 50,
+      "svg": "plan-1-50.svg",
+      "dxf": "plan-1-50.dxf"
+    },
+    {
+      "view": "front",
+      "bounds_mm": [
+        -222.46094057853858,
+        0.0,
+        222.46094057853858,
+        850.0
+      ],
+      "method": "projected_triangle_union",
+      "raster_pixel_mm": null,
+      "approximation_note": null,
+      "precision_grid_mm": 0.01,
+      "simplification_tolerance_mm": 2.5,
+      "area_mm2": 151771.44480000003,
+      "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+      "scale": 50,
+      "svg": "front-1-50.svg",
+      "dxf": "front-1-50.dxf"
+    },
+    {
+      "view": "right",
+      "bounds_mm": [
+        -190.91796677093947,
+        0.0,
+        190.91796677093947,
+        850.0
+      ],
+      "method": "projected_triangle_union",
+      "raster_pixel_mm": null,
+      "approximation_note": null,
+      "precision_grid_mm": 0.01,
+      "simplification_tolerance_mm": 2.5,
+      "area_mm2": 144794.67959999997,
+      "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+      "scale": 50,
+      "svg": "right-1-50.svg",
+      "dxf": "right-1-50.dxf"
+    },
+    {
+      "view": "plan",
+      "bounds_mm": [
+        -222.46094057853858,
+        -190.91796677093947,
+        222.46094057853858,
+        190.91796677093947
+      ],
+      "method": "projected_triangle_union",
+      "raster_pixel_mm": null,
+      "approximation_note": null,
+      "precision_grid_mm": 0.01,
+      "simplification_tolerance_mm": 5.0,
+      "area_mm2": 158665.29575000002,
+      "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+      "scale": 100,
+      "svg": "plan-1-100.svg",
+      "dxf": "plan-1-100.dxf"
+    },
+    {
+      "view": "front",
+      "bounds_mm": [
+        -222.46094057853858,
+        0.0,
+        222.46094057853858,
+        850.0
+      ],
+      "method": "projected_triangle_union",
+      "raster_pixel_mm": null,
+      "approximation_note": null,
+      "precision_grid_mm": 0.01,
+      "simplification_tolerance_mm": 5.0,
+      "area_mm2": 152049.74925000002,
+      "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+      "scale": 100,
+      "svg": "front-1-100.svg",
+      "dxf": "front-1-100.dxf"
+    },
+    {
+      "view": "right",
+      "bounds_mm": [
+        -190.91796677093947,
+        0.0,
+        190.91796677093947,
+        850.0
+      ],
+      "method": "projected_triangle_union",
+      "raster_pixel_mm": null,
+      "approximation_note": null,
+      "precision_grid_mm": 0.01,
+      "simplification_tolerance_mm": 5.0,
+      "area_mm2": 143826.49910000002,
+      "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+      "scale": 100,
+      "svg": "right-1-100.svg",
+      "dxf": "right-1-100.dxf"
+    }
+  ],
+  "files": {
+    "front-1-100.dxf": "4EA0D6FB36F54D74394EC63F3865C5A7EE65B0A26AD420001FEB75BF022835B7",
+    "front-1-100.svg": "E168D11917BE2457B772F93C353C7E07D433B73C8625457B761D9C952CC4751A",
+    "front-1-50.dxf": "0824F757110DE9AE2D7CD064B8ED8ABAA80E5CBB402B45F86FF919F21317EC4D",
+    "front-1-50.svg": "857F0927184DCEB25EA78F56F8A08D9A23E6C28A119D192D829BBBE806594726",
+    "plan-1-100.dxf": "4AF6A44D118C03DFB01C997302609F8A1B42B9BAE219B0D90564E84A4F75F935",
+    "plan-1-100.svg": "108D8D05FD055B2ABAE14AB5E5C66B43CFB485B2A8BBC89DDF90C49593B73921",
+    "plan-1-50.dxf": "801BB05F7ABF9E2C43CEA4AC2F0FD8EC3AE9B709234D5697F20A2368B83D97E2",
+    "plan-1-50.svg": "927E245649C01D838A0A9119D075AEC64695B232ED304DFDAF50C29F9F592BAE",
+    "right-1-100.dxf": "1012EB2D9FBC5C1A5BFB6A59C9C7AC912221EA6C1C848974961E5337375C77F2",
+    "right-1-100.svg": "FD89BC911757310FDE68F4BBBF93C9356A53F1D296C99C46E621D9C2451BCE93",
+    "right-1-50.dxf": "5B26FAC8FE634E7F14C7AF36D78E4A3AB43866B2EF9CC5E1866E0DC5A7702EA5",
+    "right-1-50.svg": "CDAB59761FDBC1D0B026EEDD5DAD3E457211A3AA7D6E40D26AB7037FA592B21F",
+    "sheet-A3-1-100.svg": "72EA2B88F143F3538E0EA733B6C308EC44AECD2F1F967CC7D3BA83C0CAB99501",
+    "sheet-A3-1-50.svg": "1B6A4398AEC6C1E0C3B167AA9DA09A7D835F4EE8AF1B9BB1025E748F290D14E3",
+    "views.json": "4E64D7E5860B5645B3C559C836A94AE84939FF71E4FA775C10F8D47ADC4D564B"
+  }
+}

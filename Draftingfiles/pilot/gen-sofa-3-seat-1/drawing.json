@@ -1,0 +1,215 @@
+{
+  "schema_version": 1,
+  "name": "Sofa",
+  "source": {
+    "asset_id": "gen-sofa-3-seat-1",
+    "geometry_sha256": "1BF8C78D975EF51BF9757A3F51DA0C1AA26A4991BC170FD0784F5B2208220EB1",
+    "model_sha256": "EE978EF6EDFF09F7FB5CD2CF6DC8D81EB802487959BF6565BCB2CAEAE4C9FD12",
+    "units": "mm",
+    "input_units": "mm",
+    "input_up_axis": "y",
+    "coordinate_transform": "X,-Z,Y",
+    "view_axes": {
+      "plan": "X,Y",
+      "front": "X,Z; looking +Y",
+      "right": "-Y,Z; looking -X"
+    },
+    "dimension_basis": "measured_mesh_geometry",
+    "engine_version": 2,
+    "method": "triangle_union_or_dense_mesh_raster_projection; see per-view method and resolution",
+    "source_references": [],
+    "reference_relationship_scope": "attached_to_this_drawing; not original mesh-generation inputs",
+    "created_at": "2026-09-19T01:55:35.087570+00:00",
+    "attribution": "Almond generated asset library",
+    "derived_asset_license": "CC-BY-4.0",
+    "generation_record": {
+      "asset_id": "gen-sofa-3-seat-1",
+      "name": "Sofa",
+      "model_file": "models/gen-sofa-3-seat-1.glb",
+      "model_sha256": "EE978EF6EDFF09F7FB5CD2CF6DC8D81EB802487959BF6565BCB2CAEAE4C9FD12",
+      "contract_file": "models/gen-sofa-3-seat-1.almond.json",
+      "contract_sha256": "A4EED8FE76AEC23A8FEEF4C7B8442A1D436DFFC771CE8FAC1D04AC076A7FADB9",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A generic modern three-seat sofa with square arms, three seat cushions and three back cushions, plain grey fabric upholstery, short legs.",
+        "image_task_id": "01a09789-0ef6-754a-b0cd-e3f54dfe4a6e",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978f-0a4a-7263-b015-501f0fd70df6",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 999.999937
+      },
+      "recorded_task_history": {
+        "image_model": "nano-banana",
+        "image_task_id": "01a09789-0ef6-754a-b0cd-e3f54dfe4a6e",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0978f-0a4a-7263-b015-501f0fd70df6",
+        "generated_at": "2026-09-12"
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "catalogue_image_stage_tool",
+        "id": "01a09789-0ef6-754a-b0cd-e3f54dfe4a6e",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    "limitations": [
+      "Projected silhouettes only: internal visible/hidden edges and construction layers are not inferred.",
+      "Front is the declared coordinate direction, not a verified product front.",
+      "Dimensions describe mesh geometry, not a manufacturer-verified product."
+    ]
+  },
+  "triangle_count": 4087,
+  "scales": [
+    50,
+    100
+  ],
+  "representations": [
+    {
+      "view": "plan",
+      "bounds_mm": [
+        -1173.0457996101084,
+        -491.44203839597736,
+        1173.0457996101084,
+        491.44203839597736
+      ],
+      "method": "projected_triangle_union",
+      "raster_pixel_mm": null,
+      "approximation_note": null,
+      "precision_grid_mm": 0.01,
+      "simplification_tolerance_mm": 2.5,
+      "area_mm2": 2278189.8864499996,
+      "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+      "scale": 50,
+      "svg": "plan-1-50.svg",
+      "dxf": "plan-1-50.dxf"
+    },
+    {
+      "view": "front",
+      "bounds_mm": [
+        -1173.0457996101084,
+        0.0,
+        1173.0457996101084,
+        849.9999999999999
+      ],
+      "method": "projected_triangle_union",
+      "raster_pixel_mm": null,
+      "approximation_note": null,
+      "precision_grid_mm": 0.01,
+      "simplification_tolerance_mm": 2.5,
+      "area_mm2": 1829341.48915,
+      "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+      "scale": 50,
+      "svg": "front-1-50.svg",
+      "dxf": "front-1-50.dxf"
+    },
+    {
+      "view": "right",
+      "bounds_mm": [
+        -491.44203839597736,
+        0.0,
+        491.44203839597736,
+        849.9999999999999
+      ],
+      "method": "projected_triangle_union",
+      "raster_pixel_mm": null,
+      "approximation_note": null,
+      "precision_grid_mm": 0.01,
+      "simplification_tolerance_mm": 2.5,
+      "area_mm2": 631518.54015,
+      "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+      "scale": 50,
+      "svg": "right-1-50.svg",
+      "dxf": "right-1-50.dxf"
+    },
+    {
+      "view": "plan",
+      "bounds_mm": [
+        -1173.0457996101084,
+        -491.44203839597736,
+        1173.0457996101084,
+        491.44203839597736
+      ],
+      "method": "projected_triangle_union",
+      "raster_pixel_mm": null,
+      "approximation_note": null,
+      "precision_grid_mm": 0.01,
+      "simplification_tolerance_mm": 5.0,
+      "area_mm2": 2270245.74515,
+      "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+      "scale": 100,
+      "svg": "plan-1-100.svg",
+      "dxf": "plan-1-100.dxf"
+    },
+    {
+      "view": "front",
+      "bounds_mm": [
+        -1173.0457996101084,
+        0.0,
+        1173.0457996101084,
+        849.9999999999999
+      ],
+      "method": "projected_triangle_union",
+      "raster_pixel_mm": null,
+      "approximation_note": null,
+      "precision_grid_mm": 0.01,
+      "simplification_tolerance_mm": 5.0,
+      "area_mm2": 1828976.2674,
+      "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+      "scale": 100,
+      "svg": "front-1-100.svg",
+      "dxf": "front-1-100.dxf"
+    },
+    {
+      "view": "right",
+      "bounds_mm": [
+        -491.44203839597736,
+        0.0,
+        491.44203839597736,
+        849.9999999999999
+      ],
+      "method": "projected_triangle_union",
+      "raster_pixel_mm": null,
+      "approximation_note": null,
+      "precision_grid_mm": 0.01,
+      "simplification_tolerance_mm": 5.0,
+      "area_mm2": 631295.12565,
+      "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+      "scale": 100,
+      "svg": "right-1-100.svg",
+      "dxf": "right-1-100.dxf"
+    }
+  ],
+  "files": {
+    "front-1-100.dxf": "C412F6146D19FA40259015C95A97BBF2D4046E33DD8138EFDFC7616043C359A8",
+    "front-1-100.svg": "C235171C43FCAF8CA2F67443F7D551E7C98712C6823C5F041B63789FFA242C90",
+    "front-1-50.dxf": "68CF97FCA27BADD0D548BA01832EA5F6ED294046870AB987D1EB426008364222",
+    "front-1-50.svg": "A42E33B9B942A2060CFB5198DF5BAFD8F18B8F686834A6682730531D845AD80A",
+    "plan-1-100.dxf": "4EDAEFF98766AFE2ABF0A4D96250F79EF3D70457C5C9E565AC06BF14A074CA2F",
+    "plan-1-100.svg": "864061E4E9E28EB9619D2018C742DE88E801673FE83D7FDEB7D25C6693B22499",
+    "plan-1-50.dxf": "D9826B4DC616D5A17F87DC4C736DED3991DA1BBEBC854A1BF19A8DFAF3C123BE",
+    "plan-1-50.svg": "0A4AFAF77F423E1EDCE44438C6600659D9D05B566911BF90BC3B566F2C3A3D44",
+    "right-1-100.dxf": "A48A8C58A58DE8691276038D397BF771A09D979B26908CD76DB63258B629559D",
+    "right-1-100.svg": "31EF791BA0C7200C2A0CA5176A5D4EE7FE9DB950E53BB96DE52E3387FC8C610A",
+    "right-1-50.dxf": "3D8948B0F11D3D3C5E866AB15DCC9D50CA948EF3E335E0988AA1CC5A862E9AB9",
+    "right-1-50.svg": "57B3CC4211A571354AA3F1435849F9CB1A49A134C9CF12272721C7985193C093",
+    "sheet-A3-1-100.svg": "851F7FE78417686DF50C903CE5EF99C8F2173A6A1C0DA4EEEFA489F24275A9CB",
+    "sheet-A3-1-50.svg": "299A0BC1731ED40A32BD51BD327A04FB05258C9E115F163EEAA0F50B6319BE4B",
+    "views.json": "86A2809586CA896BC641DF919639D82354DD9F4B02D7A855C0D4568E8E9E71E5"
+  }
+}

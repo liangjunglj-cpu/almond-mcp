@@ -1,0 +1,202 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-column-round-1",
+  "library_id": "generated_assets",
+  "name": "Round column (plain concrete)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-column-round-1.glb",
+  "dimensions_mm": {
+    "width": 454.1,
+    "depth": 457.0,
+    "height": 3000.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -227.05,
+        -228.5,
+        0.0
+      ],
+      "max": [
+        227.05,
+        228.5,
+        3000.0
+      ]
+    },
+    "footprint": [
+      [
+        -227.05,
+        -228.5
+      ],
+      [
+        227.05,
+        -228.5
+      ],
+      [
+        227.05,
+        228.5
+      ],
+      [
+        -227.05,
+        228.5
+      ]
+    ],
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "fixed"
+  },
+  "materials": [
+    {
+      "material_id": "concrete-smooth",
+      "objects": [
+        "gen-column-round-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-column-round-1",
+    "library_id": "generated_assets",
+    "name": "Round column (plain concrete)",
+    "category": "column",
+    "tags": [
+      "column",
+      "round",
+      "pillar",
+      "structure",
+      "component"
+    ],
+    "dimensions_mm": {
+      "width": 454.1,
+      "depth": 457.0,
+      "height": 3000.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 400.0,
+      "depth": 400.0,
+      "height": 3000.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -227.05,
+          -228.5,
+          0.0
+        ],
+        "max": [
+          227.05,
+          228.5,
+          3000.0
+        ]
+      },
+      "footprint": [
+        [
+          -227.05,
+          -228.5
+        ],
+        [
+          227.05,
+          -228.5
+        ],
+        [
+          227.05,
+          228.5
+        ],
+        [
+          -227.05,
+          228.5
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "fixed"
+    },
+    "materials": [
+      {
+        "material_id": "concrete-smooth",
+        "objects": [
+          "gen-column-round-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "A plain cylindrical concrete column, no capital or base, smooth matte finish, standing vertically on the ground.",
+        "image_task_id": "01a09788-95fb-758f-891c-de0ce066dad6",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978e-8ea9-7486-adee-fc9950ee7c89",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 1000.0
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "architecture"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "elevation",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.142,
+      "triangle_count": 4436,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "A35797E6F5D21407C4CB686EE6BF4257FD0931617C25FCD4739550A63DF9FCA4"
+}

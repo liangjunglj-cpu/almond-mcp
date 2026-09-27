@@ -1,0 +1,283 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-folded-throw-1",
+  "library_id": "generated_assets",
+  "name": "Loosely folded throw (Organic form; detailed geometry edition)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-folded-throw-1.glb",
+  "dimensions_mm": {
+    "width": 462.0,
+    "depth": 407.3,
+    "height": 180.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -231.0,
+        -203.65,
+        0.0
+      ],
+      "max": [
+        231.0,
+        203.65,
+        180.0
+      ]
+    },
+    "footprint": [
+      [
+        -231.0,
+        -203.65
+      ],
+      [
+        231.0,
+        -203.65
+      ],
+      [
+        231.0,
+        203.65
+      ],
+      [
+        -231.0,
+        203.65
+      ]
+    ],
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "accessory"
+  },
+  "materials": [
+    {
+      "material_id": "fabric-linen",
+      "objects": [
+        "gen-folded-throw-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-folded-throw-1",
+    "library_id": "generated_assets",
+    "name": "Loosely folded throw (Organic form; detailed geometry edition)",
+    "category": "textile",
+    "tags": [
+      "organic",
+      "detailed",
+      "meshy",
+      "organic-2026-09",
+      "loosely folded throw"
+    ],
+    "dimensions_mm": {
+      "width": 462.0,
+      "depth": 407.3,
+      "height": 180.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 750.0,
+      "depth": 550.0,
+      "height": 180.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -231.0,
+          -203.65,
+          0.0
+        ],
+        "max": [
+          231.0,
+          203.65,
+          180.0
+        ]
+      },
+      "footprint": [
+        [
+          -231.0,
+          -203.65
+        ],
+        [
+          231.0,
+          -203.65
+        ],
+        [
+          231.0,
+          203.65
+        ],
+        [
+          -231.0,
+          203.65
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "accessory"
+    },
+    "materials": [
+      {
+        "material_id": "fabric-linen",
+        "objects": [
+          "gen-folded-throw-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "One realistic plain linen throw blanket loosely folded into a low irregular stack, about 75 by 55 centimetres and 18 centimetres high, with several large soft cascading folds, rounded creases, a gently rumpled top and visible layered fabric edges. Natural weight and substantial cloth thickness. Unbranded neutral warm beige textile for architectural interiors. No tassels, no furniture, no person, no support stand, no ground plane. Entire object visible with margin, isolated on pure white, three-quarter view from slightly above, soft even studio lighting, physical folds rather than printed patterns, no text, no cast shadow.",
+        "image_task_id": "01a0ba79-1327-7650-8b3f-b579a41bf87e",
+        "image_model": "nano-banana-pro",
+        "mesh_task_id": "01a0ba7a-5b3c-75e4-b117-88f5db00caec",
+        "mesh_model": "meshy-7.1",
+        "generated_at": "2026-09-19",
+        "orientation_correction": null,
+        "scale_applied": 242.935734,
+        "captured_generation": {
+          "batch_id": "organic-2026-09",
+          "image": {
+            "asset_id": "gen-folded-throw-1",
+            "endpoint": "/openapi/v1/text-to-image",
+            "submitted_at": "2026-09-19T16:21:33.066538+00:00",
+            "request": {
+              "ai_model": "nano-banana-pro",
+              "aspect_ratio": "1:1",
+              "generate_multi_view": false,
+              "prompt": "One realistic plain linen throw blanket loosely folded into a low irregular stack, about 75 by 55 centimetres and 18 centimetres high, with several large soft cascading folds, rounded creases, a gently rumpled top and visible layered fabric edges. Natural weight and substantial cloth thickness. Unbranded neutral warm beige textile for architectural interiors. No tassels, no furniture, no person, no support stand, no ground plane. Entire object visible with margin, isolated on pure white, three-quarter view from slightly above, soft even studio lighting, physical folds rather than printed patterns, no text, no cast shadow."
+            },
+            "status": "SUCCEEDED",
+            "task_id": "01a0ba79-1327-7650-8b3f-b579a41bf87e",
+            "output_file": "gen-folded-throw-1.png",
+            "output_sha256": "4f6230fccc0b670f132ea702d1aaa41880214cf5257c420cc708ff2a7716f552",
+            "finished_at": 1789834909471,
+            "seed": null,
+            "consumed_credits": 9,
+            "provider_created_at": 1789834892086,
+            "provider_started_at": 1789834892094
+          },
+          "mesh": {
+            "asset_id": "gen-folded-throw-1",
+            "endpoint": "/openapi/v1/image-to-3d",
+            "submitted_at": "2026-09-19T16:22:57.057894+00:00",
+            "request": {
+              "ai_model": "meshy-7.1",
+              "model_type": "standard",
+              "geometry_resolution": "4k",
+              "should_texture": false,
+              "should_remesh": false,
+              "image_enhancement": false,
+              "target_formats": [
+                "glb"
+              ],
+              "auto_size": false,
+              "input_task_id": "01a0ba79-1327-7650-8b3f-b579a41bf87e"
+            },
+            "status": "SUCCEEDED",
+            "task_id": "01a0ba7a-5b3c-75e4-b117-88f5db00caec",
+            "output_file": "gen-folded-throw-1.glb",
+            "output_sha256": "3f60eda83261f80da04ebf204eb6ce9a7926e2c014495cc80b9a1831144d1c8e",
+            "finished_at": 1789835185342,
+            "seed": null,
+            "consumed_credits": 25,
+            "provider_created_at": 1789834976787,
+            "provider_started_at": 1789834976796
+          },
+          "derivation": {
+            "asset_id": "gen-folded-throw-1",
+            "source_sha256": "3f60eda83261f80da04ebf204eb6ce9a7926e2c014495cc80b9a1831144d1c8e",
+            "source_triangles": 330388,
+            "target_triangles": 100000,
+            "prepared_sha256": "54f4889d487a003a63666d5cadf14065c7e3ff10623a2bd8a02579289da09f8f",
+            "software": "Blender 5.1.2",
+            "method": "Weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target; triangulate. Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.9016218185424803e-07,
+            "quality": {
+              "vertices": 50002,
+              "triangles": 100000,
+              "boundary_edges": 0,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 1,
+              "largest_component_vertices": 50002,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                2.8084323180349e-05,
+                4.9347966877985946e-05,
+                0.00013677518705012528
+              ]
+            }
+          },
+          "input_image_file": "batches/organic-2026-09/gen-folded-throw-1.png",
+          "external_reference_status": "Original descriptive prompts; no external images or design references submitted.",
+          "external_reference_ids": [],
+          "dimension_basis": "Authored nominal height for architectural studies; width and depth measured after uniform normalization. Not a physical survey.",
+          "reference_review": "Reference image visually reviewed for neutral architectural use.",
+          "rights": "Generated for the Almond library using the owner-configured Meshy account; public pack distribution authorized by owner. CC BY 4.0. API balance verified; subscription contract not independently audited."
+        }
+      }
+    },
+    "usage": {
+      "suggested_rooms": [],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.384,
+      "triangle_count": 100000,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product.",
+        "Measured width/depth differs from the prompt target by more than 25%."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "0AC47E5C67CF1FC5BC38E29A8E968527021AF549811DB215FC156BBCB9CD4F6B"
+}

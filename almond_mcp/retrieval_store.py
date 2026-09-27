@@ -12,6 +12,9 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
+# Assets dropped from their manifest but still placed in a recorded scene.
+RETIRED_LIBRARY_ID = "retired"
+
 
 def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -380,10 +383,26 @@ class AlmondStore:
                     "DELETE FROM asset_rtree WHERE asset_rowid = ?",
                     (stale["id"],),
                 )
-                connection.execute(
-                    "DELETE FROM assets WHERE id = ?",
-                    (stale["id"],),
-                )
+                referenced = connection.execute(
+                    "SELECT 1 FROM instances WHERE asset_id = ? LIMIT 1",
+                    (stale["asset_id"],),
+                ).fetchone()
+                if referenced:
+                    # Scene history still points at this asset: keep the row
+                    # for lookups but take it out of its library and search.
+                    connection.execute(
+                        """
+                        UPDATE assets SET library_id = ?, file_available = 0,
+                            updated_at = ?
+                        WHERE id = ?
+                        """,
+                        (RETIRED_LIBRARY_ID, now, stale["id"]),
+                    )
+                else:
+                    connection.execute(
+                        "DELETE FROM assets WHERE id = ?",
+                        (stale["id"],),
+                    )
         return len(seen)
 
     @staticmethod
@@ -430,6 +449,9 @@ class AlmondStore:
         if library_id.strip():
             clauses.append("a.library_id = ?")
             parameters.append(library_id.strip().lower())
+        else:
+            clauses.append("a.library_id != ?")
+            parameters.append(RETIRED_LIBRARY_ID)
         tokens = re.findall(r"[\w-]+", query.lower(), flags=re.UNICODE)
         if tokens:
             joins = "JOIN asset_fts ON asset_fts.asset_id = a.asset_id"

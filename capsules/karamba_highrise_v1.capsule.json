@@ -1,30 +1,50 @@
 {
-  "capsule_id": "karamba_highrise_v1",
-  "version": 1,
-  "capability": "analyze",
-  "structure_type": "highrise",
-  "plugin_dependencies": [{"name": "Karamba3D", "min_version": "3.1"}],
-  "definition_file": "01_HighRiseSystems.ghx",
-  "title": "High rise lateral system comparison",
-  "description_for_llm": "Linear elastic (Theory I) analysis of a tall building wireframe comparing lateral systems (frame, braced, tube style member layouts) under gravity and a horizontal load. Use for early massing studies of towers where relative drift and member utilization between system options matter more than absolute values. Assumptions: the tower is a line element wireframe in metres with rigid floor to column joints, supports fixed at ground nodes, simplified equivalent static horizontal load, one steel section family. Limits: no floor diaphragms or core walls as shells, so torsional behaviour is crude; no second order effects, which matter for tall slender towers; no code level wind or seismic load derivation; foundation flexibility ignored. Trust trends between options, not absolute drift numbers. NOT YET AUDITED: the GHX has no ALMOND_IN_*/ALMOND_OUT_* harness params, so run_definition will refuse it. Retrieval context only until harnessed.",
-  "inputs": [
-    {"name": "ALMOND_IN_LINES", "type": "curve[]", "units": "m", "required": true,
-     "description": "Tower member axis curves (columns, beams, bracing), node-merged at joints."},
-    {"name": "ALMOND_IN_LOAD_KN", "type": "number", "units": "kN", "required": false, "default": 100.0,
-     "description": "Total equivalent static horizontal load distributed over floor levels."}
-  ],
-  "outputs": [
-    {"name": "ALMOND_OUT_DISP_MM", "type": "number", "units": "mm",
-     "semantics": "max_nodal_displacement",
-     "description": "Largest nodal displacement, normally the roof drift."},
-    {"name": "ALMOND_OUT_UTIL", "type": "number[]",
-     "semantics": "per_element_utilization",
-     "description": "Utilization ratio per element, 1.0 means at capacity."},
-    {"name": "ALMOND_OUT_MASS_KG", "type": "number", "units": "kg",
-     "semantics": "total_mass",
-     "description": "Total structural mass of the model."}
-  ],
-  "binding": "reserved_nicknames",
-  "confidence": "template",
-  "audited": false
+ "capsule_id": "karamba_highrise_v1",
+ "version": 1,
+ "capability": "analyze",
+ "structure_type": "highrise",
+ "plugin_dependencies": [
+  {
+   "name": "Karamba3D",
+   "min_version": "3.1"
+  }
+ ],
+ "definition_file": "01_HighRiseSystems.ghx",
+ "title": "Tall building wireframe analysis (branch 1 of the systems demo)",
+ "description_for_llm": "Linear elastic (Theory I) analysis of a tall building wireframe. The original example compares four lateral systems side by side; the harness feeds ALMOND_IN_LINES into the FIRST branch and disables the other three (their internal parametric towers exceed the Karamba trial's 20-beam cap on every solve). Loads: the branch's internal gravity load remains; its lateral point loads reference the original parametric geometry and may go inert with external lines, so treat results as gravity-dominated. No load input port. Keep member sets at or under 20 elements on a trial license - validate per frame line or use a licensed Karamba for full towers. HARNESSED 2026-08-30 from 01_HighRiseSystems.ghx. VERIFIED 2026-08-30: 1-story 6x6 m wireframe (8 lines, 4 fixed bases) -> disp 0.85 mm under the template gravity case, mass 10585 kg (the demo's heavy tower sections). Branch-0's original lateral loads reference internal geometry and are replaced by a clean gravity load in the harness. TRIAL NOTE: 16 input lines produced 32 model elements - keep inputs to about 8-10 lines on a trial license.",
+ "inputs": [
+  {
+   "name": "ALMOND_IN_LINES",
+   "type": "curve[]",
+   "units": "m",
+   "required": true,
+   "description": "Tower wireframe member axis lines (columns, beams, braces), node-merged at shared endpoints."
+  },
+  {
+   "name": "ALMOND_IN_SUPPORTS",
+   "type": "point[]",
+   "units": "m",
+   "required": false,
+   "description": "Support node positions. When omitted the validator supplies the lowest-Z nodes of the input members automatically."
+  }
+ ],
+ "outputs": [
+  {
+   "name": "ALMOND_OUT_DISP_MM",
+   "type": "number",
+   "units": "cm",
+   "semantics": "max_nodal_displacement",
+   "description": "Largest nodal displacement; Karamba emits centimetres, converted downstream per these units."
+  },
+  {
+   "name": "ALMOND_OUT_MASS_KG",
+   "type": "number",
+   "units": "kg",
+   "semantics": "total_mass",
+   "description": "Total structural mass of the model."
+  }
+ ],
+ "binding": "reserved_nicknames",
+ "confidence": "template",
+ "audited": true
 }

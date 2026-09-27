@@ -1,0 +1,639 @@
+{
+  "library_id": "construction_systems",
+  "library_name": "Almond construction system guidance",
+  "schema_version": 1,
+  "source": "Parameters distilled and paraphrased from Francis D.K. Ching, Building Construction Illustrated, 4th ed. (Wiley, 2014). Section numbers in bci_ref cite the source. All values are preliminary-sizing rules of thumb for design plausibility checks - not a substitute for engineering analysis or the governing building code.",
+  "notes": "span_range_m is the horizontal span for floor/roof/longspan systems. For wall systems span_axis is 'vertical' and span_range_m is the unsupported height range. depth_rules give depth ~= span / span_ratio. structural_material matches validate_structure's material parameter; render_material_ids link to Materialfiles material_ids so the stated construction material is reflected on the Rhino objects.",
+  "systems": [
+    {
+      "system_id": "wood-joist-floor",
+      "name": "Wood joist floor (dimension lumber)",
+      "category": "floor",
+      "structural_material": "Wood",
+      "structure_types": ["beam"],
+      "render_material_ids": ["wood-oak"],
+      "span_range_m": [2.4, 5.5],
+      "typical_spacing_m": {"element": "joist", "options": [0.305, 0.405, 0.61]},
+      "depth_rules": [
+        {"element": "joist", "span_ratio": 16, "note": "Deflection should not exceed span/360; stiffness usually governs over strength."}
+      ],
+      "elements": [
+        {"role": "joist", "note": "38 mm ('2x') dimension lumber on edge; 2x6 spans to about 3.0 m, 2x12 to about 5.5 m depending on species, grade and load."},
+        {"role": "rim_joist", "note": "Rim joist or header closes and laterally supports joist ends; double end joists under parallel partitions."},
+        {"role": "subfloor", "note": "Wood panel sheathing ties and stabilizes joists against twisting and buckling, and can act as a structural diaphragm."},
+        {"role": "support", "note": "Joists bear on wood/steel beams or loadbearing stud walls; lateral support required at joist ends."}
+      ],
+      "construction_notes": [
+        "Spacing is chosen against sheathing span rating and load magnitude.",
+        "Openings and cantilevers need doubled trimmers and headers.",
+        "Combustible light framing: fire rating comes from the finish assembly."
+      ],
+      "bci_ref": ["4.26-4.32"],
+      "tags": ["light-frame", "residential", "joist", "platform"]
+    },
+    {
+      "system_id": "wood-i-joist-floor",
+      "name": "Prefabricated wood I-joists and trussed joists",
+      "category": "floor",
+      "structural_material": "Wood",
+      "structure_types": ["beam", "truss"],
+      "render_material_ids": ["wood-birch-ply"],
+      "span_range_m": [3.0, 7.6],
+      "typical_spacing_m": {"element": "joist", "options": [0.305, 0.405, 0.61], "typical": 0.61},
+      "depth_rules": [
+        {"element": "trussed_joist", "span_ratio": 18, "note": "Rule of thumb for trussed joist depth."}
+      ],
+      "elements": [
+        {"role": "i_joist", "note": "OSB or plywood web with sawn or LVL flanges; 255 mm depth spans to ~4.9 m, 305 mm to ~5.8 m, 355 mm to ~6.7 m, 405 mm to ~7.6 m."},
+        {"role": "trussed_joist", "note": "2x4/2x6 chords with wood or tubular steel webs; depths to 1525 mm; flat wood trusses engineer up to ~27 m."},
+        {"role": "web_openings", "note": "Web openings pass mechanical and electrical runs; consult manufacturer limits."}
+      ],
+      "construction_notes": [
+        "More dimensionally stable and longer-spanning than sawn lumber of equal depth.",
+        "Bearing conditions and allowable spans are manufacturer-specific."
+      ],
+      "bci_ref": ["4.33-4.34"],
+      "tags": ["engineered-wood", "i-joist", "trussed-joist"]
+    },
+    {
+      "system_id": "wood-plank-and-beam-floor",
+      "name": "Wood plank-and-beam floor (post and beam)",
+      "category": "floor",
+      "structural_material": "Wood",
+      "structure_types": ["beam", "frame"],
+      "render_material_ids": ["wood-oak", "wood-walnut"],
+      "span_range_m": [3.0, 12.0],
+      "typical_spacing_m": {"element": "beam", "min": 1.2, "max": 2.4, "note": "Beam spacing equals the span of the planks or decking."},
+      "depth_rules": [
+        {"element": "sawn_beam", "span_ratio": 15, "note": "Width 1/3 to 1/2 of depth; limit deflection to span/360."},
+        {"element": "glulam_beam", "span_ratio": 20, "note": "Width 1/4 to 1/3 of depth; glulam engineered to ~24 m, LVL/PSL composites to ~27 m."}
+      ],
+      "elements": [
+        {"role": "post", "note": "Wood columns carry beam reactions to the foundation; larger but fewer members than joist framing."},
+        {"role": "beam", "note": "Solid sawn, glulam, or built-up; may be exposed as finish."},
+        {"role": "plank_decking", "note": "Structural planking or decking spans between beams; underside may serve as ceiling."},
+        {"role": "connection", "note": "Post-beam connections use metal straps, shear plates, split rings and through-bolts (BCI 5.49)."}
+      ],
+      "construction_notes": [
+        "Concentrated loads and floor openings need additional framing.",
+        "Skeleton frame: wall infill is nonbearing."
+      ],
+      "bci_ref": ["4.35-4.40", "5.48-5.49"],
+      "tags": ["post-and-beam", "glulam", "exposed-structure", "heavy-timber"]
+    },
+    {
+      "system_id": "steel-wide-flange-floor",
+      "name": "Structural steel frame floor (wide-flange beams and girders)",
+      "category": "floor",
+      "structural_material": "Steel",
+      "structure_types": ["beam", "frame"],
+      "render_material_ids": ["steel-painted-sage", "steel-galvanized"],
+      "span_range_m": [6.0, 10.0],
+      "typical_spacing_m": {"element": "beam", "note": "Beam spacing = span of steel decking or precast planks; column spacing = beam or girder span."},
+      "depth_rules": [
+        {"element": "beam", "span_ratio": 20, "note": "Width 1/3 to 1/2 of depth. Use the lightest section satisfying stress and deflection."},
+        {"element": "girder", "span_ratio": 15, "note": "Girders collect beam reactions to columns."},
+        {"element": "metal_decking", "span_ratio": 24, "note": "Overall composite deck depth; decking spans are short (to ~4.5 m)."}
+      ],
+      "elements": [
+        {"role": "column", "note": "W-shape columns; orient webs parallel to the short axis of the frame."},
+        {"role": "beam", "note": "W-shapes have superseded S-shapes; channels, tubes and composite sections also used."},
+        {"role": "girder", "note": "Plate girders (welded plates + stiffeners) for heavy spans; castellated beams gain depth without weight."},
+        {"role": "decking", "note": "Steel decking or precast planks span beams; composite action with concrete topping via shear studs."}
+      ],
+      "construction_notes": [
+        "Typical economical beam span 6-10 m; beyond that open-web steel joists become economical.",
+        "AISC framing types: moment (rigid), shear (simple) and semi-rigid connections; bolted or welded (BCI 4.17-4.18).",
+        "Noncombustible but needs applied fireproofing for rated construction."
+      ],
+      "bci_ref": ["4.14-4.18", "4.22", "5.35-5.38"],
+      "tags": ["steel-frame", "skeleton", "wide-flange", "composite"]
+    },
+    {
+      "system_id": "open-web-steel-joist-floor",
+      "name": "Open-web steel joist floor (K/LH/DLH series)",
+      "category": "floor",
+      "structural_material": "Steel",
+      "structure_types": ["truss", "beam"],
+      "render_material_ids": ["steel-painted-sage", "steel-mesh"],
+      "span_range_m": [6.0, 44.0],
+      "typical_spacing_m": {"element": "joist", "min": 0.61, "max": 3.05, "typical": 1.22},
+      "depth_rules": [
+        {"element": "joist", "span_ratio": 24, "note": "Span should NOT exceed 24 x joist depth (this is a maximum, not a target)."}
+      ],
+      "elements": [
+        {"role": "k_series_joist", "note": "Standard joists, 205-760 mm depths, spans to ~18 m."},
+        {"role": "lh_dlh_joist", "note": "Longspan/deep longspan, depths to 1830 mm, spans to ~44 m."},
+        {"role": "bridging", "note": "Horizontal or diagonal bridging restrains chords; required before decking."},
+        {"role": "support", "note": "Bearing on steel beams, joist girders, or masonry/concrete bearing walls."}
+      ],
+      "construction_notes": [
+        "Spacing set by decking span and joist capacity; 1.2 m common in large buildings.",
+        "Open webs pass ducts and services through the structure."
+      ],
+      "bci_ref": ["4.19-4.21"],
+      "tags": ["open-web", "joist", "longspan", "steel"]
+    },
+    {
+      "system_id": "light-gauge-steel-joist-floor",
+      "name": "Light-gauge (cold-formed) steel joist floor",
+      "category": "floor",
+      "structural_material": "Steel",
+      "structure_types": ["beam"],
+      "render_material_ids": ["steel-galvanized"],
+      "span_range_m": [3.0, 7.9],
+      "typical_spacing_m": {"element": "joist", "options": [0.405, 0.61]},
+      "depth_rules": [
+        {"element": "joist", "span_ratio": 20, "note": "150 mm joists span 3.0-4.3 m; deeper sections reach ~7.9 m."}
+      ],
+      "elements": [
+        {"role": "joist", "note": "Cold-formed C-sections; lighter and more dimensionally stable than wood, spans longer, but conducts more heat."},
+        {"role": "track", "note": "Rim tracks cap joist ends; web stiffeners at bearing points."}
+      ],
+      "construction_notes": [
+        "Noncombustible alternative to wood light framing; screwed or welded connections.",
+        "Consult manufacturer for exact sections and allowable spans."
+      ],
+      "bci_ref": ["4.23-4.25"],
+      "tags": ["cold-formed", "light-gauge", "noncombustible"]
+    },
+    {
+      "system_id": "concrete-one-way-slab",
+      "name": "Cast-in-place one-way concrete slab and beams",
+      "category": "floor",
+      "structural_material": "Concrete",
+      "structure_types": ["shell", "beam"],
+      "render_material_ids": ["concrete-smooth", "concrete-boardformed"],
+      "span_range_m": [1.8, 5.5],
+      "typical_spacing_m": {"element": "beam", "note": "Slab spans between parallel beams or bearing walls; suited to rectangular bays (long:short > 1.5)."},
+      "depth_rules": [
+        {"element": "floor_slab", "span_ratio": 30, "note": "100 mm minimum thickness; span/36 for roof slabs."},
+        {"element": "concrete_beam", "span_ratio": 16, "note": "Beam depth in 51 mm increments; cast integrally with slab."}
+      ],
+      "elements": [
+        {"role": "slab", "note": "Principal reinforcement one direction; temperature steel transverse."},
+        {"role": "beam", "note": "Supporting beams frame to girders or columns."}
+      ],
+      "construction_notes": [
+        "Suitable for light to moderate loads over relatively short spans.",
+        "Formwork and shoring is a major cost factor (BCI 4.10)."
+      ],
+      "bci_ref": ["4.04-4.05"],
+      "tags": ["cast-in-place", "one-way", "slab"]
+    },
+    {
+      "system_id": "concrete-one-way-joist-slab",
+      "name": "One-way concrete joist (ribbed/pan) slab",
+      "category": "floor",
+      "structural_material": "Concrete",
+      "structure_types": ["shell", "beam"],
+      "render_material_ids": ["concrete-smooth"],
+      "span_range_m": [4.5, 9.0],
+      "typical_spacing_m": {"element": "rib", "note": "Reusable pan forms come in 508 and 762 mm widths; rib width 125-230 mm."},
+      "depth_rules": [
+        {"element": "total_depth", "span_ratio": 24, "note": "75-115 mm slab over ribs."}
+      ],
+      "elements": [
+        {"role": "rib", "note": "Closely spaced joists cast integrally with the slab."},
+        {"role": "distribution_rib", "note": "Transverse distribution ribs for longer spans."}
+      ],
+      "construction_notes": [
+        "Lighter than a solid slab of equal depth; good for light-to-moderate loads on longer one-way spans."
+      ],
+      "bci_ref": ["4.06"],
+      "tags": ["ribbed", "pan-joist", "one-way"]
+    },
+    {
+      "system_id": "concrete-flat-plate",
+      "name": "Two-way flat plate / flat slab",
+      "category": "floor",
+      "structural_material": "Concrete",
+      "structure_types": ["shell"],
+      "render_material_ids": ["concrete-smooth"],
+      "span_range_m": [3.6, 9.0],
+      "typical_spacing_m": {"element": "column", "note": "Column grid should be square or nearly square for two-way action."},
+      "depth_rules": [
+        {"element": "flat_plate", "span_ratio": 33, "note": "Uniform 125-305 mm slab, no drops or caps; punching shear at columns governs; spans 3.6-7 m."},
+        {"element": "flat_slab", "span_ratio": 36, "note": "150-305 mm slab with drop panels (and/or column capitals) against punching shear; carries heavier loads, spans to ~9 m."},
+        {"element": "two_way_slab_on_beams", "span_ratio": 0, "note": "Slab depth ~= bay perimeter/180, 100 mm minimum, on edge beams between columns."}
+      ],
+      "elements": [
+        {"role": "slab", "note": "Simplest formwork of the concrete systems; minimum structural depth."},
+        {"role": "column", "note": "Aligned grids; shear reinforcement or drops where loads demand."}
+      ],
+      "construction_notes": [
+        "Flat plates suit apartments/hotels where the slab soffit is the ceiling.",
+        "Two-way systems are more efficient on square bays (BCI 2.19)."
+      ],
+      "bci_ref": ["4.07"],
+      "tags": ["two-way", "flat-plate", "flat-slab", "drop-panel"]
+    },
+    {
+      "system_id": "concrete-waffle-slab",
+      "name": "Two-way waffle slab",
+      "category": "floor",
+      "structural_material": "Concrete",
+      "structure_types": ["shell"],
+      "render_material_ids": ["concrete-smooth"],
+      "span_range_m": [7.5, 16.0],
+      "typical_spacing_m": {"element": "rib", "note": "Square dome forms in 485 and 762 mm sizes; rib width 125-150 mm."},
+      "depth_rules": [
+        {"element": "total_depth", "span_ratio": 24, "note": "75-115 mm slab over two-way rib grid."}
+      ],
+      "elements": [
+        {"role": "rib_grid", "note": "Two-way ribs; solid heads at columns resist punching shear."}
+      ],
+      "construction_notes": [
+        "Longest cast-in-place two-way spans; the coffered soffit is often exposed.",
+        "Bay should be square or nearly square."
+      ],
+      "bci_ref": ["4.07", "2.19"],
+      "tags": ["waffle", "two-way", "coffer", "longspan"]
+    },
+    {
+      "system_id": "precast-hollow-core-floor",
+      "name": "Precast hollow-core plank floor",
+      "category": "floor",
+      "structural_material": "Concrete",
+      "structure_types": ["beam", "shell"],
+      "render_material_ids": ["concrete-smooth"],
+      "span_range_m": [3.6, 12.0],
+      "typical_spacing_m": {"element": "plank", "note": "Plank widths 405-2440 mm, 1220 typical; planks butt side by side."},
+      "depth_rules": [
+        {"element": "hollow_core_plank", "span_ratio": 40, "note": "Depths 150, 205, 255, 305 mm. Solid flat slabs (100-205 mm) span 3.6-7 m at the same ratio."}
+      ],
+      "elements": [
+        {"role": "plank", "note": "Plant-cast, prestressed; grouted shear keys between units; optional 50 mm topping."},
+        {"role": "support", "note": "Bear on masonry/concrete walls, steel beams, or precast beams (rectangular, L-shaped, inverted-tee: spans 4.5-22 m, depth ~ span/15)."}
+      ],
+      "construction_notes": [
+        "Use span ranges for preliminary sizing only; exact capacities are manufacturer span-load tables.",
+        "Prestressing gives shallower depths than site-cast equivalents (BCI 4.08-4.09)."
+      ],
+      "bci_ref": ["4.11-4.13"],
+      "tags": ["precast", "prestressed", "hollow-core", "plank"]
+    },
+    {
+      "system_id": "precast-tee-floor",
+      "name": "Precast single-tee / double-tee floor",
+      "category": "floor",
+      "structural_material": "Concrete",
+      "structure_types": ["beam"],
+      "render_material_ids": ["concrete-smooth"],
+      "span_range_m": [9.0, 36.0],
+      "typical_spacing_m": {"element": "tee", "note": "Unit widths 2440 and 3050 mm; stems 1220/1525 apart on double tees."},
+      "depth_rules": [
+        {"element": "single_tee", "span_ratio": 30, "note": "Depths 510-1220 mm; spans 9-36 m."},
+        {"element": "double_tee", "span_ratio": 28, "note": "Depths 305-815 mm; spans 9-30 m; do not need temporary support against tipping."}
+      ],
+      "elements": [
+        {"role": "tee", "note": "Prestressed stems carry the flange deck; welded plate connections between units."}
+      ],
+      "construction_notes": [
+        "The longest-span precast floor/roof units; common in parking and industrial structures."
+      ],
+      "bci_ref": ["4.12-4.13"],
+      "tags": ["precast", "prestressed", "tee", "longspan"]
+    },
+    {
+      "system_id": "wood-platform-framing",
+      "name": "Wood platform (western) framed wall",
+      "category": "wall",
+      "span_axis": "vertical",
+      "structural_material": "Wood",
+      "structure_types": ["frame"],
+      "render_material_ids": ["wood-oak", "plaster-white"],
+      "span_range_m": [2.4, 6.1],
+      "typical_spacing_m": {"element": "stud", "options": [0.405, 0.61]},
+      "depth_rules": [],
+      "elements": [
+        {"role": "stud", "note": "2x4 (38x89) studs @405 max unsupported height 4.3 m; 2x6 (38x140) @610 max 6.1 m; story-height studs only."},
+        {"role": "plates", "note": "Single sole plate and double top plate per story; floor joists rest on the top plates of the story below."},
+        {"role": "sheathing", "note": "Wall sheathing or diagonal bracing provides lateral (racking) resistance; studs carry vertical load."},
+        {"role": "sill", "note": "Single or double sill plate anchor-bolted to the foundation wall."}
+      ],
+      "construction_notes": [
+        "Each story is a platform: subflooring extends to the wall edge and serves as the work surface.",
+        "Vertical shrinkage is greater than balloon framing but equalized between floors.",
+        "Stud spacing relates to sheathing panel dimensions (1220 mm module)."
+      ],
+      "bci_ref": ["5.41-5.46"],
+      "tags": ["light-frame", "stud-wall", "platform", "bearing-wall"]
+    },
+    {
+      "system_id": "concrete-bearing-wall",
+      "name": "Cast-in-place concrete bearing wall",
+      "category": "wall",
+      "span_axis": "vertical",
+      "structural_material": "Concrete",
+      "structure_types": ["frame", "shell"],
+      "render_material_ids": ["concrete-smooth", "concrete-boardformed"],
+      "span_range_m": [2.4, 6.0],
+      "typical_spacing_m": {"element": "wall", "note": "Thickness rules govern rather than spacing."},
+      "depth_rules": [
+        {"element": "bearing_wall_thickness", "span_ratio": 25, "note": "Not less than 150 mm, or 1/25 of unsupported height/length between stiffening elements."},
+        {"element": "nonbearing_thickness", "span_ratio": 36, "note": "Not less than 100 mm, or 1/36 of unsupported height/length."}
+      ],
+      "elements": [
+        {"role": "wall", "note": "Plain (unreinforced) walls need >=150 mm and height-to-thickness ratio under 22; basements/foundations >=205 mm."},
+        {"role": "reinforcement", "note": "Size, spacing and placement per structural engineer and code."}
+      ],
+      "construction_notes": [
+        "Formwork ties and finish (smooth or board-formed) decide the surface (BCI 5.07-5.09).",
+        "Walls double as shear walls for lateral stability."
+      ],
+      "bci_ref": ["5.06-5.09"],
+      "tags": ["cast-in-place", "bearing-wall", "shear-wall"]
+    },
+    {
+      "system_id": "concrete-column-grid",
+      "name": "Cast-in-place concrete column grid",
+      "category": "wall",
+      "span_axis": "vertical",
+      "structural_material": "Concrete",
+      "structure_types": ["frame", "highrise"],
+      "render_material_ids": ["concrete-smooth"],
+      "span_range_m": [2.4, 6.0],
+      "typical_spacing_m": {"element": "column", "note": "Column spacing = beam or slab span; spacing determines imposed loads."},
+      "depth_rules": [],
+      "elements": [
+        {"role": "column", "note": "A 305 mm concrete column can support roughly 185 m2 of tributary floor/roof area."},
+        {"role": "tied_column", "note": "Lateral ties at regular vertical spacing restrain vertical bars."},
+        {"role": "spiral_column", "note": "Continuous spiral (>=10 mm dia.) with pitch <= 1/6 core diameter, clear space <= 75 mm."}
+      ],
+      "construction_notes": [
+        "Cast monolithically with beam/slab systems (see the concrete floor entries)."
+      ],
+      "bci_ref": ["5.04-5.05"],
+      "tags": ["column", "concrete-frame"]
+    },
+    {
+      "system_id": "cmu-reinforced-wall",
+      "name": "Reinforced concrete masonry (CMU) bearing wall",
+      "category": "wall",
+      "span_axis": "vertical",
+      "structural_material": "Concrete",
+      "structure_types": ["frame", "shell"],
+      "render_material_ids": ["concrete-smooth", "brick-red"],
+      "span_range_m": [2.4, 6.0],
+      "typical_spacing_m": {"element": "vertical_bar", "max": 1.22, "note": "Vertical reinforcement >=10 mm dia. at <=1220 mm o.c. in grouted cells."},
+      "depth_rules": [],
+      "elements": [
+        {"role": "wall", "note": "Sum of vertical and horizontal steel at least 0.002 x gross wall section; joint reinforcement <=405 mm vertical spacing."},
+        {"role": "bond_beam", "note": "Reinforced bond beams at floor/roof lines and tops of walls; reinforce corners against tension."},
+        {"role": "masonry_column", "note": "Least dimension >=305 mm; maximum unsupported height 20 x least dimension; minimum four bars."},
+        {"role": "lintel_arch", "note": "Openings carried by reinforced lintels or masonry arches (BCI 5.20-5.21)."}
+      ],
+      "construction_notes": [
+        "Height-to-thickness ratio, lateral support and control-joint spacing are the critical stability factors.",
+        "Model as Concrete in validate_structure (closest available material) and say so in reporting."
+      ],
+      "bci_ref": ["5.14-5.27"],
+      "tags": ["masonry", "cmu", "bearing-wall", "reinforced"]
+    },
+    {
+      "system_id": "steel-column-frame",
+      "name": "Structural steel column frame (W-shape columns)",
+      "category": "wall",
+      "span_axis": "vertical",
+      "structural_material": "Steel",
+      "structure_types": ["frame", "highrise"],
+      "render_material_ids": ["steel-painted-sage", "steel-galvanized"],
+      "span_range_m": [2.4, 6.0],
+      "typical_spacing_m": {"element": "column", "note": "Column spacing = beam span (see steel-wide-flange-floor)."},
+      "depth_rules": [],
+      "elements": [
+        {"role": "column", "note": "Allowable load depends on area and slenderness ratio L/r; a 305 mm W-column can support up to ~1115 m2 of tributary area at a ~3.7 m effective story height."},
+        {"role": "base_plate", "note": "Base plates spread column loads to foundations."},
+        {"role": "bracing", "note": "Lateral stability from moment connections, diagonal bracing, or shear walls/cores (BCI 2.22-2.24)."}
+      ],
+      "construction_notes": [
+        "Orient column webs parallel to the short axis of the structural frame.",
+        "High-rise systems graduate to braced cores, tubes and outriggers (BCI 2.24)."
+      ],
+      "bci_ref": ["5.35-5.38", "2.22-2.24"],
+      "tags": ["steel-frame", "column", "highrise"]
+    },
+    {
+      "system_id": "steel-rigid-frame-roof",
+      "name": "Steel rigid frame (portal) roof",
+      "category": "roof",
+      "structural_material": "Steel",
+      "structure_types": ["frame", "canopy"],
+      "render_material_ids": ["steel-painted-sage", "metal-corrugated"],
+      "span_range_m": [9.0, 36.0],
+      "typical_spacing_m": {"element": "frame", "min": 6.1, "max": 7.3, "note": "Frame spacing = purlin span; purlins at 1.2-1.5 m = decking span."},
+      "depth_rules": [
+        {"element": "crown", "span_ratio": 40, "note": "Tapered members: shallowest at crown."},
+        {"element": "shoulder", "span_ratio": 25, "note": "Deepest at the knee/shoulder; moment connection bolted or welded."}
+      ],
+      "elements": [
+        {"role": "frame", "note": "Pitch 1:12 to 4:12; wall (eave) heights 2.4-9.1 m."},
+        {"role": "purlin", "note": "Channel or Z-purlins span frame to frame; eave strut at the wall line."},
+        {"role": "bracing", "note": "Rigid in-plane; must be braced perpendicular to the frames."}
+      ],
+      "construction_notes": [
+        "Pre-engineered metal building vocabulary; economical clear spans."
+      ],
+      "bci_ref": ["6.07"],
+      "tags": ["rigid-frame", "portal", "pre-engineered", "clear-span"]
+    },
+    {
+      "system_id": "steel-truss-roof",
+      "name": "Steel roof trusses (pitched, bowstring, flat)",
+      "category": "roof",
+      "structural_material": "Steel",
+      "structure_types": ["truss"],
+      "render_material_ids": ["steel-painted-sage", "steel-galvanized"],
+      "span_range_m": [7.5, 36.0],
+      "typical_spacing_m": {"element": "truss", "note": "Purlins span the truss spacing and should land at panel points to avoid chord bending."},
+      "depth_rules": [
+        {"element": "pitched_truss", "span_ratio": 4, "note": "Depth range span/4 to span/5."},
+        {"element": "bowstring_truss", "span_ratio": 6, "note": "Depth range span/6 to span/8."},
+        {"element": "flat_truss", "span_ratio": 12, "note": "Parallel-chord depth range span/12 to span/20; camber or slope 1:50 minimum for drainage."}
+      ],
+      "elements": [
+        {"role": "chord", "note": "Double angles, tees or W-shapes; gusset-plate connections."},
+        {"role": "web", "note": "Triangulated web carries shear as axial force."},
+        {"role": "bracing", "note": "Lateral bracing required perpendicular to the truss plane."}
+      ],
+      "construction_notes": [
+        "Depth allows longer spans than rolled beams; open web passes services.",
+        "Open-web steel joist roofs: joist spacing 1.2-3.0 m, span <= 24 x depth (BCI 6.12-6.13)."
+      ],
+      "bci_ref": ["6.08-6.09", "6.12-6.13"],
+      "tags": ["truss", "longspan", "roof"]
+    },
+    {
+      "system_id": "space-frame-roof",
+      "name": "Space frame roof",
+      "category": "roof",
+      "structural_material": "Steel",
+      "structure_types": ["truss", "gridshell"],
+      "render_material_ids": ["steel-painted-sage", "aluminium-anodized"],
+      "span_range_m": [9.0, 39.0],
+      "typical_spacing_m": {"element": "module", "note": "Span 6 to 36 modules; module depth sets the two-way plate action."},
+      "depth_rules": [],
+      "elements": [
+        {"role": "chord_web_members", "note": "Repetitive tetrahedral/pyramidal units; behaves as a two-way plate."},
+        {"role": "support", "note": "Column-supported spans 9-24 m; wall/edge-supported spans 9-39 m; enlarging bearing area engages more members."}
+      ],
+      "construction_notes": [
+        "Supporting bay should be square or nearly square for true two-way action."
+      ],
+      "bci_ref": ["6.10-6.11", "2.19"],
+      "tags": ["space-frame", "two-way", "longspan"]
+    },
+    {
+      "system_id": "wood-rafter-roof",
+      "name": "Wood rafter roof (sloped light framing)",
+      "category": "roof",
+      "structural_material": "Wood",
+      "structure_types": ["beam"],
+      "render_material_ids": ["wood-oak"],
+      "span_range_m": [2.4, 6.7],
+      "typical_spacing_m": {"element": "rafter", "options": [0.305, 0.405, 0.61]},
+      "depth_rules": [],
+      "elements": [
+        {"role": "rafter", "note": "2x6 spans to ~3.0 m, 2x8 to ~4.3 m, 2x10 to ~4.9 m, 2x12 to ~6.7 m (horizontal projection, per species/grade/load)."},
+        {"role": "ridge", "note": "1x6/1x8 ridge board minimum; 2x when required; structural ridge beam when ceiling joists are omitted."},
+        {"role": "ties", "note": "Ceiling joists or rafter ties resist outward thrust; collar ties stiffen the upper third."}
+      ],
+      "construction_notes": [
+        "Flat roofs: minimum slope 1:50 to drains. Low-slope up to 3:12 needs membrane or roll roofing; 4:12 to 12:12 takes shingles and tiles.",
+        "Sheathing span rating must match rafter spacing."
+      ],
+      "bci_ref": ["6.03", "6.16-6.23"],
+      "tags": ["rafter", "pitched", "light-frame"]
+    },
+    {
+      "system_id": "wood-truss-roof",
+      "name": "Wood roof trusses and trussed rafters",
+      "category": "roof",
+      "structural_material": "Wood",
+      "structure_types": ["truss"],
+      "render_material_ids": ["wood-oak", "wood-birch-ply"],
+      "span_range_m": [6.0, 30.0],
+      "typical_spacing_m": {"element": "truss", "max": 2.4, "note": "Up to 2.4 m o.c. on decking capability; up to 6.1 m when purlins span between trusses."},
+      "depth_rules": [],
+      "elements": [
+        {"role": "trussed_rafter", "note": "Plate-connected 2x4/2x6 members at close spacing (610 mm typical) for light spans."},
+        {"role": "heavy_truss", "note": "Bolted/split-ring timber trusses with purlins for the longer spans (timber trusses range to ~30 m, BCI 2.20)."},
+        {"role": "bearing", "note": "Load transfer at heel joints to bearing walls; lateral bracing of chords required."}
+      ],
+      "construction_notes": [
+        "Web members are typically 2x4 tension/compression diagonals; 2x6 where forces demand."
+      ],
+      "bci_ref": ["6.28-6.30", "2.20"],
+      "tags": ["wood-truss", "trussed-rafter", "pitched"]
+    },
+    {
+      "system_id": "concrete-shallow-foundation",
+      "name": "Concrete shallow foundation (spread footings, walls, slab on grade)",
+      "category": "foundation",
+      "structural_material": "Concrete",
+      "structure_types": [],
+      "render_material_ids": ["concrete-smooth"],
+      "span_range_m": [0.0, 0.0],
+      "typical_spacing_m": {"element": "footing", "note": "Footing plan area = column/wall load divided by allowable soil bearing pressure."},
+      "depth_rules": [],
+      "elements": [
+        {"role": "spread_footing", "note": "Wall and column footings spread loads to soil; keep bearing below frost depth and on undisturbed soil."},
+        {"role": "foundation_wall", "note": "Carries wall/floor loads to the footing; basement walls resist lateral earth pressure."},
+        {"role": "slab_on_grade", "note": "100 mm minimum, on compacted granular base with vapor retarder."},
+        {"role": "deep_alternative", "note": "Where near-surface soil is inadequate: pile foundations (driven, to bearing strata or by friction) or drilled caissons (BCI 3.24-3.26)."}
+      ],
+      "construction_notes": [
+        "Foundation type follows the soil profile and load magnitude; settlement uniformity matters more than absolute value."
+      ],
+      "bci_ref": ["3.02-3.26"],
+      "tags": ["foundation", "footing", "slab-on-grade"]
+    }
+  ],
+  "reference": {
+    "live_loads_kpa": {
+      "residential_private": 1.9,
+      "residential_public_rooms": 4.8,
+      "office": 3.8,
+      "office_lobby_corridor": 4.8,
+      "classroom": 1.9,
+      "school_corridor": 4.8,
+      "assembly_fixed_seats": 2.9,
+      "assembly_movable_seats": 4.8,
+      "stage": 7.2,
+      "library_reading": 2.9,
+      "library_stacks": 7.2,
+      "retail_first_floor": 4.8,
+      "retail_upper_floor": 3.6,
+      "storage_light": 6.0,
+      "storage_heavy": 12.0,
+      "manufacturing": 6.0,
+      "stairs_exits": 4.8,
+      "sidewalks_drives": 12.0,
+      "roof_minimum": 1.0,
+      "roof_garden": 4.8
+    },
+    "material_densities_kg_m3": {
+      "steel_rolled": 7850,
+      "aluminium": 2640,
+      "concrete_reinforced": 2400,
+      "concrete_plain": 2310,
+      "concrete_lightweight": 1680,
+      "granite": 2800,
+      "limestone": 2640,
+      "marble": 2640,
+      "sandstone": 2350,
+      "slate": 2800,
+      "wood_douglas_fir": 510,
+      "wood_southern_pine": 465,
+      "wood_spruce": 430,
+      "wood_oak_red": 655,
+      "wood_oak_white": 735,
+      "wood_maple": 670,
+      "wood_cedar": 350,
+      "water": 1000,
+      "snow_fresh": 130
+    },
+    "egress_rules": {
+      "source_note": "Egress framework from BCI A.10-A.11 and stair rules from BCI 9.03-9.05. Numeric occupant-load factors, travel distances and separation fractions are TYPICAL IBC values (BCI defers these to the governing code) - always verify against the code in force.",
+      "components": "A means of egress has three parts: exit access (the path to an exit), the exit itself (enclosed, fire-rated, self-closing doors swinging in the direction of travel), and exit discharge (to an exit court or public way).",
+      "occupant_load_m2_per_person": {
+        "business": 9.3,
+        "assembly_unconcentrated": 1.4,
+        "classroom": 1.9,
+        "residential": 18.6,
+        "mercantile": 5.6,
+        "storage": 46.5
+      },
+      "exits_required_by_occupant_load": [
+        {"max_occupants": 49, "exits": 1, "note": "single exit only for small, low buildings; multi-story business generally needs two"},
+        {"max_occupants": 500, "exits": 2},
+        {"max_occupants": 1000, "exits": 3},
+        {"max_occupants": null, "exits": 4}
+      ],
+      "exit_separation_fraction_of_diagonal": {"unsprinklered": 0.5, "sprinklered": 0.3333},
+      "max_travel_distance_m": {"business_sprinklered": 91.4, "business_unsprinklered": 61.0},
+      "max_dead_end_corridor_m": {"default": 6.1, "sprinklered_business": 15.2},
+      "egress_width_mm_per_occupant": {"stairs": 7.6, "doors_corridors": 5.1},
+      "min_widths_mm": {
+        "exit_stair": 1120, "stair_serving_under_50": 915,
+        "corridor": 1120, "door_clear": 810
+      },
+      "stair_rules_mm": {
+        "max_riser": 180, "min_tread": 280, "max_rise_between_landings": 3660,
+        "min_headroom": 2030, "max_riser_variation": 9.5,
+        "landing_min_depth": "at least the stair width",
+        "comfort_formula": "tread + 2 x riser = 610-635 mm"
+      },
+      "signage_and_lighting": "Exits identified by illuminated signs; egress paths lit by emergency lighting on power failure; exit doors swing in the direction of exit travel with panic hardware (BCI A.10-A.11).",
+      "fire_resistance": {
+        "solid_reinforced_concrete_wall_mm": {"1hr": 90, "2hr": 125, "3hr": 150, "4hr": 165},
+        "solid_brick_wall_mm": {"1hr": 100, "2hr": 150, "4hr": 205},
+        "cmu_wall_mm": {"1hr": 100, "1.5hr": 150, "2hr_to_4hr": 205},
+        "shaft_enclosure_note": "Exit stair and shaft enclosures: typically 2-hr when connecting 4 or more stories, 1-hr otherwise (IBC-typical; verify). Structural steel requires applied protection - spray fireproofing, gypsum encasement, or concrete cover - to achieve a rating (BCI A.12).",
+        "bci_ref": ["A.12-A.13"]
+      }
+    },
+    "notes": "Live loads are minimum uniformly distributed design loads by occupancy (converted from psf, 1 psf = 47.88 Pa); always verify against the governing code. Densities converted from pcf (1 pcf = 16.018 kg/m3). Source: BCI appendix A.06-A.07."
+  }
+}

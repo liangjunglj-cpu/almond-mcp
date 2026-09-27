@@ -1,0 +1,221 @@
+{
+  "schema_version": 1,
+  "name": "Person standing",
+  "source": {
+    "asset_id": "gen-person-standing-1",
+    "geometry_sha256": "17AFD6870F8A3147EB5EB5E9E1B2B166AC1F359BE0F0938C23FD86BA9190429D",
+    "model_sha256": "A297AD2AE6C0BF367CBC259D34F2C97CA579FECBB9932428E087A2ECDEF6D13B",
+    "units": "mm",
+    "input_units": "mm",
+    "input_up_axis": "y",
+    "coordinate_transform": "X,-Z,Y",
+    "view_axes": {
+      "plan": "X,Y",
+      "front": "X,Z; looking +Y",
+      "right": "-Y,Z; looking -X"
+    },
+    "dimension_basis": "measured_mesh_geometry",
+    "engine_version": 2,
+    "method": "triangle_union_or_dense_mesh_raster_projection; see per-view method and resolution",
+    "source_references": [],
+    "reference_relationship_scope": "attached_to_this_drawing; not original mesh-generation inputs",
+    "created_at": "2026-09-19T02:00:57.225997+00:00",
+    "attribution": "Almond generated asset library",
+    "derived_asset_license": "CC-BY-4.0",
+    "generation_record": {
+      "asset_id": "gen-person-standing-1",
+      "name": "Person standing",
+      "model_file": "models/gen-person-standing-1.glb",
+      "model_sha256": "A297AD2AE6C0BF367CBC259D34F2C97CA579FECBB9932428E087A2ECDEF6D13B",
+      "contract_file": "models/gen-person-standing-1.almond.json",
+      "contract_sha256": "F48A11C8B2BD86C1097CE219973BAE41AEF76E01B0E9944B502D544D6100CBF0",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "A full-body adult person standing upright in a relaxed pose, casual everyday clothing, arms at sides, plain matte grey clay-like appearance.",
+        "image_task_id": "01a09787-a448-7360-939a-ab919d08398e",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978d-653f-734a-8edf-ce2ffc1bda07",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 1029.411736
+      },
+      "recorded_task_history": {
+        "image_model": "nano-banana",
+        "image_task_id": "01a09787-a448-7360-939a-ab919d08398e",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "mesh_task_id": "01a0978d-653f-734a-8edf-ce2ffc1bda07",
+        "generated_at": "2026-09-12"
+      },
+      "image_generation": {
+        "provider": "meshy",
+        "provider_basis": "catalogue_image_stage_tool",
+        "id": "01a09787-a448-7360-939a-ab919d08398e",
+        "id_type": "image_task_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here."
+      },
+      "catalogue_recipe_override": null,
+      "recipe_evidence": "catalogue.json#/generation_recipe; recipe intent, not a captured API request",
+      "external_reference_status": "not_recorded_in_legacy_generation_evidence",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Exact submitted request, seed and complete per-task settings are not captured in this register.",
+        "Input image bytes and checksum are not linked in this register; provider task/job ID is retained.",
+        "External design references are not recorded; absence of records does not establish no references were used."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Existing manifest declaration; generating account entitlement not independently verified by this audit.",
+      "missing_recorded_fields": []
+    },
+    "limitations": [
+      "Projected silhouettes only: internal visible/hidden edges and construction layers are not inferred.",
+      "Front is the declared coordinate direction, not a verified product front.",
+      "Dimensions describe mesh geometry, not a manufacturer-verified product."
+    ]
+  },
+  "triangle_count": 4383,
+  "scales": [
+    50,
+    100
+  ],
+  "representations": [
+    {
+      "view": "plan",
+      "bounds_mm": [
+        -288.81836968117966,
+        -142.27294676204437,
+        288.81836968117966,
+        142.27294676204437
+      ],
+      "method": "projected_triangle_union",
+      "raster_pixel_mm": null,
+      "approximation_note": null,
+      "precision_grid_mm": 0.01,
+      "simplification_tolerance_mm": 2.5,
+      "preserve_topology": true,
+      "area_mm2": 115418.18889999995,
+      "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+      "scale": 50,
+      "svg": "plan-1-50.svg",
+      "dxf": "plan-1-50.dxf"
+    },
+    {
+      "view": "front",
+      "bounds_mm": [
+        -288.81836968117966,
+        0.0,
+        288.81836968117966,
+        1750.0
+      ],
+      "method": "projected_triangle_union",
+      "raster_pixel_mm": null,
+      "approximation_note": null,
+      "precision_grid_mm": 0.01,
+      "simplification_tolerance_mm": 2.5,
+      "preserve_topology": true,
+      "area_mm2": 539072.53725,
+      "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+      "scale": 50,
+      "svg": "front-1-50.svg",
+      "dxf": "front-1-50.dxf"
+    },
+    {
+      "view": "right",
+      "bounds_mm": [
+        -142.27294676204437,
+        0.0,
+        142.27294676204437,
+        1750.0
+      ],
+      "method": "projected_triangle_union",
+      "raster_pixel_mm": null,
+      "approximation_note": null,
+      "precision_grid_mm": 0.01,
+      "simplification_tolerance_mm": 2.5,
+      "preserve_topology": true,
+      "area_mm2": 317876.0641499999,
+      "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+      "scale": 50,
+      "svg": "right-1-50.svg",
+      "dxf": "right-1-50.dxf"
+    },
+    {
+      "view": "plan",
+      "bounds_mm": [
+        -288.81836968117966,
+        -142.27294676204437,
+        288.81836968117966,
+        142.27294676204437
+      ],
+      "method": "projected_triangle_union",
+      "raster_pixel_mm": null,
+      "approximation_note": null,
+      "precision_grid_mm": 0.01,
+      "simplification_tolerance_mm": 5.0,
+      "preserve_topology": true,
+      "area_mm2": 114847.24849999996,
+      "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+      "scale": 100,
+      "svg": "plan-1-100.svg",
+      "dxf": "plan-1-100.dxf"
+    },
+    {
+      "view": "front",
+      "bounds_mm": [
+        -288.81836968117966,
+        0.0,
+        288.81836968117966,
+        1750.0
+      ],
+      "method": "projected_triangle_union",
+      "raster_pixel_mm": null,
+      "approximation_note": null,
+      "precision_grid_mm": 0.01,
+      "simplification_tolerance_mm": 5.0,
+      "preserve_topology": true,
+      "area_mm2": 535840.9372999999,
+      "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+      "scale": 100,
+      "svg": "front-1-100.svg",
+      "dxf": "front-1-100.dxf"
+    },
+    {
+      "view": "right",
+      "bounds_mm": [
+        -142.27294676204437,
+        0.0,
+        142.27294676204437,
+        1750.0
+      ],
+      "method": "projected_triangle_union",
+      "raster_pixel_mm": null,
+      "approximation_note": null,
+      "precision_grid_mm": 0.01,
+      "simplification_tolerance_mm": 5.0,
+      "preserve_topology": true,
+      "area_mm2": 317873.62614999997,
+      "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+      "scale": 100,
+      "svg": "right-1-100.svg",
+      "dxf": "right-1-100.dxf"
+    }
+  ],
+  "files": {
+    "front-1-100.dxf": "CC8316972764051FED25CBF5FDB3861B7A4A1D03F7BDBAF149812EF206A827B7",
+    "front-1-100.svg": "60F5462FAE0EC0969F124D103101AF4323E6EC49A17C88606930C4ED13E960D6",
+    "front-1-50.dxf": "C6C3229D421B4F5CB0BD94DFFFB36F732CD81C0FC9BD998E9B61C4918BE0166D",
+    "front-1-50.svg": "A4B27A7E11614DA93B71C340A187A9609A92367FA616DAB0F533DE0CFC91932D",
+    "plan-1-100.dxf": "22B2EAE45202F96902AD2CF0C8EFBE8F2D79A31D4856ECF144F77F0128270536",
+    "plan-1-100.svg": "BAAB63B63C8099133CE9996B3DE191C7E21900625B3DA155FC0B39D78D2AD135",
+    "plan-1-50.dxf": "00AB31A9C5148AB0FE69D03E3061B3BBF0F8FE6BD9E1FA7360DEAE78D5421D0E",
+    "plan-1-50.svg": "4E1B0930583BA12D630BBFD94DE49AD586C93CBB11E24F5FD2A66CCEFBA96A26",
+    "right-1-100.dxf": "B4FF06CA3704F932878698767BF029E5D1FAF13507F612D96165118F09B5D187",
+    "right-1-100.svg": "1697733AA201437928CBAC2A2E0DF384CB77CC288A1D40FE6FFA586D1D19B031",
+    "right-1-50.dxf": "2908614E264DF540DC0EB5D9591A1FD649381DD81DC8BDA32A3B4AFC4BE2042A",
+    "right-1-50.svg": "AE572FBF6145B230DAA4878A1E46786197877BFEC631D69E03C14B8F862399C1",
+    "sheet-A3-1-100.svg": "750C7F95BB2F3828ED3E55F3D013E717ACEEF33345AE09FA4649124A31D0CC2E",
+    "sheet-A3-1-50.svg": "4C96E8A389D1D2C0F28538DE01B5AF66CB5AC7D1F9B66BACF3360158472983CF",
+    "views.json": "032108E487AC2A45705A4CC4D185A2ED89687EC23CBDC5A153254511F6CA77BC"
+  }
+}

@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-bicycle-1",
+  "library_id": "generated_assets",
+  "name": "Bicycle (city bike)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-bicycle-1.glb",
+  "dimensions_mm": {
+    "width": 560.5,
+    "depth": 1654.2,
+    "height": 1050.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "ground",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -280.25,
+        -827.1,
+        0.0
+      ],
+      "max": [
+        280.25,
+        827.1,
+        1050.0
+      ]
+    },
+    "footprint": [
+      [
+        -280.25,
+        -827.1
+      ],
+      [
+        280.25,
+        -827.1
+      ],
+      [
+        280.25,
+        827.1
+      ],
+      [
+        -280.25,
+        827.1
+      ]
+    ],
+    "clearance_mm": {
+      "front": 300,
+      "back": 300,
+      "left": 300,
+      "right": 300
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "accessory"
+  },
+  "materials": [
+    {
+      "material_id": "steel-painted-charcoal",
+      "objects": [
+        "gen-bicycle-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-bicycle-1",
+    "library_id": "generated_assets",
+    "name": "Bicycle (city bike)",
+    "category": "vehicle",
+    "tags": [
+      "bicycle",
+      "bike",
+      "cycling",
+      "entourage",
+      "site"
+    ],
+    "dimensions_mm": {
+      "width": 560.5,
+      "depth": 1654.2,
+      "height": 1050.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 600.0,
+      "depth": 1750.0,
+      "height": 1050.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "ground",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -280.25,
+          -827.1,
+          0.0
+        ],
+        "max": [
+          280.25,
+          827.1,
+          1050.0
+        ]
+      },
+      "footprint": [
+        [
+          -280.25,
+          -827.1
+        ],
+        [
+          280.25,
+          -827.1
+        ],
+        [
+          280.25,
+          827.1
+        ],
+        [
+          -280.25,
+          827.1
+        ]
+      ],
+      "clearance_mm": {
+        "front": 300,
+        "back": 300,
+        "left": 300,
+        "right": 300
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "accessory"
+    },
+    "materials": [
+      {
+        "material_id": "steel-painted-charcoal",
+        "objects": [
+          "gen-bicycle-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "A generic city bicycle standing upright, simple diamond frame, two wheels, handlebars and saddle, plain matte grey.",
+        "image_task_id": "01a09788-0028-73c1-b138-5be23b86a987",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978d-c97d-77f6-a39b-31bb45348599",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": "rotated_90_about_vertical",
+        "scale_applied": 1050.0
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "streetscape"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "site_plan",
+        "elevation",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.066,
+      "triangle_count": 4322,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "ADC73D4F610CF6368F90BD00C78F3BB6681ACDC27B05CABA7BEFABF3E86B6CB8"
+}

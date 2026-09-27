@@ -1,0 +1,516 @@
+[
+  {
+    "view": "plan",
+    "bounds_mm": [
+      -768.0000066757202,
+      -411.00001335144043,
+      768.0000066757202,
+      411.00001335144043
+    ],
+    "method": "projected_triangle_union",
+    "raster_pixel_mm": null,
+    "approximation_note": null,
+    "precision_grid_mm": 0.01,
+    "simplification_tolerance_mm": 2.5,
+    "area_mm2": 1254254.6249,
+    "rings": [
+      {
+        "role": "exterior",
+        "points": [
+          [
+            -768.0,
+            -411.0
+          ],
+          [
+            -768.0,
+            411.0
+          ],
+          [
+            -765.0,
+            408.0
+          ],
+          [
+            -185.25,
+            408.0
+          ],
+          [
+            -122.25,
+            405.0
+          ],
+          [
+            768.0,
+            408.0
+          ],
+          [
+            768.0,
+            -411.0
+          ],
+          [
+            669.0,
+            -408.0
+          ],
+          [
+            615.0,
+            -411.0
+          ],
+          [
+            564.0,
+            -408.0
+          ],
+          [
+            516.0,
+            -411.0
+          ],
+          [
+            465.0,
+            -408.0
+          ],
+          [
+            -768.0,
+            -411.0
+          ]
+        ]
+      },
+      {
+        "role": "hole",
+        "points": [
+          [
+            -430.9,
+            -407.46
+          ],
+          [
+            -430.91,
+            -407.45
+          ],
+          [
+            -430.92,
+            -407.46
+          ],
+          [
+            -430.9,
+            -407.46
+          ]
+        ]
+      }
+    ],
+    "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+    "scale": 50,
+    "svg": "plan-1-50.svg",
+    "dxf": "plan-1-50.dxf"
+  },
+  {
+    "view": "front",
+    "bounds_mm": [
+      -768.0000066757202,
+      0.0,
+      768.0000066757202,
+      750.0
+    ],
+    "method": "projected_triangle_union",
+    "raster_pixel_mm": null,
+    "approximation_note": null,
+    "precision_grid_mm": 0.01,
+    "simplification_tolerance_mm": 2.5,
+    "area_mm2": 248398.1461,
+    "rings": [
+      {
+        "role": "exterior",
+        "points": [
+          [
+            -693.0,
+            3.0
+          ],
+          [
+            -765.0,
+            4.5
+          ],
+          [
+            -762.0,
+            729.0
+          ],
+          [
+            -768.0,
+            729.0
+          ],
+          [
+            -768.0,
+            748.5
+          ],
+          [
+            768.0,
+            747.0
+          ],
+          [
+            765.0,
+            649.5
+          ],
+          [
+            765.0,
+            4.5
+          ],
+          [
+            762.0,
+            0.0
+          ],
+          [
+            696.0,
+            3.0
+          ],
+          [
+            696.0,
+            643.57
+          ],
+          [
+            671.44,
+            644.19
+          ],
+          [
+            -692.86,
+            645.08
+          ],
+          [
+            -690.0,
+            433.5
+          ],
+          [
+            -693.0,
+            3.0
+          ]
+        ]
+      }
+    ],
+    "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+    "scale": 50,
+    "svg": "front-1-50.svg",
+    "dxf": "front-1-50.dxf"
+  },
+  {
+    "view": "right",
+    "bounds_mm": [
+      -411.00001335144043,
+      0.0,
+      411.00001335144043,
+      750.0
+    ],
+    "method": "projected_triangle_union",
+    "raster_pixel_mm": null,
+    "approximation_note": null,
+    "precision_grid_mm": 0.01,
+    "simplification_tolerance_mm": 2.5,
+    "area_mm2": 167026.83534999995,
+    "rings": [
+      {
+        "role": "exterior",
+        "points": [
+          [
+            -328.5,
+            3.0
+          ],
+          [
+            -393.0,
+            3.0
+          ],
+          [
+            -392.35,
+            729.33
+          ],
+          [
+            -411.0,
+            730.5
+          ],
+          [
+            -408.33,
+            735.83
+          ],
+          [
+            -411.0,
+            747.0
+          ],
+          [
+            -408.0,
+            750.0
+          ],
+          [
+            -348.0,
+            747.0
+          ],
+          [
+            411.0,
+            748.5
+          ],
+          [
+            411.0,
+            729.0
+          ],
+          [
+            392.94,
+            729.0
+          ],
+          [
+            391.53,
+            690.87
+          ],
+          [
+            393.0,
+            4.5
+          ],
+          [
+            387.0,
+            1.5
+          ],
+          [
+            324.0,
+            1.5
+          ],
+          [
+            325.5,
+            643.22
+          ],
+          [
+            -208.88,
+            644.97
+          ],
+          [
+            -327.07,
+            643.5
+          ],
+          [
+            -328.5,
+            3.0
+          ]
+        ]
+      }
+    ],
+    "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+    "scale": 50,
+    "svg": "right-1-50.svg",
+    "dxf": "right-1-50.dxf"
+  },
+  {
+    "view": "plan",
+    "bounds_mm": [
+      -768.0000066757202,
+      -411.00001335144043,
+      768.0000066757202,
+      411.00001335144043
+    ],
+    "method": "projected_triangle_union",
+    "raster_pixel_mm": null,
+    "approximation_note": null,
+    "precision_grid_mm": 0.01,
+    "simplification_tolerance_mm": 5.0,
+    "area_mm2": 1260287.9999,
+    "rings": [
+      {
+        "role": "exterior",
+        "points": [
+          [
+            -768.0,
+            -411.0
+          ],
+          [
+            -768.0,
+            411.0
+          ],
+          [
+            768.0,
+            408.0
+          ],
+          [
+            768.0,
+            -411.0
+          ],
+          [
+            -768.0,
+            -411.0
+          ]
+        ]
+      },
+      {
+        "role": "hole",
+        "points": [
+          [
+            -430.9,
+            -407.46
+          ],
+          [
+            -430.91,
+            -407.45
+          ],
+          [
+            -430.92,
+            -407.46
+          ],
+          [
+            -430.9,
+            -407.46
+          ]
+        ]
+      }
+    ],
+    "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+    "scale": 100,
+    "svg": "plan-1-100.svg",
+    "dxf": "plan-1-100.dxf"
+  },
+  {
+    "view": "front",
+    "bounds_mm": [
+      -768.0000066757202,
+      0.0,
+      768.0000066757202,
+      750.0
+    ],
+    "method": "projected_triangle_union",
+    "raster_pixel_mm": null,
+    "approximation_note": null,
+    "precision_grid_mm": 0.01,
+    "simplification_tolerance_mm": 5.0,
+    "area_mm2": 247325.6611,
+    "rings": [
+      {
+        "role": "exterior",
+        "points": [
+          [
+            -693.0,
+            3.0
+          ],
+          [
+            -765.0,
+            4.5
+          ],
+          [
+            -762.0,
+            729.0
+          ],
+          [
+            -768.0,
+            729.0
+          ],
+          [
+            -768.0,
+            748.5
+          ],
+          [
+            768.0,
+            747.0
+          ],
+          [
+            762.0,
+            0.0
+          ],
+          [
+            696.0,
+            3.0
+          ],
+          [
+            696.0,
+            643.57
+          ],
+          [
+            671.44,
+            644.19
+          ],
+          [
+            -692.86,
+            645.08
+          ],
+          [
+            -693.0,
+            3.0
+          ]
+        ]
+      }
+    ],
+    "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+    "scale": 100,
+    "svg": "front-1-100.svg",
+    "dxf": "front-1-100.dxf"
+  },
+  {
+    "view": "right",
+    "bounds_mm": [
+      -411.00001335144043,
+      0.0,
+      411.00001335144043,
+      750.0
+    ],
+    "method": "projected_triangle_union",
+    "raster_pixel_mm": null,
+    "approximation_note": null,
+    "precision_grid_mm": 0.01,
+    "simplification_tolerance_mm": 5.0,
+    "area_mm2": 168113.11285000003,
+    "rings": [
+      {
+        "role": "exterior",
+        "points": [
+          [
+            -328.5,
+            3.0
+          ],
+          [
+            -393.0,
+            3.0
+          ],
+          [
+            -392.35,
+            729.33
+          ],
+          [
+            -411.0,
+            730.5
+          ],
+          [
+            -408.0,
+            750.0
+          ],
+          [
+            411.0,
+            748.5
+          ],
+          [
+            411.0,
+            729.0
+          ],
+          [
+            392.94,
+            729.0
+          ],
+          [
+            391.53,
+            690.87
+          ],
+          [
+            393.0,
+            4.5
+          ],
+          [
+            324.0,
+            1.5
+          ],
+          [
+            325.5,
+            643.22
+          ],
+          [
+            -208.88,
+            644.97
+          ],
+          [
+            -327.07,
+            643.5
+          ],
+          [
+            -328.5,
+            3.0
+          ]
+        ]
+      }
+    ],
+    "deviation_basis": "topology_preserving_simplification_tolerance_not_independently_measured",
+    "scale": 100,
+    "svg": "right-1-100.svg",
+    "dxf": "right-1-100.dxf"
+  }
+]

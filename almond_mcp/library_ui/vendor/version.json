@@ -1,0 +1,39 @@
+{
+  "package": "@google/model-viewer",
+  "version": "4.3.1",
+  "url": "https://registry.npmjs.org/@google/model-viewer/-/model-viewer-4.3.1.tgz",
+  "integrity": "sha512-GP+inXhAtY31E8rILVmByA6z8CZZjdlNajddppyI1/j1eIaSQiZcMRaUqTFe7+jv4mzRzwKIOiKBud0apiv+WQ==",
+  "license_sources": [
+    {
+      "package": "three",
+      "license_source_version": "0.183.0",
+      "tarball": "https://registry.npmjs.org/three/-/three-0.183.0.tgz",
+      "integrity": "sha512-G6SH2jfefIVa2YI4JL2VbgQhrrbp1A8dRc7lr3PW827kdVyaX2RgH6M5FmjmdVFLgSHppyg3OYOZdTfWElle+g=="
+    },
+    {
+      "package": "lit",
+      "license_source_version": "3.2.1",
+      "tarball": "https://registry.npmjs.org/lit/-/lit-3.2.1.tgz",
+      "integrity": "sha512-1BBa1E/z0O9ye5fZprPtdqnc0BFzxIxTTOO/tQFmyC/hj1O3jL4TfmLBw0WEwjAokdLwpclkvGgDJwTIh0/22w=="
+    },
+    {
+      "package": "fflate",
+      "license_source_version": "0.8.2",
+      "tarball": "https://registry.npmjs.org/fflate/-/fflate-0.8.2.tgz",
+      "integrity": "sha512-cPJU47OaAoCbg0pBvzsgpTPhmhqI5eJjh/JIu8tPj5q+T7iLvW/JAYUqmE7KOB4R1ZyEhzBaIQpQpardBF5z8A=="
+    },
+    {
+      "package": "@monogrid/gainmap-js",
+      "license_source_version": "3.1.0",
+      "tarball": "https://registry.npmjs.org/@monogrid/gainmap-js/-/gainmap-js-3.1.0.tgz",
+      "integrity": "sha512-Obb0/gEd/HReTlg8ttaYk+0m62gQJmCblMOjHSMHRrBP2zdfKMHLCRbh/6ex9fSUJMKdjjIEiohwkbGD3wj2Nw=="
+    },
+    {
+      "package": "meshoptimizer",
+      "license_source_version": "0.24.0",
+      "tarball": "https://registry.npmjs.org/meshoptimizer/-/meshoptimizer-0.24.0.tgz",
+      "integrity": "sha512-Iq/8cM5cK2B0P0QdKHexr30zEJn5sQxjXKtQJGp6LO7r1VUPwhgxau18pvybVDnEDsKE49GdlJYwqPX9A/P9Sw=="
+    }
+  ],
+  "bundle_sha256": "283b0672384614b4847636c306fc93fe4b1fcadc76d668b4e47f0ca76bcf033b"
+}

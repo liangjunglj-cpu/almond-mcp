@@ -1,0 +1,201 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-refrigerator-1",
+  "library_id": "generated_assets",
+  "name": "Refrigerator (freestanding fridge-freezer)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-refrigerator-1.glb",
+  "dimensions_mm": {
+    "width": 766.2,
+    "depth": 671.3,
+    "height": 1800.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -383.1,
+        -335.65,
+        0.0
+      ],
+      "max": [
+        383.1,
+        335.65,
+        1800.0
+      ]
+    },
+    "footprint": [
+      [
+        -383.1,
+        -335.65
+      ],
+      [
+        383.1,
+        -335.65
+      ],
+      [
+        383.1,
+        335.65
+      ],
+      [
+        -383.1,
+        335.65
+      ]
+    ],
+    "clearance_mm": {
+      "front": 1000,
+      "back": 50,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "fixed"
+  },
+  "materials": [
+    {
+      "material_id": "steel-galvanized",
+      "objects": [
+        "gen-refrigerator-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-refrigerator-1",
+    "library_id": "generated_assets",
+    "name": "Refrigerator (freestanding fridge-freezer)",
+    "category": "appliance",
+    "tags": [
+      "fridge",
+      "refrigerator",
+      "freezer",
+      "kitchen",
+      "appliance"
+    ],
+    "dimensions_mm": {
+      "width": 766.2,
+      "depth": 671.3,
+      "height": 1800.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 700.0,
+      "depth": 700.0,
+      "height": 1800.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -383.1,
+          -335.65,
+          0.0
+        ],
+        "max": [
+          383.1,
+          335.65,
+          1800.0
+        ]
+      },
+      "footprint": [
+        [
+          -383.1,
+          -335.65
+        ],
+        [
+          383.1,
+          -335.65
+        ],
+        [
+          383.1,
+          335.65
+        ],
+        [
+          -383.1,
+          335.65
+        ]
+      ],
+      "clearance_mm": {
+        "front": 1000,
+        "back": 50,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "fixed"
+    },
+    "materials": [
+      {
+        "material_id": "steel-galvanized",
+        "objects": [
+          "gen-refrigerator-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "A freestanding tall stainless steel fridge-freezer with two vertical doors and long handles, plain modern design.",
+        "image_task_id": "01a09789-01b0-7012-a2f8-f58cadfeb3f4",
+        "image_model": "nano-banana",
+        "mesh_task_id": "01a0978e-fc89-71c4-985b-8599687baf80",
+        "mesh_model": "meshy-t2 smart-topology (untextured)",
+        "generated_at": "2026-09-12",
+        "orientation_correction": null,
+        "scale_applied": 1000.000026
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "kitchen"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "plan",
+        "section",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.095,
+      "triangle_count": 1016,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "FE8C7E47BC899C6DCD820BF4C5E0F80363020565211D6DBA9B698B21FDB9EF8C"
+}

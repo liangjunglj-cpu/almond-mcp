@@ -242,6 +242,25 @@ class SceneLedgerFixesTests(RetrievalStoreTests):
         self.assertEqual(self.store.get_scene(scene["scene_id"])["instances"], 1)
         self.assertTrue(keep["instance_id"])
 
+    def test_retiring_a_library_keeps_assets_placed_in_scenes(self):
+        # 0.6 retired the IKEA catalogue by syncing it empty; state databases
+        # with IKEA scene instances must still open (FK instances -> assets).
+        scene = self.store.create_scene("Retired library")
+        placed = "ikea-sg-klippan-s49010615"
+        self.store.upsert_instance(scene["scene_id"], placed, x_mm=1000, y_mm=1000)
+
+        self.store.sync_assets([], library_id="ikea")
+
+        self.assertEqual(self.store.asset_stats("ikea")["total"], 0)
+        self.assertEqual(self.store.asset_stats("retired")["total"], 1)
+        self.assertIsNotNone(self.store.get_asset(placed))
+        self.assertNotIn(
+            placed,
+            [a["asset_id"] for a in self.store.search_assets(query="klippan")["assets"]],
+        )
+        self.assertEqual(self.store.search_assets(limit=50)["total"], self.drawing_asset_count)
+        self.assertEqual(self.store.get_scene(scene["scene_id"])["instances"], 1)
+
 
 class ValidationHistoryTests(unittest.TestCase):
     def setUp(self):

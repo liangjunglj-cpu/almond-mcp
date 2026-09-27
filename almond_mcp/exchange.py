@@ -18,6 +18,7 @@ reads those contracts; the Rhino-side execution lives in server.py.
 from __future__ import annotations
 
 import json
+import hashlib
 import math
 import re
 from pathlib import Path
@@ -117,6 +118,15 @@ def load_contract(path: str | Path) -> dict[str, Any]:
     glb = contract_path.parent / contract["file"]
     if not glb.is_file():
         raise FileNotFoundError(f"Contract references a missing file: {glb}")
+    if contract.get("model_sha256"):
+        actual = hashlib.sha256(glb.read_bytes()).hexdigest().upper()
+        if actual != contract["model_sha256"].upper():
+            raise ValueError("Model checksum does not match the asset contract")
+    if contract.get("passport"):
+        from almond_mcp.asset_passport import AssetPassport
+        passport = AssetPassport.model_validate(contract["passport"]).model_dump()
+        if passport["asset_id"] != contract["asset_id"] or passport["dimensions_mm"] != contract["dimensions_mm"]:
+            raise ValueError("Passport does not match contract identity/dimensions")
     contract["_resolved_file"] = str(glb)
     contract["_contract_path"] = str(contract_path)
     return contract

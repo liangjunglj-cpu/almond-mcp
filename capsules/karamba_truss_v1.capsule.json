@@ -1,30 +1,58 @@
 {
-  "capsule_id": "karamba_truss_v1",
-  "version": 1,
-  "capability": "analyze",
-  "structure_type": "truss",
-  "plugin_dependencies": [{"name": "Karamba3D", "min_version": "3.1"}],
-  "definition_file": "01_ParametricTruss.ghx",
-  "title": "Parametric planar truss analysis",
-  "description_for_llm": "Linear elastic (Theory I) analysis of a triangulated truss built from axis lines. Use for planar or near planar trusses where members carry mostly axial force. Assumptions: members are straight lines in metres meeting at shared nodes, connections behave as intended by the template (bending stiffness may still be active because members are modelled as beams, not ideal pin ended bars), supports at the bottom chord ends, one steel section for all members, static vertical loads. Limits: the template generates its own truss geometry from sliders, so external geometry only works after harnessing; no buckling verification of slender compression members; no joint or connection design. NOT YET AUDITED: no ALMOND_IN_*/ALMOND_OUT_* harness params exist in the GHX, so run_definition will refuse it. Retrieval context only until harnessed.",
-  "inputs": [
-    {"name": "ALMOND_IN_LINES", "type": "curve[]", "units": "m", "required": true,
-     "description": "Truss member axis lines, node-merged at shared endpoints."},
-    {"name": "ALMOND_IN_LOAD_KN", "type": "number", "units": "kN", "required": false, "default": 10.0,
-     "description": "Total vertical load distributed over the top chord nodes."}
-  ],
-  "outputs": [
-    {"name": "ALMOND_OUT_DISP_MM", "type": "number", "units": "mm",
-     "semantics": "max_nodal_displacement",
-     "description": "Largest nodal displacement in the model."},
-    {"name": "ALMOND_OUT_UTIL", "type": "number[]",
-     "semantics": "per_element_utilization",
-     "description": "Utilization ratio per element, 1.0 means at capacity."},
-    {"name": "ALMOND_OUT_MASS_KG", "type": "number", "units": "kg",
-     "semantics": "total_mass",
-     "description": "Total structural mass of the model."}
-  ],
-  "binding": "reserved_nicknames",
-  "confidence": "template",
-  "audited": false
+ "capsule_id": "karamba_truss_v1",
+ "version": 1,
+ "capability": "analyze",
+ "structure_type": "truss",
+ "plugin_dependencies": [
+  {
+   "name": "Karamba3D",
+   "min_version": "3.1"
+  }
+ ],
+ "definition_file": "01_InputCurvesAsTruss.ghx",
+ "title": "Truss analysis from input axis lines",
+ "description_for_llm": "Linear elastic (Theory I) analysis of a triangulated truss built from axis lines. Use for planar or near planar trusses where members carry mostly axial force. The template shatters input lines at their crossings (Karamba Line-Line Intersection), so members meet at shared nodes even when drawn as continuous chords. Assumptions: lines in metres, one steel section for all members, self weight active, ALMOND_IN_LOAD_KN applied as a vertical point load at EVERY model node, supports pinned at ALMOND_IN_SUPPORTS (the validator supplies the lowest-Z nodes when the caller does not). Members are modelled as beams, not ideal pin-ended bars, so some bending stiffness remains. Limits: no buckling verification of slender compression members; no joint design; no per-element utilization output, so the validator's strength check falls back to deflection and the L/250 limit. HARNESSED 2026-08-29 from 01_InputCurvesAsTruss.ghx (the input-curves Karamba example, not the slider-parametric one).",
+ "inputs": [
+  {
+   "name": "ALMOND_IN_LINES",
+   "type": "curve[]",
+   "units": "m",
+   "required": true,
+   "description": "Truss member axis lines, node-merged at shared endpoints."
+  },
+  {
+   "name": "ALMOND_IN_LOAD_KN",
+   "type": "number",
+   "units": "kN",
+   "required": false,
+   "default": 10.0,
+   "description": "Vertical point load in kN applied at every model node (drives the template's Unit-Z force vector)."
+  },
+  {
+   "name": "ALMOND_IN_SUPPORTS",
+   "type": "point[]",
+   "units": "m",
+   "required": false,
+   "description": "Support node positions. When omitted, the validator supplies the lowest-Z nodes of the input members automatically, mirroring the api pathway's convention."
+  }
+ ],
+ "outputs": [
+  {
+   "name": "ALMOND_OUT_DISP_MM",
+   "type": "number",
+   "units": "cm",
+   "semantics": "max_nodal_displacement",
+   "description": "Largest nodal displacement; Karamba's Analyse emits centimetres, converted downstream per these units."
+  },
+  {
+   "name": "ALMOND_OUT_MASS_KG",
+   "type": "number",
+   "units": "kg",
+   "semantics": "total_mass",
+   "description": "Total structural mass of the model."
+  }
+ ],
+ "binding": "reserved_nicknames",
+ "confidence": "template",
+ "audited": true
 }
