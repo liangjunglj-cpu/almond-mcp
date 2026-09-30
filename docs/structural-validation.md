@@ -113,6 +113,41 @@ In karambaCommon 3.1.60519, two result extractions have signature drift:
 treat api-mode *deflection/utilization* verdicts as incomplete until #6 is
 closed. Confidence labels in the response reflect this honestly.
 
+**Root cause found (2026-09-30, live, karambaCommon 3.1.60921; unreleased
+bridge 0.6.1-dev):** three silent argument mismatches in the reflection
+adapter, not result extraction:
+
+- `IsotropicMaterial` names the shear moduli `Gip`/`Gtr` (was `G12`/`G3`);
+  unmatched, they were filled with **0**, so every solve was singular
+  (NaN field, 0.0 mm read, "rigid body mode" warnings);
+- the material factory takes E/G/f in **kN/m²**, not kN/cm² (x10⁴ too soft
+  once the moduli were fixed);
+- `GravityLoad(force)` and `CircularHollow(diameter, ..)` were unmatched too,
+  so self weight was zero and `beam_diameter_mm` was ignored.
+
+With synonyms + unit conversion, a 3 m CHS 114.3x4 steel cantilever reads
+110 mm at the tip under 10 kN (hand check ≈ 0.1 m), and the nodal field
+(`NodeDisplacements.solve`) is used for `max_deflection_mm`.
+`Utilization_Beam.solve` supplies per-member utilization. `BeamDisplacements`
+still returns no stations in this build; member shapes are interpolated
+(cubic Hermite) from nodal translations + rotations, with a warning.
+
+## Live structure view (unreleased)
+
+`visualize_structure(guids=[...])` runs the same Karamba solve and draws it
+in every viewport through a display conduit (nothing is baked): ghosted
+undeformed axes, the exaggerated deformed shape coloured blue → red by
+displacement or utilization, supports, load arrows and a legend with
+max δ, the L/limit check and PASS/FAIL. `reanalyze=False` updates only the
+display (`scale`, `color_by`, `reveal`, `title`), so a staged construction
+sequence can be played back with `reveal` from 0 to 1, and `physics=False`
+draws the same members as plain geometry (physics off) for comparisons.
+`span_m` sets the reference span for the L/limit check when members are
+split at every node, `fixed_supports=False` pins the supports. `clear=True`
+removes the overlay. A 20-member frame solves in ~1.5 s (verified live on
+the Atelier-07 mezzanine: CHS 114.3x4 fails at 183 mm / utilization 3.59;
+CHS 193.7x8 passes at 20.9 mm / 0.66 against L/250 = 24.8 mm).
+
 ## Getting a report
 
 Every recorded run can be exported as Markdown:
