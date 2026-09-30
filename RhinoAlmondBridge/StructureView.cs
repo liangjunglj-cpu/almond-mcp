@@ -41,6 +41,7 @@ namespace RhinoAlmondBridge
         [JsonProperty("physics")] public bool Physics { get; set; } = true;
         [JsonProperty("span_m")] public double? SpanM { get; set; }
         [JsonProperty("reveal")] public double Reveal { get; set; } = 1.0;
+        [JsonProperty("display_guids")] public List<string> DisplayGuids { get; set; }
         [JsonProperty("show_legend")] public bool ShowLegend { get; set; } = true;
         [JsonProperty("clear")] public bool Clear { get; set; }
     }
@@ -105,6 +106,8 @@ namespace RhinoAlmondBridge
             data.Reveal = Math.Max(0, Math.Min(1, req.Reveal));
             data.ShowLegend = req.ShowLegend;
             data.Physics = req.Physics;
+            data.DisplaySet = req.DisplayGuids != null && req.DisplayGuids.Count > 0
+                ? new HashSet<string>(req.DisplayGuids, StringComparer.OrdinalIgnoreCase) : null;
             double maxM = data.Result.MaxDisplacementMM / 1000.0;
             // auto exaggeration: largest deflection drawn at ~6% of the model span
             data.Scale = req.Scale ?? (maxM > 1e-9 ? 0.06 * data.SpanM / maxM : 1.0);
@@ -145,6 +148,7 @@ namespace RhinoAlmondBridge
         public double ToDoc = 1000, SpanM, LimitMM, LimitRatio, Scale = 1, Reveal = 1;
         public double LoadKN;
         public bool SelfWeight, Physics = true;
+        public HashSet<string> DisplaySet;
         public string Title, ColorBy = "displacement", Material;
         public bool ShowLegend = true;
     }
@@ -188,11 +192,20 @@ namespace RhinoAlmondBridge
             float dpi = (float)e.Viewport.Bounds.Height / 1000f;
             int thick = Math.Max(3, (int)(7 * dpi));
 
+            // display filter (e.g. one frame line for a section view); the solve still covers every member
+            bool Visible(int k) => k < shown && (Data.DisplaySet == null ||
+                r.Elements[k].SourceGuids.Any(g => Data.DisplaySet.Contains(g)));
+            var endsM = Enumerable.Range(0, n).Where(Visible)
+                .SelectMany(k => new[] { r.Elements[k].StartM, r.Elements[k].EndM }).ToList();
+            bool NearShown(double[] p) => Data.DisplaySet == null ||
+                endsM.Any(q => Math.Abs(q[0] - p[0]) + Math.Abs(q[1] - p[1]) + Math.Abs(q[2] - p[2]) < 1e-3);
+
             if (!Data.Physics)
             {
                 // physics off: the same members as plain geometry, no analysis drawn
                 for (int k = 0; k < shown; k++)
                 {
+                    if (!Visible(k)) continue;
                     var el = r.Elements[k];
                     e.Display.DrawLine(P(el.StartM, new double[3], 0), P(el.EndM, new double[3], 0), Color.FromArgb(245, 245, 240), thick);
                 }
@@ -201,6 +214,7 @@ namespace RhinoAlmondBridge
             }
             for (int k = 0; k < shown; k++)
             {
+                if (!Visible(k)) continue;
                 var el = r.Elements[k];
                 // undeformed wireframe
                 e.Display.DrawLine(P(el.StartM, new double[3], 0), P(el.EndM, new double[3], 0), Ghost, Math.Max(1, thick / 3));
@@ -219,6 +233,7 @@ namespace RhinoAlmondBridge
             double arrow = Data.SpanM * 0.12 * Data.ToDoc;
             foreach (var s in r.SupportPointsM)
             {
+                if (!NearShown(s)) continue;
                 var p = new Point3d(s[0] * Data.ToDoc, s[1] * Data.ToDoc, s[2] * Data.ToDoc);
                 double h = arrow * 0.22;
                 var side = e.Viewport.CameraX; side.Z = 0;
@@ -232,6 +247,7 @@ namespace RhinoAlmondBridge
             if (Data.Reveal >= 0.999)
                 foreach (var lp in r.LoadedPointsM)
                 {
+                    if (!NearShown(lp)) continue;
                     var p = new Point3d(lp[0] * Data.ToDoc, lp[1] * Data.ToDoc, lp[2] * Data.ToDoc);
                     e.Display.DrawArrow(new Line(p + new Vector3d(0, 0, arrow), p), Color.FromArgb(255, 70, 50), 0, 0.25);
                 }

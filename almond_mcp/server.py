@@ -2347,6 +2347,7 @@ def visualize_structure(
     reveal: float = 1.0,
     reanalyze: bool = True,
     physics: bool = True,
+    display_guids: list[str] | None = None,
     title: str = "",
     clear: bool = False,
 ) -> str:
@@ -2382,6 +2383,8 @@ def visualize_structure(
             (scale / color_by / reveal / physics / title) - cheap enough to animate.
         physics: False draws the same members as plain geometry with no analysis
             overlay ("physics off"), for before/after comparisons.
+        display_guids: draw only these members (e.g. one frame line for a section
+            view); the analysis still covers every member in guids.
         title: legend title.
         clear: remove the overlay.
 
@@ -2415,6 +2418,8 @@ def visualize_structure(
         request["scale"] = scale
     if span_m is not None:
         request["span_m"] = span_m
+    if display_guids:
+        request["display_guids"] = display_guids
     if title:
         request["title"] = title
     try:
