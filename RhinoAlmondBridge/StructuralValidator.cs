@@ -233,6 +233,8 @@ namespace RhinoAlmondBridge
                 ImposedLoadKN = request.LoadKN,
                 IncludeSelfWeight = request.IncludeSelfWeight,
                 FixedRotations = request.FixedRotations,
+                // nodal field fixes the 0.0 mm max-displacement read (issue #6)
+                ReturnGeometry = false,
             };
 
             KarambaResults karamba;

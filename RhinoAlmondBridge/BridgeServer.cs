@@ -253,6 +253,10 @@ namespace RhinoAlmondBridge
                         RhinoApp.WriteLine($"RhinoAlmondBridge: Validation {valResult.Status}: {valResult.Verdict}");
                         return JsonConvert.SerializeObject(valResult);
 
+                    case "structure_view":
+                        RhinoApp.WriteLine("RhinoAlmondBridge: Structure view (Karamba live)...");
+                        return StructureView.Handle(jobj);
+
                     case "execute":
                     default:
                         string script = jobj.Value<string>("script") ?? "";

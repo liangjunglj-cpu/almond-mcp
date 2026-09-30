@@ -2331,6 +2331,107 @@ def validate_structure(
     return response
 
 
+@mcp.tool()
+def visualize_structure(
+    guids: list[str] | None = None,
+    load_kn: float = 10.0,
+    material: str = "Steel",
+    beam_diameter_mm: float | None = None,
+    beam_wall_mm: float | None = None,
+    self_weight: bool = True,
+    fixed_supports: bool = True,
+    deflection_limit_ratio: float = 250.0,
+    span_m: float | None = None,
+    color_by: str = "displacement",
+    scale: float | None = None,
+    reveal: float = 1.0,
+    reanalyze: bool = True,
+    physics: bool = True,
+    display_guids: list[str] | None = None,
+    title: str = "",
+    clear: bool = False,
+) -> str:
+    """
+    Run a live Karamba3D analysis on a line model and SHOW it in every Rhino viewport:
+    the undeformed wireframe, the exaggerated deformed shape coloured blue -> red by
+    displacement (or by utilization), supports, load arrows and a legend panel with
+    max deflection, the L/limit check and PASS/FAIL. Nothing is baked into the document.
+
+    Use it to make structural behaviour visible while designing: model the structural
+    axes as curves, include Rhino point objects at the supports, call this tool, then
+    fix the members it shows in red (add a column, shorten a cantilever, upsize the
+    section via beam_diameter_mm) and call it again. validate_structure gives the
+    auditable verdict; this tool is the visual, iterative view of the same solve.
+
+    Args:
+        guids: Curve GUIDs of the structural axes plus point GUIDs marking supports
+            (see fixed_supports). Without points, the lowest nodes are supported.
+        load_kn: Total imposed load in kN, shared equally by the free nodes (-Z).
+        material: "Steel", "S355", "Concrete", "Wood", "Aluminium".
+        beam_diameter_mm, beam_wall_mm: circular hollow section for every member
+            (default: inferred / CHS 114.3x4).
+        self_weight: include gravity.
+        fixed_supports: True = fully fixed supports, False = pinned (rotations free).
+        deflection_limit_ratio: span/ratio limit, e.g. 250 for L/250.
+        span_m: reference span in meters for the limit (default: longest member).
+            Set it when members are split at every node, e.g. a 6.2 m joist drawn
+            as two 3.1 m segments.
+        color_by: "displacement" or "utilization".
+        scale: deformation exaggeration; omit for automatic (~6% of span).
+        reveal: 0..1 fraction of members drawn (for staged construction playback).
+        reanalyze: False re-uses the last solve and only changes the display
+            (scale / color_by / reveal / physics / title) - cheap enough to animate.
+        physics: False draws the same members as plain geometry with no analysis
+            overlay ("physics off"), for before/after comparisons.
+        display_guids: draw only these members (e.g. one frame line for a section
+            view); the analysis still covers every member in guids.
+        title: legend title.
+        clear: remove the overlay.
+
+    Returns JSON: status ("pass"|"fail"|"error"|"cleared"), max_displacement_mm,
+    deflection_limit_mm, span_m, max_utilization, scale, per-element
+    {source_guids, max_displacement_mm, utilization}, warnings.
+    Requires Karamba3D 3.1 (the trial caps models at 20 beam elements).
+    """
+    if not clear and not guids:
+        return json.dumps({"status": "error", "message": "Provide the curve (and support point) GUIDs to analyse."})
+    if color_by not in ("displacement", "utilization"):
+        return json.dumps({"status": "error", "message": "color_by must be 'displacement' or 'utilization'."})
+    request = {
+        "type": "structure_view",
+        "guids": guids or [],
+        "load_kn": load_kn,
+        "material": material,
+        "self_weight": self_weight,
+        "fixed_rotations": fixed_supports,
+        "deflection_limit_ratio": deflection_limit_ratio,
+        "color_by": color_by,
+        "reveal": max(0.0, min(1.0, reveal)),
+        "reanalyze": reanalyze,
+        "physics": physics,
+        "clear": clear,
+    }
+    if beam_diameter_mm is not None:
+        request["beam_diameter_mm"] = beam_diameter_mm
+        request["beam_wall_mm"] = beam_wall_mm if beam_wall_mm is not None else beam_diameter_mm / 20.0
+    if scale is not None:
+        request["scale"] = scale
+    if span_m is not None:
+        request["span_m"] = span_m
+    if display_guids:
+        request["display_guids"] = display_guids
+    if title:
+        request["title"] = title
+    try:
+        return _send_and_receive(json.dumps(request).encode('utf-8'), timeout=90.0)
+    except socket.timeout:
+        return json.dumps({"status": "error", "message": "Structure view timed out (>90s)."})
+    except ConnectionRefusedError:
+        return json.dumps({"status": "error", "message": "Connection refused. Is the RhinoAlmondBridge plugin loaded in Rhino?"})
+    except Exception as e:
+        return json.dumps({"status": "error", "message": f"Bridge error: {e}"})
+
+
 def _render_validation_report(runs: list[dict]) -> str:
     """Markdown report of persisted validate_structure runs, newest first."""
     from datetime import datetime, timezone
