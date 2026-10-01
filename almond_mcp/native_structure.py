@@ -23,6 +23,7 @@ import time
 
 import numpy as np
 
+from . import asset_loads as al
 from . import frame_solver as fs
 
 METHOD_PREFIX = "[ALMOND NATIVE FEA (LINEAR 3D FRAME), HIGH CONFIDENCE] "
@@ -60,7 +61,9 @@ def section_from_spec(spec: dict | None, diameter_mm=None, wall_mm=None) -> tupl
 
 
 def build_frame(model: dict, load_kn: float, material: str = "Steel", fixed_supports: bool = True,
-                self_weight: bool = True, diameter_mm=None, wall_mm=None):
+                self_weight: bool = True, diameter_mm=None, wall_mm=None, asset_loads: dict | None = None):
+    """``asset_loads``: {"placements": [...], "table": LoadTable, "catalogue": {...}} adds the
+    gravity loads of placed library assets (see asset_loads.apply); its report is info["asset_loads"]."""
     """Frame + bookkeeping from an exported conditioned model (all coordinates in meters)."""
     mat = fs.material(material)
     tol = max(float(model.get("tolerance_m") or 0.0), 1e-6)
@@ -113,18 +116,23 @@ def build_frame(model: dict, load_kn: float, material: str = "Steel", fixed_supp
     if self_weight:
         frame.gravity = (0.0, 0.0, -1.0)
     info = {"support_nodes": support_nodes, "loaded_nodes": free if load_kn > 0 else [], "material": mat}
+    if asset_loads:
+        report = al.apply(frame, asset_loads["placements"], asset_loads["table"], asset_loads.get("catalogue") or {})
+        info["asset_loads"] = report
+        info["loaded_nodes"] = sorted(set(info["loaded_nodes"]) | set(report["loaded_nodes"]))
     return frame, info, warnings
 
 
 def view_result(model: dict, load_kn: float = 10.0, material: str = "Steel", fixed_supports: bool = True,
                 self_weight: bool = True, diameter_mm=None, wall_mm=None, span_m: float | None = None,
-                stations: int = 13) -> tuple[dict, float]:
+                stations: int = 13, asset_loads: dict | None = None) -> tuple[dict, float]:
     """Solve and package the result for the bridge's ``structure_draw`` overlay.
 
     Returns (result, span_m): per-element start/end points and sampled global displacements in
     meters, utilization, supports, loaded nodes and the max displacement. Raises
     frame_solver.MechanismError for unstable models."""
-    frame, info, warnings = build_frame(model, load_kn, material, fixed_supports, self_weight, diameter_mm, wall_mm)
+    frame, info, warnings = build_frame(model, load_kn, material, fixed_supports, self_weight, diameter_mm, wall_mm,
+                                        asset_loads)
     res = fs.solve(frame, stations=stations)
     span = float(span_m or model.get("max_member_span_m") or model.get("max_span_m") or 5.0)
     elements = []
@@ -137,12 +145,15 @@ def view_result(model: dict, load_kn: float = 10.0, material: str = "Steel", fix
               "loaded_points_m": [list(frame.nodes[n]) for n in info["loaded_nodes"]],
               "max_displacement_mm": round(res.max_displacement * 1000.0, 3),
               "warnings": list(model.get("warnings") or []) + warnings}
+    if "asset_loads" in info:
+        result["asset_loads"] = info["asset_loads"]
     return result, span
 
 
 def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, material: str = "Steel",
              fixed_supports: bool = True, self_weight: bool = True, diameter_mm=None, wall_mm=None,
-             limit_ratio: float = 250.0, plastic: bool = False, span_m: float | None = None) -> dict:
+             limit_ratio: float = 250.0, plastic: bool = False, span_m: float | None = None,
+             asset_loads: dict | None = None) -> dict:
     """Run the native check and return a bridge-compatible validation result."""
     result = {"status": "error", "passed": False, "structure_type": structure_type, "material": material,
               "confidence": "high", "suggestions": [], "worst_member_guids": [],
@@ -150,7 +161,8 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
               "results": {"analysis_method": "native"}}
     t0 = time.perf_counter()
     try:
-        frame, info, notes = build_frame(model, load_kn, material, fixed_supports, self_weight, diameter_mm, wall_mm)
+        frame, info, notes = build_frame(model, load_kn, material, fixed_supports, self_weight, diameter_mm, wall_mm,
+                                         asset_loads)
         result["warnings"] += notes
         res = fs.solve(frame, plastic=plastic)
     except fs.MechanismError as exc:
@@ -193,6 +205,12 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
         "equilibrium_error_kn": round(res.equilibrium_error(), 9),
         "solve_ms": round((time.perf_counter() - t0) * 1000.0, 1),
     })
+    if "asset_loads" in info:
+        result["asset_loads"] = info["asset_loads"]
+        if info["asset_loads"]["applied"]:
+            result["assumptions"] = ASSUMPTIONS + [
+                "Asset loads: estimated self weight + in-use load per placed asset (structural-loads.json), "
+                "carried by the nearest member or shared by the lever rule between two parallel members."]
     failures, sug = [], []
     if dmax_mm > limit_mm:
         failures.append(f"Deflection {dmax_mm:.1f}mm exceeds L/{limit_ratio:g} limit ({limit_mm:.1f}mm)")

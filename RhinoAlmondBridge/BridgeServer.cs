@@ -259,6 +259,9 @@ namespace RhinoAlmondBridge
                     case "structure_draw":
                         return StructureView.HandleDraw(jobj);
 
+                    case "asset_placements":
+                        return AssetPlacementExport.Handle(jobj);
+
                     case "structure_view":
                         RhinoApp.WriteLine("RhinoAlmondBridge: Structure view (Karamba live)...");
                         return StructureView.Handle(jobj);

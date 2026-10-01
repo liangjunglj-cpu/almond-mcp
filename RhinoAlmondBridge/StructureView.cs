@@ -42,6 +42,7 @@ namespace RhinoAlmondBridge
         [JsonProperty("span_m")] public double? SpanM { get; set; }
         [JsonProperty("reveal")] public double Reveal { get; set; } = 1.0;
         [JsonProperty("display_guids")] public List<string> DisplayGuids { get; set; }
+        [JsonProperty("load_label")] public string LoadLabel { get; set; }
         [JsonProperty("show_legend")] public bool ShowLegend { get; set; } = true;
         [JsonProperty("clear")] public bool Clear { get; set; }
     }
@@ -159,6 +160,7 @@ namespace RhinoAlmondBridge
             data.Reveal = Math.Max(0, Math.Min(1, req.Reveal));
             data.ShowLegend = req.ShowLegend;
             data.Physics = req.Physics;
+            if (req.LoadLabel != null) data.LoadLabel = req.LoadLabel;
             data.DisplaySet = req.DisplayGuids != null && req.DisplayGuids.Count > 0
                 ? new HashSet<string>(req.DisplayGuids, StringComparer.OrdinalIgnoreCase) : null;
             double maxM = data.Result.MaxDisplacementMM / 1000.0;
@@ -202,6 +204,7 @@ namespace RhinoAlmondBridge
         public double LoadKN;
         public bool SelfWeight, Physics = true;
         public HashSet<string> DisplaySet;
+        public string LoadLabel;
         public string Title, ColorBy = "displacement", Material;
         public string Engine = "api", DefaultTitle = "ALMOND  //  KARAMBA LIVE ANALYSIS";
         public bool ShowLegend = true;
@@ -330,7 +333,7 @@ namespace RhinoAlmondBridge
             if (!double.IsNaN(maxU))
                 e.Display.Draw2dText(maxU > 10 ? "utilization > 10  (unstable)" : string.Format("utilization {0:0.00}", maxU), maxU > 1 ? Color.FromArgb(255, 120, 100) : Color.FromArgb(200, 200, 205),
                     new Point2d(tx, y0 + 146 * dpi), false, fs, "Consolas");
-            e.Display.Draw2dText(string.Format("load {0:0} kN{1}  ·  {2}", Data.LoadKN, Data.SelfWeight ? " + self weight" : "", Data.Material),
+            e.Display.Draw2dText(Data.LoadLabel ?? string.Format("load {0:0} kN{1}  ·  {2}", Data.LoadKN, Data.SelfWeight ? " + self weight" : "", Data.Material),
                 Color.FromArgb(200, 200, 205), new Point2d(tx, y0 + 170 * dpi), false, fs, "Consolas");
             e.Display.Draw2dText(pass ? "PASS" : "FAIL", pass ? Color.FromArgb(40, 220, 90) : Color.FromArgb(240, 40, 30),
                 new Point2d(tx + 220 * dpi, y0 + 50 * dpi), false, fb, "Arial Black");

@@ -1057,6 +1057,20 @@ class AlmondStore:
             "revision": revision,
         }
 
+    def scene_instances(self, scene_id: str) -> list[dict[str, Any]]:
+        """Every instance of a scene with its world bounding box (mm), for structural loads."""
+        with self._connect() as conn:
+            if not conn.execute("SELECT 1 FROM scenes WHERE scene_id = ?", (scene_id,)).fetchone():
+                raise KeyError(f"Unknown scene_id: {scene_id}")
+            rows = conn.execute(
+                """
+                SELECT instance_id, asset_id, rhino_guid, scale, min_x, max_x, min_y, max_y, min_z, max_z
+                FROM instances WHERE scene_id = ? ORDER BY instance_id
+                """,
+                (scene_id,),
+            ).fetchall()
+        return [dict(r) for r in rows]
+
     def validate_scene(self, scene_id: str, limit: int = 100) -> dict[str, Any]:
         if not self.get_scene(scene_id):
             raise KeyError(f"Unknown scene_id: {scene_id}")

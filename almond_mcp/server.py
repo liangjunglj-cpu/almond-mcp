@@ -24,7 +24,7 @@ from fastmcp import FastMCP
 from fastmcp.resources import ResourceContent, ResourceResult
 from almond_mcp.ghx_parser import GHParser, validate_capsule_manifest
 from almond_mcp.retrieval_store import AlmondStore
-from almond_mcp import asset_passport, conditioning, exchange, paths, drafting, native_structure
+from almond_mcp import asset_passport, asset_loads, conditioning, exchange, paths, drafting, native_structure
 
 # ── Constants ────────────────────────────────────────────────────────────────
 
@@ -903,9 +903,17 @@ def get_generated_asset_passport(asset_id: str) -> dict:
         return {"status": "error", "message": f"Unknown generated asset_id: {asset_id}"}
     if not asset.get("passport"):
         return {"status": "error", "message": "Library has no passport; upgrade the asset pack."}
-    return {"status": "success", "passport": asset["passport"],
-            "file_available": asset.get("file_available", False),
-            "preview_uri": f"almond://generated/{asset_id}/preview"}
+    out = {"status": "success", "passport": asset["passport"],
+           "file_available": asset.get("file_available", False),
+           "preview_uri": f"almond://generated/{asset_id}/preview"}
+    try:
+        table = asset_loads.LoadTable(_structural_loads_path())
+        entry = table.lookup(asset_id, asset.get("category", ""))
+        if entry:
+            out["structural_loads"] = {**entry, "basis": table.basis}
+    except Exception:
+        pass
+    return out
 
 
 @mcp.tool(annotations={"readOnlyHint": True, "openWorldHint": False})
@@ -2239,6 +2247,8 @@ def validate_structure(
     fixed_supports: bool = True,
     self_weight: bool = True,
     span_m: float | None = None,
+    asset_loads: bool = False,
+    scene_id: str = "",
 ) -> str:
     """
     Validates AI-generated geometry with a structural analysis.
@@ -2282,6 +2292,13 @@ def validate_structure(
         self_weight: include member self weight.
         span_m: structural span in meters for the L/250 limit when members are split at
             every node (e.g. a 6.2 m joist drawn as two 3.1 m segments). Native engine only.
+        asset_loads: add the gravity loads of placed library assets (estimated self weight
+            plus in-use contents/occupants from each asset's load entry, e.g. a filled
+            bathtub) where they stand on (or hang from) the frame. Placements come from
+            Rhino objects tagged with an Almond asset id, or from the scene ledger when
+            scene_id is given. Native engine only; the result's "asset_loads" lists every
+            placement with its load and carrying members, or why it was not applied.
+        scene_id: scene ledger to read placements from (default: tagged Rhino objects).
     Prefer calling get_construction_guidance BEFORE generating the geometry:
     pick a real construction system and size members from its depth/spacing
     rules. This tool cross-checks the analyzed span against that same library
@@ -2317,9 +2334,16 @@ def validate_structure(
         request["self_weight"] = False
 
     result, note = None, None
+    spec = None
+    if asset_loads:
+        if engine == "karamba":
+            return json.dumps({"status": "error", "message": "asset_loads needs the native engine (engine='auto' or 'native')."})
+        spec, err = _asset_load_spec(scene_id)
+        if err:
+            return json.dumps({"status": "error", "message": err})
     if engine == "native" or (engine == "auto" and structure_type.lower() not in KARAMBA_ONLY_TYPES):
         result, note = _native_validation(guids, structure_type, load_kn, material, fixed_supports,
-                                          self_weight, span_m, required=engine == "native")
+                                          self_weight, span_m, required=engine == "native", asset_spec=spec)
         if isinstance(result, str):          # hard error (explicit native request, or no bridge)
             return result
     if result is None:
@@ -2337,6 +2361,8 @@ def validate_structure(
             return response
         if note and isinstance(result, dict):
             result.setdefault("warnings", []).append(note)
+        if spec and isinstance(result, dict):
+            result.setdefault("warnings", []).append("Asset loads were not applied: the Karamba route does not take them.")
 
     # Attach the constructibility cross-check (curated construction-system
     # span/depth guidance), then persist the run in the state DB so
@@ -2365,7 +2391,42 @@ def validate_structure(
 KARAMBA_ONLY_TYPES = ("shell", "gridshell", "membrane")
 
 
-def _native_validation(guids, structure_type, load_kn, material, fixed_supports, self_weight, span_m, required):
+def _structural_loads_path() -> Path:
+    return Path(GENERATED_LIBRARY_DIR) / "structural-loads.json"
+
+
+def _asset_load_spec(scene_id: str = ""):
+    """Placements + load table + catalogue facts for asset loads: (spec, None) or (None, error)."""
+    try:
+        table = asset_loads.LoadTable(_structural_loads_path())
+    except Exception as e:
+        return None, f"The asset load table is unavailable ({e})."
+    if scene_id:
+        try:
+            placements = asset_loads.placements_from_scene(retrieval_store.scene_instances(scene_id))
+        except KeyError as e:
+            return None, str(e).strip("'")
+    else:
+        try:
+            reply = json.loads(_send_and_receive(json.dumps({"type": "asset_placements"}).encode('utf-8'), timeout=60.0))
+        except ConnectionRefusedError:
+            return None, "Connection refused. Is the RhinoAlmondBridge plugin loaded in Rhino?"
+        except Exception as e:
+            return None, f"Could not read asset placements from Rhino ({e})."
+        if not isinstance(reply, dict) or reply.get("status") != "ok":
+            return None, "This bridge version cannot export asset placements (update almondbridge)."
+        placements = reply.get("placements") or []
+    catalogue = {}
+    for pl in placements:
+        a = generated_asset_indexer.get(pl["asset_id"]) or {}
+        catalogue[pl["asset_id"]] = {"category": a.get("category", ""), "name": a.get("product", ""),
+                                     "support_plane": (a.get("spatial") or {}).get("support_plane", "floor"),
+                                     "nominal_mm": a.get("nominal_dimensions_mm") or {}}
+    return {"placements": placements, "table": table, "catalogue": catalogue}, None
+
+
+def _native_validation(guids, structure_type, load_kn, material, fixed_supports, self_weight, span_m, required,
+                       asset_spec=None):
     """Native frame check on the bridge's exported line model.
 
     Returns (result_dict, None) when it ran, (None, note) to fall back to the Karamba
@@ -2392,7 +2453,8 @@ def _native_validation(guids, structure_type, load_kn, material, fixed_supports,
         return unavailable("No line members found for the given GUIDs.")
     try:
         result = native_structure.validate(reply, structure_type.lower(), load_kn, material,
-                                           fixed_supports=fixed_supports, self_weight=self_weight, span_m=span_m)
+                                           fixed_supports=fixed_supports, self_weight=self_weight, span_m=span_m,
+                                           asset_loads=asset_spec)
     except ValueError as e:
         return json.dumps({"status": "error", "message": str(e)}), None
     return result, None
@@ -2418,6 +2480,8 @@ def visualize_structure(
     title: str = "",
     clear: bool = False,
     engine: str = "auto",
+    asset_loads: bool = False,
+    scene_id: str = "",
 ) -> str:
     """
     Run a live structural analysis on a line model and SHOW it in every Rhino viewport:
@@ -2458,6 +2522,8 @@ def visualize_structure(
         engine: "auto" (default: Almond's native frame solver, no Karamba needed; Karamba
             when the selection has shells or the bridge cannot export a model),
             "native" or "karamba".
+        asset_loads, scene_id: add the loads of placed library assets (native engine), as in
+            validate_structure; loaded points are drawn with load arrows.
 
     Returns JSON: status ("pass"|"fail"|"error"|"cleared"), max_displacement_mm,
     deflection_limit_mm, span_m, max_utilization, scale, per-element
@@ -2499,12 +2565,19 @@ def visualize_structure(
         request["title"] = title
     global _VIEW_ENGINE
     note = None
+    spec = None
+    if asset_loads and not clear and reanalyze:
+        if engine == "karamba":
+            return json.dumps({"status": "error", "message": "asset_loads needs the native engine (engine='auto' or 'native')."})
+        spec, err = _asset_load_spec(scene_id)
+        if err:
+            return json.dumps({"status": "error", "message": err})
     if not clear and engine != "karamba" and not (not reanalyze and _VIEW_ENGINE == "api"):
         if not reanalyze and _VIEW_ENGINE == "native":
             draw = {k: v for k, v in request.items() if k not in ("guids", "reanalyze", "clear")}
             draw["type"] = "structure_draw"
             return _bridge_call(draw, 30.0)
-        reply, note = _native_view(request, guids, required=engine == "native")
+        reply, note = _native_view(request, guids, required=engine == "native", asset_spec=spec)
         if reply is not None:
             return reply
     out = _bridge_call(request, 90.0)
@@ -2536,7 +2609,7 @@ def _bridge_call(message: dict, timeout: float) -> str:
         return json.dumps({"status": "error", "message": f"Bridge error: {e}"})
 
 
-def _native_view(request: dict, guids, required: bool):
+def _native_view(request: dict, guids, required: bool, asset_spec=None):
     """Solve natively and draw through the bridge's structure_draw overlay.
 
     Returns (reply_json, None) when it ran or must stop, (None, note) to fall back to Karamba."""
@@ -2563,14 +2636,18 @@ def _native_view(request: dict, guids, required: bool):
         result, span = native_structure.view_result(
             model, request["load_kn"], request["material"], fixed_supports=request["fixed_rotations"],
             self_weight=request["self_weight"], diameter_mm=request.get("beam_diameter_mm"),
-            wall_mm=request.get("beam_wall_mm"), span_m=request.get("span_m"))
+            wall_mm=request.get("beam_wall_mm"), span_m=request.get("span_m"), asset_loads=asset_spec)
     except native_structure.fs.MechanismError as e:
         return json.dumps({"status": "fail", "analysis_method": "native", "message": str(e),
                            "mechanism_nodes": len(e.nodes)}), None
     except ValueError as e:
         return json.dumps({"status": "error", "message": str(e)}), None
     draw = {k: v for k, v in request.items() if k not in ("guids", "reanalyze", "clear")}
+    report = result.pop("asset_loads", None)
     draw.update({"type": "structure_draw", "engine": "native", "span_m": span, "result": result})
+    if report is not None:
+        draw["load_label"] = (f"load {request['load_kn']:.0f} kN + {report['applied']} assets {report['total_kn']:.1f} kN"
+                              + (" + self weight" if request["self_weight"] else ""))
     out = _bridge_call(draw, 60.0)
     try:
         parsed = json.loads(out)
@@ -2579,6 +2656,8 @@ def _native_view(request: dict, guids, required: bool):
     if isinstance(parsed, dict) and parsed.get("status") in ("pass", "fail"):
         _VIEW_ENGINE = "native"
         parsed["warnings"] = result["warnings"]
+        if report is not None:
+            parsed["asset_loads"] = report
         parsed["nodes"] = len({tuple(p) for e in result["elements"] for p in (e["start_m"], e["end_m"])})
     elif not required:
         # a bridge without structure_draw: fall back to the Karamba overlay

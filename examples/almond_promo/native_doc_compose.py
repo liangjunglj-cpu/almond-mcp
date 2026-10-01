@@ -202,7 +202,44 @@ def video():
     print("wrote", VID, VID.stat().st_size // 1024, "KB")
 
 
+def asset_loads_image():
+    """Furniture from the asset library as loads: overlay + the applied placements."""
+    rows = {r["name"]: r for r in json.loads((SRC / "assets_log.json").read_text())}
+    r114, r193 = rows["assets_114"], rows["assets_193"]
+    im = grid(["assets_114", "assets_193"],
+              [("CHS 114.3x4", f'{r114["max_mm"]:.1f} mm / u {r114["util"]:.2f} / {r114["status"].upper()}', CYAN),
+               ("CHS 193.7x8", f'{r193["max_mm"]:.1f} mm / u {r193["util"]:.2f} / {r193["status"].upper()}', CYAN)], 2,
+              title="LOADS FROM ASSET PASSPORTS  //  validate_structure(asset_loads=True), placed furniture only")
+    rep = r114["asset_loads"]
+    applied = [p for p in rep["placements"] if "carried_by" in p]
+    agg = {}
+    for p in applied:
+        a = agg.setdefault(p["asset_id"], [0, 0.0])
+        a[0] += 1
+        a[1] += p["dead_kn"] + p["imposed_kn"]
+    h = 70 + 34 * (len(agg) + 2)
+    out = Image.new("RGB", (im.width, im.height + h), INK)
+    out.paste(im, (0, 0))
+    d = ImageDraw.Draw(out)
+    y = im.height + 10
+    d.text((24, y), f'APPLIED {rep["applied"]} / SKIPPED {rep["skipped"]}  //  DEAD {rep["dead_kn"]:.2f} kN + IMPOSED '
+                    f'{rep["imposed_kn"]:.2f} kN = {rep["total_kn"]:.2f} kN', font=font("ocr", 20), fill=CYAN)
+    y += 44
+    for aid, (n, kn) in sorted(agg.items(), key=lambda kv: -kv[1][1]):
+        e = next(p for p in applied if p["asset_id"] == aid)
+        d.text((24, y), f'{n} x {aid}', font=font("mono", 24), fill=WHITE)
+        d.text((720, y), f'{kn:5.2f} kN   ({e["self_kg"]:g} kg self + {e["use_kg"]:g} kg {e["use"] or "-"})',
+               font=font("mono", 24), fill=GREY)
+        y += 34
+    d.text((24, y + 6), "Ground-floor items and the study wing are outside this frame and reported as skipped.",
+           font=font("mono", 22), fill=GREY)
+    save(out, "asset-loads.jpg")
+
+
 if __name__ == "__main__":
+    if "--assets" in sys.argv:
+        asset_loads_image()
+        sys.exit()
     images()
     if "--video" in sys.argv:
         video()

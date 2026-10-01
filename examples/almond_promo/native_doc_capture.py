@@ -87,5 +87,24 @@ def main():
     (OUT / "log.json").write_text(json.dumps(LOG, indent=1))
 
 
+def capture_asset_loads():
+    """Placed furniture as loads (asset passports): the as-drawn and resized frames, asset loads only."""
+    run_cs((HERE / "rhino_setup_view.cs").read_text(encoding="utf-8").replace("LENS", "42"), quiet=True)
+    rows = []
+    for name, (d, w) in (("assets_114", SIZES[0]), ("assets_193", SIZES[3])):
+        out = json.loads(server.visualize_structure(
+            guids=GUIDS, load_kn=0, fixed_supports=False, span_m=6.2, beam_diameter_mm=d, beam_wall_mm=w,
+            color_by="utilization", scale=40, asset_loads=True,
+            title=f"ALMOND  //  NATIVE FEA  ·  ASSET LOADS  ·  CHS {d}x{w}"))
+        run_cs(CAP.replace("PATH", str(OUT / f"{name}.jpg")), quiet=True)
+        rows.append({"name": name, "status": out.get("status"), "max_mm": out.get("max_displacement_mm"),
+                     "util": out.get("max_utilization"), "asset_loads": out.get("asset_loads")})
+        print(name, out.get("status"), out.get("max_displacement_mm"), out.get("max_utilization"), flush=True)
+    (OUT / "assets_log.json").write_text(json.dumps(rows, indent=1))
+
+
 if __name__ == "__main__":
-    main()
+    if "--assets" in sys.argv:
+        capture_asset_loads()
+    else:
+        main()

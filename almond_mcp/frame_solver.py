@@ -172,6 +172,18 @@ class Frame:
     def udl(self, element, w):
         self.member_loads.append((element, np.asarray(w, float)))
 
+    def split_element(self, ei: int, t: float) -> int:
+        """Insert a node at fraction t along element ei, splitting it in two (same section,
+        material and lineage; member loads follow both halves). Returns the new node."""
+        e = self.elements[ei]
+        p1, p2 = np.asarray(self.nodes[e.n1]), np.asarray(self.nodes[e.n2])
+        k = self.add_node(p1 + t * (p2 - p1))
+        n2 = e.n2
+        e.n2 = k
+        new = self.add_element(k, n2, e.section, e.material, truss=e.truss, ref=e.ref, tag=e.tag)
+        self.member_loads += [(new, w) for (j, w) in self.member_loads if j == ei]
+        return k
+
 
 class MechanismError(ValueError):
     """The stiffness matrix is singular: the structure (or part of it) can move freely."""

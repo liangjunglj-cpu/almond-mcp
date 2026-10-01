@@ -55,6 +55,7 @@ packages = ["almond_mcp"]
 "GeneratedAssetfiles/README.md" = "almond_mcp/data/GeneratedAssetfiles/README.md"
 "GeneratedAssetfiles/catalogue.json" = "almond_mcp/data/GeneratedAssetfiles/catalogue.json"
 "GeneratedAssetfiles/provenance.json" = "almond_mcp/data/GeneratedAssetfiles/provenance.json"
+"GeneratedAssetfiles/structural-loads.json" = "almond_mcp/data/GeneratedAssetfiles/structural-loads.json"
 "GeneratedAssetfiles/source-register.json" = "almond_mcp/data/GeneratedAssetfiles/source-register.json"
 "GeneratedAssetfiles/batches" = "almond_mcp/data/GeneratedAssetfiles/batches"
 "DrawingRecipes" = "almond_mcp/data/DrawingRecipes"
@@ -70,6 +71,7 @@ include = [
     "/Draftingfiles", "/tools/build_drawing_pilot.py",
     "/GeneratedAssetfiles/manifest.json", "/GeneratedAssetfiles/catalogue.json",
     "/GeneratedAssetfiles/provenance.json", "/GeneratedAssetfiles/passport.schema.json",
+    "/GeneratedAssetfiles/structural-loads.json",
     "/GeneratedAssetfiles/source-register.json",
     "/GeneratedAssetfiles/README.md", "/GeneratedAssetfiles/models", "/GeneratedAssetfiles/previews",
     "/DrawingAssetfiles/manifest.json", "/DiagramAssetfiles/manifest.json",

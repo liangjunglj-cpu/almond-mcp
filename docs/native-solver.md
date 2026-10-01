@@ -77,6 +77,45 @@ are immune; I-sections are not checked for it), shear/torsion interaction, dynam
 connections, national annexes. Results are a preliminary design check, not an
 engineer's sign-off.
 
+## Loads from placed assets
+
+`validate_structure(..., asset_loads=True)` and `visualize_structure(..., asset_loads=True)`
+add the gravity load of every placed library asset that stands on (or hangs from) the
+frame:
+
+- **Load data:** `GeneratedAssetfiles/structural-loads.json` gives each of the 50 library
+  assets an estimated self weight (dead) and in-use load (imposed: occupants at 80 kg,
+  water in a filled bath, books on shelves), with category defaults for other libraries.
+  These are typical-product estimates, not measured or manufacturer data. The entry is
+  also returned by `get_generated_asset_passport` as `structural_loads`.
+- **Placements:** Rhino objects tagged with an Almond asset id (`Almond.AssetId`,
+  `almond:asset_id`) via the bridge's `asset_placements` message, or the scene ledger
+  when `scene_id` is given.
+- **Load path:** floor items load the highest frame level up to 1.6 m below their base (a
+  lamp on a desk still loads the floor); ceiling items hang from the lowest level up to
+  1.5 m above their top. The load goes to the nearest member, or is shared by the lever
+  rule between the two parallel members either side (a floor spanning one way between
+  them). Members are split at the load points, so point loads are exact.
+- **Not applied, and reported why:** wall-mounted items, ground-only items (trees, cars,
+  street furniture), structural elements, assets outside the frame's plan, and assets
+  with no frame level below.
+- **Sizes:** the load is the nominal product's. A placement whose plan size differs from
+  the catalogue product by more than 1.5× (or less than 0.67×) is flagged, not rescaled:
+  Almond's placement scale usually corrects generated-mesh proportions.
+
+**Asset loads and code loads.** A code imposed floor load (e.g. EN 1991-1-1 category A,
+1.5–2.0 kN/m²) already covers movable furniture and people. Use asset loads to check
+heavy, specific items (a filled bath, full bookshelves, a kitchen island) on top of the
+remaining area load, or on their own as a furniture check — do not add them to a full
+code load without thinking about double counting.
+
+![Placed furniture as loads](images/native-solver/asset-loads.jpg)
+
+Live, Atelier-07 mezzanine (2026-10-01): 7 placed assets on the frame — bathtub
+(45 kg + 260 kg water and bather), bed (90 + 160 kg), toilet, a throw and three pendants
+hung beneath — total 6.6 kN; 15 placements reported as skipped (ground floor, study wing).
+CHS 114.3×4 under furniture and self weight only: 17.2 mm, utilization 0.30.
+
 ## Benchmarks
 
 Asserted in `tests/test_frame_solver.py` (20 closed-form cases including equilibrium,
