@@ -353,8 +353,9 @@ def test_validate_structure_passes_through_new_fields(server, monkeypatch):
         structure_type="frame",
         load_kn=25.0,
         material="S355",
+        engine="karamba",
     )
-    # Untouched passthrough, new fields included.
+    # Untouched passthrough on the Karamba route, new fields included.
     assert result == bridge_response
     parsed = json.loads(result)
     assert parsed["analysis_method"] == "api"
