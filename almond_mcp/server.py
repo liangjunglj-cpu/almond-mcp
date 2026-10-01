@@ -2249,6 +2249,8 @@ def validate_structure(
     span_m: float | None = None,
     asset_loads: bool = False,
     scene_id: str = "",
+    floor_load_kn_m2: float = 0.0,
+    floor_dead_kn_m2: float = 0.0,
 ) -> str:
     """
     Validates AI-generated geometry with a structural analysis.
@@ -2299,6 +2301,13 @@ def validate_structure(
             scene_id is given. Native engine only; the result's "asset_loads" lists every
             placement with its load and carrying members, or why it was not applied.
         scene_id: scene ledger to read placements from (default: tagged Rhino objects).
+        floor_load_kn_m2: imposed floor load in kN/m2 (e.g. 2.0 for homes, EN 1991-1-1
+            category A) on every bay enclosed by beams on a level; the beams take it by the
+            45-degree rule (two-way, one-way above 2:1). Native engine only. A code floor load
+            already covers movable furniture and people: combine it with asset_loads only for
+            heavy specific items, and set load_kn to 0 to avoid double counting.
+        floor_dead_kn_m2: superimposed dead load in kN/m2 (floor build-up, finishes) on the
+            same bays.
     Prefer calling get_construction_guidance BEFORE generating the geometry:
     pick a real construction system and size members from its depth/spacing
     rules. This tool cross-checks the analyzed span against that same library
@@ -2335,6 +2344,9 @@ def validate_structure(
 
     result, note = None, None
     spec = None
+    floor, err = _floor_spec(floor_load_kn_m2, floor_dead_kn_m2, engine)
+    if err:
+        return json.dumps({"status": "error", "message": err})
     if asset_loads:
         if engine == "karamba":
             return json.dumps({"status": "error", "message": "asset_loads needs the native engine (engine='auto' or 'native')."})
@@ -2343,7 +2355,8 @@ def validate_structure(
             return json.dumps({"status": "error", "message": err})
     if engine == "native" or (engine == "auto" and structure_type.lower() not in KARAMBA_ONLY_TYPES):
         result, note = _native_validation(guids, structure_type, load_kn, material, fixed_supports,
-                                          self_weight, span_m, required=engine == "native", asset_spec=spec)
+                                          self_weight, span_m, required=engine == "native", asset_spec=spec,
+                                          floor_spec=floor)
         if isinstance(result, str):          # hard error (explicit native request, or no bridge)
             return result
     if result is None:
@@ -2361,8 +2374,9 @@ def validate_structure(
             return response
         if note and isinstance(result, dict):
             result.setdefault("warnings", []).append(note)
-        if spec and isinstance(result, dict):
-            result.setdefault("warnings", []).append("Asset loads were not applied: the Karamba route does not take them.")
+        if (spec or floor) and isinstance(result, dict):
+            result.setdefault("warnings", []).append(
+                "Asset and floor loads were not applied: the Karamba route does not take them.")
 
     # Attach the constructibility cross-check (curated construction-system
     # span/depth guidance), then persist the run in the state DB so
@@ -2425,8 +2439,20 @@ def _asset_load_spec(scene_id: str = ""):
     return {"placements": placements, "table": table, "catalogue": catalogue}, None
 
 
+def _floor_spec(imposed, dead, engine):
+    """(spec | None, error | None) for floor area loads."""
+    imposed, dead = float(imposed or 0.0), float(dead or 0.0)
+    if imposed < 0 or dead < 0 or not (math.isfinite(imposed) and math.isfinite(dead)):
+        return None, "Floor loads must be finite and non-negative (kN/m2)."
+    if not imposed and not dead:
+        return None, None
+    if engine == "karamba":
+        return None, "Floor loads need the native engine (engine='auto' or 'native')."
+    return {"imposed": imposed, "dead": dead}, None
+
+
 def _native_validation(guids, structure_type, load_kn, material, fixed_supports, self_weight, span_m, required,
-                       asset_spec=None):
+                       asset_spec=None, floor_spec=None):
     """Native frame check on the bridge's exported line model.
 
     Returns (result_dict, None) when it ran, (None, note) to fall back to the Karamba
@@ -2454,7 +2480,7 @@ def _native_validation(guids, structure_type, load_kn, material, fixed_supports,
     try:
         result = native_structure.validate(reply, structure_type.lower(), load_kn, material,
                                            fixed_supports=fixed_supports, self_weight=self_weight, span_m=span_m,
-                                           asset_loads=asset_spec)
+                                           asset_loads=asset_spec, floor_loads=floor_spec)
     except ValueError as e:
         return json.dumps({"status": "error", "message": str(e)}), None
     return result, None
@@ -2482,6 +2508,8 @@ def visualize_structure(
     engine: str = "auto",
     asset_loads: bool = False,
     scene_id: str = "",
+    floor_load_kn_m2: float = 0.0,
+    floor_dead_kn_m2: float = 0.0,
 ) -> str:
     """
     Run a live structural analysis on a line model and SHOW it in every Rhino viewport:
@@ -2524,6 +2552,8 @@ def visualize_structure(
             "native" or "karamba".
         asset_loads, scene_id: add the loads of placed library assets (native engine), as in
             validate_structure; loaded points are drawn with load arrows.
+        floor_load_kn_m2, floor_dead_kn_m2: floor area loads on every enclosed bay, as in
+            validate_structure.
 
     Returns JSON: status ("pass"|"fail"|"error"|"cleared"), max_displacement_mm,
     deflection_limit_mm, span_m, max_utilization, scale, per-element
@@ -2566,6 +2596,11 @@ def visualize_structure(
     global _VIEW_ENGINE
     note = None
     spec = None
+    floor = None
+    if not clear and reanalyze:
+        floor, err = _floor_spec(floor_load_kn_m2, floor_dead_kn_m2, engine)
+        if err:
+            return json.dumps({"status": "error", "message": err})
     if asset_loads and not clear and reanalyze:
         if engine == "karamba":
             return json.dumps({"status": "error", "message": "asset_loads needs the native engine (engine='auto' or 'native')."})
@@ -2577,7 +2612,7 @@ def visualize_structure(
             draw = {k: v for k, v in request.items() if k not in ("guids", "reanalyze", "clear")}
             draw["type"] = "structure_draw"
             return _bridge_call(draw, 30.0)
-        reply, note = _native_view(request, guids, required=engine == "native", asset_spec=spec)
+        reply, note = _native_view(request, guids, required=engine == "native", asset_spec=spec, floor_spec=floor)
         if reply is not None:
             return reply
     out = _bridge_call(request, 90.0)
@@ -2609,7 +2644,7 @@ def _bridge_call(message: dict, timeout: float) -> str:
         return json.dumps({"status": "error", "message": f"Bridge error: {e}"})
 
 
-def _native_view(request: dict, guids, required: bool, asset_spec=None):
+def _native_view(request: dict, guids, required: bool, asset_spec=None, floor_spec=None):
     """Solve natively and draw through the bridge's structure_draw overlay.
 
     Returns (reply_json, None) when it ran or must stop, (None, note) to fall back to Karamba."""
@@ -2636,7 +2671,8 @@ def _native_view(request: dict, guids, required: bool, asset_spec=None):
         result, span = native_structure.view_result(
             model, request["load_kn"], request["material"], fixed_supports=request["fixed_rotations"],
             self_weight=request["self_weight"], diameter_mm=request.get("beam_diameter_mm"),
-            wall_mm=request.get("beam_wall_mm"), span_m=request.get("span_m"), asset_loads=asset_spec)
+            wall_mm=request.get("beam_wall_mm"), span_m=request.get("span_m"), asset_loads=asset_spec,
+            floor_loads=floor_spec)
     except native_structure.fs.MechanismError as e:
         return json.dumps({"status": "fail", "analysis_method": "native", "message": str(e),
                            "mechanism_nodes": len(e.nodes)}), None
@@ -2644,10 +2680,18 @@ def _native_view(request: dict, guids, required: bool, asset_spec=None):
         return json.dumps({"status": "error", "message": str(e)}), None
     draw = {k: v for k, v in request.items() if k not in ("guids", "reanalyze", "clear")}
     report = result.pop("asset_loads", None)
+    floor_report = result.pop("floor_loads", None)
     draw.update({"type": "structure_draw", "engine": "native", "span_m": span, "result": result})
-    if report is not None:
-        draw["load_label"] = (f"load {request['load_kn']:.0f} kN + {report['applied']} assets {report['total_kn']:.1f} kN"
-                              + (" + self weight" if request["self_weight"] else ""))
+    if report is not None or floor_report is not None:
+        parts = [f"load {request['load_kn']:.0f} kN"] if request["load_kn"] >= 0.5 else []
+        if floor_report is not None:
+            parts.append(f"floor {floor_report['imposed_kn_m2'] + floor_report['dead_kn_m2']:g} kN/m2 "
+                         f"x {floor_report['area_m2']:.0f} m2")
+        if report is not None:
+            parts.append(f"{report['applied']} assets {report['total_kn']:.1f} kN")
+        if request["self_weight"]:
+            parts.append("self weight")
+        draw["load_label"] = " + ".join(parts)
     out = _bridge_call(draw, 60.0)
     try:
         parsed = json.loads(out)
@@ -2658,6 +2702,8 @@ def _native_view(request: dict, guids, required: bool, asset_spec=None):
         parsed["warnings"] = result["warnings"]
         if report is not None:
             parsed["asset_loads"] = report
+        if floor_report is not None:
+            parsed["floor_loads"] = floor_report
         parsed["nodes"] = len({tuple(p) for e in result["elements"] for p in (e["start_m"], e["end_m"])})
     elif not required:
         # a bridge without structure_draw: fall back to the Karamba overlay

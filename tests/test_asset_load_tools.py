@@ -75,7 +75,7 @@ def test_visualize_with_asset_loads_draws_load_points(server, monkeypatch):
     out = json.loads(server.visualize_structure(guids=["beam"], load_kn=0.001, asset_loads=True))
     draw = next(m for m in sent if m["type"] == "structure_draw")
     assert "asset_loads" not in draw["result"]
-    assert draw["load_label"].startswith("load 0 kN + 1 assets 3.0 kN")
+    assert draw["load_label"] == "1 assets 3.0 kN + self weight"          # no generic load term when load_kn is 0
     assert [3.0, 0.0, 3.0] in [[round(v, 6) for v in p] for p in draw["result"]["loaded_points_m"]]
     assert out["asset_loads"]["applied"] == 1
 

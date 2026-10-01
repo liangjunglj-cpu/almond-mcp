@@ -103,8 +103,26 @@ def capture_asset_loads():
     (OUT / "assets_log.json").write_text(json.dumps(rows, indent=1))
 
 
+def capture_floor_loads():
+    """Residential floor load on every bay (2.0 imposed + 1.0 build-up kN/m2): lightest failing/passing CHS."""
+    run_cs((HERE / "rhino_setup_view.cs").read_text(encoding="utf-8").replace("LENS", "42"), quiet=True)
+    rows = []
+    for name, (d, w) in (("floor_193", (193.7, 8.0)), ("floor_219", (219.1, 8.0))):
+        out = json.loads(server.visualize_structure(
+            guids=GUIDS, load_kn=0, fixed_supports=False, span_m=6.2, beam_diameter_mm=d, beam_wall_mm=w,
+            color_by="utilization", scale=10, floor_load_kn_m2=2.0, floor_dead_kn_m2=1.0,
+            title=f"ALMOND  //  NATIVE FEA  ·  FLOOR LOADS  ·  CHS {d}x{w}"))
+        run_cs(CAP.replace("PATH", str(OUT / f"{name}.jpg")), quiet=True)
+        rows.append({"name": name, "status": out.get("status"), "max_mm": out.get("max_displacement_mm"),
+                     "util": out.get("max_utilization"), "floor_loads": out.get("floor_loads")})
+        print(name, out.get("status"), out.get("max_displacement_mm"), out.get("max_utilization"), flush=True)
+    (OUT / "floor_log.json").write_text(json.dumps(rows, indent=1))
+
+
 if __name__ == "__main__":
-    if "--assets" in sys.argv:
+    if "--floor" in sys.argv:
+        capture_floor_loads()
+    elif "--assets" in sys.argv:
         capture_asset_loads()
     else:
         main()

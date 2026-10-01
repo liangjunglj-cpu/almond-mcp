@@ -236,7 +236,29 @@ def asset_loads_image():
     save(out, "asset-loads.jpg")
 
 
+def floor_loads_image():
+    rows = {r["name"]: r for r in json.loads((SRC / "floor_log.json").read_text())}
+    a, b = rows["floor_193"], rows["floor_219"]
+    fr = a["floor_loads"]
+    lv = fr["levels"][0]
+    im = grid(["floor_193", "floor_219"],
+              [("CHS 193.7x8", f'{a["max_mm"]:.1f} mm / u {a["util"]:.2f} / {a["status"].upper()}', RED if a["status"] == "fail" else GREEN),
+               ("CHS 219.1x8", f'{b["max_mm"]:.1f} mm / u {b["util"]:.2f} / {b["status"].upper()}', GREEN if b["status"] == "pass" else RED)], 2,
+              title="FLOOR AREA LOADS  //  floor_load_kn_m2=2.0, floor_dead_kn_m2=1.0, every enclosed bay")
+    out = Image.new("RGB", (im.width, im.height + 120), INK)
+    out.paste(im, (0, 0))
+    d = ImageDraw.Draw(out)
+    d.text((24, im.height + 10), f'{lv["bays"]} BAYS / {fr["area_m2"]:.0f} m2 / {lv["bearing_walls"]} BEARING-WALL EDGES  //  '
+                                 f'{fr["total_kn"]:.0f} kN ({fr["wall_kn"]:.1f} kN STRAIGHT INTO THE WALL)', font=font("ocr", 20), fill=CYAN)
+    d.text((24, im.height + 52), "45-degree two-way distribution; members split at the load kinks, linear loads solved exactly.",
+           font=font("mono", 22), fill=GREY)
+    save(out, "floor-loads.jpg")
+
+
 if __name__ == "__main__":
+    if "--floor" in sys.argv:
+        floor_loads_image()
+        sys.exit()
     if "--assets" in sys.argv:
         asset_loads_image()
         sys.exit()
