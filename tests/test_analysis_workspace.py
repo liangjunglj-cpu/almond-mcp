@@ -83,9 +83,11 @@ def test_panel_solver_process_boundary(tmp_path):
     command = f'"{sys.executable}" -m almond_mcp'
     req = {"model": dict(BEAM, warnings=["Träger · 梁"]), "settings": {"structure": "beam", "load_kn": 5}}
     out = _host_solve(tmp_path, req, command)
-    assert out["protocol"] == 1 and out["status"] in ("pass", "fail") and out["solver"].endswith("almond_mcp solve")
+    assert out["protocol"] == 1 and out["status"] in ("pass", "fail"), out
+    assert out["solver"].endswith("almond_mcp solve")
     assert "Träger · 梁" in out["validation"]["warnings"] and out["draw"]["type"] == "structure_draw"
-    assert _host_solve(tmp_path, {"ping": True}, command)["status"] == "ok"
+    ping = _host_solve(tmp_path, {"ping": True}, command)
+    assert ping["status"] == "ok", ping
     bad = _host_solve(tmp_path, {"model": {}}, command)
     assert bad["status"] == "error" and "No exported structural model" in bad["message"]
     missing = _host_solve(tmp_path, {"ping": True}, '"C:/nowhere/python.exe" -m almond_mcp')
