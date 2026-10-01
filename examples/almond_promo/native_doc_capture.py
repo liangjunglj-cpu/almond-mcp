@@ -119,8 +119,28 @@ def capture_floor_loads():
     (OUT / "floor_log.json").write_text(json.dumps(rows, indent=1))
 
 
+def capture_combinations():
+    """EN 1990 vs unfactored under the residential floor load, four sections; stills of 193.7 and 219.1."""
+    run_cs((HERE / "rhino_setup_view.cs").read_text(encoding="utf-8").replace("LENS", "42"), quiet=True)
+    rows = []
+    for d, w in ((168.3, 6.3), (193.7, 8.0), (219.1, 8.0), (244.5, 10.0)):
+        for basis, uls in (("unfactored", "6.10"), ("en1990", "6.10"), ("en1990", "6.10ab")):
+            out = json.loads(server.visualize_structure(
+                guids=GUIDS, load_kn=0, fixed_supports=False, span_m=6.2, beam_diameter_mm=d, beam_wall_mm=w,
+                color_by="utilization", scale=10, floor_load_kn_m2=2.0, floor_dead_kn_m2=1.0,
+                design_basis=basis, uls_combination=uls))
+            rows.append({"d": d, "w": w, "basis": basis, "uls": uls, "status": out.get("status"),
+                         "max_mm": out.get("max_displacement_mm"), "util": out.get("max_utilization")})
+            print(rows[-1], flush=True)
+            if basis == "en1990" and uls == "6.10" and d in (193.7, 219.1):
+                run_cs(CAP.replace("PATH", str(OUT / f"combo_{int(d)}.jpg")), quiet=True)
+    (OUT / "combo_log.json").write_text(json.dumps(rows, indent=1))
+
+
 if __name__ == "__main__":
-    if "--floor" in sys.argv:
+    if "--combos" in sys.argv:
+        capture_combinations()
+    elif "--floor" in sys.argv:
         capture_floor_loads()
     elif "--assets" in sys.argv:
         capture_asset_loads()

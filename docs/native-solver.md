@@ -79,6 +79,35 @@ are immune; I-sections are not checked for it), shear/torsion interaction, dynam
 connections, national annexes. Results are a preliminary design check, not an
 engineer's sign-off.
 
+## Load combinations (EN 1990)
+
+Every load carries a case: **G** (permanent — self weight, `floor_dead_kn_m2`, the weight
+of placed items) or **Q** (variable — `load_kn`, `floor_load_kn_m2`, contents and
+occupants of placed items). The solver factorises the stiffness matrix once, solves each
+case, and builds every combination by exact superposition (displacements, member forces
+and member load shapes), so a combination costs no extra solve.
+
+With `design_basis="en1990"` (the default):
+
+| Check | Combination | Factors |
+| --- | --- | --- |
+| Deflection (L/250) | SLS characteristic | 1.0 G + 1.0 Q |
+| Member utilization | ULS 6.10 (default) | 1.35 G + 1.5 Q |
+| Member utilization | ULS 6.10a / 6.10b (`uls_combination="6.10ab"`), worse per member | 1.35 G + 1.05 Q / 1.15 G + 1.5 Q |
+
+Recommended values of EN 1990 Table A1.2(B) (γ_G 1.35, γ_Q 1.5, ψ0 0.7 for category A,
+ξ 0.85); national annexes may differ. Results report the governing combination per member,
+every combination's maxima and reactions, and the overlay draws the SLS shape coloured by
+the ULS envelope. `design_basis="unfactored"` checks both at G + Q, which is the Karamba
+route's basis.
+
+![EN 1990 combinations](images/native-solver/load-combinations.jpg)
+
+Live, Atelier-07 mezzanine (2026-10-01), floor 2.0 kN/m² (Q) + 1.0 kN/m² (G): CHS 193.7×8
+looked adequate for strength unfactored (u 0.76) but fails at ULS (u 1.10; 1.04 with
+6.10a/b) as well as on deflection (26.8 mm > 24.8 mm). CHS 219.1×8 passes both (18.5 mm,
+ULS u 0.86 — up from 0.59 unfactored).
+
 ## Floor area loads
 
 `validate_structure(..., floor_load_kn_m2=2.0, floor_dead_kn_m2=1.0)` (and the same on

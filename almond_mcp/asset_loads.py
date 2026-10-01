@@ -180,7 +180,8 @@ def apply(frame: fs.Frame, placements: list[dict], table: LoadTable, catalogue: 
         for ei, share in _carriers(frame, members, c):
             tag = frame.elements[ei].tag
             n = _load_node(frame, ei, c)
-            frame.load(n, fz=-(dead + imposed) * share)
+            frame.load(n, fz=-dead * share, case="G")         # the item itself: permanent
+            frame.load(n, fz=-imposed * share, case="Q")      # contents, occupants: variable
             nodes.append(n)
             carried.append({"source_guids": tag or [], "share": round(share, 3)})
             levels = _horizontal_levels(frame)                 # splits renumber elements

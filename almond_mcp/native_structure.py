@@ -11,7 +11,12 @@ so the two engines are comparable:
 - self weight: gamma x A along every member, -Z;
 - deflection limit: span / 250, span = longest member for beam/frame, else overall extent,
   unless the caller names the structural span (members split at every node are shorter);
-- pass: max deflection within the limit and member utilization <= 1.0.
+- load cases: permanent G (self weight, floor build-up, the weight of placed items) and
+  variable Q (load_kn, occupancy floor load, contents and occupants of placed items);
+- combinations (EN 1990, recommended values): deflection at SLS characteristic G + Q; member
+  checks at ULS 6.10, 1.35 G + 1.5 Q (or the worse of 6.10a/6.10b); design_basis="unfactored"
+  checks both at G + Q (the Karamba route's basis);
+- pass: SLS deflection within the limit and ULS member utilization <= 1.0.
 
 The result dict has the same shape as the bridge's ``validate`` reply, with
 ``analysis_method`` "native".
@@ -116,7 +121,7 @@ def build_frame(model: dict, load_kn: float, material: str = "Steel", fixed_supp
     free = [i for i in range(len(frame.nodes)) if i not in support_nodes] or list(range(len(frame.nodes)))
     if load_kn > 0:
         for n in free:
-            frame.load(n, fz=-load_kn / len(free))
+            frame.load(n, fz=-load_kn / len(free), case="Q")
     if self_weight:
         frame.gravity = (0.0, 0.0, -1.0)
     info = {"support_nodes": support_nodes, "loaded_nodes": free if load_kn > 0 else [], "material": mat}
@@ -131,28 +136,66 @@ def build_frame(model: dict, load_kn: float, material: str = "Steel", fixed_supp
     return frame, info, warnings
 
 
+GAMMA_G, GAMMA_Q, PSI_0, XI = 1.35, 1.5, 0.7, 0.85     # EN 1990 Table A1.2(B), category A psi_0
+SLS = ("SLS characteristic", {"G": 1.0, "Q": 1.0})
+
+
+def combinations(design_basis: str = "en1990", uls: str = "6.10") -> tuple[tuple, list]:
+    """(SLS combination, [ULS combinations]) as (name, {case: factor})."""
+    basis = (design_basis or "en1990").lower()
+    if basis == "unfactored":
+        return SLS, [("Unfactored", {"G": 1.0, "Q": 1.0})]
+    if basis != "en1990":
+        raise ValueError("design_basis must be 'en1990' or 'unfactored'.")
+    if uls == "6.10":
+        return SLS, [("ULS 6.10", {"G": GAMMA_G, "Q": GAMMA_Q})]
+    if uls == "6.10ab":
+        return SLS, [("ULS 6.10a", {"G": GAMMA_G, "Q": PSI_0 * GAMMA_Q}),
+                     ("ULS 6.10b", {"G": XI * GAMMA_G, "Q": GAMMA_Q})]
+    raise ValueError("uls_combination must be '6.10' or '6.10ab'.")
+
+
+def _label(factors: dict) -> str:
+    return " + ".join(f"{v:g}{k}" for k, v in factors.items())
+
+
+def _solve_design(frame, design_basis, uls, plastic=False, stations=11):
+    """Solve SLS + ULS combinations; per-element ULS envelope. Returns (sls, uls_results, envelope)
+    with envelope[i] = (utilization, governing combination name, element result)."""
+    sls, ulss = combinations(design_basis, uls)
+    res = fs.solve_combinations(frame, {sls[0]: sls[1], **dict(ulss)}, stations=stations, plastic=plastic)
+    envelope = []
+    for i in range(len(frame.elements)):
+        best = max(((res[n].elements[i].utilization, n) for n, _ in ulss), key=lambda t: t[0])
+        envelope.append((best[0], best[1], res[best[1]].elements[i]))
+    return res[sls[0]], [(n, f, res[n]) for n, f in ulss], envelope
+
+
 def view_result(model: dict, load_kn: float = 10.0, material: str = "Steel", fixed_supports: bool = True,
                 self_weight: bool = True, diameter_mm=None, wall_mm=None, span_m: float | None = None,
                 stations: int = 13, asset_loads: dict | None = None,
-                floor_loads: dict | None = None) -> tuple[dict, float]:
+                floor_loads: dict | None = None, design_basis: str = "en1990",
+                uls: str = "6.10") -> tuple[dict, float]:
     """Solve and package the result for the bridge's ``structure_draw`` overlay.
 
     Returns (result, span_m): per-element start/end points and sampled global displacements in
-    meters, utilization, supports, loaded nodes and the max displacement. Raises
-    frame_solver.MechanismError for unstable models."""
+    meters (SLS characteristic), ULS utilization envelope, supports, loaded nodes and the max
+    displacement. Raises frame_solver.MechanismError for unstable models."""
     frame, info, warnings = build_frame(model, load_kn, material, fixed_supports, self_weight, diameter_mm, wall_mm,
                                         asset_loads, floor_loads)
-    res = fs.solve(frame, stations=stations)
+    res, ulss, envelope = _solve_design(frame, design_basis, uls, stations=stations)
     span = float(span_m or model.get("max_member_span_m") or model.get("max_span_m") or 5.0)
     elements = []
-    for er in res.elements:
+    for er, (u, _, _) in zip(res.elements, envelope):
         e = frame.elements[er.index]
         elements.append({"source_guids": e.tag or [], "start_m": list(frame.nodes[e.n1]), "end_m": list(frame.nodes[e.n2]),
-                         "samples_m": np.round(er.disp, 9).tolist(), "utilization": round(er.utilization, 4)})
+                         "samples_m": np.round(er.disp, 9).tolist(), "utilization": round(u, 4)})
     result = {"elements": elements,
               "support_points_m": [list(frame.nodes[n]) for n in info["support_nodes"]],
               "loaded_points_m": [list(frame.nodes[n]) for n in info["loaded_nodes"]],
               "max_displacement_mm": round(res.max_displacement * 1000.0, 3),
+              "combinations": {"deflection": SLS[0],
+                               "utilization": [f"{n} ({_label(f)})" for n, f, _ in ulss]},
               "warnings": list(model.get("warnings") or []) + warnings}
     for key in ("asset_loads", "floor_loads"):
         if key in info:
@@ -163,7 +206,8 @@ def view_result(model: dict, load_kn: float = 10.0, material: str = "Steel", fix
 def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, material: str = "Steel",
              fixed_supports: bool = True, self_weight: bool = True, diameter_mm=None, wall_mm=None,
              limit_ratio: float = 250.0, plastic: bool = False, span_m: float | None = None,
-             asset_loads: dict | None = None, floor_loads: dict | None = None) -> dict:
+             asset_loads: dict | None = None, floor_loads: dict | None = None,
+             design_basis: str = "en1990", uls: str = "6.10") -> dict:
     """Run the native check and return a bridge-compatible validation result."""
     result = {"status": "error", "passed": False, "structure_type": structure_type, "material": material,
               "confidence": "high", "suggestions": [], "worst_member_guids": [],
@@ -174,7 +218,7 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
         frame, info, notes = build_frame(model, load_kn, material, fixed_supports, self_weight, diameter_mm, wall_mm,
                                          asset_loads, floor_loads)
         result["warnings"] += notes
-        res = fs.solve(frame, plastic=plastic)
+        res, ulss, envelope = _solve_design(frame, design_basis, uls, plastic=plastic)
     except fs.MechanismError as exc:
         result["verdict"] = METHOD_PREFIX + f"FAILED: {exc}"
         result["status"] = "fail"
@@ -196,16 +240,24 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
         span, basis = 5.0, "default"
     limit_mm = span * 1000.0 / limit_ratio
     dmax_mm = res.max_displacement * 1000.0
-    umax = res.max_utilization
-    stress = max(er.util_detail.get("max_stress_mpa", 0.0) for er in res.elements)
-    elem_util = [{"source_guids": frame.elements[er.index].tag or [], "utilization": round(er.utilization, 4)}
-                 for er in res.elements]
+    umax = max(u for u, _, _ in envelope)
+    governing = max(envelope, key=lambda t: t[0])[1]
+    stress = max(er.util_detail.get("max_stress_mpa", 0.0) for _, _, er in envelope)
+    elem_util = [{"source_guids": frame.elements[i].tag or [], "utilization": round(u, 4), "combination": n}
+                 for i, (u, n, _) in enumerate(envelope)]
     r = result["results"]
     r.update({
         "max_deflection_mm": round(dmax_mm, 3), "displacement_available": True, "utilization_available": True,
         "deflection_limit_mm": round(limit_mm, 3), "utilization_ratio": round(umax, 4),
         "max_stress_mpa": round(stress, 2), "yield_stress_mpa": mat.fy / 1000.0, "span_m": round(span, 3),
         "span_basis": basis, "reactions_kn": round(float(res.reactions[:, 2].sum()), 3),
+        "design_basis": (design_basis or "en1990").lower(),
+        "deflection_combination": SLS[0], "utilization_combination": governing,
+        "combinations": [{"name": SLS[0], "factors": SLS[1], "max_deflection_mm": round(dmax_mm, 3),
+                          "reactions_kn": round(float(res.reactions[:, 2].sum()), 3)}] +
+                        [{"name": n, "factors": f, "max_utilization": round(r_.max_utilization, 4),
+                          "max_deflection_mm": round(r_.max_displacement * 1000.0, 3),
+                          "reactions_kn": round(float(r_.reactions[:, 2].sum()), 3)} for n, f, r_ in ulss],
         "support_points_m": [list(frame.nodes[n]) for n in info["support_nodes"]],
         "loaded_points_m": [list(frame.nodes[n]) for n in info["loaded_nodes"]],
         "per_element_utilization": elem_util,
@@ -215,6 +267,10 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
         "equilibrium_error_kn": round(res.equilibrium_error(), 9),
         "solve_ms": round((time.perf_counter() - t0) * 1000.0, 1),
     })
+    result["assumptions"] = result["assumptions"] + [
+        f"Load combinations ({r['design_basis']}): deflection at {SLS[0]} ({_label(SLS[1])}); member checks at "
+        + ", ".join(f"{n} ({_label(f)})" for n, f, _ in ulss) + ". G = self weight, floor build-up and the weight "
+        "of placed items; Q = load_kn, occupancy floor load, contents and occupants."]
     if "floor_loads" in info:
         result["floor_loads"] = info["floor_loads"]
         result["assumptions"] = result["assumptions"] + [
@@ -228,16 +284,16 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
                 "carried by the nearest member or shared by the lever rule between two parallel members."]
     failures, sug = [], []
     if dmax_mm > limit_mm:
-        failures.append(f"Deflection {dmax_mm:.1f}mm exceeds L/{limit_ratio:g} limit ({limit_mm:.1f}mm)")
+        failures.append(f"Deflection {dmax_mm:.1f}mm ({SLS[0]}) exceeds L/{limit_ratio:g} limit ({limit_mm:.1f}mm)")
         sug += ["Increase member depth or use a stiffer cross-section", "Add intermediate supports to reduce effective span"]
     if umax > 1.0:
-        failures.append(f"Utilization ratio {umax:.2f} exceeds 1.0")
+        failures.append(f"Utilization ratio {umax:.2f} ({governing}) exceeds 1.0")
         sug.append("Use a larger cross-section or higher-grade material")
     result["passed"] = not failures
     result["status"] = "pass" if not failures else "fail"
     result["verdict"] = METHOD_PREFIX + (
-        f"PASSED: Configured checks satisfied. Deflection {dmax_mm:.1f}mm (limit {limit_mm:.1f}mm), "
-        f"Utilization {umax:.2f}" if not failures else "FAILED: " + "; ".join(failures))
+        f"PASSED: Configured checks satisfied. Deflection {dmax_mm:.1f}mm ({SLS[0]}, limit {limit_mm:.1f}mm), "
+        f"Utilization {umax:.2f} ({governing})" if not failures else "FAILED: " + "; ".join(failures))
     result["suggestions"] = sug
     worst = sorted(elem_util, key=lambda e: -e["utilization"])
     seen = []
