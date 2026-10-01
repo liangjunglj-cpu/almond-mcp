@@ -50,7 +50,8 @@ warning saying why.
   interpolation of the end displacements plus the fixed-fixed particular solution
   `v = x²(L−x)²[w_a(3L−x) + w_b(x+2L)] / 120EIL`, so one element per member gives the
   exact deflected shape and moment diagram.
-- Linear elastic, first order, static. Singular systems are reported as a
+- Linear elastic, static; first order, with a second-order (P-Δ) analysis when the
+  stability check calls for it (see Stability). Singular systems are reported as a
   **mechanism** with the nodes involved, never solved silently.
 - Rotations at nodes that only truss bars meet are restrained automatically and
   reported (they carry no load).
@@ -74,10 +75,44 @@ axes polygonized identically. `almond_mcp/native_structure.py` then applies:
   buckling 6.3.1 with L_cr = member length and the section's buckling curve, combined
   linearly with bending. γ_M0 = γ_M1 = 1.0.
 
-**Not covered:** shells, second-order/P-Δ, lateral-torsional buckling (hollow sections
-are immune; I-sections are not checked for it), shear/torsion interaction, dynamics,
-connections, national annexes. Results are a preliminary design check, not an
-engineer's sign-off.
+**Not covered:** shells, large-displacement (geometrically nonlinear) analysis beyond P-Δ, member bow imperfections and lateral-torsional buckling (hollow sections are immune; I-sections are not checked for it), shear/torsion interaction, dynamics, connections, national annexes. Results are a preliminary design check, not an engineer's sign-off.
+
+## Stability (EN 1993-1-1 5.2)
+
+With `stability="auto"` (the default), every ULS combination gets:
+
+- **Elastic critical load factor α_cr**: the smallest α with det(K + α·K_G) = 0, where K_G is
+  the consistent geometric stiffness from the first-order axial forces (compression softens,
+  tension stiffens; Wagner term in torsion). Solved as a symmetric eigenproblem through the
+  Cholesky factor of K. Compression members are split into 4 elements first — one element
+  per member overstates α_cr by ~22 % for a pin-ended column; four are within ~0.05 %.
+- **Sway imperfections** (5.3.2): φ = φ₀·α_h·α_m with φ₀ = 1/200, α_h = 2/√h (⅔…1),
+  α_m = √(0.5(1 + 1/m)), h the height of the structure and m the number of column lines,
+  applied as horizontal forces φ·V at every loaded node in +x, −x, +y and −y; the member
+  checks take the worst direction. No columns (no height) → no sway imperfection.
+- **Regime** (5.2.1): α_cr ≥ 10 → first-order results; 1 < α_cr < 10 → a second-order
+  (P-Δ) ULS analysis, iterating (K + K_G(N))·u = F until the axial forces settle; α_cr ≤ 1
+  (or a second-order stiffness that stops being positive definite) → **FAIL, unstable**.
+- Member buckling checks keep L_cr = member length: conservative for non-sway frames
+  (α_cr ≥ 10) and permitted after a global second-order analysis with sway imperfections
+  (5.2.2(7)b).
+
+`visualize_structure(view="buckling")` draws the first buckling mode of the governing ULS
+combination with its α_cr and a STABLE / SWAY-SENSITIVE / UNSTABLE badge.
+`stability="off"` returns to first-order without imperfections.
+
+Verified against closed forms: pin-ended Euler column (one element: exactly 12/π² × the
+Euler load, the textbook value; eight: within 0.003 %), cantilever (2L effective length),
+sway of a fixed-base portal with a stiff beam (π²EI/L² per column, within 0.04 %), and the
+exact second-order cantilever deflection H/(Pk)·(tan kL − kL) and base moment (within
+1e-5).
+
+![Buckling modes](images/native-solver/stability.jpg)
+
+Live, Atelier-07 mezzanine (2026-10-01), simple connections, floor 2.0 Q + 1.0 G kN/m²:
+held by the concrete walls, the CHS 244.5×10 frame is STABLE (α_cr = 126, first-order). The
+same frame in slender CHS 114.3×4 is sway-sensitive (α_cr = 5.97): the pin-ended mid column
+buckles first, and the ULS check switches to second-order (3 iterations).
 
 ## Connections (end releases)
 

@@ -298,7 +298,28 @@ def connections_image():
     save(out, "connections.jpg")
 
 
+def stability_image():
+    rows = {r["d"]: r for r in json.loads((SRC / "buckle_log.json").read_text())}
+    a, b = rows[244.5], rows[114.3]
+    im = grid(["buckle_244", "buckle_114"],
+              [("CHS 244.5x10  /  STABLE", f'alpha_cr {a["alpha"]:.0f} / first-order / u {a["util"]:.2f} / {a["status"].upper()}', GREEN),
+               ("CHS 114.3x4  /  SWAY-SENSITIVE", f'alpha_cr {b["alpha"]:.2f} / second-order P-Delta ({b["iterations"]} it.) / '
+                                                  f'{b["status"].upper()}', (255, 200, 0))], 2,
+              title="STABILITY  //  EN 1993-1-1 5.2: buckling mode 1 under ULS 6.10, simple connections")
+    out = Image.new("RGB", (im.width, im.height + 80), INK)
+    out.paste(im, (0, 0))
+    d = ImageDraw.Draw(out)
+    d.text((24, im.height + 10), "alpha_cr >= 10: first-order. 1-10: second-order (P-Delta) ULS with sway imperfections phi = 1/200 a_h a_m. <= 1: unstable.",
+           font=font("mono", 20), fill=WHITE)
+    d.text((24, im.height + 42), "Compression members are split into 4 elements for the geometric stiffness (1 element overstates alpha_cr by ~22 %).",
+           font=font("mono", 20), fill=GREY)
+    save(out, "stability.jpg")
+
+
 if __name__ == "__main__":
+    if "--stability" in sys.argv:
+        stability_image()
+        sys.exit()
     if "--connections" in sys.argv:
         connections_image()
         sys.exit()

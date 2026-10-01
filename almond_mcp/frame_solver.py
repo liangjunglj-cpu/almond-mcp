@@ -13,7 +13,9 @@ Scope, stated so results are never over-read:
   exact within each member (Hermite interpolation + the fixed-fixed particular solution);
 - member checks follow EN 1993-1-1 in simplified form (see ``member_utilization``);
 - loads carry a case label (e.g. "G" permanent, "Q" variable); each case is solved once with
-  the same factorised stiffness and combinations are exact superpositions (``solve_combinations``).
+  the same factorised stiffness and combinations are exact superpositions (``solve_combinations``);
+- stability: consistent geometric stiffness, elastic critical load factor alpha_cr
+  (``critical_load_factor``) and an iterative second-order P-Delta analysis (``solve_second_order``).
 Not covered: shells, second-order / P-delta, lateral-torsional buckling, dynamics,
 connections, and national annexes. Results are a preliminary design check.
 """
@@ -355,6 +357,8 @@ class FrameResult:
     applied: np.ndarray             # total applied load vector (6) incl. member loads, about origin
     auto_restrained: list           # (node, dof) restrained because no element provides stiffness
     combination: dict = field(default_factory=dict)   # case -> factor this result represents
+    iterations: int = 0                                 # second-order iterations (0 = first order)
+    converged: bool = True
 
     @property
     def max_displacement(self) -> float:
@@ -382,15 +386,18 @@ def solve(frame: Frame, stations: int = 11, plastic: bool = False, combination: 
     return solve_combinations(frame, {"result": combo}, stations, plastic)["result"]
 
 
-def solve_combinations(frame: Frame, combinations: dict, stations: int = 11, plastic: bool = False) -> dict:
-    """Solve every load case once (one factorisation) and return {name: FrameResult} for each
-    combination {case: factor}; cases a combination does not name get factor 0."""
+class _Assembly:
+    """Everything one factorisation gives: stiffness, per-case loads and displacements, restraints."""
+
+
+def _assemble(frame: Frame) -> _Assembly:
     nn, ne = len(frame.nodes), len(frame.elements)
     if nn == 0 or ne == 0:
         raise ValueError("The frame has no nodes or no elements.")
-    X = np.asarray(frame.nodes, float)
-    ndof = nn * DOF
-    cases = frame.cases() or ["-"]
+    m = _Assembly()
+    m.frame, m.X, m.ndof = frame, np.asarray(frame.nodes, float), nn * DOF
+    m.cases = cases = frame.cases() or ["-"]
+    ndof = m.ndof
     K = np.zeros((ndof, ndof))
     F = {c: np.zeros(ndof) for c in cases}
     member_w = {c: [[np.zeros(3), np.zeros(3)] for _ in range(ne)] for c in cases}    # global (at n1, at n2)
@@ -409,7 +416,7 @@ def solve_combinations(frame: Frame, combinations: dict, stations: int = 11, pla
     wl = {c: [] for c in cases}
     feq = {c: [] for c in cases}
     for ei, e in enumerate(frame.elements):
-        R, L = local_axes(X[e.n1], X[e.n2], e.ref)
+        R, L = local_axes(m.X[e.n1], m.X[e.n2], e.ref)
         T = _t12(R)
         kl = local_stiffness(e, L)
         idx = np.r_[e.n1 * DOF:e.n1 * DOF + 6, e.n2 * DOF:e.n2 * DOF + 6]
@@ -443,7 +450,7 @@ def solve_combinations(frame: Frame, combinations: dict, stations: int = 11, pla
             raise MechanismError(f"Load on node {n} DOF {d} that no member can carry.", [n])
         restrained[n * DOF + d] = True
 
-    u = {c: np.zeros(ndof) for c in cases}
+    Lc, free = None, np.flatnonzero(~restrained)
     for _attempt in range(64):
         free = np.flatnonzero(~restrained)
         if not free.size:
@@ -461,34 +468,192 @@ def solve_combinations(frame: Frame, combinations: dict, stations: int = 11, pla
             for i in spurious:                                  # unloaded, rotation-only: pin one DOF per mode
                 restrained[i] = True
                 auto.append((int(i // DOF), int(i % DOF)))
+    u = {c: np.zeros(ndof) for c in cases}
+    Linv = None
     if free.size:
+        # numpy has no triangular solver: invert the Cholesky factor once, then every solve is two
+        # matrix-vector products (many right-hand sides: cases, imperfections, buckling)
+        Linv = np.linalg.inv(Lc)
         for c in cases:
-            u[c][free] = np.linalg.solve(Lc.T, np.linalg.solve(Lc, F[c][free]))
+            u[c][free] = Linv.T @ (Linv @ F[c][free])
+    m.K, m.F, m.u, m.geo, m.kloc, m.wl, m.feq, m.applied = K, F, u, geo, kloc, wl, feq, applied
+    m.restrained, m.auto, m.free, m.Lc, m.Linv = restrained, auto, free, Lc, Linv
+    return m
 
+
+def _factors(m: _Assembly, combo: dict) -> dict:
+    return {c: float(combo.get(c, 0.0)) for c in m.cases}
+
+
+def _solve_linear(m: _Assembly, rhs: np.ndarray) -> np.ndarray:
+    u = np.zeros(m.ndof)
+    if m.free.size:
+        u[m.free] = m.Linv.T @ (m.Linv @ rhs[m.free])
+    return u
+
+
+def load_vector(frame_or_assembly, combination: dict) -> np.ndarray:
+    """Global load vector (nodal + equivalent member loads) of a combination."""
+    m = frame_or_assembly if isinstance(frame_or_assembly, _Assembly) else _assemble(frame_or_assembly)
+    f = _factors(m, combination)
+    return sum(f[c] * m.F[c] for c in m.cases)
+
+
+def _local_end_displacements(m, ei, uc, fe):
+    R, L, T, idx = m.geo[ei]
+    kl, rec = m.kloc[ei]
+    ul = T @ uc[idx]
+    if rec is not None:                                         # recover the member's own released rotations
+        r, cc, inv, Krc = rec
+        ul[r] = inv @ (fe[r] - Krc @ ul[cc])
+    return ul
+
+
+def _axial_forces(m: _Assembly, f: dict, uc: np.ndarray) -> np.ndarray:
+    """Mean axial force per member (tension positive) for displacements uc: EA * elongation / L."""
+    N = np.zeros(len(m.frame.elements))
+    for ei, e in enumerate(m.frame.elements):
+        fe = sum(f[c] * m.feq[c][ei] for c in m.cases)
+        ul = _local_end_displacements(m, ei, uc, fe)
+        N[ei] = e.material.E * e.section.A * (ul[6] - ul[0]) / m.geo[ei][1]
+    return N
+
+
+def _results(m: _Assembly, combo: dict, uc: np.ndarray, Fc: np.ndarray, stations: int, plastic: bool,
+             Kt: np.ndarray | None = None, N: np.ndarray | None = None) -> "FrameResult":
+    frame, f = m.frame, _factors(m, combo)
     s = np.linspace(0.0, 1.0, max(2, stations))
+    Rv = (m.K if Kt is None else Kt) @ uc - Fc
+    Rv[~m.restrained] = 0.0
+    ers = []
+    for ei, e in enumerate(frame.elements):
+        R, L, T, idx = m.geo[ei]
+        kl, _ = m.kloc[ei]
+        fe = sum(f[c] * m.feq[c][ei] for c in m.cases)
+        ul = _local_end_displacements(m, ei, uc, fe)
+        k_end = kl if N is None else kl + geometric_stiffness(e, L, N[ei])
+        fl = k_end @ ul - fe
+        w = (sum(f[c] * m.wl[c][ei][0] for c in m.cases), sum(f[c] * m.wl[c][ei][1] for c in m.cases))
+        ers.append(_element_result(ei, e, m.X, R, L, ul, fl, w, s))
+        member_utilization(ers[-1], e, plastic=plastic)
+    return FrameResult(uc.reshape(len(frame.nodes), DOF), Rv.reshape(len(frame.nodes), DOF), ers,
+                       sum(f[c] * m.applied[c] for c in m.cases), m.auto, dict(combo))
+
+
+def solve_combinations(frame: Frame, combinations: dict, stations: int = 11, plastic: bool = False,
+                       extra: dict | None = None) -> dict:
+    """Solve every load case once (one factorisation) and return {name: FrameResult} for each
+    combination {case: factor}; cases a combination does not name get factor 0. ``extra`` adds
+    a global load vector to named combinations (e.g. sway imperfections)."""
+    m = _assemble(frame)
     out = {}
     for name, combo in combinations.items():
-        f = {c: float(combo.get(c, 0.0)) for c in cases}
-        uc = sum(f[c] * u[c] for c in cases)
-        Fc = sum(f[c] * F[c] for c in cases)
-        Rv = K @ uc - Fc
-        Rv[~restrained] = 0.0
-        ers = []
-        for ei, e in enumerate(frame.elements):
-            R, L, T, idx = geo[ei]
-            kl, rec = kloc[ei]
-            ul = T @ uc[idx]
-            fe = sum(f[c] * feq[c][ei] for c in cases)
-            if rec is not None:                                 # recover the member's own released rotations
-                r, cc, inv, Krc = rec
-                ul[r] = inv @ (fe[r] - Krc @ ul[cc])
-            fl = kl @ ul - fe
-            w = (sum(f[c] * wl[c][ei][0] for c in cases), sum(f[c] * wl[c][ei][1] for c in cases))
-            ers.append(_element_result(ei, e, X, R, L, ul, fl, w, s))
-            member_utilization(ers[-1], e, plastic=plastic)
-        out[name] = FrameResult(uc.reshape(nn, DOF), Rv.reshape(nn, DOF), ers,
-                                sum(f[c] * applied[c] for c in cases), auto, dict(combo))
+        f = _factors(m, combo)
+        uc = sum(f[c] * m.u[c] for c in m.cases)
+        Fc = sum(f[c] * m.F[c] for c in m.cases)
+        if extra and name in extra:
+            uc = uc + _solve_linear(m, extra[name])
+            Fc = Fc + extra[name]
+        out[name] = _results(m, combo, uc, Fc, stations, plastic)
     return out
+
+
+# ------------------------------------------------------------------ stability
+def geometric_stiffness(e: Element, L: float, N: float) -> np.ndarray:
+    """Consistent geometric stiffness (local, 12x12) of a member under axial force N (tension
+    positive): N/30L [36 3L -36 3L; 3L 4L^2 -3L -L^2; ...] in each bending plane, plus the
+    Wagner term N*Ip/(A*L) in torsion. Truss bars carry the string term N/L laterally."""
+    kg = np.zeros((12, 12))
+    if e.truss:
+        for a, b in ((1, 7), (2, 8)):
+            kg[a, a] = kg[b, b] = N / L
+            kg[a, b] = kg[b, a] = -N / L
+        return kg
+    c = N / (30 * L)
+    v = c * np.array([[36, 3 * L, -36, 3 * L], [3 * L, 4 * L ** 2, -3 * L, -L ** 2],
+                      [-36, -3 * L, 36, -3 * L], [3 * L, -L ** 2, -3 * L, 4 * L ** 2]])
+    for dofs, sgn in (((1, 5, 7, 11), 1.0), ((2, 4, 8, 10), -1.0)):     # x-z plane: ry = -dw/dx
+        S = np.diag([1.0, sgn, 1.0, sgn])
+        kg[np.ix_(dofs, dofs)] += S @ v @ S
+    s = e.section
+    t = N * (s.Iy + s.Iz) / (s.A * L)
+    kg[3, 3] += t
+    kg[9, 9] += t
+    kg[3, 9] -= t
+    kg[9, 3] -= t
+    return kg
+
+
+def _kg_global(m: _Assembly, N: np.ndarray) -> np.ndarray:
+    KG = np.zeros((m.ndof, m.ndof))
+    for ei, e in enumerate(m.frame.elements):
+        R, L, T, idx = m.geo[ei]
+        kg = geometric_stiffness(e, L, N[ei])
+        _, rec = m.kloc[ei]
+        if rec is not None:                                     # same condensation as the elastic stiffness
+            r, cc, inv, Krc = rec
+            Tc = np.eye(12)
+            Tc[np.ix_(r, r)] = 0.0
+            Tc[np.ix_(r, cc)] = -inv @ Krc
+            kg = Tc.T @ kg @ Tc
+        KG[np.ix_(idx, idx)] += T.T @ kg @ T
+    return KG
+
+
+def critical_load_factor(frame_or_assembly, combination: dict, extra: np.ndarray | None = None) -> tuple:
+    """Elastic critical load factor alpha_cr of a combination (EN 1993-1-1 5.2.1) and its buckling
+    mode (global displacement vector, max translation 1): smallest alpha with det(K + alpha K_G) = 0,
+    K_G from the first-order axial forces. inf when nothing is in compression."""
+    m = frame_or_assembly if isinstance(frame_or_assembly, _Assembly) else _assemble(frame_or_assembly)
+    f = _factors(m, combination)
+    uc = sum(f[c] * m.u[c] for c in m.cases)
+    if extra is not None:
+        uc = uc + _solve_linear(m, extra)
+    N = _axial_forces(m, f, uc)
+    if not m.free.size or np.min(N) >= -1e-9 * max(1.0, float(np.max(np.abs(N)))):
+        return math.inf, np.zeros(m.ndof)
+    KG = _kg_global(m, N)[np.ix_(m.free, m.free)]
+    Li = m.Linv
+    A = Li @ (-KG) @ Li.T                                       # K phi = -alpha KG phi  ->  A y = (1/alpha) y
+    mu, Y = np.linalg.eigh((A + A.T) / 2)
+    k = int(np.argmax(mu))
+    if mu[k] <= 1e-12:
+        return math.inf, np.zeros(m.ndof)
+    mode = np.zeros(m.ndof)
+    mode[m.free] = Li.T @ Y[:, k]
+    trans = np.abs(mode.reshape(-1, DOF)[:, :3]).max()
+    return float(1.0 / mu[k]), mode / (trans if trans > 0 else 1.0)
+
+
+def solve_second_order(frame_or_assembly, combination: dict, extra: np.ndarray | None = None, stations: int = 11,
+                       plastic: bool = False, max_iter: int = 50, tol: float = 1e-6) -> "FrameResult":
+    """Second-order (P-Delta) analysis: solve (K + K_G(N)) u = F, updating the axial forces N until
+    they settle. Raises MechanismError if the frame loses stability under the combination."""
+    m = frame_or_assembly if isinstance(frame_or_assembly, _Assembly) else _assemble(frame_or_assembly)
+    f = _factors(m, combination)
+    Fc = sum(f[c] * m.F[c] for c in m.cases) + (extra if extra is not None else 0.0)
+    uc = sum(f[c] * m.u[c] for c in m.cases) + (_solve_linear(m, extra) if extra is not None else 0.0)
+    N = _axial_forces(m, f, uc)
+    it, converged, Kt = 0, False, m.K
+    for it in range(1, max_iter + 1):
+        Kt = m.K + _kg_global(m, N)
+        Kff = Kt[np.ix_(m.free, m.free)]
+        try:
+            np.linalg.cholesky(Kff)                             # positive definite: still stable
+        except np.linalg.LinAlgError:
+            raise MechanismError("Instability: the frame buckles under this combination (second-order "
+                                 "stiffness not positive definite).") from None
+        uc = np.zeros(m.ndof)
+        uc[m.free] = np.linalg.solve(Kff, Fc[m.free])
+        N_new = _axial_forces(m, f, uc)
+        change = float(np.max(np.abs(N_new - N))) if N.size else 0.0
+        N = N_new
+        if change <= tol * max(1.0, float(np.max(np.abs(N)))):
+            converged = True
+            break
+    res = _results(m, combination, uc, Fc, stations, plastic, Kt=Kt, N=N)
+    res.iterations, res.converged = it, converged
+    return res
 
 
 def _spurious_rotation_dofs(Kff, free, loads) -> list:
@@ -603,3 +768,34 @@ def member_utilization(er: ElementResult, e: Element, gamma_m0: float = 1.0, gam
     detail["max_stress_mpa"] = float(np.max(sig)) / 1000.0
     er.utilization = util
     er.util_detail = detail
+
+
+def prepare(frame: Frame) -> "_Assembly":
+    """Assemble and factorise once; pass the result to the analysis functions to reuse it."""
+    return _assemble(frame)
+
+
+def solve_linear(frame_or_assembly, combination: dict, extra: np.ndarray | None = None, stations: int = 11,
+                 plastic: bool = False) -> "FrameResult":
+    """First-order result of one combination, plus an optional extra global load vector."""
+    m = frame_or_assembly if isinstance(frame_or_assembly, _Assembly) else _assemble(frame_or_assembly)
+    f = _factors(m, combination)
+    uc = sum(f[c] * m.u[c] for c in m.cases)
+    Fc = sum(f[c] * m.F[c] for c in m.cases)
+    if extra is not None:
+        uc = uc + _solve_linear(m, extra)
+        Fc = Fc + extra
+    return _results(m, combination, uc, Fc, stations, plastic)
+
+
+def mode_result(frame_or_assembly, mode: np.ndarray, stations: int = 13) -> "FrameResult":
+    """Element shapes of a displacement vector (e.g. a buckling mode) with no member loads."""
+    m = frame_or_assembly if isinstance(frame_or_assembly, _Assembly) else _assemble(frame_or_assembly)
+    return _results(m, {}, mode, np.zeros(m.ndof), stations, False)
+
+
+def axial_forces(frame_or_assembly, combination: dict) -> np.ndarray:
+    """First-order mean axial force per element (tension positive) for a combination."""
+    m = frame_or_assembly if isinstance(frame_or_assembly, _Assembly) else _assemble(frame_or_assembly)
+    f = _factors(m, combination)
+    return _axial_forces(m, f, sum(f[c] * m.u[c] for c in m.cases))

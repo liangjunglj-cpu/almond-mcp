@@ -145,6 +145,8 @@ namespace RhinoAlmondBridge
                     LimitMM = spanM * 1000.0 / Math.Max(1, req.LimitRatio), LimitRatio = req.LimitRatio,
                     Material = req.Material, LoadKN = req.LoadKN, SelfWeight = req.IncludeSelfWeight,
                     Engine = jobj["engine"]?.ToString() ?? "native", DefaultTitle = "ALMOND  //  NATIVE FEA",
+                    BucklingAlpha = jobj["buckling_alpha"] != null && jobj["buckling_alpha"].Type != JTokenType.Null
+                        ? jobj["buckling_alpha"].Value<double>() : (double?)null,
                 };
             }
             else if (_conduit.Data == null)
@@ -205,6 +207,8 @@ namespace RhinoAlmondBridge
         public double LoadKN;
         public bool SelfWeight, Physics = true;
         public HashSet<string> DisplaySet;
+        /// <summary>Set when the overlay shows a buckling mode: its elastic critical load factor.</summary>
+        public double? BucklingAlpha;
         public string LoadLabel;
         public string Title, ColorBy = "displacement", Material;
         public string Engine = "api", DefaultTitle = "ALMOND  //  KARAMBA LIVE ANALYSIS";
@@ -333,6 +337,7 @@ namespace RhinoAlmondBridge
 
         private void DrawLegend(DrawEventArgs e, bool byUtil, float dpi)
         {
+            if (Data.BucklingAlpha.HasValue) { DrawBucklingLegend(e, dpi); return; }
             var r = Data.Result;
             var vp = e.Viewport.Bounds;
             int w = (int)(380 * dpi), h = (int)(300 * dpi);
@@ -367,6 +372,30 @@ namespace RhinoAlmondBridge
             e.Display.Draw2dText(hi, Color.White, new Point2d(bx + bw - hiBox.Width, by + bh + 16 * dpi), false, fs, "Consolas");
             e.Display.Draw2dText(string.Format("deformation shown x{0:0}", Data.Scale), Color.FromArgb(160, 160, 168),
                 new Point2d(tx, by + bh + 44 * dpi), false, fs, "Consolas");
+        }
+
+        /// <summary>Legend for a buckling mode: alpha_cr and its EN 1993-1-1 5.2.1 classification.</summary>
+        private void DrawBucklingLegend(DrawEventArgs e, float dpi)
+        {
+            double a = Data.BucklingAlpha.Value;
+            var vp = e.Viewport.Bounds;
+            int w = (int)(380 * dpi), h = (int)(250 * dpi);
+            int x0 = vp.Width - w - (int)(30 * dpi), y0 = (int)(30 * dpi), tx = x0 + (int)(24 * dpi);
+            int fs = Math.Max(10, (int)(16 * dpi)), fb = Math.Max(14, (int)(30 * dpi));
+            var accent = a <= 1 ? Color.FromArgb(233, 68, 43) : a < 10 ? Color.FromArgb(255, 200, 0) : Color.FromArgb(40, 220, 90);
+            string verdict = a <= 1 ? "UNSTABLE" : a < 10 ? "SWAY-SENSITIVE" : "STABLE";
+            e.Display.Draw2dRectangle(new Rectangle(x0, y0, w, h), Color.FromArgb(0, 0, 0, 0), 0, Color.FromArgb(215, 10, 10, 12));
+            e.Display.Draw2dRectangle(new Rectangle(x0, y0, (int)(5 * dpi), h), Color.FromArgb(0, 0, 0, 0), 0, accent);
+            DrawTitle(e, accent, tx, y0 + 18 * dpi, w - (int)(40 * dpi), fs);
+            e.Display.Draw2dText("BUCKLING MODE 1", Color.White, new Point2d(tx, y0 + 50 * dpi), false, fs, "Consolas");
+            e.Display.Draw2dText(string.Format("αcr = {0:0.0#}", a), Color.White, new Point2d(tx, y0 + 76 * dpi), false, fb, "Arial Black");
+            e.Display.Draw2dText(verdict, accent, new Point2d(tx, y0 + 124 * dpi), false, fs, "Consolas");
+            e.Display.Draw2dText("≥ 10 first order  ·  1-10 second order", Color.FromArgb(200, 200, 205),
+                new Point2d(tx, y0 + 152 * dpi), false, fs, "Consolas");
+            e.Display.Draw2dText("≤ 1 buckles below the ULS loads", Color.FromArgb(200, 200, 205),
+                new Point2d(tx, y0 + 176 * dpi), false, fs, "Consolas");
+            e.Display.Draw2dText(string.Format("mode shape normalised  ·  shown x{0:0.##}", Data.Scale), Color.FromArgb(160, 160, 168),
+                new Point2d(tx, y0 + 206 * dpi), false, fs, "Consolas");
         }
 
         /// <summary>Legend title shrunk to fit the panel width (long stage/iteration titles).</summary>
