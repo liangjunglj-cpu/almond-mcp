@@ -8,8 +8,8 @@ code is used or wrapped.
 Scope, stated so results are never over-read:
 - first-order (geometrically linear), linear-elastic, static;
 - straight prismatic members, rigid joints (optional axial-only truss members);
-- point loads at nodes and uniform member loads (self weight is one), exact within
-  each member (Hermite interpolation + the fixed-fixed particular solution);
+- point loads at nodes and uniform or linearly varying member loads (self weight is one),
+  exact within each member (Hermite interpolation + the fixed-fixed particular solution);
 - member checks follow EN 1993-1-1 in simplified form (see ``member_utilization``).
 Not covered: shells, second-order / P-delta, lateral-torsional buckling, dynamics,
 connections, and national annexes. Results are a preliminary design check.
@@ -148,7 +148,7 @@ class Frame:
     elements: list = field(default_factory=list)
     supports: dict = field(default_factory=dict)         # node -> 6 bools (True = restrained)
     nodal_loads: dict = field(default_factory=dict)      # node -> 6-vector kN / kNm, global
-    member_loads: list = field(default_factory=list)     # (element index, global w vector kN/m)
+    member_loads: list = field(default_factory=list)     # (element, global w at n1, global w at n2) kN/m
     gravity: tuple | None = None                         # unit vector for self weight, e.g. (0, 0, -1)
 
     def add_node(self, xyz) -> int:
@@ -170,7 +170,33 @@ class Frame:
         self.nodal_loads[node] = cur + np.array([fx, fy, fz, mx, my, mz], float)
 
     def udl(self, element, w):
-        self.member_loads.append((element, np.asarray(w, float)))
+        """Uniform member load, global vector kN/m."""
+        w = np.asarray(w, float)
+        self.member_loads.append((element, w, w))
+
+    def linear_load(self, element, w_start, w_end):
+        """Member load varying linearly from w_start at n1 to w_end at n2 (global vectors, kN/m)."""
+        self.member_loads.append((element, np.asarray(w_start, float), np.asarray(w_end, float)))
+
+    def split_element(self, ei: int, t: float) -> int:
+        """Insert a node at fraction t along element ei, splitting it in two (same section,
+        material and lineage; member loads follow both halves). Returns the new node."""
+        e = self.elements[ei]
+        p1, p2 = np.asarray(self.nodes[e.n1]), np.asarray(self.nodes[e.n2])
+        k = self.add_node(p1 + t * (p2 - p1))
+        n2 = e.n2
+        e.n2 = k
+        new = self.add_element(k, n2, e.section, e.material, truss=e.truss, ref=e.ref, tag=e.tag)
+        kept, added = [], []
+        for (j, wa, wb) in self.member_loads:
+            if j != ei:
+                kept.append((j, wa, wb))
+                continue
+            wm = wa + t * (wb - wa)                             # linear loads split at the new node
+            kept.append((ei, wa, wm))
+            added.append((new, wm, wb))
+        self.member_loads = kept + added
+        return k
 
 
 class MechanismError(ValueError):
@@ -225,16 +251,18 @@ def local_stiffness(e: Element, L: float) -> np.ndarray:
     return k
 
 
-def fixed_end_forces(wl: np.ndarray, L: float, truss: bool) -> np.ndarray:
-    """Equivalent nodal loads (local) of a uniform member load wl = (wx, wy, wz) kN/m."""
-    wx, wy, wz = wl
+def fixed_end_forces(wa: np.ndarray, wb: np.ndarray, L: float, truss: bool) -> np.ndarray:
+    """Equivalent nodal loads (local) of a member load varying linearly from wa at n1 to wb
+    at n2 (local (wx, wy, wz) kN/m). Uniform loads are wa == wb."""
     f = np.zeros(12)
-    f[0] = f[6] = wx * L / 2
-    f[1] = f[7] = wy * L / 2
-    f[2] = f[8] = wz * L / 2
+    f[0], f[6] = L * (2 * wa[0] + wb[0]) / 6, L * (wa[0] + 2 * wb[0]) / 6
+    for k in (1, 2):
+        f[k], f[k + 6] = L * (7 * wa[k] + 3 * wb[k]) / 20, L * (3 * wa[k] + 7 * wb[k]) / 20
     if not truss:
-        f[5], f[11] = wy * L ** 2 / 12, -wy * L ** 2 / 12
-        f[4], f[10] = -wz * L ** 2 / 12, wz * L ** 2 / 12
+        m1y, m2y = L ** 2 * (3 * wa[1] + 2 * wb[1]) / 60, L ** 2 * (2 * wa[1] + 3 * wb[1]) / 60
+        m1z, m2z = L ** 2 * (3 * wa[2] + 2 * wb[2]) / 60, L ** 2 * (2 * wa[2] + 3 * wb[2]) / 60
+        f[5], f[11] = m1y, -m2y
+        f[4], f[10] = -m1z, m2z
     return f
 
 
@@ -300,13 +328,16 @@ def solve(frame: Frame, stations: int = 11, plastic: bool = False) -> FrameResul
     F = np.zeros(ndof)
     geo, feq_local = [], [np.zeros(12) for _ in range(ne)]
 
-    member_w = [np.zeros(3) for _ in range(ne)]
-    for (ei, w) in frame.member_loads:
-        member_w[ei] = member_w[ei] + w
+    member_w = [[np.zeros(3), np.zeros(3)] for _ in range(ne)]       # global (at n1, at n2)
+    for (ei, wa, wb) in frame.member_loads:
+        member_w[ei][0] = member_w[ei][0] + wa
+        member_w[ei][1] = member_w[ei][1] + wb
     if frame.gravity is not None:
         g = np.asarray(frame.gravity, float)
         for ei, e in enumerate(frame.elements):
-            member_w[ei] = member_w[ei] + g * e.material.gamma * e.section.A
+            sw = g * e.material.gamma * e.section.A
+            member_w[ei][0] = member_w[ei][0] + sw
+            member_w[ei][1] = member_w[ei][1] + sw
 
     applied = np.zeros(6)
     for ei, e in enumerate(frame.elements):
@@ -315,11 +346,11 @@ def solve(frame: Frame, stations: int = 11, plastic: bool = False) -> FrameResul
         kg = T.T @ local_stiffness(e, L) @ T
         idx = np.r_[e.n1 * DOF:e.n1 * DOF + 6, e.n2 * DOF:e.n2 * DOF + 6]
         K[np.ix_(idx, idx)] += kg
-        wl = R @ member_w[ei]
-        fe = fixed_end_forces(wl, L, e.truss)
+        wl = (R @ member_w[ei][0], R @ member_w[ei][1])
+        fe = fixed_end_forces(wl[0], wl[1], L, e.truss)
         feq_local[ei] = fe
         F[idx] += T.T @ fe
-        applied[:3] += member_w[ei] * L
+        applied[:3] += (member_w[ei][0] + member_w[ei][1]) * L / 2
         geo.append((R, L, T, idx, wl))
     for n, v in frame.nodal_loads.items():
         F[n * DOF:n * DOF + 6] += np.asarray(v, float)
@@ -371,12 +402,23 @@ def _mechanism(Kff, free):
                           "or a hinged chain) and cannot carry load.", nodes)
 
 
+def _particular(wa, wb, x, L):
+    """Fixed-fixed deflection x EI under a load varying linearly wa -> wb, and its 2nd derivative:
+    v = x^2 (L-x)^2 [wa (3L - x) + wb (x + 2L)] / (120 L)."""
+    a, b = 3 * L * wa + 2 * L * wb, wb - wa
+    p = x ** 2 * (L - x) ** 2
+    dp, ddp = 4 * x ** 3 - 6 * L * x ** 2 + 2 * L ** 2 * x, 12 * x ** 2 - 12 * L * x + 2 * L ** 2
+    return p * (a + b * x) / (120 * L), (ddp * (a + b * x) + 2 * b * dp) / (120 * L)
+
+
 def _element_result(ei, e, X, R, L, ul, fl, wl, s):
     x = s * L
     E, s_ = e.material.E, e.section
-    # axial: linear + particular solution of the uniform axial load
-    u_ax = ul[0] + (ul[6] - ul[0]) * s + wl[0] * x * (L - x) / (2 * E * s_.A)
-    N = E * s_.A * (ul[6] - ul[0]) / L + wl[0] * (L - 2 * x) / 2
+    wa, wb = wl
+    # axial: linear + particular solution of the (linearly varying) axial load
+    u_ax = ul[0] + (ul[6] - ul[0]) * s + (L * (2 * wa[0] + wb[0]) * x / 6 - wa[0] * x ** 2 / 2
+                                          - (wb[0] - wa[0]) * x ** 3 / (6 * L)) / (E * s_.A)
+    N = E * s_.A * (ul[6] - ul[0]) / L + L * (2 * wa[0] + wb[0]) / 6 - wa[0] * x - (wb[0] - wa[0]) * x ** 2 / (2 * L)
     if e.truss:
         v = ul[1] + (ul[7] - ul[1]) * s
         w = ul[2] + (ul[8] - ul[2]) * s
@@ -386,10 +428,12 @@ def _element_result(ei, e, X, R, L, ul, fl, wl, s):
         h1, h2, h3, h4 = 1 - 3 * s ** 2 + 2 * s ** 3, L * (s - 2 * s ** 2 + s ** 3), 3 * s ** 2 - 2 * s ** 3, L * (-s ** 2 + s ** 3)
         d1, d2, d3, d4 = (-6 + 12 * s) / L ** 2, (-4 + 6 * s) / L, (6 - 12 * s) / L ** 2, (-2 + 6 * s) / L
         # local y: slope = rz; local z: slope = -ry. Plus fixed-fixed particular solutions.
-        v = h1 * ul[1] + h2 * ul[5] + h3 * ul[7] + h4 * ul[11] + wl[1] * x ** 2 * (L - x) ** 2 / (24 * E * s_.Iz)
-        w = h1 * ul[2] - h2 * ul[4] + h3 * ul[8] - h4 * ul[10] + wl[2] * x ** 2 * (L - x) ** 2 / (24 * E * s_.Iy)
-        kv = d1 * ul[1] + d2 * ul[5] + d3 * ul[7] + d4 * ul[11] + wl[1] * (L ** 2 - 6 * L * x + 6 * x ** 2) / (12 * E * s_.Iz)
-        kw = d1 * ul[2] - d2 * ul[4] + d3 * ul[8] - d4 * ul[10] + wl[2] * (L ** 2 - 6 * L * x + 6 * x ** 2) / (12 * E * s_.Iy)
+        pv, ppv = _particular(wa[1], wb[1], x, L)
+        pw, ppw = _particular(wa[2], wb[2], x, L)
+        v = h1 * ul[1] + h2 * ul[5] + h3 * ul[7] + h4 * ul[11] + pv / (E * s_.Iz)
+        w = h1 * ul[2] - h2 * ul[4] + h3 * ul[8] - h4 * ul[10] + pw / (E * s_.Iy)
+        kv = d1 * ul[1] + d2 * ul[5] + d3 * ul[7] + d4 * ul[11] + ppv / (E * s_.Iz)
+        kw = d1 * ul[2] - d2 * ul[4] + d3 * ul[8] - d4 * ul[10] + ppw / (E * s_.Iy)
         Mz = E * s_.Iz * kv
         My = -E * s_.Iy * kw
         tors = float(fl[9])

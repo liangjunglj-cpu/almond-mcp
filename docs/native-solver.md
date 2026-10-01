@@ -45,9 +45,11 @@ warning saying why.
 
 - Direct stiffness method, Euler-Bernoulli beams, 6 DOF per node, rigid joints
   (`almond_mcp/frame_solver.py`, numpy only, written from the textbook method).
-- Uniform member loads (self weight is one) are exact within each member: Hermite
-  interpolation of the end displacements plus the fixed-fixed particular solution, so
-  one element per member gives the exact deflected shape and moment diagram.
+- Uniform and linearly varying member loads (self weight, floor-load triangles and
+  trapezoids) are exact within each member: consistent fixed-end forces, Hermite
+  interpolation of the end displacements plus the fixed-fixed particular solution
+  `v = x²(L−x)²[w_a(3L−x) + w_b(x+2L)] / 120EIL`, so one element per member gives the
+  exact deflected shape and moment diagram.
 - Linear elastic, first order, static. Singular systems are reported as a
   **mechanism** with the nodes involved, never solved silently.
 - Rotations at nodes that only truss bars meet are restrained automatically and
@@ -76,6 +78,72 @@ axes polygonized identically. `almond_mcp/native_structure.py` then applies:
 are immune; I-sections are not checked for it), shear/torsion interaction, dynamics,
 connections, national annexes. Results are a preliminary design check, not an
 engineer's sign-off.
+
+## Floor area loads
+
+`validate_structure(..., floor_load_kn_m2=2.0, floor_dead_kn_m2=1.0)` (and the same on
+`visualize_structure`) loads every floor bay of the frame:
+
+- **Bays** are the areas enclosed by beams on one level (faces of the plan graph, found
+  with a half-edge walk). A straight line between two adjacent supports with no beam
+  along it is a **bearing wall**: bays close on it and its share goes straight into those
+  supports (in the reactions, bending no member). Diagonals between supports that would
+  cut an already closed bay are rejected.
+- **Distribution:** rectangular bays use 45° lines from the corners — short edges carry a
+  triangle, long edges a trapezoid; above 2:1 the bay spans one way onto its long edges.
+  Other convex bays use a centroid fan (each edge a triangle peaking under the centroid).
+- **Exact:** members are split at the load shape's kinks and each part carries a linear
+  load, solved exactly (a triangle on a simple span reproduces `WL³/60EI` and `WL/6`).
+- **Loads:** `floor_load_kn_m2` is the imposed (occupancy) load — e.g. 1.5–2.0 kN/m² for
+  homes (EN 1991-1-1 category A) — and `floor_dead_kn_m2` the superimposed dead load
+  (build-up, finishes). Set `load_kn=0` so the generic node load does not double count.
+
+![Floor area loads on the mezzanine](images/native-solver/floor-loads.jpg)
+
+Live, Atelier-07 mezzanine (2026-10-01): 8 bays, 62 m², 4 bearing-wall edges on the
+east wall; 2.0 + 1.0 kN/m² gives 186 kN (18.75 kN straight into the wall), reactions
+192.2 kN with self weight. CHS 193.7×8 — which passed the earlier simplified 150 kN node
+load — now fails at 26.8 mm against L/250 = 24.8 mm; the lightest passing tube is
+CHS 219.1×8 (18.5 mm, utilization 0.59).
+
+## Loads from placed assets
+
+`validate_structure(..., asset_loads=True)` and `visualize_structure(..., asset_loads=True)`
+add the gravity load of every placed library asset that stands on (or hangs from) the
+frame:
+
+- **Load data:** `GeneratedAssetfiles/structural-loads.json` gives each of the 50 library
+  assets an estimated self weight (dead) and in-use load (imposed: occupants at 80 kg,
+  water in a filled bath, books on shelves), with category defaults for other libraries.
+  These are typical-product estimates, not measured or manufacturer data. The entry is
+  also returned by `get_generated_asset_passport` as `structural_loads`.
+- **Placements:** Rhino objects tagged with an Almond asset id (`Almond.AssetId`,
+  `almond:asset_id`) via the bridge's `asset_placements` message, or the scene ledger
+  when `scene_id` is given.
+- **Load path:** floor items load the highest frame level up to 1.6 m below their base (a
+  lamp on a desk still loads the floor); ceiling items hang from the lowest level up to
+  1.5 m above their top. The load goes to the nearest member, or is shared by the lever
+  rule between the two parallel members either side (a floor spanning one way between
+  them). Members are split at the load points, so point loads are exact.
+- **Not applied, and reported why:** wall-mounted items, ground-only items (trees, cars,
+  street furniture), structural elements, assets outside the frame's plan, and assets
+  with no frame level below.
+- **Sizes:** the load is the nominal product's. A placement whose plan size differs from
+  the catalogue product by more than 1.5× (or less than 0.67×) is flagged, not rescaled:
+  Almond's placement scale usually corrects generated-mesh proportions.
+
+**Asset loads and floor loads.** A code imposed floor load (`floor_load_kn_m2`, e.g.
+EN 1991-1-1 category A, 1.5–2.0 kN/m²) already covers movable furniture and people. Use
+asset loads to check heavy, specific items (a filled bath, full bookshelves, a kitchen
+island) on top of the floor load — accepting some double counting as conservative — or
+on their own with the superimposed dead load as a furniture check.
+
+![Placed furniture as loads](images/native-solver/asset-loads.jpg)
+
+Live, Atelier-07 mezzanine (2026-10-01): 7 placed assets on the frame — bathtub
+(45 kg + 260 kg water and bather), bed (90 + 160 kg), toilet, a throw and three pendants
+hung beneath — total 6.6 kN; 15 placements reported as skipped (ground floor, study wing).
+CHS 114.3×4 under furniture and self weight only: 17.2 mm, utilization 0.30.
 
 ## Benchmarks
 
