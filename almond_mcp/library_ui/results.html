@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Almond — Structural Results</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/results.css">
+  <script src="/panel-theme.js"></script>
+  <script type="module" src="/results.js"></script>
+</head>
+<body>
+<header class="bar">
+  <div class="title"><span class="mark" aria-hidden="true">a</span><h1>Structural results</h1></div>
+  <div class="tools">
+    <button id="refresh" type="button" title="Reload the latest analysis">Refresh</button>
+    <button id="export" type="button" title="Save the member table as CSV" disabled>Save CSV</button>
+  </div>
+</header>
+<p id="notice" class="notice" role="status" aria-live="polite"></p>
+
+<section id="empty" class="empty">
+  <h2>No analysis yet</h2>
+  <p>Run an analysis in the Almond <strong>Structure</strong> workspace. Every member's forces, checks and deflection appear here, and update after each run.</p>
+  <p class="hint">In Rhino: <kbd>AlmondStructure</kbd> → select the frame → <em>Use Rhino selection</em> → <em>Run native analysis</em>.</p>
+</section>
+
+<main id="report" hidden>
+  <p id="method" class="meta"></p>
+  <section class="summary" aria-label="Summary">
+    <div class="tile verdict"><span class="k">Verdict</span><strong id="verdict"></strong><small id="verdict-note"></small></div>
+    <div class="tile"><span class="k">Max deflection</span><strong id="sum-defl"></strong><small id="sum-defl-note"></small></div>
+    <div class="tile"><span class="k">Max utilization</span><strong id="sum-util"></strong><small id="sum-util-note"></small></div>
+    <div class="tile"><span class="k">Stability αcr</span><strong id="sum-alpha"></strong><small id="sum-alpha-note"></small></div>
+    <div class="tile"><span class="k">Members</span><strong id="sum-count"></strong><small id="sum-count-note"></small></div>
+  </section>
+
+  <nav class="tabs" role="tablist" aria-label="Result tables">
+    <button role="tab" id="tab-members" aria-controls="pane-members" aria-selected="true">Members</button>
+    <button role="tab" id="tab-supports" aria-controls="pane-supports" aria-selected="false">Supports</button>
+    <button role="tab" id="tab-combinations" aria-controls="pane-combinations" aria-selected="false">Combinations</button>
+    <button role="tab" id="tab-loads" aria-controls="pane-loads" aria-selected="false">Loads</button>
+    <button role="tab" id="tab-notes" aria-controls="pane-notes" aria-selected="false">Notes</button>
+  </nav>
+
+  <section id="pane-members" role="tabpanel" aria-labelledby="tab-members">
+    <div class="filters">
+      <div class="chips" role="group" aria-label="Filter members">
+        <button data-filter="all" aria-pressed="true">All</button>
+        <button data-filter="fail" aria-pressed="false">Over 100%</button>
+        <button data-filter="warn" aria-pressed="false">80–100%</button>
+        <button data-filter="column" aria-pressed="false">Columns</button>
+        <button data-filter="beam" aria-pressed="false">Beams</button>
+        <button data-filter="brace" aria-pressed="false">Braces</button>
+      </div>
+      <input id="search" type="search" placeholder="Find a member, section or layer" aria-label="Find a member">
+    </div>
+    <p id="members-note" class="meta"></p>
+    <div class="table-wrap"><table id="members" class="data"><thead></thead><tbody></tbody></table></div>
+    <p class="meta">Click a row to select that member in Rhino. Forces are ULS design values from each element's governing combination; deflection is SLS, relative to the member's own ends. N⁺ tension, N⁻ compression.</p>
+  </section>
+
+  <section id="pane-supports" role="tabpanel" aria-labelledby="tab-supports" hidden>
+    <div class="filters"><label>Combination <select id="support-combo"></select></label></div>
+    <div class="table-wrap"><table id="supports" class="data"><thead></thead><tbody></tbody><tfoot></tfoot></table></div>
+    <p class="meta">Reactions on the structure, global axes: kN and kNm. A pinned support carries no moments.</p>
+  </section>
+
+  <section id="pane-combinations" role="tabpanel" aria-labelledby="tab-combinations" hidden>
+    <div class="table-wrap"><table id="combinations" class="data"><thead></thead><tbody></tbody></table></div>
+    <h3>Stability</h3>
+    <dl id="stability" class="facts"></dl>
+  </section>
+
+  <section id="pane-loads" role="tabpanel" aria-labelledby="tab-loads" hidden>
+    <h3>Analysis settings</h3>
+    <dl id="settings" class="facts"></dl>
+    <div id="floor-block"><h3>Floor loads</h3><div class="table-wrap"><table id="floor" class="data"><thead></thead><tbody></tbody></table></div></div>
+    <div id="asset-block"><h3>Placed models as loads</h3><div class="table-wrap"><table id="assets" class="data"><thead></thead><tbody></tbody></table></div><p id="asset-basis" class="meta"></p></div>
+  </section>
+
+  <section id="pane-notes" role="tabpanel" aria-labelledby="tab-notes" hidden>
+    <h3>Verdict</h3><p id="verdict-text"></p>
+    <div id="suggest-block"><h3>Suggestions</h3><ul id="suggestions"></ul></div>
+    <h3>Warnings</h3><ul id="warnings"></ul>
+    <h3>Assumptions</h3><ul id="assumptions"></ul>
+    <p id="limits" class="meta"></p>
+  </section>
+  <p id="snapshot" class="meta snapshot"></p>
+</main>
+</body>
+</html>

@@ -92,3 +92,11 @@ def test_panel_solver_process_boundary(tmp_path):
     assert bad["status"] == "error" and "No exported structural model" in bad["message"]
     missing = _host_solve(tmp_path, {"ping": True}, '"C:/nowhere/python.exe" -m almond_mcp')
     assert missing["status"] == "error" and "Could not start the native solver" in missing["message"]
+
+
+def test_results_page_presentation():
+    node = shutil.which("node")
+    assert node, "Node is required for the results page checks"
+    run = subprocess.run([node, "--test", str(ROOT / "tests/results_view.test.mjs")],
+                         capture_output=True, text=True, timeout=30)
+    assert run.returncode == 0, run.stdout + run.stderr

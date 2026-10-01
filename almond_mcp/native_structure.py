@@ -291,6 +291,89 @@ def _code_warnings(code: dc.Profile, uls, info: dict) -> list[str]:
     return out
 
 
+DOF_NAMES = ("Fx", "Fy", "Fz", "Mx", "My", "Mz")
+
+
+def _role(a, b) -> str:
+    d = np.asarray(b, float) - np.asarray(a, float)
+    L = float(np.linalg.norm(d)) or 1.0
+    vertical = abs(d[2]) / L
+    return "column" if vertical > 0.9 else "beam" if vertical < 0.1 else "brace"
+
+
+def member_table(model: dict, frame, sls, envelope) -> list[dict]:
+    """Every member (one per source curve), aggregated over its analysis elements: geometry, section,
+    ULS design forces and checks from each piece's governing combination, and SLS displacements."""
+    names = {tuple(m.get("source_guids") or []): m for m in model.get("members") or []}
+    groups: dict = {}
+    for i, e in enumerate(frame.elements):
+        groups.setdefault(tuple(e.tag or []), []).append(i)
+    rows = []
+    for n, (key, idx) in enumerate(groups.items(), start=1):
+        src = names.get(key, {})
+        ends = [frame.nodes[frame.elements[i].n1] for i in idx] + [frame.nodes[frame.elements[i].n2] for i in idx]
+        A, B = max(((p, q) for p in ends for q in ends), key=lambda pq: math.dist(*pq))
+        A, B = np.asarray(A), np.asarray(B)
+        chord = B - A
+        span = float(np.linalg.norm(chord)) or 1e-9
+        # SLS: deflection relative to the member's own displaced end points (what a span/limit check reads)
+        pts = np.vstack([sls.elements[i].stations for i in idx])
+        disp = np.vstack([sls.elements[i].disp for i in idx])
+        t = np.clip((pts - A) @ chord / span ** 2, 0.0, 1.0)
+        dA, dB = disp[int(np.argmin(np.linalg.norm(pts - A, axis=1)))], disp[int(np.argmin(np.linalg.norm(pts - B, axis=1)))]
+        sag = float(np.max(np.linalg.norm(disp - (np.outer(1 - t, dA) + np.outer(t, dB)), axis=1)))
+        # ULS: the governing piece and the design forces of every piece's governing combination
+        gi = max(idx, key=lambda i: envelope[i][0])
+        u, comb, ger = envelope[gi]
+        det = ger.util_detail
+        check = "flexural buckling" if det.get("buckling", -1.0) >= det.get("cross_section", 0.0) else "cross-section"
+        N = np.concatenate([envelope[i][2].N for i in idx])
+        M = np.concatenate([np.hypot(envelope[i][2].My, envelope[i][2].Mz) for i in idx])
+        V = max(max(math.hypot(ef[1], ef[2]), math.hypot(ef[7], ef[8])) for ef in (envelope[i][2].end_forces for i in idx))
+        e0 = frame.elements[idx[0]]
+        pinned = {"start": False, "end": False}
+        for i in idx:
+            el = frame.elements[i]
+            rel = el.releases or (False,) * 12
+            for node, flag in ((el.n1, rel[4] or rel[5]), (el.n2, rel[10] or rel[11])):
+                if flag:
+                    p = np.asarray(frame.nodes[node])
+                    if np.linalg.norm(p - A) < 1e-6:
+                        pinned["start"] = True
+                    elif np.linalg.norm(p - B) < 1e-6:
+                        pinned["end"] = True
+        rows.append({
+            "id": src.get("name") or f"M{n}", "source_guids": list(key), "layer": src.get("layer"),
+            "role": _role(A, B), "start_m": [round(float(v), 4) for v in A], "end_m": [round(float(v), 4) for v in B],
+            "length_m": round(span, 4), "elements": len(idx),
+            "section": e0.section.name, "material": e0.material.name, "pinned_ends": pinned,
+            "utilization": round(float(u), 4), "status": "fail" if u > 1.0 else "warn" if u > 0.8 else "ok",
+            "governing_combination": comb, "governing_check": check,
+            "cross_section_utilization": round(float(det["cross_section"]), 4) if "cross_section" in det else None,
+            "buckling_utilization": round(float(det["buckling"]), 4) if "buckling" in det else None,
+            "slenderness": round(float(det["slenderness"]), 3) if "slenderness" in det else None,
+            "chi": round(float(det["chi"]), 3) if "chi" in det else None,
+            "moduli": det.get("moduli"),
+            "max_stress_mpa": round(float(det.get("max_stress_mpa", 0.0)), 2),
+            "n_tension_kn": round(max(float(N.max()), 0.0), 3), "n_compression_kn": round(max(-float(N.min()), 0.0), 3),
+            "v_max_kn": round(float(V), 3), "m_max_knm": round(float(M.max()), 3),
+            "t_max_knm": round(max(abs(float(envelope[i][2].T)) for i in idx), 3),
+            "max_displacement_mm": round(float(np.max(np.linalg.norm(disp, axis=1))) * 1000.0, 3),
+            "deflection_mm": round(sag * 1000.0, 3),
+            "deflection_ratio": round(span / sag) if sag > 1e-9 else None,
+        })
+    return rows
+
+
+def support_table(frame, info: dict, sls, ulss, fixed: bool) -> list[dict]:
+    """Reactions at every support: SLS characteristic and each ULS combination (its governing variant)."""
+    def forces(r, n):
+        return {k: round(float(v), 3) + 0.0 for k, v in zip(DOF_NAMES, r.reactions[n])}
+    return [{"node": int(n), "position_m": [round(float(v), 4) for v in frame.nodes[n]],
+             "restraint": "fixed" if fixed else "pinned", "sls": forces(sls, n),
+             "uls": {name: forces(r_, n) for name, _, r_ in ulss}} for n in info["support_nodes"]]
+
+
 def _label(factors: dict) -> str:
     return " + ".join(f"{v:g}{k}" for k, v in factors.items())
 
@@ -496,8 +579,11 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
              limit_ratio: float | None = None, plastic: bool = False, span_m: float | None = None,
              asset_loads: dict | None = None, floor_loads: dict | None = None,
              design_basis: str = "en1990", uls: str | None = None, connections: str = "rigid",
-             stability: str = "auto", design_code=None) -> dict:
+             stability: str = "auto", design_code=None, detail: bool = False) -> dict:
     """Run the native check and return a bridge-compatible validation result.
+
+    ``detail``: add "members" (every member's geometry, section, ULS design forces and checks, SLS
+    deflection) and "supports" (reactions per combination); the panel's results page reads them.
 
     The design code profile (``design_code``, default the Eurocode recommended values) sets the
     combination factors, gamma_M0/gamma_M1 and, unless ``limit_ratio`` is given, the deflection limit."""
@@ -630,6 +716,9 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
             if g not in seen:
                 seen.append(g)
     result["worst_member_guids"] = seen[:5]
+    if detail:
+        result["members"] = member_table(model, frame, res, envelope)
+        result["supports"] = support_table(frame, info, res, ulss, fixed_supports)
     if res.auto_restrained:
         result["warnings"].append(f"{len(res.auto_restrained)} unstiffened rotation(s) at pin-jointed nodes were restrained.")
     return result

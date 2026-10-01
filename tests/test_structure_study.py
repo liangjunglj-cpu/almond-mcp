@@ -110,3 +110,30 @@ def test_cli_accepts_a_byte_order_mark():
     assert proc.returncode == 0 and json.loads(proc.stdout.decode("utf-8"))["status"] == "ok"
     out = io.StringIO()
     assert st.main(io.StringIO("\ufeff" + json.dumps({"ping": True})), out) == 0
+
+
+def test_study_reports_every_member_and_support():
+    _, out = solve({"model": model(219.1, 8), "settings": {"load_kn": 40, "fixed_rotations": False}})
+    v = out["validation"]
+    members, supports = v["members"], v["supports"]
+    assert len(members) == 8 and {m["role"] for m in members} == {"column", "beam"}
+    worst = max(members, key=lambda m: m["utilization"])
+    assert worst["utilization"] == pytest.approx(v["results"]["utilization_ratio"], abs=1e-4)
+    col = next(m for m in members if m["role"] == "column")
+    assert col["n_compression_kn"] > 0 and col["length_m"] == pytest.approx(4.0) and col["elements"] >= 1
+    assert col["governing_check"] in ("cross-section", "flexural buckling") and col["chi"] is not None
+    beam = next(m for m in members if m["role"] == "beam")
+    assert beam["m_max_knm"] > 0 and beam["deflection_mm"] > 0 and beam["deflection_ratio"] > 0
+    assert len(supports) == 4 and all(s["restraint"] == "pinned" for s in supports)
+    # the vertical reactions balance the load at SLS
+    assert sum(s["sls"]["Fz"] for s in supports) == pytest.approx(v["results"]["reactions_kn"], rel=1e-6)
+    assert set(supports[0]["uls"]) == {c["name"] for c in v["results"]["combinations"][1:]}
+    json.dumps(out, allow_nan=False)                                    # plain JSON, nothing non-finite
+
+
+def test_member_names_and_layers_come_from_the_model():
+    m = model(219.1, 8)
+    m["members"][0].update(name="C-01", layer="Structure::Columns")
+    _, out = solve({"model": m, "settings": {"load_kn": 10}})
+    row = next(r for r in out["validation"]["members"] if r["source_guids"] == ["c1"])
+    assert row["id"] == "C-01" and row["layer"] == "Structure::Columns"

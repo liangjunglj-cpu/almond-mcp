@@ -66,7 +66,8 @@ function controls() {
     b.disabled=!native||busy||(b.dataset.analysis==='analyze'&&!model)||
       (['highlight','export'].includes(b.dataset.analysis)&&(!report||dirty))||
       (b.dataset.analysis==='highlight'&&!report?.result?.worst_member_guids?.length)||
-      (b.dataset.analysis==='clear_view'&&!report?.native?.drawn);
+      (b.dataset.analysis==='clear_view'&&!report?.native?.drawn)||
+      (b.dataset.analysis==='results'&&(!report||dirty));
   });
   el('analysis-results').querySelector('[data-analysis="clear_view"]').hidden=!report?.native;
 }

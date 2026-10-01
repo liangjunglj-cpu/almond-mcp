@@ -58,12 +58,20 @@ namespace RhinoAlmondBridge
 
         private string Palette()
         {
+            string palette = HostPalette(out Color background);
+            BackgroundColor = _body.BackgroundColor = background;
+            return palette;
+        }
+
+        // Rhino's panel colours and font as the JSON the pages' panel-theme.js reads.
+        internal static string HostPalette(out Color background)
+        {
             Func<PaintColor,string> colour = key => {
                 var c = AppearanceSettings.GetPaintColor(key, true);
                 return $"#{c.R:X2}{c.G:X2}{c.B:X2}";
             };
-            var background = AppearanceSettings.GetPaintColor(PaintColor.PanelBackground, true);
-            BackgroundColor = _body.BackgroundColor = Color.FromArgb(background.R, background.G, background.B);
+            var bg = AppearanceSettings.GetPaintColor(PaintColor.PanelBackground, true);
+            background = Color.FromArgb(bg.R, bg.G, bg.B);
             return JsonConvert.SerializeObject(new {
                 paper = colour(PaintColor.PanelBackground), ink = colour(PaintColor.TextEnabled),
                 control = colour(PaintColor.NormalStart), field = colour(PaintColor.EditBoxBackground),
@@ -132,7 +140,7 @@ namespace RhinoAlmondBridge
                         var action = Regex.Match(e.Uri.AbsolutePath, "^/almond-action/" + _session + "/(drag|place)/(light|original)/(gen-[a-z0-9-]{1,100})$");
                         if (_ready && action.Success)
                             LibraryPlacement.Request(action.Groups[3].Value, action.Groups[1].Value == "drag", action.Groups[2].Value == "light");
-                        var analysis = Regex.Match(e.Uri.AbsolutePath,"^/almond-action/"+_session+"/karamba/(status|capture|analyze|highlight|export|clear_view)$");
+                        var analysis = Regex.Match(e.Uri.AbsolutePath,"^/almond-action/"+_session+"/karamba/(status|capture|analyze|highlight|export|clear_view|results)$");
                         if (_ready && analysis.Success)
                         {
                             try {

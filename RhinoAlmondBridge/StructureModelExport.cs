@@ -50,7 +50,7 @@ namespace RhinoAlmondBridge
                     }
                     var sec = beam.Section ?? SectionSpec.DefaultBeam(s);
                     // designer's connection intent on the source curve, and that curve's own ends
-                    string release = null;
+                    string release = null, name = null, layer = null;
                     double[] curveStart = null, curveEnd = null;
                     Guid gid;
                     var src = beam.SourceGuids.Count > 0 && Guid.TryParse(beam.SourceGuids[0], out gid) ? doc.Objects.FindId(gid) : null;
@@ -58,12 +58,17 @@ namespace RhinoAlmondBridge
                     {
                         release = ReleaseKeys.Select(k => src.Attributes.GetUserString(k)).FirstOrDefault(v => !string.IsNullOrWhiteSpace(v))?.Trim();
                         if (src.Geometry is Curve crv) { curveStart = M(crv.PointAtStart); curveEnd = M(crv.PointAtEnd); }
+                        name = string.IsNullOrWhiteSpace(src.Attributes.Name) ? null : src.Attributes.Name.Trim();
+                        layer = src.Attributes.LayerIndex >= 0 && src.Attributes.LayerIndex < doc.Layers.Count
+                            ? doc.Layers[src.Attributes.LayerIndex].FullPath : null;
                     }
                     members.Add(new
                     {
                         source_guids = beam.SourceGuids,
                         points = pts.Select(M).ToList(),
                         release,
+                        name,
+                        layer,
                         curve_start_m = curveStart,
                         curve_end_m = curveEnd,
                         section = new

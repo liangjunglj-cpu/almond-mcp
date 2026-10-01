@@ -2256,6 +2256,7 @@ def validate_structure(
     connections: str = "rigid",
     stability: str = "auto",
     design_code: str = "eurocode",
+    detail: bool = False,
 ) -> str:
     """
     Validates AI-generated geometry with a structural analysis.
@@ -2325,6 +2326,10 @@ def validate_structure(
             (default, EN recommended values), any profile from list_design_codes, or "off"
             (unfactored G + Q, no partial factors; same as design_basis="unfactored").
             Results carry "design_code" with the values used and any unverified ones.
+        detail: native engine only. Adds "members" (per member: role, length, section, ULS design
+            forces N/V/M/T, governing combination and check, slenderness, chi, stress,
+            utilization, SLS deflection and span/deflection ratio, pinned ends) and "supports"
+            (reactions Fx..Mz at SLS and each ULS combination). Off by default to keep replies short.
         connections: "rigid" (default: every joint transmits moment) or "simple": beams are
             pinned (major-axis bending released) and braces pinned in both axes where they
             stop - not where another member carries on in line - while columns stay
@@ -2392,7 +2397,7 @@ def validate_structure(
         result, note = _native_validation(guids, structure_type, load_kn, material, fixed_supports,
                                           self_weight, span_m, required=engine == "native", asset_spec=spec,
                                           floor_spec=floor, design=(design_basis, uls_combination, design_code),
-                                          connections=connections, stability=stability)
+                                          connections=connections, stability=stability, detail=detail)
         if isinstance(result, str):          # hard error (explicit native request, or no bridge)
             return result
     if result is None:
@@ -2487,7 +2492,7 @@ def _floor_spec(imposed, dead, engine):
 
 def _native_validation(guids, structure_type, load_kn, material, fixed_supports, self_weight, span_m, required,
                        asset_spec=None, floor_spec=None, design=("en1990", None, "eurocode"), connections="rigid",
-                       stability="auto"):
+                       stability="auto", detail=False):
     """Native frame check on the bridge's exported line model.
 
     Returns (result_dict, None) when it ran, (None, note) to fall back to the Karamba
@@ -2517,7 +2522,7 @@ def _native_validation(guids, structure_type, load_kn, material, fixed_supports,
                                            fixed_supports=fixed_supports, self_weight=self_weight, span_m=span_m,
                                            asset_loads=asset_spec, floor_loads=floor_spec,
                                            design_basis=design[0], uls=design[1], connections=connections,
-                                           stability=stability, design_code=design[2])
+                                           stability=stability, design_code=design[2], detail=detail)
     except ValueError as e:
         return json.dumps({"status": "error", "message": str(e)}), None
     return result, None
