@@ -280,7 +280,28 @@ def combinations_image():
     save(out, "load-combinations.jpg")
 
 
+def connections_image():
+    rows = json.loads((SRC / "conn_log.json").read_text())
+    names = [f'conn_{r["conn"]}_{int(r["d"])}' for r in rows]
+    heads = [(f'{r["conn"].upper()}  /  CHS {r["d"]}x{r["w"]:g}',
+              f'{r["max_mm"]:.1f} mm / u {r["util"]:.2f} / {r["pinned"]} pinned ends / {r["status"].upper()}',
+              GREEN if r["status"] == "pass" else RED) for r in rows]
+    im = grid(names, heads, 3, cell=(640, 360),
+              title="CONNECTIONS  //  rigid joints vs simple (pinned) beam connections, floor 2.0 Q + 1.0 G kN/m2, EN 1990")
+    out = Image.new("RGB", (im.width, im.height + 80), INK)
+    out.paste(im, (0, 0))
+    d = ImageDraw.Draw(out)
+    d.text((24, im.height + 10), "Rigid joints flatter the joists: with simple connections CHS 219.1x8 fails; the next size tried, CHS 244.5x10, passes.",
+           font=font("mono", 20), fill=WHITE)
+    d.text((24, im.height + 42), "Circles: pinned ends. Pieces drawn along one line stay continuous; secondary beams pin into primaries and walls.",
+           font=font("mono", 20), fill=GREY)
+    save(out, "connections.jpg")
+
+
 if __name__ == "__main__":
+    if "--connections" in sys.argv:
+        connections_image()
+        sys.exit()
     if "--combos" in sys.argv:
         combinations_image()
         sys.exit()

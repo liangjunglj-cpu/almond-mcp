@@ -16,6 +16,8 @@ namespace RhinoAlmondBridge
     /// </summary>
     public static class StructureModelExport
     {
+        private static readonly string[] ReleaseKeys = { "almond:release", "Almond.Release" };
+
         public static string Handle(JObject jobj)
         {
             var guids = jobj["guids"]?.ToObject<List<string>>() ?? new List<string>();
@@ -47,10 +49,23 @@ namespace RhinoAlmondBridge
                         pts = poly.ToList();
                     }
                     var sec = beam.Section ?? SectionSpec.DefaultBeam(s);
+                    // designer's connection intent on the source curve, and that curve's own ends
+                    string release = null;
+                    double[] curveStart = null, curveEnd = null;
+                    Guid gid;
+                    var src = beam.SourceGuids.Count > 0 && Guid.TryParse(beam.SourceGuids[0], out gid) ? doc.Objects.FindId(gid) : null;
+                    if (src != null)
+                    {
+                        release = ReleaseKeys.Select(k => src.Attributes.GetUserString(k)).FirstOrDefault(v => !string.IsNullOrWhiteSpace(v))?.Trim();
+                        if (src.Geometry is Curve crv) { curveStart = M(crv.PointAtStart); curveEnd = M(crv.PointAtEnd); }
+                    }
                     members.Add(new
                     {
                         source_guids = beam.SourceGuids,
                         points = pts.Select(M).ToList(),
+                        release,
+                        curve_start_m = curveStart,
+                        curve_end_m = curveEnd,
                         section = new
                         {
                             shape = sec.Shape, source = sec.Source,

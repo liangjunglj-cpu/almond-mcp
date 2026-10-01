@@ -129,6 +129,7 @@ namespace RhinoAlmondBridge
                         SampleDispM = e["samples_m"].ToObject<List<double[]>>(),
                         Utilization = e["utilization"] != null && (e["utilization"].Type == JTokenType.Float || e["utilization"].Type == JTokenType.Integer)
                             ? e["utilization"].Value<double>() : double.NaN,
+                        Hinges = e["hinges"]?.ToObject<bool[]>(),
                     });
                 if (res.Elements.Count == 0 || res.Elements.Any(x => x.SampleDispM == null || x.SampleDispM.Count < 2))
                     return Error("structure_draw needs elements with at least two displacement samples.");
@@ -284,6 +285,25 @@ namespace RhinoAlmondBridge
                     var da = el.SampleDispM[i]; var db = el.SampleDispM[i + 1];
                     double v = byUtil ? el.Utilization : (Len(da) + Len(db)) / 2 / maxM;
                     e.Display.DrawLine(P(a, da, Data.Scale), P(b, db, Data.Scale), Ramp(byUtil ? v : v), thick);
+                }
+            }
+            // pinned member ends: hollow circles just inside the member on the deformed shape
+            for (int k = 0; k < shown; k++)
+            {
+                if (!Visible(k)) continue;
+                var el = r.Elements[k];
+                if (el.Hinges == null || el.SampleDispM.Count < 2) continue;
+                for (int side = 0; side < 2; side++)
+                {
+                    if (side >= el.Hinges.Length || !el.Hinges[side]) continue;
+                    double t = side == 0 ? 0.06 : 0.94;
+                    double fi = t * (el.SampleDispM.Count - 1);
+                    int i0 = Math.Min((int)fi, el.SampleDispM.Count - 2);
+                    double fr = fi - i0;
+                    var d0 = el.SampleDispM[i0]; var d1 = el.SampleDispM[i0 + 1];
+                    var dd = new[] { d0[0] + (d1[0] - d0[0]) * fr, d0[1] + (d1[1] - d0[1]) * fr, d0[2] + (d1[2] - d0[2]) * fr };
+                    var pt = P(Lerp(el.StartM, el.EndM, t), dd, Data.Scale);
+                    e.Display.DrawPoint(pt, PointStyle.RoundControlPoint, Math.Max(5, (int)(7 * dpi)), Color.White);
                 }
             }
             // supports (triangles) and loaded nodes (arrows)

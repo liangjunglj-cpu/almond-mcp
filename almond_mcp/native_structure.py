@@ -7,6 +7,11 @@ so the two engines are comparable:
 
 - supports: declared anchor points (snapped to the nearest node), else every lowest-Z node;
   fully fixed, or pinned (translations only) when ``fixed_supports`` is False;
+- connections: rigid joints by default; ``connections="simple"`` pins beams (major-axis bending)
+  and braces (both axes) where they stop, i.e. where no other member carries on in line (pieces
+  drawn along one line form a continuous member); columns stay continuous; a curve's user text
+  ``almond:release``
+  ("pinned" | "pinned_start" | "pinned_end" | "rigid") overrides either mode for that member;
 - imposed load: ``load_kn`` split equally over the free (unsupported) nodes, acting -Z;
 - self weight: gamma x A along every member, -Z;
 - deflection limit: span / 250, span = longest member for beam/frame, else overall extent,
@@ -66,14 +71,87 @@ def section_from_spec(spec: dict | None, diameter_mm=None, wall_mm=None) -> tupl
     return fs.chs(114.3, 4.0), notes
 
 
+CONNECTIONS = ("rigid", "simple")
+RELEASES = ("rigid", "pinned", "pinned_start", "pinned_end")
+
+
+def _member_ends(model: dict, tol: float) -> list:
+    """Per member: (start point, end point) of its drawn curve. Uses the bridge's curve_start_m /
+    curve_end_m; otherwise the endpoints that occur once among the pieces sharing its first GUID
+    (start/end order unknown then: None)."""
+    counts: dict = {}
+    for m in model.get("members", []):
+        pts = m.get("points") or []
+        g = (m.get("source_guids") or [""])[0]
+        for q in (pts[0], pts[-1]) if pts else ():
+            key = (g, tuple(round(v / max(tol, 1e-6)) for v in q))
+            counts[key] = counts.get(key, 0) + 1
+    ends = []
+    for m in model.get("members", []):
+        if m.get("curve_start_m") and m.get("curve_end_m"):
+            ends.append((m["curve_start_m"], m["curve_end_m"], True))
+            continue
+        pts = m.get("points") or []
+        g = (m.get("source_guids") or [""])[0]
+        free = [q for q in ((pts[0], pts[-1]) if pts else ())
+                if counts[(g, tuple(round(v / max(tol, 1e-6)) for v in q))] == 1]
+        ends.append((free[0] if free else None, free[1] if len(free) > 1 else None, False))
+    return ends
+
+
+def _continued(model: dict, tol: float) -> dict:
+    """{(member index, 0 start | 1 end): True} where another member carries on in line (within 5
+    degrees) from that end, i.e. the drawn pieces form one continuous member."""
+    ends = []
+    for i, m in enumerate(model.get("members", [])):
+        pts = m.get("points") or []
+        if len(pts) < 2:
+            continue
+        for which, (a, b) in ((0, (pts[0], pts[1])), (1, (pts[-1], pts[-2]))):
+            d = np.subtract(b, a)
+            n = float(np.linalg.norm(d))
+            if n > 0:
+                ends.append((i, which, np.asarray(a, float), d / n))
+    reach = max(tol, 1e-3)
+    return {(i, w): any(j != i and np.linalg.norm(q - p) <= reach and float(d @ e) < -0.996 for (j, _, q, e) in ends)
+            for (i, w, p, d) in ends}
+
+
+def _orientation(m: dict) -> str:
+    pts = m.get("points") or []
+    if len(pts) < 2:
+        return "beam"
+    d = np.subtract(pts[-1], pts[0])
+    L = float(np.linalg.norm(d))
+    slope = abs(d[2]) / L if L > 0 else 0.0
+    return "column" if slope > 0.98 else ("beam" if slope < 0.05 else "brace")
+
+
+def _release_ends(m: dict, connections: str) -> tuple[bool, bool, str, bool]:
+    """(release at curve start, at curve end, source, release minor axis too) for one member.
+    Beams release major-axis bending only; braces both axes; columns stay continuous."""
+    kind = _orientation(m)
+    minor = kind != "beam"
+    user = (m.get("release") or "").strip().lower()
+    if user in RELEASES:
+        return user in ("pinned", "pinned_start"), user in ("pinned", "pinned_end"), "user", minor
+    if connections == "simple" and kind != "column":
+        return True, True, "simple", minor
+    return False, False, "rigid", minor
+
+
 def build_frame(model: dict, load_kn: float, material: str = "Steel", fixed_supports: bool = True,
                 self_weight: bool = True, diameter_mm=None, wall_mm=None, asset_loads: dict | None = None,
-                floor_loads: dict | None = None):
+                floor_loads: dict | None = None, connections: str = "rigid"):
     """``asset_loads``: {"placements": [...], "table": LoadTable, "catalogue": {...}} adds the
     gravity loads of placed library assets (see asset_loads.apply); its report is info["asset_loads"].
     ``floor_loads``: {"imposed": kN/m2, "dead": kN/m2, "levels": [z m] | None} loads every enclosed
-    floor bay (see floor_loads.apply); its report is info["floor_loads"]."""
-    """Frame + bookkeeping from an exported conditioned model (all coordinates in meters)."""
+    floor bay (see floor_loads.apply); its report is info["floor_loads"].
+    ``connections``: "rigid" or "simple" (see module notes); per-member ``release`` overrides.
+    All coordinates in meters (the bridge's exported conditioned model)."""
+    connections = (connections or "rigid").lower()
+    if connections not in CONNECTIONS:
+        raise ValueError("connections must be 'rigid' or 'simple'.")
     mat = fs.material(material)
     tol = max(float(model.get("tolerance_m") or 0.0), 1e-6)
     frame = fs.Frame()
@@ -86,15 +164,35 @@ def build_frame(model: dict, load_kn: float, material: str = "Steel", fixed_supp
         return frame.add_node(p)
 
     lineage = []
-    for m in model.get("members", []):
+    pinned_ends, user_members, unordered = 0, 0, 0
+    cont = _continued(model, tol) if connections == "simple" else {}
+    for mi, (m, (c0, c1, ordered)) in enumerate(zip(model.get("members", []), _member_ends(model, tol))):
         sec, notes = section_from_spec(m.get("section"), diameter_mm, wall_mm)
         warnings += notes
+        rel0, rel1, source, minor = _release_ends(m, connections)
+        user_members += source == "user"
+        if source == "user" and rel0 != rel1 and not ordered:
+            unordered += 1
+            rel0 = rel1 = True                                  # direction unknown: pin both ends
         pts = m.get("points") or []
         for a, b in zip(pts, pts[1:]):
             if math.dist(a, b) <= tol:
                 continue
-            ei = frame.add_element(node(a), node(b), sec, mat, tag=list(m.get("source_guids", [])))
+            at = lambda q, c: c is not None and math.dist(q, c) <= max(tol, 1e-3)
+            if source == "simple":
+                # pin only where the member stops: not at a joint where it carries on in line
+                ra = a is pts[0] and not cont.get((mi, 0), False)
+                rb = b is pts[-1] and not cont.get((mi, 1), False)
+            else:
+                ra = (rel0 and at(a, c0)) or (rel1 and at(a, c1))
+                rb = (rel0 and at(b, c0)) or (rel1 and at(b, c1))
+            ei = frame.add_element(node(a), node(b), sec, mat, tag=list(m.get("source_guids", [])),
+                                   releases=fs.release_mask(ra, rb, minor))
+            pinned_ends += int(ra) + int(rb)
             lineage.append(ei)
+    if unordered:
+        warnings.append(f"{unordered} member(s) asked for a one-sided release but the curve direction is "
+                        "unknown (update almondbridge); both ends were pinned.")
     if not frame.elements:
         raise ValueError("No line members to analyse.")
 
@@ -124,7 +222,8 @@ def build_frame(model: dict, load_kn: float, material: str = "Steel", fixed_supp
             frame.load(n, fz=-load_kn / len(free), case="Q")
     if self_weight:
         frame.gravity = (0.0, 0.0, -1.0)
-    info = {"support_nodes": support_nodes, "loaded_nodes": free if load_kn > 0 else [], "material": mat}
+    info = {"support_nodes": support_nodes, "loaded_nodes": free if load_kn > 0 else [], "material": mat,
+            "connections": {"mode": connections, "pinned_ends": pinned_ends, "user_released_members": user_members}}
     if floor_loads and (floor_loads.get("imposed") or floor_loads.get("dead")):
         info["floor_loads"] = fl.apply(frame, floor_loads.get("imposed", 0.0), floor_loads.get("dead", 0.0),
                                        floor_loads.get("levels"))
@@ -175,25 +274,28 @@ def view_result(model: dict, load_kn: float = 10.0, material: str = "Steel", fix
                 self_weight: bool = True, diameter_mm=None, wall_mm=None, span_m: float | None = None,
                 stations: int = 13, asset_loads: dict | None = None,
                 floor_loads: dict | None = None, design_basis: str = "en1990",
-                uls: str = "6.10") -> tuple[dict, float]:
+                uls: str = "6.10", connections: str = "rigid") -> tuple[dict, float]:
     """Solve and package the result for the bridge's ``structure_draw`` overlay.
 
     Returns (result, span_m): per-element start/end points and sampled global displacements in
     meters (SLS characteristic), ULS utilization envelope, supports, loaded nodes and the max
     displacement. Raises frame_solver.MechanismError for unstable models."""
     frame, info, warnings = build_frame(model, load_kn, material, fixed_supports, self_weight, diameter_mm, wall_mm,
-                                        asset_loads, floor_loads)
+                                        asset_loads, floor_loads, connections)
     res, ulss, envelope = _solve_design(frame, design_basis, uls, stations=stations)
     span = float(span_m or model.get("max_member_span_m") or model.get("max_span_m") or 5.0)
     elements = []
     for er, (u, _, _) in zip(res.elements, envelope):
         e = frame.elements[er.index]
+        rel = e.releases or (False,) * 12
         elements.append({"source_guids": e.tag or [], "start_m": list(frame.nodes[e.n1]), "end_m": list(frame.nodes[e.n2]),
-                         "samples_m": np.round(er.disp, 9).tolist(), "utilization": round(u, 4)})
+                         "samples_m": np.round(er.disp, 9).tolist(), "utilization": round(u, 4),
+                         "hinges": [bool(rel[4] or rel[5]), bool(rel[10] or rel[11])]})
     result = {"elements": elements,
               "support_points_m": [list(frame.nodes[n]) for n in info["support_nodes"]],
               "loaded_points_m": [list(frame.nodes[n]) for n in info["loaded_nodes"]],
               "max_displacement_mm": round(res.max_displacement * 1000.0, 3),
+              "connections": info["connections"],
               "combinations": {"deflection": SLS[0],
                                "utilization": [f"{n} ({_label(f)})" for n, f, _ in ulss]},
               "warnings": list(model.get("warnings") or []) + warnings}
@@ -207,7 +309,7 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
              fixed_supports: bool = True, self_weight: bool = True, diameter_mm=None, wall_mm=None,
              limit_ratio: float = 250.0, plastic: bool = False, span_m: float | None = None,
              asset_loads: dict | None = None, floor_loads: dict | None = None,
-             design_basis: str = "en1990", uls: str = "6.10") -> dict:
+             design_basis: str = "en1990", uls: str = "6.10", connections: str = "rigid") -> dict:
     """Run the native check and return a bridge-compatible validation result."""
     result = {"status": "error", "passed": False, "structure_type": structure_type, "material": material,
               "confidence": "high", "suggestions": [], "worst_member_guids": [],
@@ -216,13 +318,16 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
     t0 = time.perf_counter()
     try:
         frame, info, notes = build_frame(model, load_kn, material, fixed_supports, self_weight, diameter_mm, wall_mm,
-                                         asset_loads, floor_loads)
+                                         asset_loads, floor_loads, connections)
         result["warnings"] += notes
         res, ulss, envelope = _solve_design(frame, design_basis, uls, plastic=plastic)
     except fs.MechanismError as exc:
         result["verdict"] = METHOD_PREFIX + f"FAILED: {exc}"
         result["status"] = "fail"
         result["suggestions"] = ["Add supports or bracing so every part of the structure is restrained."]
+        if (connections or "").lower() == "simple":
+            result["suggestions"].append("With simple (pinned) connections the frame needs bracing, fixed column "
+                                         "bases or rigid joints for stability.")
         result["results"]["mechanism_nodes_m"] = [list(frame.nodes[n]) for n in exc.nodes] if "frame" in locals() else []
         return result
     except ValueError as exc:
@@ -263,11 +368,16 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
         "per_element_utilization": elem_util,
         "max_member_sag_mm": round(max(er.max_sag for er in res.elements) * 1000.0, 3),
         "support_mode": "fixed" if fixed_supports else "pinned",
+        "connections": info["connections"],
         "nodes": len(frame.nodes), "elements": len(frame.elements),
         "equilibrium_error_kn": round(res.equilibrium_error(), 9),
         "solve_ms": round((time.perf_counter() - t0) * 1000.0, 1),
     })
     result["assumptions"] = result["assumptions"] + [
+        ("Connections: rigid joints." if info["connections"]["mode"] == "rigid" and not info["connections"]["pinned_ends"]
+         else f"Connections: {info['connections']['mode']} ({info['connections']['pinned_ends']} pinned member ends; "
+              "beams release major-axis bending, braces both axes; torsion released at one end of "
+              "members pinned at both)."),
         f"Load combinations ({r['design_basis']}): deflection at {SLS[0]} ({_label(SLS[1])}); member checks at "
         + ", ".join(f"{n} ({_label(f)})" for n, f, _ in ulss) + ". G = self weight, floor build-up and the weight "
         "of placed items; Q = load_kn, occupancy floor load, contents and occupants."]

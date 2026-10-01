@@ -7,7 +7,8 @@ code is used or wrapped.
 
 Scope, stated so results are never over-read:
 - first-order (geometrically linear), linear-elastic, static;
-- straight prismatic members, rigid joints (optional axial-only truss members);
+- straight prismatic members, rigid joints unless a member end is released (pinned or
+  partly released ends by static condensation; optional axial-only truss members);
 - point loads at nodes and uniform or linearly varying member loads (self weight is one),
   exact within each member (Hermite interpolation + the fixed-fixed particular solution);
 - member checks follow EN 1993-1-1 in simplified form (see ``member_utilization``);
@@ -142,6 +143,24 @@ class Element:
     truss: bool = False                 # axial force only (pin-jointed bar)
     ref: tuple | None = None            # optional vector fixing local z (default: vertical plane)
     tag: object = None                  # caller's lineage (e.g. Rhino GUIDs)
+    releases: tuple | None = None       # 12 bools, local DOF order (ux uy uz rx ry rz at n1, then n2)
+
+
+def release_mask(start: bool = False, end: bool = False, minor: bool = True) -> tuple | None:
+    """Pinned member ends: major-axis bending (ry) released at the chosen ends, and minor-axis
+    bending (rz) too unless ``minor`` is False (a simple beam connection keeps plan-rotation
+    continuity, which also stops pin-ended columns spinning). When both ends are pinned, torsion
+    is released at the start so the member cannot twist as a rigid body."""
+    m = [False] * 12
+    if start:
+        m[4] = True
+        m[5] = minor
+    if end:
+        m[10] = True
+        m[11] = minor
+    if start and end:
+        m[3] = True
+    return tuple(m) if any(m) else None
 
 
 @dataclass
@@ -195,7 +214,12 @@ class Frame:
         k = self.add_node(p1 + t * (p2 - p1))
         n2 = e.n2
         e.n2 = k
-        new = self.add_element(k, n2, e.section, e.material, truss=e.truss, ref=e.ref, tag=e.tag)
+        rel_end = None
+        if e.releases:                                          # end releases move to the new outer part
+            rel_end = tuple([False] * 6 + list(e.releases[6:])) if any(e.releases[6:]) else None
+            e.releases = tuple(list(e.releases[:6]) + [False] * 6) if any(e.releases[:6]) else None
+        new = self.add_element(k, n2, e.section, e.material, truss=e.truss, ref=e.ref, tag=e.tag,
+                               releases=rel_end)
         kept, added = [], []
         for (j, wa, wb, case) in self.member_loads:
             if j != ei:
@@ -273,6 +297,30 @@ def fixed_end_forces(wa: np.ndarray, wb: np.ndarray, L: float, truss: bool) -> n
         f[5], f[11] = m1y, -m2y
         f[4], f[10] = -m1z, m2z
     return f
+
+
+def condense(kl: np.ndarray, fes: list, rel) -> tuple:
+    """Static condensation of released local DOFs: (k, [f per case], recovery | None).
+
+    Released DOFs carry no end force, so u_r = K_rr^-1 (f_r - K_rc u_c); the kept part is
+    K_cc - K_cr K_rr^-1 K_rc with equivalent loads f_c - K_cr K_rr^-1 f_r."""
+    if not rel or not any(rel):
+        return kl, fes, None
+    r = np.flatnonzero(rel)
+    c = np.flatnonzero(~np.asarray(rel, bool))
+    Krr = kl[np.ix_(r, r)]
+    if np.linalg.cond(Krr) > 1e12:
+        raise ValueError("Released end DOFs leave the member unstable (e.g. torsion released at both ends).")
+    inv = np.linalg.inv(Krr)
+    Kcr, Krc = kl[np.ix_(c, r)], kl[np.ix_(r, c)]
+    kc = np.zeros_like(kl)
+    kc[np.ix_(c, c)] = kl[np.ix_(c, c)] - Kcr @ inv @ Krc
+    out = []
+    for fe in fes:
+        f = np.zeros(12)
+        f[c] = fe[c] - Kcr @ inv @ fe[r]
+        out.append(f)
+    return kc, out, (r, c, inv, Krc)
 
 
 def _t12(R):
@@ -365,16 +413,20 @@ def solve_combinations(frame: Frame, combinations: dict, stations: int = 11, pla
         T = _t12(R)
         kl = local_stiffness(e, L)
         idx = np.r_[e.n1 * DOF:e.n1 * DOF + 6, e.n2 * DOF:e.n2 * DOF + 6]
-        K[np.ix_(idx, idx)] += T.T @ kl @ T
-        geo.append((R, L, T, idx))
-        kloc.append(kl)
+        fes = []
         for c in cases:
             w = (R @ member_w[c][ei][0], R @ member_w[c][ei][1])
             fe = fixed_end_forces(w[0], w[1], L, e.truss)
             wl[c].append(w)
             feq[c].append(fe)
-            F[c][idx] += T.T @ fe
+            fes.append(fe)
             applied[c][:3] += (member_w[c][ei][0] + member_w[c][ei][1]) * L / 2
+        kc, fcs, rec = condense(kl, fes, None if e.truss else e.releases)
+        K[np.ix_(idx, idx)] += T.T @ kc @ T
+        for c, fc in zip(cases, fcs):
+            F[c][idx] += T.T @ fc
+        geo.append((R, L, T, idx))
+        kloc.append((kl, rec))
     for (n, c), v in frame.nodal_loads.items():
         F[c][n * DOF:n * DOF + 6] += np.asarray(v, float)
         applied[c][:3] += np.asarray(v, float)[:3]
@@ -391,16 +443,25 @@ def solve_combinations(frame: Frame, combinations: dict, stations: int = 11, pla
             raise MechanismError(f"Load on node {n} DOF {d} that no member can carry.", [n])
         restrained[n * DOF + d] = True
 
-    free = np.flatnonzero(~restrained)
     u = {c: np.zeros(ndof) for c in cases}
-    if free.size:
+    for _attempt in range(64):
+        free = np.flatnonzero(~restrained)
+        if not free.size:
+            break
         Kff = K[np.ix_(free, free)]
         try:
             Lc = np.linalg.cholesky(Kff)
             if np.min(np.diag(Lc)) ** 2 < 1e-10 * np.max(np.diag(Kff)):
                 raise np.linalg.LinAlgError
+            break
         except np.linalg.LinAlgError:
-            raise _mechanism(Kff, free) from None
+            spurious = _spurious_rotation_dofs(Kff, free, [F[c][free] for c in cases])
+            if not spurious:
+                raise _mechanism(Kff, free) from None
+            for i in spurious:                                  # unloaded, rotation-only: pin one DOF per mode
+                restrained[i] = True
+                auto.append((int(i // DOF), int(i % DOF)))
+    if free.size:
         for c in cases:
             u[c][free] = np.linalg.solve(Lc.T, np.linalg.solve(Lc, F[c][free]))
 
@@ -415,14 +476,40 @@ def solve_combinations(frame: Frame, combinations: dict, stations: int = 11, pla
         ers = []
         for ei, e in enumerate(frame.elements):
             R, L, T, idx = geo[ei]
+            kl, rec = kloc[ei]
             ul = T @ uc[idx]
-            fl = kloc[ei] @ ul - sum(f[c] * feq[c][ei] for c in cases)
+            fe = sum(f[c] * feq[c][ei] for c in cases)
+            if rec is not None:                                 # recover the member's own released rotations
+                r, cc, inv, Krc = rec
+                ul[r] = inv @ (fe[r] - Krc @ ul[cc])
+            fl = kl @ ul - fe
             w = (sum(f[c] * wl[c][ei][0] for c in cases), sum(f[c] * wl[c][ei][1] for c in cases))
             ers.append(_element_result(ei, e, X, R, L, ul, fl, w, s))
             member_utilization(ers[-1], e, plastic=plastic)
         out[name] = FrameResult(uc.reshape(nn, DOF), Rv.reshape(nn, DOF), ers,
                                 sum(f[c] * applied[c] for c in cases), auto, dict(combo))
     return out
+
+
+def _spurious_rotation_dofs(Kff, free, loads) -> list:
+    """Zero-energy modes that move only rotations and that no load acts on (e.g. a member split
+    into pieces whose torsion is released at its far end twisting as a group). Such modes do not
+    affect the solution; returns one global DOF per mode to restrain, or [] if any zero-energy
+    mode moves a translation or is loaded (a real mechanism)."""
+    w, v = np.linalg.eigh(Kff)
+    tol = 1e-9 * max(float(np.max(np.abs(w))), 1e-30)
+    picks = []
+    for k in np.flatnonzero(np.abs(w) <= tol):
+        mode = v[:, k]
+        trans = np.abs(mode[(free % DOF) < 3])
+        if trans.size and trans.max() > 1e-6 * np.abs(mode).max():
+            return []
+        if any(abs(float(f @ mode)) > 1e-9 * max(float(np.abs(f).max()), 1.0) for f in loads):
+            return []
+        i = int(free[int(np.argmax(np.abs(mode)))])
+        if i not in picks:
+            picks.append(i)
+    return picks
 
 
 def _mechanism(Kff, free):

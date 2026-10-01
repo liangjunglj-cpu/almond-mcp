@@ -79,6 +79,41 @@ are immune; I-sections are not checked for it), shear/torsion interaction, dynam
 connections, national annexes. Results are a preliminary design check, not an
 engineer's sign-off.
 
+## Connections (end releases)
+
+`connections="rigid"` (default) makes every joint transmit moment. Real bolted steel and
+timber framing is usually closer to **simple construction**, and rigid joints flatter
+beam deflection, so `connections="simple"` models it:
+
+- **Beams** (members within ~3° of horizontal) are pinned for major-axis bending where they
+  *stop* — not where another member carries on in line, so pieces drawn along one line
+  form one continuous member and secondary beams pin into continuous primaries and walls.
+  Minor-axis (plan) rotation stays continuous, which is what stops pin-ended columns
+  spinning about their own axis.
+- **Braces** (inclined members) are pinned in both bending axes; **columns** stay continuous.
+- Torsion is released at one end of any member pinned at both ends, so it cannot twist as
+  a rigid body.
+- **Per member:** a curve's user text `almond:release` = `pinned` | `pinned_start` |
+  `pinned_end` | `rigid` overrides either mode (the bridge exports the curve's own start and
+  end so one-sided releases know the direction).
+
+The solver applies releases by **static condensation**: the released end DOFs are
+eliminated from the member's stiffness and fixed-end forces, then recovered after the solve
+so deflected shapes and moment diagrams stay exact (a member pinned at both ends between
+fixed supports reproduces 5wL⁴/384EI with zero end moments). Releases can leave rotations
+that nothing stiffens, or let pieces of a member twist as a group with no load acting on
+them; those zero-energy, rotation-only modes are pinned out and reported. A mode that moves
+a translation or carries load is a real mechanism and is reported as one (for example a chain
+of pin-ended pieces with nothing under the shared node). The overlay draws pinned ends as
+small circles.
+
+![Rigid vs simple connections](images/native-solver/connections.jpg)
+
+Live, Atelier-07 mezzanine (2026-10-01), floor 2.0 Q + 1.0 G kN/m², EN 1990: with rigid
+joints CHS 219.1×8 passes (18.5 mm, u 0.86); with simple connections (14 pinned ends) it
+fails (25.9 mm > 24.8 mm, u 0.98); the next size tried, CHS 244.5×10, passes (15.7 mm,
+u 0.66).
+
 ## Load combinations (EN 1990)
 
 Every load carries a case: **G** (permanent — self weight, `floor_dead_kn_m2`, the weight
