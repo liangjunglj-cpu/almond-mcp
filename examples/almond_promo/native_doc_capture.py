@@ -137,8 +137,25 @@ def capture_combinations():
     (OUT / "combo_log.json").write_text(json.dumps(rows, indent=1))
 
 
+def capture_connections():
+    """Rigid joints vs simple (pinned) connections under the residential floor load."""
+    run_cs((HERE / "rhino_setup_view.cs").read_text(encoding="utf-8").replace("LENS", "42"), quiet=True)
+    rows = []
+    for conn, (d, w) in (("rigid", (219.1, 8.0)), ("simple", (219.1, 8.0)), ("simple", (244.5, 10.0))):
+        out = json.loads(server.visualize_structure(
+            guids=GUIDS, load_kn=0, fixed_supports=False, span_m=6.2, beam_diameter_mm=d, beam_wall_mm=w,
+            color_by="utilization", scale=10, floor_load_kn_m2=2.0, floor_dead_kn_m2=1.0, connections=conn))
+        rows.append({"conn": conn, "d": d, "w": w, "status": out.get("status"), "max_mm": out.get("max_displacement_mm"),
+                     "util": out.get("max_utilization"), "pinned": (out.get("connections") or {}).get("pinned_ends")})
+        run_cs(CAP.replace("PATH", str(OUT / f"conn_{conn}_{int(d)}.jpg")), quiet=True)
+        print(rows[-1], flush=True)
+    (OUT / "conn_log.json").write_text(json.dumps(rows, indent=1))
+
+
 if __name__ == "__main__":
-    if "--combos" in sys.argv:
+    if "--connections" in sys.argv:
+        capture_connections()
+    elif "--combos" in sys.argv:
         capture_combinations()
     elif "--floor" in sys.argv:
         capture_floor_loads()

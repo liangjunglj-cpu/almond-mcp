@@ -51,6 +51,8 @@ namespace RhinoAlmondBridge
         /// <summary>Translations at equally spaced stations from start to end, meters.</summary>
         public List<double[]> SampleDispM { get; set; } = new List<double[]>();
         public double Utilization { get; set; } = double.NaN;
+        /// <summary>Pinned (moment-released) ends: [start, end]; null when rigid.</summary>
+        public bool[] Hinges { get; set; }
     }
 
     /// <summary>Per-element utilization with Rhino GUID lineage.</summary>

@@ -2253,6 +2253,7 @@ def validate_structure(
     floor_dead_kn_m2: float = 0.0,
     design_basis: str = "en1990",
     uls_combination: str = "6.10",
+    connections: str = "rigid",
 ) -> str:
     """
     Validates AI-generated geometry with a structural analysis.
@@ -2316,6 +2317,12 @@ def validate_structure(
             "unfactored" checks both at G + Q (the Karamba route's basis). Native engine.
         uls_combination: "6.10" (default) or "6.10ab" (the worse of 1.35G + 1.05Q and
             1.15G + 1.5Q per member; EN 1990 recommended values).
+        connections: "rigid" (default: every joint transmits moment) or "simple": beams are
+            pinned (major-axis bending released) and braces pinned in both axes where they
+            stop - not where another member carries on in line - while columns stay
+            continuous. Typical bolted steel and timber framing is closer to "simple"; rigid
+            joints can flatter beam deflection. A curve's user text almond:release = "pinned" |
+            "pinned_start" | "pinned_end" | "rigid" overrides either mode. Native engine.
     Prefer calling get_construction_guidance BEFORE generating the geometry:
     pick a real construction system and size members from its depth/spacing
     rules. This tool cross-checks the analyzed span against that same library
@@ -2357,6 +2364,8 @@ def validate_structure(
         return json.dumps({"status": "error", "message": err})
     try:
         native_structure.combinations(design_basis, uls_combination)
+        if (connections or "rigid").lower() not in native_structure.CONNECTIONS:
+            raise ValueError("connections must be 'rigid' or 'simple'.")
     except ValueError as e:
         return json.dumps({"status": "error", "message": str(e)})
     if asset_loads:
@@ -2368,7 +2377,8 @@ def validate_structure(
     if engine == "native" or (engine == "auto" and structure_type.lower() not in KARAMBA_ONLY_TYPES):
         result, note = _native_validation(guids, structure_type, load_kn, material, fixed_supports,
                                           self_weight, span_m, required=engine == "native", asset_spec=spec,
-                                          floor_spec=floor, design=(design_basis, uls_combination))
+                                          floor_spec=floor, design=(design_basis, uls_combination),
+                                          connections=connections)
         if isinstance(result, str):          # hard error (explicit native request, or no bridge)
             return result
     if result is None:
@@ -2467,7 +2477,7 @@ def _floor_spec(imposed, dead, engine):
 
 
 def _native_validation(guids, structure_type, load_kn, material, fixed_supports, self_weight, span_m, required,
-                       asset_spec=None, floor_spec=None, design=("en1990", "6.10")):
+                       asset_spec=None, floor_spec=None, design=("en1990", "6.10"), connections="rigid"):
     """Native frame check on the bridge's exported line model.
 
     Returns (result_dict, None) when it ran, (None, note) to fall back to the Karamba
@@ -2496,7 +2506,7 @@ def _native_validation(guids, structure_type, load_kn, material, fixed_supports,
         result = native_structure.validate(reply, structure_type.lower(), load_kn, material,
                                            fixed_supports=fixed_supports, self_weight=self_weight, span_m=span_m,
                                            asset_loads=asset_spec, floor_loads=floor_spec,
-                                           design_basis=design[0], uls=design[1])
+                                           design_basis=design[0], uls=design[1], connections=connections)
     except ValueError as e:
         return json.dumps({"status": "error", "message": str(e)}), None
     return result, None
@@ -2528,6 +2538,7 @@ def visualize_structure(
     floor_dead_kn_m2: float = 0.0,
     design_basis: str = "en1990",
     uls_combination: str = "6.10",
+    connections: str = "rigid",
 ) -> str:
     """
     Run a live structural analysis on a line model and SHOW it in every Rhino viewport:
@@ -2574,6 +2585,8 @@ def visualize_structure(
             validate_structure.
         design_basis, uls_combination: as in validate_structure; the overlay draws the SLS
             deflected shape coloured by the ULS utilization envelope.
+        connections: "rigid" or "simple", as in validate_structure; pinned ends are drawn
+            as small circles.
 
     Returns JSON: status ("pass"|"fail"|"error"|"cleared"), max_displacement_mm,
     deflection_limit_mm, span_m, max_utilization, scale, per-element
@@ -2623,6 +2636,8 @@ def visualize_structure(
             return json.dumps({"status": "error", "message": err})
         try:
             native_structure.combinations(design_basis, uls_combination)
+            if (connections or "rigid").lower() not in native_structure.CONNECTIONS:
+                raise ValueError("connections must be 'rigid' or 'simple'.")
         except ValueError as e:
             return json.dumps({"status": "error", "message": str(e)})
     if asset_loads and not clear and reanalyze:
@@ -2637,7 +2652,7 @@ def visualize_structure(
             draw["type"] = "structure_draw"
             return _bridge_call(draw, 30.0)
         reply, note = _native_view(request, guids, required=engine == "native", asset_spec=spec, floor_spec=floor,
-                                   design=(design_basis, uls_combination))
+                                   design=(design_basis, uls_combination), connections=connections)
         if reply is not None:
             return reply
     out = _bridge_call(request, 90.0)
@@ -2669,7 +2684,8 @@ def _bridge_call(message: dict, timeout: float) -> str:
         return json.dumps({"status": "error", "message": f"Bridge error: {e}"})
 
 
-def _native_view(request: dict, guids, required: bool, asset_spec=None, floor_spec=None, design=("en1990", "6.10")):
+def _native_view(request: dict, guids, required: bool, asset_spec=None, floor_spec=None, design=("en1990", "6.10"),
+                 connections="rigid"):
     """Solve natively and draw through the bridge's structure_draw overlay.
 
     Returns (reply_json, None) when it ran or must stop, (None, note) to fall back to Karamba."""
@@ -2697,7 +2713,7 @@ def _native_view(request: dict, guids, required: bool, asset_spec=None, floor_sp
             model, request["load_kn"], request["material"], fixed_supports=request["fixed_rotations"],
             self_weight=request["self_weight"], diameter_mm=request.get("beam_diameter_mm"),
             wall_mm=request.get("beam_wall_mm"), span_m=request.get("span_m"), asset_loads=asset_spec,
-            floor_loads=floor_spec, design_basis=design[0], uls=design[1])
+            floor_loads=floor_spec, design_basis=design[0], uls=design[1], connections=connections)
     except native_structure.fs.MechanismError as e:
         return json.dumps({"status": "fail", "analysis_method": "native", "message": str(e),
                            "mechanism_nodes": len(e.nodes)}), None
@@ -2707,6 +2723,7 @@ def _native_view(request: dict, guids, required: bool, asset_spec=None, floor_sp
     report = result.pop("asset_loads", None)
     floor_report = result.pop("floor_loads", None)
     combos = result.pop("combinations", None)
+    conn_report = result.pop("connections", None)
     draw.update({"type": "structure_draw", "engine": "native", "span_m": span, "result": result})
     if combos and not request.get("title"):
         draw["title"] = "ALMOND  //  NATIVE FEA  ·  u: " + " / ".join(combos["utilization"]) + "  ·  d: SLS G + Q"
@@ -2734,6 +2751,8 @@ def _native_view(request: dict, guids, required: bool, asset_spec=None, floor_sp
             parsed["floor_loads"] = floor_report
         if combos:
             parsed["combinations"] = combos
+        if conn_report:
+            parsed["connections"] = conn_report
         parsed["nodes"] = len({tuple(p) for e in result["elements"] for p in (e["start_m"], e["end_m"])})
     elif not required:
         # a bridge without structure_draw: fall back to the Karamba overlay
