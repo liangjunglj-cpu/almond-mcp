@@ -116,6 +116,30 @@ def build_frame(model: dict, load_kn: float, material: str = "Steel", fixed_supp
     return frame, info, warnings
 
 
+def view_result(model: dict, load_kn: float = 10.0, material: str = "Steel", fixed_supports: bool = True,
+                self_weight: bool = True, diameter_mm=None, wall_mm=None, span_m: float | None = None,
+                stations: int = 13) -> tuple[dict, float]:
+    """Solve and package the result for the bridge's ``structure_draw`` overlay.
+
+    Returns (result, span_m): per-element start/end points and sampled global displacements in
+    meters, utilization, supports, loaded nodes and the max displacement. Raises
+    frame_solver.MechanismError for unstable models."""
+    frame, info, warnings = build_frame(model, load_kn, material, fixed_supports, self_weight, diameter_mm, wall_mm)
+    res = fs.solve(frame, stations=stations)
+    span = float(span_m or model.get("max_member_span_m") or model.get("max_span_m") or 5.0)
+    elements = []
+    for er in res.elements:
+        e = frame.elements[er.index]
+        elements.append({"source_guids": e.tag or [], "start_m": list(frame.nodes[e.n1]), "end_m": list(frame.nodes[e.n2]),
+                         "samples_m": np.round(er.disp, 9).tolist(), "utilization": round(er.utilization, 4)})
+    result = {"elements": elements,
+              "support_points_m": [list(frame.nodes[n]) for n in info["support_nodes"]],
+              "loaded_points_m": [list(frame.nodes[n]) for n in info["loaded_nodes"]],
+              "max_displacement_mm": round(res.max_displacement * 1000.0, 3),
+              "warnings": list(model.get("warnings") or []) + warnings}
+    return result, span
+
+
 def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, material: str = "Steel",
              fixed_supports: bool = True, self_weight: bool = True, diameter_mm=None, wall_mm=None,
              limit_ratio: float = 250.0, plastic: bool = False, span_m: float | None = None) -> dict:

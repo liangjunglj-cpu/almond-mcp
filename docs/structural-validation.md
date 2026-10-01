@@ -140,8 +140,9 @@ still returns no stations in this build; member shapes are interpolated
 
 ## Live structure view (unreleased)
 
-`visualize_structure(guids=[...])` runs the same Karamba solve and draws it
-in every viewport through a display conduit (nothing is baked): ghosted
+`visualize_structure(guids=[...])` solves the frame (native solver by default,
+`engine="karamba"` for the Karamba route; see [native-solver.md](native-solver.md))
+and draws it in every viewport through a display conduit (nothing is baked): ghosted
 undeformed axes, the exaggerated deformed shape coloured blue → red by
 displacement or utilization, supports, load arrows and a legend with
 max δ, the L/limit check and PASS/FAIL. `reanalyze=False` updates only the

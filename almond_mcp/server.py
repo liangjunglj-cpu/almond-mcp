@@ -2417,9 +2417,10 @@ def visualize_structure(
     display_guids: list[str] | None = None,
     title: str = "",
     clear: bool = False,
+    engine: str = "auto",
 ) -> str:
     """
-    Run a live Karamba3D analysis on a line model and SHOW it in every Rhino viewport:
+    Run a live structural analysis on a line model and SHOW it in every Rhino viewport:
     the undeformed wireframe, the exaggerated deformed shape coloured blue -> red by
     displacement (or by utilization), supports, load arrows and a legend panel with
     max deflection, the L/limit check and PASS/FAIL. Nothing is baked into the document.
@@ -2454,16 +2455,23 @@ def visualize_structure(
             view); the analysis still covers every member in guids.
         title: legend title.
         clear: remove the overlay.
+        engine: "auto" (default: Almond's native frame solver, no Karamba needed; Karamba
+            when the selection has shells or the bridge cannot export a model),
+            "native" or "karamba".
 
     Returns JSON: status ("pass"|"fail"|"error"|"cleared"), max_displacement_mm,
     deflection_limit_mm, span_m, max_utilization, scale, per-element
     {source_guids, max_displacement_mm, utilization}, warnings.
-    Requires Karamba3D 3.1 (the trial caps models at 20 beam elements).
+    The native engine reports analysis_method "native"; engine="karamba" needs
+    Karamba3D 3.1 (the trial caps models at 20 beam elements).
     """
     if not clear and not guids:
         return json.dumps({"status": "error", "message": "Provide the curve (and support point) GUIDs to analyse."})
     if color_by not in ("displacement", "utilization"):
         return json.dumps({"status": "error", "message": "color_by must be 'displacement' or 'utilization'."})
+    engine = (engine or "auto").lower()
+    if engine not in ("auto", "native", "karamba"):
+        return json.dumps({"status": "error", "message": "engine must be 'auto', 'native' or 'karamba'."})
     request = {
         "type": "structure_view",
         "guids": guids or [],
@@ -2489,14 +2497,93 @@ def visualize_structure(
         request["display_guids"] = display_guids
     if title:
         request["title"] = title
+    global _VIEW_ENGINE
+    note = None
+    if not clear and engine != "karamba" and not (not reanalyze and _VIEW_ENGINE == "api"):
+        if not reanalyze and _VIEW_ENGINE == "native":
+            draw = {k: v for k, v in request.items() if k not in ("guids", "reanalyze", "clear")}
+            draw["type"] = "structure_draw"
+            return _bridge_call(draw, 30.0)
+        reply, note = _native_view(request, guids, required=engine == "native")
+        if reply is not None:
+            return reply
+    out = _bridge_call(request, 90.0)
+    if clear:
+        _VIEW_ENGINE = None
+    elif reanalyze:
+        _VIEW_ENGINE = "api"
+    if note:
+        try:
+            parsed = json.loads(out)
+            parsed.setdefault("warnings", []).append(note)
+            out = json.dumps(parsed)
+        except Exception:
+            pass
+    return out
+
+
+_VIEW_ENGINE: str | None = None   # which engine drew the current overlay ("native" | "api")
+
+
+def _bridge_call(message: dict, timeout: float) -> str:
     try:
-        return _send_and_receive(json.dumps(request).encode('utf-8'), timeout=90.0)
+        return _send_and_receive(json.dumps(message).encode('utf-8'), timeout=timeout)
     except socket.timeout:
-        return json.dumps({"status": "error", "message": "Structure view timed out (>90s)."})
+        return json.dumps({"status": "error", "message": f"Structure view timed out (>{timeout:.0f}s)."})
     except ConnectionRefusedError:
         return json.dumps({"status": "error", "message": "Connection refused. Is the RhinoAlmondBridge plugin loaded in Rhino?"})
     except Exception as e:
         return json.dumps({"status": "error", "message": f"Bridge error: {e}"})
+
+
+def _native_view(request: dict, guids, required: bool):
+    """Solve natively and draw through the bridge's structure_draw overlay.
+
+    Returns (reply_json, None) when it ran or must stop, (None, note) to fall back to Karamba."""
+    global _VIEW_ENGINE
+
+    def unavailable(msg):
+        if required:
+            return json.dumps({"status": "error", "message": msg}), None
+        return None, msg + " Fell back to the Karamba route."
+    try:
+        model = json.loads(_send_and_receive(
+            json.dumps({"type": "structure_model", "guids": guids}).encode('utf-8'), timeout=60.0))
+    except ConnectionRefusedError:
+        return json.dumps({"status": "error", "message": "Connection refused. Is the RhinoAlmondBridge plugin loaded in Rhino?"}), None
+    except Exception as e:
+        return unavailable(f"The bridge could not export a structural model ({e}).")
+    if not isinstance(model, dict) or model.get("status") != "ok" or "members" not in model:
+        return unavailable("This bridge version cannot export structural models (update almondbridge).")
+    if model.get("shells"):
+        return unavailable(f"The model contains {model['shells']} shell element(s), which the native frame solver does not analyse.")
+    if not model["members"]:
+        return json.dumps({"status": "error", "message": "No curve members found for the given GUIDs."}), None
+    try:
+        result, span = native_structure.view_result(
+            model, request["load_kn"], request["material"], fixed_supports=request["fixed_rotations"],
+            self_weight=request["self_weight"], diameter_mm=request.get("beam_diameter_mm"),
+            wall_mm=request.get("beam_wall_mm"), span_m=request.get("span_m"))
+    except native_structure.fs.MechanismError as e:
+        return json.dumps({"status": "fail", "analysis_method": "native", "message": str(e),
+                           "mechanism_nodes": len(e.nodes)}), None
+    except ValueError as e:
+        return json.dumps({"status": "error", "message": str(e)}), None
+    draw = {k: v for k, v in request.items() if k not in ("guids", "reanalyze", "clear")}
+    draw.update({"type": "structure_draw", "engine": "native", "span_m": span, "result": result})
+    out = _bridge_call(draw, 60.0)
+    try:
+        parsed = json.loads(out)
+    except Exception:
+        return out, None
+    if isinstance(parsed, dict) and parsed.get("status") in ("pass", "fail"):
+        _VIEW_ENGINE = "native"
+        parsed["warnings"] = result["warnings"]
+        parsed["nodes"] = len({tuple(p) for e in result["elements"] for p in (e["start_m"], e["end_m"])})
+    elif not required:
+        # a bridge without structure_draw: fall back to the Karamba overlay
+        return None, "This bridge version cannot draw native results (update almondbridge)."
+    return json.dumps(parsed), None
 
 
 def _render_validation_report(runs: list[dict]) -> str:

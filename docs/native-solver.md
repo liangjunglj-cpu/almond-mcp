@@ -9,7 +9,32 @@ Karamba remains available for shells and as a cross-check.
 | Install | nothing beyond almond-mcp + almondbridge | Karamba3D 3.1 licence (trial: 20 members) |
 | Elements | straight beams (axial, torsion, biaxial bending), truss bars | beams, shells |
 | Solve time, 20-member frame | ~13 ms (+ ~160 ms model export) | ~1.5 s |
+| `visualize_structure` round trip | ~0.4–0.6 s (export, solve, draw) | ~1.2 s |
 | `analysis_method` | `"native"` | `"api"` / `"template"` / `"rule_based"` |
+
+![Rhino 8 with the native overlay and no Karamba assemblies loaded](images/native-solver/rhino-native-no-karamba.jpg)
+
+*Rhino 8 with Grasshopper/Karamba never loaded (command line: "Karamba assemblies
+loaded: 0"); the Atelier-07 mezzanine frame solved by the native engine and drawn by
+the bridge's overlay.*
+
+## Live view
+
+`visualize_structure` uses the same engines: the server exports the model
+(`structure_model`), solves it with `frame_solver`, and sends the solved field to the
+bridge (`structure_draw`), which draws it with the same overlay as the Karamba route —
+deformed shape coloured by displacement or utilization, supports, loads and a
+PASS/FAIL legend. Display-only updates (`reanalyze=False`: scale, colouring, reveal,
+physics on/off, `display_guids`) resend no geometry.
+
+![Karamba and the native engine on the same frame](images/native-solver/native-vs-karamba.jpg)
+
+![Sizing loop on the native engine](images/native-solver/iteration.jpg)
+
+![Section A-A, one frame line drawn, all members solved](images/native-solver/section.jpg)
+
+Stills: `examples/almond_promo/native_doc_capture.py` (drives the real tool code
+against Rhino) and `native_doc_compose.py`.
 
 `engine="auto"` routes to Karamba when the structure type is shell, gridshell or
 membrane, when the selection contains shells, or when the installed bridge cannot
