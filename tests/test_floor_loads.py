@@ -31,7 +31,7 @@ def grid(xs, ys, z=3.0):
 def element_loads(f):
     """Total downward member load per original tag (kN)."""
     out = {}
-    for ei, wa, wb in f.member_loads:
+    for ei, wa, wb, _case in f.member_loads:
         e = f.elements[ei]
         out.setdefault(e.tag[0], 0.0)
         out[e.tag[0]] += -(wa[2] + wb[2]) / 2 * math.dist(f.nodes[e.n1], f.nodes[e.n2])

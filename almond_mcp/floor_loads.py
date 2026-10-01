@@ -135,9 +135,10 @@ def edge_shapes(frame: fs.Frame, bay: dict, q: float) -> list[tuple[int, int, li
     return out
 
 
-def load_member(frame: fs.Frame, ei: int, shape_list: list) -> list[int]:
+def load_member(frame: fs.Frame, ei: int, shape_list: list, cases: dict | None = None) -> list[int]:
     """Apply the summed piecewise-linear shapes [(t, w kN/m), ...] (t along n1 -> n2, downward) to
-    element ``ei`` exactly: split at the shapes' kinks and give each part its linear load."""
+    element ``ei`` exactly: split at the shapes' kinks and give each part its linear load, once per
+    load case scaled by ``cases`` ({case: factor}; default {"Q": 1})."""
     ts = sorted({round(t, 12) for pts in shape_list for t, _ in pts if 1e-9 < t < 1 - 1e-9})
     bounds = [0.0] + ts + [1.0]
     f = lambda t: sum(float(np.interp(t, [q[0] for q in pts], [q[1] for q in pts])) for pts in shape_list)
@@ -146,7 +147,9 @@ def load_member(frame: fs.Frame, ei: int, shape_list: list) -> list[int]:
         frame.split_element(parts[-1], (bounds[j] - bounds[j - 1]) / (1.0 - bounds[j - 1]))
         parts.append(len(frame.elements) - 1)
     for j, part in enumerate(parts):
-        frame.linear_load(part, (0.0, 0.0, -f(bounds[j])), (0.0, 0.0, -f(bounds[j + 1])))
+        for case, k in (cases or {"Q": 1.0}).items():
+            if k:
+                frame.linear_load(part, (0.0, 0.0, -k * f(bounds[j])), (0.0, 0.0, -k * f(bounds[j + 1])), case=case)
     return parts
 
 
@@ -215,7 +218,8 @@ def _wall_reactions(pts, L):
 
 
 def apply(frame: fs.Frame, imposed_kn_m2: float = 0.0, dead_kn_m2: float = 0.0, levels_m: list | None = None) -> dict:
-    """Load every enclosed bay with (dead + imposed) kN/m2; mutates ``frame``. Returns a report."""
+    """Load every enclosed bay with dead (case "G") + imposed (case "Q") kN/m2; mutates ``frame``.
+    Load shapes are built at unit intensity and applied once per case. Returns a report."""
     q = float(imposed_kn_m2) + float(dead_kn_m2)
     report = {"imposed_kn_m2": imposed_kn_m2, "dead_kn_m2": dead_kn_m2, "levels": [], "area_m2": 0.0,
               "imposed_kn": 0.0, "dead_kn": 0.0, "total_kn": 0.0, "wall_kn": 0.0, "warnings": []}
@@ -236,14 +240,16 @@ def apply(frame: fs.Frame, imposed_kn_m2: float = 0.0, dead_kn_m2: float = 0.0, 
             if not _convex(np.array([frame.nodes[n][:2] for n in bay["nodes"]])):
                 report["warnings"].append(f"Non-convex bay at z={z:.2f} m ({bay['area']:.1f} m2): centroid-fan "
                                           "distribution is approximate.")
-            for ei, start, pts in edge_shapes(frame, bay, q):
+            for ei, start, pts in edge_shapes(frame, bay, 1.0):
                 if ei < 0:                                     # bearing wall: straight into the supports
                     a, b = walls[-ei - 1]
                     other = b if start == a else a
                     ra, rb = _wall_reactions(pts, math.dist(frame.nodes[start][:2], frame.nodes[other][:2]))
-                    frame.load(start, fz=-ra)
-                    frame.load(other, fz=-rb)
-                    report["wall_kn"] = report.get("wall_kn", 0.0) + ra + rb
+                    for case, k in (("G", dead_kn_m2), ("Q", imposed_kn_m2)):
+                        if k:
+                            frame.load(start, fz=-k * ra, case=case)
+                            frame.load(other, fz=-k * rb, case=case)
+                    report["wall_kn"] = report.get("wall_kn", 0.0) + q * (ra + rb)
                     continue
                 # store the shape in the element's own direction (n1 -> n2)
                 if frame.elements[ei].n1 != start:
@@ -251,7 +257,7 @@ def apply(frame: fs.Frame, imposed_kn_m2: float = 0.0, dead_kn_m2: float = 0.0, 
                 shapes.setdefault(ei, []).append(pts)
         report["area_m2"] += lv["area_m2"]
     for ei, shape_list in sorted(shapes.items(), reverse=True):    # splits append elements; indices stay valid
-        load_member(frame, ei, shape_list)
+        load_member(frame, ei, shape_list, {"G": dead_kn_m2, "Q": imposed_kn_m2})
     area = report["area_m2"]
     report["wall_kn"] = round(report["wall_kn"], 3)
     report.update({"area_m2": round(area, 3), "imposed_kn": round(imposed_kn_m2 * area, 3),

@@ -255,7 +255,35 @@ def floor_loads_image():
     save(out, "floor-loads.jpg")
 
 
+def combinations_image():
+    """EN 1990 combinations: the same floor load, SLS deflection and ULS utilization, two sections."""
+    rows = json.loads((SRC / "combo_log.json").read_text())
+    pick = lambda d, basis, uls="6.10": next(r for r in rows if r["d"] == d and r["basis"] == basis and r["uls"] == uls)
+    heads = []
+    for d in (193.7, 219.1):
+        en, un = pick(d, "en1990"), pick(d, "unfactored")
+        heads.append((f"CHS {d}x8", f'SLS {en["max_mm"]:.1f} mm / ULS u {en["util"]:.2f} (unfactored {un["util"]:.2f}) / '
+                                    f'{en["status"].upper()}', GREEN if en["status"] == "pass" else RED))
+    im = grid(["combo_193", "combo_219"], heads, 2,
+              title="LOAD COMBINATIONS  //  EN 1990: deflection at SLS G + Q, members at ULS 1.35G + 1.5Q")
+    out = Image.new("RGB", (im.width, im.height + 80 + 30 * 12), INK)
+    out.paste(im, (0, 0))
+    d = ImageDraw.Draw(out)
+    y = im.height + 12
+    d.text((24, y), "FLOOR 2.0 kN/m2 IMPOSED (Q) + 1.0 kN/m2 BUILD-UP (G) + STEEL SELF WEIGHT (G)  //  62 m2", font=font("ocr", 20), fill=CYAN)
+    y += 44
+    for r in rows:
+        if r["d"] in (168.3, 193.7, 219.1, 244.5):
+            d.text((24, y), f'CHS {r["d"]}x{r["w"]:<5} {r["basis"]:10s} {r["uls"]:7s} SLS {r["max_mm"]:6.2f} mm   u {r["util"]:.3f}   '
+                            f'{r["status"].upper()}', font=font("mono", 24), fill=WHITE if r["basis"] == "en1990" else GREY)
+            y += 30
+    save(out, "load-combinations.jpg")
+
+
 if __name__ == "__main__":
+    if "--combos" in sys.argv:
+        combinations_image()
+        sys.exit()
     if "--floor" in sys.argv:
         floor_loads_image()
         sys.exit()

@@ -10,7 +10,9 @@ Scope, stated so results are never over-read:
 - straight prismatic members, rigid joints (optional axial-only truss members);
 - point loads at nodes and uniform or linearly varying member loads (self weight is one),
   exact within each member (Hermite interpolation + the fixed-fixed particular solution);
-- member checks follow EN 1993-1-1 in simplified form (see ``member_utilization``).
+- member checks follow EN 1993-1-1 in simplified form (see ``member_utilization``);
+- loads carry a case label (e.g. "G" permanent, "Q" variable); each case is solved once with
+  the same factorised stiffness and combinations are exact superpositions (``solve_combinations``).
 Not covered: shells, second-order / P-delta, lateral-torsional buckling, dynamics,
 connections, and national annexes. Results are a preliminary design check.
 """
@@ -147,9 +149,10 @@ class Frame:
     nodes: list = field(default_factory=list)            # (x, y, z) m
     elements: list = field(default_factory=list)
     supports: dict = field(default_factory=dict)         # node -> 6 bools (True = restrained)
-    nodal_loads: dict = field(default_factory=dict)      # node -> 6-vector kN / kNm, global
-    member_loads: list = field(default_factory=list)     # (element, global w at n1, global w at n2) kN/m
+    nodal_loads: dict = field(default_factory=dict)      # (node, case) -> 6-vector kN / kNm, global
+    member_loads: list = field(default_factory=list)     # (element, global w at n1, at n2 kN/m, case)
     gravity: tuple | None = None                         # unit vector for self weight, e.g. (0, 0, -1)
+    gravity_case: str = "G"                              # self weight is permanent
 
     def add_node(self, xyz) -> int:
         self.nodes.append(tuple(float(v) for v in xyz))
@@ -165,18 +168,24 @@ class Frame:
     def pin(self, node):
         self.fix(node, (True, True, True, False, False, False))
 
-    def load(self, node, fx=0.0, fy=0.0, fz=0.0, mx=0.0, my=0.0, mz=0.0):
-        cur = np.asarray(self.nodal_loads.get(node, np.zeros(6)), float)
-        self.nodal_loads[node] = cur + np.array([fx, fy, fz, mx, my, mz], float)
+    def load(self, node, fx=0.0, fy=0.0, fz=0.0, mx=0.0, my=0.0, mz=0.0, case="Q"):
+        cur = np.asarray(self.nodal_loads.get((node, case), np.zeros(6)), float)
+        self.nodal_loads[(node, case)] = cur + np.array([fx, fy, fz, mx, my, mz], float)
 
-    def udl(self, element, w):
+    def udl(self, element, w, case="Q"):
         """Uniform member load, global vector kN/m."""
         w = np.asarray(w, float)
-        self.member_loads.append((element, w, w))
+        self.member_loads.append((element, w, w, case))
 
-    def linear_load(self, element, w_start, w_end):
+    def linear_load(self, element, w_start, w_end, case="Q"):
         """Member load varying linearly from w_start at n1 to w_end at n2 (global vectors, kN/m)."""
-        self.member_loads.append((element, np.asarray(w_start, float), np.asarray(w_end, float)))
+        self.member_loads.append((element, np.asarray(w_start, float), np.asarray(w_end, float), case))
+
+    def cases(self) -> list:
+        found = {c for (_, c) in self.nodal_loads} | {m[3] for m in self.member_loads}
+        if self.gravity is not None:
+            found.add(self.gravity_case)
+        return sorted(found)
 
     def split_element(self, ei: int, t: float) -> int:
         """Insert a node at fraction t along element ei, splitting it in two (same section,
@@ -188,13 +197,13 @@ class Frame:
         e.n2 = k
         new = self.add_element(k, n2, e.section, e.material, truss=e.truss, ref=e.ref, tag=e.tag)
         kept, added = [], []
-        for (j, wa, wb) in self.member_loads:
+        for (j, wa, wb, case) in self.member_loads:
             if j != ei:
-                kept.append((j, wa, wb))
+                kept.append((j, wa, wb, case))
                 continue
             wm = wa + t * (wb - wa)                             # linear loads split at the new node
-            kept.append((ei, wa, wm))
-            added.append((new, wm, wb))
+            kept.append((ei, wa, wm, case))
+            added.append((new, wm, wb, case))
         self.member_loads = kept + added
         return k
 
@@ -297,6 +306,7 @@ class FrameResult:
     elements: list                  # ElementResult per element
     applied: np.ndarray             # total applied load vector (6) incl. member loads, about origin
     auto_restrained: list           # (node, dof) restrained because no element provides stiffness
+    combination: dict = field(default_factory=dict)   # case -> factor this result represents
 
     @property
     def max_displacement(self) -> float:
@@ -316,45 +326,58 @@ class FrameResult:
 
 
 # ------------------------------------------------------------------ solve
-def solve(frame: Frame, stations: int = 11, plastic: bool = False) -> FrameResult:
+def solve(frame: Frame, stations: int = 11, plastic: bool = False, combination: dict | None = None) -> FrameResult:
     """Solve and check every member; ``plastic`` uses plastic moduli (class 1/2), the
-    default elastic moduli are conservative and match Karamba's elastic design check."""
+    default elastic moduli are conservative and match Karamba's elastic design check.
+    ``combination`` maps load case -> factor (default: every case x 1.0)."""
+    combo = combination or {c: 1.0 for c in frame.cases()}
+    return solve_combinations(frame, {"result": combo}, stations, plastic)["result"]
+
+
+def solve_combinations(frame: Frame, combinations: dict, stations: int = 11, plastic: bool = False) -> dict:
+    """Solve every load case once (one factorisation) and return {name: FrameResult} for each
+    combination {case: factor}; cases a combination does not name get factor 0."""
     nn, ne = len(frame.nodes), len(frame.elements)
     if nn == 0 or ne == 0:
         raise ValueError("The frame has no nodes or no elements.")
     X = np.asarray(frame.nodes, float)
     ndof = nn * DOF
+    cases = frame.cases() or ["-"]
     K = np.zeros((ndof, ndof))
-    F = np.zeros(ndof)
-    geo, feq_local = [], [np.zeros(12) for _ in range(ne)]
-
-    member_w = [[np.zeros(3), np.zeros(3)] for _ in range(ne)]       # global (at n1, at n2)
-    for (ei, wa, wb) in frame.member_loads:
-        member_w[ei][0] = member_w[ei][0] + wa
-        member_w[ei][1] = member_w[ei][1] + wb
+    F = {c: np.zeros(ndof) for c in cases}
+    member_w = {c: [[np.zeros(3), np.zeros(3)] for _ in range(ne)] for c in cases}    # global (at n1, at n2)
+    for (ei, wa, wb, c) in frame.member_loads:
+        member_w[c][ei][0] = member_w[c][ei][0] + wa
+        member_w[c][ei][1] = member_w[c][ei][1] + wb
     if frame.gravity is not None:
         g = np.asarray(frame.gravity, float)
         for ei, e in enumerate(frame.elements):
             sw = g * e.material.gamma * e.section.A
-            member_w[ei][0] = member_w[ei][0] + sw
-            member_w[ei][1] = member_w[ei][1] + sw
+            member_w[frame.gravity_case][ei][0] = member_w[frame.gravity_case][ei][0] + sw
+            member_w[frame.gravity_case][ei][1] = member_w[frame.gravity_case][ei][1] + sw
 
-    applied = np.zeros(6)
+    applied = {c: np.zeros(6) for c in cases}
+    geo, kloc = [], []
+    wl = {c: [] for c in cases}
+    feq = {c: [] for c in cases}
     for ei, e in enumerate(frame.elements):
         R, L = local_axes(X[e.n1], X[e.n2], e.ref)
         T = _t12(R)
-        kg = T.T @ local_stiffness(e, L) @ T
+        kl = local_stiffness(e, L)
         idx = np.r_[e.n1 * DOF:e.n1 * DOF + 6, e.n2 * DOF:e.n2 * DOF + 6]
-        K[np.ix_(idx, idx)] += kg
-        wl = (R @ member_w[ei][0], R @ member_w[ei][1])
-        fe = fixed_end_forces(wl[0], wl[1], L, e.truss)
-        feq_local[ei] = fe
-        F[idx] += T.T @ fe
-        applied[:3] += (member_w[ei][0] + member_w[ei][1]) * L / 2
-        geo.append((R, L, T, idx, wl))
-    for n, v in frame.nodal_loads.items():
-        F[n * DOF:n * DOF + 6] += np.asarray(v, float)
-        applied[:3] += np.asarray(v, float)[:3]
+        K[np.ix_(idx, idx)] += T.T @ kl @ T
+        geo.append((R, L, T, idx))
+        kloc.append(kl)
+        for c in cases:
+            w = (R @ member_w[c][ei][0], R @ member_w[c][ei][1])
+            fe = fixed_end_forces(w[0], w[1], L, e.truss)
+            wl[c].append(w)
+            feq[c].append(fe)
+            F[c][idx] += T.T @ fe
+            applied[c][:3] += (member_w[c][ei][0] + member_w[c][ei][1]) * L / 2
+    for (n, c), v in frame.nodal_loads.items():
+        F[c][n * DOF:n * DOF + 6] += np.asarray(v, float)
+        applied[c][:3] += np.asarray(v, float)[:3]
 
     restrained = np.zeros(ndof, bool)
     for n, flags in frame.supports.items():
@@ -364,12 +387,12 @@ def solve(frame: Frame, stations: int = 11, plastic: bool = False) -> FrameResul
     scale = float(diag.max()) if diag.size else 1.0
     auto = [(i // DOF, i % DOF) for i in range(ndof) if not restrained[i] and diag[i] <= 1e-12 * scale]
     for (n, d) in auto:
-        if abs(F[n * DOF + d]) > 1e-9:
+        if any(abs(F[c][n * DOF + d]) > 1e-9 for c in cases):
             raise MechanismError(f"Load on node {n} DOF {d} that no member can carry.", [n])
         restrained[n * DOF + d] = True
 
     free = np.flatnonzero(~restrained)
-    u = np.zeros(ndof)
+    u = {c: np.zeros(ndof) for c in cases}
     if free.size:
         Kff = K[np.ix_(free, free)]
         try:
@@ -378,20 +401,28 @@ def solve(frame: Frame, stations: int = 11, plastic: bool = False) -> FrameResul
                 raise np.linalg.LinAlgError
         except np.linalg.LinAlgError:
             raise _mechanism(Kff, free) from None
-        y = np.linalg.solve(Lc, F[free])
-        u[free] = np.linalg.solve(Lc.T, y)
-    Rv = K @ u - F
-    Rv[~restrained] = 0.0
+        for c in cases:
+            u[c][free] = np.linalg.solve(Lc.T, np.linalg.solve(Lc, F[c][free]))
 
-    ers = []
     s = np.linspace(0.0, 1.0, max(2, stations))
-    for ei, e in enumerate(frame.elements):
-        R, L, T, idx, wl = geo[ei]
-        ul = T @ u[idx]
-        fl = local_stiffness(e, L) @ ul - feq_local[ei]
-        ers.append(_element_result(ei, e, X, R, L, ul, fl, wl, s))
-        member_utilization(ers[-1], e, plastic=plastic)
-    return FrameResult(u.reshape(nn, DOF), Rv.reshape(nn, DOF), ers, applied, auto)
+    out = {}
+    for name, combo in combinations.items():
+        f = {c: float(combo.get(c, 0.0)) for c in cases}
+        uc = sum(f[c] * u[c] for c in cases)
+        Fc = sum(f[c] * F[c] for c in cases)
+        Rv = K @ uc - Fc
+        Rv[~restrained] = 0.0
+        ers = []
+        for ei, e in enumerate(frame.elements):
+            R, L, T, idx = geo[ei]
+            ul = T @ uc[idx]
+            fl = kloc[ei] @ ul - sum(f[c] * feq[c][ei] for c in cases)
+            w = (sum(f[c] * wl[c][ei][0] for c in cases), sum(f[c] * wl[c][ei][1] for c in cases))
+            ers.append(_element_result(ei, e, X, R, L, ul, fl, w, s))
+            member_utilization(ers[-1], e, plastic=plastic)
+        out[name] = FrameResult(uc.reshape(nn, DOF), Rv.reshape(nn, DOF), ers,
+                                sum(f[c] * applied[c] for c in cases), auto, dict(combo))
+    return out
 
 
 def _mechanism(Kff, free):
