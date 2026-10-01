@@ -163,5 +163,5 @@ def test_tools_take_connections(server):
     assert out["results"]["connections"]["mode"] == "simple"
     server.visualize_structure(guids=["x"], connections="simple")
     hinges = [e["hinges"] for e in server._sent[-1]["result"]["elements"]]
-    assert [True, True] in hinges and [False, False] in hinges
+    assert any(h[0] for h in hinges) and any(h[1] for h in hinges) and [False, False] in hinges
     assert "connections" in json.loads(server.validate_structure(guids=["x"], connections="welded"))["message"]

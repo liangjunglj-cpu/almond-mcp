@@ -258,23 +258,145 @@ def _label(factors: dict) -> str:
     return " + ".join(f"{v:g}{k}" for k, v in factors.items())
 
 
-def _solve_design(frame, design_basis, uls, plastic=False, stations=11):
-    """Solve SLS + ULS combinations; per-element ULS envelope. Returns (sls, uls_results, envelope)
-    with envelope[i] = (utilization, governing combination name, element result)."""
+PHI_0 = 1 / 200            # EN 1993-1-1 5.3.2(3) basic sway imperfection
+STABILITY_SUBDIVISION = 4   # elements per member for geometric stiffness (alpha_cr error ~0.05 %; 1 element: +22 %)
+ALPHA_CR_FIRST_ORDER = 10.0  # 5.2.1(3): first-order analysis suffices at or above this (elastic)
+
+
+class InstabilityError(ValueError):
+    """The frame buckles below the ULS loads (alpha_cr <= 1 or second-order divergence)."""
+    def __init__(self, message, report):
+        super().__init__(message)
+        self.report = report
+
+
+def subdivide(frame, parts: int, only: set | None = None) -> None:
+    """Split bending members (all, or the element indices in ``only``) into ``parts`` equal elements
+    (in place; loads, releases and lineage follow). Geometric stiffness is only accurate with interior
+    nodes; first-order results are exact either way."""
+    if parts < 2:
+        return
+    for ei in range(len(frame.elements)):
+        if frame.elements[ei].truss or (only is not None and ei not in only):
+            continue
+        tail = ei
+        for j in range(1, parts):
+            frame.split_element(tail, 1.0 / (parts - j + 1))
+            tail = len(frame.elements) - 1
+
+
+def sway_imperfection(frame) -> dict:
+    """EN 1993-1-1 5.3.2(3): phi = phi_0 * alpha_h * alpha_m, alpha_h = 2/sqrt(h) in [2/3, 1],
+    alpha_m = sqrt(0.5 (1 + 1/m)), h = height of the structure, m = number of column lines.
+    No columns (or no height): no sway imperfection."""
+    X = np.asarray(frame.nodes, float)
+    lines = set()
+    for e in frame.elements:
+        d = X[e.n2] - X[e.n1]
+        L = float(np.linalg.norm(d))
+        if L > 0 and abs(d[2]) / L > 0.98:
+            lines.add((round(float(X[e.n1][0]), 2), round(float(X[e.n1][1]), 2)))
+    h = float(X[:, 2].max() - X[:, 2].min()) if len(X) else 0.0
+    if not lines or h < 0.1:
+        return {"phi": 0.0, "h_m": round(h, 3), "columns": len(lines), "basis": "no columns: no sway imperfection"}
+    a_h = min(1.0, max(2 / 3, 2 / math.sqrt(h)))
+    a_m = math.sqrt(0.5 * (1 + 1 / len(lines)))
+    return {"phi": PHI_0 * a_h * a_m, "h_m": round(h, 3), "columns": len(lines), "alpha_h": round(a_h, 4),
+            "alpha_m": round(a_m, 4), "basis": "EN 1993-1-1 5.3.2(3), phi_0 = 1/200"}
+
+
+def _imperfection_loads(asm, frame, combo, phi) -> dict:
+    """Equivalent horizontal forces phi * V at every loaded free node, in +x, -x, +y, -y."""
+    if phi <= 0:
+        return {"": None}
+    F = fs.load_vector(asm, combo).reshape(-1, fs.DOF)
+    V = np.where(F[:, 2] < 0, -F[:, 2], 0.0)
+    for n, flags in frame.supports.items():
+        if flags[2]:                                       # vertically supported: the load goes straight down
+            V[n] = 0.0
+    out = {}
+    for label, axis, sign in (("+x", 0, 1), ("-x", 0, -1), ("+y", 1, 1), ("-y", 1, -1)):
+        H = np.zeros_like(F)
+        H[:, axis] = sign * phi * V
+        out[label] = H.reshape(-1)
+    return out
+
+
+def _solve_design(frame, design_basis, uls, plastic=False, stations=11, stability="auto"):
+    """Solve SLS + ULS combinations; per-element ULS envelope. Returns (sls, uls_results, envelope,
+    stability report) with envelope[i] = (utilization, governing name, element result).
+
+    stability="auto": alpha_cr per ULS combination; sway imperfections (5.3.2) in every ULS check;
+    alpha_cr < 10 -> second-order (P-Delta) ULS analysis; alpha_cr <= 1 -> InstabilityError.
+    stability="off": first-order, no imperfections."""
     sls, ulss = combinations(design_basis, uls)
-    res = fs.solve_combinations(frame, {sls[0]: sls[1], **dict(ulss)}, stations=stations, plastic=plastic)
+    if (stability or "auto").lower() == "off":
+        res = fs.solve_combinations(frame, {sls[0]: sls[1], **dict(ulss)}, stations=stations, plastic=plastic)
+        envelope = []
+        for i in range(len(frame.elements)):
+            best = max(((res[n].elements[i].utilization, n) for n, _ in ulss), key=lambda t: t[0])
+            envelope.append((best[0], best[1], res[best[1]].elements[i]))
+        return res[sls[0]], [(n, f, res[n]) for n, f in ulss], envelope, {"mode": "off", "method": "first-order"}
+    if (stability or "").lower() != "auto":
+        raise ValueError("stability must be 'auto' or 'off'.")
+    # buckling needs interior nodes in the compression members: refine those (in place), then re-assemble
+    asm = fs.prepare(frame)
+    compressed = set()
+    for _, factors in ulss:
+        N = fs.axial_forces(asm, factors)
+        if N.size and N.min() < 0:
+            compressed |= {i for i in range(len(N)) if N[i] < 0.01 * N.min()}
+    if compressed:
+        subdivide(frame, STABILITY_SUBDIVISION, compressed)
+        asm = fs.prepare(frame)
+    sls_res = fs.solve_linear(asm, sls[1], stations=stations, plastic=plastic)
+    imp = sway_imperfection(frame)
+    report = {"mode": "auto", "alpha_cr": {}, "sway_imperfection": imp, "second_order": [], "iterations": 0,
+              "elements_per_member": STABILITY_SUBDIVISION}
+    variants = []                                           # (name, factors, result)
+    for name, factors in ulss:
+        alpha, _ = fs.critical_load_factor(asm, factors)
+        report["alpha_cr"][name] = None if math.isinf(alpha) else round(alpha, 3)
+        if alpha <= 1.0:
+            report["method"] = "unstable"
+            raise InstabilityError(f"Instability: elastic critical load factor alpha_cr = {alpha:.2f} <= 1 under "
+                                   f"{name}: the frame buckles before reaching the design loads.", report)
+        second = alpha < ALPHA_CR_FIRST_ORDER
+        if second:
+            report["second_order"].append(name)
+        for label, H in _imperfection_loads(asm, frame, factors, imp["phi"]).items():
+            vname = f"{name} {label} sway".strip() if label else name
+            try:
+                r_ = (fs.solve_second_order(asm, factors, extra=H, stations=stations, plastic=plastic) if second
+                      else fs.solve_linear(asm, factors, extra=H, stations=stations, plastic=plastic))
+            except fs.MechanismError as exc:
+                report["method"] = "unstable"
+                raise InstabilityError(f"Instability under {vname}: {exc}", report) from None
+            report["iterations"] = max(report["iterations"], r_.iterations)
+            variants.append((vname, factors, r_))
+    report["method"] = "second-order (P-Delta)" if report["second_order"] else "first-order"
+    finite = [a for a in report["alpha_cr"].values() if a is not None]
+    report["min_alpha_cr"] = min(finite) if finite else None
     envelope = []
     for i in range(len(frame.elements)):
-        best = max(((res[n].elements[i].utilization, n) for n, _ in ulss), key=lambda t: t[0])
-        envelope.append((best[0], best[1], res[best[1]].elements[i]))
-    return res[sls[0]], [(n, f, res[n]) for n, f in ulss], envelope
+        best = max(((v[2].elements[i].utilization, v[0]) for v in variants), key=lambda t: t[0])
+        envelope.append((best[0], best[1], next(v[2] for v in variants if v[0] == best[1]).elements[i]))
+    # one representative per ULS combination (base name): its worst imperfection variant
+    reps = []
+    for name, factors in ulss:
+        mine = [v for v in variants if v[0] == name or v[0].startswith(name + " ")]
+        worst = max(mine, key=lambda v: v[2].max_utilization)
+        worst[2].variant = worst[0][len(name):].strip()
+        reps.append((name, factors, worst[2]))
+    return sls_res, reps, envelope, report
 
 
 def view_result(model: dict, load_kn: float = 10.0, material: str = "Steel", fixed_supports: bool = True,
                 self_weight: bool = True, diameter_mm=None, wall_mm=None, span_m: float | None = None,
                 stations: int = 13, asset_loads: dict | None = None,
                 floor_loads: dict | None = None, design_basis: str = "en1990",
-                uls: str = "6.10", connections: str = "rigid") -> tuple[dict, float]:
+                uls: str = "6.10", connections: str = "rigid", stability: str = "auto",
+                view: str = "deflection") -> tuple[dict, float]:
     """Solve and package the result for the bridge's ``structure_draw`` overlay.
 
     Returns (result, span_m): per-element start/end points and sampled global displacements in
@@ -282,26 +404,49 @@ def view_result(model: dict, load_kn: float = 10.0, material: str = "Steel", fix
     displacement. Raises frame_solver.MechanismError for unstable models."""
     frame, info, warnings = build_frame(model, load_kn, material, fixed_supports, self_weight, diameter_mm, wall_mm,
                                         asset_loads, floor_loads, connections)
-    res, ulss, envelope = _solve_design(frame, design_basis, uls, stations=stations)
+    want_mode = (view or "deflection").lower() == "buckling"
+    if (view or "deflection").lower() not in ("deflection", "buckling"):
+        raise ValueError("view must be 'deflection' or 'buckling'.")
+    res, ulss, envelope, stab = _solve_design(frame, design_basis, uls, stations=stations,
+                                              stability="off" if want_mode else stability)
     span = float(span_m or model.get("max_member_span_m") or model.get("max_span_m") or 5.0)
+    buckling = None
+    if want_mode:
+        asm = fs.prepare(frame)
+        N = fs.axial_forces(asm, combinations(design_basis, uls)[1][0][1])
+        if N.size and N.min() < 0:
+            subdivide(frame, STABILITY_SUBDIVISION, {i for i in range(len(N)) if N[i] < 0.01 * N.min()})
+            asm = fs.prepare(frame)
+        name, factors = combinations(design_basis, uls)[1][0]
+        alpha, mode = fs.critical_load_factor(asm, factors)
+        if math.isinf(alpha):
+            raise ValueError("Nothing is in compression under " + name + ": there is no buckling mode to show.")
+        res = fs.mode_result(asm, mode, stations=stations)
+        buckling = {"combination": name, "alpha_cr": round(alpha, 3)}
     elements = []
-    for er, (u, _, _) in zip(res.elements, envelope):
+    # a buckling mode has no magnitude: no utilization, coloured by shape (and its own, refined elements)
+    utils = [None] * len(res.elements) if buckling else [round(u, 4) for u, _, _ in envelope]
+    if len(utils) != len(res.elements):
+        raise RuntimeError("Element results and utilization envelope do not line up.")
+    for er, u in zip(res.elements, utils):
         e = frame.elements[er.index]
         rel = e.releases or (False,) * 12
         elements.append({"source_guids": e.tag or [], "start_m": list(frame.nodes[e.n1]), "end_m": list(frame.nodes[e.n2]),
-                         "samples_m": np.round(er.disp, 9).tolist(), "utilization": round(u, 4),
+                         "samples_m": np.round(er.disp, 9).tolist(), "utilization": u,
                          "hinges": [bool(rel[4] or rel[5]), bool(rel[10] or rel[11])]})
     result = {"elements": elements,
               "support_points_m": [list(frame.nodes[n]) for n in info["support_nodes"]],
               "loaded_points_m": [list(frame.nodes[n]) for n in info["loaded_nodes"]],
               "max_displacement_mm": round(res.max_displacement * 1000.0, 3),
-              "connections": info["connections"],
+              "connections": info["connections"], "stability": stab,
               "combinations": {"deflection": SLS[0],
                                "utilization": [f"{n} ({_label(f)})" for n, f, _ in ulss]},
               "warnings": list(model.get("warnings") or []) + warnings}
     for key in ("asset_loads", "floor_loads"):
         if key in info:
             result[key] = info[key]
+    if buckling:
+        result["buckling"] = buckling
     return result, span
 
 
@@ -309,7 +454,8 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
              fixed_supports: bool = True, self_weight: bool = True, diameter_mm=None, wall_mm=None,
              limit_ratio: float = 250.0, plastic: bool = False, span_m: float | None = None,
              asset_loads: dict | None = None, floor_loads: dict | None = None,
-             design_basis: str = "en1990", uls: str = "6.10", connections: str = "rigid") -> dict:
+             design_basis: str = "en1990", uls: str = "6.10", connections: str = "rigid",
+             stability: str = "auto") -> dict:
     """Run the native check and return a bridge-compatible validation result."""
     result = {"status": "error", "passed": False, "structure_type": structure_type, "material": material,
               "confidence": "high", "suggestions": [], "worst_member_guids": [],
@@ -320,7 +466,14 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
         frame, info, notes = build_frame(model, load_kn, material, fixed_supports, self_weight, diameter_mm, wall_mm,
                                          asset_loads, floor_loads, connections)
         result["warnings"] += notes
-        res, ulss, envelope = _solve_design(frame, design_basis, uls, plastic=plastic)
+        res, ulss, envelope, stab = _solve_design(frame, design_basis, uls, plastic=plastic, stability=stability)
+    except InstabilityError as exc:
+        result["verdict"] = METHOD_PREFIX + f"FAILED: {exc}"
+        result["status"] = "fail"
+        result["results"]["stability"] = exc.report
+        result["suggestions"] = ["Brace the frame, fix the column bases, or use stiffer columns: it buckles "
+                                 "before reaching the design loads."]
+        return result
     except fs.MechanismError as exc:
         result["verdict"] = METHOD_PREFIX + f"FAILED: {exc}"
         result["status"] = "fail"
@@ -348,8 +501,12 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
     umax = max(u for u, _, _ in envelope)
     governing = max(envelope, key=lambda t: t[0])[1]
     stress = max(er.util_detail.get("max_stress_mpa", 0.0) for _, _, er in envelope)
-    elem_util = [{"source_guids": frame.elements[i].tag or [], "utilization": round(u, 4), "combination": n}
-                 for i, (u, n, _) in enumerate(envelope)]
+    per_member: dict = {}                                   # one entry per drawn member (max over its pieces)
+    for i, (u, n, _) in enumerate(envelope):
+        key = tuple(frame.elements[i].tag or [])
+        if key not in per_member or u > per_member[key]["utilization"]:
+            per_member[key] = {"source_guids": list(key), "utilization": round(u, 4), "combination": n}
+    elem_util = list(per_member.values())
     r = result["results"]
     r.update({
         "max_deflection_mm": round(dmax_mm, 3), "displacement_available": True, "utilization_available": True,
@@ -361,6 +518,7 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
         "combinations": [{"name": SLS[0], "factors": SLS[1], "max_deflection_mm": round(dmax_mm, 3),
                           "reactions_kn": round(float(res.reactions[:, 2].sum()), 3)}] +
                         [{"name": n, "factors": f, "max_utilization": round(r_.max_utilization, 4),
+                          "governing_variant": getattr(r_, "variant", ""),
                           "max_deflection_mm": round(r_.max_displacement * 1000.0, 3),
                           "reactions_kn": round(float(r_.reactions[:, 2].sum()), 3)} for n, f, r_ in ulss],
         "support_points_m": [list(frame.nodes[n]) for n in info["support_nodes"]],
@@ -369,6 +527,7 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
         "max_member_sag_mm": round(max(er.max_sag for er in res.elements) * 1000.0, 3),
         "support_mode": "fixed" if fixed_supports else "pinned",
         "connections": info["connections"],
+        "stability": stab,
         "nodes": len(frame.nodes), "elements": len(frame.elements),
         "equilibrium_error_kn": round(res.equilibrium_error(), 9),
         "solve_ms": round((time.perf_counter() - t0) * 1000.0, 1),
@@ -378,6 +537,9 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
          else f"Connections: {info['connections']['mode']} ({info['connections']['pinned_ends']} pinned member ends; "
               "beams release major-axis bending, braces both axes; torsion released at one end of "
               "members pinned at both)."),
+        (f"Stability (EN 1993-1-1 5.2): alpha_cr {stab.get('min_alpha_cr')} -> {stab['method']}; sway imperfection "
+         f"phi = {stab['sway_imperfection']['phi']:.5f} in +/-x, +/-y; member buckling length = member length"
+         if stab.get("mode") == "auto" else "Stability check off: first-order, no sway imperfections."),
         f"Load combinations ({r['design_basis']}): deflection at {SLS[0]} ({_label(SLS[1])}); member checks at "
         + ", ".join(f"{n} ({_label(f)})" for n, f, _ in ulss) + ". G = self weight, floor build-up and the weight "
         "of placed items; Q = load_kn, occupancy floor load, contents and occupants."]

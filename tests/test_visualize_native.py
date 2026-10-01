@@ -39,10 +39,11 @@ def test_native_view_sends_solved_result(server, monkeypatch):
     draw = sent[1]
     assert draw["engine"] == "native" and draw["span_m"] == 4.0 and draw["scale"] == 20 and draw["title"] == "Portal"
     res = draw["result"]
-    assert len(res["elements"]) == 3 and all(len(e["samples_m"]) == 13 for e in res["elements"])
+    assert {g for e in res["elements"] for g in e["source_guids"]} == {"c1", "c2", "b"}
+    assert all(len(e["samples_m"]) == 13 for e in res["elements"])
     assert res["support_points_m"] == [[0.0, 0.0, 0.0], [4.0, 0.0, 0.0]]
     assert res["max_displacement_mm"] > 0
-    assert out["status"] == "pass" and out["nodes"] == 4
+    assert out["status"] == "pass" and out["nodes"] >= 4            # compression members are subdivided for stability
 
 
 def test_display_only_update_reuses_native_overlay(server, monkeypatch):

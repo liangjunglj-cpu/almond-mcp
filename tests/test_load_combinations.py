@@ -69,9 +69,10 @@ def test_6_10ab_envelope_picks_the_governing_expression():
     f.add_element(a, b, SEC, STEEL, tag=["g"]); f.add_element(c, d, SEC, STEEL, tag=["q"])
     f.fix(a); f.fix(c)
     f.load(b, fz=-5.0, case="G"); f.load(d, fz=-5.0, case="Q")
-    _, ulss, env = ns._solve_design(f, "en1990", "6.10ab")
+    _, ulss, env, stab = ns._solve_design(f, "en1990", "6.10ab")
     govern = {f.elements[i].tag[0]: n for i, (_, n, _) in enumerate(env)}
-    assert govern == {"g": "ULS 6.10a", "q": "ULS 6.10b"}
+    assert govern == {"g": "ULS 6.10a", "q": "ULS 6.10b"}           # no columns: no sway variants
+    assert stab["sway_imperfection"]["phi"] == 0
 
 
 def test_mezzanine_floor_loads_reported_with_combinations():
@@ -81,7 +82,7 @@ def test_mezzanine_floor_loads_reported_with_combinations():
     en = ns.validate(ref_model(case), design_basis="en1990", **kw)
     un = ns.validate(ref_model(case), design_basis="unfactored", **kw)
     r = en["results"]
-    assert r["deflection_combination"] == "SLS characteristic" and r["utilization_combination"] == "ULS 6.10"
+    assert r["deflection_combination"] == "SLS characteristic" and r["utilization_combination"].startswith("ULS 6.10")
     assert [c["name"] for c in r["combinations"]] == ["SLS characteristic", "ULS 6.10"]
     assert r["max_deflection_mm"] == pytest.approx(un["results"]["max_deflection_mm"], rel=1e-12)
     # G = 62 m2 x 1.0 + steel, Q = 62 m2 x 2.0: the ULS factor on utilization sits between 1.35 and 1.5
@@ -102,6 +103,7 @@ def test_view_result_draws_sls_shape_with_uls_colours():
     assert res["max_displacement_mm"] == pytest.approx(un["max_displacement_mm"], rel=1e-12)
     assert max(e["utilization"] for e in res["elements"]) > 1.35 * max(e["utilization"] for e in un["elements"])
     assert res["combinations"]["utilization"] == ["ULS 6.10 (1.35G + 1.5Q)"]
+    assert res["stability"]["method"] in ("first-order", "second-order (P-Delta)")
 
 
 @pytest.fixture

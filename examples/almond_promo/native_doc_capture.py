@@ -152,8 +152,28 @@ def capture_connections():
     (OUT / "conn_log.json").write_text(json.dumps(rows, indent=1))
 
 
+def capture_stability():
+    """Buckling modes (alpha_cr) of the resized frame and of a slender one, simple connections."""
+    run_cs((HERE / "rhino_setup_view.cs").read_text(encoding="utf-8").replace("LENS", "42"), quiet=True)
+    base = dict(guids=GUIDS, load_kn=0, fixed_supports=False, span_m=6.2, floor_load_kn_m2=2.0, floor_dead_kn_m2=1.0,
+                connections="simple")
+    rows = []
+    for d, w in ((244.5, 10.0), (114.3, 4.0)):
+        out = json.loads(server.visualize_structure(beam_diameter_mm=d, beam_wall_mm=w, color_by="utilization", **base))
+        st = out.get("stability") or {}
+        b = json.loads(server.visualize_structure(beam_diameter_mm=d, beam_wall_mm=w, view="buckling", **base))
+        run_cs(CAP.replace("PATH", str(OUT / f"buckle_{int(d)}.jpg")), quiet=True)
+        rows.append({"d": d, "w": w, "status": out.get("status"), "max_mm": out.get("max_displacement_mm"),
+                     "util": out.get("max_utilization"), "alpha": (b.get("buckling") or {}).get("alpha_cr"),
+                     "method": st.get("method"), "iterations": st.get("iterations"), "scale": b.get("scale")})
+        print(rows[-1], flush=True)
+    (OUT / "buckle_log.json").write_text(json.dumps(rows, indent=1))
+
+
 if __name__ == "__main__":
-    if "--connections" in sys.argv:
+    if "--stability" in sys.argv:
+        capture_stability()
+    elif "--connections" in sys.argv:
         capture_connections()
     elif "--combos" in sys.argv:
         capture_combinations()
