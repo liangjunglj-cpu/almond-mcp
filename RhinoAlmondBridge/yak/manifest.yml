@@ -5,9 +5,11 @@ authors:
 description: >
   Almond for Rhino 8: an offline architectural Object Archive and an MCP
   bridge for AI-assisted modelling. Run Almond for the Neo Swiss Models and
-  Karamba Validation menu. AlmondLibrary opens Models; AlmondKaramba opens
-  analysis controls, support/load diagrams and result records. Karamba requires
-  a separate installation/licence; checks are first-order screening.
+  Structural Validation menu. AlmondLibrary opens Models; AlmondStructure opens
+  analysis controls, support/load diagrams, a live viewport overlay and result
+  records. The built-in native engine needs uv (as the MCP server does);
+  Karamba is optional and needs its own installation/licence. Checks are
+  design-stage screening, not code verification.
   AlmondLibraryBrowser opens the full
   browser view. Compact thumbnails offer native placement as shared blocks,
   with optional lighter meshes. Browsing and placement require no Python or AI client.

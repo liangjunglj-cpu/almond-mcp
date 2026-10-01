@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#efeee8">
-  <title>Almond — Models &amp; Karamba</title>
+  <title>Almond — Models &amp; Structure</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="/style.css">
   <link rel="stylesheet" href="/panel.css">
@@ -18,7 +18,7 @@
 <header class="masthead">
   <a class="wordmark" href="#home" aria-label="Almond home"><span class="brand-mark" aria-hidden="true">a</span>almond<span class="wordmark-dot">↗</span></a>
   <div class="mast-label">OBJECT ARCHIVE<br>MODELS & DRAWING ELEMENTS</div>
-  <nav aria-label="Main"><a href="#library" data-page="library">Models</a><a href="#karamba" data-page="karamba">Karamba</a></nav>
+  <nav aria-label="Main"><a href="#library" data-page="library">Models</a><a href="#karamba" data-page="karamba">Structure</a></nav>
   <div class="panel-tools" hidden><a id="panel-browser" href="/" target="_blank" rel="noopener" title="Open in browser" aria-label="Open in browser">↗</a><button id="panel-reload" type="button" title="Reload Almond" aria-label="Reload Almond">↻</button></div>
   <span class="local-label"><i></i> LOCAL COLLECTION</span>
 </header>
@@ -32,14 +32,15 @@
   </a>
   <a class="workspace-card" href="#karamba"><span class="workspace-number">02</span>
     <svg viewBox="0 0 240 100" aria-hidden="true"><path d="M55 83V30h130v53M55 30l130 53M185 30 55 83" fill="none" stroke="currentColor" stroke-width="2"/><path d="M90 5v20m-4-5 4 5 4-5M150 5v20m-4-5 4 5 4-5" fill="none" stroke="#e94329" stroke-width="2"/><path d="M48 88h14M178 88h14" stroke="#237963" stroke-width="5"/></svg>
-    <span class="workspace-title">Karamba Validation <span>↗</span></span><span class="workspace-copy">Set up, analyse and read the response.</span><span class="workspace-meta">SUPPORTS · LOADS · RESULTS</span>
+    <span class="workspace-title">Structural Validation <span>↗</span></span><span class="workspace-copy">Set up, analyse and read the response. Built-in engine; Karamba optional.</span><span class="workspace-meta">SUPPORTS · LOADS · RESULTS</span>
   </a>
   <div class="workspace-links"><a href="#sources">Sources ↗</a><a href="#about">About Almond ↗</a></div>
 </section>
 <section id="karamba-page" class="analysis-page" hidden>
-  <p class="eyebrow">02 / STRUCTURAL WORKSPACE</p><h1>Karamba <br>Validation<span class="red">.</span></h1>
-  <div class="engine-line"><span id="engine-state">Engine not checked</span><button type="button" data-analysis="status">Check engine ↗</button></div>
-  <p id="analysis-native-note" class="analysis-note">Open <strong>AlmondKaramba</strong> in Rhino to connect this workspace to your geometry.</p>
+  <p class="eyebrow">02 / STRUCTURAL WORKSPACE</p><h1>Structural <br>Validation<span class="red">.</span></h1>
+  <div class="engine-line"><label class="engine-choice">Engine<select id="analysis-engine"><option value="native">Almond native · built in</option><option value="karamba">Karamba3D · separate licence</option></select></label><button type="button" data-analysis="status">Check engines ↗</button></div>
+  <p id="engine-state" class="analysis-meta">Engines not checked.</p>
+  <p id="analysis-native-note" class="analysis-note">Open <strong>AlmondStructure</strong> in Rhino to connect this workspace to your geometry.</p>
   <form id="analysis-form">
     <section class="analysis-step"><h2><span>01</span> Select the structure</h2>
       <p>Use member axes, shell surfaces or meshes. Include point objects for declared supports.</p>
@@ -48,14 +49,23 @@
     </section>
     <fieldset id="analysis-settings"><legend class="sr-only">Analysis settings</legend>
       <section class="analysis-step"><h2><span>02</span> Define the setup</h2>
-        <div class="analysis-fields"><label>Structure<select id="analysis-type"><option value="frame">Frame</option><option value="beam">Beam</option><option value="truss">Truss assembly</option><option value="shell">Shell</option></select></label>
+        <div class="analysis-fields"><label>Structure<select id="analysis-type"><option value="frame">Frame</option><option value="beam">Beam</option><option value="truss">Truss assembly</option><option value="shell" data-engine="karamba">Shell · Karamba</option></select></label>
         <label>Material<select id="analysis-material"><option value="Steel">Steel / S235</option><option value="S355">Steel / S355</option><option value="Concrete">Concrete / C30/37</option><option value="Wood">Wood / C24</option><option value="Aluminium">Aluminium</option></select></label></div>
         <label>Total imposed load <span class="unit-label">kN / downward −Z</span><input id="analysis-load" type="number" min="0" max="100000" step="any" value="10" required></label>
         <p class="field-help">Split across free nodes. If all nodes are supported, the imposed load acts on all nodes.</p>
+        <div data-native class="analysis-fields"><label>Floor imposed load <span class="unit-label">kN/m² · Q</span><input id="floor-imposed" type="number" min="0" max="1000" step="any" value="0" required></label>
+        <label>Floor build-up <span class="unit-label">kN/m² · G</span><input id="floor-dead" type="number" min="0" max="1000" step="any" value="0" required></label></div>
+        <p data-native class="field-help">Every bay enclosed by beams carries the area load (45° distribution). Residential: 2.0 imposed + about 1.0 build-up.</p>
+        <label data-native class="analysis-toggle"><input id="asset-loads" type="checkbox"><span>Loads from placed Almond models</span></label>
         <label class="analysis-toggle"><input id="self-weight" type="checkbox" checked><span>Include self-weight</span></label>
         <div class="analysis-fields"><label>Support locations<select id="support-source"><option value="auto">Points, else lowest nodes</option><option value="points">Require selected points</option></select></label>
         <label>Restraint<select id="support-restraint"><option value="fixed">Fixed</option><option value="pinned">Pinned</option></select></label></div>
         <p class="field-help">Fixed restrains translation and rotation. Pinned restrains translation only.</p>
+        <div data-native class="analysis-fields"><label>Connections<select id="analysis-connections"><option value="rigid">Rigid joints</option><option value="simple">Simple · pinned beam ends</option></select></label>
+        <label>Load combinations<select id="analysis-design"><option value="en1990:6.10">EN 1990 · 1.35G + 1.5Q</option><option value="en1990:6.10ab">EN 1990 · 6.10a/b</option><option value="unfactored:6.10">Unfactored G + Q</option></select></label></div>
+        <div data-native class="analysis-fields"><label>Stability<select id="analysis-stability"><option value="auto">αcr, sway imperfection, P-Δ</option><option value="off">Off · first order</option></select></label>
+        <label>Deflection span <span class="unit-label">m · blank = auto</span><input id="analysis-span" type="number" min="0.01" max="1000" step="any" placeholder="auto"></label></div>
+        <label data-native>Viewport overlay<select id="analysis-overlay"><option value="deflection">Deflected shape · utilization</option><option value="buckling">First buckling mode</option></select></label>
         <label class="analysis-toggle"><input id="section-override" type="checkbox"><span>Override beam section / CHS</span></label>
         <div id="section-fields" class="analysis-fields" hidden><label>Diameter / mm<input id="section-diameter" type="number" value="114.3" min="1" max="5000" step="any" required></label><label>Wall / mm<input id="section-wall" type="number" value="4" min="0.1" max="2499" step="any" required></label></div>
         <details class="analysis-details"><summary>Section assumptions</summary><p id="section-summary">Sections are inferred where supported. Otherwise beams use CHS 114.3 × 4 mm and shells use 100 mm thickness.</p><p>Truss assemblies use beam elements in this workspace. Axial-only member releases are not applied.</p></details>
@@ -69,7 +79,7 @@
       <p id="diagram-load-note" class="field-help"></p>
       <div id="result-legend" class="result-legend" hidden><span>≤80%</span><span>80–100%</span><span>&gt;100%</span><span>No data</span></div>
       <p class="field-help">Colours show the maximum utilization mapped to each source member. Arrows show direction; lengths are symbolic. Up to 80 imposed-load symbols are shown. Self-weight acts throughout the model.</p>
-      <button class="analysis-button primary" type="submit" data-analysis="analyze">Run Karamba analysis ↗</button>
+      <button id="analysis-run" class="analysis-button primary" type="submit" data-analysis="analyze">Run native analysis ↗</button>
       <p id="analysis-message" role="status" aria-live="polite"></p>
     </section>
   </form>
@@ -77,14 +87,17 @@
     <p id="analysis-stale" class="analysis-note" hidden>Inputs changed — rerun required.</p>
     <p id="analysis-method" class="analysis-meta"></p><h3 id="analysis-outcome"></h3>
     <div class="metric-block"><span>Maximum deflection</span><strong id="deflection-value">—</strong><meter id="deflection-meter" min="0" max="2" low="0.8" high="1" optimum="0" value="0" aria-label="Deflection relative to limit"></meter><small id="deflection-basis"></small></div>
-    <div class="metric-block"><span>Maximum utilization</span><strong id="utilization-value">—</strong><meter id="utilization-meter" min="0" max="2" low="0.8" high="1" optimum="0" value="0" aria-label="Utilization relative to 100 percent"></meter><small>100% is the configured utilization threshold.</small></div>
-    <p class="field-help">Bars are capped visually at 200%; numerical values remain uncapped. Maximum deflection is shown numerically. A deformed shape is unavailable.</p>
+    <div class="metric-block"><span>Maximum utilization</span><strong id="utilization-value">—</strong><meter id="utilization-meter" min="0" max="2" low="0.8" high="1" optimum="0" value="0" aria-label="Utilization relative to 100 percent"></meter><small id="utilization-basis">100% is the configured utilization threshold.</small></div>
+    <div id="stability-block" class="metric-block" hidden><span>Stability · αcr</span><strong id="stability-value">—</strong><small id="stability-basis"></small></div>
+    <ul id="native-facts" class="native-facts" hidden></ul>
+    <p id="overlay-note" class="field-help">Bars are capped visually at 200%; numerical values remain uncapped. Maximum deflection is shown numerically. A deformed shape is unavailable.</p>
     <details class="analysis-details"><summary>Solver verdict &amp; suggestions</summary><p id="analysis-verdict"></p><ul id="analysis-suggestions"></ul></details>
     <details class="analysis-details" open><summary>Warnings &amp; missing evidence</summary><ul id="analysis-warnings"></ul></details>
     <div class="analysis-fields"><button type="button" class="analysis-button" data-analysis="highlight">Select worst members</button><button type="button" class="analysis-button" data-analysis="export">Save analysis JSON</button></div>
+    <button type="button" class="analysis-button" data-analysis="clear_view" data-native>Clear viewport overlay</button>
     <p id="analysis-snapshot" class="analysis-meta"></p>
   </section>
-  <details class="analysis-details"><summary>Method &amp; engine details</summary><p>First-order analysis of an idealised model. L/250 is an indicative deflection screen. This workspace does not establish full project-specific code compliance.</p><p id="engine-detail">Check the engine inside Rhino. Karamba installation and licensing are managed separately.</p><a href="https://manual.karamba3d.com/3-in-depth-component-reference/3.6-results/3.7.1-general-results/3.6.1-modelview" target="_blank" rel="noopener noreferrer">Karamba ModelView documentation ↗</a></details>
+  <details class="analysis-details"><summary>Method &amp; engine details</summary><p><strong>Almond native</strong> (built in, no licence): a 3D frame solver for line members. EN 1990 load combinations (SLS G + Q for deflection, ULS for member checks), floor bays and placed models as loads, rigid or simple connections, and an EN 1993-1-1 stability screen (αcr, sway imperfections, P-Δ below 10). Benchmarked against Karamba within 1.3% on deflection.</p><p><strong>Karamba3D</strong> (separate installation and licence): first-order analysis, also for shells.</p><p>L/250 is an indicative deflection screen. This workspace does not establish full project-specific code compliance.</p><p id="engine-detail">Check the engines inside Rhino.</p><a href="https://manual.karamba3d.com/3-in-depth-component-reference/3.6-results/3.7.1-general-results/3.6.1-modelview" target="_blank" rel="noopener noreferrer">Karamba ModelView documentation ↗</a></details>
 </section>
 <section id="library-page" hidden>
   <div class="hero">

@@ -1,40 +1,66 @@
-import {finite,metricState,utilizationFor,utilizationColour,projectPoint} from './analysis-view.mjs';
+import {finite,metricState,utilizationFor,utilizationColour,projectPoint,engineLabel,stabilityState} from './analysis-view.mjs';
 const el=id=>document.getElementById(id);
 const token=new URLSearchParams(location.search).get('bridge')||'';
 const native=/^[a-f0-9]{32}$/.test(token) && new URLSearchParams(location.search).get('panel')==='1';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let model=null,report=null,busy=false,dirty=false;
-const settings=()=>({
-  structure:el('analysis-type').value,material:el('analysis-material').value,load_kn:Number(el('analysis-load').value),
-  self_weight:el('self-weight').checked,fixed_rotations:el('support-restraint').value==='fixed',
-  explicit_supports:el('support-source').value==='points',
-  diameter_mm:el('section-override').checked?Number(el('section-diameter').value):null,
-  wall_mm:el('section-override').checked?Number(el('section-wall').value):null
-});
+let model=null,report=null,busy=false,dirty=false,checked=false;
+const engine=()=>el('analysis-engine').value;
+const optional=id=>{const v=el(id).value.trim();return v===''?null:Number(v);};
+const settings=()=>{
+  const [design_basis,uls_combination]=el('analysis-design').value.split(':');
+  const base={
+    engine:engine(),structure:el('analysis-type').value,material:el('analysis-material').value,load_kn:Number(el('analysis-load').value),
+    self_weight:el('self-weight').checked,fixed_rotations:el('support-restraint').value==='fixed',
+    explicit_supports:el('support-source').value==='points',
+    diameter_mm:el('section-override').checked?Number(el('section-diameter').value):null,
+    wall_mm:el('section-override').checked?Number(el('section-wall').value):null
+  };
+  if(base.engine!=='native')return base;
+  return {...base,floor_imposed_kn_m2:Number(el('floor-imposed').value),floor_dead_kn_m2:Number(el('floor-dead').value),
+    asset_loads:el('asset-loads').checked,connections:el('analysis-connections').value,design_basis,uls_combination,
+    stability:el('analysis-stability').value,view:el('analysis-overlay').value,span_m:optional('analysis-span')};
+};
 function message(text) {el('analysis-message').textContent=text;}
+function engineControls() {
+  const nativeEngine=engine()==='native';
+  document.querySelectorAll('#analysis-settings [data-native]').forEach(n=>n.hidden=!nativeEngine);
+  const shell=el('analysis-type').querySelector('[data-engine="karamba"]');
+  shell.disabled=nativeEngine;
+  if(nativeEngine&&el('analysis-type').value==='shell')el('analysis-type').value='frame';
+  el('analysis-run').textContent=nativeEngine?'Run native analysis ↗':'Run Karamba analysis ↗';
+  try{localStorage.setItem('almond-structure-engine',engine());}catch{}
+}
 function controls() {
   const colour=el('toggle-utilization');
   colour.disabled=!report||dirty||!report.result?.results?.utilization_available;
   if(colour.disabled)colour.checked=false;
-  el('analysis-settings').disabled=busy;
+  el('analysis-settings').disabled=busy;el('analysis-engine').disabled=busy;
   for(const id of ['section-diameter','section-wall'])el(id).disabled=!el('section-override').checked;
   document.querySelectorAll('[data-analysis]').forEach(b=>{
     b.disabled=!native||busy||(b.dataset.analysis==='analyze'&&!model)||
       (['highlight','export'].includes(b.dataset.analysis)&&(!report||dirty))||
-      (b.dataset.analysis==='highlight'&&!report?.result?.worst_member_guids?.length);
+      (b.dataset.analysis==='highlight'&&!report?.result?.worst_member_guids?.length)||
+      (b.dataset.analysis==='clear_view'&&!report?.native?.drawn);
   });
+  el('analysis-results').querySelector('[data-analysis="clear_view"]').hidden=!report?.native;
 }
 function request(action) {
   if(!native||busy)return;
-  if(!el('analysis-form').reportValidity())return;
+  if(action==='analyze'&&!el('analysis-form').reportValidity())return;
   const input=settings();
   if(input.diameter_mm!==null && input.wall_mm>=input.diameter_mm/2){message('Wall thickness must be less than half the diameter.');return;}
   busy=true;controls();
-  message(action==='analyze'?'Running Karamba in Rhino…':action==='capture'?'Select structural geometry in Rhino…':'Working in Rhino…');
+  message(action==='analyze'?(input.engine==='native'?'Exporting the model from Rhino…':'Running Karamba in Rhino…'):
+    action==='capture'?'Select structural geometry in Rhino…':action==='status'?'Checking engines…':'Working in Rhino…');
   location.href='/almond-action/'+token+'/karamba/'+action+'?data='+encodeURIComponent(JSON.stringify(input));
 }
 document.querySelectorAll('[data-analysis]').forEach(b=>{if(b.dataset.analysis!=='analyze')b.addEventListener('click',()=>request(b.dataset.analysis));});
 el('analysis-form').addEventListener('submit',e=>{e.preventDefault();request('analyze');});
+el('analysis-engine').addEventListener('change',()=>{
+  engineControls();
+  if(report){dirty=true;el('analysis-stale').hidden=false;message('Engine changed. Run analysis again to update the results.');}
+  controls();draw();
+});
 el('analysis-form').addEventListener('input',event=>{
   if(!event.target.closest('#analysis-settings'))return;
   dirty=!!report;el('section-fields').hidden=!el('section-override').checked;
@@ -43,15 +69,26 @@ el('analysis-form').addEventListener('input',event=>{
   controls();draw();
 });
 document.querySelectorAll('[data-analysis-view]').forEach(b=>b.addEventListener('change',draw));
+const engineState={karamba:'Karamba not checked',native:'Native engine not checked'};
+function showEngines(){el('engine-state').textContent=engineState.native+' · '+engineState.karamba;}
 window.almondAnalysisReceive = payload => {
+  if(payload.kind==='progress'){message(payload.message);return;}          // still busy: the solver is running
+  if(payload.kind==='native_status'){
+    engineState.native=payload.available?'Native engine ready'+(payload.version?' · v'+payload.version:''):'Native engine unavailable';
+    if(!payload.available)el('engine-detail').textContent=payload.detail||'';
+    showEngines();return;
+  }
   busy=false;
   if(payload.kind==='error'||payload.kind==='notice'){
     if(payload.stale && report){dirty=true;el('analysis-stale').hidden=false;}
     message(payload.message);controls();draw();return;
   }
   if(payload.kind==='status'){
-    el('engine-state').textContent=payload.available?'Karamba detected':'Karamba unavailable';
-    el('engine-detail').textContent=payload.detail||payload.message;message(payload.message);
+    engineState.karamba=payload.available?'Karamba detected':'Karamba not installed';
+    const n=payload.native||{};
+    engineState.native=n.checking?'Native engine starting…':n.available===false?'Native engine unavailable':engineState.native;
+    el('engine-detail').textContent=[n.detail,payload.detail||payload.message].filter(Boolean).join(' · ');
+    showEngines();message(n.available===false?n.detail:'Engines checked.');
   }
   if(payload.kind==='capture'){
     model=payload.model;report=null;dirty=false;
@@ -60,7 +97,9 @@ window.almondAnalysisReceive = payload => {
   }
   if(payload.kind==='result'){
     model=payload.model;report=payload;dirty=false;el('analysis-stale').hidden=true;
-    renderResult();message('Analysis snapshot recorded. Recapture if Rhino geometry changes.');
+    renderResult();
+    message(payload.native?.message||(payload.native?.draw_error?payload.native.draw_error:
+      'Analysis snapshot recorded. Recapture if Rhino geometry changes.'));
   }
   if(model) {
     el('selection-summary').textContent=model.objects+' objects · '+model.beams+' beams · '+model.shells+' shells · '+model.units;
@@ -68,23 +107,44 @@ window.almondAnalysisReceive = payload => {
   }
   controls();draw();
 };
+const li=text=>{const n=document.createElement('li');n.textContent=text;return n;};
+function nativeFacts(r,nat){
+  const m=r.results||{},facts=[];
+  if(m.connections)facts.push(m.connections.mode==='simple'?'Simple connections · '+m.connections.pinned_ends+' pinned member ends':'Rigid joints');
+  if(r.floor_loads)facts.push('Floor '+(r.floor_loads.imposed_kn_m2+r.floor_loads.dead_kn_m2)+' kN/m² over '+r.floor_loads.area_m2.toFixed(1)+' m² · '+r.floor_loads.total_kn.toFixed(1)+' kN');
+  if(r.asset_loads)facts.push(r.asset_loads.applied+' placed model'+(r.asset_loads.applied===1?'':'s')+' as loads · '+r.asset_loads.total_kn.toFixed(1)+' kN');
+  if(m.deflection_combination)facts.push('Deflection at '+m.deflection_combination+' · members checked at '+(m.combinations||[]).slice(1).map(c=>c.name).join(', '));
+  if(finite(m.reactions_kn))facts.push('Support reactions '+m.reactions_kn.toFixed(1)+' kN (SLS) · '+m.nodes+' nodes · '+m.elements+' elements · '+m.solve_ms+' ms');
+  if(nat.version)facts.push('Solver almond-mcp '+nat.version);
+  return facts;
+}
 function renderResult(){
-  const r=report.result,m=r.results||{},s=metricState(r);
+  const r=report.result,m=r.results||{},s=metricState(r),nat=report.native,st=stabilityState(r,nat);
   el('analysis-results').hidden=false;
   el('analysis-outcome').textContent=s.complete?(r.status==='pass'?'Within configured checks':'Configured checks exceeded'):
-    r.status==='unavailable'?'Analysis unavailable':'Results incomplete';
-  el('analysis-outcome').dataset.state=s.complete?r.status:'incomplete';
-  el('analysis-method').textContent=m.analysis_method==='api'?'Karamba · first-order analysis':'No completed Karamba analysis';
+    nat&&r.status==='fail'?'Unstable · see the verdict':r.status==='unavailable'?'Analysis unavailable':'Results incomplete';
+  el('analysis-outcome').dataset.state=s.complete||(nat&&r.status==='fail')?r.status:'incomplete';
+  el('analysis-method').textContent=engineLabel(r,report.settings);
   el('deflection-value').textContent=s.deflection==null?'Unavailable':s.deflection.toFixed(2)+' mm';
   el('utilization-value').textContent=s.utilization==null?'Unavailable':(s.utilization*100).toFixed(1)+'%';
-  el('deflection-basis').textContent=s.limit==null?'No limit returned':'L/250 screen: '+s.limit.toFixed(2)+' mm';
+  el('deflection-basis').textContent=s.limit==null?'No limit returned':'L/250 screen: '+s.limit.toFixed(2)+' mm'+
+    (m.span_m?' · span '+m.span_m+' m ('+m.span_basis+')':'');
+  el('utilization-basis').textContent=m.utilization_combination?'Governing: '+m.utilization_combination+'. 100% is the threshold.':'100% is the configured utilization threshold.';
   el('deflection-meter').value=s.deflection!=null&&s.limit?Math.min(s.deflection/s.limit,2):0;
   el('deflection-meter').hidden=s.deflection==null||!s.limit;
   el('utilization-meter').value=s.utilization==null?0:Math.min(s.utilization,2);
   el('utilization-meter').hidden=s.utilization==null;
+  el('stability-block').hidden=!st;
+  if(st){el('stability-value').textContent=st.value;el('stability-basis').textContent=st.basis;}
+  const facts=nat?nativeFacts(r,nat):[];
+  el('native-facts').hidden=!facts.length;el('native-facts').replaceChildren(...facts.map(li));
+  el('overlay-note').textContent=!nat?'Bars are capped visually at 200%; numerical values remain uncapped. Maximum deflection is shown numerically. A deformed shape is unavailable.':
+    nat.draw_error?nat.draw_error:!nat.drawn?'Nothing was drawn in the viewport for this result.':
+    nat.view==='buckling'?'The first buckling mode is drawn in the Rhino viewport. A mode has a shape but no size: it is normalised for display.':
+    'The deflected shape (exaggerated) and member utilization are drawn in the Rhino viewport. Bars here are capped at 200%.';
   el('analysis-verdict').textContent=r.verdict||'No verdict returned.';
-  el('analysis-warnings').replaceChildren(...(r.warnings||[]).map(t=>{const li=document.createElement('li');li.textContent=t;return li;}));
-  el('analysis-suggestions').replaceChildren(...(r.suggestions||[]).map(t=>{const li=document.createElement('li');li.textContent=t;return li;}));
+  el('analysis-warnings').replaceChildren(...(r.warnings||[]).map(li));
+  el('analysis-suggestions').replaceChildren(...(r.suggestions||[]).map(li));
   el('analysis-snapshot').textContent='Snapshot '+new Date(report.created_at).toLocaleString()+'. Input geometry is not monitored live.';
   el('toggle-utilization').disabled=!s.complete && !m.utilization_available;
   el('toggle-utilization').checked=!!m.utilization_available;
@@ -94,10 +154,11 @@ const example={segments:[
   {a:[4,0,3],b:[4,0,0],guids:[]}],shell_outlines:[],anchors:[]};
 function draw() {
   const source=model||example,view=el('analysis-view').value,m=report?.result?.results||{};
+  const solved=report&&!dirty&&['api','native'].includes(m.analysis_method)&&Array.isArray(m.support_points_m);
   const input=report&&!dirty?report.settings:settings();
   let supports=[],loads=[];
   const segments=source.segments||[],all=segments.flatMap(s=>[s.a,s.b]).concat((source.shell_outlines||[]).flat());
-  if(report&&!dirty && m.analysis_method==='api'){supports=m.support_points_m||[];loads=m.loaded_points_m||[];}
+  if(solved){supports=m.support_points_m||[];loads=m.loaded_points_m||[];}
   else if(all.length){
     const low=Math.min(...all.map(p=>p[2]));
     supports=input.explicit_supports?(source.anchors||[]):(source.anchors?.length?source.anchors:all.filter(p=>Math.abs(p[2]-low)<1e-6));
@@ -126,11 +187,19 @@ function draw() {
     svg.push('<path d="M '+x+' '+(y-27)+' v 22 m -4 -5 l 4 5 l 4 -5" fill="none" stroke="var(--diagram-load,#df432c)" stroke-width="2"/>');
   });
   el('analysis-diagram').innerHTML=svg.join('');
-  el('diagram-caption').textContent=!model?'Illustrative frame · no analysis results':report&&!dirty&&m.analysis_method==='api'?
-    'Recorded model and load/support positions · no displacement field is plotted':'Selection preview · support and load locations are provisional until solved';
-  el('diagram-load-note').textContent='Total imposed load '+input.load_kn+' kN ↓ · Self-weight '+(input.self_weight?'on':'off')+' · '+(input.fixed_rotations?'Fixed':'Pinned')+' supports';
+  el('diagram-caption').textContent=!model?'Illustrative frame · no analysis results':solved?
+    'Recorded model and load/support positions'+(report.native?.drawn?' · the deformed shape is drawn in the Rhino viewport':' · no displacement field is plotted'):
+    'Selection preview · support and load locations are provisional until solved';
+  const extra=input.engine==='native'&&(input.floor_imposed_kn_m2||input.floor_dead_kn_m2)?' · Floor '+(input.floor_imposed_kn_m2+input.floor_dead_kn_m2)+' kN/m²':'';
+  el('diagram-load-note').textContent='Total imposed load '+input.load_kn+' kN ↓'+extra+(input.asset_loads?' · Placed models':'')+
+    ' · Self-weight '+(input.self_weight?'on':'off')+' · '+(input.fixed_rotations?'Fixed':'Pinned')+' supports';
   el('result-legend').hidden=!el('toggle-utilization').checked||!report||dirty;
 }
+try{const saved=localStorage.getItem('almond-structure-engine');if(saved==='karamba'||saved==='native')el('analysis-engine').value=saved;}catch{}
+engineControls();
 el('analysis-native-note').hidden=native;
-if(!native) message('Open AlmondKaramba inside Rhino to select geometry and run the solver.');
+if(!native) message('Open AlmondStructure inside Rhino to select geometry and run the solver.');
+// check the engines once, the first time the workspace is shown (it also fetches the native solver)
+function firstVisit(){if(native&&!checked&&location.hash==='#karamba'){checked=true;setTimeout(()=>{if(!busy)request('status');},300);}}
+addEventListener('hashchange',firstVisit);firstVisit();
 controls();draw();

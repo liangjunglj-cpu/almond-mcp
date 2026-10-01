@@ -6,6 +6,8 @@ Subcommands:
                 original download URL and expected sha256 for each
   doctor        check directories, manifests, state DB, and the Rhino bridge
   paths         print every resolved directory and the state DB location
+  solve         one native structural study: JSON request on stdin, JSON reply
+                on stdout (the Rhino panel's solver)
 """
 from __future__ import annotations
 
@@ -223,6 +225,13 @@ def cmd_serve(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_solve(args: argparse.Namespace) -> int:
+    import io
+    from almond_mcp.structure_study import main as solve
+    return solve(io.TextIOWrapper(sys.stdin.buffer, encoding="utf-8"),
+                 io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8"))
+
+
 def cmd_library(args: argparse.Namespace) -> int:
     from almond_mcp.asset_repository import serve_library
     return serve_library(args.port, args.open)
@@ -253,6 +262,8 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("paths", help="print resolved directories")
     sub.add_parser("audit-assets", help="verify generated GLBs, embedded passports, contracts and previews offline")
 
+    sub.add_parser("solve", help="native structural study: JSON on stdin, JSON on stdout")
+
     library = sub.add_parser("library", help="open the unified model and drawing archive")
     library.add_argument("--port", type=int, default=8767, help="loopback HTTP port (default: 8767)")
     library.add_argument("--open", action="store_true", help="open the archive in your browser")
@@ -266,6 +277,7 @@ def main(argv: list[str] | None = None) -> int:
         "paths": cmd_paths,
         "library": cmd_library,
         "audit-assets": cmd_audit_assets,
+        "solve": cmd_solve,
     }
     return handlers[args.command](args)
 

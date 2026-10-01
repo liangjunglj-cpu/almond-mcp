@@ -24,7 +24,7 @@ from fastmcp import FastMCP
 from fastmcp.resources import ResourceContent, ResourceResult
 from almond_mcp.ghx_parser import GHParser, validate_capsule_manifest
 from almond_mcp.retrieval_store import AlmondStore
-from almond_mcp import asset_passport, asset_loads, conditioning, exchange, paths, drafting, native_structure
+from almond_mcp import asset_passport, asset_loads, conditioning, exchange, paths, drafting, native_structure, structure_study
 
 # ── Constants ────────────────────────────────────────────────────────────────
 
@@ -2462,12 +2462,7 @@ def _asset_load_spec(scene_id: str = ""):
         if not isinstance(reply, dict) or reply.get("status") != "ok":
             return None, "This bridge version cannot export asset placements (update almondbridge)."
         placements = reply.get("placements") or []
-    catalogue = {}
-    for pl in placements:
-        a = generated_asset_indexer.get(pl["asset_id"]) or {}
-        catalogue[pl["asset_id"]] = {"category": a.get("category", ""), "name": a.get("product", ""),
-                                     "support_plane": (a.get("spatial") or {}).get("support_plane", "floor"),
-                                     "nominal_mm": a.get("nominal_dimensions_mm") or {}}
+    catalogue = structure_study.asset_catalogue(placements, generated_asset_indexer.get)
     return {"placements": placements, "table": table, "catalogue": catalogue}, None
 
 
@@ -2745,31 +2740,9 @@ def _native_view(request: dict, guids, required: bool, asset_spec=None, floor_sp
                            "mechanism_nodes": len(e.nodes)}), None
     except ValueError as e:
         return json.dumps({"status": "error", "message": str(e)}), None
-    draw = {k: v for k, v in request.items() if k not in ("guids", "reanalyze", "clear")}
-    report = result.pop("asset_loads", None)
-    floor_report = result.pop("floor_loads", None)
-    combos = result.pop("combinations", None)
-    conn_report = result.pop("connections", None)
-    stab_report = result.pop("stability", None)
-    buckling = result.pop("buckling", None)
-    draw.update({"type": "structure_draw", "engine": "native", "span_m": span, "result": result})
-    if buckling:
-        draw["buckling_alpha"] = buckling["alpha_cr"]
-        draw["color_by"] = "displacement"
-        if not request.get("title"):
-            draw["title"] = "ALMOND  //  NATIVE FEA  \u00b7  BUCKLING  \u00b7  " + buckling["combination"]
-    elif combos and not request.get("title"):
-        draw["title"] = "ALMOND  //  NATIVE FEA  ·  u: " + " / ".join(combos["utilization"]) + "  ·  d: SLS G + Q"
-    if report is not None or floor_report is not None:
-        parts = [f"load {request['load_kn']:.0f} kN"] if request["load_kn"] >= 0.5 else []
-        if floor_report is not None:
-            parts.append(f"floor {floor_report['imposed_kn_m2'] + floor_report['dead_kn_m2']:g} kN/m2 "
-                         f"x {floor_report['area_m2']:.0f} m2")
-        if report is not None:
-            parts.append(f"{report['applied']} assets {report['total_kn']:.1f} kN")
-        if request["self_weight"]:
-            parts.append("self weight")
-        draw["load_label"] = " + ".join(parts)
+    draw, reports = structure_study.draw_message(request, result, span)
+    report, floor_report, combos = reports["asset_loads"], reports["floor_loads"], reports["combinations"]
+    conn_report, stab_report, buckling = reports["connections"], reports["stability"], reports["buckling"]
     out = _bridge_call(draw, 60.0)
     try:
         parsed = json.loads(out)

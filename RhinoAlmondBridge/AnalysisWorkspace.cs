@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using Rhino;
@@ -24,10 +25,13 @@ namespace RhinoAlmondBridge
         private string _reportFingerprint;
         private static Action<RhinoDoc> _pending;
         internal static bool Busy { get; private set; }
+        // a native solve runs out of process after the Rhino command has returned
+        internal static bool Solving { get; private set; }
         internal AnalysisWorkspace(Action<JObject> send) { _send=send; }
         internal void Request(string action, string json)
         {
             var doc = RhinoDoc.ActiveDoc;
+            if (Solving && action!="status") { SendError("The native solver is still running."); return; }
             if (Busy || LibraryPlacement.Busy || doc == null || doc.InCommand(false)>0)
             { SendError("Finish the current Rhino command first."); return; }
             AnalysisSettings settings;
@@ -54,15 +58,16 @@ namespace RhinoAlmondBridge
         {
             try
             {
-                if(action=="status") {
-                    bool available=KarambaAdapter.IsAvailable(out string reason);
-                    _send(new JObject {["kind"]="status",["available"]=available,["message"]=available ?
-                        "Karamba detected. Solver and licence checked when analysis runs." : "Karamba is unavailable in this Rhino session.",["detail"]=reason});
+                if(action=="status") { Status(); return; }
+                if(action=="clear_view") {
+                    StructureView.Handle(new JObject {["clear"]=true});
+                    _send(new JObject {["kind"]="notice",["message"]="Viewport overlay cleared."});
                     return;
                 }
                 if(action=="capture") { Capture(doc,settings);return; }
                 if (_ids.Count==0 || doc.RuntimeSerialNumber!=_document || Fingerprint(doc)!=_fingerprint)
                     throw new InvalidOperationException("The model changed or no model is selected. Capture the current Rhino selection again.");
+                if(action=="analyze" && settings.Engine=="native") { AnalyzeNative(doc,settings); return; }
                 if(action=="analyze")
                 {
                     var request=new ValidationRequest {Guids=_ids.ToList(),StructureType=settings.Structure,Material=settings.Material,
@@ -101,6 +106,74 @@ namespace RhinoAlmondBridge
             }
             catch(Exception ex) { SendError(ex.Message); }
         }
+        private void Status()
+        {
+            bool karamba=KarambaAdapter.IsAvailable(out string reason);
+            var command=NativeSolver.Resolve(out string missing);
+            _send(new JObject {["kind"]="status",["available"]=karamba,["message"]=karamba ?
+                "Karamba detected. Solver and licence checked when analysis runs." : "Karamba is unavailable in this Rhino session.",["detail"]=reason,
+                ["native"]=command==null ? new JObject {["available"]=false,["detail"]=missing} :
+                    new JObject {["checking"]=true,["detail"]=command.Label}});
+            if(command==null) return;
+            // a ping also fetches the solver on first use, so the first analysis starts quickly
+            Task.Run(async () => {
+                var reply=await NativeSolver.RunAsync(new JObject {["ping"]=true},300000).ConfigureAwait(false);
+                bool ok=(string)reply["status"]=="ok";
+                Eto.Forms.Application.Instance.AsyncInvoke(() => _send(new JObject {["kind"]="native_status",["available"]=ok,
+                    ["version"]=reply["version"],["detail"]=ok ? (string)reply["solver"] : (string)reply["message"]}));
+            });
+        }
+
+        // Export on the UI thread, solve out of process, draw and report back on the UI thread.
+        private void AnalyzeNative(RhinoDoc doc,AnalysisSettings settings)
+        {
+            var model=JObject.Parse(StructureModelExport.Handle(new JObject {["guids"]=new JArray(_ids)}));
+            if((string)model["status"]!="ok") throw new InvalidOperationException((string)model["message"] ?? "Could not export the structural model.");
+            if(settings.ExplicitSupports && !((model["anchor_points"] as JArray)?.Count>0))
+                throw new InvalidOperationException("Include Rhino point objects at the supports in the selection, or let Almond use the lowest nodes.");
+            var request=new JObject {["model"]=model,["settings"]=settings.SolverSettings()};
+            if(settings.AssetLoads)
+                request["placements"]=JObject.Parse(AssetPlacementExport.Handle(new JObject()))["placements"] ?? new JArray();
+            var snapshot=Snapshot(doc);
+            string fingerprint=_fingerprint; uint serial=_document;
+            Solving=true;
+            _send(new JObject {["kind"]="progress",["message"]="Solving with Almond's native engine…"});
+            Task.Run(async () => {
+                JObject reply;
+                try { reply=await NativeSolver.RunAsync(request,300000).ConfigureAwait(false); }
+                catch(Exception ex) { reply=new JObject {["status"]="error",["message"]=ex.Message}; }
+                Eto.Forms.Application.Instance.AsyncInvoke(() => FinishNative(reply,settings,snapshot,fingerprint,serial));
+            });
+        }
+
+        private void FinishNative(JObject reply,AnalysisSettings settings,JObject snapshot,string fingerprint,uint serial)
+        {
+            Solving=false;
+            try
+            {
+                if(fingerprint!=_fingerprint || serial!=_document)
+                    throw new InvalidOperationException("The selection changed while solving. Run the analysis again.");
+                if(!(reply["validation"] is JObject validation))
+                    throw new InvalidOperationException((string)reply["message"] ?? "The native solver returned no result.");
+                var native=new JObject {["solver"]=reply["solver"],["version"]=reply["version"],["view"]=settings.View,
+                    ["drawn"]=false,["message"]=reply["message"],["buckling"]=reply["buckling"]};
+                if(reply["draw"] is JObject draw)
+                {
+                    var shown=JObject.Parse(StructureView.HandleDraw(draw));
+                    if((string)shown["status"]=="error") native["draw_error"]=(string)shown["message"];
+                    else native["drawn"]=true;
+                }
+                _report=new JObject {["schema_version"]=1,["kind"]="result",["created_at"]=DateTime.UtcNow.ToString("o"),
+                    ["document_serial"]=_document,["geometry_fingerprint"]=_fingerprint,["object_ids"]=new JArray(_ids),
+                    ["settings"]=settings.ToJson(),["model"]=snapshot,["result"]=validation,["native"]=native,
+                    ["limits"]="Linear-elastic 3D frame analysis of the stated idealisation with EN 1990 combinations and an EN 1993-1-1 "+
+                        "stability screen. A design aid: it does not replace project-specific verification by an engineer."};
+                _reportFingerprint=_fingerprint;
+                _send((JObject)_report.DeepClone());
+            }
+            catch(Exception ex) { SendError(ex.Message); }
+        }
+
         private void Capture(RhinoDoc doc,AnalysisSettings settings)
         {
             var selected=doc.Objects.GetSelectedObjects(false,false).ToList();

@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {metricState, utilizationFor, utilizationColour, projectPoint} from '../almond_mcp/library_ui/analysis-view.mjs';
+import {metricState, utilizationFor, utilizationColour, projectPoint, engineLabel, stabilityState} from '../almond_mcp/library_ui/analysis-view.mjs';
 
 test('missing and estimated metrics cannot appear as a completed Karamba check', () => {
   for (const result of [undefined, {}, {status:'pass', results:{}},
@@ -34,4 +34,22 @@ test('diagram views preserve coordinates and reject nonfinite geometry', () => {
   assert.deepEqual(projectPoint([2,3,4],'top'),[2,-3]);
   assert.equal(projectPoint([2,Infinity,4]),null);
   assert.equal(projectPoint([2,3]),null);
+});
+test('the native engine counts as a completed analysis; estimates still do not', () => {
+  const result={status:'fail',results:{analysis_method:'native', displacement_available:true,
+    utilization_available:true, max_deflection_mm:25.9, utilization_ratio:.98, deflection_limit_mm:24.8,
+    design_basis:'en1990', stability:{mode:'auto', method:'first-order', min_alpha_cr:126.1}}};
+  assert.deepEqual(metricState(result), {complete:true,deflection:25.9,utilization:.98,limit:24.8});
+  assert.equal(engineLabel(result,{uls_combination:'6.10'}),'Almond native · first-order · EN 1990');
+  assert.equal(engineLabel({results:{analysis_method:'api'}}),'Karamba · first-order analysis');
+  assert.equal(engineLabel({results:{analysis_method:'rule_based'}}),'No completed analysis');
+});
+test('stability reads alpha_cr against the EN 1993 thresholds', () => {
+  const at=(alpha,method='first-order')=>stabilityState({results:{stability:{mode:'auto',method,min_alpha_cr:alpha}}});
+  assert.match(at(126.1).basis,/adequate/);
+  assert.match(at(5.97,'second-order (P-Delta)').basis,/second-order/);
+  assert.equal(at(null,'unstable').value,'Unstable');
+  assert.equal(stabilityState({results:{stability:{mode:'off'}}}),null);
+  assert.equal(stabilityState({results:{}}),null);
+  assert.equal(stabilityState({results:{}},{buckling:{alpha_cr:5.966,combination:'ULS 6.10'}}).value,'αcr = 5.97');
 });

@@ -18,6 +18,33 @@ Karamba remains available for shells and as a cross-check.
 loaded: 0"); the Atelier-07 mezzanine frame solved by the native engine and drawn by
 the bridge's overlay.*
 
+## In the Almond panel
+
+The same engine runs from the panel, with no AI client: run **AlmondStructure**,
+keep the engine on **Almond native**, select the members and **Use Rhino
+selection**. Step 02 adds the native options (floor imposed and build-up loads,
+loads from placed models, connections, load combinations, stability, deflection
+span, and the viewport overlay: deflected shape or first buckling mode).
+**Run native analysis** exports the conditioned line model, runs
+`almond-mcp solve` out of process (JSON in, JSON out: `almond_mcp/structure_study.py`),
+draws the result through the same `structure_draw` overlay the MCP tools use,
+and fills step 04 with deflection, utilization, the governing combination,
+αcr and the load facts. **Clear viewport overlay** removes the drawing.
+
+![Panel, rigid joints: 219.1x8 under the residential floor load passes](images/native-solver/panel-rigid.jpg)
+![Panel, simple connections: the same section fails on deflection](images/native-solver/panel-simple.jpg)
+![Panel, first buckling mode of the resized frame](images/native-solver/panel-buckling.jpg)
+
+The panel and `visualize_structure` give identical numbers (both call
+`native_structure` and share `structure_study.draw_message`): on the A07
+mezzanine 219.1x8 rigid 18.46 mm / 85.6 %, simple 25.93 mm (limit 24.8) /
+97.8 %, 244.5x10 simple 15.67 mm / 65.8 %, αcr 126.08.
+
+The plugin finds the solver as `uvx almond-mcp@<plugin version> solve` (a
+development build without a release version takes the latest), or the
+command line in `ALMOND_SOLVER_COMMAND`. A protocol number in every request
+and reply catches a plugin/solver mismatch.
+
 ## Live view
 
 `visualize_structure` uses the same engines: the server exports the model
