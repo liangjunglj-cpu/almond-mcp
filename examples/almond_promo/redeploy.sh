@@ -17,7 +17,7 @@ cp "$B" "$P/RhinoAlmondBridge.rhp" && echo copied
 powershell -NoProfile -Command "Start-Process 'C:\Program Files\Rhino 8\System\Rhino.exe' -ArgumentList '\"C:\Users\liang\Documents\almond_promo\rhino\A07-promo.3dm\"'"
 for i in $(seq 1 90); do python -c "import socket; socket.create_connection(('127.0.0.1',5000),2).close()" 2>/dev/null && break; sleep 2; done
 sleep 6
-timeout 120 python -c "
+[ "$NO_GH" = 1 ] || timeout 120 python -c "
 from bridge import run_cs
 run_cs('''var gh = RhinoApp.GetPlugInObject(\"Grasshopper\"); gh.GetType().GetMethod(\"LoadEditor\").Invoke(gh, null); gh.GetType().GetMethod(\"HideEditor\").Invoke(gh, null);
 log.Append(\"ready \" + typeof(RhinoAlmondBridge.BridgeServer).Assembly.Location + \" \" + File.GetLastWriteTime(typeof(RhinoAlmondBridge.BridgeServer).Assembly.Location));''')
