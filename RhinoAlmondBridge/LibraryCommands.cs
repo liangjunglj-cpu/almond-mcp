@@ -86,6 +86,15 @@ namespace RhinoAlmondBridge
         }
     }
 
+    public sealed class AlmondStructureCommand : Command
+    {
+        public override string EnglishName => "AlmondStructure";
+        protected override Result RunCommand(RhinoDoc doc,RunMode mode) {
+            try { AlmondLibraryCommand.OpenPanel(doc,"karamba");return Result.Success; }
+            catch(Exception ex) {RhinoApp.WriteLine(ex.Message);return Result.Failure;}
+        }
+    }
+
     public class AlmondLibraryBrowserCommand : Command
     {
         public override string EnglishName => "AlmondLibraryBrowser";

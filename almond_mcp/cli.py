@@ -6,6 +6,9 @@ Subcommands:
                 original download URL and expected sha256 for each
   doctor        check directories, manifests, state DB, and the Rhino bridge
   paths         print every resolved directory and the state DB location
+  design-codes  list the design code profiles and any profile files that fail validation
+  solve         one native structural study: JSON request on stdin, JSON reply
+                on stdout (the Rhino panel's solver)
 """
 from __future__ import annotations
 
@@ -223,6 +226,29 @@ def cmd_serve(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_design_codes(args: argparse.Namespace) -> int:
+    from almond_mcp.design_codes import listing
+    data = listing()
+    if args.json:
+        print(json.dumps(data, indent=2))
+        return 1 if data["problems"] else 0
+    print(f"Design code profiles (default: {data['default']}; user folder: {data['user_dir']})\n")
+    for p in data["profiles"]:
+        state = "verified" if p["verified"] else "UNVERIFIED: " + ", ".join(p["unverified"])
+        print(f"  {p['id']:<16} {p['name']}  [{p['origin']}; {state}]")
+    for problem in data["problems"]:
+        print(f"  ! {problem}")
+    return 1 if data["problems"] else 0
+
+
+def cmd_solve(args: argparse.Namespace) -> int:
+    import io
+    from almond_mcp.structure_study import main as solve
+    # utf-8-sig: .NET writes a byte-order mark to a child's stdin when the console encoding is UTF-8
+    return solve(io.TextIOWrapper(sys.stdin.buffer, encoding="utf-8-sig"),
+                 io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8"))
+
+
 def cmd_library(args: argparse.Namespace) -> int:
     from almond_mcp.asset_repository import serve_library
     return serve_library(args.port, args.open)
@@ -253,6 +279,10 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("paths", help="print resolved directories")
     sub.add_parser("audit-assets", help="verify generated GLBs, embedded passports, contracts and previews offline")
 
+    sub.add_parser("solve", help="native structural study: JSON on stdin, JSON on stdout")
+    codes = sub.add_parser("design-codes", help="list and validate design code profiles")
+    codes.add_argument("--json", action="store_true", help="machine-readable listing")
+
     library = sub.add_parser("library", help="open the unified model and drawing archive")
     library.add_argument("--port", type=int, default=8767, help="loopback HTTP port (default: 8767)")
     library.add_argument("--open", action="store_true", help="open the archive in your browser")
@@ -266,6 +296,8 @@ def main(argv: list[str] | None = None) -> int:
         "paths": cmd_paths,
         "library": cmd_library,
         "audit-assets": cmd_audit_assets,
+        "solve": cmd_solve,
+        "design-codes": cmd_design_codes,
     }
     return handlers[args.command](args)
 

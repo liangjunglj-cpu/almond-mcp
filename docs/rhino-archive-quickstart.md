@@ -68,10 +68,21 @@ Saved selections are browser-local. The Rhino archive uses a fresh loopback
 port when it starts, so saved selections are not guaranteed across Rhino restarts.
 The separately installed Python archive uses a stable configurable port.
 
-## Karamba Validation
+## Structural Validation
 
-Choose **Karamba** from the Almond menu, or run **AlmondKaramba** directly.
-The models area remains available through **AlmondLibrary**.
+Choose **Structure** from the Almond menu, or run **AlmondStructure** (the
+older **AlmondKaramba** still works). The models area remains available
+through **AlmondLibrary**.
+
+Pick the engine at the top. **Almond native** is built in: Rhino runs
+`uvx almond-mcp@<plugin version> solve` (uv is already needed for the MCP
+server; the first run downloads it, later runs take a second or two). It adds
+floor area loads, loads from placed Almond models, EN 1990 load combinations,
+rigid or simple connections, a stability check (αcr, sway imperfections, P-Δ)
+and draws the deformed shape, or the first buckling mode, in the viewport.
+**Karamba3D** needs its own installation and licence and also handles shells.
+Developers can point the panel at a checkout with `ALMOND_SOLVER_COMMAND`
+(for example `"<repo>\.venv\Scripts\python.exe" -m almond_mcp`).
 
 1. Select structural curves, shell surfaces/meshes and optional Rhino point
    objects for supports. Click **Use Rhino selection**. Placed visual model
@@ -86,9 +97,9 @@ The models area remains available through **AlmondLibrary**.
 4. Use Axonometric, Front or Top and the Members, Supports and Loads toggles.
    Before solving, the diagram is a provisional preview. With no selection it
    is a labelled illustrative frame, with no analysis results.
-5. Click **Run Karamba analysis**. The workspace requires the existing direct
-   Karamba API and never replaces an unavailable solve with a rule estimate.
-   Installation and licence availability are checked in the running Rhino.
+5. Click **Run native analysis** (or **Run Karamba analysis**). Neither engine
+   is ever replaced with a rule estimate when it is unavailable; **Check
+   engines** reports both in the running Rhino.
 6. Read maximum deflection against the indicative L/250 limit and utilization
    against 100%. Missing metrics display as unavailable and cannot pass.
    Toggle utilization colouring, select the highest-utilization source members,

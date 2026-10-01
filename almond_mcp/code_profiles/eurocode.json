@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "id": "eurocode",
+  "name": "Eurocode (recommended values)",
+  "basis": "EN 1990:2002+A1:2005, EN 1991-1-1:2002 and EN 1993-1-1:2005 recommended values, no National Annex",
+  "notes": "The values the Eurocodes recommend where they leave a choice to each country (Nationally Determined Parameters). A National Annex may replace any of them.",
+  "parameters": {
+    "gamma_G": {"value": 1.35, "source": "EN 1990 Table A1.2(B): unfavourable permanent actions", "verified": true},
+    "gamma_Q": {"value": 1.5, "source": "EN 1990 Table A1.2(B): leading variable action", "verified": true},
+    "psi_0": {"value": 0.7, "source": "EN 1990 Table A1.1: imposed loads, categories A (domestic, residential) and B (offices)", "verified": true},
+    "xi": {"value": 0.85, "source": "EN 1990 Table A1.2(B) note: reduction factor for unfavourable permanent actions in 6.10b", "verified": true},
+    "uls_expression": {"value": "either", "source": "EN 1990 6.4.3.2(3): expression 6.10, or the less favourable of 6.10a and 6.10b, by National Annex choice", "verified": true},
+    "uls_default": {"value": "6.10", "source": "Almond default where the code leaves the choice open", "verified": true},
+    "deflection_limit_ratio": {"value": 250, "source": "Not fixed by EN 1990 (A1.4.2: limits agreed per project or National Annex); span/250 is an indicative screen", "verified": true},
+    "gamma_M0": {"value": 1.0, "source": "EN 1993-1-1 6.1(1) Note 2B: resistance of cross-sections", "verified": true},
+    "gamma_M1": {"value": 1.0, "source": "EN 1993-1-1 6.1(1) Note 2B: resistance of members to instability", "verified": true},
+    "imposed_floor_kn_m2": {"value": {"A_residential": 2.0, "B_office": 3.0}, "source": "EN 1991-1-1 Table 6.2 recommended values: category A floors, category B", "verified": true}
+  }
+}

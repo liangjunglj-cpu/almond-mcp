@@ -24,7 +24,7 @@ from fastmcp import FastMCP
 from fastmcp.resources import ResourceContent, ResourceResult
 from almond_mcp.ghx_parser import GHParser, validate_capsule_manifest
 from almond_mcp.retrieval_store import AlmondStore
-from almond_mcp import asset_passport, asset_loads, conditioning, exchange, paths, drafting, native_structure
+from almond_mcp import asset_passport, asset_loads, conditioning, exchange, paths, drafting, native_structure, structure_study, design_codes
 
 # ── Constants ────────────────────────────────────────────────────────────────
 
@@ -2252,9 +2252,10 @@ def validate_structure(
     floor_load_kn_m2: float = 0.0,
     floor_dead_kn_m2: float = 0.0,
     design_basis: str = "en1990",
-    uls_combination: str = "6.10",
+    uls_combination: str | None = None,
     connections: str = "rigid",
     stability: str = "auto",
+    design_code: str = "eurocode",
 ) -> str:
     """
     Validates AI-generated geometry with a structural analysis.
@@ -2316,8 +2317,14 @@ def validate_structure(
             checks at ULS 1.35 G + 1.5 Q. G = self weight, floor build-up and the weight of
             placed items; Q = load_kn, the occupancy floor load, contents and occupants.
             "unfactored" checks both at G + Q (the Karamba route's basis). Native engine.
-        uls_combination: "6.10" (default) or "6.10ab" (the worse of 1.35G + 1.05Q and
-            1.15G + 1.5Q per member; EN 1990 recommended values).
+        uls_combination: "6.10" or "6.10ab" (the worse of 6.10a and 6.10b per member). Default:
+            the design code's choice (Eurocode profile: 6.10). A profile that prescribes one
+            expression overrides the request (with a warning).
+        design_code: design code profile for the numbers a code or National Annex sets
+            (gamma_G, gamma_Q, psi_0, xi, gamma_M0, gamma_M1, deflection limit): "eurocode"
+            (default, EN recommended values), any profile from list_design_codes, or "off"
+            (unfactored G + Q, no partial factors; same as design_basis="unfactored").
+            Results carry "design_code" with the values used and any unverified ones.
         connections: "rigid" (default: every joint transmits moment) or "simple": beams are
             pinned (major-axis bending released) and braces pinned in both axes where they
             stop - not where another member carries on in line - while columns stay
@@ -2368,7 +2375,7 @@ def validate_structure(
     if err:
         return json.dumps({"status": "error", "message": err})
     try:
-        native_structure.combinations(design_basis, uls_combination)
+        native_structure.combinations(design_basis, uls_combination, design_code)
         if (connections or "rigid").lower() not in native_structure.CONNECTIONS:
             raise ValueError("connections must be 'rigid' or 'simple'.")
         if (stability or "auto").lower() not in ("auto", "off"):
@@ -2384,7 +2391,7 @@ def validate_structure(
     if engine == "native" or (engine == "auto" and structure_type.lower() not in KARAMBA_ONLY_TYPES):
         result, note = _native_validation(guids, structure_type, load_kn, material, fixed_supports,
                                           self_weight, span_m, required=engine == "native", asset_spec=spec,
-                                          floor_spec=floor, design=(design_basis, uls_combination),
+                                          floor_spec=floor, design=(design_basis, uls_combination, design_code),
                                           connections=connections, stability=stability)
         if isinstance(result, str):          # hard error (explicit native request, or no bridge)
             return result
@@ -2462,12 +2469,7 @@ def _asset_load_spec(scene_id: str = ""):
         if not isinstance(reply, dict) or reply.get("status") != "ok":
             return None, "This bridge version cannot export asset placements (update almondbridge)."
         placements = reply.get("placements") or []
-    catalogue = {}
-    for pl in placements:
-        a = generated_asset_indexer.get(pl["asset_id"]) or {}
-        catalogue[pl["asset_id"]] = {"category": a.get("category", ""), "name": a.get("product", ""),
-                                     "support_plane": (a.get("spatial") or {}).get("support_plane", "floor"),
-                                     "nominal_mm": a.get("nominal_dimensions_mm") or {}}
+    catalogue = structure_study.asset_catalogue(placements, generated_asset_indexer.get)
     return {"placements": placements, "table": table, "catalogue": catalogue}, None
 
 
@@ -2484,7 +2486,7 @@ def _floor_spec(imposed, dead, engine):
 
 
 def _native_validation(guids, structure_type, load_kn, material, fixed_supports, self_weight, span_m, required,
-                       asset_spec=None, floor_spec=None, design=("en1990", "6.10"), connections="rigid",
+                       asset_spec=None, floor_spec=None, design=("en1990", None, "eurocode"), connections="rigid",
                        stability="auto"):
     """Native frame check on the bridge's exported line model.
 
@@ -2515,10 +2517,29 @@ def _native_validation(guids, structure_type, load_kn, material, fixed_supports,
                                            fixed_supports=fixed_supports, self_weight=self_weight, span_m=span_m,
                                            asset_loads=asset_spec, floor_loads=floor_spec,
                                            design_basis=design[0], uls=design[1], connections=connections,
-                                           stability=stability)
+                                           stability=stability, design_code=design[2])
     except ValueError as e:
         return json.dumps({"status": "error", "message": str(e)}), None
     return result, None
+
+
+@mcp.tool()
+def list_design_codes() -> str:
+    """
+    Lists the design code profiles validate_structure / visualize_structure accept as design_code.
+
+    A profile holds the numbers a design code or National Annex sets (load factors gamma_G,
+    gamma_Q, psi_0, xi; the ULS expression; material factors gamma_M0, gamma_M1; the deflection
+    limit; suggested imposed floor loads), each with its source clause and a verified flag.
+    "eurocode" (EN recommended values) is built in and the default; "off" is unfactored mechanics.
+    Practices add National Annex profiles as JSON files in user_dir (see docs/design-codes.md).
+    Unverified values are allowed but flagged in every result that uses them.
+
+    Returns JSON: default, profiles [{id, name, basis, origin, verified, unverified,
+    uls_expression, uls_default, deflection_limit_ratio, imposed_floor_kn_m2}], problems
+    (files that failed validation), user_dir.
+    """
+    return json.dumps(design_codes.listing())
 
 
 @mcp.tool()
@@ -2530,7 +2551,7 @@ def visualize_structure(
     beam_wall_mm: float | None = None,
     self_weight: bool = True,
     fixed_supports: bool = True,
-    deflection_limit_ratio: float = 250.0,
+    deflection_limit_ratio: float | None = None,
     span_m: float | None = None,
     color_by: str = "displacement",
     scale: float | None = None,
@@ -2546,9 +2567,10 @@ def visualize_structure(
     floor_load_kn_m2: float = 0.0,
     floor_dead_kn_m2: float = 0.0,
     design_basis: str = "en1990",
-    uls_combination: str = "6.10",
+    uls_combination: str | None = None,
     connections: str = "rigid",
     stability: str = "auto",
+    design_code: str = "eurocode",
     view: str = "deflection",
 ) -> str:
     """
@@ -2572,7 +2594,8 @@ def visualize_structure(
             (default: inferred / CHS 114.3x4).
         self_weight: include gravity.
         fixed_supports: True = fully fixed supports, False = pinned (rotations free).
-        deflection_limit_ratio: span/ratio limit, e.g. 250 for L/250.
+        deflection_limit_ratio: span/ratio limit, e.g. 250 for L/250. Default: the design code's
+            limit (Eurocode profile: 250).
         span_m: reference span in meters for the limit (default: longest member).
             Set it when members are split at every node, e.g. a 6.2 m joist drawn
             as two 3.1 m segments.
@@ -2594,8 +2617,8 @@ def visualize_structure(
             validate_structure; loaded points are drawn with load arrows.
         floor_load_kn_m2, floor_dead_kn_m2: floor area loads on every enclosed bay, as in
             validate_structure.
-        design_basis, uls_combination: as in validate_structure; the overlay draws the SLS
-            deflected shape coloured by the ULS utilization envelope.
+        design_basis, uls_combination, design_code: as in validate_structure; the overlay draws
+            the SLS deflected shape coloured by the ULS utilization envelope.
         connections: "rigid" or "simple", as in validate_structure; pinned ends are drawn
             as small circles.
         stability: "auto" or "off", as in validate_structure.
@@ -2616,6 +2639,11 @@ def visualize_structure(
     engine = (engine or "auto").lower()
     if engine not in ("auto", "native", "karamba"):
         return json.dumps({"status": "error", "message": "engine must be 'auto', 'native' or 'karamba'."})
+    if deflection_limit_ratio is None:
+        try:
+            deflection_limit_ratio = native_structure.design_profile(design_basis, design_code).deflection_limit_ratio
+        except ValueError as e:
+            return json.dumps({"status": "error", "message": str(e)})
     request = {
         "type": "structure_view",
         "guids": guids or [],
@@ -2650,7 +2678,7 @@ def visualize_structure(
         if err:
             return json.dumps({"status": "error", "message": err})
         try:
-            native_structure.combinations(design_basis, uls_combination)
+            native_structure.combinations(design_basis, uls_combination, design_code)
             if (connections or "rigid").lower() not in native_structure.CONNECTIONS:
                 raise ValueError("connections must be 'rigid' or 'simple'.")
             if (stability or "auto").lower() not in ("auto", "off"):
@@ -2673,7 +2701,7 @@ def visualize_structure(
             draw["type"] = "structure_draw"
             return _bridge_call(draw, 30.0)
         reply, note = _native_view(request, guids, required=engine == "native", asset_spec=spec, floor_spec=floor,
-                                   design=(design_basis, uls_combination), connections=connections,
+                                   design=(design_basis, uls_combination, design_code), connections=connections,
                                    stability=stability, view=view)
         if reply is not None:
             return reply
@@ -2706,7 +2734,7 @@ def _bridge_call(message: dict, timeout: float) -> str:
         return json.dumps({"status": "error", "message": f"Bridge error: {e}"})
 
 
-def _native_view(request: dict, guids, required: bool, asset_spec=None, floor_spec=None, design=("en1990", "6.10"),
+def _native_view(request: dict, guids, required: bool, asset_spec=None, floor_spec=None, design=("en1990", None, "eurocode"),
                  connections="rigid", stability="auto", view="deflection"):
     """Solve natively and draw through the bridge's structure_draw overlay.
 
@@ -2736,7 +2764,7 @@ def _native_view(request: dict, guids, required: bool, asset_spec=None, floor_sp
             self_weight=request["self_weight"], diameter_mm=request.get("beam_diameter_mm"),
             wall_mm=request.get("beam_wall_mm"), span_m=request.get("span_m"), asset_loads=asset_spec,
             floor_loads=floor_spec, design_basis=design[0], uls=design[1], connections=connections,
-            stability=stability, view=view)
+            stability=stability, view=view, design_code=design[2])
     except native_structure.InstabilityError as e:
         return json.dumps({"status": "fail", "analysis_method": "native", "message": str(e),
                            "stability": e.report, "hint": "view='buckling' draws the buckling mode."}), None
@@ -2745,31 +2773,10 @@ def _native_view(request: dict, guids, required: bool, asset_spec=None, floor_sp
                            "mechanism_nodes": len(e.nodes)}), None
     except ValueError as e:
         return json.dumps({"status": "error", "message": str(e)}), None
-    draw = {k: v for k, v in request.items() if k not in ("guids", "reanalyze", "clear")}
-    report = result.pop("asset_loads", None)
-    floor_report = result.pop("floor_loads", None)
-    combos = result.pop("combinations", None)
-    conn_report = result.pop("connections", None)
-    stab_report = result.pop("stability", None)
-    buckling = result.pop("buckling", None)
-    draw.update({"type": "structure_draw", "engine": "native", "span_m": span, "result": result})
-    if buckling:
-        draw["buckling_alpha"] = buckling["alpha_cr"]
-        draw["color_by"] = "displacement"
-        if not request.get("title"):
-            draw["title"] = "ALMOND  //  NATIVE FEA  \u00b7  BUCKLING  \u00b7  " + buckling["combination"]
-    elif combos and not request.get("title"):
-        draw["title"] = "ALMOND  //  NATIVE FEA  ·  u: " + " / ".join(combos["utilization"]) + "  ·  d: SLS G + Q"
-    if report is not None or floor_report is not None:
-        parts = [f"load {request['load_kn']:.0f} kN"] if request["load_kn"] >= 0.5 else []
-        if floor_report is not None:
-            parts.append(f"floor {floor_report['imposed_kn_m2'] + floor_report['dead_kn_m2']:g} kN/m2 "
-                         f"x {floor_report['area_m2']:.0f} m2")
-        if report is not None:
-            parts.append(f"{report['applied']} assets {report['total_kn']:.1f} kN")
-        if request["self_weight"]:
-            parts.append("self weight")
-        draw["load_label"] = " + ".join(parts)
+    draw, reports = structure_study.draw_message(request, result, span)
+    report, floor_report, combos = reports["asset_loads"], reports["floor_loads"], reports["combinations"]
+    conn_report, stab_report, buckling = reports["connections"], reports["stability"], reports["buckling"]
+    code_report = reports["design_code"]
     out = _bridge_call(draw, 60.0)
     try:
         parsed = json.loads(out)
@@ -2788,6 +2795,8 @@ def _native_view(request: dict, guids, required: bool, asset_spec=None, floor_sp
             parsed["connections"] = conn_report
         if stab_report:
             parsed["stability"] = stab_report
+        if code_report:
+            parsed["design_code"] = code_report
         if buckling:
             # a mode shape has no magnitude: the bridge's deflection-limit verdict is meaningless here
             parsed["buckling"] = buckling

@@ -14,6 +14,14 @@ class Program
             catch(Exception ex) { Console.Error.WriteLine(ex.Message); Environment.ExitCode=1; }
             return;
         }
+        if (args[0] == "--solve")
+        {
+            // the panel's process boundary: request file -> almond-mcp solve -> reply on stdout
+            var reply = NativeSolver.RunAsync(Newtonsoft.Json.Linq.JObject.Parse(File.ReadAllText(args[1])), 120000).GetAwaiter().GetResult();
+            Console.OutputEncoding = new System.Text.UTF8Encoding(false);
+            Console.WriteLine(reply.ToString(Formatting.None));
+            return;
+        }
         if (args[0] == "--mesh")
         {
             try

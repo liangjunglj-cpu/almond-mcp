@@ -15,7 +15,18 @@ HOST = os.environ.get("ALMOND_ARCHIVE_TEST_HOST")
 @pytest.mark.parametrize("settings,valid", [
     ({}, True),
     ({"load_kn": 0, "self_weight": False, "fixed_rotations": False}, True),
-    ({"structure": "shell", "material": "Concrete", "explicit_supports": True}, True),
+    ({"engine": "karamba", "structure": "shell", "material": "Concrete", "explicit_supports": True}, True),
+    ({"structure": "shell"}, False),                                   # the native engine is line members only
+    ({"engine": "native", "connections": "simple", "floor_imposed_kn_m2": 2.0, "floor_dead_kn_m2": 1.0,
+      "asset_loads": True, "design_basis": "unfactored", "uls_combination": "6.10ab", "stability": "off",
+      "view": "buckling", "span_m": 6.2}, True),
+    ({"engine": "ansys"}, False), ({"connections": "welded"}, False), ({"view": "stress"}, False),
+    ({"floor_imposed_kn_m2": -1}, False), ({"floor_dead_kn_m2": "Infinity"}, False),
+    ({"span_m": 0}, False), ({"stability": "maybe"}, False),
+    ({"design_code": "sg-na", "uls_combination": "", "deflection_limit_ratio": 360}, True),
+    ({"design_code": "off"}, True),
+    ({"design_code": "../../etc"}, False), ({"design_code": "SG NA"}, False),
+    ({"deflection_limit_ratio": 50}, False), ({"deflection_limit_ratio": 5000}, False),
     ({"diameter_mm": 114.3, "wall_mm": 4}, True),
     ({"load_kn": -1}, False), ({"load_kn": 100001}, False),
     ({"load_kn": "NaN"}, False), ({"load_kn": "Infinity"}, False),
@@ -54,3 +65,30 @@ def test_rhino_panel_theme_boundary():
     run = subprocess.run([node, "--test", str(ROOT / "tests/panel_theme.test.mjs")],
                          capture_output=True, text=True, timeout=30)
     assert run.returncode == 0, run.stdout + run.stderr
+
+
+def _host_solve(tmp_path, request, command):
+    source = tmp_path / "request.json"
+    source.write_text(json.dumps(request), encoding="utf-8")
+    env = dict(os.environ, ALMOND_SOLVER_COMMAND=command)
+    run = subprocess.run([HOST, "--solve", str(source)], capture_output=True, timeout=180, env=env)
+    return json.loads(run.stdout.decode("utf-8"))
+
+
+@pytest.mark.skipif(not HOST, reason="Build the standalone .NET archive host")
+def test_panel_solver_process_boundary(tmp_path):
+    """The bridge's NativeSolver runs `almond-mcp solve` out of process, UTF-8 both ways."""
+    import sys
+    from tests.test_asset_load_tools import BEAM
+    command = f'"{sys.executable}" -m almond_mcp'
+    req = {"model": dict(BEAM, warnings=["Träger · 梁"]), "settings": {"structure": "beam", "load_kn": 5}}
+    out = _host_solve(tmp_path, req, command)
+    assert out["protocol"] == 1 and out["status"] in ("pass", "fail"), out
+    assert out["solver"].endswith("almond_mcp solve")
+    assert "Träger · 梁" in out["validation"]["warnings"] and out["draw"]["type"] == "structure_draw"
+    ping = _host_solve(tmp_path, {"ping": True}, command)
+    assert ping["status"] == "ok", ping
+    bad = _host_solve(tmp_path, {"model": {}}, command)
+    assert bad["status"] == "error" and "No exported structural model" in bad["message"]
+    missing = _host_solve(tmp_path, {"ping": True}, '"C:/nowhere/python.exe" -m almond_mcp')
+    assert missing["status"] == "error" and "Could not start the native solver" in missing["message"]

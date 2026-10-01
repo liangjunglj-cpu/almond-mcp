@@ -1,11 +1,15 @@
 # Almond MCP for Rhino
 
 **0.6.0 — Almond workspace release.** Run **Almond** in Rhino
-for a dockable Neo Swiss menu with **Models** and **Karamba Validation**.
-**AlmondLibrary** opens models directly; **AlmondKaramba** opens the analysis
-workspace. Models retain compact tiles, Light/Original detail and shared-block
-viewport placement. Karamba adds selection capture, explicit assumptions,
+for a dockable Neo Swiss menu with **Models** and **Structural Validation**.
+**AlmondLibrary** opens models directly; **AlmondStructure** (or **AlmondKaramba**)
+opens the analysis workspace. Models retain compact tiles, Light/Original detail and
+shared-block viewport placement. The structural workspace runs Almond's built-in
+native solver (no Karamba needed: floor and placed-model loads, EN 1990
+combinations, rigid/simple connections, stability, a live viewport overlay) or,
+optionally, Karamba3D; both add selection capture, explicit assumptions,
 support/load diagram toggles, mapped utilization and an exportable result record.
+See [docs/native-solver.md](docs/native-solver.md#in-the-almond-panel).
 
 The active IKEA catalogue, source links and four supplier-specific MCP tools
 are retired. Existing local downloads and historical scene records are retained.

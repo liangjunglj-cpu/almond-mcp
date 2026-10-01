@@ -104,6 +104,8 @@
 .analysis-page h2>span{font:10px var(--mono);color:var(--muted);margin-right:12px}
 .engine-line{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 0;border-top:1px solid var(--ink);border-bottom:1px solid var(--line);font-size:12px}
 .engine-line button{font-size:11px;text-decoration:underline;text-underline-offset:3px}
+.engine-choice{display:flex!important;align-items:center;gap:8px;flex:1;min-width:0}.engine-choice select{width:auto;flex:1;min-width:0;max-width:220px}
+.native-facts{margin:0;padding:10px 0 10px 16px;border-top:1px solid var(--line);font-size:11px;line-height:1.6;color:var(--muted)}
 .analysis-step{padding:23px 0;border-bottom:1px solid var(--line)}
 .analysis-step p,.analysis-details p{font-size:13px;line-height:1.6;margin:10px 0}
 .analysis-button{border:1px solid var(--ink);padding:11px 12px;font-size:12px;text-align:left;width:100%;line-height:1.4}

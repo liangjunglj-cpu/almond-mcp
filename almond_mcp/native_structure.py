@@ -14,13 +14,16 @@ so the two engines are comparable:
   ("pinned" | "pinned_start" | "pinned_end" | "rigid") overrides either mode for that member;
 - imposed load: ``load_kn`` split equally over the free (unsupported) nodes, acting -Z;
 - self weight: gamma x A along every member, -Z;
-- deflection limit: span / 250, span = longest member for beam/frame, else overall extent,
-  unless the caller names the structural span (members split at every node are shorter);
+- deflection limit: span / the design code's ratio (250 for the Eurocode profile), span = longest
+  member for beam/frame, else overall extent, unless the caller names the structural span
+  (members split at every node are shorter);
 - load cases: permanent G (self weight, floor build-up, the weight of placed items) and
   variable Q (load_kn, occupancy floor load, contents and occupants of placed items);
-- combinations (EN 1990, recommended values): deflection at SLS characteristic G + Q; member
-  checks at ULS 6.10, 1.35 G + 1.5 Q (or the worse of 6.10a/6.10b); design_basis="unfactored"
-  checks both at G + Q (the Karamba route's basis);
+- combinations (EN 1990) with the factors of a design code profile (design_codes: "eurocode"
+  recommended values by default, a National Annex profile, or "off"): deflection at SLS
+  characteristic G + Q; member checks at ULS 6.10, gamma_G G + gamma_Q Q (or the worse of
+  6.10a/6.10b), with the profile's gamma_M0 / gamma_M1; design_basis="unfactored" (= design code
+  "off") checks both at G + Q (the Karamba route's basis);
 - pass: SLS deflection within the limit and ULS member utilization <= 1.0.
 
 The result dict has the same shape as the bridge's ``validate`` reply, with
@@ -34,14 +37,16 @@ import time
 import numpy as np
 
 from . import asset_loads as al
+from . import design_codes as dc
 from . import floor_loads as fl
 from . import frame_solver as fs
 
 METHOD_PREFIX = "[ALMOND NATIVE FEA (LINEAR 3D FRAME), HIGH CONFIDENCE] "
 LINE_TYPES = ("beam", "frame", "truss", "canopy", "highrise")
 ASSUMPTIONS = [
-    "Linear-elastic, first-order 3D frame analysis (Almond native solver).",
-    "Rigid joints; supports as described in support_mode.",
+    "Linear-elastic 3D frame analysis (Almond native solver); second-order (P-Delta) where the stability "
+    "check calls for it (see Stability).",
+    "Joints as stated under Connections; supports as described in support_mode.",
     "Imposed load shared equally by the free nodes, acting downward; self weight included when enabled.",
     "Member check: EN 1993-1-1 cross-section interaction (6.2.1(7), elastic moduli unless plastic "
     "design is requested) and flexural buckling "
@@ -235,23 +240,55 @@ def build_frame(model: dict, load_kn: float, material: str = "Steel", fixed_supp
     return frame, info, warnings
 
 
-GAMMA_G, GAMMA_Q, PSI_0, XI = 1.35, 1.5, 0.7, 0.85     # EN 1990 Table A1.2(B), category A psi_0
 SLS = ("SLS characteristic", {"G": 1.0, "Q": 1.0})
 
 
-def combinations(design_basis: str = "en1990", uls: str = "6.10") -> tuple[tuple, list]:
-    """(SLS combination, [ULS combinations]) as (name, {case: factor})."""
+def design_profile(design_basis: str = "en1990", design_code=None) -> dc.Profile:
+    """The design code profile in force: design_basis="unfactored" means no code ("off")."""
     basis = (design_basis or "en1990").lower()
-    if basis == "unfactored":
-        return SLS, [("Unfactored", {"G": 1.0, "Q": 1.0})]
-    if basis != "en1990":
+    if basis not in ("en1990", "unfactored"):
         raise ValueError("design_basis must be 'en1990' or 'unfactored'.")
-    if uls == "6.10":
-        return SLS, [("ULS 6.10", {"G": GAMMA_G, "Q": GAMMA_Q})]
-    if uls == "6.10ab":
-        return SLS, [("ULS 6.10a", {"G": GAMMA_G, "Q": PSI_0 * GAMMA_Q}),
-                     ("ULS 6.10b", {"G": XI * GAMMA_G, "Q": GAMMA_Q})]
-    raise ValueError("uls_combination must be '6.10' or '6.10ab'.")
+    return dc.OFF_PROFILE if basis == "unfactored" else dc.load(design_code)
+
+
+def combinations(design_basis: str = "en1990", uls: str | None = None, design_code=None) -> tuple[tuple, list]:
+    """(SLS combination, [ULS combinations]) as (name, {case: factor}), factors from the design code profile."""
+    if uls not in (None, "", "6.10", "6.10ab"):
+        raise ValueError("uls_combination must be '6.10' or '6.10ab'.")
+    code = design_profile(design_basis, design_code)
+    if not code.factored:
+        return SLS, [("Unfactored", {"G": 1.0, "Q": 1.0})]
+    expression, _ = code.uls(uls or None)
+    gG, gQ = code.gamma_G, code.gamma_Q
+    if expression == "6.10":
+        return SLS, [("ULS 6.10", {"G": gG, "Q": gQ})]
+    return SLS, [("ULS 6.10a", {"G": gG, "Q": round(code.psi_0 * gQ, 6)}),
+                 ("ULS 6.10b", {"G": round(code.xi * gG, 6), "Q": gQ})]
+
+
+INDICATIVE_FAMILIES = {
+    "timber": "EN 1995 (k_mod, gamma_M, creep)",
+    "concrete": "EN 1992 (cracking, reinforcement, gamma_c / gamma_s)",
+    "aluminium": "EN 1999 (alloy buckling classes, gamma_M1 = 1.1)",
+}
+
+
+def _code_warnings(code: dc.Profile, uls, info: dict) -> list[str]:
+    """Honest notes about the design basis: unverified profile values, overridden choices, materials
+    the member checks do not cover."""
+    out = []
+    if code.unverified:
+        out.append(f"Design code '{code.name}': {len(code.unverified)} value(s) not yet verified against the "
+                   f"published document ({', '.join(code.unverified)}). Treat the results as provisional.")
+    if code.factored:
+        note = code.uls(uls or None)[1]
+        if note:
+            out.append(note)
+    family = info["material"].family
+    if family in INDICATIVE_FAMILIES:
+        out.append(f"{info['material'].name} results are indicative only: {INDICATIVE_FAMILIES[family]} is not "
+                   "applied, and utilization uses the characteristic strength without material factors.")
+    return out
 
 
 def _label(factors: dict) -> str:
@@ -322,14 +359,16 @@ def _imperfection_loads(asm, frame, combo, phi) -> dict:
     return out
 
 
-def _solve_design(frame, design_basis, uls, plastic=False, stations=11, stability="auto"):
+def _solve_design(frame, design_basis, uls, plastic=False, stations=11, stability="auto", design_code=None):
     """Solve SLS + ULS combinations; per-element ULS envelope. Returns (sls, uls_results, envelope,
     stability report) with envelope[i] = (utilization, governing name, element result).
 
     stability="auto": alpha_cr per ULS combination; sway imperfections (5.3.2) in every ULS check;
     alpha_cr < 10 -> second-order (P-Delta) ULS analysis; alpha_cr <= 1 -> InstabilityError.
     stability="off": first-order, no imperfections."""
-    sls, ulss = combinations(design_basis, uls)
+    code = design_profile(design_basis, design_code)
+    frame.gamma_m = (code.gamma_M0, code.gamma_M1)
+    sls, ulss = combinations(design_basis, uls, code)
     if (stability or "auto").lower() == "off":
         res = fs.solve_combinations(frame, {sls[0]: sls[1], **dict(ulss)}, stations=stations, plastic=plastic)
         envelope = []
@@ -395,8 +434,8 @@ def view_result(model: dict, load_kn: float = 10.0, material: str = "Steel", fix
                 self_weight: bool = True, diameter_mm=None, wall_mm=None, span_m: float | None = None,
                 stations: int = 13, asset_loads: dict | None = None,
                 floor_loads: dict | None = None, design_basis: str = "en1990",
-                uls: str = "6.10", connections: str = "rigid", stability: str = "auto",
-                view: str = "deflection") -> tuple[dict, float]:
+                uls: str | None = None, connections: str = "rigid", stability: str = "auto",
+                view: str = "deflection", design_code=None) -> tuple[dict, float]:
     """Solve and package the result for the bridge's ``structure_draw`` overlay.
 
     Returns (result, span_m): per-element start/end points and sampled global displacements in
@@ -407,17 +446,18 @@ def view_result(model: dict, load_kn: float = 10.0, material: str = "Steel", fix
     want_mode = (view or "deflection").lower() == "buckling"
     if (view or "deflection").lower() not in ("deflection", "buckling"):
         raise ValueError("view must be 'deflection' or 'buckling'.")
+    code = design_profile(design_basis, design_code)
     res, ulss, envelope, stab = _solve_design(frame, design_basis, uls, stations=stations,
-                                              stability="off" if want_mode else stability)
+                                              stability="off" if want_mode else stability, design_code=code)
     span = float(span_m or model.get("max_member_span_m") or model.get("max_span_m") or 5.0)
     buckling = None
     if want_mode:
         asm = fs.prepare(frame)
-        N = fs.axial_forces(asm, combinations(design_basis, uls)[1][0][1])
+        N = fs.axial_forces(asm, combinations(design_basis, uls, code)[1][0][1])
         if N.size and N.min() < 0:
             subdivide(frame, STABILITY_SUBDIVISION, {i for i in range(len(N)) if N[i] < 0.01 * N.min()})
             asm = fs.prepare(frame)
-        name, factors = combinations(design_basis, uls)[1][0]
+        name, factors = combinations(design_basis, uls, code)[1][0]
         alpha, mode = fs.critical_load_factor(asm, factors)
         if math.isinf(alpha):
             raise ValueError("Nothing is in compression under " + name + ": there is no buckling mode to show.")
@@ -441,7 +481,8 @@ def view_result(model: dict, load_kn: float = 10.0, material: str = "Steel", fix
               "connections": info["connections"], "stability": stab,
               "combinations": {"deflection": SLS[0],
                                "utilization": [f"{n} ({_label(f)})" for n, f, _ in ulss]},
-              "warnings": list(model.get("warnings") or []) + warnings}
+              "design_code": code.summary(), "deflection_limit_ratio": code.deflection_limit_ratio,
+              "warnings": list(model.get("warnings") or []) + warnings + _code_warnings(code, uls, info)}
     for key in ("asset_loads", "floor_loads"):
         if key in info:
             result[key] = info[key]
@@ -452,11 +493,14 @@ def view_result(model: dict, load_kn: float = 10.0, material: str = "Steel", fix
 
 def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, material: str = "Steel",
              fixed_supports: bool = True, self_weight: bool = True, diameter_mm=None, wall_mm=None,
-             limit_ratio: float = 250.0, plastic: bool = False, span_m: float | None = None,
+             limit_ratio: float | None = None, plastic: bool = False, span_m: float | None = None,
              asset_loads: dict | None = None, floor_loads: dict | None = None,
-             design_basis: str = "en1990", uls: str = "6.10", connections: str = "rigid",
-             stability: str = "auto") -> dict:
-    """Run the native check and return a bridge-compatible validation result."""
+             design_basis: str = "en1990", uls: str | None = None, connections: str = "rigid",
+             stability: str = "auto", design_code=None) -> dict:
+    """Run the native check and return a bridge-compatible validation result.
+
+    The design code profile (``design_code``, default the Eurocode recommended values) sets the
+    combination factors, gamma_M0/gamma_M1 and, unless ``limit_ratio`` is given, the deflection limit."""
     result = {"status": "error", "passed": False, "structure_type": structure_type, "material": material,
               "confidence": "high", "suggestions": [], "worst_member_guids": [],
               "warnings": list(model.get("warnings") or []), "assumptions": ASSUMPTIONS,
@@ -466,7 +510,11 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
         frame, info, notes = build_frame(model, load_kn, material, fixed_supports, self_weight, diameter_mm, wall_mm,
                                          asset_loads, floor_loads, connections)
         result["warnings"] += notes
-        res, ulss, envelope, stab = _solve_design(frame, design_basis, uls, plastic=plastic, stability=stability)
+        code = design_profile(design_basis, design_code)
+        result["design_code"] = code.summary()
+        result["warnings"] += _code_warnings(code, uls, info)
+        res, ulss, envelope, stab = _solve_design(frame, design_basis, uls, plastic=plastic, stability=stability,
+                                                  design_code=code)
     except InstabilityError as exc:
         result["verdict"] = METHOD_PREFIX + f"FAILED: {exc}"
         result["status"] = "fail"
@@ -488,6 +536,9 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
         return result
 
     mat = info["material"]
+    limit_ratio = float(limit_ratio or code.deflection_limit_ratio)
+    if mat.family in INDICATIVE_FAMILIES:
+        result["confidence"] = "low"
     if span_m:
         span, basis = float(span_m), "user"
     elif structure_type in ("beam", "frame") and model.get("max_member_span_m", 0) > 0.001:
@@ -532,7 +583,12 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
         "equilibrium_error_kn": round(res.equilibrium_error(), 9),
         "solve_ms": round((time.perf_counter() - t0) * 1000.0, 1),
     })
+    uls_used = code.uls(uls or None)[0] if code.factored else "unfactored"
+    result["design_code"]["uls_expression"] = uls_used
     result["assumptions"] = result["assumptions"] + [
+        f"Design code: {code.name} ({code.basis}); gamma_M0 = {code.gamma_M0:g}, gamma_M1 = {code.gamma_M1:g}; "
+        f"deflection limit span/{limit_ratio:g}"
+        + (f"; unverified values: {', '.join(code.unverified)}." if code.unverified else "."),
         ("Connections: rigid joints." if info["connections"]["mode"] == "rigid" and not info["connections"]["pinned_ends"]
          else f"Connections: {info['connections']['mode']} ({info['connections']['pinned_ends']} pinned member ends; "
               "beams release major-axis bending, braces both axes; torsion released at one end of "
