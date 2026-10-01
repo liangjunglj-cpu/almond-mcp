@@ -165,7 +165,7 @@ def run(request: dict) -> dict:
 def main(stdin, stdout) -> int:
     """``almond-mcp solve``: one JSON request on stdin, one JSON reply on stdout."""
     try:
-        request = json.loads(stdin.read() or "{}")
+        request = json.loads(stdin.read().lstrip("\ufeff") or "{}")
         if not isinstance(request, dict):
             raise ValueError("The request must be a JSON object.")
     except ValueError as e:

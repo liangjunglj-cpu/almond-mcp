@@ -101,3 +101,12 @@ def test_cli_subprocess_round_trip_utf8():
     out = json.loads(proc.stdout.decode("utf-8"))
     assert proc.returncode == 0 and out["status"] in ("pass", "fail")
     assert "Träger · 梁" in out["validation"]["warnings"]
+
+
+def test_cli_accepts_a_byte_order_mark():
+    """.NET prefixes a child's stdin with a UTF-8 BOM when the console encoding is UTF-8 (CI's pwsh)."""
+    payload = b"\xef\xbb\xbf" + json.dumps({"ping": True}).encode("utf-8")
+    proc = subprocess.run([sys.executable, "-m", "almond_mcp", "solve"], input=payload, capture_output=True, timeout=120)
+    assert proc.returncode == 0 and json.loads(proc.stdout.decode("utf-8"))["status"] == "ok"
+    out = io.StringIO()
+    assert st.main(io.StringIO("\ufeff" + json.dumps({"ping": True})), out) == 0

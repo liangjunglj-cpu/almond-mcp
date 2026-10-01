@@ -244,7 +244,8 @@ def cmd_design_codes(args: argparse.Namespace) -> int:
 def cmd_solve(args: argparse.Namespace) -> int:
     import io
     from almond_mcp.structure_study import main as solve
-    return solve(io.TextIOWrapper(sys.stdin.buffer, encoding="utf-8"),
+    # utf-8-sig: .NET writes a byte-order mark to a child's stdin when the console encoding is UTF-8
+    return solve(io.TextIOWrapper(sys.stdin.buffer, encoding="utf-8-sig"),
                  io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8"))
 
 
