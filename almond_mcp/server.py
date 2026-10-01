@@ -2789,7 +2789,11 @@ def _native_view(request: dict, guids, required: bool, asset_spec=None, floor_sp
         if stab_report:
             parsed["stability"] = stab_report
         if buckling:
+            # a mode shape has no magnitude: the bridge's deflection-limit verdict is meaningless here
             parsed["buckling"] = buckling
+            parsed["passed"] = buckling["alpha_cr"] > 1.0
+            parsed["status"] = "pass" if parsed["passed"] else "fail"
+            parsed.pop("max_displacement_mm", None)
         parsed["nodes"] = len({tuple(p) for e in result["elements"] for p in (e["start_m"], e["end_m"])})
     elif not required:
         # a bridge without structure_draw: fall back to the Karamba overlay

@@ -171,7 +171,7 @@ def server(monkeypatch, tmp_path):
         sent.append(msg)
         if msg["type"] == "structure_model":
             return json.dumps(dict(portal_model(114.3, 4), status="ok", shells=0))
-        return json.dumps({"status": "pass", "analysis_method": "native"})
+        return json.dumps({"status": "fail", "analysis_method": "native", "max_displacement_mm": 1000.0})
     monkeypatch.setattr(srv, "_send_and_receive", fake)
     srv._sent = sent
     return srv
@@ -184,5 +184,7 @@ def test_tools_take_stability_and_buckling_view(server):
     draw = server._sent[-1]
     assert draw["buckling_alpha"] == v["buckling"]["alpha_cr"] and draw["color_by"] == "displacement"
     assert "BUCKLING" in draw["title"]
+    # the status follows alpha_cr, not the normalised mode amplitude against the deflection limit
+    assert v["status"] == "pass" and v["passed"] and "max_displacement_mm" not in v
     assert "stability" in json.loads(server.validate_structure(guids=["x"], stability="maybe"))["message"]
     assert "native" in json.loads(server.visualize_structure(guids=["x"], view="buckling", engine="karamba"))["message"]
