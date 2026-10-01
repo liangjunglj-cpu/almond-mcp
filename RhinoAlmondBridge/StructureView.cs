@@ -97,11 +97,64 @@ namespace RhinoAlmondBridge
                     Result = res, ToDoc = 1.0 / cond.UnitScaleToMeters, SpanM = spanM,
                     LimitMM = spanM * 1000.0 / Math.Max(1, req.LimitRatio), LimitRatio = req.LimitRatio,
                     Material = req.Material, LoadKN = req.LoadKN, SelfWeight = req.IncludeSelfWeight,
+                    Engine = "api", DefaultTitle = "ALMOND  //  KARAMBA LIVE ANALYSIS",
                 };
             }
+            return Present(doc, req);
+        }
 
+        /// <summary>
+        /// "structure_draw": display results computed elsewhere (Almond's native solver in the
+        /// MCP server) through the same conduit. "result" carries elements with start/end points
+        /// and sampled global displacements (meters), utilization, supports and loads; without
+        /// "result" only the display options of the current overlay change.
+        /// </summary>
+        public static string HandleDraw(JObject jobj)
+        {
+            var req = jobj.ToObject<StructureViewRequest>();
+            var doc = RhinoDoc.ActiveDoc;
+            if (doc == null) return Error("No active Rhino document.");
+            if (_conduit == null) _conduit = new StructureConduit();
+            var result = jobj["result"] as JObject;
+            if (result != null)
+            {
+                var res = new KarambaResults { Available = true, GeometryAvailable = true, DisplacementAvailable = true };
+                foreach (var e in (result["elements"] as JArray) ?? new JArray())
+                    res.Elements.Add(new ElementDeflection
+                    {
+                        SourceGuids = e["source_guids"]?.ToObject<List<string>>() ?? new List<string>(),
+                        StartM = e["start_m"].ToObject<double[]>(),
+                        EndM = e["end_m"].ToObject<double[]>(),
+                        SampleDispM = e["samples_m"].ToObject<List<double[]>>(),
+                        Utilization = e["utilization"] != null && (e["utilization"].Type == JTokenType.Float || e["utilization"].Type == JTokenType.Integer)
+                            ? e["utilization"].Value<double>() : double.NaN,
+                    });
+                if (res.Elements.Count == 0 || res.Elements.Any(x => x.SampleDispM == null || x.SampleDispM.Count < 2))
+                    return Error("structure_draw needs elements with at least two displacement samples.");
+                res.SupportPointsM = result["support_points_m"]?.ToObject<List<double[]>>() ?? new List<double[]>();
+                res.LoadedPointsM = result["loaded_points_m"]?.ToObject<List<double[]>>() ?? new List<double[]>();
+                res.MaxDisplacementMM = result["max_displacement_mm"]?.Value<double>()
+                    ?? res.Elements.Max(x => x.SampleDispM.Max(d => Len(d))) * 1000.0;
+                res.Warnings = result["warnings"]?.ToObject<List<string>>() ?? new List<string>();
+                double spanM = Math.Max(1e-3, req.SpanM ?? 5.0);
+                _conduit.Data = new StructureData
+                {
+                    Result = res, ToDoc = RhinoMath.UnitScale(UnitSystem.Meters, doc.ModelUnitSystem), SpanM = spanM,
+                    LimitMM = spanM * 1000.0 / Math.Max(1, req.LimitRatio), LimitRatio = req.LimitRatio,
+                    Material = req.Material, LoadKN = req.LoadKN, SelfWeight = req.IncludeSelfWeight,
+                    Engine = jobj["engine"]?.ToString() ?? "native", DefaultTitle = "ALMOND  //  NATIVE FEA",
+                };
+            }
+            else if (_conduit.Data == null)
+                return Error("Nothing to display yet: send a result first.");
+            return Present(doc, req);
+        }
+
+        /// <summary>Apply the display options, enable the conduit and report the shown result.</summary>
+        private static string Present(RhinoDoc doc, StructureViewRequest req)
+        {
             var data = _conduit.Data;
-            data.Title = req.Title ?? data.Title ?? "ALMOND  //  KARAMBA LIVE ANALYSIS";
+            data.Title = req.Title ?? data.Title ?? data.DefaultTitle;
             data.ColorBy = (req.ColorBy ?? "displacement").ToLowerInvariant();
             data.Reveal = Math.Max(0, Math.Min(1, req.Reveal));
             data.ShowLegend = req.ShowLegend;
@@ -119,7 +172,7 @@ namespace RhinoAlmondBridge
             return JsonConvert.SerializeObject(new
             {
                 status = r.MaxDisplacementMM <= data.LimitMM && (double.IsNaN(maxUtil) || maxUtil <= 1.0) ? "pass" : "fail",
-                analysis_method = "api",
+                analysis_method = data.Engine,
                 max_displacement_mm = Math.Round(r.MaxDisplacementMM, 3),
                 deflection_limit_mm = Math.Round(data.LimitMM, 3),
                 span_m = Math.Round(data.SpanM, 3),
@@ -150,6 +203,7 @@ namespace RhinoAlmondBridge
         public bool SelfWeight, Physics = true;
         public HashSet<string> DisplaySet;
         public string Title, ColorBy = "displacement", Material;
+        public string Engine = "api", DefaultTitle = "ALMOND  //  KARAMBA LIVE ANALYSIS";
         public bool ShowLegend = true;
     }
 
@@ -260,13 +314,14 @@ namespace RhinoAlmondBridge
             var vp = e.Viewport.Bounds;
             int w = (int)(380 * dpi), h = (int)(300 * dpi);
             int x0 = vp.Width - w - (int)(30 * dpi), y0 = (int)(30 * dpi);
-            e.Display.Draw2dRectangle(new Rectangle(x0, y0, w, h), Color.FromArgb(0, 0, 0, 0), 0, Color.FromArgb(215, 10, 10, 12));
-            e.Display.Draw2dRectangle(new Rectangle(x0, y0, (int)(5 * dpi), h), Color.FromArgb(0, 0, 0, 0), 0, Color.FromArgb(233, 68, 43));
-            int tx = x0 + (int)(24 * dpi);
-            int fs = Math.Max(10, (int)(16 * dpi)), fb = Math.Max(14, (int)(30 * dpi));
-            DrawTitle(e, Color.FromArgb(233, 68, 43), tx, y0 + 18 * dpi, w - (int)(40 * dpi), fs);
             double maxU = r.Elements.Where(x => !double.IsNaN(x.Utilization)).Select(x => x.Utilization).DefaultIfEmpty(double.NaN).Max();
             bool pass = r.MaxDisplacementMM <= Data.LimitMM && (double.IsNaN(maxU) || maxU <= 1.0);
+            var accent = pass ? Color.FromArgb(40, 220, 90) : Color.FromArgb(233, 68, 43);
+            e.Display.Draw2dRectangle(new Rectangle(x0, y0, w, h), Color.FromArgb(0, 0, 0, 0), 0, Color.FromArgb(215, 10, 10, 12));
+            e.Display.Draw2dRectangle(new Rectangle(x0, y0, (int)(5 * dpi), h), Color.FromArgb(0, 0, 0, 0), 0, accent);
+            int tx = x0 + (int)(24 * dpi);
+            int fs = Math.Max(10, (int)(16 * dpi)), fb = Math.Max(14, (int)(30 * dpi));
+            DrawTitle(e, accent, tx, y0 + 18 * dpi, w - (int)(40 * dpi), fs);
             e.Display.Draw2dText(byUtil ? "UTILIZATION" : "DISPLACEMENT", Color.White, new Point2d(tx, y0 + 50 * dpi), false, fs, "Consolas");
             e.Display.Draw2dText(string.Format("max δ {0:0.0} mm", r.MaxDisplacementMM), Color.White,
                 new Point2d(tx, y0 + 76 * dpi), false, fb, "Arial Black");

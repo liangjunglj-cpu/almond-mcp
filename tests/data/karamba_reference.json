@@ -1,0 +1,479 @@
+{
+ "provenance": {
+  "engine": "Karamba3D 3.1 (karambaCommon 3.1.60921) via almondbridge 0.6.1-dev reflection adapter",
+  "host": "Rhino 8, Windows 11",
+  "date": "2026-09-30",
+  "notes": "Steel S235 (E 210 GPa, G 80.76 GPa, gamma 78.5 kN/m3), CHS sections, Karamba AnalyzeThI (first order, Timoshenko beams). Max displacement = max nodal translation. Utilization = Karamba Utilization_Beam (elastic design, gammaM0 1.0, gammaM1 1.1).",
+  "units": "geometry mm, loads kN, results mm"
+ },
+ "cases": [
+  {
+   "id": "portal_cantilever",
+   "description": "Fixed-base portal (4 m bay, 3.2 m) with a 3 m cantilever; 10 kN shared by the 3 free nodes",
+   "members": [
+    [
+     [
+      16000,
+      0,
+      0
+     ],
+     [
+      16000,
+      0,
+      3200
+     ]
+    ],
+    [
+     [
+      20000,
+      0,
+      0
+     ],
+     [
+      20000,
+      0,
+      3200
+     ]
+    ],
+    [
+     [
+      16000,
+      0,
+      3200
+     ],
+     [
+      20000,
+      0,
+      3200
+     ]
+    ],
+    [
+     [
+      20000,
+      0,
+      3200
+     ],
+     [
+      23000,
+      0,
+      3200
+     ]
+    ]
+   ],
+   "anchors": [
+    [
+     16000,
+     0,
+     0
+    ],
+    [
+     20000,
+     0,
+     0
+    ]
+   ],
+   "fixed_supports": true,
+   "runs": [
+    {
+     "load_kn": 10,
+     "section": [
+      114.3,
+      4.0
+     ],
+     "max_displacement_mm": 110.452,
+     "nodes_m": {
+      "23,0,3.2": [
+       0.01053,
+       0,
+       -0.10995
+      ],
+      "20,0,3.2": [
+       0.01053,
+       0,
+       -0.00011
+      ],
+      "16,0,3.2": [
+       0.0105,
+       0,
+       -2e-05
+      ]
+     },
+     "utilization": [
+      0.3628,
+      0.578,
+      0.69,
+      1.2086
+     ]
+    }
+   ]
+  },
+  {
+   "id": "mezzanine",
+   "description": "Atelier-07 bedroom-wing mezzanine: 18 beams + 2 columns, pinned to walls and column bases; load shared by free nodes",
+   "members": [
+    [
+     [
+      6600,
+      0,
+      3085
+     ],
+     [
+      6600,
+      2500,
+      3085
+     ]
+    ],
+    [
+     [
+      6600,
+      2500,
+      3085
+     ],
+     [
+      6600,
+      5000,
+      3085
+     ]
+    ],
+    [
+     [
+      6600,
+      5000,
+      3085
+     ],
+     [
+      6600,
+      7500,
+      3085
+     ]
+    ],
+    [
+     [
+      6600,
+      7500,
+      3085
+     ],
+     [
+      6600,
+      10000,
+      3085
+     ]
+    ],
+    [
+     [
+      6600,
+      0,
+      3085
+     ],
+     [
+      9700,
+      0,
+      3085
+     ]
+    ],
+    [
+     [
+      9700,
+      0,
+      3085
+     ],
+     [
+      12800,
+      0,
+      3085
+     ]
+    ],
+    [
+     [
+      6600,
+      2500,
+      3085
+     ],
+     [
+      9700,
+      2500,
+      3085
+     ]
+    ],
+    [
+     [
+      9700,
+      2500,
+      3085
+     ],
+     [
+      12800,
+      2500,
+      3085
+     ]
+    ],
+    [
+     [
+      6600,
+      5000,
+      3085
+     ],
+     [
+      9700,
+      5000,
+      3085
+     ]
+    ],
+    [
+     [
+      9700,
+      5000,
+      3085
+     ],
+     [
+      12800,
+      5000,
+      3085
+     ]
+    ],
+    [
+     [
+      6600,
+      7500,
+      3085
+     ],
+     [
+      9700,
+      7500,
+      3085
+     ]
+    ],
+    [
+     [
+      9700,
+      7500,
+      3085
+     ],
+     [
+      12800,
+      7500,
+      3085
+     ]
+    ],
+    [
+     [
+      6600,
+      10000,
+      3085
+     ],
+     [
+      9700,
+      10000,
+      3085
+     ]
+    ],
+    [
+     [
+      9700,
+      10000,
+      3085
+     ],
+     [
+      12800,
+      10000,
+      3085
+     ]
+    ],
+    [
+     [
+      9700,
+      0,
+      3085
+     ],
+     [
+      9700,
+      2500,
+      3085
+     ]
+    ],
+    [
+     [
+      9700,
+      2500,
+      3085
+     ],
+     [
+      9700,
+      5000,
+      3085
+     ]
+    ],
+    [
+     [
+      9700,
+      5000,
+      3085
+     ],
+     [
+      9700,
+      7500,
+      3085
+     ]
+    ],
+    [
+     [
+      9700,
+      7500,
+      3085
+     ],
+     [
+      9700,
+      10000,
+      3085
+     ]
+    ],
+    [
+     [
+      6600,
+      0,
+      0
+     ],
+     [
+      6600,
+      0,
+      3085
+     ]
+    ],
+    [
+     [
+      6600,
+      5000,
+      0
+     ],
+     [
+      6600,
+      5000,
+      3085
+     ]
+    ]
+   ],
+   "anchors": [
+    [
+     12800,
+     0,
+     3085
+    ],
+    [
+     12800,
+     2500,
+     3085
+    ],
+    [
+     12800,
+     5000,
+     3085
+    ],
+    [
+     12800,
+     7500,
+     3085
+    ],
+    [
+     12800,
+     10000,
+     3085
+    ],
+    [
+     6600,
+     10000,
+     3085
+    ],
+    [
+     9700,
+     10000,
+     3085
+    ],
+    [
+     6600,
+     0,
+     0
+    ],
+    [
+     6600,
+     5000,
+     0
+    ]
+   ],
+   "fixed_supports": false,
+   "runs": [
+    {
+     "load_kn": 150,
+     "section": [
+      114.3,
+      4.0
+     ],
+     "max_displacement_mm": 183.013,
+     "max_utilization": 3.5879
+    },
+    {
+     "load_kn": 150,
+     "section": [
+      139.7,
+      5.0
+     ],
+     "max_displacement_mm": 82.052,
+     "max_utilization": 1.9098
+    },
+    {
+     "load_kn": 150,
+     "section": [
+      168.3,
+      6.3
+     ],
+     "max_displacement_mm": 38.557,
+     "max_utilization": 1.0719
+    },
+    {
+     "load_kn": 150,
+     "section": [
+      193.7,
+      8.0
+     ],
+     "max_displacement_mm": 20.92,
+     "max_utilization": 0.6645
+    },
+    {
+     "load_kn": 150,
+     "section": [
+      219.1,
+      8.0
+     ],
+     "max_displacement_mm": 14.522,
+     "max_utilization": 0.519
+    },
+    {
+     "load_kn": 0.001,
+     "section": [
+      114.3,
+      4.0
+     ],
+     "max_displacement_mm": 6.204,
+     "max_utilization": 0.1061
+    },
+    {
+     "load_kn": 50,
+     "section": [
+      114.3,
+      4.0
+     ],
+     "max_displacement_mm": 65.115,
+     "max_utilization": 1.235
+    },
+    {
+     "load_kn": 100,
+     "section": [
+      114.3,
+      4.0
+     ],
+     "max_displacement_mm": 124.064,
+     "max_utilization": 2.375
+    }
+   ]
+  }
+ ]
+}

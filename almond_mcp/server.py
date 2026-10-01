@@ -24,7 +24,7 @@ from fastmcp import FastMCP
 from fastmcp.resources import ResourceContent, ResourceResult
 from almond_mcp.ghx_parser import GHParser, validate_capsule_manifest
 from almond_mcp.retrieval_store import AlmondStore
-from almond_mcp import asset_passport, conditioning, exchange, paths, drafting
+from almond_mcp import asset_passport, conditioning, exchange, paths, drafting, native_structure
 
 # ── Constants ────────────────────────────────────────────────────────────────
 
@@ -2234,14 +2234,24 @@ def validate_structure(
     guids: list[str],
     structure_type: str = "beam",
     load_kn: float = 10.0,
-    material: str = "Steel"
+    material: str = "Steel",
+    engine: str = "auto",
+    fixed_supports: bool = True,
+    self_weight: bool = True,
+    span_m: float | None = None,
 ) -> str:
     """
-    Validates AI-generated geometry against Karamba3D structural analysis.
+    Validates AI-generated geometry with a structural analysis.
     Call this AFTER execute_rhino_script to verify the generated structure is buildable.
 
-    The bridge tries three analysis pathways in strict order of confidence and
-    always tells you which one actually ran:
+    engine="auto" (default) analyses line models (beams, columns, trusses, frames) with
+    Almond's built-in 3D frame solver: analysis_method "native", confidence "high",
+    no Karamba install needed. It is a linear-elastic first-order frame analysis with
+    EN 1993-1-1 member checks (elastic moduli; flexural buckling with L_cr = member
+    length; no lateral-torsional buckling), benchmarked against closed-form results
+    and live Karamba runs. Models with shells, and shell/gridshell/membrane structure
+    types, go to Karamba. engine="karamba" forces the Karamba route, which tries three
+    pathways in strict order of confidence and always tells you which one ran:
         analysis_method "api"        — direct Karamba 3.1 API solve, confidence "high"
         analysis_method "template"   — audited capsule GHX template,  confidence "medium"
         analysis_method "rule_based" — heuristic span/slenderness rules, confidence "low"
@@ -2267,6 +2277,11 @@ def validate_structure(
             "highrise"   — high-rise structural systems
         load_kn: Applied load in kN (default 10.0).
         material: Material type: "Steel", "S355", "Concrete", "Wood", "Aluminium" (default "Steel").
+        engine: "auto" | "native" | "karamba" (see above).
+        fixed_supports: True = fully fixed supports, False = pinned (rotations free).
+        self_weight: include member self weight.
+        span_m: structural span in meters for the L/250 limit when members are split at
+            every node (e.g. a 6.2 m joist drawn as two 3.1 m segments). Native engine only.
     Prefer calling get_construction_guidance BEFORE generating the geometry:
     pick a real construction system and size members from its depth/spacing
     rules. This tool cross-checks the analyzed span against that same library
@@ -2281,11 +2296,14 @@ def validate_structure(
         (up to 5 Rhino GUIDs of the most over-utilized members — edit those
         first). The results object carries the numbers: max_deflection_mm,
         deflection_limit_mm, utilization_ratio, max_stress_mpa, yield_stress_mpa,
-        span_m, analysis_method ("api"|"template"|"rule_based"), reactions_kn
+        span_m, analysis_method ("native"|"api"|"template"|"rule_based"), reactions_kn
         (total vertical reaction, api path only), and per_element_utilization —
         a list of {source_guids, utilization} entries (utilization 1.0 = at
         capacity) keyed back to the Rhino objects that produced each element.
     """
+    engine = (engine or "auto").lower()
+    if engine not in ("auto", "native", "karamba"):
+        return json.dumps({"status": "error", "message": "engine must be 'auto', 'native' or 'karamba'."})
     request = {
         "type": "validate",
         "guids": guids,
@@ -2293,31 +2311,45 @@ def validate_structure(
         "load_kn": load_kn,
         "material": material,
     }
-    payload = json.dumps(request).encode('utf-8')
+    if not fixed_supports:
+        request["fixed_rotations"] = False
+    if not self_weight:
+        request["self_weight"] = False
 
-    try:
-        response = _send_and_receive(payload, timeout=60.0)
-    except socket.timeout:
-        return json.dumps({"status": "error", "message": "Structural validation timed out (>60s)."})
-    except ConnectionRefusedError:
-        return json.dumps({"status": "error", "message": "Connection refused. Is the RhinoAlmondBridge plugin loaded in Rhino?"})
-    except Exception as e:
-        return json.dumps({"status": "error", "message": f"Bridge error: {e}"})
+    result, note = None, None
+    if engine == "native" or (engine == "auto" and structure_type.lower() not in KARAMBA_ONLY_TYPES):
+        result, note = _native_validation(guids, structure_type, load_kn, material, fixed_supports,
+                                          self_weight, span_m, required=engine == "native")
+        if isinstance(result, str):          # hard error (explicit native request, or no bridge)
+            return result
+    if result is None:
+        try:
+            response = _send_and_receive(json.dumps(request).encode('utf-8'), timeout=60.0)
+        except socket.timeout:
+            return json.dumps({"status": "error", "message": "Structural validation timed out (>60s)."})
+        except ConnectionRefusedError:
+            return json.dumps({"status": "error", "message": "Connection refused. Is the RhinoAlmondBridge plugin loaded in Rhino?"})
+        except Exception as e:
+            return json.dumps({"status": "error", "message": f"Bridge error: {e}"})
+        try:
+            result = json.loads(response)
+        except Exception:
+            return response
+        if note and isinstance(result, dict):
+            result.setdefault("warnings", []).append(note)
 
     # Attach the constructibility cross-check (curated construction-system
     # span/depth guidance), then persist the run in the state DB so
     # export_structural_report can render an auditable history. Neither step
     # may ever break validation itself.
     try:
-        result = json.loads(response)
         if isinstance(result, dict) and result.get("status") in ("pass", "fail"):
-            span_m = None
+            span = None
             results_block = result.get("results")
             if isinstance(results_block, dict):
-                span_m = results_block.get("span_m")
+                span = results_block.get("span_m")
             try:
-                check = construction_library.assess_span(
-                    structure_type, material, span_m)
+                check = construction_library.assess_span(structure_type, material, span)
                 result["construction_check"] = check
                 if check.get("warnings"):
                     result.setdefault("warnings", [])
@@ -2325,10 +2357,45 @@ def validate_structure(
             except Exception:
                 pass
             retrieval_store.record_validation_run(request, result, guids)
-            return json.dumps(result)
     except Exception:
         pass
-    return response
+    return json.dumps(result)
+
+
+KARAMBA_ONLY_TYPES = ("shell", "gridshell", "membrane")
+
+
+def _native_validation(guids, structure_type, load_kn, material, fixed_supports, self_weight, span_m, required):
+    """Native frame check on the bridge's exported line model.
+
+    Returns (result_dict, None) when it ran, (None, note) to fall back to the Karamba
+    route with a note, or (json_error_string, None) when it must stop (explicit native
+    request that cannot run, or no bridge)."""
+    def unavailable(msg):
+        if required:
+            return json.dumps({"status": "error", "message": msg}), None
+        return None, msg + " Fell back to the Karamba route."
+    try:
+        reply = json.loads(_send_and_receive(
+            json.dumps({"type": "structure_model", "guids": guids}).encode('utf-8'), timeout=60.0))
+    except socket.timeout:
+        return unavailable("Exporting the structural model timed out.")
+    except ConnectionRefusedError:
+        return json.dumps({"status": "error", "message": "Connection refused. Is the RhinoAlmondBridge plugin loaded in Rhino?"}), None
+    except Exception as e:
+        return unavailable(f"The bridge could not export a structural model ({e}).")
+    if not isinstance(reply, dict) or reply.get("status") != "ok" or "members" not in reply:
+        return unavailable("This bridge version cannot export structural models (update almondbridge).")
+    if reply.get("shells"):
+        return unavailable(f"The model contains {reply['shells']} shell element(s), which the native frame solver does not analyse.")
+    if not reply["members"]:
+        return unavailable("No line members found for the given GUIDs.")
+    try:
+        result = native_structure.validate(reply, structure_type.lower(), load_kn, material,
+                                           fixed_supports=fixed_supports, self_weight=self_weight, span_m=span_m)
+    except ValueError as e:
+        return json.dumps({"status": "error", "message": str(e)}), None
+    return result, None
 
 
 @mcp.tool()
@@ -2350,9 +2417,10 @@ def visualize_structure(
     display_guids: list[str] | None = None,
     title: str = "",
     clear: bool = False,
+    engine: str = "auto",
 ) -> str:
     """
-    Run a live Karamba3D analysis on a line model and SHOW it in every Rhino viewport:
+    Run a live structural analysis on a line model and SHOW it in every Rhino viewport:
     the undeformed wireframe, the exaggerated deformed shape coloured blue -> red by
     displacement (or by utilization), supports, load arrows and a legend panel with
     max deflection, the L/limit check and PASS/FAIL. Nothing is baked into the document.
@@ -2387,16 +2455,23 @@ def visualize_structure(
             view); the analysis still covers every member in guids.
         title: legend title.
         clear: remove the overlay.
+        engine: "auto" (default: Almond's native frame solver, no Karamba needed; Karamba
+            when the selection has shells or the bridge cannot export a model),
+            "native" or "karamba".
 
     Returns JSON: status ("pass"|"fail"|"error"|"cleared"), max_displacement_mm,
     deflection_limit_mm, span_m, max_utilization, scale, per-element
     {source_guids, max_displacement_mm, utilization}, warnings.
-    Requires Karamba3D 3.1 (the trial caps models at 20 beam elements).
+    The native engine reports analysis_method "native"; engine="karamba" needs
+    Karamba3D 3.1 (the trial caps models at 20 beam elements).
     """
     if not clear and not guids:
         return json.dumps({"status": "error", "message": "Provide the curve (and support point) GUIDs to analyse."})
     if color_by not in ("displacement", "utilization"):
         return json.dumps({"status": "error", "message": "color_by must be 'displacement' or 'utilization'."})
+    engine = (engine or "auto").lower()
+    if engine not in ("auto", "native", "karamba"):
+        return json.dumps({"status": "error", "message": "engine must be 'auto', 'native' or 'karamba'."})
     request = {
         "type": "structure_view",
         "guids": guids or [],
@@ -2422,14 +2497,93 @@ def visualize_structure(
         request["display_guids"] = display_guids
     if title:
         request["title"] = title
+    global _VIEW_ENGINE
+    note = None
+    if not clear and engine != "karamba" and not (not reanalyze and _VIEW_ENGINE == "api"):
+        if not reanalyze and _VIEW_ENGINE == "native":
+            draw = {k: v for k, v in request.items() if k not in ("guids", "reanalyze", "clear")}
+            draw["type"] = "structure_draw"
+            return _bridge_call(draw, 30.0)
+        reply, note = _native_view(request, guids, required=engine == "native")
+        if reply is not None:
+            return reply
+    out = _bridge_call(request, 90.0)
+    if clear:
+        _VIEW_ENGINE = None
+    elif reanalyze:
+        _VIEW_ENGINE = "api"
+    if note:
+        try:
+            parsed = json.loads(out)
+            parsed.setdefault("warnings", []).append(note)
+            out = json.dumps(parsed)
+        except Exception:
+            pass
+    return out
+
+
+_VIEW_ENGINE: str | None = None   # which engine drew the current overlay ("native" | "api")
+
+
+def _bridge_call(message: dict, timeout: float) -> str:
     try:
-        return _send_and_receive(json.dumps(request).encode('utf-8'), timeout=90.0)
+        return _send_and_receive(json.dumps(message).encode('utf-8'), timeout=timeout)
     except socket.timeout:
-        return json.dumps({"status": "error", "message": "Structure view timed out (>90s)."})
+        return json.dumps({"status": "error", "message": f"Structure view timed out (>{timeout:.0f}s)."})
     except ConnectionRefusedError:
         return json.dumps({"status": "error", "message": "Connection refused. Is the RhinoAlmondBridge plugin loaded in Rhino?"})
     except Exception as e:
         return json.dumps({"status": "error", "message": f"Bridge error: {e}"})
+
+
+def _native_view(request: dict, guids, required: bool):
+    """Solve natively and draw through the bridge's structure_draw overlay.
+
+    Returns (reply_json, None) when it ran or must stop, (None, note) to fall back to Karamba."""
+    global _VIEW_ENGINE
+
+    def unavailable(msg):
+        if required:
+            return json.dumps({"status": "error", "message": msg}), None
+        return None, msg + " Fell back to the Karamba route."
+    try:
+        model = json.loads(_send_and_receive(
+            json.dumps({"type": "structure_model", "guids": guids}).encode('utf-8'), timeout=60.0))
+    except ConnectionRefusedError:
+        return json.dumps({"status": "error", "message": "Connection refused. Is the RhinoAlmondBridge plugin loaded in Rhino?"}), None
+    except Exception as e:
+        return unavailable(f"The bridge could not export a structural model ({e}).")
+    if not isinstance(model, dict) or model.get("status") != "ok" or "members" not in model:
+        return unavailable("This bridge version cannot export structural models (update almondbridge).")
+    if model.get("shells"):
+        return unavailable(f"The model contains {model['shells']} shell element(s), which the native frame solver does not analyse.")
+    if not model["members"]:
+        return json.dumps({"status": "error", "message": "No curve members found for the given GUIDs."}), None
+    try:
+        result, span = native_structure.view_result(
+            model, request["load_kn"], request["material"], fixed_supports=request["fixed_rotations"],
+            self_weight=request["self_weight"], diameter_mm=request.get("beam_diameter_mm"),
+            wall_mm=request.get("beam_wall_mm"), span_m=request.get("span_m"))
+    except native_structure.fs.MechanismError as e:
+        return json.dumps({"status": "fail", "analysis_method": "native", "message": str(e),
+                           "mechanism_nodes": len(e.nodes)}), None
+    except ValueError as e:
+        return json.dumps({"status": "error", "message": str(e)}), None
+    draw = {k: v for k, v in request.items() if k not in ("guids", "reanalyze", "clear")}
+    draw.update({"type": "structure_draw", "engine": "native", "span_m": span, "result": result})
+    out = _bridge_call(draw, 60.0)
+    try:
+        parsed = json.loads(out)
+    except Exception:
+        return out, None
+    if isinstance(parsed, dict) and parsed.get("status") in ("pass", "fail"):
+        _VIEW_ENGINE = "native"
+        parsed["warnings"] = result["warnings"]
+        parsed["nodes"] = len({tuple(p) for e in result["elements"] for p in (e["start_m"], e["end_m"])})
+    elif not required:
+        # a bridge without structure_draw: fall back to the Karamba overlay
+        return None, "This bridge version cannot draw native results (update almondbridge)."
+    return json.dumps(parsed), None
 
 
 def _render_validation_report(runs: list[dict]) -> str:
