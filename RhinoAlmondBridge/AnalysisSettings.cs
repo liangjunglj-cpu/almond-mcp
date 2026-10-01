@@ -23,7 +23,9 @@ namespace RhinoAlmondBridge
         public double FloorDead;
         public bool AssetLoads;
         public string DesignBasis = "en1990";
-        public string UlsCombination = "6.10";
+        public string UlsCombination = "";          // "" = the design code's choice
+        public string DesignCode = "eurocode";      // a design code profile id, or "off"
+        public double? LimitRatio;                  // span / ratio; null = the design code's limit
         public string Stability = "auto";
         public string View = "deflection";
         public double? SpanM;
@@ -33,7 +35,8 @@ namespace RhinoAlmondBridge
             if (json == null || json.Length > 4096) throw new InvalidDataException("Invalid analysis settings.");
             var data = JObject.Parse(json);
             string[] allowed = {"engine","structure","material","load_kn","self_weight","fixed_rotations","explicit_supports","diameter_mm","wall_mm",
-                "connections","floor_imposed_kn_m2","floor_dead_kn_m2","asset_loads","design_basis","uls_combination","stability","view","span_m"};
+                "connections","floor_imposed_kn_m2","floor_dead_kn_m2","asset_loads","design_basis","uls_combination","stability","view","span_m",
+                "design_code","deflection_limit_ratio"};
             if (data.Properties().Any(p => !allowed.Contains(p.Name))) throw new InvalidDataException("Unknown analysis setting.");
             var value = new AnalysisSettings {
                 Engine=(string)data["engine"] ?? "native",
@@ -44,7 +47,8 @@ namespace RhinoAlmondBridge
                 Connections=(string)data["connections"] ?? "rigid",
                 FloorImposed=(double?)data["floor_imposed_kn_m2"] ?? 0, FloorDead=(double?)data["floor_dead_kn_m2"] ?? 0,
                 AssetLoads=(bool?)data["asset_loads"] ?? false,
-                DesignBasis=(string)data["design_basis"] ?? "en1990", UlsCombination=(string)data["uls_combination"] ?? "6.10",
+                DesignBasis=(string)data["design_basis"] ?? "en1990", UlsCombination=(string)data["uls_combination"] ?? "",
+                DesignCode=(string)data["design_code"] ?? "eurocode", LimitRatio=(double?)data["deflection_limit_ratio"],
                 Stability=(string)data["stability"] ?? "auto", View=(string)data["view"] ?? "deflection",
                 SpanM=(double?)data["span_m"]
             };
@@ -61,11 +65,15 @@ namespace RhinoAlmondBridge
                 value.DiameterMM <= 0 || value.DiameterMM > 5000 || value.WallMM <= 0 || value.WallMM >= value.DiameterMM/2)))
                 throw new InvalidDataException("CHS wall thickness must be positive and less than half the diameter (maximum diameter 5,000 mm).");
             if (!new[]{"rigid","simple"}.Contains(value.Connections) || !new[]{"en1990","unfactored"}.Contains(value.DesignBasis) ||
-                !new[]{"6.10","6.10ab"}.Contains(value.UlsCombination) || !new[]{"auto","off"}.Contains(value.Stability) ||
+                !new[]{"","6.10","6.10ab"}.Contains(value.UlsCombination) || !new[]{"auto","off"}.Contains(value.Stability) ||
                 !new[]{"deflection","buckling"}.Contains(value.View))
                 throw new InvalidDataException("Choose supported connection, design basis, stability and view options.");
             foreach (double load in new[]{value.FloorImposed, value.FloorDead})
                 if (!Finite(load) || load < 0 || load > 1000) throw new InvalidDataException("Floor loads must be between 0 and 1,000 kN/m².");
+            if (!System.Text.RegularExpressions.Regex.IsMatch(value.DesignCode, "^[a-z0-9][a-z0-9-]{0,39}$"))
+                throw new InvalidDataException("Choose a design code profile.");
+            if (value.LimitRatio.HasValue && (!Finite(value.LimitRatio.Value) || value.LimitRatio < 100 || value.LimitRatio > 1000))
+                throw new InvalidDataException("The deflection limit must be span/100 to span/1000.");
             if (value.SpanM.HasValue && (!Finite(value.SpanM.Value) || value.SpanM <= 0 || value.SpanM > 1000))
                 throw new InvalidDataException("The deflection span must be a positive length up to 1,000 m.");
             return value;
@@ -77,12 +85,14 @@ namespace RhinoAlmondBridge
             ["diameter_mm"]=DiameterMM,["wall_mm"]=WallMM,
             ["connections"]=Connections,["floor_imposed_kn_m2"]=FloorImposed,["floor_dead_kn_m2"]=FloorDead,
             ["asset_loads"]=AssetLoads,["design_basis"]=DesignBasis,["uls_combination"]=UlsCombination,
-            ["stability"]=Stability,["view"]=View,["span_m"]=SpanM
+            ["stability"]=Stability,["view"]=View,["span_m"]=SpanM,
+            ["design_code"]=DesignCode,["deflection_limit_ratio"]=LimitRatio
         };
         // what `almond-mcp solve` reads (explicit_supports is a Rhino-side capture rule; the export carries anchors)
         internal JObject SolverSettings() {
             var s = ToJson();
             s.Remove("engine"); s.Remove("explicit_supports");
+            if (UlsCombination == "") s["uls_combination"] = null;
             return s;
         }
     }

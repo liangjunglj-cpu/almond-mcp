@@ -16,7 +16,9 @@ export function engineLabel(result, settings) {
   const m = result?.results || {};
   if (m.analysis_method === 'api') return 'Karamba · first-order analysis';
   if (m.analysis_method !== 'native') return 'No completed analysis';
-  const basis = m.design_basis === 'unfactored' ? 'unfactored G + Q' :
+  const code = result?.design_code;
+  const basis = code ? (code.id === 'off' ? 'unfactored G + Q' : code.name + ' · ULS ' + (code.uls_expression || '6.10')) :
+    m.design_basis === 'unfactored' ? 'unfactored G + Q' :
     settings?.uls_combination === '6.10ab' ? 'EN 1990 6.10a/b' : 'EN 1990';
   const method = m.stability?.method || 'first-order';
   return 'Almond native · ' + method + ' · ' + basis;

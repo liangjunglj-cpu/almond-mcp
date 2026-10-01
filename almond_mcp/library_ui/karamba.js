@@ -3,11 +3,10 @@ const el=id=>document.getElementById(id);
 const token=new URLSearchParams(location.search).get('bridge')||'';
 const native=/^[a-f0-9]{32}$/.test(token) && new URLSearchParams(location.search).get('panel')==='1';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let model=null,report=null,busy=false,dirty=false,checked=false;
+let model=null,report=null,busy=false,dirty=false,checked=false,codes=null;
 const engine=()=>el('analysis-engine').value;
 const optional=id=>{const v=el(id).value.trim();return v===''?null:Number(v);};
 const settings=()=>{
-  const [design_basis,uls_combination]=el('analysis-design').value.split(':');
   const base={
     engine:engine(),structure:el('analysis-type').value,material:el('analysis-material').value,load_kn:Number(el('analysis-load').value),
     self_weight:el('self-weight').checked,fixed_rotations:el('support-restraint').value==='fixed',
@@ -17,10 +16,37 @@ const settings=()=>{
   };
   if(base.engine!=='native')return base;
   return {...base,floor_imposed_kn_m2:Number(el('floor-imposed').value),floor_dead_kn_m2:Number(el('floor-dead').value),
-    asset_loads:el('asset-loads').checked,connections:el('analysis-connections').value,design_basis,uls_combination,
+    asset_loads:el('asset-loads').checked,connections:el('analysis-connections').value,design_basis:'en1990',
+    design_code:el('analysis-code').value,uls_combination:el('analysis-uls').value||null,
+    deflection_limit_ratio:optional('analysis-limit'),
     stability:el('analysis-stability').value,view:el('analysis-overlay').value,span_m:optional('analysis-span')};
 };
 function message(text) {el('analysis-message').textContent=text;}
+// Design code profiles come from the solver (built-in Eurocode, a practice's National Annex files, "off").
+function showCodes(list) {
+  if(!list?.profiles?.length)return;
+  codes=list;
+  let saved=el('analysis-code').value;
+  try{saved=localStorage.getItem('almond-design-code')||saved;}catch{}
+  el('analysis-code').replaceChildren(...list.profiles.map(p=>{
+    const o=document.createElement('option');o.value=p.id;
+    o.textContent=p.name+(p.verified?'':' · unverified');return o;}));
+  el('analysis-code').value=list.profiles.some(p=>p.id===saved)?saved:list.default;
+  codeControls();
+}
+function codeControls() {
+  const id=el('analysis-code').value,p=codes?.profiles?.find(x=>x.id===id),uls=el('analysis-uls');
+  try{localStorage.setItem('almond-design-code',id);}catch{}
+  const fixed=!p||id==='off'||p.uls_expression!=='either';
+  uls.disabled=fixed;if(fixed)uls.value='';
+  uls.options[0].textContent=p?'Code default · '+(id==='off'?'unfactored':p.uls_expression==='either'?p.uls_default:p.uls_expression):'Code default';
+  el('analysis-limit').placeholder=p?'code: '+p.deflection_limit_ratio:'code';
+  const floors=Object.entries(p?.imposed_floor_kn_m2||{}).map(([k,v])=>k.replace(/^[A-Z]+_/,'').replace(/_/g,' ')+' '+v);
+  el('code-note').textContent=!p?'Load factors, material factors and the deflection limit come from the design code profile.':
+    id==='off'?'No design code: characteristic G + Q, no partial factors, span/250 screen. For comparisons, not design.':
+    p.basis+'.'+(floors.length?' Suggested floor loads (kN/m²): '+floors.join(', ')+'.':'')+
+    (p.verified?'':' Unverified values: '+p.unverified.join(', ')+' — results are provisional.');
+}
 function engineControls() {
   const nativeEngine=engine()==='native';
   document.querySelectorAll('#analysis-settings [data-native]').forEach(n=>n.hidden=!nativeEngine);
@@ -56,6 +82,7 @@ function request(action) {
 }
 document.querySelectorAll('[data-analysis]').forEach(b=>{if(b.dataset.analysis!=='analyze')b.addEventListener('click',()=>request(b.dataset.analysis));});
 el('analysis-form').addEventListener('submit',e=>{e.preventDefault();request('analyze');});
+el('analysis-code').addEventListener('change',codeControls);
 el('analysis-engine').addEventListener('change',()=>{
   engineControls();
   if(report){dirty=true;el('analysis-stale').hidden=false;message('Engine changed. Run analysis again to update the results.');}
@@ -74,6 +101,7 @@ function showEngines(){el('engine-state').textContent=engineState.native+' · '+
 window.almondAnalysisReceive = payload => {
   if(payload.kind==='progress'){message(payload.message);return;}          // still busy: the solver is running
   if(payload.kind==='native_status'){
+    showCodes(payload.design_codes);
     engineState.native=payload.available?'Native engine ready'+(payload.version?' · v'+payload.version:''):'Native engine unavailable';
     if(!payload.available)el('engine-detail').textContent=payload.detail||'';
     showEngines();return;
@@ -109,7 +137,8 @@ window.almondAnalysisReceive = payload => {
 };
 const li=text=>{const n=document.createElement('li');n.textContent=text;return n;};
 function nativeFacts(r,nat){
-  const m=r.results||{},facts=[];
+  const m=r.results||{},facts=[],code=r.design_code;
+  if(code)facts.push('Design code: '+code.name+(code.unverified?.length?' (unverified: '+code.unverified.join(', ')+')':''));
   if(m.connections)facts.push(m.connections.mode==='simple'?'Simple connections · '+m.connections.pinned_ends+' pinned member ends':'Rigid joints');
   if(r.floor_loads)facts.push('Floor '+(r.floor_loads.imposed_kn_m2+r.floor_loads.dead_kn_m2)+' kN/m² over '+r.floor_loads.area_m2.toFixed(1)+' m² · '+r.floor_loads.total_kn.toFixed(1)+' kN');
   if(r.asset_loads)facts.push(r.asset_loads.applied+' placed model'+(r.asset_loads.applied===1?'':'s')+' as loads · '+r.asset_loads.total_kn.toFixed(1)+' kN');
@@ -127,7 +156,7 @@ function renderResult(){
   el('analysis-method').textContent=engineLabel(r,report.settings);
   el('deflection-value').textContent=s.deflection==null?'Unavailable':s.deflection.toFixed(2)+' mm';
   el('utilization-value').textContent=s.utilization==null?'Unavailable':(s.utilization*100).toFixed(1)+'%';
-  el('deflection-basis').textContent=s.limit==null?'No limit returned':'L/250 screen: '+s.limit.toFixed(2)+' mm'+
+  el('deflection-basis').textContent=s.limit==null?'No limit returned':'L/'+(m.span_m?Math.round(m.span_m*1000/s.limit):250)+' limit: '+s.limit.toFixed(2)+' mm'+
     (m.span_m?' · span '+m.span_m+' m ('+m.span_basis+')':'');
   el('utilization-basis').textContent=m.utilization_combination?'Governing: '+m.utilization_combination+'. 100% is the threshold.':'100% is the configured utilization threshold.';
   el('deflection-meter').value=s.deflection!=null&&s.limit?Math.min(s.deflection/s.limit,2):0;
@@ -196,7 +225,7 @@ function draw() {
   el('result-legend').hidden=!el('toggle-utilization').checked||!report||dirty;
 }
 try{const saved=localStorage.getItem('almond-structure-engine');if(saved==='karamba'||saved==='native')el('analysis-engine').value=saved;}catch{}
-engineControls();
+engineControls();codeControls();
 el('analysis-native-note').hidden=native;
 if(!native) message('Open AlmondStructure inside Rhino to select geometry and run the solver.');
 // check the engines once, the first time the workspace is shown (it also fetches the native solver)

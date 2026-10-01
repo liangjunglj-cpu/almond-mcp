@@ -51,6 +51,9 @@
       <section class="analysis-step"><h2><span>02</span> Define the setup</h2>
         <div class="analysis-fields"><label>Structure<select id="analysis-type"><option value="frame">Frame</option><option value="beam">Beam</option><option value="truss">Truss assembly</option><option value="shell" data-engine="karamba">Shell · Karamba</option></select></label>
         <label>Material<select id="analysis-material"><option value="Steel">Steel / S235</option><option value="S355">Steel / S355</option><option value="Concrete">Concrete / C30/37</option><option value="Wood">Wood / C24</option><option value="Aluminium">Aluminium</option></select></label></div>
+        <div data-native class="analysis-fields"><label>Design code<select id="analysis-code"><option value="eurocode">Eurocode (recommended values)</option><option value="off">Off (unfactored mechanics)</option></select></label>
+        <label>ULS expression<select id="analysis-uls"><option value="">Code default</option><option value="6.10">6.10</option><option value="6.10ab">6.10a / 6.10b</option></select></label></div>
+        <p data-native id="code-note" class="field-help">Load factors, material factors and the deflection limit come from the design code profile.</p>
         <label>Total imposed load <span class="unit-label">kN / downward −Z</span><input id="analysis-load" type="number" min="0" max="100000" step="any" value="10" required></label>
         <p class="field-help">Split across free nodes. If all nodes are supported, the imposed load acts on all nodes.</p>
         <div data-native class="analysis-fields"><label>Floor imposed load <span class="unit-label">kN/m² · Q</span><input id="floor-imposed" type="number" min="0" max="1000" step="any" value="0" required></label>
@@ -62,9 +65,9 @@
         <label>Restraint<select id="support-restraint"><option value="fixed">Fixed</option><option value="pinned">Pinned</option></select></label></div>
         <p class="field-help">Fixed restrains translation and rotation. Pinned restrains translation only.</p>
         <div data-native class="analysis-fields"><label>Connections<select id="analysis-connections"><option value="rigid">Rigid joints</option><option value="simple">Simple · pinned beam ends</option></select></label>
-        <label>Load combinations<select id="analysis-design"><option value="en1990:6.10">EN 1990 · 1.35G + 1.5Q</option><option value="en1990:6.10ab">EN 1990 · 6.10a/b</option><option value="unfactored:6.10">Unfactored G + Q</option></select></label></div>
-        <div data-native class="analysis-fields"><label>Stability<select id="analysis-stability"><option value="auto">αcr, sway imperfection, P-Δ</option><option value="off">Off · first order</option></select></label>
-        <label>Deflection span <span class="unit-label">m · blank = auto</span><input id="analysis-span" type="number" min="0.01" max="1000" step="any" placeholder="auto"></label></div>
+        <label>Stability<select id="analysis-stability"><option value="auto">αcr, sway imperfection, P-Δ</option><option value="off">Off · first order</option></select></label></div>
+        <div data-native class="analysis-fields"><label>Deflection span <span class="unit-label">m · blank = auto</span><input id="analysis-span" type="number" min="0.01" max="1000" step="any" placeholder="auto"></label>
+        <label>Deflection limit <span class="unit-label">span / · blank = code</span><input id="analysis-limit" type="number" min="100" max="1000" step="any" placeholder="code"></label></div>
         <label data-native>Viewport overlay<select id="analysis-overlay"><option value="deflection">Deflected shape · utilization</option><option value="buckling">First buckling mode</option></select></label>
         <label class="analysis-toggle"><input id="section-override" type="checkbox"><span>Override beam section / CHS</span></label>
         <div id="section-fields" class="analysis-fields" hidden><label>Diameter / mm<input id="section-diameter" type="number" value="114.3" min="1" max="5000" step="any" required></label><label>Wall / mm<input id="section-wall" type="number" value="4" min="0.1" max="2499" step="any" required></label></div>

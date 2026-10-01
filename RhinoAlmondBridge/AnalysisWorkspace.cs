@@ -120,7 +120,8 @@ namespace RhinoAlmondBridge
                 var reply=await NativeSolver.RunAsync(new JObject {["ping"]=true},300000).ConfigureAwait(false);
                 bool ok=(string)reply["status"]=="ok";
                 Eto.Forms.Application.Instance.AsyncInvoke(() => _send(new JObject {["kind"]="native_status",["available"]=ok,
-                    ["version"]=reply["version"],["detail"]=ok ? (string)reply["solver"] : (string)reply["message"]}));
+                    ["version"]=reply["version"],["design_codes"]=reply["design_codes"],
+                    ["detail"]=ok ? (string)reply["solver"] : (string)reply["message"]}));
             });
         }
 

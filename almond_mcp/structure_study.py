@@ -13,19 +13,19 @@ import json
 import math
 from pathlib import Path
 
-from almond_mcp import __version__, asset_loads, native_structure, paths
+from almond_mcp import __version__, asset_loads, design_codes, native_structure, paths
 
 PROTOCOL = 1
 
 DEFAULTS = {
     "structure": "frame", "material": "Steel", "load_kn": 10.0, "self_weight": True, "fixed_rotations": True,
     "diameter_mm": None, "wall_mm": None, "span_m": None, "floor_imposed_kn_m2": 0.0, "floor_dead_kn_m2": 0.0,
-    "asset_loads": False, "design_basis": "en1990", "uls_combination": "6.10", "connections": "rigid",
-    "stability": "auto", "view": "deflection",
+    "asset_loads": False, "design_basis": "en1990", "uls_combination": None, "connections": "rigid",
+    "stability": "auto", "view": "deflection", "design_code": design_codes.DEFAULT, "deflection_limit_ratio": None,
 }
 CHOICES = {
     "structure": ("beam", "frame", "truss"), "design_basis": ("en1990", "unfactored"),
-    "uls_combination": ("6.10", "6.10ab"), "connections": ("rigid", "simple"), "stability": ("auto", "off"),
+    "connections": ("rigid", "simple"), "stability": ("auto", "off"),
     "view": ("deflection", "buckling"),
 }
 
@@ -42,6 +42,11 @@ def settings(raw: dict | None) -> dict:
         s[key] = float(s[key])
         if not math.isfinite(s[key]) or s[key] < 0:
             raise ValueError(f"{key} must be finite and non-negative.")
+    if s["uls_combination"] not in (None, "6.10", "6.10ab"):
+        raise ValueError("uls_combination must be one of: 6.10, 6.10ab (or empty for the design code's choice).")
+    s["design_code"] = str(s["design_code"] or design_codes.DEFAULT).lower()
+    if s["deflection_limit_ratio"] is not None and not 100 <= float(s["deflection_limit_ratio"]) <= 1000:
+        raise ValueError("deflection_limit_ratio must be between 100 and 1000 (span/ratio).")
     if (s["diameter_mm"] is None) != (s["wall_mm"] is None):
         raise ValueError("Give both the CHS diameter and wall thickness, or neither.")
     if s["span_m"] is not None and not (math.isfinite(float(s["span_m"])) and float(s["span_m"]) > 0):
@@ -74,7 +79,8 @@ def draw_message(request: dict, result: dict, span: float) -> tuple[dict, dict]:
     ``request`` carries the display options (load_kn, material, self_weight, fixed_rotations, title,
     color_by, scale, ...); keys that only steer the analysis are not forwarded."""
     reports = {k: result.pop(k, None) for k in
-               ("asset_loads", "floor_loads", "combinations", "connections", "stability", "buckling")}
+               ("asset_loads", "floor_loads", "combinations", "connections", "stability", "buckling",
+                "design_code", "deflection_limit_ratio")}
     draw = {k: v for k, v in request.items() if k not in ("guids", "reanalyze", "clear")}
     draw.update({"type": "structure_draw", "engine": "native", "span_m": span, "result": result})
     buckling, combos = reports["buckling"], reports["combinations"]
@@ -114,6 +120,7 @@ def run(request: dict) -> dict:
                              "line members; choose the Karamba engine for shells.")
         if not model["members"]:
             raise ValueError("No line members in the selection.")
+        code = native_structure.design_profile(s["design_basis"], s["design_code"])
         floor = ({"imposed": s["floor_imposed_kn_m2"], "dead": s["floor_dead_kn_m2"]}
                  if s["floor_imposed_kn_m2"] or s["floor_dead_kn_m2"] else None)
         assets = _asset_spec(list(request.get("placements") or [])) if s["asset_loads"] else None
@@ -123,9 +130,11 @@ def run(request: dict) -> dict:
 
     common = dict(fixed_supports=s["fixed_rotations"], self_weight=s["self_weight"], diameter_mm=s["diameter_mm"],
                   wall_mm=s["wall_mm"], asset_loads=assets, floor_loads=floor, design_basis=s["design_basis"],
-                  uls=s["uls_combination"], connections=s["connections"], stability=s["stability"])
+                  uls=s["uls_combination"], connections=s["connections"], stability=s["stability"],
+                  design_code=code)
+    limit_ratio = float(s["deflection_limit_ratio"] or code.deflection_limit_ratio)
     validation = native_structure.validate(model, s["structure"], s["load_kn"], s["material"],
-                                           span_m=s["span_m"], **common)
+                                           span_m=s["span_m"], limit_ratio=limit_ratio, **common)
     out.update(status=validation["status"], validation=validation, settings=s)
     if validation["status"] == "error":
         out["message"] = validation.get("verdict", "The native check could not run.")
@@ -144,7 +153,8 @@ def run(request: dict) -> dict:
         out["message"] = str(e)
         return out
     display = {"load_kn": s["load_kn"], "material": s["material"], "self_weight": s["self_weight"],
-               "fixed_rotations": s["fixed_rotations"], "color_by": "utilization"}
+               "fixed_rotations": s["fixed_rotations"], "color_by": "utilization",
+               "deflection_limit_ratio": limit_ratio}
     draw, reports = draw_message(display, result, span)
     out["draw"] = draw
     if reports["buckling"]:
@@ -161,8 +171,8 @@ def main(stdin, stdout) -> int:
     except ValueError as e:
         reply = {"protocol": PROTOCOL, "version": __version__, "status": "error", "message": f"Bad request: {e}"}
     else:
-        reply = ({"protocol": PROTOCOL, "version": __version__, "status": "ok"} if request.get("ping")
-                 else run(request))
+        reply = ({"protocol": PROTOCOL, "version": __version__, "status": "ok",
+                  "design_codes": design_codes.listing()} if request.get("ping") else run(request))
     stdout.write(json.dumps(_clean(reply), allow_nan=False))
     stdout.flush()
     return 0 if reply["status"] != "error" else 1

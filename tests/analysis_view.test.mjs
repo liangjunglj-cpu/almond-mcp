@@ -53,3 +53,9 @@ test('stability reads alpha_cr against the EN 1993 thresholds', () => {
   assert.equal(stabilityState({results:{}}),null);
   assert.equal(stabilityState({results:{}},{buckling:{alpha_cr:5.966,combination:'ULS 6.10'}}).value,'αcr = 5.97');
 });
+test('the method line names the design code profile that was applied', () => {
+  const r={results:{analysis_method:'native',stability:{method:'second-order (P-Delta)'}},
+    design_code:{id:'sg',name:'Singapore NA',uls_expression:'6.10ab'}};
+  assert.equal(engineLabel(r),'Almond native · second-order (P-Delta) · Singapore NA · ULS 6.10ab');
+  assert.equal(engineLabel({...r,design_code:{id:'off',name:'Off'}}),'Almond native · second-order (P-Delta) · unfactored G + Q');
+});

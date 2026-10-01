@@ -18,6 +18,12 @@ Karamba remains available for shells and as a cross-check.
 loaded: 0"); the Atelier-07 mezzanine frame solved by the native engine and drawn by
 the bridge's overlay.*
 
+## Design codes
+
+Combination factors, material factors and the deflection limit come from a design code profile:
+the built-in Eurocode recommended values by default, a National Annex file you add, or `off`
+(unfactored). See [design-codes.md](design-codes.md).
+
 ## In the Almond panel
 
 The same engine runs from the panel, with no AI client: run **AlmondStructure**,
