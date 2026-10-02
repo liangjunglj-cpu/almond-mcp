@@ -139,3 +139,12 @@ def test_fabrication_choice_is_validated_and_reported():
     assert any("hot-finished" in a for a in r["assumptions"])
     bad = ns.validate(m, "frame", 300, fabrication="welded")
     assert bad["status"] == "error" and "fabrication" in bad["verdict"]
+
+
+def test_solid_rectangular_sections_from_the_model():
+    """Concrete and timber members arrive as solid rectangles (width x depth in metres), not hollow boxes."""
+    sec, notes = ns.section_from_spec({"shape": "rect", "width": 0.30, "height": 0.64})
+    assert sec.shape == "rect" and sec.A == pytest.approx(0.30 * 0.64) and not notes
+    assert sec.Iy == pytest.approx(0.30 * 0.64 ** 3 / 12)                 # depth along local z
+    box, _ = ns.section_from_spec({"shape": "box", "width": 0.30, "height": 0.64})
+    assert box.shape == "rhs" and box.A < sec.A                            # a box stays hollow

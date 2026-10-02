@@ -68,6 +68,8 @@ def section_from_spec(spec: dict | None, diameter_mm=None, wall_mm=None) -> tupl
     shape = (spec.get("shape") or "circular_hollow").lower()
     to_mm = 1000.0
     try:
+        if shape in ("rect", "rectangular", "solid_rectangle") and spec.get("height") and spec.get("width"):
+            return fs.rect(spec["width"] * to_mm, spec["height"] * to_mm), notes      # solid: concrete, timber
         if shape == "box" and spec.get("height") and spec.get("width"):
             t = spec.get("wall") or min(spec["height"], spec["width"]) / 10
             return fs.rhs(spec["height"] * to_mm, spec["width"] * to_mm, t * to_mm), notes
