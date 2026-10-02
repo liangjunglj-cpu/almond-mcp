@@ -15,7 +15,7 @@ ROOT = Path(__file__).resolve().parents[1]
 TESTS = ["tests/test_frame_solver.py", "tests/test_native_structure.py", "tests/test_load_combinations.py",
          "tests/test_end_releases.py", "tests/test_stability.py", "tests/test_floor_loads.py",
          "tests/test_asset_loads.py", "tests/test_design_codes.py", "tests/test_structure_study.py",
-         "tests/test_validate_engines.py", "tests/test_visualize_native.py", "tests/test_hand_calculations.py"]
+         "tests/test_validate_engines.py", "tests/test_visualize_native.py", "tests/test_hand_calculations.py", "tests/test_ec3.py"]
 
 MUTANTS = [
     ("load factor gamma_G 1.35 -> 1.30", "almond_mcp/code_profiles/eurocode.json", '"gamma_G": {"value": 1.35', '"gamma_G": {"value": 1.30'),
@@ -43,6 +43,16 @@ MUTANTS = [
     ("results table: deflection = absolute movement", "almond_mcp/native_structure.py",
      "sag = float(np.max(np.linalg.norm(disp - (np.outer(1 - t, dA) + np.outer(t, dB)), axis=1)))",
      "sag = float(np.max(np.linalg.norm(disp, axis=1)))"),
+    ("Annex B class-3 kyy 0.6 -> 0.3", "almond_mcp/ec3.py",
+     "kyy = cm_y * min(1 + 0.6 * lam_y * n_y, 1 + 0.6 * n_y)", "kyy = cm_y * min(1 + 0.3 * lam_y * n_y, 1 + 0.3 * n_y)"),
+    ("Table B.3 Cm floor 0.4 -> 0.2", "almond_mcp/ec3.py", "return max(0.4, 0.6 + 0.4 * psi)", "return max(0.2, 0.6 + 0.4 * psi)"),
+    ("cold-formed tubes on the hot-finished curve", "almond_mcp/ec3.py",
+     'if fabrication == "hot_finished":', "if True:"),
+    ("CHS class-3 limit not scaled by fy", "almond_mcp/ec3.py",
+     "3 if r <= 90 * eps ** 2 else 4", "3 if r <= 90 else 4"),
+    ("buckling length = analysis element, not member", "almond_mcp/ec3.py",
+     'out.setdefault(e.group if getattr(e, "group", None) is not None else i, []).append(i)',
+     "out.setdefault(i, []).append(i)"),
     ("deflection limit ratio ignored by the overlay", "almond_mcp/structure_study.py",
      '"deflection_limit_ratio": limit_ratio}', '"deflection_limit_ratio": 250.0}'),
 ]
@@ -55,12 +65,15 @@ def run_tests():
 
 
 def main():
+    only = [a.lower() for a in sys.argv[1:]]          # optional: run only mutants whose name contains one of these
     code, tail = run_tests()
     print(f"baseline: exit {code} | {tail}", flush=True)
     if code != 0:
         sys.exit("baseline must pass")
     survived = []
     for name, rel, old, new in MUTANTS:
+        if only and not any(o in name.lower() for o in only):
+            continue
         path = ROOT / rel
         original = path.read_bytes()
         text = original.decode("utf-8")
@@ -76,7 +89,8 @@ def main():
         if not caught:
             survived.append(name)
         print(f"{'CAUGHT  ' if caught else 'MISSED  '} {name} | {tail}", flush=True)
-    print(f"\n{len(MUTANTS) - len(survived)}/{len(MUTANTS)} planted errors caught")
+    ran = [m for m in MUTANTS if not only or any(o in m[0].lower() for o in only)]
+    print(f"\n{len(ran) - len(survived)}/{len(ran)} planted errors caught")
 
 
 if __name__ == "__main__":

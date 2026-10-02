@@ -137,3 +137,14 @@ def test_member_names_and_layers_come_from_the_model():
     _, out = solve({"model": m, "settings": {"load_kn": 10}})
     row = next(r for r in out["validation"]["members"] if r["source_guids"] == ["c1"])
     assert row["id"] == "C-01" and row["layer"] == "Structure::Columns"
+
+
+def test_study_passes_the_tube_fabrication():
+    hot = solve({"model": model(219.1, 8), "settings": {"load_kn": 40, "fabrication": "hot_finished"}})[1]
+    cold = solve({"model": model(219.1, 8), "settings": {"load_kn": 40}})[1]
+    assert hot["validation"]["results"]["fabrication"] == "hot_finished"
+    assert cold["validation"]["results"]["fabrication"] == "cold_formed"
+    col = lambda o: max((m for m in o["validation"]["members"] if m["role"] == "column"), key=lambda m: m["utilization"])
+    assert col(cold)["buckling_curves"] == ["c", "c"] and col(hot)["buckling_curves"] == ["a", "a"]
+    assert col(cold)["chi"] <= col(hot)["chi"]
+    assert solve({"model": model(219.1, 8), "settings": {"fabrication": "welded"}})[1]["status"] == "error"

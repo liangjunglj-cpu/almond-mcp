@@ -18,7 +18,7 @@ const settings=()=>{
   return {...base,floor_imposed_kn_m2:Number(el('floor-imposed').value),floor_dead_kn_m2:Number(el('floor-dead').value),
     asset_loads:el('asset-loads').checked,connections:el('analysis-connections').value,design_basis:'en1990',
     design_code:el('analysis-code').value,uls_combination:el('analysis-uls').value||null,
-    deflection_limit_ratio:optional('analysis-limit'),
+    deflection_limit_ratio:optional('analysis-limit'),fabrication:el('analysis-fabrication').value,
     stability:el('analysis-stability').value,view:el('analysis-overlay').value,span_m:optional('analysis-span')};
 };
 function message(text) {el('analysis-message').textContent=text;}

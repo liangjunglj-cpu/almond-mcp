@@ -112,13 +112,39 @@ axes polygonized identically. `almond_mcp/native_structure.py` then applies:
 - **Deflection limit:** span/250. Span = longest member for beam/frame, else overall
   extent; `span_m` overrides it when members are split at every node (a 6.2 m joist
   drawn as two 3.1 m segments).
-- **Member check (EN 1993-1-1, simplified):** cross-section interaction 6.2.1(7)
-  `|N|/N_Rd + |M_y|/M_y,Rd + |M_z|/M_z,Rd` (CHS: resultant moment) with **elastic**
-  moduli by default (conservative, the same basis as the Karamba check); flexural
-  buckling 6.3.1 with L_cr = member length and the section's buckling curve, combined
-  linearly with bending. γ_M0 = γ_M1 = 1.0.
+- **Member checks (EN 1993-1-1, `almond_mcp/ec3.py`), per member** (the member between its
+  joints, whatever the analysis split it into), for every ULS combination:
+  - **Section class** from Table 5.2 for the actual stresses, with ε = √(235/f_y):
+    CHS d/t against 50/70/90 ε² (Class 4 above 59.6 in S355); RHS walls (c = h − 3t) and
+    I-section webs from ψ and α; I-section flange outstands 9/10/14 ε. **Class 4 fails as
+    not covered** (effective sections, EN 1993-1-5/-1-6, are not applied).
+  - **Cross-section** 6.2.1(7) `|N|/N_Rd + |M_y|/M_y,Rd + |M_z|/M_z,Rd` (CHS: resultant
+    moment), elastic moduli by default; plastic only for Class 1/2 when plastic design is
+    requested.
+  - **Flexural buckling** 6.3.1 about both axes with L_cr = the member length, curves from
+    Table 6.2: hollow sections **cold-formed (EN 10219) → curve c by default**, hot-finished
+    (EN 10210) → a (a0 for S460) with `fabrication="hot_finished"`; rolled I by h/b and t_f.
+  - **Compression + bending** 6.3.3 (6.61)/(6.62) with the **Annex B** interaction factors
+    (Class 3 form with elastic moduli, Class 1/2 form with plastic) and Table B.3 C_m:
+    0.6 + 0.4ψ ≥ 0.4 for linear moment diagrams, the table's upper bound 1.0 for members
+    with transverse load.
+  - γ_M0, γ_M1 from the design code profile.
 
-**Not covered:** shells, large-displacement (geometrically nonlinear) analysis beyond P-Δ, member bow imperfections and lateral-torsional buckling (hollow sections are immune; I-sections are not checked for it), shear/torsion interaction, dynamics, connections, national annexes. Results are a preliminary design check, not an engineer's sign-off.
+**Not covered:** shells, large-displacement (geometrically nonlinear) analysis beyond P-Δ, member bow imperfections (5.3.2(6)), lateral-torsional buckling (hollow sections are immune; I-sections are not checked for it), shear resistance (6.2.6) and torsion, Class 4 effective sections, aluminium to EN 1999, dynamics, connections. Results are a preliminary design check, not an engineer's sign-off.
+
+### Validation
+
+- `tests/test_hand_calculations.py` and `tests/test_ec3.py`: closed forms worked from first
+  principles and from the standard's text (beam, cantilever, column buckling on curves a and
+  c, Table 5.2 classes by grade, Table B.3 C_m, an Annex B case where k = 1.3).
+- `tools/mutation_check.py` plants known engineering errors one at a time (wrong factors,
+  wrong curve, unscaled class limits, buckling length of one analysis element, ...) and
+  reports whether the tests catch each.
+- Before October 2026 the member check combined compression and bending with k = 1 (up to
+  ~15 % unconservative against Annex B), used curve a for every hollow section (cold-formed
+  sections ~23 % unconservative at λ̄ = 1), did not scale class limits by f_y, and — with the
+  stability check on — buckled members over one quarter of their length (the stability
+  check's subdivision). All four are fixed and covered by tests.
 
 ## Stability (EN 1993-1-1 5.2)
 
@@ -136,9 +162,9 @@ With `stability="auto"` (the default), every ULS combination gets:
 - **Regime** (5.2.1): α_cr ≥ 10 → first-order results; 1 < α_cr < 10 → a second-order
   (P-Δ) ULS analysis, iterating (K + K_G(N))·u = F until the axial forces settle; α_cr ≤ 1
   (or a second-order stiffness that stops being positive definite) → **FAIL, unstable**.
-- Member buckling checks keep L_cr = member length: conservative for non-sway frames
-  (α_cr ≥ 10) and permitted after a global second-order analysis with sway imperfections
-  (5.2.2(7)b).
+- Member buckling checks use L_cr = the member length, also when the stability check has
+  split the member into elements: conservative for non-sway frames (α_cr ≥ 10) and permitted
+  after a global second-order analysis with sway imperfections (5.2.2(7)b).
 
 `visualize_structure(view="buckling")` draws the first buckling mode of the governing ULS
 combination with its α_cr and a STABLE / SWAY-SENSITIVE / UNSTABLE badge.

@@ -26,6 +26,7 @@ namespace RhinoAlmondBridge
         public string UlsCombination = "";          // "" = the design code's choice
         public string DesignCode = "eurocode";      // a design code profile id, or "off"
         public double? LimitRatio;                  // span / ratio; null = the design code's limit
+        public string Fabrication = "cold_formed";  // hollow sections: cold_formed (curve c) | hot_finished (curve a)
         public string Stability = "auto";
         public string View = "deflection";
         public double? SpanM;
@@ -36,7 +37,7 @@ namespace RhinoAlmondBridge
             var data = JObject.Parse(json);
             string[] allowed = {"engine","structure","material","load_kn","self_weight","fixed_rotations","explicit_supports","diameter_mm","wall_mm",
                 "connections","floor_imposed_kn_m2","floor_dead_kn_m2","asset_loads","design_basis","uls_combination","stability","view","span_m",
-                "design_code","deflection_limit_ratio"};
+                "design_code","deflection_limit_ratio","fabrication"};
             if (data.Properties().Any(p => !allowed.Contains(p.Name))) throw new InvalidDataException("Unknown analysis setting.");
             var value = new AnalysisSettings {
                 Engine=(string)data["engine"] ?? "native",
@@ -49,6 +50,7 @@ namespace RhinoAlmondBridge
                 AssetLoads=(bool?)data["asset_loads"] ?? false,
                 DesignBasis=(string)data["design_basis"] ?? "en1990", UlsCombination=(string)data["uls_combination"] ?? "",
                 DesignCode=(string)data["design_code"] ?? "eurocode", LimitRatio=(double?)data["deflection_limit_ratio"],
+                Fabrication=(string)data["fabrication"] ?? "cold_formed",
                 Stability=(string)data["stability"] ?? "auto", View=(string)data["view"] ?? "deflection",
                 SpanM=(double?)data["span_m"]
             };
@@ -70,6 +72,8 @@ namespace RhinoAlmondBridge
                 throw new InvalidDataException("Choose supported connection, design basis, stability and view options.");
             foreach (double load in new[]{value.FloorImposed, value.FloorDead})
                 if (!Finite(load) || load < 0 || load > 1000) throw new InvalidDataException("Floor loads must be between 0 and 1,000 kN/m².");
+            if (!new[]{"cold_formed","hot_finished"}.Contains(value.Fabrication))
+                throw new InvalidDataException("Choose cold-formed or hot-finished hollow sections.");
             if (!System.Text.RegularExpressions.Regex.IsMatch(value.DesignCode, "^[a-z0-9][a-z0-9-]{0,39}$"))
                 throw new InvalidDataException("Choose a design code profile.");
             if (value.LimitRatio.HasValue && (!Finite(value.LimitRatio.Value) || value.LimitRatio < 100 || value.LimitRatio > 1000))
@@ -86,7 +90,7 @@ namespace RhinoAlmondBridge
             ["connections"]=Connections,["floor_imposed_kn_m2"]=FloorImposed,["floor_dead_kn_m2"]=FloorDead,
             ["asset_loads"]=AssetLoads,["design_basis"]=DesignBasis,["uls_combination"]=UlsCombination,
             ["stability"]=Stability,["view"]=View,["span_m"]=SpanM,
-            ["design_code"]=DesignCode,["deflection_limit_ratio"]=LimitRatio
+            ["design_code"]=DesignCode,["deflection_limit_ratio"]=LimitRatio,["fabrication"]=Fabrication
         };
         // what `almond-mcp solve` reads (explicit_supports is a Rhino-side capture rule; the export carries anchors)
         internal JObject SolverSettings() {
