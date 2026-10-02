@@ -32,7 +32,7 @@ test('sorts numbers, natural ids, and keeps missing values last', () => {
   assert.equal(sortRows(rows, 'deflection_ratio', 1).at(-1).id, 'M3');
 });
 test('formatting never shows NaN', () => {
-  assert.equal(fmt(NaN), '—'); assert.equal(fmt(null), '—'); assert.equal(fmt(2.345, 2), '2.35');
+  assert.equal(fmt(-0.001, 2), '0.00'); assert.equal(fmt(-0.5, 1), '-0.5'); assert.equal(fmt(NaN), '—'); assert.equal(fmt(null), '—'); assert.equal(fmt(2.345, 2), '2.35');
   assert.deepEqual([utilState(1.2), utilState(0.9), utilState(0.2), utilState(null)], ['fail', 'warn', 'ok', 'dim']);
   assert.equal(ends({start: true, end: false}), 'pin · rigid'); assert.equal(ends(null), '—');
 });

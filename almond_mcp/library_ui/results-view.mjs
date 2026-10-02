@@ -2,7 +2,9 @@
 export const finite = v => typeof v === 'number' && Number.isFinite(v);
 
 export function fmt(value, digits = 1) {
-  return finite(value) ? value.toFixed(digits) : '—';
+  if (!finite(value)) return '—';
+  const text = value.toFixed(digits);
+  return Number(text) === 0 ? text.replace('-', '') : text;   // never "-0.00"
 }
 
 export function utilState(u) {
