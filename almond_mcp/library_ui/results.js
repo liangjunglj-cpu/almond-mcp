@@ -215,11 +215,12 @@ function renderNotes() {
 
 function renderSummary() {
   const r = report.result, m = r.results || {}, st = stabilityState(r, report.native), c = counts(rows);
-  const pass = r.status === 'pass';
+  const pass = r.status === 'pass', indicative = r.status === 'indicative';
   el('method').textContent = engineLabel(r, report.settings) + (report.native?.version ? ' · almond-mcp ' + report.native.version : '');
-  el('verdict').textContent = pass ? 'Pass' : r.status === 'fail' ? 'Fail' : 'Incomplete';
-  el('verdict').parentElement.dataset.state = pass ? 'pass' : r.status === 'fail' ? 'fail' : '';
-  el('verdict-note').textContent = pass ? 'Within the configured checks' : r.status === 'fail' ? 'Configured checks exceeded' : (r.verdict || '');
+  el('verdict').textContent = indicative ? 'Indicative' : pass ? 'Pass' : r.status === 'fail' ? 'Fail' : 'Incomplete';
+  el('verdict').parentElement.dataset.state = indicative ? 'indicative' : pass ? 'pass' : r.status === 'fail' ? 'fail' : '';
+  el('verdict-note').textContent = indicative ? 'No capacity check for ' + (r.material || 'this material') + ': forces and deflection only'
+    : pass ? 'Within the configured checks' : r.status === 'fail' ? 'Configured checks exceeded' : (r.verdict || '');
   el('sum-defl').textContent = finite(m.max_deflection_mm) ? fmt(m.max_deflection_mm, 1) + ' mm' : '—';
   el('sum-defl-note').textContent = finite(m.deflection_limit_mm) ? 'limit ' + fmt(m.deflection_limit_mm, 1) + ' mm' : '';
   el('sum-util').textContent = finite(m.utilization_ratio) ? (m.utilization_ratio * 100).toFixed(1) + '%' : '—';

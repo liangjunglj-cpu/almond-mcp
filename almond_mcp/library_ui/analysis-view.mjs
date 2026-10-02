@@ -9,7 +9,7 @@ export function metricState(result) {
     utilization: solved && m.utilization_available === true && finite(m.utilization_ratio) ? m.utilization_ratio : null,
     limit: finite(m.deflection_limit_mm) && m.deflection_limit_mm > 0 ? m.deflection_limit_mm : null,
     complete: solved && m.displacement_available === true && m.utilization_available === true &&
-      finite(m.max_deflection_mm) && finite(m.utilization_ratio) && ['pass','fail'].includes(result?.status)
+      finite(m.max_deflection_mm) && finite(m.utilization_ratio) && ['pass','fail','indicative'].includes(result?.status)
   };
 }
 export function engineLabel(result, settings) {

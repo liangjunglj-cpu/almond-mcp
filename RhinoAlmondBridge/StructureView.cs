@@ -43,6 +43,8 @@ namespace RhinoAlmondBridge
         [JsonProperty("reveal")] public double Reveal { get; set; } = 1.0;
         [JsonProperty("display_guids")] public List<string> DisplayGuids { get; set; }
         [JsonProperty("load_label")] public string LoadLabel { get; set; }
+        /// <summary>Replaces PASS when there is no capacity verdict (e.g. "INDICATIVE" for concrete).</summary>
+        [JsonProperty("verdict_label")] public string VerdictLabel { get; set; }
         [JsonProperty("show_legend")] public bool ShowLegend { get; set; } = true;
         [JsonProperty("clear")] public bool Clear { get; set; }
     }
@@ -147,6 +149,7 @@ namespace RhinoAlmondBridge
                     Engine = jobj["engine"]?.ToString() ?? "native", DefaultTitle = "ALMOND  //  NATIVE FEA",
                     BucklingAlpha = jobj["buckling_alpha"] != null && jobj["buckling_alpha"].Type != JTokenType.Null
                         ? jobj["buckling_alpha"].Value<double>() : (double?)null,
+                    VerdictLabel = string.IsNullOrWhiteSpace(req.VerdictLabel) ? null : req.VerdictLabel.Trim(),
                 };
             }
             else if (_conduit.Data == null)
@@ -176,7 +179,9 @@ namespace RhinoAlmondBridge
             double maxUtil = r.Elements.Where(e => !double.IsNaN(e.Utilization)).Select(e => e.Utilization).DefaultIfEmpty(double.NaN).Max();
             return JsonConvert.SerializeObject(new
             {
-                status = r.MaxDisplacementMM <= data.LimitMM && (double.IsNaN(maxUtil) || maxUtil <= 1.0) ? "pass" : "fail",
+                status = r.MaxDisplacementMM > data.LimitMM ? "fail"
+                    : data.VerdictLabel != null ? "indicative"
+                    : (double.IsNaN(maxUtil) || maxUtil <= 1.0) ? "pass" : "fail",
                 analysis_method = data.Engine,
                 max_displacement_mm = Math.Round(r.MaxDisplacementMM, 3),
                 deflection_limit_mm = Math.Round(data.LimitMM, 3),
@@ -210,6 +215,7 @@ namespace RhinoAlmondBridge
         /// <summary>Set when the overlay shows a buckling mode: its elastic critical load factor.</summary>
         public double? BucklingAlpha;
         public string LoadLabel;
+        public string VerdictLabel;
         public string Title, ColorBy = "displacement", Material;
         public string Engine = "api", DefaultTitle = "ALMOND  //  KARAMBA LIVE ANALYSIS";
         public bool ShowLegend = true;
@@ -343,8 +349,11 @@ namespace RhinoAlmondBridge
             int w = (int)(380 * dpi), h = (int)(300 * dpi);
             int x0 = vp.Width - w - (int)(30 * dpi), y0 = (int)(30 * dpi);
             double maxU = r.Elements.Where(x => !double.IsNaN(x.Utilization)).Select(x => x.Utilization).DefaultIfEmpty(double.NaN).Max();
-            bool pass = r.MaxDisplacementMM <= Data.LimitMM && (double.IsNaN(maxU) || maxU <= 1.0);
-            var accent = pass ? Color.FromArgb(40, 220, 90) : Color.FromArgb(233, 68, 43);
+            bool deflects = r.MaxDisplacementMM > Data.LimitMM;
+            bool indicative = Data.VerdictLabel != null && !deflects;      // no capacity verdict: only deflection can fail
+            bool pass = !deflects && (double.IsNaN(maxU) || maxU <= 1.0);
+            var amber = Color.FromArgb(255, 186, 60);
+            var accent = indicative ? amber : pass ? Color.FromArgb(40, 220, 90) : Color.FromArgb(233, 68, 43);
             e.Display.Draw2dRectangle(new Rectangle(x0, y0, w, h), Color.FromArgb(0, 0, 0, 0), 0, Color.FromArgb(215, 10, 10, 12));
             e.Display.Draw2dRectangle(new Rectangle(x0, y0, (int)(5 * dpi), h), Color.FromArgb(0, 0, 0, 0), 0, accent);
             int tx = x0 + (int)(24 * dpi);
@@ -360,8 +369,11 @@ namespace RhinoAlmondBridge
                     new Point2d(tx, y0 + 146 * dpi), false, fs, "Consolas");
             e.Display.Draw2dText(Data.LoadLabel ?? string.Format("load {0:0} kN{1}  ·  {2}", Data.LoadKN, Data.SelfWeight ? " + self weight" : "", Data.Material),
                 Color.FromArgb(200, 200, 205), new Point2d(tx, y0 + 170 * dpi), false, fs, "Consolas");
-            e.Display.Draw2dText(pass ? "PASS" : "FAIL", pass ? Color.FromArgb(40, 220, 90) : Color.FromArgb(240, 40, 30),
-                new Point2d(tx + 220 * dpi, y0 + 50 * dpi), false, fb, "Arial Black");
+            if (indicative)
+                e.Display.Draw2dText(Data.VerdictLabel, amber, new Point2d(tx + 190 * dpi, y0 + 54 * dpi), false, Math.Max(10, (int)(20 * dpi)), "Arial Black");
+            else
+                e.Display.Draw2dText(pass ? "PASS" : "FAIL", pass ? Color.FromArgb(40, 220, 90) : Color.FromArgb(240, 40, 30),
+                    new Point2d(tx + 220 * dpi, y0 + 50 * dpi), false, fb, "Arial Black");
             // gradient bar
             int bx = tx, by = (int)(y0 + 206 * dpi), bw = w - (int)(48 * dpi), bh = (int)(16 * dpi);
             for (int i = 0; i < bw; i++)

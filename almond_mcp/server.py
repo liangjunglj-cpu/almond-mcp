@@ -2809,6 +2809,9 @@ def _native_view(request: dict, guids, required: bool, asset_spec=None, floor_sp
             parsed["stability"] = stab_report
         if code_report:
             parsed["design_code"] = code_report
+        if reports.get("indicative") and parsed.get("status") == "pass":
+            parsed["status"] = "indicative"                 # the bridge judged utilization; there is no capacity check
+            parsed["passed"] = None
         if buckling:
             # a mode shape has no magnitude: the bridge's deflection-limit verdict is meaningless here
             parsed["buckling"] = buckling

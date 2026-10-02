@@ -148,3 +148,50 @@ def test_solid_rectangular_sections_from_the_model():
     assert sec.Iy == pytest.approx(0.30 * 0.64 ** 3 / 12)                 # depth along local z
     box, _ = ns.section_from_spec({"shape": "box", "width": 0.30, "height": 0.64})
     assert box.shape == "rhs" and box.A < sec.A                            # a box stays hollow
+
+
+def beam_with_midspan(span=6.0, sec=None):
+    m = model([[0, 0, 3], [span / 2, 0, 3], [span, 0, 3]], [[0, 0, 3], [span, 0, 3]], span)
+    if sec:
+        m["members"][0]["section"] = sec
+    return m
+
+
+RECT = {"shape": "rect", "width": 0.30, "height": 0.60}
+
+
+def test_concrete_and_timber_get_no_capacity_verdict():
+    """Without EN 1992/EN 1995 there is no pass/fail on capacity: forces and deflection only."""
+    for material in ("Concrete", "Wood"):
+        r = ns.validate(beam_with_midspan(6.0, RECT), "beam", 50.0, material=material, fixed_supports=False)
+        assert r["status"] == "indicative" and r["passed"] is None
+        assert "INDICATIVE ONLY" in r["verdict"] and "no pass/fail" in r["verdict"]
+        assert r["results"]["utilization_ratio"] > 0                       # still reported, for comparison
+    # far beyond the characteristic strength but within the deflection limit: still no capacity FAIL
+    heavy = ns.validate(beam_with_midspan(6.0, RECT), "beam", 400.0, material="Concrete", fixed_supports=False,
+                        stability="off")
+    assert heavy["results"]["utilization_ratio"] > 1
+    assert heavy["results"]["max_deflection_mm"] < heavy["results"]["deflection_limit_mm"]
+    assert heavy["status"] == "indicative"
+    # excessive deflection is a real failure whatever the material
+    soft = ns.validate(beam_with_midspan(12.0, {"shape": "rect", "width": 0.20, "height": 0.25}), "beam", 400.0,
+                       material="Concrete", fixed_supports=False, stability="off")
+    assert soft["results"]["max_deflection_mm"] > soft["results"]["deflection_limit_mm"]
+    assert soft["status"] == "fail" and "Deflection" in soft["verdict"]
+
+
+def test_steel_verdicts_are_unchanged():
+    assert ns.validate(beam_with_midspan(), "beam", 10.0, material="Steel", fixed_supports=False)["status"] == "pass"
+    assert ns.validate(beam_with_midspan(), "beam", 2000.0, material="Steel", fixed_supports=False)["status"] == "fail"
+
+
+def test_overlay_is_labelled_indicative_for_concrete():
+    from almond_mcp import structure_study as st
+    sec = {"shape": "rect", "width": 0.30, "height": 0.60}
+    m = model([[0, 0, 3], [6, 0, 3]], [[0, 0, 3], [6, 0, 3]], 6.0)
+    m["members"][0]["section"] = sec
+    concrete = st.run({"model": m, "settings": {"structure": "beam", "material": "Concrete", "load_kn": 50}})
+    steel = st.run({"model": model([[0, 0, 3], [6, 0, 3]], [[0, 0, 3], [6, 0, 3]], 6.0),
+                    "settings": {"structure": "beam", "load_kn": 10}})
+    assert concrete["status"] == "indicative" and concrete["draw"]["verdict_label"] == "INDICATIVE"
+    assert "verdict_label" not in steel["draw"] and "indicative" not in steel["draw"]["result"]

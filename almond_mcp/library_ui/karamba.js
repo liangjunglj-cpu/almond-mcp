@@ -151,7 +151,8 @@ function nativeFacts(r,nat){
 function renderResult(){
   const r=report.result,m=r.results||{},s=metricState(r),nat=report.native,st=stabilityState(r,nat);
   el('analysis-results').hidden=false;
-  el('analysis-outcome').textContent=s.complete?(r.status==='pass'?'Within configured checks':'Configured checks exceeded'):
+  el('analysis-outcome').textContent=s.complete?(r.status==='indicative'?'Indicative only · no capacity check for '+(r.material||'this material'):
+    r.status==='pass'?'Within configured checks':'Configured checks exceeded'):
     nat&&r.status==='fail'?'Unstable · see the verdict':r.status==='unavailable'?'Analysis unavailable':'Results incomplete';
   el('analysis-outcome').dataset.state=s.complete||(nat&&r.status==='fail')?r.status:'incomplete';
   el('analysis-method').textContent=engineLabel(r,report.settings);

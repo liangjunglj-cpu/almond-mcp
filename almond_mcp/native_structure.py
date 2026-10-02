@@ -599,6 +599,7 @@ def view_result(model: dict, load_kn: float = 10.0, material: str = "Steel", fix
               "combinations": {"deflection": SLS[0],
                                "utilization": [f"{n} ({_label(f)})" for n, f, _ in ulss]},
               "design_code": code.summary(), "deflection_limit_ratio": code.deflection_limit_ratio,
+              "indicative": INDICATIVE_FAMILIES.get(info["material"].family),
               "warnings": list(model.get("warnings") or []) + warnings + _code_warnings(code, uls, info)}
     for key in ("asset_loads", "floor_loads"):
         if key in info:
@@ -744,14 +745,26 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
         failures.append(f"{len(slender)} member(s) have Class 4 (slender) sections, which these checks do not "
                         "cover (EN 1993-1-5/-1-6 effective sections)")
         sug.append("Use thicker walls: Class 4 starts at d/t = 90 x 235/fy for CHS (59.6 for S355)")
-    if umax > 1.0:
+    indicative = INDICATIVE_FAMILIES.get(mat.family)
+    if umax > 1.0 and not indicative:
         failures.append(f"Utilization ratio {umax:.2f} ({governing}) exceeds 1.0")
         sug.append("Use a larger cross-section or higher-grade material")
-    result["passed"] = not failures
-    result["status"] = "pass" if not failures else "fail"
-    result["verdict"] = METHOD_PREFIX + (
-        f"PASSED: Configured checks satisfied. Deflection {dmax_mm:.1f}mm ({SLS[0]}, limit {limit_mm:.1f}mm), "
-        f"Utilization {umax:.2f} ({governing})" if not failures else "FAILED: " + "; ".join(failures))
+    if indicative and not failures:
+        # no capacity verdict without the material's own design code; deflection and stability still decide fail
+        result["passed"] = None
+        result["status"] = "indicative"
+        result["verdict"] = METHOD_PREFIX + (
+            f"INDICATIVE ONLY ({mat.name}): forces, deflection and stability are computed, but member capacity "
+            f"is not checked to {indicative}, so there is no pass/fail. Deflection {dmax_mm:.1f}mm ({SLS[0]}, "
+            f"limit {limit_mm:.1f}mm); utilization {umax:.2f} against the characteristic strength, for comparison only.")
+        sug.append(f"Have the members designed to {indicative.split(' (')[0]} (an engineer); use the forces "
+                   "in the results as the starting point.")
+    else:
+        result["passed"] = not failures
+        result["status"] = "pass" if not failures else "fail"
+        result["verdict"] = METHOD_PREFIX + (
+            f"PASSED: Configured checks satisfied. Deflection {dmax_mm:.1f}mm ({SLS[0]}, limit {limit_mm:.1f}mm), "
+            f"Utilization {umax:.2f} ({governing})" if not failures else "FAILED: " + "; ".join(failures))
     result["suggestions"] = sug
     worst = sorted(elem_util, key=lambda e: -e["utilization"])
     seen = []
