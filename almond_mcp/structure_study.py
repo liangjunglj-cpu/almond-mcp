@@ -134,7 +134,7 @@ def run(request: dict) -> dict:
                   design_code=code)
     limit_ratio = float(s["deflection_limit_ratio"] or code.deflection_limit_ratio)
     validation = native_structure.validate(model, s["structure"], s["load_kn"], s["material"],
-                                           span_m=s["span_m"], limit_ratio=limit_ratio, **common)
+                                           span_m=s["span_m"], limit_ratio=limit_ratio, detail=True, **common)
     out.update(status=validation["status"], validation=validation, settings=s)
     if validation["status"] == "error":
         out["message"] = validation.get("verdict", "The native check could not run.")

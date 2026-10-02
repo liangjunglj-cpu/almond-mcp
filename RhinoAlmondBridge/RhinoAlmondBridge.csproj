@@ -19,6 +19,11 @@
   </ItemGroup>
 
   <ItemGroup>
+    <!-- Panel tab icons: Almond and Almond Results -->
+    <EmbeddedResource Include="Resources\*.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
     <!-- Pin to the Rhino 8.0 GA SDK so yak tags the package rh8_0 (any
          Rhino 8 service release) instead of the newest SDK it restored
          (e.g. rh8_32, which hides the package from users on 8.0-8.31). -->

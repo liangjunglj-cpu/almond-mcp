@@ -106,6 +106,8 @@ Developers can point the panel at a checkout with `ALMOND_SOLVER_COMMAND`
    or save a JSON report containing input IDs, settings, geometry snapshot,
    warnings, result method and timestamp.
 
+**Open full results** (or `AlmondResults`) shows every member's forces, checks and deflection, the support reactions and the combinations in the Almond Results panel, with CSV export.
+
 Changing analysis settings marks results stale. Recapture after changing Rhino
 geometry or document units; the native bridge rejects stale selections. Results
 are snapshots, not live monitoring. Overlay/view toggles do not rerun analysis.

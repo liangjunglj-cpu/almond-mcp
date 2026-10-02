@@ -27,7 +27,8 @@ namespace RhinoAlmondBridge
         protected override LoadReturnCode OnLoad(ref string errorMessage)
         {
             RhinoApp.WriteLine("RhinoAlmondBridge: Loading MCP Bridge plugin...");
-            Rhino.UI.Panels.RegisterPanel(this, typeof(AlmondLibraryPanel), "Almond", null);
+            Rhino.UI.Panels.RegisterPanel(this, typeof(AlmondLibraryPanel), "Almond", Icon("almond.ico"));
+            Rhino.UI.Panels.RegisterPanel(this, typeof(AlmondResultsPanel), "Almond Results", Icon("results.ico"));
 
             _server = new BridgeServer(port: 5000);
             _server.Start();
@@ -36,6 +37,17 @@ namespace RhinoAlmondBridge
             RhinoApp.WriteLine("RhinoAlmondBridge: Ready to receive C# scripts from MCP server.");
 
             return LoadReturnCode.Success;
+        }
+
+        // Panel tab icons, embedded in the assembly (Resources/*.ico, several sizes each).
+        private static System.Drawing.Icon Icon(string name)
+        {
+            try
+            {
+                using (var stream = typeof(RhinoAlmondBridgePlugin).Assembly.GetManifestResourceStream("RhinoAlmondBridge.Resources." + name))
+                    return stream == null ? null : new System.Drawing.Icon(stream);
+            }
+            catch { return null; }
         }
 
         protected override void OnShutdown()

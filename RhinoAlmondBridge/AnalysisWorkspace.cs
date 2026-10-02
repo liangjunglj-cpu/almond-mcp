@@ -65,6 +65,11 @@ namespace RhinoAlmondBridge
                     return;
                 }
                 if(action=="capture") { Capture(doc,settings);return; }
+                if(action=="results") {
+                    AnalysisResults.Open(doc);
+                    _send(new JObject {["kind"]="notice",["message"]="Full results opened in the Almond Results panel."});
+                    return;
+                }
                 if (_ids.Count==0 || doc.RuntimeSerialNumber!=_document || Fingerprint(doc)!=_fingerprint)
                     throw new InvalidOperationException("The model changed or no model is selected. Capture the current Rhino selection again.");
                 if(action=="analyze" && settings.Engine=="native") { AnalyzeNative(doc,settings); return; }
@@ -81,6 +86,7 @@ namespace RhinoAlmondBridge
                         ["settings"]=settings.ToJson(),["model"]=snapshot,["result"]=JObject.FromObject(result),
                         ["limits"]="First-order analysis of the stated idealisation. L/250 is an indicative screen, not project-specific code verification."};
                     _reportFingerprint=_fingerprint;
+                    AnalysisResults.Publish(_report);
                     _send((JObject)_report.DeepClone());
                     return;
                 }
@@ -170,6 +176,7 @@ namespace RhinoAlmondBridge
                     ["limits"]="Linear-elastic 3D frame analysis of the stated idealisation with EN 1990 combinations and an EN 1993-1-1 "+
                         "stability screen. A design aid: it does not replace project-specific verification by an engineer."};
                 _reportFingerprint=_fingerprint;
+                AnalysisResults.Publish(_report);
                 _send((JObject)_report.DeepClone());
             }
             catch(Exception ex) { SendError(ex.Message); }

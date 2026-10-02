@@ -41,6 +41,16 @@ and fills step 04 with deflection, utilization, the governing combination,
 ![Panel, simple connections: the same section fails on deflection](images/native-solver/panel-simple.jpg)
 ![Panel, first buckling mode of the resized frame](images/native-solver/panel-buckling.jpg)
 
+**Open full results ↗** (or the `AlmondResults` command) opens the **Almond Results** panel,
+docked beside the Almond panel: a summary, then every member (role, section, length, ULS
+utilization with its governing check and combination, design forces N/V/M/T, stress, slenderness
+and χ, SLS deflection and span/deflection, end connections), the support reactions for each
+combination, the combinations and stability, the loads and settings, and all notes. Click a member
+to select it in Rhino; **Save CSV** writes the member table. The same tables are available to the
+MCP tools with `validate_structure(..., detail=True)`.
+
+![Almond Results panel](images/native-solver/results-panel.jpg)
+
 The panel and `visualize_structure` give identical numbers (both call
 `native_structure` and share `structure_study.draw_message`): on the A07
 mezzanine 219.1x8 rigid 18.46 mm / 85.6 %, simple 25.93 mm (limit 24.8) /
