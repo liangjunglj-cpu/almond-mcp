@@ -1145,11 +1145,12 @@ namespace RhinoAlmondBridge
         {
             section = section ?? SectionSpec.DefaultBeam(unitScaleToMeters);
 
-            if (section.Shape == "box")
+            if (section.Shape == "box" || section.Shape == "rect")
             {
                 double hCm = Units.SectionCm(section.Height, unitScaleToMeters);
                 double wCm = Units.SectionCm(section.Width, unitScaleToMeters);
-                double tCm = Units.SectionCm(section.WallThickness, unitScaleToMeters);
+                // a solid rectangle (concrete, timber) as a box whose walls meet in the middle
+                double tCm = section.Shape == "rect" ? 0.49 * Math.Min(hCm, wCm) : Units.SectionCm(section.WallThickness, unitScaleToMeters);
                 if (hCm > 0 && wCm > 0)
                 {
                     try

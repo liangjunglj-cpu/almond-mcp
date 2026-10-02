@@ -98,6 +98,10 @@ namespace RhinoAlmondBridge
         public List<Point3d> AnchorPoints { get; set; } = new List<Point3d>();
 
         public List<string> Warnings { get; set; } = new List<string>();
+        /// <summary>Solids that are neither prismatic members nor thin plates (not analysed).</summary>
+        public int SkippedSolids { get; set; }
+        /// <summary>Prismatic solids read as centre-line members.</summary>
+        public int SolidMembers { get; set; }
 
         /// <summary>Document tolerance used during conditioning (document units).</summary>
         public double Tolerance { get; set; }
@@ -157,6 +161,13 @@ namespace RhinoAlmondBridge
                 Classify(obj, guidStr, model, rawBeams);
             }
 
+            if (model.SolidMembers > 0)
+                model.Warnings.Add($"{model.SolidMembers} solid member(s) were read as their centre lines, with solid " +
+                    "rectangular sections from their cross-sections. Check the sections, or draw centre lines for full control.");
+            if (model.SkippedSolids > 0)
+                model.Warnings.Add($"{model.SkippedSolids} solid(s) were neither prismatic members nor thin plates and were not " +
+                    "analysed (listed above): draw their centre lines to include them.");
+
             // Weld beam endpoints, then split members that cross each other.
             if (rawBeams.Count > 0)
             {
@@ -189,9 +200,10 @@ namespace RhinoAlmondBridge
         }
 
         /// <summary>
-        /// Classify one Rhino object into beams (curves; brep edges only when
-        /// the brep is NOT shell-like) or shells (meshes; closed or planar
-        /// breps meshed with RhinoCommon), or an anchor point.
+        /// Classify one Rhino object: curves are beams; prismatic solids (long, filling their
+        /// box) and member-like extrusions become centre-line beams with their section; thin
+        /// solids, planar or curved surfaces and meshes are shells; any other solid is skipped
+        /// with a warning to draw its centre lines. Brep edges are never used as beams.
         /// </summary>
         public void Classify(RhinoObject obj, string guidStr, ConditionedModel model,
             List<ConditionedBeam> rawBeams)
@@ -230,12 +242,17 @@ namespace RhinoAlmondBridge
             Brep brep = null;
             if (geom is Extrusion ext)
             {
-                // Extrusions that encode a member (compact profile, long path)
-                // become beams along their path with an inferred section.
+                // Extrusions that encode a member (profile small against a long path) become
+                // beams along their path; a thin slab extruded through its thickness does not.
                 var inferred = InferSection(obj, scale);
                 var path = ext.PathLineCurve();
-                if (inferred != null && inferred.Source == "inferred" && path != null)
+                var pb = ext.Profile3d(new ComponentIndex(ComponentIndexType.ExtrusionBottomProfile, 0))?.GetBoundingBox(true);
+                double across = pb.HasValue && pb.Value.IsValid ? new[] { pb.Value.Diagonal.X, pb.Value.Diagonal.Y, pb.Value.Diagonal.Z }.Max() : 0;
+                if (inferred != null && inferred.Source == "inferred" && path != null &&
+                    path.GetLength() >= MemberSlenderness * across)
                 {
+                    if (ext.ProfileCount == 1 && ext.IsCappedAtBottom && ext.IsCappedAtTop && inferred.Shape == "box")
+                        inferred = new SectionSpec { Shape = "rect", Width = inferred.Width, Height = inferred.Height, Source = "inferred" };
                     rawBeams.Add(new ConditionedBeam
                     {
                         Axis = path,
@@ -258,7 +275,31 @@ namespace RhinoAlmondBridge
                 return;
             }
 
-            if (IsShellLike(brep))
+            if (brep.IsSolid)
+            {
+                var member = SolidMember(brep);
+                if (member.Kind == "member")
+                {
+                    rawBeams.Add(new ConditionedBeam
+                    {
+                        Axis = member.Axis,
+                        SourceGuids = new List<string> { guidStr },
+                        Section = member.Section,
+                    });
+                    model.SolidMembers++;
+                    return;
+                }
+                if (member.Kind == "other")
+                {
+                    model.Warnings.Add($"GUID {guidStr}: solid of {member.Describe(scale)} is neither a prismatic member nor a " +
+                        "thin plate, so it was not analysed. Draw its centre lines (one curve per member) to include it.");
+                    model.SkippedSolids++;
+                    return;
+                }
+                // a thin solid (slab, wall): a shell, as before
+            }
+
+            if (brep.IsSolid || IsShellLike(brep) || brep.Faces.Count > 0)
             {
                 var meshes = Mesh.CreateFromBrep(brep, MeshingParameters.FastRenderMesh);
                 if (meshes != null && meshes.Length > 0)
@@ -279,20 +320,78 @@ namespace RhinoAlmondBridge
                     model.Warnings.Add($"GUID {guidStr}: brep meshing failed, skipped.");
                 }
             }
-            else
+        }
+
+        /// <summary>A prismatic solid is a member when it is at least this many times longer than it is wide.</summary>
+        public const double MemberSlenderness = 3.0;
+        /// <summary>... and fills at least this share of its oriented box (a truss with openings does not).</summary>
+        public const double MemberFill = 0.6;
+        /// <summary>A solid is a plate (slab, wall) when its thickness is at most this share of its second dimension.</summary>
+        public const double PlateThinness = 0.25;
+
+        public class SolidShape
+        {
+            public string Kind;            // "member" | "plate" | "other"
+            public Curve Axis;
+            public SectionSpec Section;
+            public double Length, Width, Height, Fill;
+            public string Describe(double s) =>
+                $"{Length * s:0.##} x {Width * s:0.##} x {Height * s:0.##} m, filling {Fill * 100:0}% of its box";
+        }
+
+        /// <summary>
+        /// Shape of a closed solid in its own frame: the axis is the direction carrying the most
+        /// straight-edge length (a prism's long edges), the box is measured in that frame.
+        /// </summary>
+        public static SolidShape SolidMember(Brep brep)
+        {
+            var dirs = new List<(Vector3d d, double len)>();
+            foreach (var edge in brep.Edges)
             {
-                // Not shell-like: use edges as beam axes (e.g. drawn wireframes).
-                var section = InferSection(obj, scale) ?? SectionSpec.DefaultBeam(scale);
-                foreach (var edge in brep.Edges)
+                if (!edge.IsLinear(RhinoMath.SqrtEpsilon)) continue;
+                var v = edge.PointAtEnd - edge.PointAtStart;
+                double len = v.Length;
+                if (len <= RhinoMath.ZeroTolerance) continue;
+                v.Unitize();
+                int k = dirs.FindIndex(x => Math.Abs(x.d * v) > 0.999);
+                if (k >= 0) dirs[k] = (dirs[k].d, dirs[k].len + len); else dirs.Add((v, len));
+            }
+            var vmp = VolumeMassProperties.Compute(brep);
+            double volume = vmp?.Volume ?? 0;
+            var centroid = vmp?.Centroid ?? brep.GetBoundingBox(true).Center;
+            var result = new SolidShape { Kind = "other" };
+            foreach (var (d, _) in dirs.OrderByDescending(x => x.len).Take(3))
+            {
+                var plane = new Plane(centroid, d);                        // plane normal = candidate axis
+                var box = brep.GetBoundingBox(plane);
+                if (!box.IsValid) continue;
+                double a = box.Max.X - box.Min.X, b = box.Max.Y - box.Min.Y, L = box.Max.Z - box.Min.Z;
+                double fill = a * b * L > 0 ? volume / (a * b * L) : 0;
+                var dims = new[] { L, a, b }.OrderByDescending(x => x).ToArray();
+                result = new SolidShape { Kind = "other", Length = dims[0], Width = dims[1], Height = dims[2], Fill = fill };
+                if (L >= MemberSlenderness * Math.Max(a, b) && fill >= MemberFill)
                 {
-                    rawBeams.Add(new ConditionedBeam
+                    var p0 = plane.PointAt((box.Min.X + box.Max.X) / 2, (box.Min.Y + box.Max.Y) / 2, box.Min.Z);
+                    var p1 = plane.PointAt((box.Min.X + box.Max.X) / 2, (box.Min.Y + box.Max.Y) / 2, box.Max.Z);
+                    // depth (section height) = the cross dimension closest to vertical; vertical members: the larger one
+                    bool vertical = Math.Abs(d * Vector3d.ZAxis) > 0.9;
+                    bool xIsDepth = vertical ? a >= b : Math.Abs(plane.XAxis * Vector3d.ZAxis) >= Math.Abs(plane.YAxis * Vector3d.ZAxis);
+                    return new SolidShape
                     {
-                        Axis = edge.DuplicateCurve(),
-                        SourceGuids = new List<string> { guidStr },
-                        Section = section,
-                    });
+                        Kind = "member", Axis = new LineCurve(p0, p1), Length = L, Fill = fill,
+                        Width = xIsDepth ? b : a, Height = xIsDepth ? a : b,
+                        Section = new SectionSpec { Shape = "rect", Width = xIsDepth ? b : a, Height = xIsDepth ? a : b, Source = "solid" },
+                    };
                 }
             }
+            if (dirs.Count == 0)
+            {
+                var bb = brep.GetBoundingBox(true);
+                var dd = new[] { bb.Diagonal.X, bb.Diagonal.Y, bb.Diagonal.Z }.OrderByDescending(x => x).ToArray();
+                result = new SolidShape { Kind = "other", Length = dd[0], Width = dd[1], Height = dd[2], Fill = bb.Volume > 0 ? volume / bb.Volume : 0 };
+            }
+            if (result.Height <= PlateThinness * result.Width) result.Kind = "plate";
+            return result;
         }
 
         /// <summary>
