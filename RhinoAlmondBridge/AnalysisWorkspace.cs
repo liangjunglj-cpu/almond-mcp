@@ -42,6 +42,8 @@ namespace RhinoAlmondBridge
                 try {
                     _pending = target => Execute(target,action,settings);
                     RhinoApp.RunScript("_AlmondAnalysisAction",false);
+                    // the command never ran (Rhino was running a script or command): answer, so the panel never waits forever
+                    if(_pending!=null) SendError("Rhino was busy. Try again.");
                 }
                 catch(Exception ex) { SendError(ex.Message); }
                 finally { _pending=null;Busy=false; }
