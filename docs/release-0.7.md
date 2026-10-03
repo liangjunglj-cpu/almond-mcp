@@ -120,8 +120,16 @@ checks target them; checks 2-9 above carry over.
 | Shells (#25): capture a two-bay frame plus one planar surface with the native engine | Pass: amber *Selection captured, but it includes 1 shell.*, the Karamba3D/centre-line hint, the summary ends *shells need Karamba3D*, the Structure chip asks for input and Run stays disabled |
 | Full run: recapture the frame alone, Steel CHS 219.1×8, fixed bases, rigid joints | Pass: *Within configured checks*, 0.33 mm, 3.3 %, αcr 307.55, overlay drawn, solver almond-mcp 0.7.0rc2 |
 
-Still to do after `almond-mcp 0.7.0rc2` is on PyPI: the first run with `ALMOND_SOLVER_COMMAND` removed
-(and no user-level `UV_NATIVE_TLS`).
+### rc.2 publication
+
+`almond-mcp 0.7.0rc2` was uploaded to PyPI on 3 October 2026; the PyPI SHA-256 of the wheel and sdist match the
+table above. First run from PyPI on the exact Yak: `ALMOND_SOLVER_COMMAND`, `UV_NATIVE_TLS` and `UV_SYSTEM_CERTS`
+unset, and `UV_CACHE_DIR` pointed at an empty folder so nothing came from the cache. **Pass:** the panel showed
+*Starting the native engine… The first run downloads it.*, then *Native engine ready · v0.7.0rc2* after about
+17 s (289 MB downloaded), behind the same TLS-inspecting network that broke rc.1.
+
+Follow-up: uv now reports `UV_NATIVE_TLS` as deprecated in favour of `UV_SYSTEM_CERTS`. It still works; a later
+release should set both.
 
 ## Build record — rc.1, 3 October 2026 (PyPI only)
 
