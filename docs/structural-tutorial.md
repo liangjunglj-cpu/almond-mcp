@@ -62,6 +62,17 @@ The line under the button confirms what it took (or, in red, why it could not), 
 
 The workspace is split into five tabs. **Run** and its status line stay in view below them, so you can run from any tab; the results open on the **Results** tab.
 
+**Before you run.** Above Run, four chips show what a run needs: **Engine**, **Structure**, **Loads** and **Supports**. A green tick is ready; an amber triangle needs input, and the same tab shows a **!**. Click a chip to open its tab. Run stays disabled until all four are green.
+
+**Status line.** Under Run, one line says what the panel is doing, with an icon and colour:
+
+| Icon | Means |
+|---|---|
+| Blue spinner | Working: checking engines, capturing, solving |
+| Green tick | Done: engines ready, selection captured, within the configured checks |
+| Amber triangle | Needs attention: inputs changed (rerun), or an indicative result for concrete, timber or aluminium |
+| Red cross | An error or a failed check, with a **How to fix** line under it |
+
 | Tab | Setting | Start with | What it means |
 |---|---|---|---|
 | **Model** | Use Rhino selection | | Captures the selected curves and support points (step 3). |
