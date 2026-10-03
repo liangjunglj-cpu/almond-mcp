@@ -128,6 +128,11 @@ unset, and `UV_CACHE_DIR` pointed at an empty folder so nothing came from the ca
 *Starting the native engine… The first run downloads it.*, then *Native engine ready · v0.7.0rc2* after about
 17 s (289 MB downloaded), behind the same TLS-inspecting network that broke rc.1.
 
+Published on 4 October 2026: the Yak (`914b890e…`) to yak.rhino3d.com as `almondbridge 0.7.0-rc.2 (prerelease)`,
+listed by `Yak.exe search --all --prerelease almondbridge`; tag `v0.7.0rc2` on `4564c1c`; GitHub pre-release
+[v0.7.0rc2](https://github.com/liangjunglj-cpu/almond-mcp/releases/tag/v0.7.0rc2) with the Yak, wheel, sdist and
+`SHA256SUMS.txt`. Food4Rhino stays on 0.6.0.
+
 Follow-up: uv now reports `UV_NATIVE_TLS` as deprecated in favour of `UV_SYSTEM_CERTS`. It still works; a later
 release should set both.
 
