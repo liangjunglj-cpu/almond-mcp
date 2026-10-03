@@ -196,6 +196,10 @@ window.almondAnalysisReceive = payload => {
     showCodes(payload.design_codes);
     engineState.native=payload.available?'Native engine ready'+(payload.version?' · v'+payload.version:''):'Native engine unavailable';
     if(!payload.available)el('engine-detail').textContent=payload.detail||'';
+    // the engine answers after the "starting" status: settle the status line with the outcome
+    if(el('analysis-status').dataset.state==='busy'&&/engine/i.test(el('analysis-message').textContent))
+      payload.available?message('Engines checked. Native engine ready'+(payload.version?' · v'+payload.version:'')+'.','ok'):
+        message('Native engine unavailable'+(payload.detail?': '+payload.detail:'.'),'error');
     showEngines();return;
   }
   busy=false;
