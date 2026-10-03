@@ -25,17 +25,14 @@ Users start with the [Structure workspace tutorial](structural-tutorial.md).
 | Solids | Prismatic solids read as centre lines with rectangular sections; brep edges never become beams | #18 |
 | Verdict | Concrete, timber and aluminium are indicative: no capacity pass/fail | #18 |
 | Sections | `almond:section` user text per curve (`rect`, `box`, `chs`, with units) | #19 |
-| Pre-release | The panel pins its PyPI twin for prereleases (`0.7.0-rc.1` → `almond-mcp@0.7.0rc1`); before, any version with a hyphen ran the latest stable, 0.6.0, which has no `solve` command | this release |
+| Pre-release | The panel pins its PyPI twin for prereleases (`0.7.0-rc.1` → `almond-mcp@0.7.0rc1`); before, any version with a hyphen ran the latest stable, 0.6.0, which has no `solve` command | #20 |
+| Capture feedback | Capture errors (200-object limit, library blocks, units) show beside the button, not only at the foot of the form | #21 |
+| Workspace layout | Structure workspace in five tabs (Model, Loads, Supports, Code, Results) with icons; a status line with colours and "How to fix" hints; an Engine/Structure/Loads/Supports checklist that enables Run | #22 |
 
 ## Merge order
 
-Each PR is stacked on the previous one; merge in order, each after its CI passes:
-
-1. #18 `feat/ec3-member-checks` → master
-2. #19 `feat/curve-sections` (retargets to master once #18 merges)
-3. `release/0.7.0-rc.1` (version bump, docs, the pin fix)
-
-Build the artifacts from the merged master revision, not from a branch.
+All merged in order on 3 October 2026: #18 → #19 → #20 → #21 → #22 (master `d00db0a`). Build the published
+artifacts from master, not from a branch.
 
 ## Build
 
@@ -90,21 +87,51 @@ Record pass/fail, the Yak SHA-256, Windows version and Rhino service release her
   when unverified.
 - One panel study takes at most 200 selected objects.
 
-## Build record — rc.1 preparation, 3 October 2026
+## Build record — rc.1, 3 October 2026
 
-Built locally with `./tools/prepare_release.ps1` from the `release/0.7.0-rc.1` branch (before merging; rebuild
-from master for publication). On this machine uv needs `UV_NATIVE_TLS=1` (a TLS-inspecting proxy), and the
-script must run under PowerShell 7, or `powershell.exe -File` without stream redirection, because Windows
-PowerShell 5.1 turns uv's stderr notes into terminating errors when the streams are redirected inside PowerShell.
+Built with `./tools/prepare_release.ps1` from master `d00db0a` (after #22), in a clean `git worktree` of that
+commit: the main checkout held unrelated uncommitted asset work that must not reach a release. This build
+supersedes the earlier rc.1 builds from the release branch and from `d73f0de`; their hashes are not to be published.
 
 - Tests: 398 passed (including the .NET archive-host and solver process-boundary tests).
-- Clean wheel install: 56 MCP tools, archive HTTP and repository resource checks passed.
-- Yak audit: 392 routes checked, 50 models, 51.1 MB.
-- `almondbridge-0.7.0-rc.1-rh8_0-win.yak` SHA-256 `819377182f495931ef9d1f143b9b60fad8c552fcee8c25b39c8f87ab56f26d2b`
-- `almond_mcp-0.7.0rc1-py3-none-any.whl` SHA-256 `b24dc4d6e02a99debde2ec98acb4d239c61f1decef92ebf08546625f51561492`
-- Rhino in-process smoke test: **pending**.
+- Clean wheel install: 56 MCP tools; archive HTTP and repository resource checks passed.
+- Yak audit: 392 routes, 57 assets (50 models, 7 elements), 10 drawing packages, 51.1 MB; bridge `0.7.0-rc.1`,
+  archive `0.7.0rc1`.
 
-The bundled `food4rhino-listing.md` still describes 0.6.0; it is updated only for a stable release.
+| File | SHA-256 |
+|---|---|
+| `almondbridge-0.7.0-rc.1-rh8_0-win.yak` | `8c701864f2ee18911447fd00d7b944bcf6a5aa9bad42f053b1ed84b169ff8c81` |
+| `almond_mcp-0.7.0rc1-py3-none-any.whl` | `9189cd46b5f4685b2f49f20c0f34e14365173603f5f4ff0e3262948e01e06a85` |
+| `almond_mcp-0.7.0rc1.tar.gz` | `e4c304ecab3ffb471ed05dd5b89cc0e508e2f0119242de086917eec0998d9151` |
+| `almondbridge-0.7.0-rc.1-food4rhino.zip` | `ee44ae8dc34bec0cf8462558fa7b3ab9ab2b573823375552849de210a89b07e1` |
+
+`dist/release-0.7.0rc1/SHA256SUMS.txt` lists these and the reports.
+
+On this machine uv needs `UV_NATIVE_TLS=1` (a TLS-inspecting proxy), and the script must run under
+PowerShell 7, or `powershell.exe -File` without stream redirection: Windows PowerShell 5.1 turns uv's stderr
+notes into terminating errors when the streams are redirected inside PowerShell. The bundled
+`food4rhino-listing.md` still describes 0.6.0; it is updated only for a stable release.
+
+### Rhino smoke test so far
+
+Windows 11 Home 10.0.26200, Rhino 8. The panel's solver pointed at a local install of the rc wheel
+(`ALMOND_SOLVER_COMMAND`), since `almond-mcp 0.7.0rc1` is not yet on PyPI.
+
+| # | Check | Result |
+|---|---|---|
+| 1 | Check engines; and without the override, the unpublished PyPI rc | Pass: *Native engine ready · v0.7.0rc1*; without it the panel reports the engine as starting and does not crash |
+| 2 | Two-bay steel frame, Eurocode, floor 2.0 + 1.0, pinned, rigid | Pass: 5.34 mm, 38.3 %, αcr 31.18, overlay drawn, Results panel 13 rows |
+| 3 | Simple joints, then the buckling overlay | Pass (simple joints on fixed bases; on pinned bases the frame is correctly a mechanism) |
+| 4 | `almond:section` rect + Concrete | Pass: *Indicative only*, RECT 300x600 in the Results panel |
+| 5 | More than 200 objects | Pass: refused with the 200-object message (shown beside the button since #21) |
+| 6 | Solid box column / block | Pass via the export path: centre line with a rect section and a warning; block skipped |
+| 7 | Results panel sort, filter, row click, CSV | Pass (CSV content; the Save dialog itself not yet clicked) |
+| 8 | MCP `validate_structure` / `visualize_structure` from the rc wheel | Pass: identical to the panel (5.339 mm, αcr 31.18) |
+| 9 | Models workspace after the update | Pending |
+
+Checks 1-8 ran on the `d73f0de` build. On `d00db0a` the tabbed workspace was walked through on the A07
+mezzanine (capture, loads, supports, code, run, rerun; status states and the run checklist). Still to do on
+this exact Yak: check 9, the CSV Save dialog, and the first run from PyPI with `ALMOND_SOLVER_COMMAND` removed.
 
 ## Publication record
 
