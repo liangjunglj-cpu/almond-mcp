@@ -1,14 +1,14 @@
 # Almond workspace for Rhino 8
 
-Install **almondbridge 0.7.0-rc.1** from Rhino's Package Manager (search
+Install **almondbridge 0.7.0-rc.2** from Rhino's Package Manager (search
 `almondbridge` with **Include pre-releases** ticked), or install the supplied
-**almondbridge-0.7.0-rc.1-rh8_0-win.yak**. Save your work, restart Rhino, and
+**almondbridge-0.7.0-rc.2-rh8_0-win.yak**. Save your work, restart Rhino, and
 run **Almond**. Windows / Rhino 8.0+. This is a pre-release; the stable version
 remains 0.6.0.
 
 Browsing and placing the included library models need neither Python nor an
 MCP client. The structural engine and the optional AI workflow use the matching
-`almond-mcp 0.7.0rc1` Python package through uv (see below).
+`almond-mcp 0.7.0rc2` Python package through uv (see below).
 
 The archive opens in a dockable **Almond** panel inside Rhino. Its background,
 text, controls and font follow Rhino appearance settings, including theme changes.
@@ -76,7 +76,7 @@ Choose **Structure** from the Almond menu, or run **AlmondStructure** (the older
 **AlmondKaramba** still works). The step-by-step guide is the
 [Structure workspace tutorial](https://github.com/liangjunglj-cpu/almond-mcp/blob/master/docs/structural-tutorial.md).
 
-**Almond native** is built in. Rhino runs `uvx almond-mcp@0.7.0rc1 solve`, so uv
+**Almond native** is built in. Rhino runs `uvx almond-mcp@0.7.0rc2 solve`, so uv
 must be installed (`winget install astral-sh.uv`); the first run downloads the
 engine, later runs take a few seconds. It analyses frames drawn as centre lines:
 
@@ -110,7 +110,7 @@ Install [uv](https://docs.astral.sh/uv/getting-started/installation/). Configure
 your MCP client with command `uvx` and these arguments:
 
 ```json
-["--from", "almond-mcp==0.7.0rc1", "almond-mcp"]
+["--from", "almond-mcp==0.7.0rc2", "almond-mcp"]
 ```
 
 The MCP client launches its own stdio server. It connects to the Rhino bridge
