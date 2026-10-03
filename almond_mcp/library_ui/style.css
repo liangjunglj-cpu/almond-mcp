@@ -115,7 +115,7 @@
 .analysis-button:disabled{opacity:.45}
 .analysis-meta{font:10px/1.6 var(--mono)!important;color:var(--muted)}
 .analysis-meta.error{color:var(--red)}
-.analysis-tabs{display:flex;gap:2px;margin-top:14px;border-bottom:1px solid var(--line);position:sticky;top:0;z-index:3;background:var(--paper)}
+.analysis-tabs{display:flex;gap:2px;margin-top:14px;border-bottom:1px solid var(--line);position:sticky;top:var(--tabs-top,0);z-index:3;background:var(--paper)}
 .analysis-tabs button{flex:1;position:relative;padding:11px 2px 9px;font-size:12px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px}
 .analysis-tabs button[aria-selected=true]{color:var(--ink);border-bottom-color:var(--red)}
 .tab-dot{position:absolute;top:6px;right:6px;width:6px;height:6px;border-radius:50%;background:var(--red)}

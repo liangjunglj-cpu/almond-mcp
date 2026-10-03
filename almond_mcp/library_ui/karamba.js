@@ -72,6 +72,11 @@ function showTab(name) {
   try{localStorage.setItem('almond-structure-tab',name);}catch{}
 }
 document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
+// In the Rhino panel the Almond header is pinned to the top as well: pin the tab bar just below it.
+const masthead=document.querySelector('.masthead');
+function pinTabs(){const pinned=masthead&&getComputedStyle(masthead).position==='sticky';
+  document.documentElement.style.setProperty('--tabs-top',(pinned?masthead.offsetHeight:0)+'px');}
+pinTabs();addEventListener('resize',pinTabs);
 document.querySelector('.analysis-tabs').addEventListener('keydown',e=>{
   const i=TABS.indexOf(document.activeElement?.dataset?.tab);if(i<0)return;
   const step={ArrowRight:1,ArrowLeft:-1,Home:-i,End:TABS.length-1-i}[e.key];if(step===undefined)return;
