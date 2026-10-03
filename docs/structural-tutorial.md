@@ -58,28 +58,35 @@ Leave **Engine** on **Almond native · built in**. Choose Karamba3D only for she
 
 The panel confirms what it took, for example `29 objects · 20 beams · 0 shells · Millimeters`, and draws a small diagram of the frame under **Read the model**. If you edit the geometry later, capture it again: results never follow later edits.
 
-## 4. Set the code, loads and joints
+## 4. Set the loads and joints
 
-Work down the setup. These values are a sensible start for a home.
+Step 02 shows the settings you change on most checks. The rest sit under **More settings**, closed by default: their defaults suit a first check. While it is closed, its line says *All at their defaults* or lists what you changed, in red, so nothing changed is hidden.
+
+**Always visible**
 
 | Setting | Start with | What it means |
 |---|---|---|
 | Structure | Frame | *Beam* for a single member, *Truss assembly* for trusses. |
 | Material | Steel / S235 | S355, Concrete C30/37, Wood C24 and Aluminium are also listed. Concrete, timber and aluminium give **indicative** results (see [Limits](#7-know-the-limits)). |
-| Design code | Eurocode (recommended values) | The safety factors and limits. *Off* runs plain mechanics without them, for comparisons only. National Annex profiles you add appear here too. |
-| ULS expression | Code default | How the factors combine loads (6.10, or 6.10a/6.10b). |
 | Total imposed load | 0 kN | One extra load shared over the free nodes. Use 0 when you give floor loads. |
-| Floor imposed load | 2.0 kN/m² | People and furniture (Q). The panel suggests values for the chosen code. |
+| Floor imposed load | 2.0 kN/m² | People and furniture (Q). |
 | Floor build-up | 1.0 kN/m² | The floor's own weight: screed, boards, tiles (G). |
-| Loads from placed Almond models | Off | Adds the real weight of placed library items, such as a filled bath. |
 | Include self-weight | On | The members' own weight. |
-| Support locations, Restraint | Points, else lowest nodes; Pinned | Pinned is the cautious choice. *Fixed* also restrains rotation. |
+| Restraint | Pinned | How the frame is held at its supports. Pinned is the cautious choice; *Fixed* also restrains rotation. |
 | Connections | Rigid joints | *Simple · pinned beam ends* for typical bolted steel or timber. It is stricter and closer to how they behave. |
-| Stability | αcr, sway imperfection, P-Δ | Checks whether the frame could buckle, and switches to second-order analysis when αcr is below 10. |
-| Deflection span, limit | Blank | Blank takes the longest member and the code's limit (span/250). Type the real span when beams are drawn in pieces. |
 | Viewport overlay | Deflected shape · utilization | Or *First buckling mode*. |
-| Steel tubes | Cold-formed · EN 10219 | How the tubes are made, which sets the buckling curve: cold-formed uses curve c, hot-finished curve a. |
 | Override beam section / CHS | Off, or e.g. 219.1 × 8 | One tube for every member, in mm. |
+
+**More settings**
+
+| Setting | Default | When to change it |
+|---|---|---|
+| Design code, ULS expression | Eurocode (recommended values), code default | To use a National Annex profile you added, or *Off* for unfactored comparisons. The note under it lists the code's suggested floor loads. |
+| Stability | αcr, sway imperfection, P-Δ | *Off · first order* only for comparisons. |
+| Deflection span, limit | Blank: longest member, code limit (span/250) | Type the real span when beams are drawn in pieces, or a stricter limit such as 300. |
+| Support locations | Points, else lowest nodes | *Require selected points* to refuse a model without support points. |
+| Loads from placed Almond models | Off | Adds the real weight of placed library items, such as a filled bath. |
+| Steel tubes | Cold-formed · EN 10219 | *Hot-finished* only when the tubes are specified as EN 10210; it sets the buckling curve. |
 
 <img src="images/tutorial/panel-code.jpg" alt="The setup with Eurocode, floor loads 2.0 and 1.0, pinned restraint and rigid joints" width="300"> <img src="images/tutorial/panel-lower.jpg" alt="Lower part of the setup: deflection span, overlay, tube size and the frame diagram" width="300">
 

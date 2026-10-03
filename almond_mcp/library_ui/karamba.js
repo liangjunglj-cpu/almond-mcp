@@ -3,7 +3,7 @@ const el=id=>document.getElementById(id);
 const token=new URLSearchParams(location.search).get('bridge')||'';
 const native=/^[a-f0-9]{32}$/.test(token) && new URLSearchParams(location.search).get('panel')==='1';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let model=null,report=null,busy=false,dirty=false,checked=false,codes=null;
+let model=null,report=null,busy=false,dirty=false,checked=false,codes=null,pending=null;   // pending: the action Rhino has not answered yet
 const engine=()=>el('analysis-engine').value;
 const optional=id=>{const v=el(id).value.trim();return v===''?null:Number(v);};
 const settings=()=>{
@@ -22,6 +22,8 @@ const settings=()=>{
     stability:el('analysis-stability').value,view:el('analysis-overlay').value,span_m:optional('analysis-span')};
 };
 function message(text) {el('analysis-message').textContent=text;}
+// A capture's answer belongs in step 01, beside the button pressed: the shared status line is at the foot of the form.
+function captureNote(text,error) {const s=el('selection-summary');s.textContent=text;s.classList.toggle('error',!!error);}
 // Design code profiles come from the solver (built-in Eurocode, a practice's National Annex files, "off").
 function showCodes(list) {
   if(!list?.profiles?.length)return;
@@ -46,6 +48,21 @@ function codeControls() {
     id==='off'?'No design code: characteristic G + Q, no partial factors, span/250 screen. For comparisons, not design.':
     p.basis+'.'+(floors.length?' Suggested floor loads (kN/m²): '+floors.join(', ')+'.':'')+
     (p.verified?'':' Unverified values: '+p.unverified.join(', ')+' — results are provisional.');
+  advancedSummary();
+}
+// "More settings" holds what a first check leaves at its default. Closed, it names whatever differs from the
+// default, so a changed limit or code is never hidden: [control, default, how to say it].
+const ADVANCED=[['analysis-code',()=>codes?.default||'eurocode',()=>el('analysis-code').selectedOptions[0]?.textContent||'code'],
+  ['analysis-uls','',v=>'ULS '+v],['analysis-stability','auto',()=>'stability off'],['analysis-span','',v=>'span '+v+' m'],
+  ['analysis-limit','',v=>'limit L/'+v],['support-source','auto',()=>'supports at points only'],
+  ['analysis-fabrication','cold_formed',()=>'hot-finished tubes']];
+function advancedSummary() {
+  const nativeEngine=engine()==='native';
+  const changed=ADVANCED.filter(([id,def])=>{const n=el(id);
+    return !(n.closest('[data-native]')&&!nativeEngine)&&n.value!==(typeof def==='function'?def():def);}).map(([id,,say])=>say(el(id).value));
+  if(nativeEngine&&el('asset-loads').checked)changed.push('placed-model loads');
+  el('advanced-summary').textContent=changed.length?'Changed: '+changed.join(' · '):'All at their defaults';
+  el('advanced-settings').classList.toggle('changed',changed.length>0);
 }
 function engineControls() {
   const nativeEngine=engine()==='native';
@@ -55,6 +72,7 @@ function engineControls() {
   if(nativeEngine&&el('analysis-type').value==='shell')el('analysis-type').value='frame';
   el('analysis-run').textContent=nativeEngine?'Run native analysis ↗':'Run Karamba analysis ↗';
   try{localStorage.setItem('almond-structure-engine',engine());}catch{}
+  advancedSummary();
 }
 function controls() {
   const colour=el('toggle-utilization');
@@ -76,7 +94,8 @@ function request(action) {
   if(action==='analyze'&&!el('analysis-form').reportValidity())return;
   const input=settings();
   if(input.diameter_mm!==null && input.wall_mm>=input.diameter_mm/2){message('Wall thickness must be less than half the diameter.');return;}
-  busy=true;controls();
+  busy=true;pending=action;controls();
+  if(action==='capture')captureNote('Select structural geometry in Rhino…');
   message(action==='analyze'?(input.engine==='native'?'Exporting the model from Rhino…':'Running Karamba in Rhino…'):
     action==='capture'?'Select structural geometry in Rhino…':action==='status'?'Checking engines…':'Working in Rhino…');
   location.href='/almond-action/'+token+'/karamba/'+action+'?data='+encodeURIComponent(JSON.stringify(input));
@@ -108,7 +127,9 @@ window.almondAnalysisReceive = payload => {
     showEngines();return;
   }
   busy=false;
+  const answered=pending;pending=null;
   if(payload.kind==='error'||payload.kind==='notice'){
+    if(answered==='capture')captureNote(payload.message,payload.kind==='error');
     if(payload.stale && report){dirty=true;el('analysis-stale').hidden=false;}
     message(payload.message);controls();draw();return;
   }
@@ -131,7 +152,7 @@ window.almondAnalysisReceive = payload => {
       'Analysis snapshot recorded. Recapture if Rhino geometry changes.'));
   }
   if(model) {
-    el('selection-summary').textContent=model.objects+' objects · '+model.beams+' beams · '+model.shells+' shells · '+model.units;
+    captureNote(model.objects+' objects · '+model.beams+' beams · '+model.shells+' shells · '+model.units);
     el('section-summary').textContent=model.default_sections+' beam sections use the CHS 114.3 × 4 mm default before overrides. Shell default: 100 mm. Inferred sections need review.';
   }
   controls();draw();
@@ -228,6 +249,12 @@ function draw() {
 }
 try{const saved=localStorage.getItem('almond-structure-engine');if(saved==='karamba'||saved==='native')el('analysis-engine').value=saved;}catch{}
 engineControls();codeControls();
+el('analysis-settings').addEventListener('input',advancedSummary);
+el('analysis-settings').addEventListener('change',advancedSummary);
+try{el('advanced-settings').open=localStorage.getItem('almond-advanced-open')==='1';}catch{}
+el('advanced-settings').addEventListener('toggle',()=>{try{localStorage.setItem('almond-advanced-open',el('advanced-settings').open?'1':'0');}catch{}});
+// an invalid value inside the closed section would stop Run with nothing in view: open it
+el('analysis-form').addEventListener('invalid',e=>{if(e.target.closest('#advanced-settings'))el('advanced-settings').open=true;},true);
 el('analysis-native-note').hidden=native;
 if(!native) message('Open AlmondStructure inside Rhino to select geometry and run the solver.');
 // check the engines once, the first time the workspace is shown (it also fetches the native solver)
