@@ -48,6 +48,21 @@ function codeControls() {
     id==='off'?'No design code: characteristic G + Q, no partial factors, span/250 screen. For comparisons, not design.':
     p.basis+'.'+(floors.length?' Suggested floor loads (kN/m²): '+floors.join(', ')+'.':'')+
     (p.verified?'':' Unverified values: '+p.unverified.join(', ')+' — results are provisional.');
+  advancedSummary();
+}
+// "More settings" holds what a first check leaves at its default. Closed, it names whatever differs from the
+// default, so a changed limit or code is never hidden: [control, default, how to say it].
+const ADVANCED=[['analysis-code',()=>codes?.default||'eurocode',()=>el('analysis-code').selectedOptions[0]?.textContent||'code'],
+  ['analysis-uls','',v=>'ULS '+v],['analysis-stability','auto',()=>'stability off'],['analysis-span','',v=>'span '+v+' m'],
+  ['analysis-limit','',v=>'limit L/'+v],['support-source','auto',()=>'supports at points only'],
+  ['analysis-fabrication','cold_formed',()=>'hot-finished tubes']];
+function advancedSummary() {
+  const nativeEngine=engine()==='native';
+  const changed=ADVANCED.filter(([id,def])=>{const n=el(id);
+    return !(n.closest('[data-native]')&&!nativeEngine)&&n.value!==(typeof def==='function'?def():def);}).map(([id,,say])=>say(el(id).value));
+  if(nativeEngine&&el('asset-loads').checked)changed.push('placed-model loads');
+  el('advanced-summary').textContent=changed.length?'Changed: '+changed.join(' · '):'All at their defaults';
+  el('advanced-settings').classList.toggle('changed',changed.length>0);
 }
 function engineControls() {
   const nativeEngine=engine()==='native';
@@ -57,6 +72,7 @@ function engineControls() {
   if(nativeEngine&&el('analysis-type').value==='shell')el('analysis-type').value='frame';
   el('analysis-run').textContent=nativeEngine?'Run native analysis ↗':'Run Karamba analysis ↗';
   try{localStorage.setItem('almond-structure-engine',engine());}catch{}
+  advancedSummary();
 }
 function controls() {
   const colour=el('toggle-utilization');
@@ -233,6 +249,12 @@ function draw() {
 }
 try{const saved=localStorage.getItem('almond-structure-engine');if(saved==='karamba'||saved==='native')el('analysis-engine').value=saved;}catch{}
 engineControls();codeControls();
+el('analysis-settings').addEventListener('input',advancedSummary);
+el('analysis-settings').addEventListener('change',advancedSummary);
+try{el('advanced-settings').open=localStorage.getItem('almond-advanced-open')==='1';}catch{}
+el('advanced-settings').addEventListener('toggle',()=>{try{localStorage.setItem('almond-advanced-open',el('advanced-settings').open?'1':'0');}catch{}});
+// an invalid value inside the closed section would stop Run with nothing in view: open it
+el('analysis-form').addEventListener('invalid',e=>{if(e.target.closest('#advanced-settings'))el('advanced-settings').open=true;},true);
 el('analysis-native-note').hidden=native;
 if(!native) message('Open AlmondStructure inside Rhino to select geometry and run the solver.');
 // check the engines once, the first time the workspace is shown (it also fetches the native solver)
