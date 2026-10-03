@@ -232,3 +232,5 @@
 .analysis-button[data-analysis=export]::before{--mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M8 1.5v8m-3.2-3.2L8 9.5l3.2-3.2M2 11v3.5h12V11' fill='none' stroke='%23000' stroke-width='1.6'/%3E%3C/svg%3E")}
 .analysis-button[data-analysis=clear_view]::before{--mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m3 3 10 10M13 3 3 13' fill='none' stroke='%23000' stroke-width='1.8'/%3E%3C/svg%3E")}
 .analysis-runbar .analysis-button.primary{width:100%}
+
+#advanced-summary.error{color:var(--busy)}
