@@ -21,9 +21,28 @@ const settings=()=>{
     deflection_limit_ratio:optional('analysis-limit'),fabrication:el('analysis-fabrication').value,
     stability:el('analysis-stability').value,view:el('analysis-overlay').value,span_m:optional('analysis-span')};
 };
-function message(text) {el('analysis-message').textContent=text;}
+// One status line under Run for everything the panel does: idle, busy, ok, warn, error or info, with an icon and colour.
+// Errors carry a hint on how to fix them, so the user is never left with only the message.
+const HINTS=[
+  [/at most 200/i,'Join short segments into continuous curves (Almond splits them at every crossing), or check part of the structure.'],
+  [/library blocks/i,'Select the structural centre lines and support points, not furniture blocks.'],
+  [/finish the current rhino command|rhino was busy/i,'Press Esc in Rhino to end the running command, then try again.'],
+  [/still running/i,'Wait for the current run to finish.'],
+  [/document units/i,'Set standard document units in Rhino (Options > Units), then capture again.'],
+  [/uv is not installed|could not start the native solver|engine unavailable/i,'Install uv (winget install astral-sh.uv), restart Rhino, then press Check engines.'],
+  [/geometry changed|recapture|model changed/i,'The geometry changed after capture: click Use Rhino selection again on the Model tab.'],
+  [/mechanism|unstable|singular/i,'Part of the frame can move freely: add support points, or use Fixed restraints or Rigid joints on the Supports tab.'],
+  [/no (curve|structural|exported|geometry)/i,'Select the structural centre lines in Rhino, then Use Rhino selection on the Model tab.'],
+  [/faces|simplify/i,'Use a simpler surface or mesh, or draw centre lines instead.'],
+  [/wall thickness/i,'On the Model tab, make the CHS wall less than half its diameter.']];
+function hintFor(text){const h=HINTS.find(([re])=>re.test(text||''));return h?h[1]:'Read the warnings on the Results tab, or Troubleshooting in the Almond structure tutorial.';}
+function message(text,state='info',hint) {
+  el('analysis-message').textContent=text;el('analysis-status').dataset.state=state;
+  const tip=state==='error'?(hint??hintFor(text)):hint;
+  el('analysis-hint').textContent=tip?'How to fix: '+tip:'';el('analysis-hint').hidden=!tip;
+}
 // A capture's answer belongs in step 01, beside the button pressed: the shared status line is at the foot of the form.
-function captureNote(text,error) {const s=el('selection-summary');s.textContent=text;s.classList.toggle('error',!!error);}
+function captureNote(text,error) {const s=el('selection-summary');s.textContent=text;s.classList.toggle('error',!!error);s.classList.remove('need');}
 // Design code profiles come from the solver (built-in Eurocode, a practice's National Annex files, "off").
 function showCodes(list) {
   if(!list?.profiles?.length)return;
@@ -50,8 +69,8 @@ function codeControls() {
     (p.verified?'':' Unverified values: '+p.unverified.join(', ')+' — results are provisional.');
   advancedSummary();
 }
-// "More settings" holds what a first check leaves at its default. Closed, it names whatever differs from the
-// default, so a changed limit or code is never hidden: [control, default, how to say it].
+// The Code tab holds what a first check leaves at its default. Its line names whatever differs from the default, and
+// the tab shows a dot, so a changed limit or code is never hidden behind it: [control, default, how to say it].
 const ADVANCED=[['analysis-code',()=>codes?.default||'eurocode',()=>el('analysis-code').selectedOptions[0]?.textContent||'code'],
   ['analysis-uls','',v=>'ULS '+v],['analysis-stability','auto',()=>'stability off'],['analysis-span','',v=>'span '+v+' m'],
   ['analysis-limit','',v=>'limit L/'+v],['support-source','auto',()=>'supports at points only'],
@@ -62,8 +81,26 @@ function advancedSummary() {
     return !(n.closest('[data-native]')&&!nativeEngine)&&n.value!==(typeof def==='function'?def():def);}).map(([id,,say])=>say(el(id).value));
   if(nativeEngine&&el('asset-loads').checked)changed.push('placed-model loads');
   el('advanced-summary').textContent=changed.length?'Changed: '+changed.join(' · '):'All at their defaults';
-  el('advanced-settings').classList.toggle('changed',changed.length>0);
+  el('advanced-summary').classList.toggle('error',changed.length>0);
+  el('tab-code').querySelector('.tab-dot').hidden=!changed.length;
 }
+// The workspace in tabs; Run and its status line stay in view below them.
+const TABS=['model','loads','supports','code','results'];
+function showTab(name) {
+  for(const t of TABS){const on=t===name,b=el('tab-'+t);b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1;el('pane-'+t).hidden=!on;}
+  try{localStorage.setItem('almond-structure-tab',name);}catch{}
+}
+document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
+// In the Rhino panel the Almond header is pinned to the top as well: pin the tab bar just below it.
+const masthead=document.querySelector('.masthead');
+function pinTabs(){const pinned=masthead&&getComputedStyle(masthead).position==='sticky';
+  document.documentElement.style.setProperty('--tabs-top',(pinned?masthead.offsetHeight:0)+'px');}
+pinTabs();addEventListener('resize',pinTabs);
+document.querySelector('.analysis-tabs').addEventListener('keydown',e=>{
+  const i=TABS.indexOf(document.activeElement?.dataset?.tab);if(i<0)return;
+  const step={ArrowRight:1,ArrowLeft:-1,Home:-i,End:TABS.length-1-i}[e.key];if(step===undefined)return;
+  e.preventDefault();const next=TABS[(i+step+TABS.length)%TABS.length];showTab(next);el('tab-'+next).focus();
+});
 function engineControls() {
   const nativeEngine=engine()==='native';
   document.querySelectorAll('#analysis-settings [data-native]').forEach(n=>n.hidden=!nativeEngine);
@@ -75,13 +112,16 @@ function engineControls() {
   advancedSummary();
 }
 function controls() {
+  const ready=renderReadiness();
   const colour=el('toggle-utilization');
   colour.disabled=!report||dirty||!report.result?.results?.utilization_available;
   if(colour.disabled)colour.checked=false;
   el('analysis-settings').disabled=busy;el('analysis-engine').disabled=busy;
+  el('results-empty').hidden=!el('analysis-results').hidden;
+  el('tab-results').querySelector('.tab-dot').hidden=!(report&&dirty);   // results out of date
   for(const id of ['section-diameter','section-wall'])el(id).disabled=!el('section-override').checked;
   document.querySelectorAll('[data-analysis]').forEach(b=>{
-    b.disabled=!native||busy||(b.dataset.analysis==='analyze'&&!model)||
+    b.disabled=!native||busy||(b.dataset.analysis==='analyze'&&!ready)||
       (['highlight','export'].includes(b.dataset.analysis)&&(!report||dirty))||
       (b.dataset.analysis==='highlight'&&!report?.result?.worst_member_guids?.length)||
       (b.dataset.analysis==='clear_view'&&!report?.native?.drawn)||
@@ -93,11 +133,11 @@ function request(action) {
   if(!native||busy)return;
   if(action==='analyze'&&!el('analysis-form').reportValidity())return;
   const input=settings();
-  if(input.diameter_mm!==null && input.wall_mm>=input.diameter_mm/2){message('Wall thickness must be less than half the diameter.');return;}
+  if(input.diameter_mm!==null && input.wall_mm>=input.diameter_mm/2){message('Wall thickness must be less than half the diameter.','error');return;}
   busy=true;pending=action;controls();
   if(action==='capture')captureNote('Select structural geometry in Rhino…');
   message(action==='analyze'?(input.engine==='native'?'Exporting the model from Rhino…':'Running Karamba in Rhino…'):
-    action==='capture'?'Select structural geometry in Rhino…':action==='status'?'Checking engines…':'Working in Rhino…');
+    action==='capture'?'Select structural geometry in Rhino…':action==='status'?'Checking engines…':'Working in Rhino…','busy');
   location.href='/almond-action/'+token+'/karamba/'+action+'?data='+encodeURIComponent(JSON.stringify(input));
 }
 document.querySelectorAll('[data-analysis]').forEach(b=>{if(b.dataset.analysis!=='analyze')b.addEventListener('click',()=>request(b.dataset.analysis));});
@@ -105,25 +145,61 @@ el('analysis-form').addEventListener('submit',e=>{e.preventDefault();request('an
 el('analysis-code').addEventListener('change',codeControls);
 el('analysis-engine').addEventListener('change',()=>{
   engineControls();
-  if(report){dirty=true;el('analysis-stale').hidden=false;message('Engine changed. Run analysis again to update the results.');}
+  if(report){dirty=true;el('analysis-stale').hidden=false;message('Engine changed. Run analysis again to update the results.','warn');}
   controls();draw();
 });
 el('analysis-form').addEventListener('input',event=>{
-  if(!event.target.closest('#analysis-settings'))return;
+  if(!event.target.closest('#analysis-settings')||event.target.closest('[data-analysis-view]'))return;   // diagram toggles only redraw
   dirty=!!report;el('section-fields').hidden=!el('section-override').checked;
   el('analysis-stale').hidden=!dirty;
-  if(dirty)message('Inputs changed. Run analysis again to update the results.');
+  if(dirty)message('Inputs changed. Run analysis again to update the results.','warn');
   controls();draw();
 });
 document.querySelectorAll('[data-analysis-view]').forEach(b=>b.addEventListener('change',draw));
 const engineState={karamba:'Karamba not checked',native:'Native engine not checked'};
-function showEngines(){el('engine-state').textContent=engineState.native+' · '+engineState.karamba;}
+function showEngines(){
+  el('engine-state').textContent=engineState.native+' · '+engineState.karamba;
+  const n=engine()==='native'?engineState.native:engineState.karamba;
+  el('engine-state').dataset.state=/ready|detected/i.test(n)?'ok':/starting|checking/i.test(n)?'busy':/unavailable|not installed/i.test(n)?'error':'idle';
+  controls();
+}
+// What a run needs before it can start: a checklist beside Run, and a "!" on the tab that still needs input.
+function readiness(){
+  const nativeEngine=engine()==='native',n=nativeEngine?engineState.native:engineState.karamba;
+  const loads=Number(el('analysis-load').value)>0||el('self-weight').checked||
+    (nativeEngine&&(Number(el('floor-imposed').value)>0||Number(el('floor-dead').value)>0||el('asset-loads').checked));
+  const anchors=model?.anchors?.length||0,points=el('support-source').value==='points';
+  const down=/unavailable|not installed/i.test(n);
+  return [
+    {key:'engine',tab:null,label:'Engine',state:/ready|detected/i.test(n)?'ok':down?'error':'busy',
+     tip:down?'Press Check engines; the note under the engine line says why.':'Checking the engine…'},
+    {key:'model',tab:'model',label:'Structure',state:model?'ok':'need',
+     tip:model?model.beams+' beams · '+model.shells+' shells':'Model tab: select in Rhino, then Use Rhino selection'},
+    {key:'loads',tab:'loads',label:'Loads',state:loads?'ok':'need',tip:loads?'Loads set':'Loads tab: add a load or self-weight'},
+    {key:'supports',tab:'supports',label:'Supports',state:points&&model&&!anchors?'need':'ok',
+     tip:points&&model&&!anchors?'Supports tab: select support points, or allow the lowest nodes':(anchors?anchors+' support points':'Lowest nodes')}];
+}
+function renderReadiness(){
+  const items=readiness();
+  el('run-checklist').replaceChildren(...items.map(i=>{
+    const n=document.createElement('li');n.dataset.state=i.state;n.title=i.tip;
+    const icon=document.createElement('span');icon.className='ck-icon';icon.setAttribute('aria-hidden','true');n.append(icon,i.label);
+    if(i.tab){n.tabIndex=0;n.addEventListener('click',()=>showTab(i.tab));n.addEventListener('keydown',e=>{if(e.key==='Enter')showTab(i.tab);});}
+    return n;}));
+  for(const i of items)if(i.tab){const need=el('tab-'+i.tab).querySelector('.tab-need');if(need)need.hidden=i.state!=='need';}
+  el('loads-required').hidden=items.find(i=>i.key==='loads').state!=='need';
+  return items.every(i=>i.state==='ok');
+}
 window.almondAnalysisReceive = payload => {
-  if(payload.kind==='progress'){message(payload.message);return;}          // still busy: the solver is running
+  if(payload.kind==='progress'){message(payload.message,'busy');return;}          // still busy: the solver is running
   if(payload.kind==='native_status'){
     showCodes(payload.design_codes);
     engineState.native=payload.available?'Native engine ready'+(payload.version?' · v'+payload.version:''):'Native engine unavailable';
     if(!payload.available)el('engine-detail').textContent=payload.detail||'';
+    // the engine answers after the "starting" status: settle the status line with the outcome
+    if(el('analysis-status').dataset.state==='busy'&&/engine/i.test(el('analysis-message').textContent))
+      payload.available?message('Engines checked. Native engine ready'+(payload.version?' · v'+payload.version:'')+'.','ok'):
+        message('Native engine unavailable'+(payload.detail?': '+payload.detail:'.'),'error');
     showEngines();return;
   }
   busy=false;
@@ -131,25 +207,28 @@ window.almondAnalysisReceive = payload => {
   if(payload.kind==='error'||payload.kind==='notice'){
     if(answered==='capture')captureNote(payload.message,payload.kind==='error');
     if(payload.stale && report){dirty=true;el('analysis-stale').hidden=false;}
-    message(payload.message);controls();draw();return;
+    message(payload.message,payload.kind==='error'?'error':'ok');controls();draw();return;
   }
   if(payload.kind==='status'){
     engineState.karamba=payload.available?'Karamba detected':'Karamba not installed';
     const n=payload.native||{};
     engineState.native=n.checking?'Native engine starting…':n.available===false?'Native engine unavailable':engineState.native;
     el('engine-detail').textContent=[n.detail,payload.detail||payload.message].filter(Boolean).join(' · ');
-    showEngines();message(n.available===false?n.detail:'Engines checked.');
+    showEngines();
+    if(n.available===false)message('Native engine unavailable'+(n.detail?': '+n.detail:'.'),'error');
+    else if(n.checking)message('Starting the native engine… The first run downloads it.','busy');
+    else message('Engines checked.','ok');
   }
   if(payload.kind==='capture'){
     model=payload.model;report=null;dirty=false;
     el('analysis-results').hidden=true;el('analysis-stale').hidden=true;
-    message('Selection captured. Review the assumptions and run analysis.');
+    message('Selection captured. Review the tabs, then Run.','ok');
   }
   if(payload.kind==='result'){
+    showTab('results');
     model=payload.model;report=payload;dirty=false;el('analysis-stale').hidden=true;
     renderResult();
-    message(payload.native?.message||(payload.native?.draw_error?payload.native.draw_error:
-      'Analysis snapshot recorded. Recapture if Rhino geometry changes.'));
+    resultStatus();
   }
   if(model) {
     captureNote(model.objects+' objects · '+model.beams+' beams · '+model.shells+' shells · '+model.units);
@@ -168,6 +247,17 @@ function nativeFacts(r,nat){
   if(finite(m.reactions_kn))facts.push('Support reactions '+m.reactions_kn.toFixed(1)+' kN (SLS) · '+m.nodes+' nodes · '+m.elements+' elements · '+m.solve_ms+' ms');
   if(nat.version)facts.push('Solver almond-mcp '+nat.version);
   return facts;
+}
+// The run's outcome in the status line: green within the checks, amber indicative, red exceeded or unstable.
+function resultStatus(){
+  const r=report.result||{},nat=report.native||{},s=metricState(r);
+  const figures=[s.deflection!=null?s.deflection.toFixed(1)+' mm':null,s.utilization!=null?(s.utilization*100).toFixed(0)+'%':null].filter(Boolean).join(' · ');
+  const outcome=el('analysis-outcome').textContent+(figures?' · '+figures:'');
+  if(nat.draw_error)return message(outcome+'. The viewport overlay could not be drawn: '+nat.draw_error,'warn');
+  if(r.status==='pass')return message(outcome,'ok');
+  if(r.status==='indicative')return message(outcome,'warn','Concrete, timber and aluminium are not capacity-checked yet: read the forces and deflection, and have the members designed to their code.');
+  if(!s.complete)return message(outcome,'error',/unstable/i.test(outcome)?hintFor('unstable'):undefined);
+  return message(outcome,'error','The Results tab lists the governing member and check: try a larger section (Model tab), stiffer joints (Supports tab), or the real span (Code tab).');
 }
 function renderResult(){
   const r=report.result,m=r.results||{},s=metricState(r),nat=report.native,st=stabilityState(r,nat);
@@ -251,12 +341,12 @@ try{const saved=localStorage.getItem('almond-structure-engine');if(saved==='kara
 engineControls();codeControls();
 el('analysis-settings').addEventListener('input',advancedSummary);
 el('analysis-settings').addEventListener('change',advancedSummary);
-try{el('advanced-settings').open=localStorage.getItem('almond-advanced-open')==='1';}catch{}
-el('advanced-settings').addEventListener('toggle',()=>{try{localStorage.setItem('almond-advanced-open',el('advanced-settings').open?'1':'0');}catch{}});
-// an invalid value inside the closed section would stop Run with nothing in view: open it
-el('analysis-form').addEventListener('invalid',e=>{if(e.target.closest('#advanced-settings'))el('advanced-settings').open=true;},true);
+// an invalid value on another tab would stop Run with nothing in view: show its tab
+el('analysis-form').addEventListener('invalid',e=>{const pane=e.target.closest('[data-pane]');if(pane)showTab(pane.dataset.pane);},true);
+let savedTab='model';try{savedTab=localStorage.getItem('almond-structure-tab')||'model';}catch{}
+showTab(TABS.includes(savedTab)?savedTab:'model');
 el('analysis-native-note').hidden=native;
-if(!native) message('Open AlmondStructure inside Rhino to select geometry and run the solver.');
+if(!native) message('Open AlmondStructure inside Rhino to select geometry and run the solver.','info');
 // check the engines once, the first time the workspace is shown (it also fetches the native solver)
 function firstVisit(){if(native&&!checked&&location.hash==='#karamba'){checked=true;setTimeout(()=>{if(!busy)request('status');},300);}}
 addEventListener('hashchange',firstVisit);firstVisit();

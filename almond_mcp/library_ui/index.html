@@ -39,47 +39,21 @@
 <section id="karamba-page" class="analysis-page" hidden>
   <p class="eyebrow">02 / STRUCTURAL WORKSPACE</p><h1>Structural <br>Validation<span class="red">.</span></h1>
   <div class="engine-line"><label class="engine-choice">Engine<select id="analysis-engine"><option value="native">Almond native · built in</option><option value="karamba">Karamba3D · separate licence</option></select></label><button type="button" data-analysis="status">Check engines ↗</button></div>
-  <p id="engine-state" class="analysis-meta">Engines not checked.</p>
+  <p id="engine-state" class="analysis-meta engine-state" data-state="idle">Engines not checked.</p>
   <p id="analysis-native-note" class="analysis-note">Open <strong>AlmondStructure</strong> in Rhino to connect this workspace to your geometry.</p>
+  <nav class="analysis-tabs" role="tablist" aria-label="Structure workspace"><button type="button" role="tab" id="tab-model" data-tab="model" aria-controls="pane-model" aria-selected="false" tabindex="-1"><svg class="tab-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.5 14 5v6l-6 3.5L2 11V5zM2 5l6 3.5L14 5M8 8.5V15"/></svg><span>Model</span><i class="tab-need" hidden title="Needs input">!</i></button><button type="button" role="tab" id="tab-loads" data-tab="loads" aria-controls="pane-loads" aria-selected="false" tabindex="-1"><svg class="tab-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M4 1.5v7M1.8 6.3 4 8.5l2.2-2.2M12 1.5v7M9.8 6.3 12 8.5l2.2-2.2M1.5 11.5h13M3 14.5h10"/></svg><span>Loads</span><i class="tab-need" hidden title="Needs input">!</i></button><button type="button" role="tab" id="tab-supports" data-tab="supports" aria-controls="pane-supports" aria-selected="false" tabindex="-1"><svg class="tab-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 3.5h13M8 3.5v4M8 7.5l-4.5 5.5h9zM3 15h10"/></svg><span>Supports</span><i class="tab-need" hidden title="Needs input">!</i></button><button type="button" role="tab" id="tab-code" data-tab="code" aria-controls="pane-code" aria-selected="false" tabindex="-1"><svg class="tab-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M3.5 1.5h6l3 3v10h-9zM9.5 1.5v3h3M5.5 9.6l1.8 1.8 3.2-3.4"/></svg><span>Code</span><i class="tab-dot" hidden></i></button><button type="button" role="tab" id="tab-results" data-tab="results" aria-controls="pane-results" aria-selected="false" tabindex="-1"><svg class="tab-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 14.5h13M4 12.5V8M8 12.5V3.5M12 12.5V6.5"/></svg><span>Results</span><i class="tab-dot" hidden></i></button></nav>
   <form id="analysis-form">
-    <section class="analysis-step"><h2><span>01</span> Select the structure</h2>
+    <fieldset id="analysis-settings"><legend class="sr-only">Analysis settings</legend>
+    <section id="pane-model" class="analysis-step analysis-pane" role="tabpanel" aria-labelledby="tab-model" data-pane="model"><h2>Select the structure</h2>
       <p>Use member axes, shell surfaces or meshes. Include point objects for declared supports.</p>
       <button class="analysis-button" type="button" data-analysis="capture">Use Rhino selection ↗</button>
-      <p id="selection-summary" class="analysis-meta">No geometry captured.</p>
-    </section>
-    <fieldset id="analysis-settings"><legend class="sr-only">Analysis settings</legend>
-      <section class="analysis-step"><h2><span>02</span> Define the setup</h2>
-        <div class="analysis-fields"><label>Structure<select id="analysis-type"><option value="frame">Frame</option><option value="beam">Beam</option><option value="truss">Truss assembly</option><option value="shell" data-engine="karamba">Shell · Karamba</option></select></label>
+      <p id="selection-summary" class="analysis-meta need">Required: select the structure in Rhino, then Use Rhino selection.</p>
+      <div class="analysis-fields"><label>Structure<select id="analysis-type"><option value="frame">Frame</option><option value="beam">Beam</option><option value="truss">Truss assembly</option><option value="shell" data-engine="karamba">Shell · Karamba</option></select></label>
         <label>Material<select id="analysis-material"><option value="Steel">Steel / S235</option><option value="S355">Steel / S355</option><option value="Concrete">Concrete / C30/37</option><option value="Wood">Wood / C24</option><option value="Aluminium">Aluminium</option></select></label></div>
-        <label>Total imposed load <span class="unit-label">kN / downward −Z</span><input id="analysis-load" type="number" min="0" max="100000" step="any" value="10" required></label>
-        <p class="field-help">Split across free nodes. If all nodes are supported, the imposed load acts on all nodes.</p>
-        <div data-native class="analysis-fields"><label>Floor imposed load <span class="unit-label">kN/m² · Q</span><input id="floor-imposed" type="number" min="0" max="1000" step="any" value="0" required></label>
-        <label>Floor build-up <span class="unit-label">kN/m² · G</span><input id="floor-dead" type="number" min="0" max="1000" step="any" value="0" required></label></div>
-        <p data-native class="field-help">Every bay enclosed by beams carries the area load (45° distribution). Residential: 2.0 imposed + about 1.0 build-up.</p>
-        <label class="analysis-toggle"><input id="self-weight" type="checkbox" checked><span>Include self-weight</span></label>
-        <div class="analysis-fields"><label>Restraint<select id="support-restraint"><option value="fixed">Fixed</option><option value="pinned">Pinned</option></select></label>
-        <label data-native>Connections<select id="analysis-connections"><option value="rigid">Rigid joints</option><option value="simple">Simple · pinned beam ends</option></select></label></div>
-        <p class="field-help">Fixed restrains translation and rotation; pinned, translation only. Simple joints pin the beam ends, as for bolted steel or timber.</p>
-        <label data-native>Viewport overlay<select id="analysis-overlay"><option value="deflection">Deflected shape · utilization</option><option value="buckling">First buckling mode</option></select></label>
-        <label class="analysis-toggle"><input id="section-override" type="checkbox"><span>Override beam section / CHS</span></label>
-        <div id="section-fields" class="analysis-fields" hidden><label>Diameter / mm<input id="section-diameter" type="number" value="114.3" min="1" max="5000" step="any" required></label><label>Wall / mm<input id="section-wall" type="number" value="4" min="0.1" max="2499" step="any" required></label></div>
-        <details id="advanced-settings" class="analysis-advanced"><summary><span>More settings</span><small id="advanced-summary">All at their defaults</small></summary>
-          <p class="field-help">Rarely needed: the defaults suit a first check. Open these to change the design code, stability, deflection limit, supports or tube fabrication.</p>
-          <div data-native class="analysis-fields"><label>Design code<select id="analysis-code"><option value="eurocode">Eurocode (recommended values)</option><option value="off">Off (unfactored mechanics)</option></select></label>
-        <label>ULS expression<select id="analysis-uls"><option value="">Code default</option><option value="6.10">6.10</option><option value="6.10ab">6.10a / 6.10b</option></select></label></div>
-          <p data-native id="code-note" class="field-help">Load factors, material factors and the deflection limit come from the design code profile.</p>
-          <label data-native>Stability<select id="analysis-stability"><option value="auto">αcr, sway imperfection, P-Δ</option><option value="off">Off · first order</option></select></label>
-          <div data-native class="analysis-fields"><label>Deflection span <span class="unit-label">m · blank = auto</span><input id="analysis-span" type="number" min="0.01" max="1000" step="any" placeholder="auto"></label>
-        <label>Deflection limit <span class="unit-label">span / · blank = code</span><input id="analysis-limit" type="number" min="100" max="1000" step="any" placeholder="code"></label></div>
-          <label>Support locations<select id="support-source"><option value="auto">Points, else lowest nodes</option><option value="points">Require selected points</option></select></label>
-          <label data-native class="analysis-toggle"><input id="asset-loads" type="checkbox"><span>Loads from placed Almond models</span></label>
-          <label data-native>Steel tubes<select id="analysis-fabrication"><option value="cold_formed">Cold-formed · EN 10219 (curve c)</option><option value="hot_finished">Hot-finished · EN 10210 (curve a)</option></select></label>
-          <p data-native class="field-help">How the hollow sections are made. Cold-formed is the safe default; choose hot-finished only when it is specified.</p>
-          <details class="analysis-details"><summary>Section assumptions</summary><p id="section-summary">Sections are inferred where supported. Otherwise beams use CHS 114.3 × 4 mm and shells use 100 mm thickness.</p><p>Truss assemblies use beam elements in this workspace. Axial-only member releases are not applied.</p></details>
-        </details>
-      </section>
-    </fieldset>
-    <section class="analysis-step diagram-step"><h2><span>03</span> Read the model</h2>
+      <label class="analysis-toggle"><input id="section-override" type="checkbox"><span>Override beam section / CHS</span></label>
+      <div id="section-fields" class="analysis-fields" hidden><label>Diameter / mm<input id="section-diameter" type="number" value="114.3" min="1" max="5000" step="any" required></label><label>Wall / mm<input id="section-wall" type="number" value="4" min="0.1" max="2499" step="any" required></label></div>
+      <details class="analysis-details"><summary>Section assumptions</summary><p id="section-summary">Sections are inferred where supported. Otherwise beams use CHS 114.3 × 4 mm and shells use 100 mm thickness.</p><p>Truss assemblies use beam elements in this workspace. Axial-only member releases are not applied.</p></details>
+      <div class="diagram-step"><h3 class="pane-subhead">The model</h3>
       <label class="diagram-view">View<select id="analysis-view" data-analysis-view><option value="axon">Axonometric</option><option value="front">Front</option><option value="top">Top</option></select></label>
       <svg id="analysis-diagram" viewBox="0 0 320 240" role="img" aria-label="Structural model with toggled support, load and utilization overlays"></svg>
       <p id="diagram-caption" class="analysis-meta"></p>
@@ -87,11 +61,40 @@
       <p id="diagram-load-note" class="field-help"></p>
       <div id="result-legend" class="result-legend" hidden><span>≤80%</span><span>80–100%</span><span>&gt;100%</span><span>No data</span></div>
       <p class="field-help">Colours show the maximum utilization mapped to each source member. Arrows show direction; lengths are symbolic. Up to 80 imposed-load symbols are shown. Self-weight acts throughout the model.</p>
-      <button id="analysis-run" class="analysis-button primary" type="submit" data-analysis="analyze">Run native analysis ↗</button>
-      <p id="analysis-message" role="status" aria-live="polite"></p>
+      </div>
     </section>
-  </form>
-  <section id="analysis-results" class="analysis-step" hidden><h2><span>04</span> Results</h2>
+    <section id="pane-loads" class="analysis-step analysis-pane" role="tabpanel" aria-labelledby="tab-loads" data-pane="loads" hidden><h2>Loads</h2>
+      <label>Total imposed load <span class="unit-label">kN / downward −Z</span><input id="analysis-load" type="number" min="0" max="100000" step="any" value="10" required></label>
+      <p class="field-help">Split across free nodes. If all nodes are supported, the imposed load acts on all nodes.</p>
+      <div data-native class="analysis-fields"><label>Floor imposed load <span class="unit-label">kN/m² · Q</span><input id="floor-imposed" type="number" min="0" max="1000" step="any" value="0" required></label>
+        <label>Floor build-up <span class="unit-label">kN/m² · G</span><input id="floor-dead" type="number" min="0" max="1000" step="any" value="0" required></label></div>
+      <p data-native class="field-help">Every bay enclosed by beams carries the area load (45° distribution). Residential: 2.0 imposed + about 1.0 build-up.</p>
+      <label class="analysis-toggle"><input id="self-weight" type="checkbox" checked><span>Include self-weight</span></label>
+      <p id="loads-required" class="field-required" hidden>Add a load before running: a total load, a floor load, or self-weight.</p>
+      <label data-native class="analysis-toggle"><input id="asset-loads" type="checkbox"><span>Loads from placed Almond models</span></label>
+    </section>
+    <section id="pane-supports" class="analysis-step analysis-pane" role="tabpanel" aria-labelledby="tab-supports" data-pane="supports" hidden><h2>Supports and joints</h2>
+      <div class="analysis-fields"><label>Restraint<select id="support-restraint"><option value="fixed">Fixed</option><option value="pinned">Pinned</option></select></label>
+      <label data-native>Connections<select id="analysis-connections"><option value="rigid">Rigid joints</option><option value="simple">Simple · pinned beam ends</option></select></label></div>
+      <p class="field-help">Fixed restrains translation and rotation; pinned, translation only. Simple joints pin the beam ends, as for bolted steel or timber.</p>
+      <label>Support locations<select id="support-source"><option value="auto">Points, else lowest nodes</option><option value="points">Require selected points</option></select></label>
+    </section>
+    <section id="pane-code" class="analysis-step analysis-pane" role="tabpanel" aria-labelledby="tab-code" data-pane="code" hidden><h2>Code and checks</h2>
+      <p id="advanced-summary" class="analysis-meta">All at their defaults</p>
+      <p class="field-help">The defaults suit a first check. Change these for a National Annex profile, a stricter deflection limit, or tubes specified as hot-finished.</p>
+      <div data-native class="analysis-fields"><label>Design code<select id="analysis-code"><option value="eurocode">Eurocode (recommended values)</option><option value="off">Off (unfactored mechanics)</option></select></label>
+        <label>ULS expression<select id="analysis-uls"><option value="">Code default</option><option value="6.10">6.10</option><option value="6.10ab">6.10a / 6.10b</option></select></label></div>
+      <p data-native id="code-note" class="field-help">Load factors, material factors and the deflection limit come from the design code profile.</p>
+      <label data-native>Stability<select id="analysis-stability"><option value="auto">αcr, sway imperfection, P-Δ</option><option value="off">Off · first order</option></select></label>
+      <div data-native class="analysis-fields"><label>Deflection span <span class="unit-label">m · blank = auto</span><input id="analysis-span" type="number" min="0.01" max="1000" step="any" placeholder="auto"></label>
+        <label>Deflection limit <span class="unit-label">span / · blank = code</span><input id="analysis-limit" type="number" min="100" max="1000" step="any" placeholder="code"></label></div>
+      <label data-native>Steel tubes<select id="analysis-fabrication"><option value="cold_formed">Cold-formed · EN 10219 (curve c)</option><option value="hot_finished">Hot-finished · EN 10210 (curve a)</option></select></label>
+      <p data-native class="field-help">How the hollow sections are made. Cold-formed is the safe default; choose hot-finished only when it is specified.</p>
+    </section>
+    <section id="pane-results" class="analysis-step analysis-pane" role="tabpanel" aria-labelledby="tab-results" data-pane="results" hidden><h2>Results</h2>
+      <label data-native>Viewport overlay<select id="analysis-overlay"><option value="deflection">Deflected shape · utilization</option><option value="buckling">First buckling mode</option></select></label>
+      <p id="results-empty" class="field-help">Run the analysis to see its results here.</p>
+  <section id="analysis-results" class="analysis-step" hidden><h3 class="pane-subhead">Latest run</h3>
     <p id="analysis-stale" class="analysis-note" hidden>Inputs changed — rerun required.</p>
     <p id="analysis-method" class="analysis-meta"></p><h3 id="analysis-outcome"></h3>
     <div class="metric-block"><span>Maximum deflection</span><strong id="deflection-value">—</strong><meter id="deflection-meter" min="0" max="2" low="0.8" high="1" optimum="0" value="0" aria-label="Deflection relative to limit"></meter><small id="deflection-basis"></small></div>
@@ -105,6 +108,10 @@
     <div class="analysis-fields"><button type="button" class="analysis-button" data-analysis="results">Open full results ↗</button><button type="button" class="analysis-button" data-analysis="clear_view" data-native>Clear viewport overlay</button></div>
     <p id="analysis-snapshot" class="analysis-meta"></p>
   </section>
+    </section>
+    </fieldset>
+    <div class="analysis-runbar"><ul id="run-checklist" class="run-checklist" aria-label="Before you run"></ul><button id="analysis-run" class="analysis-button primary" type="submit" data-analysis="analyze">Run native analysis ↗</button><div id="analysis-status" class="status" data-state="idle" role="status" aria-live="polite"><span class="st-icon" aria-hidden="true"></span><div class="st-text"><p id="analysis-message"></p><p id="analysis-hint" class="status-hint" hidden></p></div></div></div>
+  </form>
   <details class="analysis-details"><summary>Method &amp; engine details</summary><p><strong>Almond native</strong> (built in, no licence): a 3D frame solver for line members. EN 1990 load combinations (SLS G + Q for deflection, ULS for member checks), floor bays and placed models as loads, rigid or simple connections, and an EN 1993-1-1 stability screen (αcr, sway imperfections, P-Δ below 10). Benchmarked against Karamba within 1.3% on deflection.</p><p><strong>Karamba3D</strong> (separate installation and licence): first-order analysis, also for shells.</p><p>L/250 is an indicative deflection screen. This workspace does not establish full project-specific code compliance.</p><p id="engine-detail">Check the engines inside Rhino.</p><a href="https://manual.karamba3d.com/3-in-depth-component-reference/3.6-results/3.7.1-general-results/3.6.1-modelview" target="_blank" rel="noopener noreferrer">Karamba ModelView documentation ↗</a></details>
 </section>
 <section id="library-page" hidden>
