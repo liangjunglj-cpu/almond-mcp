@@ -223,7 +223,7 @@ namespace RhinoAlmondBridge
                 {
                     Axis = crv.DuplicateCurve(),
                     SourceGuids = new List<string> { guidStr },
-                    Section = InferSection(obj, scale) ?? SectionSpec.DefaultBeam(scale),
+                    Section = SectionFromUserText(obj, scale, model.Warnings) ?? InferSection(obj, scale) ?? SectionSpec.DefaultBeam(scale),
                 });
                 return;
             }
@@ -539,6 +539,46 @@ namespace RhinoAlmondBridge
                 }
             }
             return result;
+        }
+
+        private static readonly string[] SectionKeys = { "almond:section", "Almond.Section" };
+        private static readonly System.Text.RegularExpressions.Regex SectionText = new System.Text.RegularExpressions.Regex(
+            @"^\s*(rect|box|chs)\s+([0-9.]+)\s*[x*]\s*([0-9.]+)(?:\s*[x*]\s*([0-9.]+))?\s*(mm|cm|m)?\s*$",
+            System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+        /// <summary>
+        /// Section the designer wrote on a curve as user text <c>almond:section</c>, in millimetres unless
+        /// a unit follows (<c>rect 30x64 cm</c>):
+        /// <c>rect 300x640</c> (solid, width x depth), <c>box 200x300x8</c> (width x depth x wall) or
+        /// <c>chs 114.3x4</c> (diameter x wall). Returns null when the key is absent; an unreadable value
+        /// adds a warning and returns null so the drawn or default section applies.
+        /// </summary>
+        public static SectionSpec SectionFromUserText(RhinoObject obj, double unitScaleToMeters, List<string> warnings)
+        {
+            var text = SectionKeys.Select(k => obj?.Attributes.GetUserString(k)).FirstOrDefault(v => !string.IsNullOrWhiteSpace(v));
+            if (text == null) return null;
+            var m = SectionText.Match(text);
+            var inv = System.Globalization.CultureInfo.InvariantCulture;
+            double a = 0, b = 0, c = 0;
+            bool ok = m.Success
+                && double.TryParse(m.Groups[2].Value, System.Globalization.NumberStyles.Float, inv, out a)
+                && double.TryParse(m.Groups[3].Value, System.Globalization.NumberStyles.Float, inv, out b)
+                && (!m.Groups[4].Success || double.TryParse(m.Groups[4].Value, System.Globalization.NumberStyles.Float, inv, out c));
+            var shape = ok ? m.Groups[1].Value.ToLowerInvariant() : null;
+            ok = ok && a > 0 && b > 0 && (shape == "box" ? c > 0 && m.Groups[4].Success : !m.Groups[4].Success);
+            if (!ok)
+            {
+                warnings?.Add($"almond:section '{text.Trim()}' on {obj.Id} was not understood (use rect 300x640, box 200x300x8 " +
+                    "or chs 114.3x4, in mm unless a unit follows); the drawn or default section was used.");
+                return null;
+            }
+            var unit = m.Groups[5].Success ? m.Groups[5].Value.ToLowerInvariant() : "mm";
+            double mm = (unit == "m" ? 1.0 : unit == "cm" ? 0.01 : 0.001) / unitScaleToMeters;   // given unit -> document units
+            if (shape == "chs")
+                return new SectionSpec { Shape = "circular_hollow", Diameter = a * mm, WallThickness = b * mm, Source = "user" };
+            if (shape == "box")
+                return new SectionSpec { Shape = "box", Width = a * mm, Height = b * mm, WallThickness = c * mm, Source = "user" };
+            return new SectionSpec { Shape = "rect", Width = a * mm, Height = b * mm, Source = "user" };
         }
 
         /// <summary>

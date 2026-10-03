@@ -201,6 +201,13 @@ beam deflection, so `connections="simple"` models it:
   `pinned_end` | `rigid` overrides either mode (the bridge exports the curve's own start and
   end so one-sided releases know the direction).
 
+**Sections per curve.** A curve's user text `almond:section` sets its section, in millimetres unless a
+unit follows (`rect 30x64 cm`):
+`rect 300x640` (solid, width x depth: concrete, timber), `box 200x300x8` (width x depth x wall) or
+`chs 114.3x4` (diameter x wall). It takes precedence over a section inferred from the geometry; the
+panel's *Override beam section* still overrides everything. An unreadable value is reported as a
+warning and the inferred or default CHS is used.
+
 The solver applies releases by **static condensation**: the released end DOFs are
 eliminated from the member's stiffness and fixed-end forces, then recovered after the solve
 so deflected shapes and moment diagrams stay exact (a member pinned at both ends between
