@@ -50,8 +50,8 @@ function codeControls() {
     (p.verified?'':' Unverified values: '+p.unverified.join(', ')+' — results are provisional.');
   advancedSummary();
 }
-// "More settings" holds what a first check leaves at its default. Closed, it names whatever differs from the
-// default, so a changed limit or code is never hidden: [control, default, how to say it].
+// The Code tab holds what a first check leaves at its default. Its line names whatever differs from the default, and
+// the tab shows a dot, so a changed limit or code is never hidden behind it: [control, default, how to say it].
 const ADVANCED=[['analysis-code',()=>codes?.default||'eurocode',()=>el('analysis-code').selectedOptions[0]?.textContent||'code'],
   ['analysis-uls','',v=>'ULS '+v],['analysis-stability','auto',()=>'stability off'],['analysis-span','',v=>'span '+v+' m'],
   ['analysis-limit','',v=>'limit L/'+v],['support-source','auto',()=>'supports at points only'],
@@ -62,8 +62,21 @@ function advancedSummary() {
     return !(n.closest('[data-native]')&&!nativeEngine)&&n.value!==(typeof def==='function'?def():def);}).map(([id,,say])=>say(el(id).value));
   if(nativeEngine&&el('asset-loads').checked)changed.push('placed-model loads');
   el('advanced-summary').textContent=changed.length?'Changed: '+changed.join(' · '):'All at their defaults';
-  el('advanced-settings').classList.toggle('changed',changed.length>0);
+  el('advanced-summary').classList.toggle('error',changed.length>0);
+  el('tab-code').querySelector('.tab-dot').hidden=!changed.length;
 }
+// The workspace in tabs; Run and its status line stay in view below them.
+const TABS=['model','loads','supports','code','results'];
+function showTab(name) {
+  for(const t of TABS){const on=t===name,b=el('tab-'+t);b.setAttribute('aria-selected',String(on));b.tabIndex=on?0:-1;el('pane-'+t).hidden=!on;}
+  try{localStorage.setItem('almond-structure-tab',name);}catch{}
+}
+document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.tab)));
+document.querySelector('.analysis-tabs').addEventListener('keydown',e=>{
+  const i=TABS.indexOf(document.activeElement?.dataset?.tab);if(i<0)return;
+  const step={ArrowRight:1,ArrowLeft:-1,Home:-i,End:TABS.length-1-i}[e.key];if(step===undefined)return;
+  e.preventDefault();const next=TABS[(i+step+TABS.length)%TABS.length];showTab(next);el('tab-'+next).focus();
+});
 function engineControls() {
   const nativeEngine=engine()==='native';
   document.querySelectorAll('#analysis-settings [data-native]').forEach(n=>n.hidden=!nativeEngine);
@@ -79,6 +92,8 @@ function controls() {
   colour.disabled=!report||dirty||!report.result?.results?.utilization_available;
   if(colour.disabled)colour.checked=false;
   el('analysis-settings').disabled=busy;el('analysis-engine').disabled=busy;
+  el('results-empty').hidden=!el('analysis-results').hidden;
+  el('tab-results').querySelector('.tab-dot').hidden=!(report&&dirty);   // results out of date
   for(const id of ['section-diameter','section-wall'])el(id).disabled=!el('section-override').checked;
   document.querySelectorAll('[data-analysis]').forEach(b=>{
     b.disabled=!native||busy||(b.dataset.analysis==='analyze'&&!model)||
@@ -109,7 +124,7 @@ el('analysis-engine').addEventListener('change',()=>{
   controls();draw();
 });
 el('analysis-form').addEventListener('input',event=>{
-  if(!event.target.closest('#analysis-settings'))return;
+  if(!event.target.closest('#analysis-settings')||event.target.closest('[data-analysis-view]'))return;   // diagram toggles only redraw
   dirty=!!report;el('section-fields').hidden=!el('section-override').checked;
   el('analysis-stale').hidden=!dirty;
   if(dirty)message('Inputs changed. Run analysis again to update the results.');
@@ -146,6 +161,7 @@ window.almondAnalysisReceive = payload => {
     message('Selection captured. Review the assumptions and run analysis.');
   }
   if(payload.kind==='result'){
+    showTab('results');
     model=payload.model;report=payload;dirty=false;el('analysis-stale').hidden=true;
     renderResult();
     message(payload.native?.message||(payload.native?.draw_error?payload.native.draw_error:
@@ -251,10 +267,10 @@ try{const saved=localStorage.getItem('almond-structure-engine');if(saved==='kara
 engineControls();codeControls();
 el('analysis-settings').addEventListener('input',advancedSummary);
 el('analysis-settings').addEventListener('change',advancedSummary);
-try{el('advanced-settings').open=localStorage.getItem('almond-advanced-open')==='1';}catch{}
-el('advanced-settings').addEventListener('toggle',()=>{try{localStorage.setItem('almond-advanced-open',el('advanced-settings').open?'1':'0');}catch{}});
-// an invalid value inside the closed section would stop Run with nothing in view: open it
-el('analysis-form').addEventListener('invalid',e=>{if(e.target.closest('#advanced-settings'))el('advanced-settings').open=true;},true);
+// an invalid value on another tab would stop Run with nothing in view: show its tab
+el('analysis-form').addEventListener('invalid',e=>{const pane=e.target.closest('[data-pane]');if(pane)showTab(pane.dataset.pane);},true);
+let savedTab='model';try{savedTab=localStorage.getItem('almond-structure-tab')||'model';}catch{}
+showTab(TABS.includes(savedTab)?savedTab:'model');
 el('analysis-native-note').hidden=native;
 if(!native) message('Open AlmondStructure inside Rhino to select geometry and run the solver.');
 // check the engines once, the first time the workspace is shown (it also fetches the native solver)

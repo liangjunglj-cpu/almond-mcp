@@ -45,7 +45,7 @@ The panel's **Override beam section** sets one tube size for every member and ta
 
 ## 2. Open the Structure workspace
 
-Type `AlmondStructure` in Rhino's command line, or run `Almond` and click **Structure**. The panel opens beside the viewport and checks its engines. Wait for **Native engine ready** under the engine choice.
+Type `AlmondStructure` in Rhino's command line, or run `Almond` and click **Structure**. The panel opens beside the viewport, on the **Model** tab, and checks its engines. Wait for **Native engine ready** under the engine choice.
 
 Leave **Engine** on **Almond native · built in**. Choose Karamba3D only for shells and surfaces.
 
@@ -54,39 +54,34 @@ Leave **Engine** on **Almond native · built in**. Choose Karamba3D only for she
 ## 3. Capture the frame
 
 1. Select the structural curves in Rhino, plus any support points.
-2. Click **Use Rhino selection ↗**.
+2. On the **Model** tab, click **Use Rhino selection ↗**.
 
-The panel confirms what it took, for example `29 objects · 20 beams · 0 shells · Millimeters`, and draws a small diagram of the frame under **Read the model**. If you edit the geometry later, capture it again: results never follow later edits.
+The line under the button confirms what it took (or, in red, why it could not), for example `29 objects · 20 beams · 0 shells · Millimeters`, and draws a small diagram of the frame under **The model**, further down the tab. If you edit the geometry later, capture it again: results never follow later edits.
 
-## 4. Set the loads and joints
+## 4. Work through the tabs
 
-Step 02 shows the settings you change on most checks. The rest sit under **More settings**, closed by default: their defaults suit a first check. While it is closed, its line says *All at their defaults* or lists what you changed, in red, so nothing changed is hidden.
+The workspace is split into five tabs. **Run** and its status line stay in view below them, so you can run from any tab; the results open on the **Results** tab.
 
-**Always visible**
+| Tab | Setting | Start with | What it means |
+|---|---|---|---|
+| **Model** | Use Rhino selection | | Captures the selected curves and support points (step 3). |
+| | Structure | Frame | *Beam* for a single member, *Truss assembly* for trusses. |
+| | Material | Steel / S235 | S355, Concrete C30/37, Wood C24 and Aluminium are also listed. Concrete, timber and aluminium give **indicative** results (see [Limits](#7-know-the-limits)). |
+| | Override beam section / CHS | Off, or e.g. 219.1 × 8 | One tube for every member, in mm. Below it, the model diagram previews members, supports and loads. |
+| **Loads** | Total imposed load | 0 kN | One extra load shared over the free nodes. Use 0 when you give floor loads. |
+| | Floor imposed load, build-up | 2.0 and 1.0 kN/m² | People and furniture (Q); the floor's own weight (G). |
+| | Include self-weight | On | The members' own weight. |
+| | Loads from placed Almond models | Off | Adds the real weight of placed library items, such as a filled bath. |
+| **Supports** | Restraint | Pinned | The cautious choice; *Fixed* also restrains rotation. |
+| | Connections | Rigid joints | *Simple · pinned beam ends* for typical bolted steel or timber. |
+| | Support locations | Points, else lowest nodes | *Require selected points* refuses a model without support points. |
+| **Code** | Design code, ULS expression | Eurocode, code default | A National Annex profile you added, or *Off* for unfactored comparisons. |
+| | Stability | αcr, sway imperfection, P-Δ | *Off · first order* only for comparisons. |
+| | Deflection span, limit | Blank: longest member, span/250 | The real span when beams are drawn in pieces, or a stricter limit such as 300. |
+| | Steel tubes | Cold-formed · EN 10219 | *Hot-finished* only when the tubes are specified as EN 10210. |
+| **Results** | Viewport overlay | Deflected shape · utilization | Or *First buckling mode*. |
 
-| Setting | Start with | What it means |
-|---|---|---|
-| Structure | Frame | *Beam* for a single member, *Truss assembly* for trusses. |
-| Material | Steel / S235 | S355, Concrete C30/37, Wood C24 and Aluminium are also listed. Concrete, timber and aluminium give **indicative** results (see [Limits](#7-know-the-limits)). |
-| Total imposed load | 0 kN | One extra load shared over the free nodes. Use 0 when you give floor loads. |
-| Floor imposed load | 2.0 kN/m² | People and furniture (Q). |
-| Floor build-up | 1.0 kN/m² | The floor's own weight: screed, boards, tiles (G). |
-| Include self-weight | On | The members' own weight. |
-| Restraint | Pinned | How the frame is held at its supports. Pinned is the cautious choice; *Fixed* also restrains rotation. |
-| Connections | Rigid joints | *Simple · pinned beam ends* for typical bolted steel or timber. It is stricter and closer to how they behave. |
-| Viewport overlay | Deflected shape · utilization | Or *First buckling mode*. |
-| Override beam section / CHS | Off, or e.g. 219.1 × 8 | One tube for every member, in mm. |
-
-**More settings**
-
-| Setting | Default | When to change it |
-|---|---|---|
-| Design code, ULS expression | Eurocode (recommended values), code default | To use a National Annex profile you added, or *Off* for unfactored comparisons. The note under it lists the code's suggested floor loads. |
-| Stability | αcr, sway imperfection, P-Δ | *Off · first order* only for comparisons. |
-| Deflection span, limit | Blank: longest member, code limit (span/250) | Type the real span when beams are drawn in pieces, or a stricter limit such as 300. |
-| Support locations | Points, else lowest nodes | *Require selected points* to refuse a model without support points. |
-| Loads from placed Almond models | Off | Adds the real weight of placed library items, such as a filled bath. |
-| Steel tubes | Cold-formed · EN 10219 | *Hot-finished* only when the tubes are specified as EN 10210; it sets the buckling curve. |
+The **Code** tab's defaults suit a first check. When anything on it differs from the default, the tab shows a red dot and its first line names the change (*Changed: limit L/300*). The **Results** tab shows a dot when its numbers are out of date and need a rerun.
 
 <img src="images/tutorial/panel-code.jpg" alt="The setup with Eurocode, floor loads 2.0 and 1.0, pinned restraint and rigid joints" width="300"> <img src="images/tutorial/panel-lower.jpg" alt="Lower part of the setup: deflection span, overlay, tube size and the frame diagram" width="300">
 
