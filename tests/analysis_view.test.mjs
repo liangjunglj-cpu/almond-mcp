@@ -59,3 +59,8 @@ test('the method line names the design code profile that was applied', () => {
   assert.equal(engineLabel(r),'Almond native · second-order (P-Delta) · Singapore NA · ULS 6.10ab');
   assert.equal(engineLabel({...r,design_code:{id:'off',name:'Off'}}),'Almond native · second-order (P-Delta) · unfactored G + Q');
 });
+test('an indicative (concrete/timber) result is complete but not a pass or fail', () => {
+  const r={status:'indicative',results:{analysis_method:'native',displacement_available:true,utilization_available:true,
+    max_deflection_mm:14.1,utilization_ratio:0.52,deflection_limit_mm:129.4}};
+  assert.equal(metricState(r).complete,true);
+});

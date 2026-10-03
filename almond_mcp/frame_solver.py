@@ -146,6 +146,7 @@ class Element:
     ref: tuple | None = None            # optional vector fixing local z (default: vertical plane)
     tag: object = None                  # caller's lineage (e.g. Rhino GUIDs)
     releases: tuple | None = None       # 12 bools, local DOF order (ux uy uz rx ry rz at n1, then n2)
+    group: int | None = None            # the member this element is part of (kept through splits)
 
 
 def release_mask(start: bool = False, end: bool = False, minor: bool = True) -> tuple | None:
@@ -213,6 +214,8 @@ class Frame:
         """Insert a node at fraction t along element ei, splitting it in two (same section,
         material and lineage; member loads follow both halves). Returns the new node."""
         e = self.elements[ei]
+        if e.group is None:
+            e.group = ei                                        # both halves stay one member
         p1, p2 = np.asarray(self.nodes[e.n1]), np.asarray(self.nodes[e.n2])
         k = self.add_node(p1 + t * (p2 - p1))
         n2 = e.n2
@@ -222,7 +225,7 @@ class Frame:
             rel_end = tuple([False] * 6 + list(e.releases[6:])) if any(e.releases[6:]) else None
             e.releases = tuple(list(e.releases[:6]) + [False] * 6) if any(e.releases[:6]) else None
         new = self.add_element(k, n2, e.section, e.material, truss=e.truss, ref=e.ref, tag=e.tag,
-                               releases=rel_end)
+                               releases=rel_end, group=e.group)
         kept, added = [], []
         for (j, wa, wb, case) in self.member_loads:
             if j != ei:
@@ -735,12 +738,15 @@ _ALPHA = {"a0": 0.13, "a": 0.21, "b": 0.34, "c": 0.49, "d": 0.76}
 
 def member_utilization(er: ElementResult, e: Element, gamma_m0: float = 1.0, gamma_m1: float = 1.0,
                        plastic: bool = False) -> None:
-    """EN 1993-1-1, simplified, for steel/aluminium (strength checks only for the others):
+    """Element-level screening check, EN 1993-1-1 simplified (strength checks only for timber/concrete).
+    Almond's validation replaces it for steel members with the per-member checks in ec3.py (section
+    class, both buckling axes, Annex B interaction); this one remains for direct frame_solver use:
     - cross-section 6.2.1(7): |N|/N_Rd + |My|/M_Rd,y + |Mz|/M_Rd,z (CHS: resultant moment),
       elastic moduli by default (conservative, any class but 4), plastic when ``plastic`` and
       the section is compact;
     - flexural buckling 6.3.1 for compression members with L_cr = member length and the
-      section's buckling curve; combined linearly with bending (k = 1, conservative).
+      section's buckling curve; combined linearly with bending (k = 1: NOT conservative under
+      Annex B, which can give k up to about 1.8 - use ec3.member_check for design checks).
     Lateral-torsional buckling and shear/torsion interaction are not checked."""
     s, m = e.section, e.material
     fy = m.fy

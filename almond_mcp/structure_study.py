@@ -22,10 +22,11 @@ DEFAULTS = {
     "diameter_mm": None, "wall_mm": None, "span_m": None, "floor_imposed_kn_m2": 0.0, "floor_dead_kn_m2": 0.0,
     "asset_loads": False, "design_basis": "en1990", "uls_combination": None, "connections": "rigid",
     "stability": "auto", "view": "deflection", "design_code": design_codes.DEFAULT, "deflection_limit_ratio": None,
+    "fabrication": "cold_formed",
 }
 CHOICES = {
     "structure": ("beam", "frame", "truss"), "design_basis": ("en1990", "unfactored"),
-    "connections": ("rigid", "simple"), "stability": ("auto", "off"),
+    "connections": ("rigid", "simple"), "stability": ("auto", "off"), "fabrication": ("cold_formed", "hot_finished"),
     "view": ("deflection", "buckling"),
 }
 
@@ -80,7 +81,7 @@ def draw_message(request: dict, result: dict, span: float) -> tuple[dict, dict]:
     color_by, scale, ...); keys that only steer the analysis are not forwarded."""
     reports = {k: result.pop(k, None) for k in
                ("asset_loads", "floor_loads", "combinations", "connections", "stability", "buckling",
-                "design_code", "deflection_limit_ratio")}
+                "design_code", "deflection_limit_ratio", "indicative")}
     draw = {k: v for k, v in request.items() if k not in ("guids", "reanalyze", "clear")}
     draw.update({"type": "structure_draw", "engine": "native", "span_m": span, "result": result})
     buckling, combos = reports["buckling"], reports["combinations"]
@@ -91,6 +92,8 @@ def draw_message(request: dict, result: dict, span: float) -> tuple[dict, dict]:
             draw["title"] = "ALMOND  //  NATIVE FEA  ·  BUCKLING  ·  " + buckling["combination"]
     elif combos and not request.get("title"):
         draw["title"] = "ALMOND  //  NATIVE FEA  ·  u: " + " / ".join(combos["utilization"]) + "  ·  d: SLS G + Q"
+    if reports["indicative"]:
+        draw["verdict_label"] = "INDICATIVE"            # no pass/fail without the material's design code
     report, floor_report = reports["asset_loads"], reports["floor_loads"]
     if report is not None or floor_report is not None:
         parts = [f"load {request['load_kn']:.0f} kN"] if request["load_kn"] >= 0.5 else []
@@ -131,7 +134,7 @@ def run(request: dict) -> dict:
     common = dict(fixed_supports=s["fixed_rotations"], self_weight=s["self_weight"], diameter_mm=s["diameter_mm"],
                   wall_mm=s["wall_mm"], asset_loads=assets, floor_loads=floor, design_basis=s["design_basis"],
                   uls=s["uls_combination"], connections=s["connections"], stability=s["stability"],
-                  design_code=code)
+                  design_code=code, fabrication=s["fabrication"])
     limit_ratio = float(s["deflection_limit_ratio"] or code.deflection_limit_ratio)
     validation = native_structure.validate(model, s["structure"], s["load_kn"], s["material"],
                                            span_m=s["span_m"], limit_ratio=limit_ratio, detail=True, **common)

@@ -46,6 +46,7 @@ const MEMBER_COLS = [
   {key: 'id', label: 'Member', left: true},
   {key: 'role', label: 'Role', left: true},
   {key: 'section', label: 'Section', left: true},
+  {key: 'section_class', label: 'Class', unit: 'EN 5.2'},
   {key: 'length_m', label: 'Length', unit: 'm'},
   {key: 'utilization', label: 'Utilization', unit: 'ULS'},
   {key: 'governing_check', label: 'Check', left: true},
@@ -77,7 +78,8 @@ function renderMembers() {
     u.innerHTML = '<span class="util"><span class="track"><span class="fill ' + state + '"></span></span><span class="' + state + '"></span></span>';
     u.querySelector('.fill').style.width = Math.min(100, (r.utilization || 0) * 100) + '%';
     u.querySelector('.util > span:last-child').textContent = finite(r.utilization) ? (r.utilization * 100).toFixed(1) + '%' : '—';
-    tr.append(name, td(r.role || '—', 'l'), td(r.section || '—', 'l'), td(fmt(r.length_m, 2)), u,
+    tr.append(name, td(r.role || '—', 'l'), td(r.section || '—', 'l'),
+      td(r.section_class ? String(r.section_class) : '—', r.section_class === 4 ? 'fail' : ''), td(fmt(r.length_m, 2)), u,
       td(r.governing_check || '—', 'l'), td(r.governing_combination || '—', 'l'),
       td(fmt(r.n_tension_kn, 1)), td(fmt(r.n_compression_kn, 1)), td(fmt(r.v_max_kn, 1)), td(fmt(r.m_max_knm, 2)),
       td(fmt(r.t_max_knm, 2)), td(fmt(r.max_stress_mpa, 1)), td(fmt(r.slenderness, 2)), td(fmt(r.chi, 2)),
@@ -213,11 +215,12 @@ function renderNotes() {
 
 function renderSummary() {
   const r = report.result, m = r.results || {}, st = stabilityState(r, report.native), c = counts(rows);
-  const pass = r.status === 'pass';
+  const pass = r.status === 'pass', indicative = r.status === 'indicative';
   el('method').textContent = engineLabel(r, report.settings) + (report.native?.version ? ' · almond-mcp ' + report.native.version : '');
-  el('verdict').textContent = pass ? 'Pass' : r.status === 'fail' ? 'Fail' : 'Incomplete';
-  el('verdict').parentElement.dataset.state = pass ? 'pass' : r.status === 'fail' ? 'fail' : '';
-  el('verdict-note').textContent = pass ? 'Within the configured checks' : r.status === 'fail' ? 'Configured checks exceeded' : (r.verdict || '');
+  el('verdict').textContent = indicative ? 'Indicative' : pass ? 'Pass' : r.status === 'fail' ? 'Fail' : 'Incomplete';
+  el('verdict').parentElement.dataset.state = indicative ? 'indicative' : pass ? 'pass' : r.status === 'fail' ? 'fail' : '';
+  el('verdict-note').textContent = indicative ? 'No capacity check for ' + (r.material || 'this material') + ': forces and deflection only'
+    : pass ? 'Within the configured checks' : r.status === 'fail' ? 'Configured checks exceeded' : (r.verdict || '');
   el('sum-defl').textContent = finite(m.max_deflection_mm) ? fmt(m.max_deflection_mm, 1) + ' mm' : '—';
   el('sum-defl-note').textContent = finite(m.deflection_limit_mm) ? 'limit ' + fmt(m.deflection_limit_mm, 1) + ' mm' : '';
   el('sum-util').textContent = finite(m.utilization_ratio) ? (m.utilization_ratio * 100).toFixed(1) + '%' : '—';

@@ -42,8 +42,9 @@ namespace RhinoAlmondBridge
         {
             var members = report?["result"]?["members"] as JArray;
             if (members == null || members.Count == 0) throw new InvalidOperationException("This result has no member table. Run the native engine.");
-            string[] cols = { "id", "role", "layer", "section", "material", "length_m", "elements", "utilization", "status",
-                "governing_check", "governing_combination", "cross_section_utilization", "buckling_utilization", "slenderness", "chi",
+            string[] cols = { "id", "role", "layer", "section", "material", "section_class", "length_m", "buckling_length_m", "elements",
+                "utilization", "status", "governing_check", "governing_combination", "cross_section_utilization", "buckling_utilization",
+                "eq_6_61", "eq_6_62", "lambda_y", "lambda_z", "chi_y", "chi_z", "cm_y", "cm_z", "kyy", "kzz", "slenderness", "chi",
                 "max_stress_mpa", "n_tension_kn", "n_compression_kn", "v_max_kn", "m_max_knm", "t_max_knm",
                 "max_displacement_mm", "deflection_mm", "deflection_ratio", "pinned_start", "pinned_end", "source_guids" };
             var sb = new StringBuilder();

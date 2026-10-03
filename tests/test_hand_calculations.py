@@ -63,18 +63,24 @@ def test_shear_is_read_at_both_member_ends():
     assert r["members"][0]["v_max_kn"] == pytest.approx(1.35 * W * L, rel=2e-3)
 
 
-def test_column_flexural_buckling_curve_a():
+@pytest.mark.parametrize("fabrication, alpha", [("hot_finished", 0.21), ("cold_formed", 0.49)])
+@pytest.mark.parametrize("stability", ["off", "auto"])
+def test_column_flexural_buckling(fabrication, alpha, stability):
+    """Curve a (hot-finished) or c (cold-formed, the default); the buckling length is the whole
+    4 m member also when the stability check splits it into pieces."""
     L, P = 4.0, 300.0
     r = ns.validate(model([[0, 0, 0], [0, 0, L]], [[0, 0, 0]], L), "frame", P, fixed_supports=True,
-                    self_weight=False, stability="off", detail=True)
+                    self_weight=False, stability=stability, detail=True, fabrication=fabrication)
     k = r["members"][0]
     lam = math.sqrt(A * FY / (math.pi ** 2 * E * I / L ** 2))
-    phi = 0.5 * (1 + 0.21 * (lam - 0.2) + lam ** 2)
+    phi = 0.5 * (1 + alpha * (lam - 0.2) + lam ** 2)
     chi = 1 / (phi + math.sqrt(phi ** 2 - lam ** 2))
     assert k["n_compression_kn"] == pytest.approx(1.5 * P, rel=1e-6)
+    assert k["buckling_length_m"] == pytest.approx(L)
     assert k["slenderness"] == pytest.approx(lam, abs=2e-3)
     assert k["chi"] == pytest.approx(chi, abs=2e-3)
-    assert k["buckling_utilization"] == pytest.approx(1.5 * P / (chi * A * FY), rel=5e-3)
+    if stability == "off":                                     # no imperfection moments: N/(chi A fy)
+        assert k["utilization"] == pytest.approx(1.5 * P / (chi * A * FY), rel=5e-3)
 
 
 def test_en1990_6_10a_and_6_10b_totals():

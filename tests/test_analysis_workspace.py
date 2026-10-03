@@ -25,6 +25,7 @@ HOST = os.environ.get("ALMOND_ARCHIVE_TEST_HOST")
     ({"span_m": 0}, False), ({"stability": "maybe"}, False),
     ({"design_code": "sg-na", "uls_combination": "", "deflection_limit_ratio": 360}, True),
     ({"design_code": "off"}, True),
+    ({"fabrication": "hot_finished"}, True), ({"fabrication": "welded"}, False),
     ({"design_code": "../../etc"}, False), ({"design_code": "SG NA"}, False),
     ({"deflection_limit_ratio": 50}, False), ({"deflection_limit_ratio": 5000}, False),
     ({"diameter_mm": 114.3, "wall_mm": 4}, True),

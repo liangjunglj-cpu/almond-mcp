@@ -37,6 +37,7 @@ import time
 import numpy as np
 
 from . import asset_loads as al
+from . import ec3
 from . import design_codes as dc
 from . import floor_loads as fl
 from . import frame_solver as fs
@@ -48,9 +49,12 @@ ASSUMPTIONS = [
     "check calls for it (see Stability).",
     "Joints as stated under Connections; supports as described in support_mode.",
     "Imposed load shared equally by the free nodes, acting downward; self weight included when enabled.",
-    "Member check: EN 1993-1-1 cross-section interaction (6.2.1(7), elastic moduli unless plastic "
-    "design is requested) and flexural buckling "
-    "(6.3.1, L_cr = member length); lateral-torsional buckling not checked.",
+    "Member checks per member (EN 1993-1-1): section class from Table 5.2 for the actual stresses "
+    "(Class 4 flagged as not covered); cross-section 6.2.1(7) with elastic moduli (plastic only for "
+    "Class 1/2 when plastic design is requested); flexural buckling about both axes (6.3.1, curves "
+    "from Table 6.2, L_cr = the member between its joints, 5.2.2(7)b); compression + bending by "
+    "6.3.3 (6.61)/(6.62) with Annex B factors and Table B.3 Cm. Not checked: lateral-torsional "
+    "buckling, shear (6.2.6), torsion, local bow imperfections.",
     "Preliminary design check, not an engineer's sign-off.",
 ]
 
@@ -64,6 +68,8 @@ def section_from_spec(spec: dict | None, diameter_mm=None, wall_mm=None) -> tupl
     shape = (spec.get("shape") or "circular_hollow").lower()
     to_mm = 1000.0
     try:
+        if shape in ("rect", "rectangular", "solid_rectangle") and spec.get("height") and spec.get("width"):
+            return fs.rect(spec["width"] * to_mm, spec["height"] * to_mm), notes      # solid: concrete, timber
         if shape == "box" and spec.get("height") and spec.get("width"):
             t = spec.get("wall") or min(spec["height"], spec["width"]) / 10
             return fs.rhs(spec["height"] * to_mm, spec["width"] * to_mm, t * to_mm), notes
@@ -294,6 +300,17 @@ def _code_warnings(code: dc.Profile, uls, info: dict) -> list[str]:
 DOF_NAMES = ("Fx", "Fy", "Fz", "Mx", "My", "Mz")
 
 
+def _r(v, digits):
+    return None if v is None else round(float(v), digits)
+
+
+def _fabrication(value) -> str:
+    v = (value or "cold_formed").lower().replace("-", "_").replace(" ", "_")
+    if v not in ec3.FABRICATION:
+        raise ValueError("fabrication must be 'cold_formed' or 'hot_finished'.")
+    return v
+
+
 def _role(a, b) -> str:
     d = np.asarray(b, float) - np.asarray(a, float)
     L = float(np.linalg.norm(d)) or 1.0
@@ -326,7 +343,8 @@ def member_table(model: dict, frame, sls, envelope) -> list[dict]:
         gi = max(idx, key=lambda i: envelope[i][0])
         u, comb, ger = envelope[gi]
         det = ger.util_detail
-        check = "flexural buckling" if det.get("buckling", -1.0) >= det.get("cross_section", 0.0) else "cross-section"
+        check = det.get("governing_check") or (
+            "flexural buckling" if det.get("buckling", -1.0) >= det.get("cross_section", 0.0) else "cross-section")
         N = np.concatenate([envelope[i][2].N for i in idx])
         M = np.concatenate([np.hypot(envelope[i][2].My, envelope[i][2].Mz) for i in idx])
         V = max(max(math.hypot(ef[1], ef[2]), math.hypot(ef[7], ef[8])) for ef in (envelope[i][2].end_forces for i in idx))
@@ -347,13 +365,21 @@ def member_table(model: dict, frame, sls, envelope) -> list[dict]:
             "role": _role(A, B), "start_m": [round(float(v), 4) for v in A], "end_m": [round(float(v), 4) for v in B],
             "length_m": round(span, 4), "elements": len(idx),
             "section": e0.section.name, "material": e0.material.name, "pinned_ends": pinned,
-            "utilization": round(float(u), 4), "status": "fail" if u > 1.0 else "warn" if u > 0.8 else "ok",
+            "utilization": round(float(u), 4),
+            "status": "fail" if u > 1.0 or det.get("class") == 4 else "warn" if u > 0.8 else "ok",
             "governing_combination": comb, "governing_check": check,
             "cross_section_utilization": round(float(det["cross_section"]), 4) if "cross_section" in det else None,
             "buckling_utilization": round(float(det["buckling"]), 4) if "buckling" in det else None,
             "slenderness": round(float(det["slenderness"]), 3) if "slenderness" in det else None,
             "chi": round(float(det["chi"]), 3) if "chi" in det else None,
-            "moduli": det.get("moduli"),
+            "moduli": det.get("moduli"), "section_class": det.get("class"),
+            "buckling_curves": [det["curve_y"], det["curve_z"]] if "curve_y" in det else None,
+            "chi_y": _r(det.get("chi_y"), 3), "chi_z": _r(det.get("chi_z"), 3),
+            "lambda_y": _r(det.get("lambda_y"), 3), "lambda_z": _r(det.get("lambda_z"), 3),
+            "cm_y": _r(det.get("cm_y"), 3), "cm_z": _r(det.get("cm_z"), 3),
+            "kyy": _r(det.get("kyy"), 3), "kzz": _r(det.get("kzz"), 3),
+            "eq_6_61": _r(det.get("eq_6_61"), 4), "eq_6_62": _r(det.get("eq_6_62"), 4),
+            "buckling_length_m": _r(det.get("length_cr_m"), 3),
             "max_stress_mpa": round(float(det.get("max_stress_mpa", 0.0)), 2),
             "n_tension_kn": round(max(float(N.max()), 0.0), 3), "n_compression_kn": round(max(-float(N.min()), 0.0), 3),
             "v_max_kn": round(float(V), 3), "m_max_knm": round(float(M.max()), 3),
@@ -442,7 +468,8 @@ def _imperfection_loads(asm, frame, combo, phi) -> dict:
     return out
 
 
-def _solve_design(frame, design_basis, uls, plastic=False, stations=11, stability="auto", design_code=None):
+def _solve_design(frame, design_basis, uls, plastic=False, stations=11, stability="auto", design_code=None,
+                  fabrication="cold_formed"):
     """Solve SLS + ULS combinations; per-element ULS envelope. Returns (sls, uls_results, envelope,
     stability report) with envelope[i] = (utilization, governing name, element result).
 
@@ -454,6 +481,9 @@ def _solve_design(frame, design_basis, uls, plastic=False, stations=11, stabilit
     sls, ulss = combinations(design_basis, uls, code)
     if (stability or "auto").lower() == "off":
         res = fs.solve_combinations(frame, {sls[0]: sls[1], **dict(ulss)}, stations=stations, plastic=plastic)
+        members = ec3.groups(frame)
+        for r_ in res.values():
+            ec3.apply(frame, r_, members, plastic, fabrication)
         envelope = []
         for i in range(len(frame.elements)):
             best = max(((res[n].elements[i].utilization, n) for n, _ in ulss), key=lambda t: t[0])
@@ -471,7 +501,9 @@ def _solve_design(frame, design_basis, uls, plastic=False, stations=11, stabilit
     if compressed:
         subdivide(frame, STABILITY_SUBDIVISION, compressed)
         asm = fs.prepare(frame)
+    members = ec3.groups(frame)
     sls_res = fs.solve_linear(asm, sls[1], stations=stations, plastic=plastic)
+    ec3.apply(frame, sls_res, members, plastic, fabrication)
     imp = sway_imperfection(frame)
     report = {"mode": "auto", "alpha_cr": {}, "sway_imperfection": imp, "second_order": [], "iterations": 0,
               "elements_per_member": STABILITY_SUBDIVISION}
@@ -494,6 +526,7 @@ def _solve_design(frame, design_basis, uls, plastic=False, stations=11, stabilit
             except fs.MechanismError as exc:
                 report["method"] = "unstable"
                 raise InstabilityError(f"Instability under {vname}: {exc}", report) from None
+            ec3.apply(frame, r_, members, plastic, fabrication)
             report["iterations"] = max(report["iterations"], r_.iterations)
             variants.append((vname, factors, r_))
     report["method"] = "second-order (P-Delta)" if report["second_order"] else "first-order"
@@ -518,7 +551,7 @@ def view_result(model: dict, load_kn: float = 10.0, material: str = "Steel", fix
                 stations: int = 13, asset_loads: dict | None = None,
                 floor_loads: dict | None = None, design_basis: str = "en1990",
                 uls: str | None = None, connections: str = "rigid", stability: str = "auto",
-                view: str = "deflection", design_code=None) -> tuple[dict, float]:
+                view: str = "deflection", design_code=None, fabrication: str = "cold_formed") -> tuple[dict, float]:
     """Solve and package the result for the bridge's ``structure_draw`` overlay.
 
     Returns (result, span_m): per-element start/end points and sampled global displacements in
@@ -531,7 +564,8 @@ def view_result(model: dict, load_kn: float = 10.0, material: str = "Steel", fix
         raise ValueError("view must be 'deflection' or 'buckling'.")
     code = design_profile(design_basis, design_code)
     res, ulss, envelope, stab = _solve_design(frame, design_basis, uls, stations=stations,
-                                              stability="off" if want_mode else stability, design_code=code)
+                                              stability="off" if want_mode else stability, design_code=code,
+                                              fabrication=_fabrication(fabrication))
     span = float(span_m or model.get("max_member_span_m") or model.get("max_span_m") or 5.0)
     buckling = None
     if want_mode:
@@ -565,6 +599,7 @@ def view_result(model: dict, load_kn: float = 10.0, material: str = "Steel", fix
               "combinations": {"deflection": SLS[0],
                                "utilization": [f"{n} ({_label(f)})" for n, f, _ in ulss]},
               "design_code": code.summary(), "deflection_limit_ratio": code.deflection_limit_ratio,
+              "indicative": INDICATIVE_FAMILIES.get(info["material"].family),
               "warnings": list(model.get("warnings") or []) + warnings + _code_warnings(code, uls, info)}
     for key in ("asset_loads", "floor_loads"):
         if key in info:
@@ -579,7 +614,8 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
              limit_ratio: float | None = None, plastic: bool = False, span_m: float | None = None,
              asset_loads: dict | None = None, floor_loads: dict | None = None,
              design_basis: str = "en1990", uls: str | None = None, connections: str = "rigid",
-             stability: str = "auto", design_code=None, detail: bool = False) -> dict:
+             stability: str = "auto", design_code=None, detail: bool = False,
+             fabrication: str = "cold_formed") -> dict:
     """Run the native check and return a bridge-compatible validation result.
 
     ``detail``: add "members" (every member's geometry, section, ULS design forces and checks, SLS
@@ -600,7 +636,7 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
         result["design_code"] = code.summary()
         result["warnings"] += _code_warnings(code, uls, info)
         res, ulss, envelope, stab = _solve_design(frame, design_basis, uls, plastic=plastic, stability=stability,
-                                                  design_code=code)
+                                                  design_code=code, fabrication=_fabrication(fabrication))
     except InstabilityError as exc:
         result["verdict"] = METHOD_PREFIX + f"FAILED: {exc}"
         result["status"] = "fail"
@@ -670,8 +706,11 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
         "solve_ms": round((time.perf_counter() - t0) * 1000.0, 1),
     })
     uls_used = code.uls(uls or None)[0] if code.factored else "unfactored"
+    r["fabrication"] = _fabrication(fabrication)
     result["design_code"]["uls_expression"] = uls_used
     result["assumptions"] = result["assumptions"] + [
+        ("Hollow sections: cold-formed (EN 10219), buckling curve c" if _fabrication(fabrication) == "cold_formed"
+         else "Hollow sections: hot-finished (EN 10210), buckling curve a (a0 for S460)") + ".",
         f"Design code: {code.name} ({code.basis}); gamma_M0 = {code.gamma_M0:g}, gamma_M1 = {code.gamma_M1:g}; "
         f"deflection limit span/{limit_ratio:g}"
         + (f"; unverified values: {', '.join(code.unverified)}." if code.unverified else "."),
@@ -700,14 +739,32 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
     if dmax_mm > limit_mm:
         failures.append(f"Deflection {dmax_mm:.1f}mm ({SLS[0]}) exceeds L/{limit_ratio:g} limit ({limit_mm:.1f}mm)")
         sug += ["Increase member depth or use a stiffer cross-section", "Add intermediate supports to reduce effective span"]
-    if umax > 1.0:
+    slender = sorted({tuple(frame.elements[i].tag or [str(i)]) for i, (_, _, er) in enumerate(envelope)
+                      if er.util_detail.get("class") == 4})
+    if slender:
+        failures.append(f"{len(slender)} member(s) have Class 4 (slender) sections, which these checks do not "
+                        "cover (EN 1993-1-5/-1-6 effective sections)")
+        sug.append("Use thicker walls: Class 4 starts at d/t = 90 x 235/fy for CHS (59.6 for S355)")
+    indicative = INDICATIVE_FAMILIES.get(mat.family)
+    if umax > 1.0 and not indicative:
         failures.append(f"Utilization ratio {umax:.2f} ({governing}) exceeds 1.0")
         sug.append("Use a larger cross-section or higher-grade material")
-    result["passed"] = not failures
-    result["status"] = "pass" if not failures else "fail"
-    result["verdict"] = METHOD_PREFIX + (
-        f"PASSED: Configured checks satisfied. Deflection {dmax_mm:.1f}mm ({SLS[0]}, limit {limit_mm:.1f}mm), "
-        f"Utilization {umax:.2f} ({governing})" if not failures else "FAILED: " + "; ".join(failures))
+    if indicative and not failures:
+        # no capacity verdict without the material's own design code; deflection and stability still decide fail
+        result["passed"] = None
+        result["status"] = "indicative"
+        result["verdict"] = METHOD_PREFIX + (
+            f"INDICATIVE ONLY ({mat.name}): forces, deflection and stability are computed, but member capacity "
+            f"is not checked to {indicative}, so there is no pass/fail. Deflection {dmax_mm:.1f}mm ({SLS[0]}, "
+            f"limit {limit_mm:.1f}mm); utilization {umax:.2f} against the characteristic strength, for comparison only.")
+        sug.append(f"Have the members designed to {indicative.split(' (')[0]} (an engineer); use the forces "
+                   "in the results as the starting point.")
+    else:
+        result["passed"] = not failures
+        result["status"] = "pass" if not failures else "fail"
+        result["verdict"] = METHOD_PREFIX + (
+            f"PASSED: Configured checks satisfied. Deflection {dmax_mm:.1f}mm ({SLS[0]}, limit {limit_mm:.1f}mm), "
+            f"Utilization {umax:.2f} ({governing})" if not failures else "FAILED: " + "; ".join(failures))
     result["suggestions"] = sug
     worst = sorted(elem_util, key=lambda e: -e["utilization"])
     seen = []

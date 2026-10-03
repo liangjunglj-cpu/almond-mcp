@@ -18,7 +18,7 @@ const settings=()=>{
   return {...base,floor_imposed_kn_m2:Number(el('floor-imposed').value),floor_dead_kn_m2:Number(el('floor-dead').value),
     asset_loads:el('asset-loads').checked,connections:el('analysis-connections').value,design_basis:'en1990',
     design_code:el('analysis-code').value,uls_combination:el('analysis-uls').value||null,
-    deflection_limit_ratio:optional('analysis-limit'),
+    deflection_limit_ratio:optional('analysis-limit'),fabrication:el('analysis-fabrication').value,
     stability:el('analysis-stability').value,view:el('analysis-overlay').value,span_m:optional('analysis-span')};
 };
 function message(text) {el('analysis-message').textContent=text;}
@@ -151,7 +151,8 @@ function nativeFacts(r,nat){
 function renderResult(){
   const r=report.result,m=r.results||{},s=metricState(r),nat=report.native,st=stabilityState(r,nat);
   el('analysis-results').hidden=false;
-  el('analysis-outcome').textContent=s.complete?(r.status==='pass'?'Within configured checks':'Configured checks exceeded'):
+  el('analysis-outcome').textContent=s.complete?(r.status==='indicative'?'Indicative only · no capacity check for '+(r.material||'this material'):
+    r.status==='pass'?'Within configured checks':'Configured checks exceeded'):
     nat&&r.status==='fail'?'Unstable · see the verdict':r.status==='unavailable'?'Analysis unavailable':'Results incomplete';
   el('analysis-outcome').dataset.state=s.complete||(nat&&r.status==='fail')?r.status:'incomplete';
   el('analysis-method').textContent=engineLabel(r,report.settings);

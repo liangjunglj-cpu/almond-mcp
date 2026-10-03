@@ -2257,6 +2257,7 @@ def validate_structure(
     stability: str = "auto",
     design_code: str = "eurocode",
     detail: bool = False,
+    fabrication: str = "cold_formed",
 ) -> str:
     """
     Validates AI-generated geometry with a structural analysis.
@@ -2326,6 +2327,9 @@ def validate_structure(
             (default, EN recommended values), any profile from list_design_codes, or "off"
             (unfactored G + Q, no partial factors; same as design_basis="unfactored").
             Results carry "design_code" with the values used and any unverified ones.
+        fabrication: hollow steel sections (CHS/RHS) are "cold_formed" (default, EN 10219,
+            buckling curve c) or "hot_finished" (EN 10210, curve a; a0 for S460). The difference
+            is up to about 23 % in buckling resistance; use hot_finished only when specified.
         detail: native engine only. Adds "members" (per member: role, length, section, ULS design
             forces N/V/M/T, governing combination and check, slenderness, chi, stress,
             utilization, SLS deflection and span/deflection ratio, pinned ends) and "supports"
@@ -2397,7 +2401,8 @@ def validate_structure(
         result, note = _native_validation(guids, structure_type, load_kn, material, fixed_supports,
                                           self_weight, span_m, required=engine == "native", asset_spec=spec,
                                           floor_spec=floor, design=(design_basis, uls_combination, design_code),
-                                          connections=connections, stability=stability, detail=detail)
+                                          connections=connections, stability=stability, detail=detail,
+                                          fabrication=fabrication)
         if isinstance(result, str):          # hard error (explicit native request, or no bridge)
             return result
     if result is None:
@@ -2492,7 +2497,7 @@ def _floor_spec(imposed, dead, engine):
 
 def _native_validation(guids, structure_type, load_kn, material, fixed_supports, self_weight, span_m, required,
                        asset_spec=None, floor_spec=None, design=("en1990", None, "eurocode"), connections="rigid",
-                       stability="auto", detail=False):
+                       stability="auto", detail=False, fabrication="cold_formed"):
     """Native frame check on the bridge's exported line model.
 
     Returns (result_dict, None) when it ran, (None, note) to fall back to the Karamba
@@ -2522,7 +2527,8 @@ def _native_validation(guids, structure_type, load_kn, material, fixed_supports,
                                            fixed_supports=fixed_supports, self_weight=self_weight, span_m=span_m,
                                            asset_loads=asset_spec, floor_loads=floor_spec,
                                            design_basis=design[0], uls=design[1], connections=connections,
-                                           stability=stability, design_code=design[2], detail=detail)
+                                           stability=stability, design_code=design[2], detail=detail,
+                                           fabrication=fabrication)
     except ValueError as e:
         return json.dumps({"status": "error", "message": str(e)}), None
     return result, None
@@ -2576,6 +2582,7 @@ def visualize_structure(
     connections: str = "rigid",
     stability: str = "auto",
     design_code: str = "eurocode",
+    fabrication: str = "cold_formed",
     view: str = "deflection",
 ) -> str:
     """
@@ -2707,7 +2714,7 @@ def visualize_structure(
             return _bridge_call(draw, 30.0)
         reply, note = _native_view(request, guids, required=engine == "native", asset_spec=spec, floor_spec=floor,
                                    design=(design_basis, uls_combination, design_code), connections=connections,
-                                   stability=stability, view=view)
+                                   stability=stability, view=view, fabrication=fabrication)
         if reply is not None:
             return reply
     out = _bridge_call(request, 90.0)
@@ -2740,7 +2747,7 @@ def _bridge_call(message: dict, timeout: float) -> str:
 
 
 def _native_view(request: dict, guids, required: bool, asset_spec=None, floor_spec=None, design=("en1990", None, "eurocode"),
-                 connections="rigid", stability="auto", view="deflection"):
+                 connections="rigid", stability="auto", view="deflection", fabrication="cold_formed"):
     """Solve natively and draw through the bridge's structure_draw overlay.
 
     Returns (reply_json, None) when it ran or must stop, (None, note) to fall back to Karamba."""
@@ -2769,7 +2776,7 @@ def _native_view(request: dict, guids, required: bool, asset_spec=None, floor_sp
             self_weight=request["self_weight"], diameter_mm=request.get("beam_diameter_mm"),
             wall_mm=request.get("beam_wall_mm"), span_m=request.get("span_m"), asset_loads=asset_spec,
             floor_loads=floor_spec, design_basis=design[0], uls=design[1], connections=connections,
-            stability=stability, view=view, design_code=design[2])
+            stability=stability, view=view, design_code=design[2], fabrication=fabrication)
     except native_structure.InstabilityError as e:
         return json.dumps({"status": "fail", "analysis_method": "native", "message": str(e),
                            "stability": e.report, "hint": "view='buckling' draws the buckling mode."}), None
@@ -2802,6 +2809,9 @@ def _native_view(request: dict, guids, required: bool, asset_spec=None, floor_sp
             parsed["stability"] = stab_report
         if code_report:
             parsed["design_code"] = code_report
+        if reports.get("indicative") and parsed.get("status") == "pass":
+            parsed["status"] = "indicative"                 # the bridge judged utilization; there is no capacity check
+            parsed["passed"] = None
         if buckling:
             # a mode shape has no magnitude: the bridge's deflection-limit verdict is meaningless here
             parsed["buckling"] = buckling
