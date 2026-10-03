@@ -120,6 +120,10 @@ an AI client. See the repository README for client-specific setup.
 
 ## Troubleshooting
 
+- Native engine unavailable with *invalid peer certificate* or *UnknownIssuer*: security software or a
+  proxy inspects HTTPS and uv does not trust it. The panel asks uv to use the Windows certificates; for
+  the MCP server (and older plugins) run once in PowerShell
+  `[Environment]::SetEnvironmentVariable('UV_NATIVE_TLS','1','User')`, then restart Rhino and the MCP client.
 - Archive folder missing: reinstall the full Yak package; copying only the RHP
   is insufficient. Keep its dependencies and `archive` directory together.
 - Model download reports the file changed: reinstall that release. The host

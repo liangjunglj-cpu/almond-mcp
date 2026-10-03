@@ -31,6 +31,7 @@ const HINTS=[
   [/finish the current rhino command|rhino was busy/i,'Press Esc in Rhino to end the running command, then try again.'],
   [/still running/i,'Wait for the current run to finish.'],
   [/document units/i,'Set standard document units in Rhino (Options > Units), then capture again.'],
+  [/certificate|unknownissuer/i,'Security software or a proxy on this network inspects HTTPS. Allow uv to use the Windows certificates: in PowerShell run [Environment]::SetEnvironmentVariable("UV_NATIVE_TLS","1","User"), restart Rhino, then press Check engines.'],
   [/uv is not installed|could not start the native solver|engine unavailable/i,'Install uv (winget install astral-sh.uv), restart Rhino, then press Check engines.'],
   [/geometry changed|recapture|model changed/i,'The geometry changed after capture: click Use Rhino selection again on the Model tab.'],
   [/mechanism|unstable|singular/i,'Part of the frame can move freely: add support points, or use Fixed restraints or Rigid joints on the Supports tab.'],
