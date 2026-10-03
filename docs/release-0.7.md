@@ -125,13 +125,18 @@ Windows 11 Home 10.0.26200, Rhino 8. The panel's solver pointed at a local insta
 | 4 | `almond:section` rect + Concrete | Pass: *Indicative only*, RECT 300x600 in the Results panel |
 | 5 | More than 200 objects | Pass: refused with the 200-object message (shown beside the button since #21) |
 | 6 | Solid box column / block | Pass via the export path: centre line with a rect section and a warning; block skipped |
-| 7 | Results panel sort, filter, row click, CSV | Pass (CSV content; the Save dialog itself not yet clicked) |
+| 7 | Results panel sort, filter, row click, CSV | Pass. On `d00db0a`: **Save CSV** opened *Save member results*; the saved file has a UTF-8 BOM and 21 lines (header + 20 members) |
 | 8 | MCP `validate_structure` / `visualize_structure` from the rc wheel | Pass: identical to the panel (5.339 mm, αcr 31.18) |
-| 9 | Models workspace after the update | Pending |
+| 9 | Models workspace after the update | Pass on `d00db0a` (checked by hand): catalogue browses, a model places in the viewport |
 
-Checks 1-8 ran on the `d73f0de` build. On `d00db0a` the tabbed workspace was walked through on the A07
-mezzanine (capture, loads, supports, code, run, rerun; status states and the run checklist). Still to do on
-this exact Yak: check 9, the CSV Save dialog, and the first run from PyPI with `ALMOND_SOLVER_COMMAND` removed.
+Checks 1-6 and 8 ran on the `d73f0de` build; checks 7 (Save dialog) and 9 on `d00db0a`. On `d00db0a` the
+tabbed workspace was also walked through on the A07 mezzanine (capture, loads, supports, code, run, rerun;
+status states and the run checklist). Still to do on this exact Yak: the first run from PyPI, with
+`ALMOND_SOLVER_COMMAND` removed, after `almond-mcp 0.7.0rc1` is uploaded.
+
+Testing note: automation that starts an Almond command from a script and then calls the panel's web view
+synchronously can deadlock Rhino (the command never returns and selection stops working). Interactive use
+does not do this; drive automated checks with real clicks and keep commands and panel scripting apart.
 
 ## Publication record
 
