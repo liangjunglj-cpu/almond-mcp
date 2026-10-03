@@ -95,6 +95,19 @@ def test_panel_solver_process_boundary(tmp_path):
     assert missing["status"] == "error" and "Could not start the native solver" in missing["message"]
 
 
+@pytest.mark.skipif(not HOST, reason="Build the standalone .NET archive host")
+@pytest.mark.parametrize("version, package", [
+    ("0.7.0", "almond-mcp@0.7.0"),
+    ("0.7.0-rc.1", "almond-mcp@0.7.0rc1"),             # Yak prerelease -> its PyPI twin, never an older stable
+    ("0.7.0-beta.2", "almond-mcp@0.7.0b2"),
+    ("0.6.1-dev", "almond-mcp"),                        # development builds take the latest
+    ("", "almond-mcp"),
+])
+def test_panel_solver_package_pin(version, package):
+    run = subprocess.run([HOST, "--package", version], capture_output=True, text=True, timeout=30)
+    assert run.stdout.strip() == package, run.stdout + run.stderr
+
+
 def test_results_page_presentation():
     node = shutil.which("node")
     assert node, "Node is required for the results page checks"
