@@ -1,6 +1,8 @@
 # Almond 0.7 — structural analysis
 
-Pre-release pair: **almondbridge 0.7.0-rc.1** (Yak, Rhino 8 / Windows) and **almond-mcp 0.7.0rc1** (PyPI).
+Pre-release pair: **almondbridge 0.7.0-rc.2** (Yak, Rhino 8 / Windows) and **almond-mcp 0.7.0rc2** (PyPI).
+rc.1 went to PyPI only (`almond-mcp 0.7.0rc1`); its Yak was never pushed, because the first run from PyPI
+failed behind a TLS-inspecting proxy (fixed in #26) and the shell feedback was unclear (#25).
 Stable remains 0.6.0 until an rc passes the Rhino smoke test below. RhinoCommon stays pinned to
 8.0.23304.9001; plugin identity `c337dbb8-394a-4593-9c2b-a3d7cfc91893` is unchanged. The build and
 publication mechanics are those of [release-0.6.md](release-0.6.md) (`tools/prepare_release.ps1`, the
@@ -28,11 +30,13 @@ Users start with the [Structure workspace tutorial](structural-tutorial.md).
 | Pre-release | The panel pins its PyPI twin for prereleases (`0.7.0-rc.1` → `almond-mcp@0.7.0rc1`); before, any version with a hyphen ran the latest stable, 0.6.0, which has no `solve` command | #20 |
 | Capture feedback | Capture errors (200-object limit, library blocks, units) show beside the button, not only at the foot of the form | #21 |
 | Workspace layout | Structure workspace in five tabs (Model, Loads, Supports, Code, Results) with icons; a status line with colours and "How to fix" hints; an Engine/Structure/Loads/Supports checklist that enables Run | #22 |
+| Shells | Shells are flagged at capture when the native engine is selected (it solves line models only), with a specific fix: Karamba3D, or centre lines | #25 |
+| First run | The panel starts uv with `UV_NATIVE_TLS=1` (Windows certificate store), so the engine downloads behind TLS-inspecting proxies and antivirus; a user's own setting is kept; a certificate error gets a specific hint | #26 |
 
 ## Merge order
 
-All merged in order on 3 October 2026: #18 → #19 → #20 → #21 → #22 (master `d00db0a`). Build the published
-artifacts from master, not from a branch.
+All merged in order on 3 October 2026: #18 → #19 → #20 → #21 → #22 (master `d00db0a`), then #25 and #26
+(master `6964ebe`). Build the published artifacts from master, not from a branch.
 
 ## Build
 
@@ -40,7 +44,7 @@ artifacts from master, not from a branch.
 ./tools/prepare_release.ps1
 ```
 
-This produces `dist/release-0.7.0rc1/` with the wheel, sdist, `almondbridge-0.7.0-rc.1-rh8_0-win.yak`,
+This produces `dist/release-0.7.0rc2/` with the wheel, sdist, `almondbridge-0.7.0-rc.2-rh8_0-win.yak`,
 the Food4Rhino ZIP, the test and audit reports and `SHA256SUMS.txt`. Nothing is uploaded.
 
 ## Required Rhino smoke test (structure workspace)
@@ -49,7 +53,7 @@ In addition to the archive checks in [release-0.6.md](release-0.6.md#required-fi
 on the exact Yak, in a clean Rhino 8 profile **without** `ALMOND_SOLVER_COMMAND` set:
 
 1. `AlmondStructure` opens; **Check engines** reports *Native engine ready*. This requires
-   `almond-mcp 0.7.0rc1` on PyPI, so publish it first (see below). Without it, the panel must report
+   `almond-mcp 0.7.0rc2` on PyPI, so publish it first (see below). Without it, the panel must report
    the failure clearly, not crash.
 2. Draw a two-bay steel frame with support points. Capture it, run with Eurocode, floor 2.0 + 1.0 kN/m²
    and pinned bases. Expect a deflected overlay, a verdict, αcr and the Results panel filling.
@@ -59,7 +63,7 @@ on the exact Yak, in a clean Rhino 8 profile **without** `ALMOND_SOLVER_COMMAND`
 5. Select more than 200 objects: the panel refuses with the 200-object message.
 6. Select a solid box column: it is read as a centre line with a warning; a block-shaped solid is skipped.
 7. Results panel: sort, filter (*Over 100%*, *Columns*), row click selects the member, **Save CSV**.
-8. MCP: with `uvx --from almond-mcp==0.7.0rc1 almond-mcp` configured, `validate_structure` with
+8. MCP: with `uvx --from almond-mcp==0.7.0rc2 almond-mcp` configured, `validate_structure` with
    `detail=True` and `visualize_structure` on the same frame give the panel's numbers.
 9. Update path: install over 0.6.0 and confirm the Models workspace still browses and places.
 
@@ -67,12 +71,12 @@ Record pass/fail, the Yak SHA-256, Windows version and Rhino service release her
 
 ## Publication sequence (operator)
 
-1. **PyPI first:** `uv publish dist/release-0.7.0rc1/*` with the maintainer token. Verify
-   `uvx --from almond-mcp==0.7.0rc1 almond-mcp --version` on a clean machine. The bridge's panel
+1. **PyPI first:** `uv publish dist/release-0.7.0rc2/*` with the maintainer token. Verify
+   `uvx --from almond-mcp==0.7.0rc2 almond-mcp --version` on a clean machine. The bridge's panel
    depends on this package, so the Yak must not go out before it.
-2. **Yak:** `Yak.exe push dist/release-0.7.0rc1/almondbridge-0.7.0-rc.1-rh8_0-win.yak`, then
+2. **Yak:** `Yak.exe push dist/release-0.7.0rc2/almondbridge-0.7.0-rc.2-rh8_0-win.yak`, then
    `Yak.exe search --all --prerelease almondbridge`. Users need **Include pre-releases**.
-3. Tag `v0.7.0rc1` and create a GitHub pre-release with the checksums.
+3. Tag `v0.7.0rc2` and create a GitHub pre-release with the checksums.
 4. Food4Rhino stays on 0.6.0 until a stable 0.7.0.
 
 ## Known limits (documented to users)
@@ -87,7 +91,11 @@ Record pass/fail, the Yak SHA-256, Windows version and Rhino service release her
   when unverified.
 - One panel study takes at most 200 selected objects.
 
-## Build record — rc.1, 3 October 2026
+## Build record — rc.2
+
+Pending: built from master after #26.
+
+## Build record — rc.1, 3 October 2026 (PyPI only)
 
 Built with `./tools/prepare_release.ps1` from master `d00db0a` (after #22), in a clean `git worktree` of that
 commit: the main checkout held unrelated uncommitted asset work that must not reach a release. This build
@@ -137,6 +145,13 @@ status states and the run checklist). Still to do on this exact Yak: the first r
 Testing note: automation that starts an Almond command from a script and then calls the panel's web view
 synchronously can deadlock Rhino (the command never returns and selection stops working). Interactive use
 does not do this; drive automated checks with real clicks and keep commands and panel scripting apart.
+
+### rc.1 publication
+
+`almond-mcp 0.7.0rc1` was uploaded to PyPI on 3 October 2026 (hashes as above). The first run from PyPI, with
+`ALMOND_SOLVER_COMMAND` removed, failed on this machine: *invalid peer certificate: UnknownIssuer*, because uv
+trusts only its bundled roots and the network inspects TLS. With `UV_NATIVE_TLS=1` set for the user it passed
+(*Native engine ready · v0.7.0rc1*). The rc.1 Yak was not pushed; rc.2 sets the variable itself (#26).
 
 ## Publication record
 

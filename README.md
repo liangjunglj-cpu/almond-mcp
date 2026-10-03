@@ -1,6 +1,6 @@
 # Almond MCP for Rhino
 
-**0.7.0-rc.1 — structural analysis pre-release.** The Structure workspace now runs
+**0.7.0-rc.2 — structural analysis pre-release.** The Structure workspace now runs
 Almond's own 3D frame solver: floor and placed-model loads, EN 1990 combinations,
 rigid/simple joints, stability (αcr, sway imperfections, P-Δ), EN 1993-1-1 member
 checks, per-curve sections (`almond:section`) and the **Almond Results** panel for
