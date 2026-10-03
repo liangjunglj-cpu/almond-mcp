@@ -170,6 +170,7 @@ A typical request: *"Check the frame on layer Structure with 2 kN/m² imposed an
 | You see | Do this |
 |---|---|
 | Native engine unavailable | Install uv (`winget install astral-sh.uv`), restart Rhino, then click **Check engines**. The first run downloads the engine. |
+| Native engine unavailable: *invalid peer certificate* / *UnknownIssuer* | Security software or a proxy on your network inspects HTTPS, and uv does not trust it. From 0.7.0-rc.2 the panel tells uv to use the Windows certificates itself. For older versions and for the MCP server, run once in PowerShell: `[Environment]::SetEnvironmentVariable('UV_NATIVE_TLS','1','User')`, then restart Rhino and your MCP client. |
 | Nothing captured | The structural layer is probably hidden. Show it, select the curves, and capture again. |
 | "Select at most 200 structural objects per study" | Join segments into continuous curves (step 1), or check part of the structure. |
 | "The model changed" | You edited the geometry after capturing. Click **Use Rhino selection** again. |
