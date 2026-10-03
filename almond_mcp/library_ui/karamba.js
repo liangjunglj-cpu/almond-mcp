@@ -23,7 +23,9 @@ const settings=()=>{
 };
 // One status line under Run for everything the panel does: idle, busy, ok, warn, error or info, with an icon and colour.
 // Errors carry a hint on how to fix them, so the user is never left with only the message.
+const SHELL_NOTE='The native engine analyses line members: select only the centre-line curves and support points, or switch the engine to Karamba3D for shells.';
 const HINTS=[
+  [/shell element/i,SHELL_NOTE],
   [/at most 200/i,'Join short segments into continuous curves (Almond splits them at every crossing), or check part of the structure.'],
   [/library blocks/i,'Select the structural centre lines and support points, not furniture blocks.'],
   [/finish the current rhino command|rhino was busy/i,'Press Esc in Rhino to end the running command, then try again.'],
@@ -170,11 +172,12 @@ function readiness(){
     (nativeEngine&&(Number(el('floor-imposed').value)>0||Number(el('floor-dead').value)>0||el('asset-loads').checked));
   const anchors=model?.anchors?.length||0,points=el('support-source').value==='points';
   const down=/unavailable|not installed/i.test(n);
+  const shells=nativeEngine&&model?.shells>0;           // captured, but the native engine refuses shells: say so before Run
   return [
     {key:'engine',tab:null,label:'Engine',state:/ready|detected/i.test(n)?'ok':down?'error':'busy',
      tip:down?'Press Check engines; the note under the engine line says why.':'Checking the engine…'},
-    {key:'model',tab:'model',label:'Structure',state:model?'ok':'need',
-     tip:model?model.beams+' beams · '+model.shells+' shells':'Model tab: select in Rhino, then Use Rhino selection'},
+    {key:'model',tab:'model',label:'Structure',state:model&&!shells?'ok':'need',
+     tip:!model?'Model tab: select in Rhino, then Use Rhino selection':shells?SHELL_NOTE:model.beams+' beams · '+model.shells+' shells'},
     {key:'loads',tab:'loads',label:'Loads',state:loads?'ok':'need',tip:loads?'Loads set':'Loads tab: add a load or self-weight'},
     {key:'supports',tab:'supports',label:'Supports',state:points&&model&&!anchors?'need':'ok',
      tip:points&&model&&!anchors?'Supports tab: select support points, or allow the lowest nodes':(anchors?anchors+' support points':'Lowest nodes')}];
@@ -222,7 +225,9 @@ window.almondAnalysisReceive = payload => {
   if(payload.kind==='capture'){
     model=payload.model;report=null;dirty=false;
     el('analysis-results').hidden=true;el('analysis-stale').hidden=true;
-    message('Selection captured. Review the tabs, then Run.','ok');
+    if(engine()==='native'&&model.shells>0)
+      message('Selection captured, but it includes '+model.shells+' shell'+(model.shells===1?'':'s')+'.','warn',SHELL_NOTE);
+    else message('Selection captured. Review the tabs, then Run.','ok');
   }
   if(payload.kind==='result'){
     showTab('results');
@@ -231,7 +236,9 @@ window.almondAnalysisReceive = payload => {
     resultStatus();
   }
   if(model) {
-    captureNote(model.objects+' objects · '+model.beams+' beams · '+model.shells+' shells · '+model.units);
+    const shellsOnNative=engine()==='native'&&model.shells>0;
+    captureNote(model.objects+' objects · '+model.beams+' beams · '+model.shells+' shells · '+model.units+(shellsOnNative?' · shells need Karamba3D':''));
+    el('selection-summary').classList.toggle('need',shellsOnNative);
     el('section-summary').textContent=model.default_sections+' beam sections use the CHS 114.3 × 4 mm default before overrides. Shell default: 100 mm. Inferred sections need review.';
   }
   controls();draw();
