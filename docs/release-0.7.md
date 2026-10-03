@@ -91,9 +91,45 @@ Record pass/fail, the Yak SHA-256, Windows version and Rhino service release her
   when unverified.
 - One panel study takes at most 200 selected objects.
 
-## Build record — rc.2
+## Build record — rc.2, 3 October 2026
 
-Pending: built from master after #26.
+Built with `./tools/prepare_release.ps1` from master `4564c1c` (after #27), in a clean `git worktree` of that
+commit, with `UV_NATIVE_TLS=1` and `powershell.exe -File` as for rc.1.
+
+- Tests: 400 passed, 0 failed (including the .NET archive-host and solver process-boundary tests).
+- Clean wheel install: 56 MCP tools; archive HTTP and repository resource checks passed.
+- Yak audit: 392 routes, 57 assets (50 models, 7 elements), 10 drawing packages, 51.1 MB; bridge `0.7.0-rc.2`,
+  archive `0.7.0rc2`.
+
+| File | SHA-256 |
+|---|---|
+| `almondbridge-0.7.0-rc.2-rh8_0-win.yak` | `914b890e850b43c0fe5bc97cb76bee239912cddd32f6bfd6fc343b70f5dbf8f7` |
+| `almond_mcp-0.7.0rc2-py3-none-any.whl` | `c602ba520d97d02987d7bb61062ba7e62180c7df59e933c7301833e2226fa3f1` |
+| `almond_mcp-0.7.0rc2.tar.gz` | `864854ac16a95203d035d52e227b573b5a27e35dab189ae981de3741d16c3168` |
+| `almondbridge-0.7.0-rc.2-food4rhino.zip` | `15e4844f847a56f23e43171501ba1b11bbe9580102d74b5f22ee229d76c156b4` |
+
+### rc.2 smoke test
+
+Windows 11 Home 10.0.26200, Rhino 8, the exact Yak above installed over rc.1 (the Package Manager removed the
+inactive rc.1 at start). The rc.2 code differs from the rc.1 smoke-tested build only by #25 and #26, so these
+checks target them; checks 2-9 above carry over.
+
+| Check | Result |
+|---|---|
+| Certificate fix (#26), before PyPI: user-level `UV_NATIVE_TLS` removed; the panel's solver set to `uvx --refresh --from <rc2 wheel> almond-mcp`, which re-resolves the dependencies from PyPI on every start | Pass: *Native engine ready · v0.7.0rc2*. Control: the same `uvx --refresh` from a shell without the variable fails with *invalid peer certificate: UnknownIssuer* |
+| Shells (#25): capture a two-bay frame plus one planar surface with the native engine | Pass: amber *Selection captured, but it includes 1 shell.*, the Karamba3D/centre-line hint, the summary ends *shells need Karamba3D*, the Structure chip asks for input and Run stays disabled |
+| Full run: recapture the frame alone, Steel CHS 219.1×8, fixed bases, rigid joints | Pass: *Within configured checks*, 0.33 mm, 3.3 %, αcr 307.55, overlay drawn, solver almond-mcp 0.7.0rc2 |
+
+### rc.2 publication
+
+`almond-mcp 0.7.0rc2` was uploaded to PyPI on 3 October 2026; the PyPI SHA-256 of the wheel and sdist match the
+table above. First run from PyPI on the exact Yak: `ALMOND_SOLVER_COMMAND`, `UV_NATIVE_TLS` and `UV_SYSTEM_CERTS`
+unset, and `UV_CACHE_DIR` pointed at an empty folder so nothing came from the cache. **Pass:** the panel showed
+*Starting the native engine… The first run downloads it.*, then *Native engine ready · v0.7.0rc2* after about
+17 s (289 MB downloaded), behind the same TLS-inspecting network that broke rc.1.
+
+Follow-up: uv now reports `UV_NATIVE_TLS` as deprecated in favour of `UV_SYSTEM_CERTS`. It still works; a later
+release should set both.
 
 ## Build record — rc.1, 3 October 2026 (PyPI only)
 
