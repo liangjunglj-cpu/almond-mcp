@@ -3,7 +3,7 @@ const el=id=>document.getElementById(id);
 const token=new URLSearchParams(location.search).get('bridge')||'';
 const native=/^[a-f0-9]{32}$/.test(token) && new URLSearchParams(location.search).get('panel')==='1';
 const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
-let model=null,report=null,busy=false,dirty=false,checked=false,codes=null;
+let model=null,report=null,busy=false,dirty=false,checked=false,codes=null,pending=null;   // pending: the action Rhino has not answered yet
 const engine=()=>el('analysis-engine').value;
 const optional=id=>{const v=el(id).value.trim();return v===''?null:Number(v);};
 const settings=()=>{
@@ -22,6 +22,8 @@ const settings=()=>{
     stability:el('analysis-stability').value,view:el('analysis-overlay').value,span_m:optional('analysis-span')};
 };
 function message(text) {el('analysis-message').textContent=text;}
+// A capture's answer belongs in step 01, beside the button pressed: the shared status line is at the foot of the form.
+function captureNote(text,error) {const s=el('selection-summary');s.textContent=text;s.classList.toggle('error',!!error);}
 // Design code profiles come from the solver (built-in Eurocode, a practice's National Annex files, "off").
 function showCodes(list) {
   if(!list?.profiles?.length)return;
@@ -76,7 +78,8 @@ function request(action) {
   if(action==='analyze'&&!el('analysis-form').reportValidity())return;
   const input=settings();
   if(input.diameter_mm!==null && input.wall_mm>=input.diameter_mm/2){message('Wall thickness must be less than half the diameter.');return;}
-  busy=true;controls();
+  busy=true;pending=action;controls();
+  if(action==='capture')captureNote('Select structural geometry in Rhino…');
   message(action==='analyze'?(input.engine==='native'?'Exporting the model from Rhino…':'Running Karamba in Rhino…'):
     action==='capture'?'Select structural geometry in Rhino…':action==='status'?'Checking engines…':'Working in Rhino…');
   location.href='/almond-action/'+token+'/karamba/'+action+'?data='+encodeURIComponent(JSON.stringify(input));
@@ -108,7 +111,9 @@ window.almondAnalysisReceive = payload => {
     showEngines();return;
   }
   busy=false;
+  const answered=pending;pending=null;
   if(payload.kind==='error'||payload.kind==='notice'){
+    if(answered==='capture')captureNote(payload.message,payload.kind==='error');
     if(payload.stale && report){dirty=true;el('analysis-stale').hidden=false;}
     message(payload.message);controls();draw();return;
   }
@@ -131,7 +136,7 @@ window.almondAnalysisReceive = payload => {
       'Analysis snapshot recorded. Recapture if Rhino geometry changes.'));
   }
   if(model) {
-    el('selection-summary').textContent=model.objects+' objects · '+model.beams+' beams · '+model.shells+' shells · '+model.units;
+    captureNote(model.objects+' objects · '+model.beams+' beams · '+model.shells+' shells · '+model.units);
     el('section-summary').textContent=model.default_sections+' beam sections use the CHS 114.3 × 4 mm default before overrides. Shell default: 100 mm. Inferred sections need review.';
   }
   controls();draw();
