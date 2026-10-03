@@ -1,12 +1,14 @@
 # Almond workspace for Rhino 8
 
-Install **almondbridge 0.6.0** from Rhino's Package Manager (search
-`almondbridge`), or install the supplied **almondbridge-0.6.0-rh8_0-win.yak**.
-Save your work, restart Rhino, and run **Almond**. Windows / Rhino 8.0+.
+Install **almondbridge 0.7.0-rc.1** from Rhino's Package Manager (search
+`almondbridge` with **Include pre-releases** ticked), or install the supplied
+**almondbridge-0.7.0-rc.1-rh8_0-win.yak**. Save your work, restart Rhino, and
+run **Almond**. Windows / Rhino 8.0+. This is a pre-release; the stable version
+remains 0.6.0.
 
 Browsing and placing the included library models need neither Python nor an
-MCP client. The optional AI workflow uses the matching `almond-mcp 0.6.0`
-Python package (see below).
+MCP client. The structural engine and the optional AI workflow use the matching
+`almond-mcp 0.7.0rc1` Python package through uv (see below).
 
 The archive opens in a dockable **Almond** panel inside Rhino. Its background,
 text, controls and font follow Rhino appearance settings, including theme changes.
@@ -70,53 +72,37 @@ The separately installed Python archive uses a stable configurable port.
 
 ## Structural Validation
 
-Choose **Structure** from the Almond menu, or run **AlmondStructure** (the
-older **AlmondKaramba** still works). The models area remains available
-through **AlmondLibrary**.
+Choose **Structure** from the Almond menu, or run **AlmondStructure** (the older
+**AlmondKaramba** still works). The step-by-step guide is the
+[Structure workspace tutorial](https://github.com/liangjunglj-cpu/almond-mcp/blob/master/docs/structural-tutorial.md).
 
-Pick the engine at the top. **Almond native** is built in: Rhino runs
-`uvx almond-mcp@<plugin version> solve` (uv is already needed for the MCP
-server; the first run downloads it, later runs take a second or two). It adds
-floor area loads, loads from placed Almond models, EN 1990 load combinations,
-rigid or simple connections, a stability check (αcr, sway imperfections, P-Δ)
-and draws the deformed shape, or the first buckling mode, in the viewport.
+**Almond native** is built in. Rhino runs `uvx almond-mcp@0.7.0rc1 solve`, so uv
+must be installed (`winget install astral-sh.uv`); the first run downloads the
+engine, later runs take a few seconds. It analyses frames drawn as centre lines:
+
+- loads: total load, floor area loads (imposed and build-up), placed Almond models, self-weight;
+- EN 1990 load combinations from the selected design code (Eurocode recommended
+  values by default; National Annex profiles can be added);
+- rigid or simple (pinned beam end) connections, and per-curve `almond:release`;
+- per-curve sections with `almond:section` user text (`rect 300x640`, `box 200x300x8`,
+  `chs 114.3x4`, mm unless a unit follows); otherwise inferred, or CHS 114.3 × 4;
+- stability: alpha-cr, sway imperfections and P-Delta second-order analysis below 10;
+- EN 1993-1-1 steel member checks: section class, buckling curves by fabrication,
+  flexural buckling with Annex B interaction;
+- the deflected shape or first buckling mode in the viewport, and every member,
+  support and combination in the **Almond Results** panel (`AlmondResults`), with CSV export.
+
+Concrete, timber and aluminium results are indicative: forces, deflection and
+stability are computed, but EN 1992/1995/1999 are not applied, so there is no
+capacity pass/fail. Prismatic solids are read as their centre lines; other solids
+are skipped with a warning. One study takes at most 200 selected objects.
 **Karamba3D** needs its own installation and licence and also handles shells.
 Developers can point the panel at a checkout with `ALMOND_SOLVER_COMMAND`
 (for example `"<repo>\.venv\Scripts\python.exe" -m almond_mcp`).
 
-1. Select structural curves, shell surfaces/meshes and optional Rhino point
-   objects for supports. Click **Use Rhino selection**. Placed visual model
-   blocks are not structural analysis models.
-2. Set material, total downward load, self-weight and fixed/pinned restraints.
-   Selected points define support locations; without points the lowest nodes
-   are used. Choose **Require selected points** to disallow that inference.
-3. Review sections. The default beam is CHS 114.3 × 4 mm and shell thickness
-   is 100 mm. Inferred sections need review. A CHS override uses millimetres
-   independently of document units. Truss assemblies retain beam elements;
-   axial-only releases are not applied.
-4. Use Axonometric, Front or Top and the Members, Supports and Loads toggles.
-   Before solving, the diagram is a provisional preview. With no selection it
-   is a labelled illustrative frame, with no analysis results.
-5. Click **Run native analysis** (or **Run Karamba analysis**). Neither engine
-   is ever replaced with a rule estimate when it is unavailable; **Check
-   engines** reports both in the running Rhino.
-6. Read maximum deflection against the indicative L/250 limit and utilization
-   against 100%. Missing metrics display as unavailable and cannot pass.
-   Toggle utilization colouring, select the highest-utilization source members,
-   or save a JSON report containing input IDs, settings, geometry snapshot,
-   warnings, result method and timestamp.
-
-**Open full results** (or `AlmondResults`) shows every member's forces, checks and deflection, the support reactions and the combinations in the Almond Results panel, with CSV export.
-
-Changing analysis settings marks results stale. Recapture after changing Rhino
-geometry or document units; the native bridge rejects stale selections. Results
-are snapshots, not live monitoring. Overlay/view toggles do not rerun analysis.
-Only actual support/load positions and reported utilization are shown after a
-solve; no displacement field is returned, so no deformed shape is drawn.
-
-This is first-order analysis of the stated idealisation, not full project-specific
-code verification. Review solver warnings and inferred assumptions. The existing
-MCP validation tool remains available, with explicitly labelled fallback methods.
+Changing settings marks results stale; recapture after changing Rhino geometry.
+Results are snapshots, not live monitoring. This is design-stage screening of the
+stated idealisation, not a substitute for an engineer's design and sign-off.
 
 ## Optional AI/MCP workflow
 
@@ -124,7 +110,7 @@ Install [uv](https://docs.astral.sh/uv/getting-started/installation/). Configure
 your MCP client with command `uvx` and these arguments:
 
 ```json
-["--from", "almond-mcp==0.6.0", "almond-mcp"]
+["--from", "almond-mcp==0.7.0rc1", "almond-mcp"]
 ```
 
 The MCP client launches its own stdio server. It connects to the Rhino bridge

@@ -14,6 +14,11 @@ class Program
             catch(Exception ex) { Console.Error.WriteLine(ex.Message); Environment.ExitCode=1; }
             return;
         }
+        if (args[0] == "--package")
+        {
+            Console.WriteLine(NativeSolver.PackageFor(args[1]));
+            return;
+        }
         if (args[0] == "--solve")
         {
             // the panel's process boundary: request file -> almond-mcp solve -> reply on stdout

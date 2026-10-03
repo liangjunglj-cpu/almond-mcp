@@ -55,10 +55,22 @@ namespace RhinoAlmondBridge
                 reason = "uv is not installed (the Almond MCP server needs it too): winget install astral-sh.uv, then restart Rhino.";
                 return null;
             }
-            // a release plugin pins its own solver version; a development build takes the latest
-            string version = PluginVersion;
-            string package = version.Contains("-") ? "almond-mcp" : "almond-mcp@" + version;
+            string package = PackageFor(PluginVersion);
             return new Command { File = uvx, Arguments = package + " solve", Label = "uvx " + package + " solve" };
+        }
+
+        /// <summary>
+        /// The uvx package for a plugin version. A release (0.7.0) or Yak prerelease (0.7.0-rc.1) pins its PyPI twin
+        /// (almond-mcp@0.7.0, almond-mcp@0.7.0rc1): unpinned, uvx would resolve the latest stable release, which can
+        /// predate this bridge's solver protocol. A development build (0.6.1-dev) takes the latest.
+        /// </summary>
+        internal static string PackageFor(string version)
+        {
+            var m = System.Text.RegularExpressions.Regex.Match(version ?? "", @"^(\d+\.\d+\.\d+)(?:-(alpha|beta|rc)\.(\d+))?$");
+            if (!m.Success) return "almond-mcp";
+            if (!m.Groups[2].Success) return "almond-mcp@" + m.Groups[1].Value;
+            string tag = m.Groups[2].Value == "alpha" ? "a" : m.Groups[2].Value == "beta" ? "b" : "rc";
+            return "almond-mcp@" + m.Groups[1].Value + tag + m.Groups[3].Value;
         }
 
         private static string FindUvx()
