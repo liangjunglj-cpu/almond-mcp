@@ -2,11 +2,21 @@
 import json, socket, sys
 from pathlib import Path
 
+def _with_token(msg):
+    """This Rhino session's bridge token (almondbridge writes it at startup; see almond_mcp.bridge_client)."""
+    import os
+    token = os.environ.get("ALMOND_BRIDGE_TOKEN") or ""
+    path = Path(os.environ.get("LOCALAPPDATA", Path.home() / "AppData" / "Local")) / "Almond" / "bridge.token"
+    if not token and path.exists():
+        token = path.read_text(encoding="utf-8").strip()
+    return {**msg, "token": token} if token else msg
+
+
 WORK = Path(r"C:\Users\liang\Documents\almond_promo")
 
 
 def execute(source, timeout=120, quiet=False):
-    payload = json.dumps({'type': 'execute', 'script': source, 'timeout_s': timeout}).encode()
+    payload = json.dumps(_with_token({'type': 'execute', 'script': source, 'timeout_s': timeout})).encode()
     with socket.create_connection(('127.0.0.1', 5000), timeout=30) as s:
         s.settimeout(timeout + 15)
         s.sendall(len(payload).to_bytes(4, 'big') + payload)
