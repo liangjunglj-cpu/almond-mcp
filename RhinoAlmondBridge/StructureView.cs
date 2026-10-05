@@ -248,10 +248,29 @@ namespace RhinoAlmondBridge
         protected override void CalculateBoundingBox(CalculateBoundingBoxEventArgs e)
         {
             if (Data?.Result == null) return;
+            // everything drawn, not just the undeformed members: the view's clipping planes come from this box,
+            // so support symbols below a base, load arrows and the exaggerated shape would otherwise be cut off
+            var pts = new List<Point3d>();
             foreach (var el in Data.Result.Elements)
             {
-                e.IncludeBoundingBox(new BoundingBox(new[] { P(el.StartM, new double[3], 0), P(el.EndM, new double[3], 0) }));
+                int n = el.SampleDispM.Count;
+                for (int i = 0; i < n; i++)
+                {
+                    double t = n > 1 ? i / (double)(n - 1) : 0;
+                    var m = new[] { el.StartM[0] + t * (el.EndM[0] - el.StartM[0]), el.StartM[1] + t * (el.EndM[1] - el.StartM[1]),
+                                    el.StartM[2] + t * (el.EndM[2] - el.StartM[2]) };
+                    pts.Add(P(m, new double[3], 0));
+                    pts.Add(P(m, el.SampleDispM[i], Data.Scale));
+                }
             }
+            double reach = Data.SpanM * 0.12 * Data.ToDoc;                // the load arrow length; symbols are smaller
+            foreach (var s in Data.Result.SupportPointsM.Concat(Data.Result.LoadedPointsM))
+            {
+                var p = P(s, new double[3], 0);
+                pts.Add(p + new Vector3d(reach, reach, reach));
+                pts.Add(p - new Vector3d(reach, reach, reach));
+            }
+            if (pts.Count > 0) e.IncludeBoundingBox(new BoundingBox(pts));
         }
 
         protected override void DrawForeground(DrawEventArgs e)
