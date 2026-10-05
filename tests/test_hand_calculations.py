@@ -50,8 +50,10 @@ def test_cantilever_tip_load():
     assert c["m_max_knm"] == pytest.approx(1.5 * P * L, rel=1e-3)
     assert c["v_max_kn"] == pytest.approx(1.5 * P, rel=1e-3)
     assert c["max_displacement_mm"] == pytest.approx(tip * 1000, rel=1e-3)
-    # deflection relative to the member's own (displaced) ends: max of xi - xi^2 (3 - xi) / 2 = 0.1925 x tip
-    assert c["deflection_mm"] == pytest.approx(0.19245 * tip * 1000, rel=0.01)
+    # deflection relative to what supports the member: a cantilever's root, so the full tip deflection (its
+    # displaced chord turns with it and would read only 0.19 x tip)
+    assert c["deflection_mm"] == pytest.approx(tip * 1000, rel=1e-3)
+    assert r["results"]["max_deflection_mm"] == pytest.approx(tip * 1000, rel=1e-3)
     assert abs(r["supports"][0]["uls"]["ULS 6.10"]["My"]) == pytest.approx(1.5 * P * L, rel=1e-3)
 
 

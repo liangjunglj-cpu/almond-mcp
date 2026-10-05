@@ -27,6 +27,7 @@ from dataclasses import dataclass, field
 import numpy as np
 
 DOF = 6   # ux uy uz rx ry rz per node
+PIVOT_TOL = 1e-13   # Cholesky pivot / own diagonal below this = singular (mechanism)
 
 
 # ------------------------------------------------------------------ materials
@@ -462,7 +463,9 @@ def _assemble(frame: Frame) -> _Assembly:
         Kff = K[np.ix_(free, free)]
         try:
             Lc = np.linalg.cholesky(Kff)
-            if np.min(np.diag(Lc)) ** 2 < 1e-10 * np.max(np.diag(Kff)):
+            # each pivot against its own diagonal: a zero-energy mode collapses its pivot to round-off,
+            # while a very short (stiff) member elsewhere in the model must not make sound DOFs look singular
+            if np.min(np.diag(Lc) ** 2 / np.diag(Kff)) < PIVOT_TOL:
                 raise np.linalg.LinAlgError
             break
         except np.linalg.LinAlgError:
