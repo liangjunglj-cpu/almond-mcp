@@ -140,7 +140,7 @@ namespace RhinoAlmondBridge
                         var action = Regex.Match(e.Uri.AbsolutePath, "^/almond-action/" + _session + "/(drag|place)/(light|original)/(gen-[a-z0-9-]{1,100})$");
                         if (_ready && action.Success)
                             LibraryPlacement.Request(action.Groups[3].Value, action.Groups[1].Value == "drag", action.Groups[2].Value == "light");
-                        var analysis = Regex.Match(e.Uri.AbsolutePath,"^/almond-action/"+_session+"/karamba/(status|capture|analyze|highlight|export|clear_view|results)$");
+                        var analysis = Regex.Match(e.Uri.AbsolutePath,"^/almond-action/"+_session+"/karamba/(status|capture|analyze|highlight|export|clear_view|results|set_support)$");
                         if (_ready && analysis.Success)
                         {
                             try {

@@ -64,3 +64,19 @@ test('an indicative (concrete/timber) result is complete but not a pass or fail'
     max_deflection_mm:14.1,utilization_ratio:0.52,deflection_limit_mm:129.4}};
   assert.equal(metricState(r).complete,true);
 });
+test('support specs round-trip between the picker and almond:support text', async () => {
+  const {splitSupportSpec, supportSpec, supportGlyph, supportSymbol} = await import('../almond_mcp/library_ui/analysis-view.mjs');
+  assert.deepEqual(splitSupportSpec('roller-x kz=5000'), {type:'roller-x', springs:'kz=5000'});
+  assert.deepEqual(splitSupportSpec(null), {type:'', springs:''});
+  assert.deepEqual(splitSupportSpec('Pin'), {type:'pinned', springs:''});
+  assert.equal(supportSpec('', ''), '');                                  // default: clear the user text
+  assert.equal(supportSpec('fixed', 'RX=8000, ry:8000'), 'fixed rx=8000 ry=8000');
+  assert.equal(supportSpec('spring', 'kz=50000'), 'spring kz=50000');
+  for (const [type, springs] of [['', 'kz=1'], ['spring', ''], ['spring', 'kz=0'], ['fixed', 'kq=5'], ['fixed', 'kz'], ['fixed', 'kz=-1']])
+    assert.equal(supportSpec(type, springs), null, type + ' ' + springs);
+  assert.equal(supportGlyph('fixed rx=8000'), 'spring');
+  assert.equal(supportGlyph('roller-y'), 'roller');
+  assert.equal(supportGlyph('', false), 'pinned');
+  assert.equal(supportGlyph(null, true), 'fixed');
+  for (const g of ['fixed', 'pinned', 'roller', 'spring']) assert.match(supportSymbol(g, 10, 20), /^<path /);
+});

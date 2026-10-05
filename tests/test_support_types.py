@@ -1,6 +1,7 @@
 """Support types per support point (fixed, pinned, rollers, springs) against closed forms.
 
 Each expected value is a textbook result worked here, not taken from the solver."""
+import json
 import math
 
 import pytest
@@ -172,3 +173,18 @@ def test_overlay_reports_the_checked_deflection_and_support_types():
     assert view["max_deflection_mm"] == pytest.approx(checked["max_deflection_mm"], rel=0.01)
     assert view["max_displacement_mm"] > view["max_deflection_mm"]
     assert view["support_types"] == ["fixed", "roller-x kz=5000"]
+
+
+def test_set_support_type_tool_validates_then_asks_the_bridge(monkeypatch, tmp_path):
+    from tests.test_capsules import _load_server
+    server = _load_server(monkeypatch, tmp_path, tmp_path)
+    sent = []
+    monkeypatch.setattr(server, "_send_and_receive", lambda payload, timeout=None: (sent.append(json.loads(payload)) or
+                        json.dumps({"status": "ok", "updated": [], "errors": []})))
+    assert json.loads(server.set_support_type(["g1", "g2"], "Fixed RX=8000"))["status"] == "ok"
+    assert sent[-1] == {"type": "set_support", "guids": ["g1", "g2"], "spec": "fixed rx=8000"}
+    server.set_support_type(["g1"], "default")
+    assert sent[-1]["spec"] == ""
+    bad = json.loads(server.set_support_type(["g1"], "hinge"))
+    assert bad["status"] == "error" and "not understood" in bad["message"] and len(sent) == 2   # nothing sent
+    assert json.loads(server.set_support_type([], "fixed"))["status"] == "error"

@@ -68,3 +68,9 @@
 /* Linework is an intentionally light drawing sheet; material previews use the host surface. */
 .rhino-panel .view-image{background:#f3f3ef}
 @media(max-width:330px){.rhino-panel .wordmark{font-size:0;gap:0}.rhino-panel .masthead nav{margin-left:0;flex:1}.rhino-panel .filters button{padding:5px;font-size:10px}.rhino-panel .placement-tools{flex-wrap:wrap}}
+.rhino-panel .support-table{width:100%;border-collapse:collapse;font-size:11px;margin:4px 0}
+.rhino-panel .support-table th{text-align:left;font-weight:600;color:var(--muted);border-bottom:1px solid var(--line);padding:3px 4px}
+.rhino-panel .support-table td{border-bottom:1px solid var(--line);padding:3px 4px;vertical-align:middle;white-space:nowrap}
+.rhino-panel .support-table select{width:100%}
+.rhino-panel .support-table input{width:100%;min-width:70px;box-sizing:border-box;background:var(--field);border:1px solid var(--line);border-radius:3px;padding:4px 3px;font-family:inherit;font-size:11px;color:var(--ink)}
+.rhino-panel .support-table input[aria-invalid=true]{border-color:#d33926}

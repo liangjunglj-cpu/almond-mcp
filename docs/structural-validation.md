@@ -81,8 +81,12 @@ the default with a warning. Results report `support_types`, `support_mode`
 ("mixed" when they differ) and each support's `restraint` and reactions (a
 spring's reaction is its force on the structure).
 
-In Rhino, write the spec as `almond:support` user text on the support point
-(a Rhino point object in the selection); almondbridge releases after 0.7.0rc2
+Setting a type, three ways (all write the same `almond:support` user text on
+the Rhino point object): the Almond panel's Supports tab lists the captured
+support points with a type picker and a springs field; the MCP tool
+`set_support_type(guids=[...], support="roller-x")` sets it from Claude (checked
+with the native parser first; `""` or `"default"` clears it); or edit the user
+text in Rhino's Properties. almondbridge releases after 0.7.0rc2
 export it in the `supports` list (older bridges send plain anchor points, which
 take the default). A support point lying part-way along a member splits the
 member there, so a column under the middle of a continuous beam acts on it. The
