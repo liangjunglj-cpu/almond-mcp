@@ -106,3 +106,86 @@ def test_box_and_default_sections_from_spec():
     assert sec.name == "CHS 114.3x4"
     sec, notes = ns.section_from_spec({"shape": "circular_hollow", "diameter": 0.1, "wall": 0.08})
     assert sec.name == "CHS 114.3x4" and notes
+
+
+def _chs_model(lines, anchors, extent=None):
+    sec = {"shape": "circular_hollow", "diameter": 0.2191, "wall": 0.008}
+    members = [{"source_guids": [f"m{i}"], "points": [list(a), list(b)], "section": sec} for i, (a, b) in enumerate(lines)]
+    spans = [math.dist(a, b) for a, b in lines]
+    return {"members": members, "anchor_points": [list(p) for p in anchors], "tolerance_m": 0.001,
+            "max_member_span_m": max(spans), "max_span_m": extent or max(spans), "warnings": []}
+
+
+def test_brace_landing_millimetres_from_a_joint_is_not_a_mechanism():
+    """A brace drawn 2 mm below the beam-column joint leaves a 2 mm column piece."""
+    lines = [((0, 0, 0), (0, 0, 3.998)), ((0, 0, 3.998), (0, 0, 4)), ((0, 0, 4), (6, 0, 4)), ((6, 0, 4), (6, 0, 0)),
+             ((0, 0, 3.998), (6, 0, 0))]
+    out = ns.validate(_chs_model(lines, [(0, 0, 0), (6, 0, 0)]), "frame", 20)
+    assert out["status"] == "pass", out["verdict"]
+
+
+def test_piece_shorter_than_the_weld_distance_is_collapsed_with_a_warning():
+    lines = [((0, 0, 0), (6, 0, 0)), ((6, 0, 0), (6.002, 0, 0)), ((6.002, 0, 0), (12, 0, 0))]
+    out = ns.validate(_chs_model(lines, [(0, 0, 0)]), "beam", 1)
+    assert out["status"] in ("pass", "fail") and "Mechanism" not in out["verdict"]
+    assert any("collapsed into a single joint" in w for w in out["warnings"])
+    assert out["results"]["elements"] >= 2
+
+
+def _tower(storeys, bay=6.0, h=3.5):
+    lines, anchors = [], [(x, y, 0) for x in (0, bay) for y in (0, bay)]
+    corners = [(0, 0), (bay, 0), (bay, bay), (0, bay)]
+    for s in range(storeys):
+        for x, y in corners:
+            lines.append(((x, y, s * h), (x, y, (s + 1) * h)))
+        for (x0, y0), (x1, y1) in zip(corners, corners[1:] + corners[:1]):
+            lines.append(((x0, y0, (s + 1) * h), (x1, y1, (s + 1) * h)))
+    return _chs_model(lines, anchors, extent=storeys * h)
+
+
+def test_tall_frame_deflection_excludes_column_shortening():
+    """The checked deflection is the beams' (relative to the column tops); the absolute maximum, mostly
+    column shortening in a 20-storey frame, is reported separately and does not fail the check."""
+    kw = dict(fixed_supports=True, floor_loads={"imposed": 3.0, "dead": 4.0}, stability="off", span_m=6.0)
+    one = ns.validate(_tower(1), "frame", 0, **kw)["results"]
+    tall = ns.validate(_tower(20), "frame", 0, **kw)
+    r = tall["results"]
+    assert r["max_displacement_mm"] > 2 * r["max_deflection_mm"]
+    assert r["max_deflection_mm"] == pytest.approx(one["max_deflection_mm"], rel=0.15)
+    assert "exceeds" not in tall["verdict"] or "Deflection" not in tall["verdict"]
+
+
+def test_cantilever_deflection_is_measured_from_its_root():
+    """A member's chord turns with a cantilever, so the tip deflection is measured from the root's
+    position: self weight w L^4 / 8EI."""
+    L = 3.0
+    out = ns.validate(_chs_model([((0, 0, 3), (L, 0, 3))], [(0, 0, 3)]), "beam", 0, stability="off", detail=True)
+    s = fs.chs(219.1, 8)
+    w = 78.5 * s.A
+    expected = w * L ** 4 / (8 * 210e6 * s.Iy) * 1000
+    assert out["members"][0]["deflection_mm"] == pytest.approx(expected, rel=2e-3)
+    assert out["results"]["max_deflection_mm"] == pytest.approx(expected, rel=2e-3)
+
+
+def test_secondary_beam_deflection_includes_the_girders():
+    f = fs.Frame()
+    m, g, b, c = fs.material("S355"), fs.chs(219.1, 8), fs.chs(168.3, 6.3), fs.chs(323.9, 12.5)
+    n = lambda *p: f.add_node(p)
+    base = [n(0, 0, 0), n(6, 0, 0), n(6, 6, 0), n(0, 6, 0)]
+    top = [n(0, 0, 4), n(6, 0, 4), n(6, 6, 4), n(0, 6, 4)]
+    for a, t in zip(base, top):
+        f.add_element(a, t, c, m, tag=[f"c{a}"])
+        f.fix(a)
+    g0, g1, mid = n(3, 0, 4), n(3, 6, 4), n(3, 3, 4)
+    for a, z, tag in ((top[0], g0, "g0"), (g0, top[1], "g0"), (top[3], g1, "g1"), (g1, top[2], "g1"),
+                      (top[1], top[2], "e1"), (top[3], top[0], "e0")):
+        f.add_element(a, z, g, m, tag=[tag])
+    f.add_element(g0, mid, b, m, tag=["s"])
+    f.add_element(mid, g1, b, m, tag=["s"])
+    f.load(mid, fz=-40)
+    r = fs.solve(f)
+    d = ns.member_deflections(f, r)
+    secondary = max(float(d[i].max()) for i, e in enumerate(f.elements) if e.tag == ["s"])
+    girder_mid = -r.displacements[g0, 2]
+    assert girder_mid > 0.05 * secondary                                   # the girders do deflect
+    assert secondary == pytest.approx(-r.displacements[mid, 2] - (-r.displacements[top[0], 2]), rel=1e-6)

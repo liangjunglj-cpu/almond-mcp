@@ -166,3 +166,45 @@ def test_tools_take_floor_loads(server):
 def test_tools_reject_bad_floor_loads(server):
     assert "native" in json.loads(server.validate_structure(guids=["x"], floor_load_kn_m2=2, engine="karamba"))["message"]
     assert "non-negative" in json.loads(server.validate_structure(guids=["x"], floor_load_kn_m2=-1))["message"]
+
+
+def test_unjoined_crossing_diagonals_keep_the_floor_load():
+    """X diagonals crossing without a joint (Rhino joins touching lines; members a few mm apart in height
+    or a JSON model do not): the bay is divided at the crossing, the load is all there, and a warning says
+    the members are not connected."""
+    f, ids = grid([0, 6], [0, 6])
+    f.add_element(ids[0, 0], ids[6, 6], SEC, STEEL, tag=["d1"])
+    f.add_element(ids[6, 0], ids[0, 6], SEC, STEEL, tag=["d2"])
+    rep = fl.apply(f, imposed_kn_m2=5.0)
+    assert rep["area_m2"] == pytest.approx(36.0) and rep["levels"][0]["bays"] == 4
+    assert sum(element_loads(f).values()) == pytest.approx(180.0, rel=1e-9)
+    assert any("no joint" in w for w in rep["warnings"])
+
+
+def test_crossed_bay_in_a_larger_floor_is_not_dropped():
+    f, ids = grid([0, 6, 12], [0, 6, 12])
+    f.add_element(ids[0, 0], ids[6, 6], SEC, STEEL, tag=["d1"])
+    f.add_element(ids[6, 0], ids[0, 6], SEC, STEEL, tag=["d2"])
+    fl.apply(f, imposed_kn_m2=1.0)
+    assert sum(element_loads(f).values()) == pytest.approx(144.0, rel=1e-9)
+
+
+def test_crossing_members_with_overhangs_load_only_the_enclosed_part():
+    """Two beams crossed by two others past their ends: one-way bay 6 x 2 on the parts between the
+    crossings, nothing on the overhangs."""
+    f = fs.Frame()
+    for a, b, tag in (((-1, 0), (7, 0), "L0"), ((-1, 2), (7, 2), "L2"), ((0, -1), (0, 3), "T0"), ((6, -1), (6, 3), "T6")):
+        f.add_element(f.add_node((*a, 3.0)), f.add_node((*b, 3.0)), SEC, STEEL, tag=[tag])
+    rep = fl.apply(f, imposed_kn_m2=1.0)
+    loads = element_loads(f)
+    assert rep["area_m2"] == pytest.approx(12.0) and loads["L0"] == pytest.approx(6.0) and loads["L2"] == pytest.approx(6.0)
+    for ei, wa, wb, _ in f.member_loads:
+        e = f.elements[ei]
+        assert 0.0 - 1e-9 <= min(f.nodes[e.n1][0], f.nodes[e.n2][0]) and max(f.nodes[e.n1][0], f.nodes[e.n2][0]) <= 6.0 + 1e-9
+
+
+def test_stub_inside_a_bay_does_not_drop_it():
+    f, ids = grid([0, 6], [0, 6])
+    f.add_element(ids[0, 0], f.add_node((2, 2, 3.0)), SEC, STEEL, tag=["stub"])     # ends inside the bay
+    rep = fl.apply(f, imposed_kn_m2=1.0)
+    assert rep["area_m2"] == pytest.approx(36.0) and sum(element_loads(f).values()) == pytest.approx(36.0)

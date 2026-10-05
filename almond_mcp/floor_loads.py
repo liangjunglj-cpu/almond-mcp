@@ -41,25 +41,72 @@ def _levels(frame: fs.Frame) -> dict:
     return levels
 
 
-def find_bays(frame: fs.Frame, members: list[int], walls: list | None = None) -> list[dict]:
-    """Enclosed faces of the plan graph of ``members`` (+ bearing ``walls`` as node pairs, given
-    edge ids -1, -2, ...): [{nodes, edges, area, centroid}].
+def plan_crossings(frame: fs.Frame, members: list[int]) -> dict[int, list[tuple[float, tuple]]]:
+    """Proper plan crossings between ``members`` that share no node there: {element: [(t, (x, y))]}.
+    Rhino's conditioner joins lines that touch, but members a few mm apart in height (or a model sent
+    as JSON) can cross without a joint; the bay finder must still see the crossing."""
+    if len(members) < 2:
+        return {}
+    P1 = np.array([frame.nodes[frame.elements[ei].n1][:2] for ei in members], float)
+    D = np.array([frame.nodes[frame.elements[ei].n2][:2] for ei in members], float) - P1
+    # P1_i + s D_i = P1_j + u D_j for every pair (i, j)
+    den = D[:, None, 0] * D[None, :, 1] - D[:, None, 1] * D[None, :, 0]
+    W = P1[None, :, :] - P1[:, None, :]
+    with np.errstate(divide="ignore", invalid="ignore"):
+        s = (W[..., 0] * D[None, :, 1] - W[..., 1] * D[None, :, 0]) / den
+        u = (W[..., 0] * D[:, None, 1] - W[..., 1] * D[:, None, 0]) / den
+    eps = 1e-9
+    hit = (np.abs(den) > 1e-12) & (s > eps) & (s < 1 - eps) & (u > eps) & (u < 1 - eps)
+    out: dict[int, list] = {}
+    for i, j in zip(*np.nonzero(np.triu(hit, 1))):
+        p = tuple(float(v) for v in P1[i] + s[i, j] * D[i])
+        out.setdefault(members[i], []).append((float(s[i, j]), p))
+        out.setdefault(members[j], []).append((float(u[i, j]), p))
+    return out
+
+
+def _faces(frame: fs.Frame, members: list[int], walls: list | None = None, crossings: dict | None = None):
+    """(bays, enclosed area) of the plan graph of ``members`` (+ bearing ``walls`` as node pairs, edge
+    ids -1, -2, ...). Members are cut at ``crossings`` into pieces between virtual vertices; dangling
+    pieces are pruned. Each bay: {nodes (vertex keys), points (plan xy), edges [(element, t at the
+    edge's start vertex, t at its end vertex)], area, centroid}. Enclosed area = the outer faces'.
 
     Half-edge walk keeping the face on the left: at each vertex take the neighbour that comes
     just before the arrival vertex in counter-clockwise order. Bounded faces come out
-    counter-clockwise (positive area); the outer face is negative and dropped."""
-    adj: dict[int, list[tuple[float, int, int]]] = {}
-    links = [(frame.elements[ei].n1, frame.elements[ei].n2, ei) for ei in members]
-    links += [(a, b, -(k + 1)) for k, (a, b) in enumerate(walls or [])]
-    for n1, n2, ei in links:
-        for u, v in ((n1, n2), (n2, n1)):
-            pu, pv = frame.nodes[u], frame.nodes[v]
-            adj.setdefault(u, []).append((math.atan2(pv[1] - pu[1], pv[0] - pu[0]), v, ei))
+    counter-clockwise (positive area); outer faces are negative."""
+    xy: dict = {}
+    links = []                                             # (vertex a, vertex b, (element, t at a, t at b))
+    for ei in members:
+        e = frame.elements[ei]
+        xy[e.n1], xy[e.n2] = tuple(frame.nodes[e.n1][:2]), tuple(frame.nodes[e.n2][:2])
+        cuts = sorted((crossings or {}).get(ei, []))
+        keys = [e.n1] + [("x", round(p[0], 9), round(p[1], 9)) for _, p in cuts] + [e.n2]
+        ts = [0.0] + [t for t, _ in cuts] + [1.0]
+        for (_, p), k in zip(cuts, keys[1:-1]):
+            xy[k] = p
+        links += [(keys[i], keys[i + 1], (ei, ts[i], ts[i + 1])) for i in range(len(keys) - 1)]
+    for k, (a, b) in enumerate(walls or []):
+        xy[a], xy[b] = tuple(frame.nodes[a][:2]), tuple(frame.nodes[b][:2])
+        links.append((a, b, (-(k + 1), 0.0, 1.0)))
+    while True:                                            # prune dangling pieces (stubs bound no area)
+        deg: dict = {}
+        for a, b, _ in links:
+            deg[a] = deg.get(a, 0) + 1
+            deg[b] = deg.get(b, 0) + 1
+        kept = [l for l in links if deg[l[0]] > 1 and deg[l[1]] > 1]
+        if len(kept) == len(links):
+            break
+        links = kept
+    adj: dict = {}
+    for a, b, (ei, ta, tb) in links:
+        for u, v, edge in ((a, b, (ei, ta, tb)), (b, a, (ei, tb, ta))):
+            pu, pv = xy[u], xy[v]
+            adj.setdefault(u, []).append((math.atan2(pv[1] - pu[1], pv[0] - pu[0]), v, edge))
     for u in adj:
-        adj[u].sort()
-    used, bays = set(), []
+        adj[u].sort(key=lambda x: x[0])
+    used, bays, enclosed = set(), [], 0.0
     for u in adj:
-        for _, v, ei in adj[u]:
+        for _, v, _e in adj[u]:
             if (u, v) in used:
                 continue
             nodes, edges, a, b = [], [], u, v
@@ -72,18 +119,27 @@ def find_bays(frame: fs.Frame, members: list[int], walls: list | None = None) ->
                 a, b = b, around[i - 1][1]
                 if len(nodes) > 4 * len(links) + 4:
                     break
-            if len(nodes) < 3 or len(set(edges)) != len(edges):
-                continue                       # dangling edges, not an enclosed bay
-            P = np.array([frame.nodes[n][:2] for n in nodes])
+            if len(nodes) < 3:
+                continue
+            P = np.array([xy[n] for n in nodes], float)
             x, y = P[:, 0], P[:, 1]
             cross = x * np.roll(y, -1) - np.roll(x, -1) * y
             area = cross.sum() / 2
             if area <= 1e-9:
-                continue                       # the outer face
+                enclosed -= area                   # an outer face: its area is what the members enclose
+                continue
+            if len({(e[0], min(e[1], e[2])) for e in edges}) != len(edges):
+                continue                           # walks an edge twice: not a simple bay
             cx = ((x + np.roll(x, -1)) * cross).sum() / (6 * area)
             cy = ((y + np.roll(y, -1)) * cross).sum() / (6 * area)
-            bays.append({"nodes": nodes, "edges": edges, "area": float(area), "centroid": (float(cx), float(cy))})
-    return bays
+            bays.append({"nodes": nodes, "points": P, "edges": edges, "area": float(area),
+                         "centroid": (float(cx), float(cy))})
+    return bays, float(enclosed)
+
+
+def find_bays(frame: fs.Frame, members: list[int], walls: list | None = None, crossings: dict | None = None) -> list[dict]:
+    """Enclosed faces of the plan graph of ``members`` (see ``_faces``)."""
+    return _faces(frame, members, walls, crossings)[0]
 
 
 def _cross(u, v) -> float:
@@ -105,9 +161,10 @@ def _convex(P):
     return all(v >= -1e-9 for v in s)
 
 
-def edge_shapes(frame: fs.Frame, bay: dict, q: float) -> list[tuple[int, int, list[tuple[float, float]]]]:
-    """Load shape on each bay edge: (element, start node, [(t, w kN/m), ...]) piecewise linear in t."""
-    P = np.array([frame.nodes[n][:2] for n in bay["nodes"]])
+def edge_shapes(frame: fs.Frame, bay: dict, q: float) -> list[tuple[tuple, object, list[tuple[float, float]]]]:
+    """Load shape on each bay edge: ((element, t at start, t at end), start vertex, [(t, w kN/m), ...])
+    piecewise linear in t along the edge from its start vertex."""
+    P = np.asarray(bay["points"], float)
     k = len(P)
     out = []
     if _is_rectangle(P):
@@ -135,21 +192,36 @@ def edge_shapes(frame: fs.Frame, bay: dict, q: float) -> list[tuple[int, int, li
     return out
 
 
+def _shape_on(pts, a: float, b: float) -> tuple[float, float]:
+    """Values at a and b of the linear piece of shape ``pts`` (ascending t) that spans [a, b]; zero
+    outside the shape's range (a shape may cover only part of the member, with a jump at its ends)."""
+    m = (a + b) / 2
+    if not pts[0][0] <= m <= pts[-1][0]:
+        return 0.0, 0.0
+    for (t0, w0), (t1, w1) in zip(pts, pts[1:]):
+        if t0 <= m <= t1 and t1 > t0:
+            k = (w1 - w0) / (t1 - t0)
+            return w0 + k * (a - t0), w0 + k * (b - t0)
+    return 0.0, 0.0
+
+
 def load_member(frame: fs.Frame, ei: int, shape_list: list, cases: dict | None = None) -> list[int]:
-    """Apply the summed piecewise-linear shapes [(t, w kN/m), ...] (t along n1 -> n2, downward) to
-    element ``ei`` exactly: split at the shapes' kinks and give each part its linear load, once per
-    load case scaled by ``cases`` ({case: factor}; default {"Q": 1})."""
+    """Apply the summed piecewise-linear shapes [(t, w kN/m), ...] (t ascending along n1 -> n2,
+    downward; a shape may cover only part of [0, 1]) to element ``ei`` exactly: split at the shapes'
+    kinks and give each part its linear load, once per load case scaled by ``cases`` ({case:
+    factor}; default {"Q": 1})."""
     ts = sorted({round(t, 12) for pts in shape_list for t, _ in pts if 1e-9 < t < 1 - 1e-9})
     bounds = [0.0] + ts + [1.0]
-    f = lambda t: sum(float(np.interp(t, [q[0] for q in pts], [q[1] for q in pts])) for pts in shape_list)
     parts = [ei]
     for j in range(1, len(bounds) - 1):                         # split the remaining tail each time
         frame.split_element(parts[-1], (bounds[j] - bounds[j - 1]) / (1.0 - bounds[j - 1]))
         parts.append(len(frame.elements) - 1)
     for j, part in enumerate(parts):
+        ends = [_shape_on(pts, bounds[j], bounds[j + 1]) for pts in shape_list]
+        wa, wb = sum(v[0] for v in ends), sum(v[1] for v in ends)
         for case, k in (cases or {"Q": 1.0}).items():
-            if k:
-                frame.linear_load(part, (0.0, 0.0, -k * f(bounds[j])), (0.0, 0.0, -k * f(bounds[j + 1])), case=case)
+            if k and (wa or wb):
+                frame.linear_load(part, (0.0, 0.0, -k * wa), (0.0, 0.0, -k * wb), case=case)
     return parts
 
 
@@ -161,6 +233,7 @@ def bearing_walls(frame: fs.Frame, members: list[int], z: float) -> list[tuple[i
     linked = {frozenset((frame.elements[ei].n1, frame.elements[ei].n2)) for ei in members}
     segs = [(np.asarray(frame.nodes[frame.elements[ei].n1][:2]), np.asarray(frame.nodes[frame.elements[ei].n2][:2]))
             for ei in members]
+    crossings = plan_crossings(frame, members)
     walls = []
     for i, a in enumerate(on_level):
         for b in on_level[i + 1:]:
@@ -186,7 +259,7 @@ def bearing_walls(frame: fs.Frame, members: list[int], z: float) -> list[tuple[i
     accepted = []
     for a, b in walls:
         mid = (np.asarray(frame.nodes[a][:2]) + np.asarray(frame.nodes[b][:2])) / 2
-        if any(_inside(mid, [frame.nodes[n][:2] for n in bay["nodes"]]) for bay in find_bays(frame, members, accepted)):
+        if any(_inside(mid, [tuple(p) for p in bay["points"]]) for bay in find_bays(frame, members, accepted, crossings)):
             continue
         accepted.append((a, b))
     return accepted
@@ -230,17 +303,26 @@ def apply(frame: fs.Frame, imposed_kn_m2: float = 0.0, dead_kn_m2: float = 0.0, 
         if levels_m and not any(abs(z - lz) <= LEVEL_TOL for lz in levels_m):
             continue
         walls = bearing_walls(frame, members, z)
-        bays = find_bays(frame, members, walls)
+        crossings = plan_crossings(frame, members)
+        bays, enclosed = _faces(frame, members, walls, crossings)
         if not bays:
             continue
-        lv = {"z_m": round(z, 3), "bays": len(bays), "area_m2": round(sum(b["area"] for b in bays), 3),
-              "bearing_walls": len(walls)}
+        loaded = sum(b["area"] for b in bays)
+        lv = {"z_m": round(z, 3), "bays": len(bays), "area_m2": round(loaded, 3), "bearing_walls": len(walls)}
         report["levels"].append(lv)
+        if crossings:
+            n = sum(len(v) for v in crossings.values()) // 2
+            lv["unjoined_crossings"] = n
+            report["warnings"].append(f"{n} member crossing(s) at z={z:.2f} m have no joint: the floor load was "
+                                      "divided at each crossing, but the members are not connected there.")
+        if enclosed - loaded > max(0.005 * enclosed, 1e-6):
+            report["warnings"].append(f"{enclosed - loaded:.1f} m2 enclosed by members at z={z:.2f} m could not be "
+                                      "resolved into floor bays and carries no floor load.")
         for bay in bays:
-            if not _convex(np.array([frame.nodes[n][:2] for n in bay["nodes"]])):
+            if not _convex(np.asarray(bay["points"], float)):
                 report["warnings"].append(f"Non-convex bay at z={z:.2f} m ({bay['area']:.1f} m2): centroid-fan "
                                           "distribution is approximate.")
-            for ei, start, pts in edge_shapes(frame, bay, 1.0):
+            for (ei, ta, tb), start, pts in edge_shapes(frame, bay, 1.0):
                 if ei < 0:                                     # bearing wall: straight into the supports
                     a, b = walls[-ei - 1]
                     other = b if start == a else a
@@ -251,9 +333,8 @@ def apply(frame: fs.Frame, imposed_kn_m2: float = 0.0, dead_kn_m2: float = 0.0, 
                             frame.load(other, fz=-k * rb, case=case)
                     report["wall_kn"] = report.get("wall_kn", 0.0) + q * (ra + rb)
                     continue
-                # store the shape in the element's own direction (n1 -> n2)
-                if frame.elements[ei].n1 != start:
-                    pts = [(1 - t, w) for t, w in reversed(pts)]
+                # the edge is the part [ta -> tb] of the element: map to the element's own t (n1 -> n2)
+                pts = sorted((ta + t * (tb - ta), w) for t, w in pts)
                 shapes.setdefault(ei, []).append(pts)
         report["area_m2"] += lv["area_m2"]
     for ei, shape_list in sorted(shapes.items(), reverse=True):    # splits append elements; indices stay valid

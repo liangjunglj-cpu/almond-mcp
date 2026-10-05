@@ -2356,8 +2356,9 @@ def validate_structure(
         ("pass"|"fail"|"error"), passed (bool), verdict (text), suggestions,
         confidence ("high"|"medium"|"low"), warnings, and worst_member_guids
         (up to 5 Rhino GUIDs of the most over-utilized members — edit those
-        first). The results object carries the numbers: max_deflection_mm,
-        deflection_limit_mm, utilization_ratio, max_stress_mpa, yield_stress_mpa,
+        first). The results object carries the numbers: max_deflection_mm (native:
+        member deflection relative to its supports; max_displacement_mm is the absolute
+        maximum), deflection_limit_mm, utilization_ratio, max_stress_mpa, yield_stress_mpa,
         span_m, analysis_method ("native"|"api"|"template"|"rule_based"), reactions_kn
         (total vertical reaction, api path only), and per_element_utilization —
         a list of {source_guids, utilization} entries (utilization 1.0 = at

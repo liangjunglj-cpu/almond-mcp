@@ -194,6 +194,21 @@ def test_mechanism_is_reported():
         fs.solve(f)
 
 
+@pytest.mark.parametrize("span,piece", [(3.0, 1e-3), (12.0, 1e-3), (12.0, 2e-3)])
+def test_millimetre_piece_is_not_a_mechanism(span, piece):
+    """A piece of a millimetre between members of metres is very stiff, not singular: the pivot test
+    compares each pivot with its own diagonal, so it is not mistaken for a mechanism."""
+    f = fs.Frame()
+    sec = fs.chs(219.1, 8)
+    n = [f.add_node((0, 0, 0)), f.add_node((span / 2, 0, 0)), f.add_node((span / 2 + piece, 0, 0)), f.add_node((span, 0, 0))]
+    for a, b in zip(n, n[1:]):
+        f.add_element(a, b, sec, STEEL)
+    f.fix(n[0])
+    f.load(n[-1], fz=-10)
+    tip = -fs.solve(f).displacements[n[-1], 2]
+    assert tip == pytest.approx(10 * span ** 3 / (3 * STEEL.E * sec.Iy), rel=1e-3)
+
+
 def test_section_properties_chs_rhs_i():
     s = fs.chs(114.3, 4.0)
     assert s.A == pytest.approx(1.3858e-3, rel=1e-3)            # 13.9 cm2 (EN 10210 table)

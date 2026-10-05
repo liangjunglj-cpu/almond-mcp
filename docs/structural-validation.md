@@ -63,7 +63,11 @@ automatically and says so in `warnings`.
 ## Pass criteria
 
 - **Deflection:** `max_deflection_mm ≤ span_mm / 250` (e.g. 24 mm for a 6 m
-  span, 48 mm for 12 m).
+  span, 48 mm for 12 m). On the native engine `max_deflection_mm` is each
+  member's deflection relative to what supports it (beam ends on columns, a
+  cantilever's root, a truss chord's end posts), so column shortening in a tall
+  frame does not count as beam deflection; the absolute maximum is reported as
+  `max_displacement_mm`. Storey drift is not checked.
 - **Strength:** utilization < 1.0 against yield (S235: fy = 235 MPa).
 - Rule-based pathway: mid-span UDL deflection `5wL⁴/384EI`, moment `wL²/8`,
   with load sharing across members.

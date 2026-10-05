@@ -16,7 +16,11 @@ so the two engines are comparable:
 - self weight: gamma x A along every member, -Z;
 - deflection limit: span / the design code's ratio (250 for the Eurocode profile), span = longest
   member for beam/frame, else overall extent, unless the caller names the structural span
-  (members split at every node are shorter);
+  (members split at every node are shorter); the deflection checked is each member's deflection
+  relative to what supports it (``member_deflections``), so column shortening in a tall frame or
+  rigid-body sway does not count as beam deflection; the absolute maximum is reported alongside;
+- joints: points closer than WELD_RATIO x the model's extent are welded into one node (a piece of a
+  few mm beside members of many metres cannot be solved accurately);
 - load cases: permanent G (self weight, floor build-up, the weight of placed items) and
   variable Q (load_kn, occupancy floor load, contents and occupants of placed items);
 - combinations (EN 1990) with the factors of a design code profile (design_codes: "eurocode"
@@ -49,6 +53,9 @@ ASSUMPTIONS = [
     "check calls for it (see Stability).",
     "Joints as stated under Connections; supports as described in support_mode.",
     "Imposed load shared equally by the free nodes, acting downward; self weight included when enabled.",
+    "Deflection checked per member relative to its supports (beam ends on columns, a cantilever's root, a truss "
+    "chord's end posts), not the absolute displacement: column shortening and rigid-body sway are excluded. "
+    "Storey drift is not checked.",
     "Member checks per member (EN 1993-1-1): section class from Table 5.2 for the actual stresses "
     "(Class 4 flagged as not covered); cross-section 6.2.1(7) with elastic moduli (plastic only for "
     "Class 1/2 when plastic design is requested); flexural buckling about both axes (6.3.1, curves "
@@ -83,6 +90,9 @@ def section_from_spec(spec: dict | None, diameter_mm=None, wall_mm=None) -> tupl
 
 
 CONNECTIONS = ("rigid", "simple")
+WELD_RATIO = 2e-4          # points closer than this x the model's diagonal extent are one node
+COLLINEAR_COS = 0.9995     # pieces meeting within ~1.8 degrees of a straight line are one member
+STEEP_SIN = 0.7            # members at least ~45 degrees from horizontal support what they meet
 RELEASES = ("rigid", "pinned", "pinned_start", "pinned_end")
 
 
@@ -167,15 +177,20 @@ def build_frame(model: dict, load_kn: float, material: str = "Steel", fixed_supp
     tol = max(float(model.get("tolerance_m") or 0.0), 1e-6)
     frame = fs.Frame()
     warnings = []
+    # weld points closer than a small fraction of the model size: a member piece of a few mm next to
+    # members of many metres leaves the stiffness matrix too ill-conditioned to solve (false mechanism)
+    pts_all = [p for m in model.get("members", []) for p in (m.get("points") or [])]
+    extent = float(np.linalg.norm(np.ptp(np.asarray(pts_all, float), axis=0))) if pts_all else 0.0
+    weld = max(tol, WELD_RATIO * extent)
 
     def node(p):
         for i, q in enumerate(frame.nodes):
-            if math.dist(p, q) <= tol:
+            if math.dist(p, q) <= weld:
                 return i
         return frame.add_node(p)
 
     lineage = []
-    pinned_ends, user_members, unordered = 0, 0, 0
+    pinned_ends, user_members, unordered, welded = 0, 0, 0, 0
     cont = _continued(model, tol) if connections == "simple" else {}
     for mi, (m, (c0, c1, ordered)) in enumerate(zip(model.get("members", []), _member_ends(model, tol))):
         sec, notes = section_from_spec(m.get("section"), diameter_mm, wall_mm)
@@ -197,10 +212,17 @@ def build_frame(model: dict, load_kn: float, material: str = "Steel", fixed_supp
             else:
                 ra = (rel0 and at(a, c0)) or (rel1 and at(a, c1))
                 rb = (rel0 and at(b, c0)) or (rel1 and at(b, c1))
-            ei = frame.add_element(node(a), node(b), sec, mat, tag=list(m.get("source_guids", [])),
+            na, nb = node(a), node(b)
+            if na == nb:                                        # shorter than the weld distance
+                welded += 1
+                continue
+            ei = frame.add_element(na, nb, sec, mat, tag=list(m.get("source_guids", [])),
                                    releases=fs.release_mask(ra, rb, minor))
             pinned_ends += int(ra) + int(rb)
             lineage.append(ei)
+    if welded:
+        warnings.append(f"{welded} member piece(s) shorter than {weld * 1000:.1f} mm were collapsed into a single "
+                        "joint (points this close are one node for the analysis).")
     if unordered:
         warnings.append(f"{unordered} member(s) asked for a one-sided release but the curve direction is "
                         "unknown (update almondbridge); both ends were pinned.")
@@ -318,7 +340,123 @@ def _role(a, b) -> str:
     return "column" if vertical > 0.9 else "beam" if vertical < 0.1 else "brace"
 
 
-def member_table(model: dict, frame, sls, envelope) -> list[dict]:
+def _member_groups(frame) -> list[list[int]]:
+    """Elements forming one structural member: the pieces of one drawn curve (same source GUIDs) and
+    pieces that carry on in a straight line through a joint (a beam drawn bay by bay, a column drawn
+    storey by storey)."""
+    X = np.asarray(frame.nodes, float)
+    parent = list(range(len(frame.elements)))
+
+    def find(i):
+        while parent[i] != i:
+            parent[i] = parent[parent[i]]
+            i = parent[i]
+        return i
+
+    by_tag, at = {}, {}
+    for i, e in enumerate(frame.elements):
+        if e.tag:
+            j = by_tag.setdefault(tuple(e.tag), i)
+            parent[find(i)] = find(j)
+        d = X[e.n2] - X[e.n1]
+        d = d / (np.linalg.norm(d) or 1.0)
+        at.setdefault(e.n1, []).append((i, d))
+        at.setdefault(e.n2, []).append((i, -d))
+    for ends in at.values():
+        for k, (i, di) in enumerate(ends):
+            for j, dj in ends[k + 1:]:
+                if float(di @ dj) < -COLLINEAR_COS:
+                    parent[find(i)] = find(j)
+    groups: dict = {}
+    for i in range(len(frame.elements)):
+        groups.setdefault(find(i), []).append(i)
+    return list(groups.values())
+
+
+def member_deflections(frame, res) -> list[np.ndarray]:
+    """Deflection at every station of every element (m): the displacement across the member relative to
+    what supports it, which is what a span/limit check reads (not the absolute displacement, which in a
+    tall frame is mostly column shortening).
+
+    A member is supported where it meets a support or a steep member (about 45 degrees or more) that leads
+    down to one: a beam on columns, a truss chord at its end posts, a floor beam on a diagrid. Between
+    supporting points the reference displacement is interpolated, beyond the last one (a cantilever) it
+    is that point's translation, so root rotation counts as deflection. A member resting on other
+    members (a secondary beam on girders) is measured from their deflected positions, so their
+    deflection adds to its own. Movement along the member's axis is not deflection."""
+    X = np.asarray(frame.nodes, float)
+    U = res.displacements[:, :3]
+    els = frame.elements
+    down: dict = {}                                     # node -> [(lower node, element)] along steep members
+    for i, e in enumerate(els):
+        d = X[e.n2] - X[e.n1]
+        L = float(np.linalg.norm(d))
+        if L > 0 and abs(d[2]) / L >= STEEP_SIN:
+            hi, lo = (e.n1, e.n2) if d[2] < 0 else (e.n2, e.n1)
+            down.setdefault(hi, []).append((lo, i))
+    supported = {n for n, f in frame.supports.items() if f[2]}
+    reach = set(supported)
+    for n in sorted(range(len(X)), key=lambda k: X[k, 2]):   # lower nodes first
+        if any(lo in reach for lo, _ in down.get(n, [])):
+            reach.add(n)
+    groups = _member_groups(frame)
+    info = []
+    for g in groups:
+        members = set(g)
+        nodes = sorted({n for i in g for n in (els[i].n1, els[i].n2)})
+        P = X[nodes]
+        a = P[int(np.argmax(np.linalg.norm(P - P[0], axis=1)))]
+        b = P[int(np.argmax(np.linalg.norm(P - a, axis=1)))]
+        axis = (b - a) / (np.linalg.norm(b - a) or 1.0)
+        own = [n for n in nodes if n in supported or any(lo in reach and i not in members for lo, i in down.get(n, []))]
+        info.append({"els": g, "nodes": nodes, "a": a, "axis": axis, "own": own})
+    base = {n: U[n] for n in reach}                     # supported points move with their support path
+    out = [np.zeros(len(res.elements[i].stations)) for i in range(len(els))]
+    done = [False] * len(groups)
+
+    def measure(gi, refs):
+        g = info[gi]
+        ts = np.array([(X[n] - g["a"]) @ g["axis"] for n in refs])
+        order = np.argsort(ts)
+        ts, vs = ts[order], np.array([base[refs[k]] for k in order])
+        cand = {}
+        for i in g["els"]:
+            er = res.elements[i]
+            t = (er.stations - g["a"]) @ g["axis"]
+            ref = np.stack([np.interp(t, ts, vs[:, k]) for k in range(3)], axis=1)   # clamped beyond the ends
+            rel = er.disp - ref
+            perp = rel - np.outer(rel @ g["axis"], g["axis"])
+            out[i] = np.linalg.norm(perp, axis=1)
+            for n, s in ((els[i].n1, 0), (els[i].n2, -1)):
+                if n not in base and (n not in cand or out[i][s] > np.linalg.norm(U[n] - cand[n])):
+                    cand[n] = er.disp[s] - perp[s]
+        return cand
+
+    first = True
+    while True:
+        new = {}
+        for gi, g in enumerate(info):
+            if done[gi]:
+                continue
+            refs = g["own"] if first else [n for n in g["nodes"] if n in base]
+            if not refs:
+                continue
+            done[gi] = True
+            for n, v in measure(gi, refs).items():
+                if n not in new or np.linalg.norm(U[n] - v) > np.linalg.norm(U[n] - new[n]):
+                    new[n] = v                           # the larger deflection governs a shared point
+        if not new and not first:
+            break
+        base.update(new)
+        first = False
+    for gi, g in enumerate(info):                        # not connected to any support path: absolute
+        if not done[gi]:
+            for i in g["els"]:
+                out[i] = np.linalg.norm(res.elements[i].disp, axis=1)
+    return out
+
+
+def member_table(model: dict, frame, sls, envelope, deflections=None) -> list[dict]:
     """Every member (one per source curve), aggregated over its analysis elements: geometry, section,
     ULS design forces and checks from each piece's governing combination, and SLS displacements."""
     names = {tuple(m.get("source_guids") or []): m for m in model.get("members") or []}
@@ -339,6 +477,8 @@ def member_table(model: dict, frame, sls, envelope) -> list[dict]:
         t = np.clip((pts - A) @ chord / span ** 2, 0.0, 1.0)
         dA, dB = disp[int(np.argmin(np.linalg.norm(pts - A, axis=1)))], disp[int(np.argmin(np.linalg.norm(pts - B, axis=1)))]
         sag = float(np.max(np.linalg.norm(disp - (np.outer(1 - t, dA) + np.outer(t, dB)), axis=1)))
+        if deflections is not None:                     # relative to what supports the member (cantilevers too)
+            sag = max(float(np.max(deflections[i])) for i in idx)
         # ULS: the governing piece and the design forces of every piece's governing combination
         gi = max(idx, key=lambda i: envelope[i][0])
         u, comb, ger = envelope[gi]
@@ -422,8 +562,11 @@ def subdivide(frame, parts: int, only: set | None = None) -> None:
     nodes; first-order results are exact either way."""
     if parts < 2:
         return
+    X = np.asarray(frame.nodes, float)
+    lengths = [float(np.linalg.norm(X[e.n2] - X[e.n1])) for e in frame.elements]
+    short = 0.01 * max(lengths, default=0.0)                   # stubs: splitting them only worsens conditioning
     for ei in range(len(frame.elements)):
-        if frame.elements[ei].truss or (only is not None and ei not in only):
+        if frame.elements[ei].truss or (only is not None and ei not in only) or lengths[ei] < short:
             continue
         tail = ei
         for j in range(1, parts):
@@ -670,7 +813,8 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
     if span < 0.001:
         span, basis = 5.0, "default"
     limit_mm = span * 1000.0 / limit_ratio
-    dmax_mm = res.max_displacement * 1000.0
+    deflections = member_deflections(frame, res)
+    dmax_mm = max(float(np.max(d)) for d in deflections) * 1000.0
     umax = max(u for u, _, _ in envelope)
     governing = max(envelope, key=lambda t: t[0])[1]
     stress = max(er.util_detail.get("max_stress_mpa", 0.0) for _, _, er in envelope)
@@ -682,7 +826,9 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
     elem_util = list(per_member.values())
     r = result["results"]
     r.update({
-        "max_deflection_mm": round(dmax_mm, 3), "displacement_available": True, "utilization_available": True,
+        "max_deflection_mm": round(dmax_mm, 3), "deflection_measure": "member, relative to its supports",
+        "max_displacement_mm": round(res.max_displacement * 1000.0, 3),
+        "displacement_available": True, "utilization_available": True,
         "deflection_limit_mm": round(limit_mm, 3), "utilization_ratio": round(umax, 4),
         "max_stress_mpa": round(stress, 2), "yield_stress_mpa": mat.fy / 1000.0, "span_m": round(span, 3),
         "span_basis": basis, "reactions_kn": round(float(res.reactions[:, 2].sum()), 3),
@@ -692,7 +838,8 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
                           "reactions_kn": round(float(res.reactions[:, 2].sum()), 3)}] +
                         [{"name": n, "factors": f, "max_utilization": round(r_.max_utilization, 4),
                           "governing_variant": getattr(r_, "variant", ""),
-                          "max_deflection_mm": round(r_.max_displacement * 1000.0, 3),
+                          "max_deflection_mm": round(max(float(np.max(d)) for d in member_deflections(frame, r_)) * 1000.0, 3),
+                          "max_displacement_mm": round(r_.max_displacement * 1000.0, 3),
                           "reactions_kn": round(float(r_.reactions[:, 2].sum()), 3)} for n, f, r_ in ulss],
         "support_points_m": [list(frame.nodes[n]) for n in info["support_nodes"]],
         "loaded_points_m": [list(frame.nodes[n]) for n in info["loaded_nodes"]],
@@ -774,7 +921,7 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
                 seen.append(g)
     result["worst_member_guids"] = seen[:5]
     if detail:
-        result["members"] = member_table(model, frame, res, envelope)
+        result["members"] = member_table(model, frame, res, envelope, deflections)
         result["supports"] = support_table(frame, info, res, ulss, fixed_supports)
     if res.auto_restrained:
         result["warnings"].append(f"{len(res.auto_restrained)} unstiffened rotation(s) at pin-jointed nodes were restrained.")
