@@ -823,6 +823,8 @@ def view_result(model: dict, load_kn: float = 10.0, material: str = "Steel", fix
             result[key] = info[key]
     if buckling:
         result["buckling"] = buckling
+    else:                                               # what the deflection check reads (validate's measure)
+        result["max_deflection_mm"] = round(max(float(np.max(d)) for d in member_deflections(frame, res)) * 1000.0, 3)
     return result, span
 
 

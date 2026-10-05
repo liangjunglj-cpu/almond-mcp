@@ -75,7 +75,11 @@ namespace RhinoAlmondBridge
         public bool DisplacementAvailable { get; set; }
         public bool UtilizationAvailable { get; set; }
         public List<double[]> SupportPointsM { get; set; } = new List<double[]>();
+        /// <summary>Support type per SupportPointsM entry ("fixed", "roller-x", "spring kz=50000", ...); may be empty.</summary>
+        public List<string> SupportTypes { get; set; } = new List<string>();
         public List<double[]> LoadedPointsM { get; set; } = new List<double[]>();
+        /// <summary>Checked deflection (native: per member, relative to its supports); null = use MaxDisplacementMM.</summary>
+        public double? MaxDeflectionMM { get; set; }
 
         /// <summary>Utilization per analyzed element, keyed to source Rhino GUIDs.</summary>
         public List<ElementUtilization> PerElementUtilization { get; set; } = new List<ElementUtilization>();
@@ -914,13 +918,18 @@ namespace RhinoAlmondBridge
                 throw new InvalidOperationException("No Karamba elements could be built.");
 
             // ── Supports ─────────────────────────────────────────────────────
-            // Declared anchor points win; otherwise all lowest-Z nodes.
+            // Declared anchor points win (each with its almond:support type); otherwise all lowest-Z nodes.
             var supportPtsM = new List<Point3d>();
+            var supportSpecs = new List<string>();
             if (cond.AnchorPoints.Count > 0)
             {
-                foreach (var p in cond.AnchorPoints)
+                for (int k = 0; k < cond.AnchorPoints.Count; k++)
+                {
+                    var p = cond.AnchorPoints[k];
                     supportPtsM.Add(new Point3d(Units.LenM(p.X, scale),
                         Units.LenM(p.Y, scale), Units.LenM(p.Z, scale)));
+                    supportSpecs.Add(k < cond.Supports.Count ? cond.Supports[k].Spec : null);
+                }
             }
             else if (nodePoints.Count > 0)
             {
@@ -937,23 +946,46 @@ namespace RhinoAlmondBridge
             var supportType = FindType("Karamba.Supports.Support");
             var supportObjs = new List<object>();
             var fullyFixed = new List<bool> { true, true, true, spec.FixedRotations, spec.FixedRotations, spec.FixedRotations };
+            string defaultLabel = spec.FixedRotations ? "fixed" : "pinned";
             res.SupportPointsM = supportPtsM.Select(p => new[] {p.X,p.Y,p.Z}).ToList();
+            int sprungSupports = 0;
 
-            foreach (var p in supportPtsM)
+            for (int k = 0; k < supportPtsM.Count; k++)
             {
+                var p = supportPtsM[k];
+                var conditions = fullyFixed;
+                string label = defaultLabel, text = k < supportSpecs.Count ? supportSpecs[k] : null;
+                if (!string.IsNullOrWhiteSpace(text))
+                {
+                    bool[] restraint, sprung;
+                    string parsed, error;
+                    if (SupportSpec.TryParse(text, out restraint, out sprung, out parsed, out error))
+                    {
+                        // Karamba springs are not wired up: a sprung direction is held rigid here
+                        if (sprung.Any(b => b)) sprungSupports++;
+                        conditions = restraint.Select((r, d) => r || sprung[d]).ToList();
+                        label = parsed;
+                    }
+                    else
+                        res.Warnings.Add($"Support '{text}' not understood ({error}); the default ({defaultLabel}) was used.");
+                }
+                res.SupportTypes.Add(label);
                 // karambaCommon 3.1: Karamba.Factories.FactorySupport.Support(
                 //   Point3 position, IReadOnlyList<bool> conditions)
-                // conditions = Tx,Ty,Tz,Rx,Ry,Rz fixities; fully fixed here.
+                // conditions = Tx,Ty,Tz,Rx,Ry,Rz fixities.
                 object sup = InvokeNamed(supportFactory, supportFactory.GetType(),
                     "Support",
                     new Dictionary<string, object>
                     {
                         { "position", NewPoint3(p.X, p.Y, p.Z) },
-                        { "conditions", fullyFixed },
+                        { "conditions", conditions },
                     },
                     null);
                 supportObjs.Add(sup);
             }
+            if (sprungSupports > 0)
+                res.Warnings.Add($"{sprungSupports} spring support(s): the Karamba route holds sprung directions rigid; " +
+                    "use the native engine for elastic supports.");
 
             // ── Loads: gravity self weight + imposed point loads (kN) ───────
             var loadFactory = GetFactory(k3d, "Load");

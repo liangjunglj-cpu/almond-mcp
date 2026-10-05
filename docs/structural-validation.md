@@ -81,9 +81,14 @@ the default with a warning. Results report `support_types`, `support_mode`
 ("mixed" when they differ) and each support's `restraint` and reactions (a
 spring's reaction is its force on the structure).
 
-In Rhino this will be the `almond:support` user text on a support point, read
-by the next almondbridge release; until then the `supports` list can only be
-sent by a model JSON (the `almond-mcp solve` protocol).
+In Rhino, write the spec as `almond:support` user text on the support point
+(a Rhino point object in the selection); almondbridge releases after 0.7.0rc2
+export it in the `supports` list (older bridges send plain anchor points, which
+take the default). A support point lying part-way along a member splits the
+member there, so a column under the middle of a continuous beam acts on it. The
+Rhino overlay draws each type (block = fixed, triangle = pinned, triangle on
+rollers = roller, zigzag = spring). The Karamba route applies the restraints but
+holds sprung directions rigid, with a warning.
 
 ## Pass criteria
 
