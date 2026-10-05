@@ -2899,6 +2899,39 @@ def _render_validation_report(runs: list[dict]) -> str:
 
 
 @mcp.tool()
+def set_support_type(guids: list[str], support: str = "") -> str:
+    """
+    Sets the support type of Rhino support points for the structural check.
+
+    Supports are the Rhino point objects included with the structure when calling validate_structure or
+    visualize_structure. This writes the type as almond:support user text on each point (undoable in
+    Rhino); points without one take the run's default (fixed_supports: fixed, or pinned).
+
+    support: "fixed" (all six), "pinned" (translations), "roller" (vertical only: slides in plan),
+    "roller-x" / "roller-y" (vertical + the other horizontal: slides along x / y), "spring" with
+    stiffnesses, all in global axes. Springs: kx ky kz in kN/m, rx ry rz in kNm/rad, and a sprung
+    direction is no longer rigid, e.g. "spring kz=50000" (soil), "fixed rx=8000 ry=8000" (semi-rigid
+    base), "roller-x kz=5000" (elastic bearing). "" or "default" removes the type.
+
+    The native engine applies every type; the Karamba route holds sprung directions rigid. A support
+    point part-way along a member splits the member there. Results report support_types and each
+    support's reactions (a spring's reaction is its force on the structure).
+    """
+    spec = (support or "").strip()
+    if not guids:
+        return json.dumps({"status": "error", "message": "Give the GUIDs of the Rhino point objects to set."})
+    if spec.lower() in ("", "default"):
+        spec = ""
+    else:
+        try:
+            spec = native_structure.parse_support(spec)[2]
+        except ValueError as exc:
+            return json.dumps({"status": "error", "message": f"Support '{support}' not understood ({exc}). Types: fixed, "
+                               "pinned, roller, roller-x, roller-y, spring; springs kx ky kz (kN/m), rx ry rz (kNm/rad)."})
+    return _bridge_call({"type": "set_support", "guids": list(guids), "spec": spec}, 30.0)
+
+
+@mcp.tool()
 def export_structural_report(path: str = "", limit: int = 50) -> str:
     """
     Renders the persisted validate_structure history to a Markdown report.

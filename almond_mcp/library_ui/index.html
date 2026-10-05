@@ -74,10 +74,14 @@
       <label data-native class="analysis-toggle"><input id="asset-loads" type="checkbox"><span>Loads from placed Almond models</span></label>
     </section>
     <section id="pane-supports" class="analysis-step analysis-pane" role="tabpanel" aria-labelledby="tab-supports" data-pane="supports" hidden><h2>Supports and joints</h2>
-      <div class="analysis-fields"><label>Restraint<select id="support-restraint"><option value="fixed">Fixed</option><option value="pinned">Pinned</option></select></label>
+      <div class="analysis-fields"><label>Default restraint<select id="support-restraint"><option value="fixed">Fixed</option><option value="pinned">Pinned</option></select></label>
       <label data-native>Connections<select id="analysis-connections"><option value="rigid">Rigid joints</option><option value="simple">Simple · pinned beam ends</option></select></label></div>
-      <p class="field-help">Fixed restrains translation and rotation; pinned, translation only. Simple joints pin the beam ends, as for bolted steel or timber.</p>
+      <p class="field-help">The default applies to support points without their own type, and to the lowest nodes. Fixed restrains translation and rotation; pinned, translation only. Simple joints pin the beam ends, as for bolted steel or timber.</p>
       <label>Support locations<select id="support-source"><option value="auto">Points, else lowest nodes</option><option value="points">Require selected points</option></select></label>
+      <h3 class="pane-subhead">Support types</h3>
+      <p class="field-help">Each Rhino point object in the selection is a support. Give one its own type here; Almond writes it to the point as <code>almond:support</code> user text. Rollers slide (roller-x along x); springs in kN/m (kx ky kz) and kNm/rad (rx ry rz), e.g. <code>kz=50000</code> or <code>rx=8000 ry=8000</code> for a semi-rigid base. Karamba holds springs rigid.</p>
+      <div class="table-wrap" id="support-list" hidden><table id="support-table" class="support-table"><thead><tr><th>#</th><th>x, y, z · m</th><th>Type</th><th>Springs</th></tr></thead><tbody></tbody></table></div>
+      <p id="support-empty" class="field-help">No support points captured: include Rhino point objects in the selection, or Almond supports the lowest nodes with the default restraint.</p>
     </section>
     <section id="pane-code" class="analysis-step analysis-pane" role="tabpanel" aria-labelledby="tab-code" data-pane="code" hidden><h2>Code and checks</h2>
       <p id="advanced-summary" class="analysis-meta">All at their defaults</p>

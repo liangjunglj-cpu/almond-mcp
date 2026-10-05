@@ -34,13 +34,18 @@ namespace RhinoAlmondBridge
             if (Solving && action!="status") { SendError("The native solver is still running."); return; }
             if (Busy || LibraryPlacement.Busy || doc == null || doc.InCommand(false)>0)
             { SendError("Finish the current Rhino command first."); return; }
-            AnalysisSettings settings;
-            try { settings=AnalysisSettings.Parse(json); }
+            AnalysisSettings settings=null;
+            JObject support=null;
+            try {
+                // set_support carries {guid, spec}, not the analysis settings
+                if(action=="set_support") support=ParseSupportRequest(json);
+                else settings=AnalysisSettings.Parse(json);
+            }
             catch(Exception ex) { SendError(ex.Message); return; }
             Busy=true;
             Eto.Forms.Application.Instance.AsyncInvoke(() => {
                 try {
-                    _pending = target => Execute(target,action,settings);
+                    _pending = target => Execute(target,action,settings,support);
                     RhinoApp.RunScript("_AlmondAnalysisAction",false);
                     // the command never ran (Rhino was running a script or command): answer, so the panel never waits forever
                     if(_pending!=null) SendError("Rhino was busy. Try again.");
@@ -56,11 +61,20 @@ namespace RhinoAlmondBridge
             action(doc); return Result.Success;
         }
         private void SendError(string text) => _send(new JObject {["kind"]="error",["message"]=text,["stale"]=true});
-        private void Execute(RhinoDoc doc,string action,AnalysisSettings settings)
+        private static JObject ParseSupportRequest(string json)
+        {
+            if (json == null || json.Length > 1024) throw new InvalidDataException("Invalid support request.");
+            var data = JObject.Parse(json);
+            if (data.Properties().Any(p => p.Name != "guid" && p.Name != "spec") || !Guid.TryParse((string)data["guid"], out _))
+                throw new InvalidDataException("Invalid support request.");
+            return data;
+        }
+        private void Execute(RhinoDoc doc,string action,AnalysisSettings settings,JObject support=null)
         {
             try
             {
                 if(action=="status") { Status(); return; }
+                if(action=="set_support") { SetSupport(doc,support); return; }
                 if(action=="clear_view") {
                     StructureView.Handle(new JObject {["clear"]=true});
                     _send(new JObject {["kind"]="notice",["message"]="Viewport overlay cleared."});
@@ -209,11 +223,26 @@ namespace RhinoAlmondBridge
             _report=null;_reportFingerprint=null;
             _send(new JObject {["kind"]="capture",["model"]=Snapshot(doc),["settings"]=settings.ToJson()});
         }
+        // a support point's almond:support text is part of the model: editing it in Rhino makes the results stale
         private string Fingerprint(RhinoDoc doc) => doc.ModelUnitSystem + ":" + doc.ModelAbsoluteTolerance.ToString("R",System.Globalization.CultureInfo.InvariantCulture) + ":" +
             string.Join("|",_ids.Select(id => {
                 var obj=doc.Objects.FindId(Guid.Parse(id));
-                return obj==null ? id+":missing" : id+":"+obj.Geometry.DataCRC(0);
+                return obj==null ? id+":missing" : id+":"+obj.Geometry.DataCRC(0)+(obj.Geometry is Point ? ":"+SupportSpec.Read(obj) : "");
             }));
+
+        /// <summary>The panel's support-type picker: write (or clear) almond:support on one captured support point,
+        /// then send the refreshed snapshot. Results become stale; the next run reads the new type.</summary>
+        private void SetSupport(RhinoDoc doc,JObject support)
+        {
+            string id=(string)support["guid"], spec=((string)support["spec"] ?? "").Trim();
+            if(doc.RuntimeSerialNumber!=_document || !_ids.Contains(id,StringComparer.OrdinalIgnoreCase))
+                throw new InvalidOperationException("Capture the selection again: that support point is not in the current study.");
+            string label=SupportSpec.Write(doc,Guid.Parse(id),spec);
+            _fingerprint=Fingerprint(doc);
+            _report=null;_reportFingerprint=null;
+            _send(new JObject {["kind"]="supports",["model"]=Snapshot(doc),
+                ["message"]=label==null ? "Support type cleared: the default restraint applies." : "Support set to "+label+"."});
+        }
         private JObject Snapshot(RhinoDoc doc)
         {
             var model=new ModelConditioner().Condition(doc,_ids);
@@ -239,6 +268,8 @@ namespace RhinoAlmondBridge
                 return new JObject {["objects"]=_ids.Count,["beams"]=model.Beams.Count,["shells"]=model.Shells.Count,
                     ["units"]=doc.ModelUnitSystem.ToString(),["segments"]=segments,["shell_outlines"]=shells,
                     ["anchors"]=new JArray(model.AnchorPoints.Select(p=>(JToken)Point(p,model.UnitScaleToMeters))),
+                    ["supports"]=new JArray(model.Supports.Select(sp=>(JToken)new JObject {["point"]=Point(sp.Location,model.UnitScaleToMeters),
+                        ["spec"]=sp.Spec,["guid"]=sp.SourceGuid})),
                     ["default_sections"]=model.Beams.Count(b=>b.Section?.Source=="default"),
                     ["warnings"]=new JArray(model.Warnings),["geometry_fingerprint"]=_fingerprint};
             }
