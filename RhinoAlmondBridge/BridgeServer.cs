@@ -118,6 +118,7 @@ namespace RhinoAlmondBridge
         public void Stop()
         {
             _running = false;
+            BridgeAuth.Revoke();          // now, not when the listener thread next wakes: Rhino may exit first
         }
 
         private void ListenLoop()
