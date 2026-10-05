@@ -1,6 +1,6 @@
 # Solver benchmarks: native frame solver vs OpenSees
 
-Eleven building typologies (`tests/structural_typologies.py`) solved by Almond's native frame solver
+Twelve building typologies (`tests/structural_typologies.py`) solved by Almond's native frame solver
 and, independently, by [OpenSees](https://opensees.berkeley.edu/) through OpenSeesPy:
 
 | Typology | What it exercises |
@@ -16,6 +16,7 @@ and, independently, by [OpenSees](https://opensees.berkeley.edu/) through OpenSe
 | canopy | cantilevers with back-spans, edge beam, eccentric load |
 | diagrid | inclined members only (local axes), wind |
 | Vierendeel | rigid-jointed girder without diagonals |
+| mixed supports | fixed, semi-rigid (rotational springs), pinned, sliding, soil-spring and roller bases |
 
 Checks (`test_opensees_crosscheck.py`): linear displacements, rotations, reactions and member
 forces (to ~1e-9 relative; 1e-3 where OpenSees needs penalty links for member end releases);

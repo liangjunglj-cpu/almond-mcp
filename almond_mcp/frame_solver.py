@@ -9,6 +9,7 @@ Scope, stated so results are never over-read:
 - first-order (geometrically linear), linear-elastic, static;
 - straight prismatic members, rigid joints unless a member end is released (pinned or
   partly released ends by static condensation; optional axial-only truss members);
+- supports: any of the 6 DOFs restrained per node, and/or elastic springs to ground (``Frame.spring``);
 - point loads at nodes and uniform or linearly varying member loads (self weight is one),
   exact within each member (Hermite interpolation + the fixed-fixed particular solution);
 - member checks follow EN 1993-1-1 in simplified form (see ``member_utilization``);
@@ -172,6 +173,7 @@ class Frame:
     nodes: list = field(default_factory=list)            # (x, y, z) m
     elements: list = field(default_factory=list)
     supports: dict = field(default_factory=dict)         # node -> 6 bools (True = restrained)
+    springs: dict = field(default_factory=dict)          # node -> 6 stiffnesses to ground (kN/m, kNm/rad)
     nodal_loads: dict = field(default_factory=dict)      # (node, case) -> 6-vector kN / kNm, global
     member_loads: list = field(default_factory=list)     # (element, global w at n1, at n2 kN/m, case)
     gravity: tuple | None = None                         # unit vector for self weight, e.g. (0, 0, -1)
@@ -188,6 +190,18 @@ class Frame:
 
     def fix(self, node, dofs=(True,) * 6):
         self.supports[node] = tuple(bool(v) for v in dofs)
+
+    def spring(self, node, kx=0.0, ky=0.0, kz=0.0, rx=0.0, ry=0.0, rz=0.0):
+        """Elastic support: springs to ground on the node's DOFs (translations kN/m, rotations kNm/rad).
+        A DOF that is also restrained stays rigid."""
+        k = np.array([kx, ky, kz, rx, ry, rz], float)
+        if np.any(k < 0) or not np.all(np.isfinite(k)):
+            raise ValueError("Spring stiffnesses must be finite and non-negative.")
+        self.springs[node] = tuple(float(v) for v in np.asarray(self.springs.get(node, np.zeros(6))) + k)
+
+    def vertically_supported(self, node) -> bool:
+        """Restrained or sprung in global Z: vertical load at this node goes straight into the support."""
+        return bool(self.supports.get(node, (False,) * 6)[2]) or self.springs.get(node, (0.0,) * 6)[2] > 0
 
     def pin(self, node):
         self.fix(node, (True, True, True, False, False, False))
@@ -443,6 +457,9 @@ def _assemble(frame: Frame) -> _Assembly:
         F[c][n * DOF:n * DOF + 6] += np.asarray(v, float)
         applied[c][:3] += np.asarray(v, float)[:3]
 
+    for n, ks in frame.springs.items():                 # elastic supports: stiffness to ground
+        for d, k in enumerate(ks):
+            K[n * DOF + d, n * DOF + d] += k
     restrained = np.zeros(ndof, bool)
     for n, flags in frame.supports.items():
         restrained[n * DOF:n * DOF + 6] = flags
@@ -532,6 +549,11 @@ def _results(m: _Assembly, combo: dict, uc: np.ndarray, Fc: np.ndarray, stations
     s = np.linspace(0.0, 1.0, max(2, stations))
     Rv = (m.K if Kt is None else Kt) @ uc - Fc
     Rv[~m.restrained] = 0.0
+    for n, ks in frame.springs.items():                 # a spring's reaction is its force on the structure
+        for d, k in enumerate(ks):
+            i = n * DOF + d
+            if k and not m.restrained[i]:
+                Rv[i] = -k * uc[i]
     ers = []
     for ei, e in enumerate(frame.elements):
         R, L, T, idx = m.geo[ei]

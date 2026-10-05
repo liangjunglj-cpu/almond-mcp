@@ -328,10 +328,39 @@ def vierendeel(span=12.0, depth=1.5, panels=6, P=30.0):
     return {"frame": f, "combos": {"ULS": {"G": 1.35, "Q": 1.5}}}
 
 
+def mixed_supports(bay=6.0, h=4.0):
+    """Single-storey 2 x 1 bay frame on six different supports: fixed, semi-rigid (rotational springs),
+    pinned, a roller sliding along x, a soil spring and a roller; beam UDLs and wind in x."""
+    f = fs.Frame()
+    G = Grid(f)
+    col, bm = fs.rhs(250, 250, 10), fs.rhs(400, 200, 12.5)
+    bases = {(0, 0): ((True,) * 6, None), (1, 0): ((True, True, True, False, False, True), dict(rx=8000, ry=8000)),
+             (2, 0): ((True, True, True, False, False, False), None), (0, 1): ((False, True, True, False, False, False), None),
+             (1, 1): ((False,) * 6, dict(kx=1e5, ky=1e5, kz=5e4, rx=2e4, ry=2e4, rz=2e4)),
+             (2, 1): ((False, False, True, False, False, False), None)}
+    for (i, j), (restraint, springs) in bases.items():
+        b = G.n(i * bay, j * bay, 0)
+        f.fix(b, restraint)
+        if springs:
+            f.spring(b, **springs)
+        f.add_element(b, G.n(i * bay, j * bay, h), col, S355)
+    for j in (0, 1):
+        for i in (0, 1):
+            e = f.add_element(G.n(i * bay, j * bay, h), G.n((i + 1) * bay, j * bay, h), bm, S355)
+            f.udl(e, (0, 0, -12), "G")
+            f.udl(e, (0, 0, -9), "Q")
+    for i in (0, 1, 2):
+        f.add_element(G.n(i * bay, 0, h), G.n(i * bay, bay, h), bm, S355)
+    for j in (0, 1):
+        f.load(G.n(0, j * bay, h), fx=6.0, case="W")
+    f.gravity = (0, 0, -1)
+    return {"frame": f, "combos": {"ULS wind": {"G": 1.35, "Q": 1.05, "W": 1.5}}}
+
+
 ALL = {
     "moment frame": moment_frame, "braced tower": braced_tower, "Pratt truss": pratt_truss, "portal": portal_2d,
     "warehouse": warehouse, "space grid": space_grid, "arch": arch, "L-bracket": l_bracket, "canopy": canopy,
-    "diagrid": diagrid, "Vierendeel": vierendeel,
+    "diagrid": diagrid, "Vierendeel": vierendeel, "mixed supports": mixed_supports,
 }
 
 
