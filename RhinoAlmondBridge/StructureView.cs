@@ -136,6 +136,10 @@ namespace RhinoAlmondBridge
                 if (res.Elements.Count == 0 || res.Elements.Any(x => x.SampleDispM == null || x.SampleDispM.Count < 2))
                     return Error("structure_draw needs elements with at least two displacement samples.");
                 res.SupportPointsM = result["support_points_m"]?.ToObject<List<double[]>>() ?? new List<double[]>();
+                res.SupportTypes = result["support_types"]?.ToObject<List<string>>() ?? new List<string>();
+                var defl = result["max_deflection_mm"];
+                res.MaxDeflectionMM = defl != null && (defl.Type == JTokenType.Float || defl.Type == JTokenType.Integer)
+                    ? defl.Value<double>() : (double?)null;
                 res.LoadedPointsM = result["loaded_points_m"]?.ToObject<List<double[]>>() ?? new List<double[]>();
                 res.MaxDisplacementMM = result["max_displacement_mm"]?.Value<double>()
                     ?? res.Elements.Max(x => x.SampleDispM.Max(d => Len(d))) * 1000.0;
@@ -179,11 +183,12 @@ namespace RhinoAlmondBridge
             double maxUtil = r.Elements.Where(e => !double.IsNaN(e.Utilization)).Select(e => e.Utilization).DefaultIfEmpty(double.NaN).Max();
             return JsonConvert.SerializeObject(new
             {
-                status = r.MaxDisplacementMM > data.LimitMM ? "fail"
+                status = StructureConduit.Checked(r) > data.LimitMM ? "fail"
                     : data.VerdictLabel != null ? "indicative"
                     : (double.IsNaN(maxUtil) || maxUtil <= 1.0) ? "pass" : "fail",
                 analysis_method = data.Engine,
                 max_displacement_mm = Math.Round(r.MaxDisplacementMM, 3),
+                max_deflection_mm = Math.Round(StructureConduit.Checked(r), 3),
                 deflection_limit_mm = Math.Round(data.LimitMM, 3),
                 span_m = Math.Round(data.SpanM, 3),
                 max_utilization = double.IsNaN(maxUtil) ? (double?)null : Math.Round(maxUtil, 4),
@@ -318,18 +323,15 @@ namespace RhinoAlmondBridge
             }
             // supports (triangles) and loaded nodes (arrows)
             double arrow = Data.SpanM * 0.12 * Data.ToDoc;
-            foreach (var s in r.SupportPointsM)
+            for (int si = 0; si < r.SupportPointsM.Count; si++)
             {
+                var s = r.SupportPointsM[si];
                 if (!NearShown(s)) continue;
                 var p = new Point3d(s[0] * Data.ToDoc, s[1] * Data.ToDoc, s[2] * Data.ToDoc);
-                double h = arrow * 0.22;
                 var side = e.Viewport.CameraX; side.Z = 0;
                 if (!side.Unitize()) side = Vector3d.XAxis;
-                var down = new Vector3d(0, 0, -h);
-                var tri = new[] { p, p + down + side * h * 0.8, p + down - side * h * 0.8 };
-                e.Display.DrawPolygon(tri, Color.FromArgb(233, 68, 43), true);
-                e.Display.DrawPolyline(new[] { tri[0], tri[1], tri[2], tri[0] }, Color.White, Math.Max(1, thick / 3));
-                e.Display.DrawLine(p + down * 1.25 + side * h, p + down * 1.25 - side * h, Color.White, Math.Max(1, thick / 3));
+                string glyph = si < r.SupportTypes.Count ? SupportSpec.Glyph(r.SupportTypes[si]) : "pinned";
+                DrawSupport(e, p, side, arrow * 0.22, glyph, Math.Max(1, thick / 3));
             }
             if (Data.Reveal >= 0.999)
                 foreach (var lp in r.LoadedPointsM)
@@ -341,6 +343,54 @@ namespace RhinoAlmondBridge
             if (Data.ShowLegend) DrawLegend(e, byUtil, dpi);
         }
 
+        /// <summary>Support symbol under point p: fixed = filled block on hatching, pinned = triangle on a
+        /// ground line, roller = triangle on rollers, spring = zigzag to a ground line.</summary>
+        private static void DrawSupport(DrawEventArgs e, Point3d p, Vector3d side, double h, string glyph, int w)
+        {
+            var red = Color.FromArgb(233, 68, 43);
+            var down = new Vector3d(0, 0, -h);
+            Point3d ground;
+            if (glyph == "fixed")
+            {
+                var box = new[] { p + side * h * 0.8, p - side * h * 0.8, p - side * h * 0.8 + down * 0.6, p + side * h * 0.8 + down * 0.6 };
+                e.Display.DrawPolygon(box, red, true);
+                e.Display.DrawPolyline(new[] { box[0], box[1], box[2], box[3], box[0] }, Color.White, w);
+                ground = p + down * 0.6;
+                for (int k = 0; k < 4; k++)                         // hatching
+                {
+                    var a = ground + side * h * (-0.8 + 0.5 * k);
+                    e.Display.DrawLine(a, a + down * 0.35 - side * h * 0.3, Color.White, w);
+                }
+                return;
+            }
+            if (glyph == "spring")
+            {
+                var pts = new List<Point3d> { p };
+                for (int k = 1; k <= 6; k++)
+                    pts.Add(p + down * (k / 7.0) + side * h * (k % 2 == 1 ? 0.45 : -0.45));
+                pts.Add(p + down);
+                e.Display.DrawPolyline(pts, red, w + 1);
+                ground = p + down;
+            }
+            else
+            {
+                var tri = new[] { p, p + down + side * h * 0.8, p + down - side * h * 0.8 };
+                e.Display.DrawPolygon(tri, red, true);
+                e.Display.DrawPolyline(new[] { tri[0], tri[1], tri[2], tri[0] }, Color.White, w);
+                ground = p + down;
+                if (glyph == "roller")
+                {
+                    foreach (double f in new[] { -0.45, 0.45 })
+                        e.Display.DrawCircle(new Circle(new Plane(ground + side * h * f + down * 0.18, side, Vector3d.ZAxis), h * 0.18), Color.White, w);
+                    ground += down * 0.36;
+                }
+            }
+            e.Display.DrawLine(ground + down * 0.25 + side * h, ground + down * 0.25 - side * h, Color.White, w);
+        }
+
+        /// <summary>The deflection the check compares with the limit (member deflection when the engine sent it).</summary>
+        internal static double Checked(KarambaResults r) => r.MaxDeflectionMM ?? r.MaxDisplacementMM;
+
         private void DrawLegend(DrawEventArgs e, bool byUtil, float dpi)
         {
             if (Data.BucklingAlpha.HasValue) { DrawBucklingLegend(e, dpi); return; }
@@ -349,7 +399,7 @@ namespace RhinoAlmondBridge
             int w = (int)(380 * dpi), h = (int)(300 * dpi);
             int x0 = vp.Width - w - (int)(30 * dpi), y0 = (int)(30 * dpi);
             double maxU = r.Elements.Where(x => !double.IsNaN(x.Utilization)).Select(x => x.Utilization).DefaultIfEmpty(double.NaN).Max();
-            bool deflects = r.MaxDisplacementMM > Data.LimitMM;
+            bool deflects = Checked(r) > Data.LimitMM;
             bool indicative = Data.VerdictLabel != null && !deflects;      // no capacity verdict: only deflection can fail
             bool pass = !deflects && (double.IsNaN(maxU) || maxU <= 1.0);
             var amber = Color.FromArgb(255, 186, 60);
@@ -360,7 +410,7 @@ namespace RhinoAlmondBridge
             int fs = Math.Max(10, (int)(16 * dpi)), fb = Math.Max(14, (int)(30 * dpi));
             DrawTitle(e, accent, tx, y0 + 18 * dpi, w - (int)(40 * dpi), fs);
             e.Display.Draw2dText(byUtil ? "UTILIZATION" : "DISPLACEMENT", Color.White, new Point2d(tx, y0 + 50 * dpi), false, fs, "Consolas");
-            e.Display.Draw2dText(string.Format("max δ {0:0.0} mm", r.MaxDisplacementMM), Color.White,
+            e.Display.Draw2dText(string.Format("max δ {0:0.0} mm", Checked(r)), Color.White,
                 new Point2d(tx, y0 + 76 * dpi), false, fb, "Arial Black");
             e.Display.Draw2dText(string.Format("limit L/{0:0} = {1:0.0} mm", Data.LimitRatio, Data.LimitMM), Color.FromArgb(200, 200, 205),
                 new Point2d(tx, y0 + 122 * dpi), false, fs, "Consolas");

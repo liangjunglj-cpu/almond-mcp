@@ -97,6 +97,9 @@ namespace RhinoAlmondBridge
         /// <summary>Declared anchor/support points (Rhino point objects in the GUID set).</summary>
         public List<Point3d> AnchorPoints { get; set; } = new List<Point3d>();
 
+        /// <summary>The same points with their <c>almond:support</c> type and GUID (parallel to AnchorPoints).</summary>
+        public List<SupportPoint> Supports { get; set; } = new List<SupportPoint>();
+
         public List<string> Warnings { get; set; } = new List<string>();
         /// <summary>Solids that are neither prismatic members nor thin plates (not analysed).</summary>
         public int SkippedSolids { get; set; }
@@ -173,7 +176,7 @@ namespace RhinoAlmondBridge
             {
                 var welded = MergeNodes(rawBeams, model.Tolerance);
                 var split = SplitAtIntersections(welded, model.Tolerance);
-                model.Beams.AddRange(split);
+                model.Beams.AddRange(SplitAtPoints(split, model.AnchorPoints, model.Tolerance, model.Warnings));
             }
 
             // Longest single member = per-member span estimate; the overall
@@ -214,6 +217,7 @@ namespace RhinoAlmondBridge
             if (geom is Point pt)
             {
                 model.AnchorPoints.Add(pt.Location);
+                model.Supports.Add(new SupportPoint { Location = pt.Location, Spec = SupportSpec.Read(obj), SourceGuid = guidStr });
                 return;
             }
 
@@ -538,6 +542,56 @@ namespace RhinoAlmondBridge
                     });
                 }
             }
+            return result;
+        }
+
+        /// <summary>
+        /// Split beam axes where a support point lies part-way along them (within tolerance), so the support
+        /// lands on a node: a column under the middle of a continuous beam, a bearing under a truss chord.
+        /// Supports at a member's end need no split.
+        /// </summary>
+        public List<ConditionedBeam> SplitAtPoints(List<ConditionedBeam> beams, List<Point3d> points, double tolerance,
+            List<string> warnings = null)
+        {
+            if (beams == null || beams.Count == 0 || points == null || points.Count == 0)
+                return beams ?? new List<ConditionedBeam>();
+            double tol = tolerance > 0 ? tolerance : 0.001;
+            var result = new List<ConditionedBeam>();
+            int splits = 0;
+            foreach (var beam in beams)
+            {
+                var crv = beam.Axis;
+                var ts = new List<double>();
+                foreach (var p in points)
+                {
+                    double t;
+                    if (!crv.ClosestPoint(p, out t, tol)) continue;
+                    if (crv.PointAt(t).DistanceTo(p) > tol) continue;
+                    if (p.DistanceTo(crv.PointAtStart) <= tol || p.DistanceTo(crv.PointAtEnd) <= tol) continue;
+                    ts.Add(t);
+                }
+                ts = ts.Distinct().OrderBy(t => t).ToList();
+                var pieces = ts.Count > 0 ? crv.Split(ts) : null;
+                if (pieces == null || pieces.Length < 2)
+                {
+                    result.Add(beam);
+                    continue;
+                }
+                splits += ts.Count;
+                foreach (var piece in pieces)
+                {
+                    if (piece == null || piece.GetLength() <= tol) continue;
+                    result.Add(new ConditionedBeam
+                    {
+                        Axis = piece,
+                        SourceGuids = new List<string>(beam.SourceGuids),
+                        Section = beam.Section,
+                    });
+                }
+            }
+            if (splits > 0 && warnings != null)
+                warnings.Add($"{splits} support point(s) lie part-way along a member; the member was split there so the " +
+                    "support acts on it.");
             return result;
         }
 
