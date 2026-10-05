@@ -22,6 +22,7 @@ user-facing summary; this file is the reasoning.
 | RhinoCommon / Grasshopper SDK | McNeel | MIT (RhinoCommon) / developer terms; referenced not shipped | **no** |
 | Newtonsoft.Json, Roslyn, System.* DLLs | NuGet | MIT | yes — inside Yak package only, with notices |
 | IKEA product names in manifests | public catalogue facts | nominative fair use; disclaimer in notices | yes (names only) |
+| OpenSeesPy (benchmark reference solver, `benchmarks/`) | Univ. of California / Oregon State, PyPI `openseespy` | free for research, education and internal use; commercial redistribution of anything that imports it needs a licence (Dr. Minjie Zhu) | **no** — optional `bench` dependency group only; never imported by `almond_mcp`; `benchmarks/` is outside the wheel and sdist |
 | Generated asset library (`GeneratedAssetfiles/models/*.glb` + `.almond.json` contracts) | generated with Meshy from self-authored prompts (`GeneratedAssetfiles/catalogue.json`), normalised by `tools/build_generated_assets.py` | Meshy Terms: output generated on a paid plan belongs to the account; released here under CC BY 4.0 (manifest/contracts MIT) | yes — git repository; manifest in the wheel, model files fetched by `almond-mcp fetch-assets` |
 
 ## 3D Warehouse analysis
@@ -90,6 +91,8 @@ Re-run this audit if any of these change:
   manifest at the same time);
 - `Grasshopperfiles` content is referenced by a distributed artifact;
 - the bridge gains a NuGet dependency (extend the Yak notices);
+- `almond_mcp` (or anything shipped) starts importing `openseespy`, or `benchmarks/` is added to
+  the sdist/wheel;
 - a generated asset is regenerated or re-prompted (update `provenance.json` and
   rebuild the manifest so task ids and checksums stay truthful);
 - Almond starts shipping generated geometry derived from 3D Warehouse meshes

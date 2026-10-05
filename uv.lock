@@ -31,6 +31,10 @@ dependencies = [
 ]
 
 [package.dev-dependencies]
+bench = [
+    { name = "openseespy" },
+    { name = "pytest" },
+]
 dev = [
     { name = "pytest" },
 ]
@@ -49,6 +53,10 @@ requires-dist = [
 ]
 
 [package.metadata.requires-dev]
+bench = [
+    { name = "openseespy", specifier = ">=3.5" },
+    { name = "pytest", specifier = ">=8.0" },
+]
 dev = [{ name = "pytest", specifier = ">=8.0" }]
 
 [[package]]
@@ -942,6 +950,43 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/02/2e/58d83848dd1a79cb92ed8e63f6ba901ca282c5f09d04af9423ec26c56fd7/openapi_pydantic-0.5.1.tar.gz", hash = "sha256:ff6835af6bde7a459fb93eb93bb92b8749b754fc6e51b2f1590a19dc3005ee0d", size = 60892, upload-time = "2025-01-08T19:29:27.083Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/12/cf/03675d8bd8ecbf4445504d8071adab19f5f993676795708e36402ab38263/openapi_pydantic-0.5.1-py3-none-any.whl", hash = "sha256:a3a09ef4586f5bd760a8df7f43028b60cafb6d9f61de2acba9574766255ab146", size = 96381, upload-time = "2025-01-08T19:29:25.275Z" },
+]
+
+[[package]]
+name = "openseespy"
+version = "3.8.0.0"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "openseespylinux", marker = "sys_platform == 'linux'" },
+    { name = "openseespymac", marker = "sys_platform == 'darwin'" },
+    { name = "openseespywin", marker = "sys_platform == 'win32'" },
+]
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/5d/f0/7cf984fed2e96286427828a0b669d034f18b674ccc84042d20835a99d543/openseespy-3.8.0.0-py3-none-any.whl", hash = "sha256:ce6a43503b737025f763a87bebacb1cc2fbd82a156982647e9e014a11b85fdbd", size = 2792, upload-time = "2026-03-18T22:23:27.372Z" },
+]
+
+[[package]]
+name = "openseespylinux"
+version = "3.8.0.0"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a4/77/83cd6946a4710916e0a85df9fcd5271db3c94ac018a59f113acfd5ee40e2/openseespylinux-3.8.0.0-py3-none-any.whl", hash = "sha256:2307e40213f1d7128a5a5151d5c8beee8244b8b988528a58f5e44394a045ba64", size = 86251016, upload-time = "2026-03-18T21:47:48.539Z" },
+]
+
+[[package]]
+name = "openseespymac"
+version = "3.8.0.0"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/42/ca/4d8eff97f95ad415010fefe595738162fc052cb8536434d5124fb0b46e99/openseespymac-3.8.0.0-py3-none-macosx_13_0_arm64.whl", hash = "sha256:c6ddd1a28ce528258ef41237dd7883c827b8aa6f1a2d9b62e65da1f1074779ef", size = 10115801, upload-time = "2026-03-18T22:21:08.233Z" },
+]
+
+[[package]]
+name = "openseespywin"
+version = "3.8.0.0"
+source = { registry = "https://pypi.org/simple" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/fc/6f/7d77002684c8075e024001fbe82ba695dbd553cb30d5ee2335a677344faa/openseespywin-3.8.0.0-py3-none-win_amd64.whl", hash = "sha256:ee0f48317582641cf06347fe0babd34a230823b56397603c9b5b2d3b96089b73", size = 6787016, upload-time = "2026-03-18T22:18:55.099Z" },
 ]
 
 [[package]]

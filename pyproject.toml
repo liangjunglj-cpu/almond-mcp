@@ -33,6 +33,12 @@ almond-mcp = "almond_mcp.cli:main"
 dev = [
     "pytest>=8.0",
 ]
+# Independent reference solver for benchmarks/ (OpenSeesPy: free for research, education and internal
+# use only - never a runtime dependency, never shipped; see docs/licensing-audit.md).
+bench = [
+    "pytest>=8.0",
+    "openseespy>=3.5",
+]
 
 [build-system]
 requires = ["hatchling"]
