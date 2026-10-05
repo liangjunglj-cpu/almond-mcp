@@ -6,7 +6,9 @@ support points). This module applies the same modelling conventions as the Karam
 so the two engines are comparable:
 
 - supports: declared anchor points (snapped to the nearest node), else every lowest-Z node;
-  fully fixed, or pinned (translations only) when ``fixed_supports`` is False;
+  fully fixed, or pinned (translations only) when ``fixed_supports`` is False; a support point in
+  the model's ``supports`` list may carry its own type (``parse_support``: fixed, pinned, roller,
+  roller-x, roller-y, spring, with optional spring stiffnesses), e.g. from ``almond:support`` user text;
 - connections: rigid joints by default; ``connections="simple"`` pins beams (major-axis bending)
   and braces (both axes) where they stop, i.e. where no other member carries on in line (pieces
   drawn along one line form a continuous member); columns stay continuous; a curve's user text
@@ -90,6 +92,42 @@ def section_from_spec(spec: dict | None, diameter_mm=None, wall_mm=None) -> tupl
 
 
 CONNECTIONS = ("rigid", "simple")
+_T, _F = True, False
+SUPPORT_TYPES = {                                       # restrained DOFs (ux uy uz rx ry rz), global axes
+    "fixed": (_T, _T, _T, _T, _T, _T), "pinned": (_T, _T, _T, _F, _F, _F), "pin": (_T, _T, _T, _F, _F, _F),
+    "roller": (_F, _F, _T, _F, _F, _F),                 # vertical only: slides in plan
+    "roller-x": (_F, _T, _T, _F, _F, _F),               # slides along x
+    "roller-y": (_T, _F, _T, _F, _F, _F),               # slides along y
+    "spring": (_F,) * 6,                                # only the listed springs
+}
+SPRING_KEYS = ("kx", "ky", "kz", "rx", "ry", "rz")       # kN/m (translations), kNm/rad (rotations)
+
+
+def parse_support(text: str) -> tuple[tuple, tuple, str]:
+    """A support specification -> (restrained DOFs, spring stiffnesses, label).
+
+    ``"<type> [key=value ...]"``: type is one of SUPPORT_TYPES; keys kx ky kz (kN/m) and rx ry rz
+    (kNm/rad) add springs to ground in global axes, and a sprung DOF is no longer rigid. Examples:
+    ``fixed``, ``roller-x``, ``spring kz=50000``, ``fixed rx=8000 ry=8000`` (semi-rigid base).
+    Raises ValueError for anything else."""
+    words = str(text or "").replace(",", " ").lower().split()
+    if not words or words[0] not in SUPPORT_TYPES:
+        raise ValueError(f"unknown support type {text!r}")
+    restraint, springs = list(SUPPORT_TYPES[words[0]]), [0.0] * 6
+    for w in words[1:]:
+        key, sep, value = w.replace(":", "=").partition("=")
+        if not sep or key not in SPRING_KEYS:
+            raise ValueError(f"unknown support setting {w!r}")
+        k = float(value)
+        if not (math.isfinite(k) and k >= 0):
+            raise ValueError(f"spring {key} must be a non-negative number")
+        d = SPRING_KEYS.index(key)
+        springs[d], restraint[d] = k, False
+    if not any(restraint) and not any(springs):
+        raise ValueError("a spring support needs at least one stiffness, e.g. 'spring kz=50000'")
+    label = "pinned" if words[0] == "pin" else words[0]
+    extra = [f"{SPRING_KEYS[d]}={springs[d]:g}" for d in range(6) if springs[d]]
+    return tuple(restraint), tuple(springs), " ".join([label] + extra)
 WELD_RATIO = 2e-4          # points closer than this x the model's diagonal extent are one node
 COLLINEAR_COS = 0.9995     # pieces meeting within ~1.8 degrees of a straight line are one member
 STEEP_SIN = 0.7            # members at least ~45 degrees from horizontal support what they meet
@@ -229,25 +267,44 @@ def build_frame(model: dict, load_kn: float, material: str = "Steel", fixed_supp
     if not frame.elements:
         raise ValueError("No line members to analyse.")
 
-    anchors = model.get("anchor_points") or []
-    support_nodes = []
-    if anchors:
-        X = np.asarray(frame.nodes)
-        for p in anchors:
-            d = np.linalg.norm(X - np.asarray(p), axis=1)
-            i = int(np.argmin(d))
-            if d[i] <= max(tol, 0.05):
-                support_nodes.append(i)
-            else:
-                warnings.append(f"Support point {tuple(round(v, 3) for v in p)} is {d[i]:.3f} m from "
-                                "the nearest node and was ignored.")
-    if not support_nodes:
+    default = "fixed" if fixed_supports else "pinned"
+    # typed support points first, then plain anchor points that no typed point already covers
+    declared = [(s.get("point_m") or s.get("point"), s.get("spec")) for s in model.get("supports") or []]
+    declared = [(p, spec) for p, spec in declared if p is not None]
+    declared += [(p, None) for p in model.get("anchor_points") or []
+                 if not any(math.dist(p, q) <= max(tol, 1e-6) for q, _ in declared)]
+    chosen: dict = {}                                   # node -> (restraint, springs, label)
+    X = np.asarray(frame.nodes)
+    for p, spec in declared:
+        d = np.linalg.norm(X - np.asarray(p), axis=1)
+        i = int(np.argmin(d))
+        if d[i] > max(tol, 0.05):
+            warnings.append(f"Support point {tuple(round(v, 3) for v in p)} is {d[i]:.3f} m from "
+                            "the nearest node and was ignored.")
+            continue
+        try:
+            sup = parse_support(spec or default)
+        except ValueError as exc:
+            warnings.append(f"Support '{spec}' at {tuple(round(v, 3) for v in p)} not understood ({exc}); the default "
+                            f"({default}) was used. Types: fixed, pinned, roller, roller-x, roller-y, spring kz=...")
+            sup = parse_support(default)
+        if i in chosen and chosen[i][2] != sup[2]:
+            warnings.append(f"Two supports ({chosen[i][2]}, {sup[2]}) land on the node at "
+                            f"{tuple(round(v, 3) for v in frame.nodes[i])}; both restraints apply.")
+            old = chosen[i]
+            sup = (tuple(a or b for a, b in zip(old[0], sup[0])), tuple(max(a, b) for a, b in zip(old[1], sup[1])),
+                   f"{old[2]} + {sup[2]}")
+        chosen[i] = sup
+    if not chosen:
         zmin = min(p[2] for p in frame.nodes)
-        support_nodes = [i for i, p in enumerate(frame.nodes) if p[2] <= zmin + tol]
-        warnings.append(f"No anchor points declared; supporting {len(support_nodes)} lowest-Z node(s).")
-    support_nodes = sorted(set(support_nodes))
+        chosen = {i: parse_support(default) for i, p in enumerate(frame.nodes) if p[2] <= zmin + tol}
+        warnings.append(f"No anchor points declared; supporting {len(chosen)} lowest-Z node(s).")
+    support_nodes = sorted(chosen)
     for n in support_nodes:
-        frame.fix(n) if fixed_supports else frame.pin(n)
+        restraint, springs, _ = chosen[n]
+        frame.fix(n, restraint)                         # all False for a pure spring: still a support node
+        if any(springs):
+            frame.spring(n, *springs)
 
     free = [i for i in range(len(frame.nodes)) if i not in support_nodes] or list(range(len(frame.nodes)))
     if load_kn > 0:
@@ -255,7 +312,8 @@ def build_frame(model: dict, load_kn: float, material: str = "Steel", fixed_supp
             frame.load(n, fz=-load_kn / len(free), case="Q")
     if self_weight:
         frame.gravity = (0.0, 0.0, -1.0)
-    info = {"support_nodes": support_nodes, "loaded_nodes": free if load_kn > 0 else [], "material": mat,
+    info = {"support_nodes": support_nodes, "support_labels": {n: chosen[n][2] for n in support_nodes},
+            "loaded_nodes": free if load_kn > 0 else [], "material": mat,
             "connections": {"mode": connections, "pinned_ends": pinned_ends, "user_released_members": user_members}}
     if floor_loads and (floor_loads.get("imposed") or floor_loads.get("dead")):
         info["floor_loads"] = fl.apply(frame, floor_loads.get("imposed", 0.0), floor_loads.get("dead", 0.0),
@@ -394,7 +452,7 @@ def member_deflections(frame, res) -> list[np.ndarray]:
         if L > 0 and abs(d[2]) / L >= STEEP_SIN:
             hi, lo = (e.n1, e.n2) if d[2] < 0 else (e.n2, e.n1)
             down.setdefault(hi, []).append((lo, i))
-    supported = {n for n, f in frame.supports.items() if f[2]}
+    supported = {n for n in frame.supports if frame.vertically_supported(n)}
     reach = set(supported)
     for n in sorted(range(len(X)), key=lambda k: X[k, 2]):   # lower nodes first
         if any(lo in reach for lo, _ in down.get(n, [])):
@@ -532,12 +590,27 @@ def member_table(model: dict, frame, sls, envelope, deflections=None) -> list[di
 
 
 def support_table(frame, info: dict, sls, ulss, fixed: bool) -> list[dict]:
-    """Reactions at every support: SLS characteristic and each ULS combination (its governing variant)."""
+    """Reactions at every support: SLS characteristic and each ULS combination (its governing variant).
+    A spring's reaction is its force on the structure."""
     def forces(r, n):
         return {k: round(float(v), 3) + 0.0 for k, v in zip(DOF_NAMES, r.reactions[n])}
+    labels = info.get("support_labels") or {}
     return [{"node": int(n), "position_m": [round(float(v), 4) for v in frame.nodes[n]],
-             "restraint": "fixed" if fixed else "pinned", "sls": forces(sls, n),
+             "restraint": labels.get(n, "fixed" if fixed else "pinned"), "sls": forces(sls, n),
              "uls": {name: forces(r_, n) for name, _, r_ in ulss}} for n in info["support_nodes"]]
+
+
+def _support_mode(info: dict, fixed_supports: bool) -> str:
+    """The one support type every support has ("fixed", "pinned", ...), else "mixed"."""
+    kinds = set((info.get("support_labels") or {}).values())
+    return kinds.pop() if len(kinds) == 1 else ("mixed" if kinds else ("fixed" if fixed_supports else "pinned"))
+
+
+def _support_counts(info: dict) -> dict:
+    counts: dict = {}
+    for k in (info.get("support_labels") or {}).values():
+        counts[k] = counts.get(k, 0) + 1
+    return counts
 
 
 def _label(factors: dict) -> str:
@@ -600,8 +673,8 @@ def _imperfection_loads(asm, frame, combo, phi) -> dict:
         return {"": None}
     F = fs.load_vector(asm, combo).reshape(-1, fs.DOF)
     V = np.where(F[:, 2] < 0, -F[:, 2], 0.0)
-    for n, flags in frame.supports.items():
-        if flags[2]:                                       # vertically supported: the load goes straight down
+    for n in frame.supports:
+        if frame.vertically_supported(n):                  # the load goes straight into the support
             V[n] = 0.0
     out = {}
     for label, axis, sign in (("+x", 0, 1), ("-x", 0, -1), ("+y", 1, 1), ("-y", 1, -1)):
@@ -736,6 +809,7 @@ def view_result(model: dict, load_kn: float = 10.0, material: str = "Steel", fix
                          "hinges": [bool(rel[4] or rel[5]), bool(rel[10] or rel[11])]})
     result = {"elements": elements,
               "support_points_m": [list(frame.nodes[n]) for n in info["support_nodes"]],
+              "support_types": [info["support_labels"][n] for n in info["support_nodes"]],
               "loaded_points_m": [list(frame.nodes[n]) for n in info["loaded_nodes"]],
               "max_displacement_mm": round(res.max_displacement * 1000.0, 3),
               "connections": info["connections"], "stability": stab,
@@ -791,6 +865,10 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
         result["verdict"] = METHOD_PREFIX + f"FAILED: {exc}"
         result["status"] = "fail"
         result["suggestions"] = ["Add supports or bracing so every part of the structure is restrained."]
+        labels = set(((locals().get("info") or {}).get("support_labels") or {}).values())
+        if any(k.startswith(("roller", "spring")) for k in labels):
+            result["suggestions"].append("Rollers and springs leave directions free: at least one support must hold "
+                                         "each horizontal direction (x, y) and the frame against turning in plan.")
         if (connections or "").lower() == "simple":
             result["suggestions"].append("With simple (pinned) connections the frame needs bracing, fixed column "
                                          "bases or rigid joints for stability.")
@@ -845,7 +923,8 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
         "loaded_points_m": [list(frame.nodes[n]) for n in info["loaded_nodes"]],
         "per_element_utilization": elem_util,
         "max_member_sag_mm": round(max(er.max_sag for er in res.elements) * 1000.0, 3),
-        "support_mode": "fixed" if fixed_supports else "pinned",
+        "support_mode": _support_mode(info, fixed_supports),
+        "support_types": [info["support_labels"][n] for n in info["support_nodes"]],
         "connections": info["connections"],
         "stability": stab,
         "nodes": len(frame.nodes), "elements": len(frame.elements),
@@ -865,6 +944,8 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
          else f"Connections: {info['connections']['mode']} ({info['connections']['pinned_ends']} pinned member ends; "
               "beams release major-axis bending, braces both axes; torsion released at one end of "
               "members pinned at both)."),
+        "Supports: " + ", ".join(f"{n} {k}" for k, n in sorted(_support_counts(info).items())) + " (global axes; "
+        "rollers restrain vertical movement and the named horizontal direction, springs in kN/m and kNm/rad).",
         (f"Stability (EN 1993-1-1 5.2): alpha_cr {stab.get('min_alpha_cr')} -> {stab['method']}; sway imperfection "
          f"phi = {stab['sway_imperfection']['phi']:.5f} in +/-x, +/-y; member buckling length = member length"
          if stab.get("mode") == "auto" else "Stability check off: first-order, no sway imperfections."),

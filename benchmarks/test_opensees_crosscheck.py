@@ -1,4 +1,4 @@
-"""Native frame solver vs OpenSees on eleven building typologies (linear, buckling, P-Delta).
+"""Native frame solver vs OpenSees on twelve building typologies (linear, buckling, P-Delta).
 
 Skipped unless OpenSeesPy is installed (``uv sync --group bench``); see benchmarks/README.md."""
 import pytest
@@ -25,6 +25,7 @@ LINEAR = [
     ("canopy", T.canopy, {}, "ULS", 1e-9),
     ("diagrid", T.diagrid, {}, "ULS wind", 1e-9),
     ("Vierendeel", T.vierendeel, {}, "ULS", 1e-9),
+    ("mixed supports", T.mixed_supports, {}, "ULS wind", 1e-9),
 ]
 
 
@@ -51,6 +52,7 @@ BUCKLING = [
     ("moment frame", T.moment_frame, {"bx": 2, "by": 1, "storeys": 3}, "ULS wind", 4, 8, False),
     ("Pratt truss", T.pratt_truss, {}, "Q", 1, 1, True),
     ("space grid", T.space_grid, {"nx": 8}, "ULS", 1, 1, True),
+    ("mixed supports", T.mixed_supports, {}, "ULS wind", 8, 16, False),
 ]
 
 
@@ -85,6 +87,7 @@ PDELTA = [
     ("canopy", T.canopy, "ULS"),
     ("arch near buckling", _arch_with_lateral, "near buckling"),
     ("portal x6 load", lambda: T.portal_2d(w=36.0), "Q"),
+    ("mixed supports", T.mixed_supports, "ULS wind"),
 ]
 
 

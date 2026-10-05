@@ -60,6 +60,31 @@ A rule-based answer is an estimate, not FEA — the label is the contract.
 Supports: when no anchors are declared, the bridge pins the lowest-Z node(s)
 automatically and says so in `warnings`.
 
+### Support types (native engine)
+
+By default every support point gets the same restraint (`fixed_supports`:
+fixed, or pinned). A support point can carry its own type in the model's
+`supports` list, `{"point_m": [x, y, z], "spec": "<type> [springs]"}`:
+
+| Spec | Restrained (global axes) | Typical use |
+| --- | --- | --- |
+| `fixed` | all six | moment base, built-in end |
+| `pinned` (`pin`) | three translations | simple base plate |
+| `roller` | vertical | sliding bearing |
+| `roller-x` / `roller-y` | vertical + y / x (slides along x / y) | expansion joint |
+| `spring kz=50000` | only the listed springs | soil, elastic bearing |
+
+Spring keys: `kx ky kz` in kN/m, `rx ry rz` in kNm/rad; a sprung direction is
+no longer rigid, so `fixed rx=8000 ry=8000` is a semi-rigid base. Points with
+no spec (and `anchor_points`) take the default; an unknown spec falls back to
+the default with a warning. Results report `support_types`, `support_mode`
+("mixed" when they differ) and each support's `restraint` and reactions (a
+spring's reaction is its force on the structure).
+
+In Rhino this will be the `almond:support` user text on a support point, read
+by the next almondbridge release; until then the `supports` list can only be
+sent by a model JSON (the `almond-mcp solve` protocol).
+
 ## Pass criteria
 
 - **Deflection:** `max_deflection_mm ≤ span_mm / 250` (e.g. 24 mm for a 6 m

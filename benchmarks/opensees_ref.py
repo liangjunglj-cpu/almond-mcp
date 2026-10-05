@@ -2,7 +2,8 @@
 
 Conventions mapped one to one: local z of every member = the vecxz of its geomTransf (Almond's
 vertical-plane rule), Iy about local y, member end releases as zeroLength links in the member's
-local axes with the released directions left out (stiff penalty springs elsewhere), truss bars as
+local axes with the released directions left out (stiff penalty springs elsewhere), support springs
+as zeroLength springs to a fixed ground node (global axes), truss bars as
 Truss elements (self weight lumped to their nodes), linearly varying member loads as 40 partial
 uniform loads. Rotations of nodes that only bars reach are fixed (Almond restrains them too).
 
@@ -22,6 +23,7 @@ import openseespy.opensees as ops
 from almond_mcp import frame_solver as fs
 
 K_RIGID = 1e12
+_GROUND: dict = {}                                     # frame node -> its spring's ground node (last build)
 
 
 def _member_w(frame, combo):
@@ -55,6 +57,21 @@ def build(frame: fs.Frame, combo: dict, second_order: bool = False, scale: float
             ops.fix(i + 1, *[int(v) for v in flags])
     ops.uniaxialMaterial("Elastic", 1, K_RIGID)
     dup = len(X) + 1
+    ground = {}
+    for n, ks in frame.springs.items():                 # support springs: zeroLength to a fixed ground node
+        dirs = [d for d in range(6) if ks[d] and not frame.supports.get(n, (False,) * 6)[d]]
+        if not dirs:
+            continue
+        ops.node(dup, *X[n])
+        ops.fix(dup, 1, 1, 1, 1, 1, 1)
+        for d in dirs:
+            ops.uniaxialMaterial("Elastic", 10 ** 7 + 6 * n + d, ks[d])
+        ops.element("zeroLength", 2 * 10 ** 6 + n, dup, n + 1, "-mat", *[10 ** 7 + 6 * n + d for d in dirs],
+                    "-dir", *[d + 1 for d in dirs])
+        ground[n] = dup
+        dup += 1
+    _GROUND.clear()
+    _GROUND.update(ground)
     axes = {}
     for ei, e in enumerate(frame.elements):
         R, L = fs.local_axes(X[e.n1], X[e.n2], e.ref)
@@ -129,6 +146,8 @@ def _results(frame, nn):
     R = np.zeros((nn, 6))
     for n in frame.supports:
         R[n] = ops.nodeReaction(n + 1)
+    for n, g in _GROUND.items():                        # a spring's reaction is found at its ground node
+        R[n] += np.array(ops.nodeReaction(g))
     forces = []
     for ei, e in enumerate(frame.elements):
         if e.truss:
