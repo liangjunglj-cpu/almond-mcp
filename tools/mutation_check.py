@@ -12,7 +12,7 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-TESTS = ["tests/test_frame_solver.py", "tests/test_native_structure.py", "tests/test_load_combinations.py",
+TESTS = ["tests/test_rigorous_validation.py", "tests/test_frame_solver.py", "tests/test_native_structure.py", "tests/test_load_combinations.py",
          "tests/test_end_releases.py", "tests/test_stability.py", "tests/test_floor_loads.py",
          "tests/test_asset_loads.py", "tests/test_design_codes.py", "tests/test_structure_study.py",
          "tests/test_validate_engines.py", "tests/test_visualize_native.py", "tests/test_hand_calculations.py", "tests/test_ec3.py"]
@@ -70,7 +70,8 @@ def main():
     print(f"baseline: exit {code} | {tail}", flush=True)
     if code != 0:
         sys.exit("baseline must pass")
-    survived = []
+    survived, skipped, errors = [], [], []
+    attempted, caught_count = 0, 0
     for name, rel, old, new in MUTANTS:
         if only and not any(o in name.lower() for o in only):
             continue
@@ -79,18 +80,27 @@ def main():
         text = original.decode("utf-8")
         if text.count(old) != 1:
             print(f"SKIP {name}: target found {text.count(old)} times", flush=True)
+            skipped.append(name)
             continue
+        attempted += 1
         try:
             path.write_bytes(text.replace(old, new).encode("utf-8"))
             code, tail = run_tests()
         finally:
             path.write_bytes(original)
-        caught = code != 0
+        caught = code == 1
+        if code not in (0, 1):
+            errors.append(name)
+            print(f"ERROR   {name}: pytest exit {code} | {tail}", flush=True)
+            continue
         if not caught:
             survived.append(name)
+        else:
+            caught_count += 1
         print(f"{'CAUGHT  ' if caught else 'MISSED  '} {name} | {tail}", flush=True)
-    ran = [m for m in MUTANTS if not only or any(o in m[0].lower() for o in only)]
-    print(f"\n{len(ran) - len(survived)}/{len(ran)} planted errors caught")
+    print(f"\n{caught_count}/{attempted} planted errors caught; {len(skipped)} skipped, {len(errors)} runner errors")
+    if not attempted or survived or skipped or errors:
+        sys.exit(1)
 
 
 if __name__ == "__main__":

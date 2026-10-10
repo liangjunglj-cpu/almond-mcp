@@ -31,6 +31,16 @@ DOF = 6   # ux uy uz rx ry rz per node
 PIVOT_TOL = 1e-13   # Cholesky pivot / own diagonal below this = singular (mechanism)
 
 
+def _finite_vector(values, size, label):
+    try:
+        vector = np.asarray(values, dtype=float)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ValueError(f"{label} must contain {size} finite numbers.") from exc
+    if vector.shape != (size,) or not np.all(np.isfinite(vector)):
+        raise ValueError(f"{label} must contain {size} finite numbers.")
+    return vector.copy()
+
+
 # ------------------------------------------------------------------ materials
 @dataclass(frozen=True)
 class Material:
@@ -83,8 +93,20 @@ class Section:
     dims_mm: tuple = ()
 
 
+def _positive_dimensions(*values: float) -> tuple[float, ...]:
+    """Reject nonphysical dimensions before computing any section properties."""
+    try:
+        dimensions = tuple(float(v) for v in values)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ValueError("Section dimensions must be finite positive numbers.") from exc
+    if any(isinstance(v, bool) for v in values) or not all(math.isfinite(v) and v > 0 for v in dimensions):
+        raise ValueError("Section dimensions must be finite positive numbers.")
+    return dimensions
+
+
 def chs(d_mm: float, t_mm: float) -> Section:
     """Circular hollow section, outer diameter and wall in mm."""
+    d_mm, t_mm = _positive_dimensions(d_mm, t_mm)
     D, t = d_mm / 1000, t_mm / 1000
     if not (0 < t < D / 2):
         raise ValueError(f"CHS {d_mm}x{t_mm}: wall must be between 0 and D/2.")
@@ -99,6 +121,7 @@ def chs(d_mm: float, t_mm: float) -> Section:
 
 def rhs(h_mm: float, b_mm: float, t_mm: float) -> Section:
     """Rectangular hollow section (depth h along local z, width b), mm."""
+    h_mm, b_mm, t_mm = _positive_dimensions(h_mm, b_mm, t_mm)
     h, b, t = h_mm / 1000, b_mm / 1000, t_mm / 1000
     if not (0 < 2 * t < min(h, b)):
         raise ValueError(f"RHS {h_mm}x{b_mm}x{t_mm}: wall too thick.")
@@ -116,6 +139,7 @@ def rhs(h_mm: float, b_mm: float, t_mm: float) -> Section:
 
 def rect(b_mm: float, h_mm: float) -> Section:
     """Solid rectangle (timber, concrete), width b and depth h in mm."""
+    b_mm, h_mm = _positive_dimensions(b_mm, h_mm)
     b, h = b_mm / 1000, h_mm / 1000
     a, c = max(b, h), min(b, h)
     J = a * c ** 3 * (1 / 3 - 0.21 * c / a * (1 - c ** 4 / (12 * a ** 4)))
@@ -125,6 +149,9 @@ def rect(b_mm: float, h_mm: float) -> Section:
 
 def i_section(h_mm: float, b_mm: float, tw_mm: float, tf_mm: float) -> Section:
     """Doubly symmetric I-section (no root radii), depth along local z, mm."""
+    h_mm, b_mm, tw_mm, tf_mm = _positive_dimensions(h_mm, b_mm, tw_mm, tf_mm)
+    if 2 * tf_mm >= h_mm or tw_mm >= b_mm:
+        raise ValueError("I-section flanges must leave a positive web depth and the web must fit within the width.")
     h, b, tw, tf = h_mm / 1000, b_mm / 1000, tw_mm / 1000, tf_mm / 1000
     hw = h - 2 * tf
     A = 2 * b * tf + hw * tw
@@ -181,7 +208,7 @@ class Frame:
     gamma_m: tuple = (1.0, 1.0)                          # (gamma_M0, gamma_M1) for the member checks
 
     def add_node(self, xyz) -> int:
-        self.nodes.append(tuple(float(v) for v in xyz))
+        self.nodes.append(tuple(_finite_vector(xyz, 3, "Node coordinates")))
         return len(self.nodes) - 1
 
     def add_element(self, n1, n2, section, mat, **kw) -> int:
@@ -208,16 +235,16 @@ class Frame:
 
     def load(self, node, fx=0.0, fy=0.0, fz=0.0, mx=0.0, my=0.0, mz=0.0, case="Q"):
         cur = np.asarray(self.nodal_loads.get((node, case), np.zeros(6)), float)
-        self.nodal_loads[(node, case)] = cur + np.array([fx, fy, fz, mx, my, mz], float)
+        self.nodal_loads[(node, case)] = _finite_vector(cur + _finite_vector([fx, fy, fz, mx, my, mz], 6, "Nodal load"), 6, "Accumulated nodal load")
 
     def udl(self, element, w, case="Q"):
         """Uniform member load, global vector kN/m."""
-        w = np.asarray(w, float)
+        w = _finite_vector(w, 3, "Uniform member load")
         self.member_loads.append((element, w, w, case))
 
     def linear_load(self, element, w_start, w_end, case="Q"):
         """Member load varying linearly from w_start at n1 to w_end at n2 (global vectors, kN/m)."""
-        self.member_loads.append((element, np.asarray(w_start, float), np.asarray(w_end, float), case))
+        self.member_loads.append((element, _finite_vector(w_start, 3, "Member start load"), _finite_vector(w_end, 3, "Member end load"), case))
 
     def cases(self) -> list:
         found = {c for (_, c) in self.nodal_loads} | {m[3] for m in self.member_loads}
