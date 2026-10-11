@@ -2358,7 +2358,9 @@ def validate_structure(
         (up to 5 Rhino GUIDs of the most over-utilized members — edit those
         first). The results object carries the numbers: max_deflection_mm (native:
         member deflection relative to its supports; max_displacement_mm is the absolute
-        maximum), deflection_limit_mm, utilization_ratio, max_stress_mpa, yield_stress_mpa,
+        maximum), deflection_limit_mm, storey_drift (native: per storey drift vs h/300, a
+        project default; fails the check except for structure_type "truss"),
+        utilization_ratio, max_stress_mpa, yield_stress_mpa,
         span_m, analysis_method ("native"|"api"|"template"|"rule_based"), reactions_kn
         (total vertical reaction, api path only), and per_element_utilization —
         a list of {source_guids, utilization} entries (utilization 1.0 = at
@@ -2585,6 +2587,7 @@ def visualize_structure(
     design_code: str = "eurocode",
     fabrication: str = "cold_formed",
     view: str = "deflection",
+    structure_type: str = "beam",
 ) -> str:
     """
     Run a live structural analysis on a line model and SHOW it in every Rhino viewport:
@@ -2638,10 +2641,15 @@ def visualize_structure(
         view: "deflection" (default) or "buckling": draw the first buckling mode of the
             governing ULS combination with its alpha_cr (STABLE >= 10, SWAY-SENSITIVE 1-10,
             UNSTABLE <= 1) instead of the deflected shape.
+        structure_type: as in validate_structure (sets the reference span; storey drift is
+            checked for every type except "truss"). With the same inputs the overlay's PASS/FAIL
+            is validate_structure's native verdict.
 
-    Returns JSON: status ("pass"|"fail"|"error"|"cleared"), max_displacement_mm,
-    deflection_limit_mm, span_m, max_utilization, scale, per-element
-    {source_guids, max_displacement_mm, utilization}, warnings.
+    Returns JSON: status ("pass"|"fail"|"indicative"|"error"|"cleared"), max_deflection_mm
+    (native: each member's deflection relative to its supports, the value checked against
+    deflection_limit_mm, as in validate_structure), max_displacement_mm (absolute, incl. column
+    shortening and sway; it scales the drawing), storey_drift, failures, class4_members, span_m,
+    max_utilization, scale, per-element {source_guids, max_displacement_mm, utilization}, warnings.
     The native engine reports analysis_method "native"; engine="karamba" needs
     Karamba3D 3.1 (the trial caps models at 20 beam elements).
     """
@@ -2712,10 +2720,20 @@ def visualize_structure(
         if not reanalyze and _VIEW_ENGINE == "native":
             draw = {k: v for k, v in request.items() if k not in ("guids", "reanalyze", "clear")}
             draw["type"] = "structure_draw"
-            return _bridge_call(draw, 30.0)
+            if _VIEW_VERDICT:
+                draw["verdict_status"] = _VIEW_VERDICT["status"]
+            out = _bridge_call(draw, 30.0)
+            try:
+                parsed = json.loads(out)
+            except Exception:
+                return out
+            if _VIEW_VERDICT and isinstance(parsed, dict) and parsed.get("status") in ("pass", "fail", "indicative"):
+                _apply_verdict(parsed, _VIEW_VERDICT)       # an older bridge judges the absolute displacement
+            return json.dumps(parsed)
         reply, note = _native_view(request, guids, required=engine == "native", asset_spec=spec, floor_spec=floor,
                                    design=(design_basis, uls_combination, design_code), connections=connections,
-                                   stability=stability, view=view, fabrication=fabrication)
+                                   stability=stability, view=view, fabrication=fabrication,
+                                   structure_type=structure_type)
         if reply is not None:
             return reply
     out = _bridge_call(request, 90.0)
@@ -2734,6 +2752,22 @@ def visualize_structure(
 
 
 _VIEW_ENGINE: str | None = None   # which engine drew the current overlay ("native" | "api")
+_VIEW_VERDICT: dict | None = None  # the native checks' verdict for the overlay on screen
+
+
+def _apply_verdict(reply: dict, verdict: dict) -> None:
+    """Replace the bridge's own PASS/FAIL (older bridges judge the absolute nodal displacement, column
+    shortening and sway included, against span/limit, and ignore Class 4 sections) with the native
+    checks' verdict: member deflection relative to its supports, Class 4 sections, utilization and
+    storey drift, as validate_structure judges them."""
+    reply["status"] = verdict["status"]
+    reply["passed"] = verdict["passed"]
+    for key in ("max_deflection_mm", "deflection_measure", "deflection_limit_mm", "failures",
+                "class4_members", "utilization_combination"):
+        reply[key] = verdict[key]
+    drift = verdict["storey_drift"]
+    reply["storey_drift"] = {k: drift.get(k) for k in ("checked", "limit_ratio", "basis", "max_drift_mm",
+                                                        "utilization", "governing")}
 
 
 def _bridge_call(message: dict, timeout: float) -> str:
@@ -2748,11 +2782,12 @@ def _bridge_call(message: dict, timeout: float) -> str:
 
 
 def _native_view(request: dict, guids, required: bool, asset_spec=None, floor_spec=None, design=("en1990", None, "eurocode"),
-                 connections="rigid", stability="auto", view="deflection", fabrication="cold_formed"):
+                 connections="rigid", stability="auto", view="deflection", fabrication="cold_formed",
+                 structure_type="beam"):
     """Solve natively and draw through the bridge's structure_draw overlay.
 
     Returns (reply_json, None) when it ran or must stop, (None, note) to fall back to Karamba."""
-    global _VIEW_ENGINE
+    global _VIEW_ENGINE, _VIEW_VERDICT
 
     def unavailable(msg):
         if required:
@@ -2777,7 +2812,8 @@ def _native_view(request: dict, guids, required: bool, asset_spec=None, floor_sp
             self_weight=request["self_weight"], diameter_mm=request.get("beam_diameter_mm"),
             wall_mm=request.get("beam_wall_mm"), span_m=request.get("span_m"), asset_loads=asset_spec,
             floor_loads=floor_spec, design_basis=design[0], uls=design[1], connections=connections,
-            stability=stability, view=view, design_code=design[2], fabrication=fabrication)
+            stability=stability, view=view, design_code=design[2], fabrication=fabrication,
+            structure_type=(structure_type or "beam").lower(), limit_ratio=request.get("deflection_limit_ratio"))
     except native_structure.InstabilityError as e:
         return json.dumps({"status": "fail", "analysis_method": "native", "message": str(e),
                            "stability": e.report, "hint": "view='buckling' draws the buckling mode."}), None
@@ -2789,13 +2825,13 @@ def _native_view(request: dict, guids, required: bool, asset_spec=None, floor_sp
     draw, reports = structure_study.draw_message(request, result, span)
     report, floor_report, combos = reports["asset_loads"], reports["floor_loads"], reports["combinations"]
     conn_report, stab_report, buckling = reports["connections"], reports["stability"], reports["buckling"]
-    code_report = reports["design_code"]
+    code_report, verdict = reports["design_code"], reports["verdict"]
     out = _bridge_call(draw, 60.0)
     try:
         parsed = json.loads(out)
     except Exception:
         return out, None
-    if isinstance(parsed, dict) and parsed.get("status") in ("pass", "fail"):
+    if isinstance(parsed, dict) and parsed.get("status") in ("pass", "fail", "indicative"):
         _VIEW_ENGINE = "native"
         parsed["warnings"] = result["warnings"]
         if report is not None:
@@ -2810,9 +2846,9 @@ def _native_view(request: dict, guids, required: bool, asset_spec=None, floor_sp
             parsed["stability"] = stab_report
         if code_report:
             parsed["design_code"] = code_report
-        if reports.get("indicative") and parsed.get("status") == "pass":
-            parsed["status"] = "indicative"                 # the bridge judged utilization; there is no capacity check
-            parsed["passed"] = None
+        if verdict:
+            _apply_verdict(parsed, verdict)                 # the native checks decide, not the bridge's legend
+        _VIEW_VERDICT = verdict
         if buckling:
             # a mode shape has no magnitude: the bridge's deflection-limit verdict is meaningless here
             parsed["buckling"] = buckling

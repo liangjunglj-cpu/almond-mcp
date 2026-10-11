@@ -67,7 +67,11 @@ and reply catches a plugin/solver mismatch.
 (`structure_model`), solves it with `frame_solver`, and sends the solved field to the
 bridge (`structure_draw`), which draws it with the same overlay as the Karamba route —
 deformed shape coloured by displacement or utilization, supports, loads and a
-PASS/FAIL legend. Display-only updates (`reanalyze=False`: scale, colouring, reveal,
+PASS/FAIL legend. The PASS/FAIL is `validate`'s (`view_result` returns the same
+checks as `verdict`; the draw message carries `verdict_status`, and the server
+replaces the status of an older bridge, which judged the absolute displacement and
+ignored Class 4). The legend's headline is the member deflection, with the absolute
+displacement (which scales the drawing) and the storey drift below it. Display-only updates (`reanalyze=False`: scale, colouring, reveal,
 physics on/off, `display_guids`) resend no geometry.
 
 ![Karamba and the native engine on the same frame](images/native-solver/native-vs-karamba.jpg)
@@ -112,6 +116,21 @@ axes polygonized identically. `almond_mcp/native_structure.py` then applies:
 - **Deflection limit:** span/250. Span = longest member for beam/frame, else overall
   extent; `span_m` overrides it when members are split at every node (a 6.2 m joist
   drawn as two 3.1 m segments).
+- **Deflection measured** per member relative to what holds it (`member_deflections`):
+  beams from their supports (cantilevers from the root, root rotation included);
+  steep members (columns, braces, diagrid bars, ≥ ~45°) held at two or more points
+  — supports, a brace or column below, or a floor that reaches another member's
+  support path — from the chord through those points' displaced positions, so a
+  storey's sway is not column deflection. Pieces that kink by less than ~1.8° form
+  one member: the columns of a 60°-twisted tower are one helical member from the
+  foundation to the roof, measured floor to floor. A lone post (its arm is not a
+  floor) stays a cantilever.
+- **Storey drift** (`storey_drift`): per steep member line on a support path, the
+  horizontal displacement between consecutive held points over their height, at
+  SLS characteristic, against h / `storey_drift_limit_ratio` (300, a project default
+  in the profile: no Eurocode clause fixes it). Per storey in `results.storey_drift`;
+  it fails the check and names itself in the verdict when it governs (not judged for
+  `structure_type="truss"`).
 - **Member checks (EN 1993-1-1, `almond_mcp/ec3.py`), per member** (the member between its
   joints, whatever the analysis split it into), for every ULS combination:
   - **Section class** from Table 5.2 for the actual stresses, with ε = √(235/f_y):

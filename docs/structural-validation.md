@@ -90,9 +90,19 @@ sent by a model JSON (the `almond-mcp solve` protocol).
 - **Deflection:** `max_deflection_mm ≤ span_mm / 250` (e.g. 24 mm for a 6 m
   span, 48 mm for 12 m). On the native engine `max_deflection_mm` is each
   member's deflection relative to what supports it (beam ends on columns, a
-  cantilever's root, a truss chord's end posts), so column shortening in a tall
-  frame does not count as beam deflection; the absolute maximum is reported as
-  `max_displacement_mm`. Storey drift is not checked.
+  cantilever's root, a truss chord's end posts; a column or brace between the
+  floors that hold it, from the chord through their displaced positions), so
+  column shortening and sway in a tall frame do not count as deflection; the
+  absolute maximum is reported as `max_displacement_mm`.
+- **Storey drift (native engine):** the horizontal displacement of every column
+  line between consecutive floors ≤ storey height / 300
+  (`results.storey_drift`: per storey, governing first). h/300 is a project
+  default in the design code profile (`storey_drift_limit_ratio`, marked
+  `project_default`, `verified: false`): EN 1993-1-1 7.2.2 / EN 1990 A1.4.3
+  leave horizontal limits to the project or the National Annex. Reported but
+  not judged for `structure_type="truss"` (a spanning truss's posts turn with
+  it).
+- **Class 4 sections** fail as not covered (EN 1993-1-5/-1-6).
 - **Strength:** utilization < 1.0 against yield (S235: fy = 235 MPa).
 - Rule-based pathway: mid-span UDL deflection `5wL⁴/384EI`, moment `wL²/8`,
   with load sharing across members.
@@ -174,7 +184,13 @@ still returns no stations in this build; member shapes are interpolated
 and draws it in every viewport through a display conduit (nothing is baked): ghosted
 undeformed axes, the exaggerated deformed shape coloured blue → red by
 displacement or utilization, supports, load arrows and a legend with
-max δ, the L/limit check and PASS/FAIL. `reanalyze=False` updates only the
+max δ, the L/limit check and PASS/FAIL. On the native engine the PASS/FAIL is
+validate_structure's verdict for the same inputs (member deflection, Class 4,
+utilization, storey drift; pass the same `structure_type`): the server computes
+it and sends it with the result, and overrides the status an older bridge
+judges from the absolute displacement. The legend reads "max δ (member)" with
+the absolute displacement and the storey drift as secondary lines; the
+absolute maximum still sets the automatic deformation scale. `reanalyze=False` updates only the
 display (`scale`, `color_by`, `reveal`, `title`), so a staged construction
 sequence can be played back with `reveal` from 0 to 1, and `physics=False`
 draws the same members as plain geometry (physics off) for comparisons.

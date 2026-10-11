@@ -15,7 +15,8 @@ ROOT = Path(__file__).resolve().parents[1]
 TESTS = ["tests/test_frame_solver.py", "tests/test_native_structure.py", "tests/test_load_combinations.py",
          "tests/test_end_releases.py", "tests/test_stability.py", "tests/test_floor_loads.py",
          "tests/test_asset_loads.py", "tests/test_design_codes.py", "tests/test_structure_study.py",
-         "tests/test_validate_engines.py", "tests/test_visualize_native.py", "tests/test_hand_calculations.py", "tests/test_ec3.py"]
+         "tests/test_validate_engines.py", "tests/test_visualize_native.py", "tests/test_hand_calculations.py", "tests/test_ec3.py",
+         "tests/test_deflection_verdicts.py"]
 
 MUTANTS = [
     ("load factor gamma_G 1.35 -> 1.30", "almond_mcp/code_profiles/eurocode.json", '"gamma_G": {"value": 1.35', '"gamma_G": {"value": 1.30'),
@@ -55,6 +56,14 @@ MUTANTS = [
      "out.setdefault(i, []).append(i)"),
     ("deflection limit ratio ignored by the overlay", "almond_mcp/structure_study.py",
      '"deflection_limit_ratio": limit_ratio}', '"deflection_limit_ratio": 250.0}'),
+    ("column sway counted as deflection (cantilever from the base)", "almond_mcp/native_structure.py",
+     'chord = first and g["steep"] and len(g["held"]) >= 2', "chord = False"),
+    ("storey drift left out of the verdict", "almond_mcp/native_structure.py",
+     'if worst and drift.get("checked") and worst["utilization"] > 1.0:', "if False:"),
+    ("storey drift limit h/300 -> h/200", "almond_mcp/code_profiles/eurocode.json",
+     '"storey_drift_limit_ratio": {"value": 300', '"storey_drift_limit_ratio": {"value": 200'),
+    ("overlay keeps the bridge's absolute-displacement verdict", "almond_mcp/server.py",
+     "_apply_verdict(parsed, verdict)                 # the native checks decide", "pass  # the native checks decide"),
 ]
 
 
