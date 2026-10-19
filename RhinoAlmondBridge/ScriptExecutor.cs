@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Newtonsoft.Json;
 using Rhino;
+using Rhino.Commands;
 using Rhino.DocObjects;
 using Rhino.Geometry;
 
@@ -14,12 +15,10 @@ namespace RhinoAlmondBridge
 {
     /// <summary>
     /// Compiles and executes C# RhinoCommon scripts at runtime using Roslyn.
-    /// Wraps all execution in an Undo block for atomic rollback on failure.
+    /// Owns an Undo record and rolls back retained records on failure.
     /// </summary>
     public class ScriptExecutor
     {
-        private static bool _aiaLayersCreated = false;
-
         /// <summary>
         /// Compiles the provided C# source code using Roslyn, executes it within Rhino,
         /// and returns the result including any created GUIDs or error traces.
@@ -31,18 +30,26 @@ namespace RhinoAlmondBridge
         /// </param>
         public ScriptResult Execute(string csharpCode)
         {
+            return Execute(csharpCode, RhinoDoc.ActiveDoc);
+        }
+
+        // Keep one document throughout execution; also allows native headless tests.
+        internal ScriptResult Execute(string csharpCode, RhinoDoc doc)
+        {
             var result = new ScriptResult { Status = "success" };
 
-            EnsureAiaLayers();
+            if (doc == null)
+            {
+                result.Status = "error";
+                result.Message = "No active Rhino document.";
+                return result;
+            }
 
-            // Wrap the user's code in a namespace and using statements if not already present
-            string fullSource = WrapScript(csharpCode);
-
-            // Compile
+            // Validate before creating layers or touching the Undo/Redo history.
             Assembly assembly;
             try
             {
-                assembly = CompileScript(fullSource);
+                assembly = CompileScript(WrapScript(csharpCode));
             }
             catch (Exception ex)
             {
@@ -52,13 +59,9 @@ namespace RhinoAlmondBridge
                 return result;
             }
 
-            // Execute within an Undo block
-            var doc = RhinoDoc.ActiveDoc;
-            uint undoSn = doc.BeginUndoRecord("MCP C# Script Execution");
-
+            MethodInfo runMethod;
             try
             {
-                // Find the Run method
                 var entryType = assembly.GetTypes()
                     .FirstOrDefault(t => t.GetMethod("Run", BindingFlags.Public | BindingFlags.Static) != null);
 
@@ -66,11 +69,28 @@ namespace RhinoAlmondBridge
                 {
                     result.Status = "error";
                     result.Message = "Script must contain a class with: public static List<Guid> Run(RhinoDoc doc)";
-                    doc.EndUndoRecord(undoSn);
                     return result;
                 }
 
-                var runMethod = entryType.GetMethod("Run", BindingFlags.Public | BindingFlags.Static);
+                runMethod = entryType.GetMethod("Run", BindingFlags.Public | BindingFlags.Static);
+            }
+            catch (Exception ex)
+            {
+                SetRuntimeError(result, ex);
+                return result;
+            }
+
+            uint undoSn = doc.BeginUndoRecord("MCP C# Script Execution");
+            if (undoSn == 0)
+            {
+                result.Status = "error";
+                result.Message = "Cannot start an Undo record. Finish the active command or Undo/Redo operation and ensure Undo recording is enabled before retrying.";
+                return result;
+            }
+
+            try
+            {
+                EnsureAiaLayers(doc);
                 var invokeResult = runMethod.Invoke(null, new object[] { doc });
 
                 // Collect GUIDs
@@ -81,32 +101,135 @@ namespace RhinoAlmondBridge
                     if (guids.Count > 0)
                         AddScaleDimensions(doc, guids);
                 }
-
-                doc.EndUndoRecord(undoSn);
-                doc.Views.Redraw();
             }
             catch (TargetInvocationException ex)
             {
                 // The actual exception is in InnerException
-                var inner = ex.InnerException ?? ex;
-                doc.EndUndoRecord(undoSn);
-                doc.Undo();
-
-                result.Status = "runtime_error";
-                result.Message = inner.Message;
-                result.ErrorTrace = inner.ToString();
+                SetRuntimeError(result, ex.InnerException ?? ex);
             }
             catch (Exception ex)
             {
-                doc.EndUndoRecord(undoSn);
-                doc.Undo();
+                SetRuntimeError(result, ex);
+            }
 
-                result.Status = "runtime_error";
-                result.Message = ex.Message;
-                result.ErrorTrace = ex.ToString();
+            try
+            {
+                FinishUndoRecord(doc, undoSn, result.Status != "success");
+            }
+            catch (Exception ex)
+            {
+                ReportUndoError(result, ex);
+            }
+            finally
+            {
+                // Never close a record opened by the script or another caller.
+                try
+                {
+                    if (OwnsUndoRecord(doc, undoSn) && !doc.EndUndoRecord(undoSn))
+                        throw new InvalidOperationException("Could not close the script's Undo record.");
+                }
+                catch (Exception ex)
+                {
+                    ReportUndoError(result, ex);
+                }
+            }
+
+            // A display failure must not roll back an already completed script.
+            try
+            {
+                doc.Views.Redraw();
+            }
+            catch (Exception ex)
+            {
+                RhinoApp.WriteLine($"RhinoAlmondBridge: Redraw error: {ex.Message}");
             }
 
             return result;
+        }
+
+        private static bool OwnsUndoRecord(RhinoDoc doc, uint undoSn)
+        {
+            return undoSn != 0 && doc.UndoRecordingIsActive &&
+                doc.CurrentUndoRecordSerialNumber == undoSn;
+        }
+
+        private static void FinishUndoRecord(RhinoDoc doc, uint undoSn, bool rollback)
+        {
+            if (!OwnsUndoRecord(doc, undoSn))
+                throw new InvalidOperationException("The script changed its Undo record. Automatic rollback was skipped to protect other work.");
+
+            bool purged = false;
+            int ownerThreadId = System.Environment.CurrentManagedThreadId;
+            uint nextUndoSn = doc.NextUndoRecordSerialNumber;
+            EventHandler<UndoRedoEventArgs> onUndoRedo = (sender, e) =>
+            {
+                if (System.Environment.CurrentManagedThreadId == ownerThreadId &&
+                    e.UndoSerialNumber == undoSn && e.IsPurgeRecord)
+                    purged = true;
+            };
+
+            // Rhino discards empty records during EndUndoRecord and reports their
+            // serial via IsPurgeRecord. Undoing after that would undo earlier work.
+            // Observe only this synchronous close; no custom marker is needed,
+            // so an empty failure also preserves an existing Redo history.
+            Command.UndoRedo += onUndoRedo;
+            try
+            {
+                if (!doc.EndUndoRecord(undoSn))
+                    throw new InvalidOperationException("Could not close the script's Undo record.");
+            }
+            finally
+            {
+                Command.UndoRedo -= onUndoRedo;
+            }
+
+            if (!rollback || purged)
+                return;
+
+            if (doc.UndoRecordingIsActive || doc.UndoActive || doc.RedoActive ||
+                doc.NextUndoRecordSerialNumber != nextUndoSn)
+                throw new InvalidOperationException("Undo state changed while closing the script's record. Automatic rollback was skipped to protect other work.");
+
+            try
+            {
+                if (!doc.Undo())
+                    throw new InvalidOperationException("Rhino could not undo the failed script's record.");
+            }
+            finally
+            {
+                // Modeless Undo starts its own record. No Rhino command will end
+                // it for us; leaving it open keeps UndoActive true indefinitely.
+                if (doc.UndoRecordingIsActive)
+                {
+                    if (!OwnsUndoRecord(doc, nextUndoSn))
+                        throw new InvalidOperationException("Undo recovery encountered another active record and left it under its owner's control.");
+                    if (!doc.EndUndoRecord(nextUndoSn))
+                        throw new InvalidOperationException("Could not close the rollback Undo record.");
+                }
+
+                if (doc.UndoActive || doc.RedoActive)
+                    throw new InvalidOperationException("Rhino still reports an active Undo/Redo operation after recovery.");
+            }
+        }
+
+        private static void SetRuntimeError(ScriptResult result, Exception ex)
+        {
+            result.Status = "runtime_error";
+            result.Message = ex.Message;
+            result.ErrorTrace = ex.ToString();
+            result.Guids.Clear();
+        }
+
+        private static void ReportUndoError(ScriptResult result, Exception ex)
+        {
+            if (result.Status == "success")
+            {
+                SetRuntimeError(result, ex);
+                return;
+            }
+
+            result.Message += " Undo recovery: " + ex.Message;
+            result.ErrorTrace += "\nUndo recovery: " + ex;
         }
 
         /// <summary>
@@ -190,15 +313,10 @@ using Rhino.Commands;
         }
 
         /// <summary>
-        /// Creates AIA Standard Layers once per Rhino session.
+        /// Creates missing AIA Standard Layers in the current script's Undo record.
         /// </summary>
-        private void EnsureAiaLayers()
+        private void EnsureAiaLayers(RhinoDoc doc)
         {
-            if (_aiaLayersCreated) return;
-
-            var doc = RhinoDoc.ActiveDoc;
-            if (doc == null) return;
-
             var layers = new Dictionary<string, System.Drawing.Color>
             {
                 { "A-WALL", System.Drawing.Color.Black },
@@ -214,8 +332,6 @@ using Rhino.Commands;
                     doc.Layers.Add(layer);
                 }
             }
-
-            _aiaLayersCreated = true;
         }
 
         /// <summary>
