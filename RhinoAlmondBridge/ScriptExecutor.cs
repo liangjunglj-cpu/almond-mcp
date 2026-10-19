@@ -207,9 +207,14 @@ namespace RhinoAlmondBridge
                         throw new InvalidOperationException("Could not close the rollback Undo record.");
                 }
 
-                if (doc.UndoActive || doc.RedoActive)
+                if (doc.UndoRecordingIsActive || doc.UndoActive || doc.RedoActive)
                     throw new InvalidOperationException("Rhino still reports an active Undo/Redo operation after recovery.");
             }
+
+            // Undo puts the failed nonempty script on Redo. Once recovery has
+            // completed, discard that history so Redo cannot replay partial edits.
+            // Keep this outside finally: failed recovery must retain its history.
+            doc.ClearRedoRecords();
         }
 
         private static void SetRuntimeError(ScriptResult result, Exception ex)

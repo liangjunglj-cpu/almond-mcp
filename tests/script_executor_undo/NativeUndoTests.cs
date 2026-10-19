@@ -188,6 +188,64 @@ namespace AlmondScriptUndoTests
                 Check(Count(doc) == 0, "Void Run changes were not undoable.");
             });
 
+            Run(lines, "immediate Redo cannot replay a failed creation", doc =>
+            {
+                Prepare(doc);
+                var previous = Seed(doc);
+                Failed(Execute(doc, "doc.Objects.AddPoint(new Point3d(10, 0, 0)); throw new InvalidOperationException(\"expected\");"));
+                Check(Count(doc) == 1 && Live(doc, previous), "Failed creation was not rolled back.");
+                bool redone = TryRedo(doc);
+                Check(!redone && Count(doc) == 1 && Live(doc, previous), "Immediate Redo replayed the failed creation.");
+            });
+
+            Run(lines, "immediate Redo cannot replay a failed deletion", doc =>
+            {
+                Prepare(doc);
+                var previous = Seed(doc);
+                Failed(Execute(doc, "doc.Objects.Delete(new Guid(\"" + previous + "\"), true); throw new InvalidOperationException(\"expected\");"));
+                Check(Live(doc, previous), "Failed deletion was not rolled back.");
+                bool redone = TryRedo(doc);
+                Check(!redone && Count(doc) == 1 && Live(doc, previous), "Immediate Redo replayed the failed deletion.");
+            });
+
+            Run(lines, "immediate Redo cannot replay a failed attribute edit", doc =>
+            {
+                Prepare(doc);
+                var previous = Seed(doc);
+                string originalName = doc.Objects.FindId(previous).Attributes.Name;
+                Failed(Execute(doc, "var id = new Guid(\"" + previous + "\"); var a = doc.Objects.FindId(id).Attributes.Duplicate(); a.Name = \"temporary\"; doc.Objects.ModifyAttributes(id, a, true); throw new InvalidOperationException(\"expected\");"));
+                Check(doc.Objects.FindId(previous).Attributes.Name == originalName, "Failed attribute edit was not rolled back.");
+                bool redone = TryRedo(doc);
+                Check(!redone && doc.Objects.FindId(previous).Attributes.Name == originalName, "Immediate Redo replayed the failed attribute edit.");
+            });
+
+            Run(lines, "immediate Redo cannot replay failed first-call layer initialization", doc =>
+            {
+                Failed(Execute(doc, "throw new InvalidOperationException(\"expected\");"));
+                Check(Count(doc) == 0 && doc.Layers.FindName("A-WALL") == null, "First-call layer initialization was not rolled back.");
+                bool redone = TryRedo(doc);
+                Check(!redone && Count(doc) == 0 && doc.Layers.FindName("A-WALL") == null, "Immediate Redo replayed failed first-call layer initialization.");
+            });
+
+            Run(lines, "nonempty failure preserves two earlier Undo/Redo records", doc =>
+            {
+                Prepare(doc);
+                var first = Seed(doc);
+                var second = Seed(doc);
+                Failed(Execute(doc, "doc.Objects.AddPoint(new Point3d(10, 0, 0)); throw new InvalidOperationException(\"expected\");"));
+                Check(Count(doc) == 2 && Live(doc, first) && Live(doc, second), "Failure changed earlier work.");
+                Check(!TryRedo(doc), "Failed script remained available to Redo.");
+                Undo(doc);
+                Check(Count(doc) == 1 && Live(doc, first) && !Live(doc, second), "First Undo did not remove only the second successful object.");
+                Undo(doc);
+                Check(Count(doc) == 0 && !Live(doc, first) && !Live(doc, second), "Second Undo did not remove the first successful object.");
+                Redo(doc);
+                Check(Count(doc) == 1 && Live(doc, first) && !Live(doc, second), "First Redo did not restore only the first successful object.");
+                Redo(doc);
+                Check(Count(doc) == 2 && Live(doc, first) && Live(doc, second), "Second Redo did not restore only the two successful objects.");
+                Check(!TryRedo(doc) && Count(doc) == 2, "Failed geometry survived beyond the earlier successful Redo records.");
+            });
+
             string report = "Rhino " + RhinoApp.Version + "\n" + string.Join("\n", lines);
             int failures = lines.Count(line => line.StartsWith("FAIL "));
             if (failures != 0)
@@ -291,6 +349,26 @@ namespace AlmondScriptUndoTests
             Check(Live(doc, id), "Later Undo did not restore the deleted point.");
             Redo(doc);
             Check(!Live(doc, id), "Later Redo did not delete the point again.");
+        }
+
+        private static bool TryRedo(RhinoDoc doc)
+        {
+            Idle(doc);
+            uint sn = doc.NextUndoRecordSerialNumber;
+            bool redone;
+            try
+            {
+                // Do not make another edit before this call: an edit would clear
+                // Redo itself and hide a failed script left by the executor.
+                redone = doc.Redo();
+            }
+            finally
+            {
+                if (doc.UndoRecordingIsActive && doc.CurrentUndoRecordSerialNumber == sn)
+                    Check(doc.EndUndoRecord(sn), "Could not finish the test's immediate Redo.");
+            }
+            Idle(doc);
+            return redone;
         }
 
         private static void Check(bool condition, string message)
