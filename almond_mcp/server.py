@@ -2357,9 +2357,12 @@ def validate_structure(
         confidence ("high"|"medium"|"low"), warnings, and worst_member_guids
         (up to 5 Rhino GUIDs of the most over-utilized members — edit those
         first). The results object carries the numbers: max_deflection_mm (native:
-        member deflection relative to its supports; max_displacement_mm is the absolute
-        maximum), deflection_limit_mm, utilization_ratio, max_stress_mpa, yield_stress_mpa,
-        span_m, analysis_method ("native"|"api"|"template"|"rule_based"), reactions_kn
+        the governing member's deflection relative to its supports, i.e. the largest
+        deflection / limit; for beam/frame every member is checked against its own span,
+        named in governing_deflection {member, span_m, limit_mm}; largest_deflection_mm and
+        max_displacement_mm, the absolute maximum, alongside), deflection_limit_mm and span_m
+        (the governing member's), utilization_ratio, max_stress_mpa, yield_stress_mpa,
+        analysis_method ("native"|"api"|"template"|"rule_based"), reactions_kn
         (total vertical reaction, api path only), and per_element_utilization —
         a list of {source_guids, utilization} entries (utilization 1.0 = at
         capacity) keyed back to the Rhino objects that produced each element.

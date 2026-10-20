@@ -107,11 +107,28 @@ axes polygonized identically. `almond_mcp/native_structure.py` then applies:
 
 - **Supports:** declared Rhino points (snapped to the nearest node within 50 mm), else
   every lowest-Z node. `fixed_supports=False` pins them (translations only).
-- **Loads:** `load_kn` shared equally by the free nodes, acting downward; self weight
-  γ·A along every member unless `self_weight=False`.
-- **Deflection limit:** span/250. Span = longest member for beam/frame, else overall
-  extent; `span_m` overrides it when members are split at every node (a 6.2 m joist
-  drawn as two 3.1 m segments).
+- **Curved members:** the bridge polylines curves to the document tolerance (1 mm), often
+  dozens of vertices per piece. Each smooth run is analysed as equal chords within 1/500 of
+  its length of the curve, turning at most 0.1 rad each, at most 24 per piece
+  (`CURVE_SAGITTA_RATIO`, `MAX_CURVE_TURN`, `MAX_CURVE_SEGMENTS`; `curve_ratio=None` keeps
+  every vertex). The chords of one run are one member for the EN 1993 checks. A 336-piece
+  diagrid vault exported with 15,456 vertices solves at 1,197 nodes; on a smaller vault the
+  results stay within 0.1 % of a 16-chords-per-piece reference.
+- **Size:** before assembling, the DOF count (after the x4 stability split of compressed
+  members) is checked against 18,000 DOF and the free memory; a larger model returns
+  `status: "error"` ("Model too large for the dense solver: N nodes ... X GB") with
+  `results.model_size`, never a `MemoryError`.
+- **Loads:** `load_kn` shared equally by the free joints (where members meet or end; the
+  vertices along a curve are not joints), acting downward; a curve only between supports
+  (a lone arch) carries it as a uniform line load. Self weight γ·A along every member
+  unless `self_weight=False`.
+- **Deflection limit:** span/250. For beam/frame every member is checked against its own
+  span: the drawn member (one curve or line, however it was split at joints, plus pieces
+  carrying on in line) between the points that support it, twice the overhang for a
+  cantilever. The governing member (largest deflection/limit) is named in the verdict and
+  in `results.governing_deflection`; `max_deflection_mm` and `deflection_limit_mm` are
+  its values, `largest_deflection_mm` the largest of any member. Other structure types
+  use the overall extent; `span_m` overrides either.
 - **Member checks (EN 1993-1-1, `almond_mcp/ec3.py`), per member** (the member between its
   joints, whatever the analysis split it into), for every ULS combination:
   - **Section class** from Table 5.2 for the actual stresses, with ε = √(235/f_y):
