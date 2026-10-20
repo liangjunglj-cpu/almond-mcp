@@ -22,13 +22,19 @@ so the two engines are comparable:
   as equal chords within its length / CURVE_SAGITTA_RATIO of the curve, turning at most
   MAX_CURVE_TURN each, at most MAX_CURVE_SEGMENTS (``simplify_curve``), and is one member for the
   EN 1993 checks;
-- size: a model beyond the dense solver (MAX_DENSE_DOF, or the free memory, counting the stability
-  refinement) is refused with an error result before assembly (``check_size``);
+- size: the dense solver works within a fixed memory budget (DENSE_BUDGET_GB, so a model's verdict does
+  not depend on what else is open). Before assembly the worst case (every bending member compressed
+  and refined for stability) is estimated; over budget, curved members are coarsened, then the
+  stability refinement is reduced, and only a model that still does not fit is refused with an
+  error result (``check_size``);
 - deflection limit: span / the design code's ratio (250 for the Eurocode profile); for beam/frame
   every member against its own span: the drawn member (one curve or line, however split at joints,
   and the pieces carrying on in line) between the points that support it, twice the overhang for a
-  cantilever; else the overall extent, unless the caller names the structural span. The deflection
-  checked is each member's deflection relative to what supports it (``member_deflection_spans``),
+  cantilever; a surface-like frame (vault, gridshell, arch: ``is_surface``) instead gets a global check
+  (largest node displacement against the span between its supports) and a local one (each member's
+  sag between its joints against its length), ``surface_deflections``; other types the overall
+  extent; the caller's span overrides. The member deflection checked is each member's deflection
+  relative to what supports it (``member_deflection_spans``),
   so column shortening in a tall frame or rigid-body sway does not count as beam deflection; the
   governing member (largest deflection / limit) is named in the verdict, the largest deflection and
   the absolute maximum displacement are reported alongside;
@@ -74,7 +80,9 @@ ASSUMPTIONS = [
     "Deflection checked per member relative to its supports (beam ends on columns, a cantilever's root, a truss "
     "chord's end posts), not the absolute displacement: column shortening and rigid-body sway are excluded. "
     "For beam/frame each member is checked against its own span between those supports (a cantilever: twice "
-    "its length). Storey drift is not checked.",
+    "its length); a frame working as a surface (vault, gridshell, arch, no columns) is checked globally (largest "
+    "displacement against the span between its supports) and locally (member sag between its joints). Storey "
+    "drift is not checked.",
     "Member checks per member (EN 1993-1-1): section class from Table 5.2 for the actual stresses "
     "(Class 4 flagged as not covered); cross-section 6.2.1(7) with elastic moduli (plastic only for "
     "Class 1/2 when plastic design is requested); flexural buckling about both axes (6.3.1, curves "
@@ -154,8 +162,10 @@ MAX_CURVE_SEGMENTS = 24    # ...and at most this many straight elements per curv
 MAX_CURVE_TURN = 0.1       # rad: ...and each chord turns at most this much (long, strongly curved runs)
 SMOOTH_COS = math.cos(0.15)  # a polyline turning more than ~8.6 degrees at a vertex has a corner there (the
                            # bridge polylines curves with at most 0.1 rad per vertex)
-MAX_DENSE_DOF = 18_000     # the dense solver's practical limit (stability eigenvalues take minutes beyond)
-DENSE_COPIES = {"linear": 4, "stability": 10}   # n x n float64 matrices alive at once (K, factor, inverse, K_G, ...)
+DENSE_BUDGET_GB = 6.0      # memory the dense matrices may take: fixed, so the verdict is the model's alone
+DENSE_COPIES = {"linear": 6, "stability": 10}   # measured peaks in n x n float64 matrices: assembly (K, K_ff,
+                           # factor, inverse, index copies) 5.9; alpha_cr (+ K_G and its eigenproblem) 9.7
+CURVE_FALLBACK_SEGMENTS = (8, 4, 2, 1)   # coarser curves, tried in turn when a model exceeds the budget
 
 
 class ModelTooLargeError(ValueError):
@@ -183,25 +193,38 @@ def _available_memory() -> float:
         return 0.0
 
 
-def check_size(nodes: int, elements: int, stage: str = "linear", memory: float | None = None) -> dict:
-    """Refuse a model the dense solver cannot handle, before assembling it: ``stage`` "linear" (one
-    stiffness factorisation) or "stability" (also geometric stiffness and its eigenvalues, after the
-    compressed members are split). ``memory``: free bytes (default: measured). Raises
-    ModelTooLargeError carrying the size; returns the size otherwise."""
+def max_dof(stage: str = "linear") -> int:
+    """The most DOF a dense ``stage`` ("linear" or "stability") fits in DENSE_BUDGET_GB."""
+    return int(math.sqrt(DENSE_BUDGET_GB * 1e9 / (8.0 * DENSE_COPIES[stage])))
+
+
+def check_size(nodes: int, elements: int, stage: str = "linear", added: int = 0) -> dict:
+    """Refuse a model the dense solver cannot handle within its budget, before assembling it: ``stage``
+    "linear" (one stiffness factorisation) or "stability" (also geometric stiffness and its eigenvalues;
+    ``added`` of the nodes come from refining the compressed members). Raises ModelTooLargeError
+    carrying the size; returns the size, with the free memory for a warning, otherwise."""
     dof = 6 * int(nodes)
     need = DENSE_COPIES[stage] * 8.0 * dof ** 2
-    free = _available_memory() if memory is None else float(memory)
+    free = _available_memory()
     size = {"nodes": int(nodes), "elements": int(elements), "dof": dof, "stage": stage,
-            "memory_gb": round(need / 1e9, 2), "free_memory_gb": round(free / 1e9, 2) if free else None,
-            "max_dof": MAX_DENSE_DOF}
-    if dof <= MAX_DENSE_DOF and not (free and need > 0.8 * free):
+            "memory_gb": round(need / 1e9, 2), "budget_gb": DENSE_BUDGET_GB, "max_dof": max_dof(stage),
+            "free_memory_gb": round(free / 1e9, 2) if free else None}
+    if dof <= max_dof(stage):
         return size
-    what = f" after the x{STABILITY_SUBDIVISION} stability split of compressed members" if stage == "stability" else ""
-    hint = (" or run with stability='off' (no split)" if stage == "stability" else "")
+    what = f" ({added} added to refine compressed members for the stability check)" if added else ""
+    hint = " or run with stability='off'" if stage == "stability" else ""
     raise ModelTooLargeError(
         f"Model too large for the dense solver: {nodes} nodes / {elements} elements{what} = {dof} DOF, needing about "
-        f"{need / 1e9:.1f} GB" + (f" ({free / 1e9:.1f} GB free)" if free else "") + f"; the limit is {MAX_DENSE_DOF} "
-        f"DOF. Analyse fewer members at a time{hint}.", size)
+        f"{need / 1e9:.1f} GB against its {DENSE_BUDGET_GB:g} GB budget (at most {max_dof(stage)} DOF for the "
+        f"{stage} analysis). Analyse fewer members at a time{hint}.", size)
+
+
+def _memory_warning(size: dict) -> list[str]:
+    free = size.get("free_memory_gb")
+    if free and size["memory_gb"] > 0.8 * free:
+        return [f"The analysis needs about {size['memory_gb']:.1f} GB and {free:.1f} GB is free now: it may be slow "
+                "(swapping). Close other programs if it takes long."]
+    return []
 
 
 def _turns(P: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
@@ -533,6 +556,7 @@ def build_frame(model: dict, load_kn: float, material: str = "Steel", fixed_supp
     if self_weight:
         frame.gravity = (0.0, 0.0, -1.0)
     info = {"support_nodes": support_nodes, "support_labels": {n: chosen[n][2] for n in support_nodes},
+            "curved_pieces": curved_pieces,
             "loaded_nodes": free if load_kn > 0 else [], "material": mat,
             "connections": {"mode": connections, "pinned_ends": pinned_ends, "user_released_members": user_members}}
     if floor_loads and (floor_loads.get("imposed") or floor_loads.get("dead")):
@@ -758,10 +782,7 @@ def _drawn_members(model: dict, frame) -> dict:
     """{source GUIDs: (id, element indices)} per drawn member, in element order; id = the curve's name or Mn
     (the ids member_table and the deflection verdict use)."""
     names = {tuple(m.get("source_guids") or []): m.get("name") for m in model.get("members") or []}
-    groups: dict = {}
-    for i, e in enumerate(frame.elements):
-        groups.setdefault(tuple(e.tag or []), []).append(i)
-    return {key: (names.get(key) or f"M{n}", idx) for n, (key, idx) in enumerate(groups.items(), start=1)}
+    return {key: (names.get(key) or f"M{n}", idx) for n, (key, idx) in enumerate(_tag_groups(frame).items(), start=1)}
 
 
 SPAN_FLOOR = 1e-3           # m: a span shorter than this (a station on a cantilever's root) checks nothing
@@ -778,6 +799,122 @@ def governing_deflection(deflections, spans, span: float | None = None) -> tuple
         if r[k] > best[0]:
             best = (float(r[k]), i, k, float(L[k]))
     return best[1:]
+
+
+def is_surface(frame) -> bool:
+    """A frame carried as a surface, not by a beam/column hierarchy (a vault, gridshell, arch or curved roof):
+    no straight near-vertical member, no taller than it is wide (not a tower), and at least half the member
+    length curved or inclined."""
+    X = np.asarray(frame.nodes, float)
+    if not len(X) or np.ptp(X[:, 2]) > max(np.ptp(X[:, 0]), np.ptp(X[:, 1])):
+        return False
+    total = shaped = 0.0
+    for idx in _tag_groups(frame).values():
+        nodes = sorted({n for i in idx for n in (frame.elements[i].n1, frame.elements[i].n2)})
+        P = X[nodes]
+        a = P[int(np.argmax(np.linalg.norm(P - P[0], axis=1)))]
+        b = P[int(np.argmax(np.linalg.norm(P - a, axis=1)))]
+        chord = float(np.linalg.norm(b - a))
+        length = sum(float(np.linalg.norm(X[frame.elements[i].n2] - X[frame.elements[i].n1])) for i in idx)
+        if chord <= 0:
+            continue
+        d = (b - a) / chord
+        off = P - a - np.outer((P - a) @ d, d)
+        straight = float(np.max(np.linalg.norm(off, axis=1))) <= 0.01 * chord
+        slope = abs(float(d[2]))
+        if straight and slope > 0.9:
+            return False                                # a column: the frame has a load path hierarchy
+        total += length
+        shaped += length if (not straight or 0.1 < slope) else 0.0
+    return total > 0 and shaped >= 0.5 * total
+
+
+def _tag_groups(frame) -> dict:
+    groups: dict = {}
+    for i, e in enumerate(frame.elements):
+        groups.setdefault(tuple(e.tag or []), []).append(i)
+    return groups
+
+
+def surface_deflections(frame, res) -> dict:
+    """Deflection of a surface-like frame, in two parts.
+
+    Global: the largest node displacement against the structure's span, twice the largest plan distance
+    from any node to its nearest support (the crown of a vault or arch: the distance between its supports;
+    an overhang: twice its reach). Local: every member's sag between its own joints (relative to the chord
+    through its displaced ends) against its length between them. Returns {"global": (node, displacement m,
+    span m), "local": (element, station, sag m, length m)}, the local one with the largest sag / length."""
+    X = np.asarray(frame.nodes, float)
+    U = res.displacements[:, :3]
+    sup = [n for n in frame.supports if frame.vertically_supported(n)] or list(frame.supports)
+    free = [n for n in range(len(X)) if n not in frame.supports]
+    best_g = (None, 0.0, 0.0)
+    if sup and free:
+        reach = np.min(np.linalg.norm(X[free][:, None, :2] - X[sup][None, :, :2], axis=2), axis=1)
+        u = np.linalg.norm(U[free], axis=1)
+        k = int(np.argmax(u))
+        best_g = (free[k], float(u[k]), 2.0 * float(np.max(reach)))
+    best_l = (-1.0, None, 0, 0.0, 0.0)
+    for idx in ec3.groups(frame).values():              # the member between its joints, however refined
+        ends = [frame.elements[i].n1 for i in idx] + [frame.elements[i].n2 for i in idx]
+        A = max(ends, key=lambda n: np.linalg.norm(X[n] - X[ends[0]]))
+        B = max(ends, key=lambda n: np.linalg.norm(X[n] - X[A]))
+        c = X[B] - X[A]
+        L = float(np.linalg.norm(c))
+        if L <= SPAN_FLOOR:
+            continue
+        axis = c / L
+        for i in idx:
+            er = res.elements[i]
+            t = np.clip((er.stations - X[A]) @ axis / L, 0.0, 1.0)
+            rel = er.disp - (np.outer(1 - t, U[A]) + np.outer(t, U[B]))
+            sag = np.linalg.norm(rel - np.outer(rel @ axis, axis), axis=1)
+            k = int(np.argmax(sag))
+            if sag[k] / L > best_l[0]:
+                best_l = (float(sag[k] / L), i, k, float(sag[k]), L)
+    return {"global": best_g, "local": best_l[1:]}
+
+
+def deflection_check(model: dict, frame, res, structure_type: str = "frame", span_m: float | None = None) -> dict:
+    """What the SLS deflection is checked against, and the governing deflection.
+
+    span_m given: every member's deflection against it ("user"). beam/frame: a surface-like frame
+    (is_surface) gets the global and local checks of surface_deflections ("surface"); otherwise each
+    member against its own span (member_deflection_spans, "member"). Other types: the overall extent.
+    Returns {basis, kind (member | global | local), span, deflection (m), largest (m), element, node,
+    deflections, spans}."""
+    deflections, spans = member_deflection_spans(frame, res)
+    largest = max(float(np.max(d)) for d in deflections)
+    out = {"deflections": deflections, "spans": spans, "largest": largest, "node": None, "kind": "member"}
+    if not span_m and structure_type in ("beam", "frame") and is_surface(frame):
+        sd = surface_deflections(frame, res)
+        gn, gu, gspan = sd["global"]
+        le, lk, lsag, llen = sd["local"]
+        gspan = gspan if gspan > SPAN_FLOOR else 0.0
+        out["surface"] = {"global": {"node_m": [round(float(v), 4) for v in frame.nodes[gn]] if gn is not None else None,
+                                     "deflection_mm": round(gu * 1000, 3), "span_m": round(gspan, 3)},
+                          "local": {"element": le, "deflection_mm": round(lsag * 1000, 3), "span_m": round(llen, 3)}}
+        out["largest"] = max(gu, lsag)
+        if gn is not None and gspan and (le is None or gu / gspan >= lsag / llen):
+            el = next((i for i, e in enumerate(frame.elements) if gn in (e.n1, e.n2)), 0)
+            out.update(basis="surface", kind="global", span=gspan, deflection=gu, element=el, node=gn)
+        elif le is not None:
+            out.update(basis="surface", kind="local", span=llen, deflection=lsag, element=le)
+        if "basis" in out:
+            return out
+    if span_m:
+        span, basis = float(span_m), "user"
+    elif structure_type in ("beam", "frame"):
+        span, basis = 0.0, "member"
+    else:
+        span, basis = float(model.get("max_span_m") or 0.0), "extent"
+    if basis != "member" and span < 0.001:
+        span, basis = 5.0, "default"
+    gi, gk, span = governing_deflection(deflections, spans, None if basis == "member" else span)
+    if span <= SPAN_FLOOR:                                  # nothing deflects (or no measurable span)
+        span = float(model.get("max_member_span_m") or model.get("max_span_m") or 5.0)
+    out.update(basis=basis, span=span, deflection=float(deflections[gi][gk]), element=gi)
+    return out
 
 
 def member_table(model: dict, frame, sls, envelope, deflections=None, spans=None) -> list[dict]:
@@ -933,12 +1070,59 @@ def subdivide(frame, parts: int, only: set | None = None) -> None:
             tail = len(frame.elements) - 1
 
 
-def _refine_compressed(frame, compressed: set) -> None:
-    """Subdivide the compressed members for the geometric stiffness, if the refined model still fits."""
-    plan = _split_plan(frame, STABILITY_SUBDIVISION, compressed)
-    added = sum(k - 1 for k in plan.values())
-    check_size(len(frame.nodes) + added, len(frame.elements) + added, "stability")
-    subdivide(frame, STABILITY_SUBDIVISION, compressed)
+def _refine_compressed(frame, compressed: set | None) -> tuple[int, dict]:
+    """Subdivide the compressed members (None: every bending member) for the geometric stiffness, into
+    STABILITY_SUBDIVISION elements per member, fewer (down to 2) if that would exceed the budget.
+    Returns (elements per member, size); raises ModelTooLargeError if even 2 do not fit."""
+    for parts in range(STABILITY_SUBDIVISION, 1, -1):
+        added = sum(k - 1 for k in _split_plan(frame, parts, compressed).values())
+        if 6 * (len(frame.nodes) + added) <= max_dof("stability") or parts == 2:
+            size = check_size(len(frame.nodes) + added, len(frame.elements) + added, "stability", added)
+            subdivide(frame, parts, compressed)
+            return parts, size
+
+
+def _worst_dof(frame, parts: int) -> int:
+    """DOF of the analysis if every bending member were compressed and refined into ``parts`` (0: as built)."""
+    return 6 * (len(frame.nodes) + sum(k - 1 for k in _split_plan(frame, parts).values()))
+
+
+def build_within_budget(model: dict, *args, stability: bool = True, curve_ratio=CURVE_SAGITTA_RATIO,
+                        max_curve_segments: int = MAX_CURVE_SEGMENTS):
+    """build_frame (``args`` as there, after model) with curved members coarsened (CURVE_FALLBACK_SEGMENTS chords
+    per piece at most) until the worst case of the analysis fits the dense solver's budget: every bending
+    member compressed and refined into STABILITY_SUBDIVISION elements, else 3, else 2 (a run of k chords
+    needs no more than that refinement, so curves are not coarsened below it). Deterministic: the same
+    model always gets the same discretisation. Raises ModelTooLargeError when even the first-order
+    analysis cannot fit."""
+    caps = [max_curve_segments] + [c for c in CURVE_FALLBACK_SEGMENTS if c < max_curve_segments]
+    built: dict = {}
+
+    def build(cap):
+        if cap not in built:
+            built[cap] = build_frame(model, *args, curve_ratio=curve_ratio, max_curve_segments=cap)
+        return built[cap]
+
+    chosen = None
+    for parts in range(STABILITY_SUBDIVISION, 1, -1) if stability else (0,):
+        for cap in [c for c in caps if c >= parts] or caps[:1]:
+            frame, info, _ = build(cap)
+            if _worst_dof(frame, parts) <= max_dof("stability" if parts else "linear"):
+                chosen = cap
+                break
+            if not info["curved_pieces"]:
+                break
+        if chosen is not None:
+            break
+    if chosen is None:              # the worst case never fits: the refinement of what is actually compressed decides
+        fallback = [c for c in caps if c <= 2] or caps[-1:]
+        chosen = next((c for c in fallback if 6 * len(build(c)[0].nodes) <= max_dof("linear")), fallback[-1])
+    frame, info, warnings = build(chosen)
+    if chosen != max_curve_segments and info["curved_pieces"]:
+        warnings = warnings + [f"Curved members were coarsened to at most {chosen} chord(s) per piece so the analysis "
+                               f"fits the dense solver's {DENSE_BUDGET_GB:g} GB budget ({len(frame.nodes)} nodes)."]
+    check_size(len(frame.nodes), len(frame.elements))
+    return frame, info, warnings
 
 
 def sway_imperfection(frame) -> dict:
@@ -989,7 +1173,7 @@ def _solve_design(frame, design_basis, uls, plastic=False, stations=11, stabilit
     code = design_profile(design_basis, design_code)
     frame.gamma_m = (code.gamma_M0, code.gamma_M1)
     sls, ulss = combinations(design_basis, uls, code)
-    check_size(len(frame.nodes), len(frame.elements))
+    size = check_size(len(frame.nodes), len(frame.elements))
     if (stability or "auto").lower() == "off":
         res = fs.solve_combinations(frame, {sls[0]: sls[1], **dict(ulss)}, stations=stations, plastic=plastic)
         members = ec3.groups(frame)
@@ -999,7 +1183,9 @@ def _solve_design(frame, design_basis, uls, plastic=False, stations=11, stabilit
         for i in range(len(frame.elements)):
             best = max(((res[n].elements[i].utilization, n) for n, _ in ulss), key=lambda t: t[0])
             envelope.append((best[0], best[1], res[best[1]].elements[i]))
-        return res[sls[0]], [(n, f, res[n]) for n, f in ulss], envelope, {"mode": "off", "method": "first-order"}
+        return res[sls[0]], [(n, f, res[n]) for n, f in ulss], envelope, {"mode": "off", "method": "first-order",
+                                                                          "dense_size": size,
+                                                                          "warnings": _memory_warning(size)}
     if (stability or "").lower() != "auto":
         raise ValueError("stability must be 'auto' or 'off'.")
     # buckling needs interior nodes in the compression members: refine those (in place), then re-assemble
@@ -1009,15 +1195,19 @@ def _solve_design(frame, design_basis, uls, plastic=False, stations=11, stabilit
         N = fs.axial_forces(asm, factors)
         if N.size and N.min() < 0:
             compressed |= {i for i in range(len(N)) if N[i] < 0.01 * N.min()}
+    parts, notes = STABILITY_SUBDIVISION, []
     if compressed:
-        _refine_compressed(frame, compressed)
+        parts, size = _refine_compressed(frame, compressed)
         asm = fs.prepare(frame)
+        if parts < STABILITY_SUBDIVISION:
+            notes.append(f"Compressed members were refined into {parts} elements each for alpha_cr (not "
+                         f"{STABILITY_SUBDIVISION}) to fit the dense solver's budget: alpha_cr may be ~1 % high.")
     members = ec3.groups(frame)
     sls_res = fs.solve_linear(asm, sls[1], stations=stations, plastic=plastic)
     ec3.apply(frame, sls_res, members, plastic, fabrication)
     imp = sway_imperfection(frame)
     report = {"mode": "auto", "alpha_cr": {}, "sway_imperfection": imp, "second_order": [], "iterations": 0,
-              "elements_per_member": STABILITY_SUBDIVISION}
+              "elements_per_member": parts, "dense_size": size, "warnings": notes + _memory_warning(size)}
     variants = []                                           # (name, factors, result)
     for name, factors in ulss:
         alpha, _ = fs.critical_load_factor(asm, factors)
@@ -1083,18 +1273,21 @@ def view_result(model: dict, load_kn: float = 10.0, material: str = "Steel", fix
 def _view_result(model, load_kn, material, fixed_supports, self_weight, diameter_mm, wall_mm, span_m, stations,
                  asset_loads, floor_loads, design_basis, uls, connections, stability, view, design_code, fabrication,
                  curve_ratio, max_curve_segments):
-    frame, info, warnings = build_frame(model, load_kn, material, fixed_supports, self_weight, diameter_mm, wall_mm,
-                                        asset_loads, floor_loads, connections, curve_ratio, max_curve_segments)
     want_mode = (view or "deflection").lower() == "buckling"
+    frame, info, warnings = build_within_budget(model, load_kn, material, fixed_supports, self_weight, diameter_mm,
+                                                wall_mm, asset_loads, floor_loads, connections,
+                                                stability=want_mode or (stability or "auto").lower() != "off",
+                                                curve_ratio=curve_ratio, max_curve_segments=max_curve_segments)
     if (view or "deflection").lower() not in ("deflection", "buckling"):
         raise ValueError("view must be 'deflection' or 'buckling'.")
     code = design_profile(design_basis, design_code)
     res, ulss, envelope, stab = _solve_design(frame, design_basis, uls, stations=stations,
                                               stability="off" if want_mode else stability, design_code=code,
                                               fabrication=_fabrication(fabrication))
+    warnings += stab.pop("warnings", [])
     span = float(span_m or 0.0)
-    if not span and not want_mode:                          # the member whose deflection / span is largest
-        span = governing_deflection(*member_deflection_spans(frame, res))[2]
+    if not span and not want_mode:                          # the governing deflection's span
+        span = deflection_check(model, frame, res)["span"]
     if span <= SPAN_FLOOR:
         span = float(model.get("max_member_span_m") or model.get("max_span_m") or 5.0)
     buckling = None
@@ -1161,14 +1354,17 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
               "results": {"analysis_method": "native"}}
     t0 = time.perf_counter()
     try:
-        frame, info, notes = build_frame(model, load_kn, material, fixed_supports, self_weight, diameter_mm, wall_mm,
-                                         asset_loads, floor_loads, connections, curve_ratio, max_curve_segments)
+        frame, info, notes = build_within_budget(model, load_kn, material, fixed_supports, self_weight, diameter_mm,
+                                                 wall_mm, asset_loads, floor_loads, connections,
+                                                 stability=(stability or "auto").lower() != "off",
+                                                 curve_ratio=curve_ratio, max_curve_segments=max_curve_segments)
         result["warnings"] += notes
         code = design_profile(design_basis, design_code)
         result["design_code"] = code.summary()
         result["warnings"] += _code_warnings(code, uls, info)
         res, ulss, envelope, stab = _solve_design(frame, design_basis, uls, plastic=plastic, stability=stability,
                                                   design_code=code, fabrication=_fabrication(fabrication))
+        result["warnings"] += stab.pop("warnings", [])
     except InstabilityError as exc:
         result["verdict"] = METHOD_PREFIX + f"FAILED: {exc}"
         result["status"] = "fail"
@@ -1210,26 +1406,20 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
     limit_ratio = float(limit_ratio or code.deflection_limit_ratio)
     if mat.family in INDICATIVE_FAMILIES:
         result["confidence"] = "low"
-    deflections, spans = member_deflection_spans(frame, res)
-    dmax_mm = max(float(np.max(d)) for d in deflections) * 1000.0
-    # the span each deflection is checked against: the user's, each member's own (beam, frame), else the extent
-    if span_m:
-        span, basis = float(span_m), "user"
-    elif structure_type in ("beam", "frame"):
-        span, basis = 0.0, "member"
-    else:
-        span, basis = float(model.get("max_span_m") or 0.0), "extent"
-    if basis != "member" and span < 0.001:
-        span, basis = 5.0, "default"
-    gi, gk, span = governing_deflection(deflections, spans, None if basis == "member" else span)
-    if span <= SPAN_FLOOR:                                  # nothing deflects (or no measurable span)
-        span = float(model.get("max_member_span_m") or model.get("max_span_m") or 5.0)
-    dcheck_mm = float(deflections[gi][gk]) * 1000.0
+    dc = deflection_check(model, frame, res, structure_type, span_m)
+    deflections, spans, span, basis, gi = dc["deflections"], dc["spans"], dc["span"], dc["basis"], dc["element"]
+    dmax_mm, dcheck_mm = dc["largest"] * 1000.0, dc["deflection"] * 1000.0
     limit_mm = span * 1000.0 / limit_ratio
     drawn = _drawn_members(model, frame)
     gtag = tuple(frame.elements[gi].tag or [])
     gname = drawn.get(gtag, (None,))[0] or f"element {gi}"
-    where = f" in member {gname}" + (f" (span {span:.2f} m)" if basis == "member" else "")
+    if dc["kind"] == "global":
+        at = ", ".join(f"{v:.2f}" for v in frame.nodes[dc["node"]])
+        where = f" at ({at}) on member {gname} (global, span {span:.2f} m between the supports either side)"
+    elif dc["kind"] == "local":
+        where = f" in member {gname} (local sag over its {span:.2f} m between joints)"
+    else:
+        where = f" in member {gname}" + (f" (span {span:.2f} m)" if basis == "member" else "")
     umax = max(u for u, _, _ in envelope)
     governing = max(envelope, key=lambda t: t[0])[1]
     stress = max(er.util_detail.get("max_stress_mpa", 0.0) for _, _, er in envelope)
@@ -1242,15 +1432,21 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
     r = result["results"]
     r.update({
         "max_deflection_mm": round(dcheck_mm, 3), "largest_deflection_mm": round(dmax_mm, 3),
-        "deflection_measure": "member, relative to its supports",
-        "governing_deflection": {"member": gname, "source_guids": list(gtag), "deflection_mm": round(dcheck_mm, 3),
+        "deflection_measure": ("surface: node displacement against the span between supports (global) and member "
+                               "sag between its joints (local)" if basis == "surface" else
+                               "member, relative to its supports"),
+        "governing_deflection": {"member": gname, "source_guids": list(gtag), "kind": dc["kind"],
+                                 "node_m": [round(float(v), 4) for v in frame.nodes[dc["node"]]]
+                                 if dc["node"] is not None else None,
+                                 "deflection_mm": round(dcheck_mm, 3),
                                  "span_m": round(span, 3), "limit_mm": round(limit_mm, 3),
                                  "utilization": round(dcheck_mm / limit_mm, 4) if limit_mm > 0 else None},
         "max_displacement_mm": round(res.max_displacement * 1000.0, 3),
         "displacement_available": True, "utilization_available": True,
         "deflection_limit_mm": round(limit_mm, 3), "utilization_ratio": round(umax, 4),
         "max_stress_mpa": round(stress, 2), "yield_stress_mpa": mat.fy / 1000.0, "span_m": round(span, 3),
-        "span_basis": basis, "reactions_kn": round(float(res.reactions[:, 2].sum()), 3),
+        "span_basis": basis, **({"surface_deflection": dc["surface"]} if "surface" in dc else {}),
+        "reactions_kn": round(float(res.reactions[:, 2].sum()), 3),
         "design_basis": (design_basis or "en1990").lower(),
         "deflection_combination": SLS[0], "utilization_combination": governing,
         "combinations": [{"name": SLS[0], "factors": SLS[1], "max_deflection_mm": round(dmax_mm, 3),

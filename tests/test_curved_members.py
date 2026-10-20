@@ -146,17 +146,22 @@ def test_oversize_model_returns_an_error_result_instead_of_raising():
     assert out["status"] == "error" and out["passed"] is False
     assert "too large for the dense solver" in out["verdict"] and "3136 nodes" in out["verdict"]
     size = out["results"]["model_size"]
-    assert size["dof"] == 6 * 3136 > ns.MAX_DENSE_DOF and size["memory_gb"] > 1
+    assert size["dof"] == 6 * 3136 > ns.max_dof("linear") and size["memory_gb"] > 1
     with pytest.raises(ns.ModelTooLargeError):
         ns.view_result(model, 100.0)
 
 
-def test_size_check_counts_the_stability_split_and_free_memory():
-    assert ns.check_size(1000, 1500, "linear", memory=64e9)["dof"] == 6000
-    with pytest.raises(ns.ModelTooLargeError, match="stability split"):
-        ns.check_size(3100, 4000, "stability", memory=64e9)                     # 18,600 DOF
-    with pytest.raises(ns.ModelTooLargeError, match="GB free"):
-        ns.check_size(2000, 3000, "stability", memory=4e9)                      # 11 GB needed, 4 GB free
+def test_size_gate_is_a_fixed_budget_not_the_free_memory(monkeypatch):
+    """The same model is analysed or refused whatever else is open; low free memory only warns."""
+    assert ns.max_dof("stability") < ns.max_dof("linear")
+    nodes = ns.max_dof("stability") // 6
+    for free in (1e9, 1e12):
+        monkeypatch.setattr(ns, "_available_memory", lambda free=free: free)
+        size = ns.check_size(nodes, nodes, "stability")
+        assert size["dof"] <= ns.max_dof("stability")
+        assert bool(ns._memory_warning(size)) == (free == 1e9)
+        with pytest.raises(ns.ModelTooLargeError, match="added to refine compressed members"):
+            ns.check_size(nodes + 10, nodes, "stability", added=10)
 
 
 def test_out_of_memory_is_an_error_result_not_an_exception(monkeypatch):
@@ -227,3 +232,87 @@ def test_cantilever_span_is_twice_the_overhang():
 def test_user_span_still_overrides():
     out = ns.validate(rib_vault(4), "frame", 10.0, span_m=6.2)
     assert out["results"]["span_basis"] == "user" and out["results"]["deflection_limit_mm"] == pytest.approx(24.8)
+
+
+def test_curved_vault_over_the_budget_is_coarsened_and_validates(monkeypatch):
+    """Over budget, curves are coarsened (deterministically) before anything is assembled, instead of refusing."""
+    model = diagrid_vault(12)
+    full, _, _ = ns.build_frame(model, 10.0)
+    monkeypatch.setattr(ns, "DENSE_BUDGET_GB", ns.DENSE_COPIES["stability"] * 8.0 * (6 * 150) ** 2 / 1e9)
+    assert ns._worst_dof(full, ns.STABILITY_SUBDIVISION) > ns.max_dof("stability")                  # the default chords do not fit
+    out = ns.validate(model, "frame", 1.5 * 10.4 * 6.0)
+    assert out["status"] == "pass", out["verdict"]
+    assert any("coarsened to at most" in w for w in out["warnings"])
+    assert out["results"]["nodes"] * 6 <= ns.max_dof("stability")
+    assert out["results"]["stability"]["elements_per_member"] == ns.STABILITY_SUBDIVISION
+
+
+def test_stability_refinement_is_reduced_before_refusing(monkeypatch):
+    """Straight members cannot be coarsened: their stability split drops to 3 or 2 elements to fit."""
+    lines = [((0, 0, 0), (0, 0, 4)), ((6, 0, 0), (6, 0, 4)), ((0, 0, 4), (6, 0, 4)), ((0, 0, 0), (6, 0, 4))]
+    sec = {"shape": "circular_hollow", "diameter": 0.2191, "wall": 0.008}
+    model = {"members": [{"source_guids": [f"m{i}"], "points": [list(a), list(b)], "section": sec}
+                         for i, (a, b) in enumerate(lines)],
+             "anchor_points": [[0, 0, 0], [6, 0, 0]], "tolerance_m": 0.001, "max_member_span_m": 6,
+             "max_span_m": 6, "warnings": []}
+    full = ns.validate(model, "frame", 50.0)
+    monkeypatch.setattr(ns, "DENSE_BUDGET_GB", ns.DENSE_COPIES["stability"] * 8.0 * (6 * 8) ** 2 / 1e9)
+    small = ns.validate(model, "frame", 50.0)
+    assert full["results"]["stability"]["elements_per_member"] == 4
+    assert small["results"]["stability"]["elements_per_member"] in (2, 3)
+    assert any("refined into" in w for w in small["warnings"])
+    a, b = small["results"]["stability"]["min_alpha_cr"], full["results"]["stability"]["min_alpha_cr"]
+    assert a == pytest.approx(b, rel=0.05)
+
+
+def test_vault_deflection_is_global_against_its_span_and_local_between_joints():
+    """A diagrid vault carries load as a surface: its crown deflection is judged against the span between the
+    supports either side (~2R), and each diagonal only on its own sag between joints."""
+    out = ns.validate(diagrid_vault(12), "frame", 1.5 * 10.4 * 6.0, detail=True)
+    r = out["results"]
+    assert r["span_basis"] == "surface"
+    g, sd = r["governing_deflection"], r["surface_deflection"]
+    assert g["kind"] in ("global", "local") and ("global" in out["verdict"] or "local sag" in out["verdict"])
+    assert sd["global"]["span_m"] == pytest.approx(2 * 5.2, rel=0.05)           # the vault span, not a piece
+    assert sd["local"]["span_m"] < 3.0                                          # a diagonal between two joints
+    assert r["max_deflection_mm"] == g["deflection_mm"] and r["deflection_limit_mm"] == g["limit_mm"]
+
+
+def test_frames_with_columns_and_flat_grids_keep_the_member_check():
+    sec = {"shape": "circular_hollow", "diameter": 0.2191, "wall": 0.008}
+    lines = [((0, 0, 0), (0, 0, 4)), ((6, 0, 0), (6, 0, 4)), ((0, 0, 4), (6, 0, 4))]
+    portal = {"members": [{"source_guids": [f"m{i}"], "points": [list(a), list(b)], "section": sec}
+                          for i, (a, b) in enumerate(lines)],
+              "anchor_points": [[0, 0, 0], [6, 0, 0]], "tolerance_m": 0.001, "max_member_span_m": 6,
+              "max_span_m": 6, "warnings": []}
+    assert ns.validate(portal, "frame", 20.0)["results"]["span_basis"] == "member"
+    frame, _, _ = ns.build_frame(rib_vault(4), 10.0)
+    assert ns.is_surface(frame)
+    tower = [((0, 0, 0), (0, 0, 30)), ((8, 0, 0), (8, 0, 30)), ((0, 0, 30), (8, 0, 30))]
+    frame, _, _ = ns.build_frame({"members": [{"source_guids": [f"t{i}"], "points": [list(a), list(b)]}
+                                              for i, (a, b) in enumerate(tower)], "tolerance_m": 0.001}, 0.0)
+    assert not ns.is_surface(frame)
+
+
+def test_curved_member_moments_are_continuous_in_the_member_axes():
+    """Each chord reports moments in its own turned axes; the member check reads them in the member's
+    chord axes, where the moment vector is continuous through the joints between chords (no false kinks
+    that would set Table B.3's Cm to 1.0)."""
+    from almond_mcp import ec3
+    frame, _, _ = ns.build_frame(rib_vault(24), 30.0, max_curve_segments=4)
+    res = fs.solve(frame, combination={"G": 1.35, "Q": 1.5})
+    X = np.asarray(frame.nodes)
+    checked = 0
+    for idx in ec3.groups(frame).values():
+        if len(idx) < 2:
+            continue
+        ers = [res.elements[i] for i in idx]
+        A, B = X[frame.elements[idx[0]].n1], X[frame.elements[idx[-1]].n2]
+        My, Mz = ec3._member_moments(frame, idx, ers, A, B)
+        n = len(ers[0].My)
+        peak = max(float(np.max(np.abs(My))), float(np.max(np.abs(Mz))), 1e-9)
+        for k in range(1, len(ers)):                    # end of one chord vs start of the next
+            assert abs(My[k * n - 1] - My[k * n]) < 1e-6 * peak + 1e-9
+            assert abs(Mz[k * n - 1] - Mz[k * n]) < 1e-6 * peak + 1e-9
+        checked += 1
+    assert checked >= 7 * 6
