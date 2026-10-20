@@ -88,7 +88,7 @@ The workspace is split into five tabs. **Run** and its status line stay in view 
 | | Support locations | Points, else lowest nodes | *Require selected points* refuses a model without support points. |
 | **Code** | Design code, ULS expression | Eurocode, code default | A National Annex profile you added, or *Off* for unfactored comparisons. |
 | | Stability | αcr, sway imperfection, P-Δ | *Off · first order* only for comparisons. |
-| | Deflection span, limit | Blank: longest member, span/250 | The real span when beams are drawn in pieces, or a stricter limit such as 300. |
+| | Deflection span, limit | Blank: each member's own span between its supports, span/250 | One span to check every member against, or a stricter limit such as 300. |
 | | Steel tubes | Cold-formed · EN 10219 | *Hot-finished* only when the tubes are specified as EN 10210. |
 | **Results** | Viewport overlay | Deflected shape · utilization | Or *First buckling mode*. |
 
