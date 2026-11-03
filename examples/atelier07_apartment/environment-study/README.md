@@ -80,12 +80,23 @@ small rooms at 22 °C lose heat to cooler neighbours. The rooms' exchange balanc
 Envelope check against Approved Document L (England, OGL): walls 0.18, roof 0.15 and windows 1.10 pass
 the limits; the ground floor (0.22 against 0.18) does not.
 
-**Tropical variant (synthetic weather):** the same rooms and constructions on a *synthetic* tropical year at 1.35° N
-(a test fixture, not Singapore data) with cooling to the room set-points. The Singapore pack gives RETV
-11.28 W/m², under the 25 W/m² limit. The south and west façades reach about 22 W/m² each, with
-solar correction factors derived from the weather file. The double-height living room needs about 530 kWh/m² of
-cooling a year. This is indicative only, not a BCA Green Mark assessment. A run on a real Singapore EPW needs the
-file downloaded first.
+**Singapore variant:** the same rooms and constructions on Singapore weather (Changi Intl AP, TMYx 2011–2025
+from climate.onebuilding.org; download it yourself, it is not redistributed). The rooms are cooled to their
+set-points, with no heat recovery and no window ventilation.
+
+- **RETV:** 10.95 W/m², under the 25 W/m² limit. The south façade gives 22.9 W/m² and the west 19.3 W/m².
+- **Solar correction factors:** derived from the real weather file. East walls (1.26) see more sun than west (1.05)
+  because Singapore's afternoons are cloudier.
+- **Cooling:** the double-height living room needs about 450 kWh/m² a year, the kitchen 174, the bedroom 92 and
+  the study 86.
+- **Comfort:** cooling holds the *air* at 26 °C. The glass and wall surfaces stay warmer, so the operative
+  temperature in cooled rooms is above 26 °C almost all year. Hours above 28 °C operative are the useful figure:
+  none in the kitchen, hall or study, 250 in the bedroom and 2,781 in the living room. The living room's large area
+  of sun-warmed glass shows up there even with cooling.
+
+The same run on a synthetic tropical year at 1.35° N (a test fixture) gave RETV 11.28 W/m² and about 530 kWh/m²
+in the living room. Both runs are kept in `rooms_results.json`. They are indicative only, not a BCA Green Mark
+assessment.
 
 Board 04 (`A07-board-04-rooms-constructions.png`) shows:
 - the step strip;
