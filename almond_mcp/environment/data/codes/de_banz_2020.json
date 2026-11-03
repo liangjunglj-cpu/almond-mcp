@@ -1,0 +1,436 @@
+{
+ "pack": "de_banz_2020",
+ "source": "de-banz-2020",
+ "relation": "bundled",
+ "description": "Flat-rate U-values (W/m2K) for unrefurbished elements of existing German residential buildings by construction age band (Tables 2 and 3). For existing-stock baselines, not new-build requirements. null = no value given.",
+ "age_bands": [
+  "<=1918",
+  "1919-1948",
+  "1949-1957",
+  "1958-1968",
+  "1969-1978",
+  "1979-1983",
+  "1984-1994",
+  "1995-2001",
+  ">=2002"
+ ],
+ "window_age_bands": [
+  "<=1978",
+  "1979-1983",
+  "1984-1994",
+  "1995-2001",
+  ">=2002"
+ ],
+ "opaque": {
+  "roof_solid": {
+   "name": "Roof, solid construction (also walls between heated and unheated attic)",
+   "kind": "roof",
+   "u_values": {
+    "<=1918": 2.1,
+    "1919-1948": 2.1,
+    "1949-1957": 2.1,
+    "1958-1968": 1.3,
+    "1969-1978": 1.3,
+    "1979-1983": 0.6,
+    "1984-1994": 0.4,
+    "1995-2001": 0.3,
+    ">=2002": 0.2
+   }
+  },
+  "roof_timber": {
+   "name": "Roof, timber construction",
+   "kind": "roof",
+   "u_values": {
+    "<=1918": 2.6,
+    "1919-1948": 1.4,
+    "1949-1957": 1.4,
+    "1958-1968": 1.4,
+    "1969-1978": 0.8,
+    "1979-1983": 0.7,
+    "1984-1994": 0.5,
+    "1995-2001": 0.3,
+    ">=2002": 0.2
+   }
+  },
+  "top_ceiling_solid": {
+   "name": "Top floor ceiling, solid (also floors over outside air)",
+   "kind": "roof",
+   "u_values": {
+    "<=1918": 2.1,
+    "1919-1948": 2.1,
+    "1949-1957": 2.1,
+    "1958-1968": 2.1,
+    "1969-1978": 0.6,
+    "1979-1983": 0.6,
+    "1984-1994": 0.3,
+    "1995-2001": 0.3,
+    ">=2002": 0.2
+   }
+  },
+  "top_ceiling_timber": {
+   "name": "Top floor ceiling, timber joists",
+   "kind": "roof",
+   "u_values": {
+    "<=1918": 1.0,
+    "1919-1948": 1.0,
+    "1949-1957": 0.8,
+    "1958-1968": 0.7,
+    "1969-1978": 0.6,
+    "1979-1983": 0.4,
+    "1984-1994": 0.3,
+    "1995-2001": 0.3,
+    ">=2002": 0.2
+   }
+  },
+  "wall_two_leaf_uninsulated": {
+   "name": "External wall, two-leaf without insulation",
+   "kind": "wall_external",
+   "u_values": {
+    "<=1918": 1.3,
+    "1919-1948": 1.3,
+    "1949-1957": 1.3,
+    "1958-1968": 1.4,
+    "1969-1978": 1.0,
+    "1979-1983": 0.8,
+    "1984-1994": 0.6,
+    "1995-2001": 0.5,
+    ">=2002": 0.4
+   }
+  },
+  "wall_two_leaf_insulated": {
+   "name": "External wall, two-leaf with insulation",
+   "kind": "wall_external",
+   "u_values": {
+    "<=1918": null,
+    "1919-1948": null,
+    "1949-1957": 1.0,
+    "1958-1968": 0.9,
+    "1969-1978": 0.9,
+    "1979-1983": 0.7,
+    "1984-1994": 0.5,
+    "1995-2001": 0.5,
+    ">=2002": 0.4
+   }
+  },
+  "wall_solid_brick_upto_20cm": {
+   "name": "External wall, solid brick / dense stone / sand-lime up to 20 cm",
+   "kind": "wall_external",
+   "u_values": {
+    "<=1918": 2.8,
+    "1919-1948": 2.8,
+    "1949-1957": 2.8,
+    "1958-1968": null,
+    "1969-1978": null,
+    "1979-1983": null,
+    "1984-1994": null,
+    "1995-2001": null,
+    ">=2002": null
+   }
+  },
+  "wall_solid_brick_20_30cm": {
+   "name": "External wall, as above, 20-30 cm",
+   "kind": "wall_external",
+   "u_values": {
+    "<=1918": 1.8,
+    "1919-1948": 1.8,
+    "1949-1957": 1.8,
+    "1958-1968": null,
+    "1969-1978": null,
+    "1979-1983": null,
+    "1984-1994": null,
+    "1995-2001": null,
+    ">=2002": null
+   }
+  },
+  "wall_solid_brick_over_30cm": {
+   "name": "External wall, as above, over 30 cm",
+   "kind": "wall_external",
+   "u_values": {
+    "<=1918": 1.5,
+    "1919-1948": 1.5,
+    "1949-1957": 1.5,
+    "1958-1968": null,
+    "1969-1978": null,
+    "1979-1983": null,
+    "1984-1994": null,
+    "1995-2001": null,
+    ">=2002": null
+   }
+  },
+  "wall_perforated_brick": {
+   "name": "External wall, perforated brick / hollow pumice block or similar porous material",
+   "kind": "wall_external",
+   "u_values": {
+    "<=1918": 1.4,
+    "1919-1948": 1.4,
+    "1949-1957": 1.4,
+    "1958-1968": 1.4,
+    "1969-1978": 1.0,
+    "1979-1983": 0.8,
+    "1984-1994": 0.6,
+    "1995-2001": 0.5,
+    ">=2002": 0.4
+   }
+  },
+  "wall_other_solid_upto_20cm": {
+   "name": "External wall, other solid build-ups up to 20 cm",
+   "kind": "wall_external",
+   "u_values": {
+    "<=1918": 3.0,
+    "1919-1948": 3.0,
+    "1949-1957": 3.0,
+    "1958-1968": 1.4,
+    "1969-1978": 1.0,
+    "1979-1983": 0.8,
+    "1984-1994": 0.7,
+    "1995-2001": 0.7,
+    ">=2002": 0.4
+   }
+  },
+  "wall_other_solid_over_20cm": {
+   "name": "External wall, other solid build-ups over 20 cm, with any original insulation",
+   "kind": "wall_external",
+   "u_values": {
+    "<=1918": 2.2,
+    "1919-1948": 2.2,
+    "1949-1957": 2.2,
+    "1958-1968": 1.4,
+    "1969-1978": 1.0,
+    "1979-1983": 0.8,
+    "1984-1994": 0.6,
+    "1995-2001": 0.5,
+    ">=2002": 0.4
+   }
+  },
+  "wall_timber_insulated": {
+   "name": "External wall, solid timber or timber frame with insulating infill",
+   "kind": "wall_external",
+   "u_values": {
+    "<=1918": 0.5,
+    "1919-1948": 0.5,
+    "1949-1957": 0.5,
+    "1958-1968": 0.5,
+    "1969-1978": 0.5,
+    "1979-1983": 0.5,
+    "1984-1994": 0.4,
+    "1995-2001": 0.4,
+    ">=2002": 0.3
+   }
+  },
+  "wall_half_timbered_clay": {
+   "name": "External wall, half-timbered with clay infill, up to 25 cm",
+   "kind": "wall_external",
+   "u_values": {
+    "<=1918": 1.5,
+    "1919-1948": 1.5,
+    "1949-1957": 1.5,
+    "1958-1968": null,
+    "1969-1978": null,
+    "1979-1983": null,
+    "1984-1994": null,
+    "1995-2001": null,
+    ">=2002": null
+   }
+  },
+  "wall_half_timbered_brick": {
+   "name": "External wall, half-timbered with brick or stone infill, up to 25 cm",
+   "kind": "wall_external",
+   "u_values": {
+    "<=1918": 2.0,
+    "1919-1948": 2.0,
+    "1949-1957": 2.0,
+    "1958-1968": null,
+    "1969-1978": null,
+    "1979-1983": null,
+    "1984-1994": null,
+    "1995-2001": null,
+    ">=2002": null
+   }
+  },
+  "wall_timber_other": {
+   "name": "External wall, other timber construction",
+   "kind": "wall_external",
+   "u_values": {
+    "<=1918": 2.0,
+    "1919-1948": 2.0,
+    "1949-1957": 1.5,
+    "1958-1968": 1.4,
+    "1969-1978": 0.6,
+    "1979-1983": 0.5,
+    "1984-1994": 0.4,
+    "1995-2001": 0.4,
+    ">=2002": 0.3
+   }
+  },
+  "basement_ceiling_rc": {
+   "name": "Basement ceiling, solid reinforced concrete",
+   "kind": "floor_ground",
+   "u_values": {
+    "<=1918": 1.6,
+    "1919-1948": 1.6,
+    "1949-1957": 2.3,
+    "1958-1968": 1.0,
+    "1969-1978": 1.0,
+    "1979-1983": 0.8,
+    "1984-1994": 0.6,
+    "1995-2001": 0.6,
+    ">=2002": 0.5
+   }
+  },
+  "basement_ceiling_timber": {
+   "name": "Basement ceiling, timber joists",
+   "kind": "floor_ground",
+   "u_values": {
+    "<=1918": 1.0,
+    "1919-1948": 1.0,
+    "1949-1957": 1.0,
+    "1958-1968": 0.8,
+    "1969-1978": 0.6,
+    "1979-1983": 0.6,
+    "1984-1994": 0.4,
+    "1995-2001": 0.4,
+    ">=2002": 0.4
+   }
+  },
+  "basement_ceiling_brick": {
+   "name": "Basement ceiling, brick or hollow block",
+   "kind": "floor_ground",
+   "u_values": {
+    "<=1918": 1.2,
+    "1919-1948": 1.2,
+    "1949-1957": 1.5,
+    "1958-1968": 1.0,
+    "1969-1978": 1.0,
+    "1979-1983": 0.8,
+    "1984-1994": 0.6,
+    "1995-2001": 0.6,
+    ">=2002": 0.5
+   }
+  },
+  "ground_floor_rc": {
+   "name": "Floor on ground, solid reinforced concrete",
+   "kind": "floor_ground",
+   "u_values": {
+    "<=1918": 1.6,
+    "1919-1948": 1.6,
+    "1949-1957": 2.3,
+    "1958-1968": 1.2,
+    "1969-1978": 1.2,
+    "1979-1983": 0.8,
+    "1984-1994": 0.6,
+    "1995-2001": 0.6,
+    ">=2002": 0.5
+   }
+  },
+  "ground_floor_brick_timber": {
+   "name": "Floor on ground, brick or timber",
+   "kind": "floor_ground",
+   "u_values": {
+    "<=1918": 1.2,
+    "1919-1948": 1.2,
+    "1949-1957": 1.5,
+    "1958-1968": 1.0,
+    "1969-1978": 1.0,
+    "1979-1983": 0.8,
+    "1984-1994": 0.6,
+    "1995-2001": 0.6,
+    ">=2002": null
+   }
+  },
+  "ground_floor_timber_void": {
+   "name": "Floor on ground or void, timber",
+   "kind": "floor_ground",
+   "u_values": {
+    "<=1918": 1.8,
+    "1919-1948": 1.8,
+    "1949-1957": 1.0,
+    "1958-1968": 0.8,
+    "1969-1978": 0.6,
+    "1979-1983": 0.6,
+    "1984-1994": 0.4,
+    "1995-2001": 0.4,
+    ">=2002": null
+   }
+  }
+ },
+ "windows": {
+  "timber_single": {
+   "name": "Timber window, single glazing",
+   "u_w": {
+    "<=1978": 5.0,
+    "1979-1983": null,
+    "1984-1994": null,
+    "1995-2001": null,
+    ">=2002": null
+   },
+   "u_g": {
+    "<=1978": 5.8,
+    "1979-1983": null,
+    "1984-1994": null,
+    "1995-2001": null,
+    ">=2002": null
+   }
+  },
+  "timber_double": {
+   "name": "Timber window, two panes",
+   "u_w": {
+    "<=1978": 2.7,
+    "1979-1983": 2.7,
+    "1984-1994": 2.7,
+    "1995-2001": 1.6,
+    ">=2002": 1.5
+   },
+   "u_g": {
+    "<=1978": 2.9,
+    "1979-1983": 2.9,
+    "1984-1994": 2.9,
+    "1995-2001": 1.4,
+    ">=2002": 1.2
+   }
+  },
+  "pvc_insulating": {
+   "name": "PVC window, insulating glazing",
+   "u_w": {
+    "<=1978": 3.0,
+    "1979-1983": 3.0,
+    "1984-1994": 3.0,
+    "1995-2001": 1.9,
+    ">=2002": 1.5
+   },
+   "u_g": {
+    "<=1978": 2.9,
+    "1979-1983": 2.9,
+    "1984-1994": 2.9,
+    "1995-2001": 1.4,
+    ">=2002": 1.2
+   }
+  },
+  "metal_insulating": {
+   "name": "Aluminium or steel window, insulating glazing",
+   "u_w": {
+    "<=1978": 4.3,
+    "1979-1983": 4.3,
+    "1984-1994": 3.2,
+    "1995-2001": 1.9,
+    ">=2002": 1.5
+   },
+   "u_g": {
+    "<=1978": 2.9,
+    "1979-1983": 2.9,
+    "1984-1994": 2.9,
+    "1995-2001": 1.4,
+    ">=2002": 1.2
+   }
+  }
+ },
+ "doors": {
+  "metal": {
+   "name": "Door, mainly metal",
+   "u": 4.0
+  },
+  "timber_plastic": {
+   "name": "Door, mainly timber, wood-based or plastic",
+   "u": 2.9
+  }
+ }
+}

@@ -1,0 +1,92 @@
+{
+ "sources": [
+  {
+   "id": "energyplus-hof",
+   "title": "EnergyPlus datasets/ASHRAE_2005_HOF_Materials.idf (thermal properties after the ASHRAE 2005 Handbook of Fundamentals)",
+   "publisher": "EnergyPlus contributors (NREL, LBNL, ORNL et al.)",
+   "version": "EnergyPlus v26.2.0",
+   "url": "https://github.com/NREL/EnergyPlus/blob/v26.2.0/datasets/ASHRAE_2005_HOF_Materials.idf",
+   "licence": "LicenseRef-EnergyPlus",
+   "licence_url": "https://github.com/NREL/EnergyPlus/blob/v26.2.0/LICENSE.txt",
+   "attribution": "Contains data from EnergyPlus, Copyright (c) 1996-present, The Board of Trustees of the University of Illinois, The Regents of the University of California through LBNL, ORNL (UT-Battelle), Alliance for Energy Innovation, LLC, and other contributors. All rights reserved. See LICENSES/EnergyPlus.txt.",
+   "retrieved": "2026-11-03"
+  },
+  {
+   "id": "energyplus-glass",
+   "title": "EnergyPlus datasets/WindowGlassMaterials.idf (spectral-average glass properties from the LBNL WINDOW glass library)",
+   "publisher": "EnergyPlus contributors",
+   "version": "EnergyPlus v26.2.0",
+   "url": "https://github.com/NREL/EnergyPlus/blob/v26.2.0/datasets/WindowGlassMaterials.idf",
+   "licence": "LicenseRef-EnergyPlus",
+   "licence_url": "https://github.com/NREL/EnergyPlus/blob/v26.2.0/LICENSE.txt",
+   "attribution": "Contains data from EnergyPlus (see energyplus-hof).",
+   "retrieved": "2026-11-03"
+  },
+  {
+   "id": "honeybee-standards",
+   "title": "honeybee-standards radiance_default.json generic modifiers (floor 0.20, wall 0.50, ceiling 0.80, exterior 0.35)",
+   "publisher": "Ladybug Tools",
+   "version": "v2.0.7",
+   "url": "https://github.com/ladybug-tools/honeybee-standards/blob/v2.0.7/honeybee_standards/radiance_default.json",
+   "licence": "MIT",
+   "licence_url": "https://github.com/ladybug-tools/honeybee-standards/blob/v2.0.7/LICENSE",
+   "attribution": "Default reflectances from honeybee-standards, MIT License, Copyright (c) 2020 Ladybug Tools. See LICENSES/honeybee-standards.txt.",
+   "retrieved": "2026-11-03"
+  },
+  {
+   "id": "de-banz-2020",
+   "title": "Bekanntmachung der Regeln zur Datenaufnahme und Datenverwendung im Wohngebaeudebestand, BAnz AT 04.12.2020 B1, Tables 2 and 3 (flat-rate U-values by age band)",
+   "publisher": "Bundesministerium fuer Wirtschaft und Energie / Bundesministerium des Innern, fuer Bau und Heimat",
+   "version": "8 October 2020",
+   "url": "https://www.bundesanzeiger.de/pub/publication/qzQUGd8A3unSCCbVMcf/content/qzQUGd8A3unSCCbVMcf/BAnz%20AT%2004.12.2020%20B1.pdf",
+   "licence": "LicenseRef-PublicDomain-DE-UrhG-5",
+   "licence_url": "https://www.gesetze-im-internet.de/urhg/__5.html",
+   "attribution": "Source: Bekanntmachung BAnz AT 04.12.2020 B1 (official work, Section 5 UrhG).",
+   "retrieved": "2026-11-03"
+  },
+  {
+   "id": "hotmaps-building-stock",
+   "title": "Hotmaps building-stock dataset: U-values by country, sector and construction period",
+   "publisher": "Hotmaps project (H2020 grant 723677); residential values from IEE TABULA (www.episcope.eu); service values from Birchall et al. 2014",
+   "version": "gitlab.com/hotmaps/building-stock @ 9805473f",
+   "url": "https://gitlab.com/hotmaps/building-stock",
+   "licence": "CC-BY-4.0",
+   "licence_url": "https://creativecommons.org/licenses/by/4.0/",
+   "attribution": "U-values from the Hotmaps building-stock dataset (CC BY 4.0), residential part based on the IEE TABULA project (www.episcope.eu). Reduced to element averages by Almond.",
+   "retrieved": "2026-11-03"
+  },
+  {
+   "id": "uk-adl-2021",
+   "title": "Approved Document L, Conservation of fuel and power, Volume 1: Dwellings (Table 1.1, Table 4.1) and Volume 2: Buildings other than dwellings (Table 4.1), 2021 edition incorporating 2023 amendments",
+   "publisher": "HM Government (DLUHC)",
+   "version": "2021 edition incorporating 2023 amendments",
+   "url": "https://www.gov.uk/government/publications/conservation-of-fuel-and-power-approved-document-l",
+   "licence": "OGL-UK-3.0",
+   "licence_url": "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/",
+   "attribution": "Contains public sector information licensed under the Open Government Licence v3.0 (Approved Document L 2021, Crown copyright).",
+   "retrieved": "2026-11-03"
+  },
+  {
+   "id": "bca-envelope-code",
+   "title": "BCA Code on Envelope Thermal Performance for Buildings (ETTV, RETV, RTTV formulas and maximum values) - cited for the method only; no tables reproduced",
+   "publisher": "Building and Construction Authority, Singapore",
+   "version": "2008 (R3b)",
+   "url": "https://file.go.gov.sg/bca-envl-therm-code.pdf",
+   "licence": "LicenseRef-Method-Cited",
+   "licence_url": "https://www1.bca.gov.sg/terms-of-use",
+   "attribution": "Formulas implemented from the BCA Code on Envelope Thermal Performance for Buildings; solar correction factors and shading coefficients are computed by Almond, not taken from the Code's tables. Indicative only; not a BCA Green Mark assessment.",
+   "retrieved": "2026-11-03"
+  },
+  {
+   "id": "almond-own",
+   "title": "Almond engineering assumptions (typical values; check against product data)",
+   "publisher": "Almond",
+   "version": "1",
+   "url": "",
+   "licence": "MIT",
+   "licence_url": "",
+   "attribution": "",
+   "retrieved": "2026-11-03"
+  }
+ ]
+}

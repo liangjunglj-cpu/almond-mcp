@@ -127,6 +127,108 @@ def pmv_ppd(ta, tr, vel, rh, met, clo, wme=0.0) -> dict[str, np.ndarray]:
     return {"pmv": pmv, "ppd": ppd, "within_iso7730_range": valid, "clothing_temperature": tcl}
 
 
+def _psat_mmhg(t_c) -> np.ndarray:
+    return np.exp(18.6686 - 4030.183 / (np.asarray(t_c, dtype=float) + 235.0))
+
+
+def set_star(ta, tr, vel, rh, met, clo, wme=0.0) -> np.ndarray:
+    """Standard Effective Temperature SET* (degC) by the two-node model of Gagge, Fobelets and Berglund
+    (1986, ASHRAE Transactions 92-2B): one hour of 1-minute steps for core and skin temperature with
+    vasomotor, sweating and shivering control, then the temperature of the standard environment (50 % RH,
+    still air, standard clothing for the activity) giving the same skin heat loss and wettedness. Works
+    outdoors too, where mean radiant temperature includes the sun (see rooms.semi_outdoor_mrt)."""
+    ta, tr, vel, rh, met, clo, wme = np.broadcast_arrays(*(np.asarray(x, dtype=float) for x in (ta, tr, vel, rh, met, clo, wme)))
+    vp = rh / 100.0 * _psat_mmhg(ta)                       # mmHg
+    body_weight, body_area = 69.9, 1.8258
+    lr = 2.2                                              # Lewis relation, K/mmHg
+    sigma = 5.67e-8
+    t_sk = np.full(ta.shape, 33.7)
+    t_cr = np.full(ta.shape, 36.8)
+    alfa = np.full(ta.shape, 0.1)
+    skbf = np.full(ta.shape, 6.3)
+    rm = met * 58.2
+    m = rm.copy()
+    wk = wme * 58.2
+    esk = 0.1 * met
+    rcl = 0.155 * clo
+    facl = 1.0 + 0.15 * clo
+    icl = 0.45
+    wcrit = 0.85
+    chc = np.maximum(3.0, 8.600001 * np.maximum(vel, 0.0) ** 0.53)
+    chr_ = np.full(ta.shape, 4.7)
+    ctc = chr_ + chc
+    top = (chr_ * tr + chc * ta) / ctc
+    pwet = np.zeros(ta.shape)
+    tcl = top + (t_sk - top) / (ctc * (1.0 / (facl * ctc) + rcl))
+    for _ in range(60):
+        for _ in range(8):                                # clothing surface temperature / radiative coefficient
+            chr_ = 4.0 * 0.72 * sigma * ((tcl + tr) / 2.0 + 273.15) ** 3
+            ctc = chr_ + chc
+            ra = 1.0 / (facl * ctc)
+            top = (chr_ * tr + chc * ta) / ctc
+            tcl = (ra * t_sk + rcl * top) / (ra + rcl)
+        dry = (t_sk - top) / (ra + rcl)
+        hfcs = (t_cr - t_sk) * (5.28 + 1.163 * skbf)
+        eres = 0.0023 * m * (44.0 - vp)
+        cres = 0.0014 * m * (34.0 - ta)
+        scr = m - hfcs - eres - cres - wk
+        ssk = hfcs - dry - esk
+        tcsk = 0.97 * alfa * body_weight
+        tccr = 0.97 * (1.0 - alfa) * body_weight
+        t_sk = t_sk + ssk * body_area / (tcsk * 60.0)
+        t_cr = t_cr + scr * body_area / (tccr * 60.0)
+        t_b = alfa * t_sk + (1.0 - alfa) * t_cr
+        sksig, crsig, bdsig = t_sk - 33.7, t_cr - 36.8, t_b - 36.49
+        warms, colds = np.maximum(sksig, 0), np.maximum(-sksig, 0)
+        warmc, coldc = np.maximum(crsig, 0), np.maximum(-crsig, 0)
+        warmb = np.maximum(bdsig, 0)
+        skbf = np.clip((6.3 + 200.0 * warmc) / (1.0 + 0.5 * colds), 0.5, 90.0)
+        alfa = 0.0417737 + 0.7451833 / (skbf + 0.585417)
+        regsw = np.minimum(170.0 * warmb * np.exp(warms / 10.7), 500.0)
+        ersw = 0.68 * regsw
+        rea = 1.0 / (lr * facl * chc)
+        recl = rcl / (lr * icl)
+        emax = (_psat_mmhg(t_sk) - vp) / (rea + recl)
+        with np.errstate(divide="ignore", invalid="ignore"):
+            prsw = np.where(emax > 0, ersw / np.where(emax > 0, emax, 1.0), wcrit)
+        pwet = 0.06 + 0.94 * prsw
+        edif = pwet * emax - ersw
+        over = (pwet > wcrit) & (emax > 0)
+        pwet = np.where(over, wcrit, pwet)
+        prsw = np.where(over, wcrit / 0.94, prsw)
+        ersw = np.where(over, prsw * emax, ersw)
+        edif = np.where(over, 0.06 * (1.0 - prsw) * emax, edif)
+        neg = emax < 0
+        edif = np.where(neg, 0.0, edif)
+        ersw = np.where(neg, 0.0, ersw)
+        pwet = np.where(neg, wcrit, pwet)
+        esk = np.where(neg, emax, ersw + edif)
+        m = rm + 19.4 * colds * coldc                     # shivering
+    hsk = dry + esk
+    # standard environment for this activity
+    chcs = np.where(met < 0.85, 3.0, np.maximum(3.0, 5.66 * np.maximum(met - 0.85, 0.0) ** 0.39))
+    ctcs = chcs + chr_
+    rclos = 1.52 / (met + 0.6944) - 0.1835
+    rcls = 0.155 * rclos
+    facls = 1.0 + 0.25 * rclos
+    fcls = 1.0 / (1.0 + 0.155 * facls * ctcs * rclos)
+    ims = 0.45
+    icls = ims * chcs / ctcs * (1.0 - fcls) / (chcs / ctcs - fcls * ims)
+    ras = 1.0 / (facls * ctcs)
+    reas = 1.0 / (lr * facls * chcs)
+    recls = rcls / (lr * icls)
+    hd_s = 1.0 / (ras + rcls)
+    he_s = 1.0 / (reas + recls)
+    lo, hi = np.full(ta.shape, -40.0), np.full(ta.shape, 80.0)
+    psk = _psat_mmhg(t_sk)
+    for _ in range(60):                                   # bisection: heat loss falls as SET rises
+        mid = 0.5 * (lo + hi)
+        f = hsk - hd_s * (t_sk - mid) - pwet * he_s * (psk - 0.5 * _psat_mmhg(mid))
+        hi = np.where(f > 0, mid, hi)                      # skin loses less than this SET implies: lower it
+        lo = np.where(f > 0, lo, mid)
+    return 0.5 * (lo + hi)
+
+
 def operative_temperature(ta, tr, vel=0.1) -> np.ndarray:
     """ASHRAE 55 simplified operative temperature: mean of air and radiant at low air speed, weighted
     towards air temperature above 0.2 m/s."""

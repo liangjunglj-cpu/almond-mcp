@@ -51,16 +51,16 @@ CONSTRUCTIONS = {    # U-values W/m2K, external solar absorptance, thermal mass 
                              "absorptance_wall": 0.5, "absorptance_roof": 0.6, "mass": "light"},
 }
 
-SCHEDULES = ("office", "school", "residential", "always")
+SCHEDULES = ("office", "school", "residential", "bedroom", "always")
 # Fresh-air supply when occupied, l/s per m2 of floor - indicative EN 16798-1:2019 Category II values
 # (offices 7 l/s per person at 10 m2 + 0.7 l/s m2 for a low-polluting building; dwellings ~0.42).
 # Per floor area, not per volume, so a double-height room is not ventilated twice as hard.
-VENTILATION_L_S_M2 = {"office": 1.4, "school": 4.0, "residential": 0.42, "always": 0.42}
+VENTILATION_L_S_M2 = {"office": 1.4, "school": 4.0, "residential": 0.42, "bedroom": 0.42, "always": 0.42}
 
 
 @dataclass
 class Surface:
-    kind: str                       # wall | roof | ground_floor | exposed_floor | window | adiabatic
+    kind: str                       # wall | roof | ground_floor | exposed_floor | window | adiabatic | interzone | opening
     area: float                     # m2 (walls net of windows)
     normal: tuple[float, float, float]
     u_value: float = 0.0
@@ -70,6 +70,8 @@ class Surface:
     name: str = ""
     samples: np.ndarray | None = None       # (k, 3) points on the surface for solar ray tracing
     irradiance: np.ndarray | None = None    # (8760,) W/m2 incident on the outside, filled by solar_on_surfaces
+    construction: str = ""                  # assembly id (constructions.py), "" = from the preset
+    neighbor: str = ""                      # interzone surfaces: the room on the other side
 
     @property
     def tilt_cos(self) -> float:
@@ -83,6 +85,10 @@ class Zone:
     volume: float
     surfaces: list[Surface] = field(default_factory=list)
     source: dict = field(default_factory=dict)
+    mass: tuple[float, float] | None = None          # (A_m m2, C_m J/K) from constructions; None = preset class
+    opening_ach: np.ndarray | None = None            # (8760,) air changes through permanent openings
+    coupling_w: np.ndarray | None = None             # (8760,) heat from neighbouring rooms into the air node
+    profile: dict | None = None                      # room use: {"schedule", "occupancy_w_m2", ...} overrides
 
     def validate(self) -> None:
         if not self.floor_area > 0:
@@ -178,6 +184,10 @@ def occupancy(weather, schedule: str) -> tuple[np.ndarray, np.ndarray, np.ndarra
         occ = np.where((hod < 8) | (hod >= 18), 1.0, np.where(workday, 0.2, 0.7))
         equip = np.where((hod >= 6) & (hod < 22), 0.5, 0.2)
         light = np.where((hod >= 18) & (hod < 23), 0.8, np.where((hod >= 6) & (hod < 8), 0.4, 0.05))
+    elif schedule == "bedroom":
+        occ = np.where((hod < 7) | (hod >= 22), 1.0, 0.0)
+        equip = np.where(occ > 0, 0.1, 0.05)
+        light = np.where((hod >= 21) & (hod < 23), 0.5, np.where((hod >= 6) & (hod < 7), 0.3, 0.0))
     elif schedule == "always":
         occ = np.ones(HOURS)
         equip = np.ones(HOURS)
@@ -191,7 +201,20 @@ def apply_construction(zone: Zone, st: Settings, glazing_props: dict | None = No
     """Fill U-values / absorptance / g from the construction preset and overrides. Returns notes."""
     c = CONSTRUCTIONS[st.construction]
     notes = []
+    from . import constructions as asm
     for s in zone.surfaces:
+        if s.construction:
+            props = asm.summary(s.construction)
+            if s.kind == "window" and props["kind"] == "window":
+                s.u_value = float(st.u_values.get("window", props["u_value"]))
+                s.g_value = float(st.window_g if st.window_g is not None else props["g_value"])
+                s.frame_fraction = float(props["frame_fraction"])
+                continue
+            if s.kind in ("wall", "roof", "ground_floor", "exposed_floor", "interzone") and props["kind"] != "window":
+                s.u_value = float(st.u_values.get(s.kind, props["u_value"]))
+                if props.get("outside_solar_absorptance") is not None:
+                    s.absorptance = float(props["outside_solar_absorptance"])
+                continue
         if s.kind == "window":
             u = st.u_values.get("window", st.window_u if st.window_u is not None else s.u_value or 2.0)
             s.u_value = float(u)
@@ -200,7 +223,7 @@ def apply_construction(zone: Zone, st: Settings, glazing_props: dict | None = No
         elif s.kind in ("wall", "roof", "ground_floor", "exposed_floor"):
             s.u_value = float(st.u_values.get(s.kind, c[s.kind]))
             s.absorptance = c["absorptance_roof"] if s.kind == "roof" else c["absorptance_wall"]
-    if st.window_g is None and any(s.kind == "window" for s in zone.surfaces):
+    if st.window_g is None and any(s.kind == "window" and not s.construction for s in zone.surfaces):
         notes.append("window g-values come from the glazing material (or 0.5 when it has none)")
     return notes
 
@@ -240,7 +263,13 @@ def simulate(zone: Zone, weather, st: Settings, warmup_days: int = 30) -> dict:
     Af = zone.floor_area
     A_m = am_ratio * Af
     C_m = cm_per * Af
+    if zone.mass is not None and st.mass is None:
+        A_m, C_m = float(zone.mass[0]), float(zone.mass[1])
+        mass = "from constructions"
     A_t = LAMBDA_AT * Af
+    if zone.mass is not None:
+        # a real room: every surface facing it counts (small rooms have more than 4.5 m2 per m2 of floor)
+        A_t = max(A_t, sum(s.area for s in zone.surfaces if s.kind != "opening"), 1.05 * A_m)
     H_tr_is = H_IS * A_t
     H_tr_ms = H_MS * A_m
     H_tr_w = sum(s.u_value * s.area for s in zone.surfaces if s.kind == "window")
@@ -260,22 +289,27 @@ def simulate(zone: Zone, weather, st: Settings, warmup_days: int = 30) -> dict:
     g = weather.ground_temperatures[0]["monthly_c"] if weather.ground_temperatures else None
     t_ground = np.asarray(g, dtype=float)[weather.month - 1] if g is not None else t_out
     t_e = (H_op * t_out + H_gr * t_ground) / H_op_total if H_op_total > 0 else t_out
-    occ, equip, light = occupancy(weather, st.schedule)
-    phi_int = Af * (st.occupancy_w_m2 * occ + st.equipment_w_m2 * equip + st.lighting_w_m2 * light)
+    prof = zone.profile or {}
+    occ, equip, light = occupancy(weather, prof.get("schedule", st.schedule))
+    phi_int = Af * (prof.get("occupancy_w_m2", st.occupancy_w_m2) * occ + prof.get("equipment_w_m2", st.equipment_w_m2) * equip
+                    + prof.get("lighting_w_m2", st.lighting_w_m2) * light)
     phi_sol, shaded, sol_info = solar_gains(zone, weather, st)
     V = zone.volume
     if st.ventilation_ach is not None:
         vent_ach = float(st.ventilation_ach)
         vent_rate = vent_ach * V / 3.6 / Af
     else:
-        vent_rate = st.ventilation_l_s_m2 if st.ventilation_l_s_m2 is not None else VENTILATION_L_S_M2[st.schedule]
+        vent_rate = (st.ventilation_l_s_m2 if st.ventilation_l_s_m2 is not None else
+                     prof.get("ventilation_l_s_m2", VENTILATION_L_S_M2.get(prof.get("schedule", st.schedule), 0.42)))
         vent_ach = vent_rate * Af * 3.6 / V                      # l/s m2 -> air changes per hour
     base_ach = st.infiltration_ach + np.where(occ > 0, vent_ach, 0.0)
+    if zone.opening_ach is not None:
+        base_ach = base_ach + np.asarray(zone.opening_ach, dtype=float)
     nv_ach = st.natural_ventilation_ach
 
     occupied = occ > 0
-    heat_sp = st.heating_setpoint
-    cool_sp = st.cooling_setpoint
+    heat_sp = prof.get("heating_setpoint", st.heating_setpoint)
+    cool_sp = prof.get("cooling_setpoint", st.cooling_setpoint)
 
     t_air = np.zeros(HOURS)
     t_s = np.zeros(HOURS)
@@ -285,6 +319,8 @@ def simulate(zone: Zone, weather, st: Settings, warmup_days: int = 30) -> dict:
 
     # ISO 13790 C.2 split of internal and solar gains
     phi_ia = 0.5 * phi_int
+    if zone.coupling_w is not None:
+        phi_ia = phi_ia + np.asarray(zone.coupling_w, dtype=float)
     f_m = A_m / A_t
     f_st = 1.0 - A_m / A_t - H_tr_w / (9.1 * A_t)
     phi_m = f_m * (0.5 * phi_int + phi_sol)
@@ -347,7 +383,8 @@ def simulate(zone: Zone, weather, st: Settings, warmup_days: int = 30) -> dict:
                   "H_ve_base_w_k": round(float(RHO_CA * base_ach.mean() * V / 3600.0), 2), "H_tr_w_w_k": round(H_tr_w, 2),
                   "H_tr_op_w_k": round(H_op, 2), "H_ground_w_k": round(H_gr, 2), "H_tr_em_w_k": round(H_tr_em, 2),
                   "H_tr_ms_w_k": round(H_tr_ms, 2), "H_tr_is_w_k": round(H_tr_is, 2), "C_m_mj_k": round(C_m / 1e6, 2),
-                  "mass_class": mass, "solar": sol_info},
+                  "A_m_m2": round(A_m, 2), "mass_class": mass, "solar": sol_info,
+                  "opening_ach_mean": round(float(np.mean(zone.opening_ach)), 2) if zone.opening_ach is not None else 0.0},
     }
 
 
@@ -454,12 +491,16 @@ def _clip_triangles_to_box(tris: np.ndarray, lo: np.ndarray, hi: np.ndarray) -> 
 
 def zone_from_mesh(name: str, vertices: np.ndarray, triangles: np.ndarray, windows: list[dict],
                    other_zones: list[tuple[np.ndarray, np.ndarray]] | None = None, ground_z: float | None = None,
-                   samples_per_surface: int = 9, seed: int = 0, window_tolerance: float = 0.3) -> Zone:
+                   samples_per_surface: int = 9, seed: int = 0, window_tolerance: float = 0.3,
+                   face_construction: list[str] | None = None, face_open: np.ndarray | None = None,
+                   other_names: list[str] | None = None) -> Zone:
     """A Zone from a closed triangle mesh (metres). ``windows``: [{"vertices", "triangles", "name",
     "g_value", "u_value"}] - glazing parallel to a zone face and within ``window_tolerance`` of it (set
     back in the wall depth) is subtracted from that face, clipped to the zone's extent. Faces shared
     with ``other_zones`` are adiabatic; faces facing down at the lowest level (or at ``ground_z``) are
-    ground floors."""
+    ground floors. ``face_construction`` (one assembly id or "" per triangle) groups the opaque faces
+    by construction; ``face_open`` marks triangles with no building element on them (openings);
+    ``other_names`` names ``other_zones`` so shared faces become "interzone" surfaces."""
     v = np.asarray(vertices, dtype=float)
     t = np.asarray(triangles, dtype=np.int64)
     a, b, c = v[t[:, 0]], v[t[:, 1]], v[t[:, 2]]
@@ -467,6 +508,8 @@ def zone_from_mesh(name: str, vertices: np.ndarray, triangles: np.ndarray, windo
     area = 0.5 * np.linalg.norm(cr, axis=1)
     keep = area > 1e-9
     a, b, c, cr, area = a[keep], b[keep], c[keep], cr[keep], area[keep]
+    fcons = np.asarray(face_construction if face_construction is not None else [""] * len(keep), dtype=object)[keep]
+    fopen = np.asarray(face_open if face_open is not None else np.zeros(len(keep), bool), dtype=bool)[keep]
     normal = cr / (2 * area[:, None])
     vol = float(np.einsum("ij,ij->i", a, np.cross(b, c)).sum() / 6.0)
     if vol < 0:
@@ -491,20 +534,28 @@ def zone_from_mesh(name: str, vertices: np.ndarray, triangles: np.ndarray, windo
     kind[(kind == "floor") & is_ground] = "ground_floor"
     kind[kind == "floor"] = "exposed_floor"
     # adiabatic: faces whose outside lies inside another zone
+    neighbor = np.full(len(cen), "", dtype=object)
     if other_zones:
         from .raytrace import BVH
         probe = cen + normal * 0.05
         inside_any = np.zeros(len(cen), dtype=bool)
-        for ov, ot in other_zones:
+        for zi, (ov, ot) in enumerate(other_zones):
             ov = np.asarray(ov, dtype=float)
             ot = np.asarray(ot, dtype=np.int64)
             bvh = BVH(ov[ot[:, 0]], ov[ot[:, 1]], ov[ot[:, 2]])
-            inside_any |= _inside(bvh, probe)
-        kind[inside_any] = "adiabatic"
+            hit = _inside(bvh, probe)
+            if other_names is not None:
+                neighbor[hit & (neighbor == "")] = other_names[zi]
+            inside_any |= hit
+        kind[inside_any] = "interzone" if other_names is not None else "adiabatic"
+    kind[fopen & ~np.isin(kind, ["interzone", "adiabatic"])] = "opening"
     rng = np.random.default_rng(seed)
     surfaces: list[Surface] = []
     plane_key = np.concatenate([np.round(normal * 100).astype(np.int64),
                                 np.round(np.einsum("ij,ij->i", normal, a) / 0.02).astype(np.int64)[:, None]], axis=1)
+    cons_ids = {c_: i for i, c_ in enumerate(sorted(set(fcons.tolist()) | set(neighbor.tolist())))}
+    group_key = np.concatenate([plane_key, np.array([cons_ids[x] for x in fcons], dtype=np.int64)[:, None],
+                                np.array([cons_ids[x] for x in neighbor], dtype=np.int64)[:, None]], axis=1)
     # windows: assign each to the zone face plane it lies on (glass is often set back in the wall
     # depth, so within ``window_tolerance``), keeping only the part inside the zone's extent - a pane
     # running past two storeys is shared between the two zones
@@ -555,25 +606,35 @@ def zone_from_mesh(name: str, vertices: np.ndarray, triangles: np.ndarray, windo
         tri_pts = np.stack([wa, wb, wc], axis=1)
         surfaces.append(Surface(kind="window", area=float(warea.sum()), normal=tuple(out_n), name=w.get("name", "window"),
                                 g_value=float(w.get("g_value") or 0.0), u_value=float(w.get("u_value") or 0.0),
-                                samples=_surface_samples(tri_pts, out_n, samples_per_surface, rng)))
+                                samples=_surface_samples(tri_pts, out_n, samples_per_surface, rng),
+                                construction=str(w.get("construction") or "")))
     # opaque surfaces grouped by plane
-    for k in ("wall", "roof", "ground_floor", "exposed_floor", "adiabatic"):
+    for k in ("wall", "roof", "ground_floor", "exposed_floor", "adiabatic", "interzone", "opening"):
         sel = np.flatnonzero(kind == k)
         if not sel.size:
             continue
-        uniq, inv = np.unique(plane_key[sel], axis=0, return_inverse=True)
+        uniq, inv = np.unique(group_key[sel], axis=0, return_inverse=True)
+        inv = inv.reshape(-1)
+        # the windows of a plane come off its largest construction group
+        largest: dict[tuple, tuple[int, float]] = {}
         for gi in range(len(uniq)):
-            s2 = sel[inv.reshape(-1) == gi]
+            pk = tuple(uniq[gi][:4])
+            a_g = float(area[sel[inv == gi]].sum())
+            if pk not in largest or a_g > largest[pk][1]:
+                largest[pk] = (gi, a_g)
+        for gi in range(len(uniq)):
+            s2 = sel[inv == gi]
             A = float(area[s2].sum())
-            pk = tuple(uniq[gi])
-            A_net = A - win_area_by_plane.get(pk, 0.0)
+            pk = tuple(uniq[gi][:4])
+            A_net = A - (win_area_by_plane.get(pk, 0.0) if largest[pk][0] == gi and k in ("wall", "roof") else 0.0)
             if A_net <= 1e-6:
                 continue
             nrm = (normal[s2] * area[s2, None]).sum(axis=0)
             nrm /= max(np.linalg.norm(nrm), 1e-12)
             tri_pts = np.stack([a[s2], b[s2], c[s2]], axis=1)
             surfaces.append(Surface(kind=k, area=A_net, normal=tuple(nrm), name=f"{k} {gi}",
-                                    samples=_surface_samples(tri_pts, nrm, samples_per_surface, rng) if k in ("wall", "roof", "exposed_floor") else None))
+                                    samples=_surface_samples(tri_pts, nrm, samples_per_surface, rng) if k in ("wall", "roof", "exposed_floor") else None,
+                                    construction=str(fcons[s2[0]]), neighbor=str(neighbor[s2[0]])))
     pts_all = np.vstack([a, b, c])
     ext = np.ptp(pts_all[:, :2], axis=0)
     z = Zone(name=name, floor_area=floor_area, volume=vol, surfaces=surfaces,

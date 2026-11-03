@@ -1,0 +1,45 @@
+{
+ "pack": "sg_bca",
+ "source": "bca-envelope-code",
+ "relation": "method",
+ "description": "Singapore envelope thermal transfer values, implemented from the formulas of the BCA Code on Envelope Thermal Performance for Buildings. Solar correction factors (CF) are computed from the site weather file by Almond and shading coefficients from the modelled geometry; the Code's tables are not reproduced. Indicative only - not a BCA Green Mark assessment. You may load your own copy of the Code's CF tables (user_tables) for a table-based figure; such a file is never bundled.",
+ "formulas": {
+  "ETTV": {
+   "applies": "air-conditioned non-residential buildings, walls",
+   "expression": "12 (1 - WWR) U_wall + 3.4 WWR U_fen + 211 WWR CF SC",
+   "coefficients": {
+    "opaque": 12.0,
+    "fenestration_conduction": 3.4,
+    "solar": 211.0
+   },
+   "max_w_m2": 50.0
+  },
+  "RETV": {
+   "applies": "residential buildings, walls",
+   "expression": "3.4 (1 - WWR) U_wall + 1.3 WWR U_fen + 58.6 WWR CF SC",
+   "coefficients": {
+    "opaque": 3.4,
+    "fenestration_conduction": 1.3,
+    "solar": 58.6
+   },
+   "max_w_m2": 25.0
+  },
+  "RTTV": {
+   "applies": "air-conditioned buildings with skylights, roofs",
+   "expression": "12.5 (1 - SKR) U_roof + 4.8 SKR U_sky + 485 SKR CF SC",
+   "coefficients": {
+    "opaque": 12.5,
+    "fenestration_conduction": 4.8,
+    "solar": 485.0
+   },
+   "max_w_m2": 50.0
+  }
+ },
+ "shading_coefficient": "SC = SC_glass x SC_external; SC_glass = g / 0.87 (relative to 3 mm clear glass); SC_external = solar on the shaded window / solar on the same window unshaded, ray traced on the model",
+ "cf_method": "CF(orientation) = mean irradiance on a vertical surface of that orientation over the daytime hours of the weather file, divided by the mean over the eight principal orientations (re-derived by Almond)",
+ "comfort_defaults": {
+  "model": "adaptive (ASHRAE 55 with elevated air speed) for naturally ventilated spaces",
+  "cooling_setpoint_c": 25.0,
+  "note": "Air-conditioned set-points are user inputs; consult SS 553 for the applicable design conditions (not reproduced)."
+ }
+}

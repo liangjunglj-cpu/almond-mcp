@@ -357,6 +357,40 @@ def _is_closed(v: np.ndarray, f: np.ndarray) -> bool:
     return bool(total > 0 and np.linalg.norm(cr.sum(axis=0)) < 0.05 * total)
 
 
+def _add_construction(b: "SceneBuilder", v: np.ndarray, f: np.ndarray, info: dict) -> None:
+    """An element with an ``almond:construction``: glazing optics from the window assembly; opaque finishes
+    from the assembly's layers - the top of a roof shows its outside finish, the underside of a floor its
+    soffit, everything else the inside finish."""
+    from . import constructions as asm
+    cid = info["construction"]
+    try:
+        p = asm.summary(cid)
+    except ValueError as exc:
+        raise ValueError(f"Object {info['guid']}: {exc}") from None
+    if p["kind"] == "window":
+        mat = Material(f"c:{cid}", kind="glazing", transmittance=max(min(p["tau_v"], 1.0), 0.01),
+                       g_value=p["g_value"], u_value=p["u_value"])
+        info.update(material=mat.name, reason=f"construction {cid}")
+        b.add_mesh(v, f, mat, info)
+        return
+    inside = p.get("inside_reflectance")
+    outside = p.get("outside_reflectance")
+    m_in = Material(f"c:{cid}:in", reflectance=min(inside if inside is not None else 0.5, 0.95))
+    m_out = Material(f"c:{cid}:out", reflectance=min(outside if outside is not None else 0.35, 0.95))
+    a, bb, c = v[f[:, 0]], v[f[:, 1]], v[f[:, 2]]
+    n = np.cross(bb - a, c - a)
+    nz = n[:, 2] / np.maximum(np.linalg.norm(n, axis=1), 1e-30)
+    i_in, i_out = b.material_index(m_in), b.material_index(m_out)
+    if p["kind"] == "roof":
+        idx = np.where(nz > 0.7, i_out, i_in)
+    elif p["kind"].startswith("floor"):
+        idx = np.where(nz < -0.7, i_out, i_in)
+    else:
+        idx = np.full(len(f), i_in)
+    info.update(material=f"construction {cid}", reason=f"construction {cid}")
+    b.add_mesh(v, f, m_in, info, tri_materials=idx)
+
+
 def scene_from_export(data: dict, overrides: dict | None = None, default_glazing: str = DEFAULT_GLAZING) -> Scene:
     """Build a Scene from the JSON the Rhino export script writes (see rhino.py):
 
@@ -379,11 +413,15 @@ def scene_from_export(data: dict, overrides: dict | None = None, default_glazing
         texts = [o.get("layer", ""), o.get("name", ""), o.get("material", "")]
         guid = str(o.get("guid", ""))
         spec = overrides.get(guid.lower()) or overrides.get(str(o.get("layer", "")).lower())
-        info = {"guid": guid, "layer": o.get("layer", ""), "name": o.get("name", "")}
+        info = {"guid": guid, "layer": o.get("layer", ""), "name": o.get("name", ""),
+                "construction": str(o.get("construction") or ""), "room": str(o.get("room") or "")}
         if spec is not None:
             mat = material_from_spec(f"{info['layer'] or guid}", spec)
             info.update(material=mat.name, reason="override")
             b.add_mesh(v, f, mat, info)
+            continue
+        if info["construction"]:
+            _add_construction(b, v, f, info)
             continue
         name, reason = classify(texts, str(o.get("env_material", "") or ""), float(o.get("transparency", 0) or 0))
         if name is not None and name in overrides:

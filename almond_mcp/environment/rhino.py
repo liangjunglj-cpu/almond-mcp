@@ -2,11 +2,15 @@
 
 * export: meshes the chosen objects (or every visible object) to a JSON file - vertices, triangles,
   layer path, object name, render material name and transparency, ``almond:env_material`` user text,
+  rooms and constructions (``almond:room``, ``almond:room_use``, ``almond:room_set``, ``almond:room_heat_c``,
+  ``almond:room_cool_c``, ``almond:room_height``, ``almond:construction``); closed planar curves tagged
+  as rooms are exported as boundary polylines,
   block instances flattened with their own nested layers - plus the document's unit scale and the
   Sun panel's north angle.
 * draw: reads a small text file of coloured quads and legend labels and adds one vertex-coloured mesh
   plus text dots on ``Almond::Environment::<label>``.
 * clear: deletes the objects on that layer (or on every Environment layer).
+* tag: sets or removes ``almond:*`` user text on objects (rooms, constructions), as one undoable step.
 
 Result layers live under ``Almond::Environment`` and are never exported as geometry.
 """
@@ -74,7 +78,9 @@ public class Script {
     sb.Append("{\"guid\":\"").Append(guid).Append("\",\"layer\":\"").Append(Esc(layer))
       .Append("\",\"name\":\"").Append(Esc(attr.Name)).Append("\",\"material\":\"").Append(Esc(matName))
       .Append("\",\"transparency\":").Append(transp.ToString("R", C))
-      .Append(",\"env_material\":\"").Append(Esc(envMat)).Append("\",\"vertices\":[");
+      .Append(",\"env_material\":\"").Append(Esc(envMat)).Append("\"");
+    Tags(sb, attr);
+    sb.Append(",\"vertices\":[");
     for (int i = 0; i < m.Vertices.Count; i++) {
       var v = m.Vertices[i];
       if (i > 0) sb.Append(",");
@@ -88,6 +94,39 @@ public class Script {
     }
     sb.Append("]}");
   }
+  static string[] TagKeys = { "construction", "room", "room_use", "room_set", "room_heat_c", "room_cool_c", "room_height" };
+  static void Tags(StringBuilder sb, ObjectAttributes attr) {
+    foreach (var k in TagKeys) {
+      string val = attr.GetUserString("almond:" + k);
+      if (!string.IsNullOrEmpty(val)) sb.Append(",\"").Append(k).Append("\":\"").Append(Esc(val)).Append("\"");
+    }
+  }
+  static bool EmitBoundary(StringBuilder sb, ref bool first, RhinoDoc doc, RhinoObject obj, ObjectAttributes attr, string guid, Transform xf) {
+    var crv = obj.Geometry as Curve;
+    if (crv == null || string.IsNullOrEmpty(attr.GetUserString("almond:room"))) return false;
+    if (!crv.IsClosed || !crv.IsPlanar()) return false;
+    var c = crv.DuplicateCurve();
+    if (!xf.IsIdentity) c.Transform(xf);
+    Polyline pl;
+    if (!c.TryGetPolyline(out pl)) {
+      var pc = c.ToPolyline(0.01 * RhinoMath.UnitScale(UnitSystem.Meters, doc.ModelUnitSystem), 0.05, 0.0, 0.0);
+      if (pc == null || !pc.TryGetPolyline(out pl)) return false;
+    }
+    string layer = "";
+    if (attr.LayerIndex >= 0 && attr.LayerIndex < doc.Layers.Count) layer = doc.Layers[attr.LayerIndex].FullPath;
+    if (!first) sb.Append(",");
+    first = false;
+    sb.Append("{\"guid\":\"").Append(guid).Append("\",\"layer\":\"").Append(Esc(layer))
+      .Append("\",\"name\":\"").Append(Esc(attr.Name)).Append("\"");
+    Tags(sb, attr);
+    sb.Append(",\"boundary\":[");
+    for (int i = 0; i < pl.Count; i++) {
+      if (i > 0) sb.Append(",");
+      sb.Append(pl[i].X.ToString("G9", C)).Append(",").Append(pl[i].Y.ToString("G9", C)).Append(",").Append(pl[i].Z.ToString("G9", C));
+    }
+    sb.Append("],\"vertices\":[],\"faces\":[]}");
+    return true;
+  }
   static void Walk(StringBuilder sb, ref bool first, RhinoDoc doc, RhinoObject obj, ObjectAttributes attr, string guid,
                    Transform xf, MeshingParameters mp, int depth, ref int count) {
     if (depth > 8) return;
@@ -98,6 +137,7 @@ public class Script {
         Walk(sb, ref first, doc, sub, sub.Attributes, guid, x, mp, depth + 1, ref count);
       return;
     }
+    if (EmitBoundary(sb, ref first, doc, obj, attr, guid, xf)) { count++; return; }
     var parts = Meshes(obj.Geometry, mp);
     if (parts.Count == 0) return;
     // thin curved parts (railings, balusters, pipes) mesh to thousands of facets that add nothing to
@@ -263,6 +303,40 @@ public class Script {
 }
 '''
 
+_CS_TAG = r'''
+using System;
+using System.Collections.Generic;
+using Rhino;
+using Rhino.DocObjects;
+
+public class Script {
+  public static List<Guid> Run(RhinoDoc doc) {
+    // guid, key, value triples; an empty value removes the key
+    string[] t = new string[] { __TRIPLES__ };
+    uint undo = doc.BeginUndoRecord("Almond environment tags");
+    var done = new List<Guid>();
+    var missing = new List<string>();
+    try {
+      for (int i = 0; i + 2 < t.Length; i += 3) {
+        Guid g;
+        RhinoObject o = Guid.TryParse(t[i], out g) ? doc.Objects.FindId(g) : null;
+        if (o == null) { missing.Add(t[i]); continue; }
+        var attr = o.Attributes.Duplicate();
+        if (t[i + 2].Length == 0) attr.DeleteUserString("almond:" + t[i + 1]);
+        else attr.SetUserString("almond:" + t[i + 1], t[i + 2]);
+        doc.Objects.ModifyAttributes(o, attr, true);
+        if (!done.Contains(g)) done.Add(g);
+      }
+    } finally { doc.EndUndoRecord(undo); }
+    if (missing.Count > 0) throw new Exception("Objects not found: " + string.Join(", ", missing));
+    doc.Views.Redraw();
+    return done;
+  }
+}
+'''
+
+TAG_KEYS = ("construction", "room", "room_use", "room_set", "room_heat_c", "room_cool_c", "room_height")
+
 _GUID = re.compile(r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
 _SAFE = re.compile(r"[^A-Za-z0-9 _\-.()]")
 
@@ -316,3 +390,21 @@ def draw_file(cells_m, colors, units_to_m: float, legend: list[tuple[tuple[float
         clean = str(text).replace("\n", " ").replace("\r", " ")
         lines.append(f"T,{x * s:.6g},{y * s:.6g},{z * s:.6g},{clean}")
     return "\n".join(lines) + "\n"
+
+
+def tag_script(assignments: dict[str, dict[str, str]]) -> str:
+    """C# that sets (value) or removes ("") almond:* user text: {guid: {key: value}} with keys from TAG_KEYS."""
+    triples = []
+    for guid, kv in assignments.items():
+        if not _GUID.match(str(guid)):
+            raise ValueError(f"Not a Rhino object GUID: {guid}")
+        for k, val in kv.items():
+            if k not in TAG_KEYS:
+                raise ValueError(f"Unknown tag '{k}'. Tags: {', '.join(TAG_KEYS)}")
+            val = "" if val is None else str(val)
+            if len(val) > 120 or any(ch in val for ch in '"\\\n\r'):
+                raise ValueError(f"Tag value for {k} must be plain text up to 120 characters")
+            triples += [str(guid), k, val]
+    if not triples:
+        raise ValueError("Nothing to tag")
+    return _CS_TAG.replace("__TRIPLES__", ", ".join(json.dumps(x) for x in triples))

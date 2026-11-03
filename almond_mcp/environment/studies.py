@@ -678,3 +678,192 @@ def climate_report(weather, hdd_base: float = 18.0, cdd_base: float = 18.0, thre
     if include_psychrometric_bins:
         out["psychrometric_bins"] = climate.psychrometric_bins(weather)
     return out
+
+
+# ── rooms ────────────────────────────────────────────────────────────────────
+
+def prepare_rooms(data: dict, overrides: dict | None = None) -> tuple[list, list, Scene, list[str]]:
+    """Rooms, their enclosure checks and the analysis scene. Room volumes drawn as zones are left out of
+    the scene unless nothing is modelled around them (then their faces are the envelope)."""
+    from . import rooms as rm
+    rooms = rm.rooms_from_export(data)
+    if not rooms:
+        raise ValueError("No rooms in the model: tag closed volumes, surfaces or boundary curves with almond:room "
+                         "(define_room) first")
+    base = scene_from_export(data, overrides)
+    if data.get("rhino_north_deg") is not None:
+        base.north_deg = float(data["rhino_north_deg"]) - 90.0      # Rhino Sun panel: counter-clockwise from +X
+    volume_guids = {g.lower() for r in rooms if r.source in ("volume", "boundary") for g in r.guids}
+    exclude = {i for i, o in enumerate(base.objects) if str(o.get("guid", "")).lower() in volume_guids}
+    encs = [rm.enclosure(r, base, exclude, neighbours=rooms) for r in rooms]
+    ignore = dict(overrides or {})
+    for r, e in zip(rooms, encs):
+        if r.source in ("volume", "boundary") and not e.self_enclosed:
+            for g in r.guids:
+                ignore[g.lower()] = "ignore"
+    scene = scene_from_export(data, ignore) if ignore != (overrides or {}) else base
+    scene.north_deg = base.north_deg
+    notes = [e.warning for e in encs if e.warning]
+    return rooms, encs, scene, notes
+
+
+def _windows(scene: Scene) -> list[dict]:
+    out = []
+    for i, o in enumerate(scene.objects):
+        sel = scene.tri_object == i
+        if not sel.any():
+            continue
+        mat = scene.materials[int(scene.tri_material[sel][0])]
+        if mat.kind != "glazing":
+            continue
+        out.append({"vertices": scene.vertices, "triangles": scene.triangles[sel], "name": o.get("name") or o.get("layer") or "window",
+                    "g_value": mat.g_value, "u_value": mat.u_value, "construction": o.get("construction", "")})
+    return out
+
+
+def envelope_surfaces(zones: list[thermal.Zone]) -> list[dict]:
+    """The exterior surfaces of the zones in the form codes.check_envelope expects."""
+    kinds = {"wall": "wall_external", "window": "window", "roof": "roof", "ground_floor": "floor_ground",
+             "exposed_floor": "floor_exposed"}
+    out = []
+    for z in zones:
+        for s in z.surfaces:
+            if s.kind in kinds:
+                out.append({"kind": kinds[s.kind], "area": s.area, "normal": list(s.normal), "u_value": s.u_value,
+                            "g_value": s.g_value, "room": z.name, "construction": s.construction})
+    return out
+
+
+def run_rooms_thermal(data: dict, weather, settings: thermal.Settings, label: str = "", inputs: dict | None = None,
+                      overrides: dict | None = None, envelope_pack: str = "", pack_options: dict | None = None) -> dict:
+    """Thermal study of user-defined rooms: enclosed and semi-open rooms by coupled 5R1C zones with their
+    constructions, open rooms by semi-outdoor comfort."""
+    from . import codes, rooms as rm
+    settings.validate()
+    t0 = time.time()
+    rooms, encs, scene, notes = prepare_rooms(data, overrides)
+    zones = rm.zones_from_rooms(rooms, encs, scene, _windows(scene))
+    for z in zones:
+        z.source.pop("warning", None)                      # the room mesh is re-sampled, not a modelling error
+        if z.source.get("openings"):
+            z.opening_ach = rm.opening_air_changes(z.source["openings"], z.volume, weather)
+    solar_info = thermal.solar_on_surfaces(zones, scene, weather, scene.north_deg) if zones else {"surfaces": 0}
+    for z in zones:
+        notes += [f"{z.name}: {n}" for n in thermal.apply_construction(z, settings)]
+    results, balance = rm.couple(zones, weather, settings) if zones else ([], {"links": 0})
+    run_id = new_run_id("rooms")
+    arrays: dict[str, np.ndarray] = {}
+    out_rooms = []
+    zi = {z.name: (z, r) for z, r in zip(zones, results)}
+    for k, (room, enc) in enumerate(zip(rooms, encs)):
+        entry = {"room": room.name, "use": room.use, "defined_by": room.source, "enclosure": enc.to_json(),
+                 "construction_set": room.construction_set or None}
+        if enc.state == "open":
+            roof = next((c for c, op, p in zip(enc.tri_construction, enc.tri_open, enc.tri_points)
+                         if c and not op and np.cross(p[1] - p[0], p[2] - p[0])[2] > 0), "")
+            so = rm.semi_outdoor(room, enc, scene, weather, roof_construction=str(roof))
+            for key, arr in so.pop("_hourly").items():
+                arrays[f"r{k}_{key}"] = arr
+            so.pop("_points", None)
+            so.pop("_svv", None)
+            entry.update(method="semi_outdoor", comfort=so)
+        else:
+            z, res = zi[room.name]
+            summ = thermal.summarize(z, res, weather, settings)
+            summ["constructions"] = _construction_table(z)
+            entry.update(method="5R1C" + (" + openings" if enc.state == "semi_open" else ""), thermal=summ)
+            for key in ("t_op", "t_air", "heating_w", "cooling_w"):
+                arrays[f"r{k}_{key}"] = res[key]
+        out_rooms.append(entry)
+    result = {"run_id": run_id, "study": "rooms_thermal", "label": label or "rooms", "created": datetime.now().isoformat(timespec="seconds"),
+              "weather": {"location": weather.location.label(), "file": weather.source_path},
+              "engine": {"method": "rooms: enclosure check per room; enclosed / semi-open rooms as ISO 13790 5R1C zones with "
+                                   "constructions, thermal mass from areal heat capacity and heat exchange through shared faces; "
+                                   "open rooms as semi-outdoor comfort (SolarCal MRT, SET*)",
+                         "ray_backend": raytrace.backend(), "solar_sampling": solar_info, "interzone": balance},
+              "settings": settings.__dict__, "rooms": out_rooms, "inputs": inputs or {}, "notes": notes,
+              "assumptions": ["Room-use gains, schedules and set-points: Almond assumptions (rooms.ROOM_USES), overridable per room.",
+                              "Faces with no construction use the preset U-values of the settings; mass falls back to the preset "
+                              "class when less than half the opaque area has a construction.",
+                              "No moisture balance; a design-stage comparison model, not a compliance simulation."]}
+    if envelope_pack:
+        result["envelope_check"] = codes.check_envelope(envelope_surfaces(zones), envelope_pack, weather, **(pack_options or {}))
+    heads = []
+    for e in out_rooms:
+        if e["method"] == "semi_outdoor":
+            heads.append(f"{e['room']}: open, SET* mean {e['comfort']['set_c']['mean_occupied']} degC")
+        else:
+            t = e["thermal"]
+            heads.append(f"{e['room']}: heating {t['heating_kwh_m2']} / cooling {t['cooling_kwh_m2']} kWh/m2, "
+                         f"{t['hours_above_26c_occupied']} h > 26 degC")
+    result["headline"] = "; ".join(heads)
+    result["timing_s"] = round(time.time() - t0, 2)
+    run_dir = save_run(run_id, result, None, arrays)
+    result["run_dir"] = str(run_dir)
+    return result
+
+
+def _construction_table(z: thermal.Zone) -> list[dict]:
+    from . import constructions as asm
+    rows: dict[tuple, dict] = {}
+    for s in z.surfaces:
+        if s.kind == "opening":
+            continue
+        key = (s.kind, s.construction)
+        r = rows.setdefault(key, {"surface": s.kind, "construction": s.construction or "(preset)",
+                                  "name": asm.get(s.construction)["name"] if s.construction else "settings preset",
+                                  "area_m2": 0.0, "u_value": s.u_value})
+        r["area_m2"] = round(r["area_m2"] + s.area, 2)
+    return sorted(rows.values(), key=lambda r: (r["surface"], -r["area_m2"]))
+
+
+def run_rooms_daylight(data: dict, weather, study: str = "annual", quality: str = "medium", label: str = "",
+                       spacing: float = 0.5, height: float = 0.8, overrides: dict | None = None, **kw) -> dict:
+    """Daylight per room: one work-plane grid per room, one simulation, metrics per room."""
+    from . import rooms as rm
+    rooms, encs, scene, notes = prepare_rooms(data, overrides)
+    grids, owner = [], []
+    for k, r in enumerate(rooms):
+        g = rm.daylight_grid(r, spacing, height)
+        if g.n:
+            grids.append(g)
+            owner.append(np.full(g.n, k))
+    if not grids:
+        raise ValueError("Could not place sensors on any room floor")
+    owner = np.concatenate(owner)
+    grid = SensorGrid(np.vstack([g.points for g in grids]), np.vstack([g.normals for g in grids]),
+                      np.concatenate([g.cell_area for g in grids]), spacing, np.vstack([g.cells for g in grids]), owner)
+    res = run_daylight(scene, grid, weather, study, quality, label or f"rooms {study}", **kw)
+    _, arrays = load_run(res["run_id"])
+    per = []
+    for k, r in enumerate(rooms):
+        m = owner == k
+        if not m.any():
+            continue
+        a = grid.cell_area[m]
+        row = {"room": r.name, "use": r.use, "enclosure": encs[k].state, "sensors": int(m.sum()), "area_m2": round(float(a.sum()), 1)}
+        if "df" in arrays:
+            v = arrays["df"][m]
+            row.update(average_df_pct=round(float(np.average(v, weights=a)), 2),
+                       area_df_ge_2_pct=round(100 * float(a[v >= 2].sum() / a.sum()), 1))
+        if "da" in arrays:
+            da = arrays["da"][m]
+            row["sda_pct"] = round(100 * float(a[da >= 0.5].sum() / a.sum()), 1)
+        if "ase_hours" in arrays:
+            ase = arrays["ase_hours"][m]
+            row["ase_pct"] = round(100 * float(a[ase > 250].sum() / a.sum()), 1)
+        if "udi_useful" in arrays:
+            row["udi_useful_mean_pct"] = round(100 * float(np.average(arrays["udi_useful"][m], weights=a)), 1)
+        per.append(row)
+    res["rooms"] = per
+    res["room_names"] = [r.name for r in rooms]
+    res["notes"] = notes + res.get("notes", [])
+    res["headline"] = "; ".join(f"{p['room']}: " + (f"sDA {p['sda_pct']} %" if "sda_pct" in p else f"DF {p.get('average_df_pct')} %")
+                                for p in per)
+    result_path = Path(res["run_dir"]) / "result.json"
+    if result_path.is_file():
+        saved = json.loads(result_path.read_text(encoding="utf-8"))
+        saved.update(rooms=per, room_names=res["room_names"], headline=res["headline"], notes=res["notes"])
+        result_path.write_text(json.dumps(_jsonable(saved), indent=1), encoding="utf-8")
+    np.save(Path(res["run_dir"]) / "room_owner.npy", owner)
+    return res

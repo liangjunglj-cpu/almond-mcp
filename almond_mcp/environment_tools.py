@@ -556,8 +556,195 @@ def register(mcp, send: Sender) -> dict:
                 "constructions": thermal.CONSTRUCTIONS, "thermal_mass_classes": list(thermal.MASS_CLASSES),
                 "ray_backend": daylight.raytrace.backend()}
 
+    # ── rooms, constructions, code packs ─────────────────────────────────────
+
+    @mcp.tool(annotations=READ_ONLY)
+    def list_constructions(kind: str = "", region: str = "") -> dict:
+        """The construction library: layered assemblies (walls, roofs, floors, partitions, windows) with their
+        U-value, areal heat capacity, finishes and glazing g / visible transmittance, plus construction sets
+        (defaults per surface kind) and the sources and licences of the material data. kind: wall_external |
+        wall_internal | roof | floor_ground | floor_exposed | floor_internal | window | door; region: eu, ch, de,
+        uk, sg, tropical, temperate. Assign one to Rhino elements with assign_construction."""
+        from almond_mcp.environment import constructions as asm
+        try:
+            sets = asm._load("assemblies.json")["sets"]
+            return {"status": "success", "constructions": asm.catalogue(kind, region),
+                    "sets": [s for s in sets if not region or region in s["regions"]],
+                    "frames": list(asm.frames().values()),
+                    "sources": [{k: s[k] for k in ("id", "title", "licence", "attribution")} for s in asm.sources().values()],
+                    "note": "Layer data: EnergyPlus / ASHRAE HOF (BSD-style licence); finishes, frames and assembly "
+                            "compositions are Almond assumptions - check against product data."}
+        except ValueError as exc:
+            return _err(str(exc))
+
+    @mcp.tool(annotations=READ_ONLY)
+    def get_construction(construction: str = "", custom: dict | None = None, diagram: bool = True) -> dict:
+        """One construction in full: its layers (outside to inside, with conductivity, density, specific heat,
+        thermal resistance and source), U-value by the EN ISO 6946 procedure, areal heat capacity each side
+        (EN ISO 13786 periodic method), finishes; windows: U_g, U_w, g, visible transmittance. custom = an
+        inline assembly {"kind": "wall_external", "layers": [{"material": "concrete_2400", "thickness_m": 0.2},
+        ...]} to evaluate your own build-up. diagram=True adds an SVG section detail."""
+        from almond_mcp.environment import constructions as asm
+        try:
+            p = asm.properties(custom if custom else construction)
+            out = {"status": "success", **p}
+            if diagram:
+                from almond_mcp.environment import diagrams
+                out["section_svg"] = diagrams.construction_section(p).svg()
+            return out
+        except (ValueError, KeyError) as exc:
+            return _err(str(exc))
+
+    @mcp.tool(annotations=READ_ONLY)
+    def list_code_packs() -> dict:
+        """Regional code packs for envelope checks: what each contains, whether its values are bundled (licence
+        recorded) or only its method is implemented, and the attribution to show. Packs: sg_bca (ETTV / RETV /
+        RTTV, method; indicative, not a Green Mark assessment), uk_adl_2021 (Approved Document L limiting
+        U-values, OGL), de_banz_2020 (German age-band U-values, public domain), eu_hotmaps (EU stock U-values,
+        CC BY 4.0)."""
+        from almond_mcp.environment import codes
+        return {"status": "success", "packs": codes.packs()}
+
+    @mcp.tool(annotations=WRITES)
+    def define_room(name: str, guids: list[str], use: str = "living", construction_set: str = "",
+                    heating_setpoint_c: float | None = None, cooling_setpoint_c: float | None = None,
+                    height_m: float | None = None, remove: bool = False) -> dict:
+        """Mark Rhino objects as one room (user text almond:room...). guids: a closed volume, several surfaces
+        that bound the room (roof, walls - the room is the prism over their plan), or a closed planar curve
+        with height_m. Rooms need not be enclosed: open pavilions and loggias are assessed with a warning.
+        use: living | bedroom | kitchen | bath | circulation | office | classroom | outdoor (sets gains,
+        schedule and set-points); construction_set fills faces with no construction (list_constructions).
+        remove=True clears the room tags. Undoable in Rhino."""
+        from almond_mcp.environment import rooms as rm
+        try:
+            if not guids:
+                return _err("Give the GUIDs of the room's volume, surfaces or boundary curve")
+            if remove:
+                tags = {k: "" for k in ("room", "room_use", "room_set", "room_heat_c", "room_cool_c", "room_height")}
+            else:
+                if not name.strip():
+                    return _err("A room needs a name")
+                if use not in rm.ROOM_USES:
+                    return _err(f"use must be one of {', '.join(rm.ROOM_USES)}")
+                if construction_set:
+                    from almond_mcp.environment import constructions as asm
+                    if construction_set not in {s["id"] for s in asm._load("assemblies.json")["sets"]}:
+                        return _err(f"Unknown construction set '{construction_set}' (list_constructions)")
+                tags = {"room": name.strip(), "room_use": use, "room_set": construction_set,
+                        "room_heat_c": "" if heating_setpoint_c is None else f"{float(heating_setpoint_c):g}",
+                        "room_cool_c": "" if cooling_setpoint_c is None else f"{float(cooling_setpoint_c):g}",
+                        "room_height": "" if height_m is None else f"{float(height_m):g}"}
+            reply = _execute(send, rhino.tag_script({g: tags for g in guids}), 60.0)
+            return {"status": "success", "room": None if remove else name.strip(), "tagged": len(guids),
+                    "guids": reply.get("guids") or [], "next_step": "list_rooms to see the enclosure check"}
+        except (ValueError, RuntimeError, OSError) as exc:
+            return _bridge_errors(exc)
+
+    @mcp.tool(annotations=WRITES)
+    def assign_construction(guids: list[str], construction: str) -> dict:
+        """Give Rhino elements (walls, slabs, roofs, windows) a construction from list_constructions (user text
+        almond:construction). An empty construction removes it. Rooms pick up the construction of each element
+        that bounds them; analyses use its U-value, thermal mass, finishes and glazing. Undoable in Rhino."""
+        from almond_mcp.environment import constructions as asm
+        try:
+            if construction:
+                asm.get(construction)
+            reply = _execute(send, rhino.tag_script({g: {"construction": construction} for g in guids}), 60.0)
+            return {"status": "success", "construction": construction or None, "tagged": len(guids),
+                    "guids": reply.get("guids") or [], "summary": asm.summary(construction) if construction else None}
+        except (ValueError, RuntimeError, OSError) as exc:
+            return _bridge_errors(exc)
+
+    @mcp.tool(annotations=READ_ONLY)
+    def list_rooms(geometry_guids: list[str] | None = None) -> dict:
+        """The rooms defined in Rhino with their enclosure check: enclosed / semi-open / open, open share of the
+        sides and top, openings by orientation, and the constructions found on their boundaries. geometry_guids:
+        what to export (default every visible object)."""
+        from almond_mcp.environment import rooms as rm
+        try:
+            data = _export(send, list(geometry_guids or []))
+            rooms, encs, scene, notes = studies.prepare_rooms(data)
+            out = []
+            for r, e in zip(rooms, encs):
+                found = sorted({c for c in e.tri_construction if c})
+                out.append({"room": r.name, "use": r.use, "defined_by": r.source, "construction_set": r.construction_set or None,
+                            "floor_area_m2": round(rm._floor_area(r), 2), "height_m": round(r.height, 2),
+                            "enclosure": e.to_json(), "constructions_on_boundary": found, "guids": r.guids})
+            return {"status": "success", "rooms": out, "warnings": notes}
+        except (ValueError, RuntimeError, OSError) as exc:
+            return _bridge_errors(exc)
+
+    @mcp.tool(annotations=READ_ONLY)
+    def analyze_rooms(epw_path: str, study: str = "thermal", geometry_guids: list[str] | None = None,
+                      construction: str = "typical", schedule: str = "residential", infiltration_ach: float = 0.3,
+                      natural_ventilation_ach: float = 0.0, shading_g_factor: float = 1.0,
+                      shading_min_outdoor_c: float | None = None, daylight_study: str = "annual",
+                      quality: str = "medium", spacing_m: float = 0.5, envelope_pack: str = "",
+                      pack_options: dict | None = None, label: str = "", background: bool = False) -> dict:
+        """Analyse the rooms defined in Rhino (define_room) with their constructions (assign_construction).
+        study: thermal | daylight. Thermal: enclosed and semi-open rooms as coupled ISO 13790 zones (mass from
+        the constructions, heat flow between rooms through shared walls and floors, air through openings);
+        open rooms as semi-outdoor comfort (MRT with sun on the body, SET*). Rooms without a construction set
+        use the preset `construction` for untagged faces. Daylight: one work-plane grid per room, metrics
+        per room (sDA/ASE annual, or daylight_factor / point_in_time via daylight_study). envelope_pack
+        (sg_bca, uk_adl_2021, de_banz_2020, eu_hotmaps) adds a code check with pack_options such as
+        {"residential": true} for RETV, {"dwelling": false}, {"age_band": "1958-1968"}, {"country": "de"}.
+        background=True returns a job_id (poll get_environment_run)."""
+        if background:
+            fn = getattr(analyze_rooms, "fn", analyze_rooms)
+            args = _params(fn, locals())
+            return _start_job("rooms", lambda: fn(**args))
+        try:
+            data = _export(send, list(geometry_guids or []))
+            if study == "daylight":
+                weather = epw.load(epw_path) if epw_path else None
+                res = studies.run_rooms_daylight(data, weather, daylight_study, quality, label, spacing_m)
+            elif study == "thermal":
+                weather = _weather(epw_path)
+                st = thermal.Settings(construction=construction, schedule=schedule, infiltration_ach=infiltration_ach,
+                                      natural_ventilation_ach=natural_ventilation_ach, shading_g_factor=shading_g_factor,
+                                      shading_min_outdoor_c=shading_min_outdoor_c)
+                res = studies.run_rooms_thermal(data, weather, st, label, {"epw_path": epw_path, "units_to_m": data.get("units_to_m")},
+                                                envelope_pack=envelope_pack, pack_options=pack_options)
+            else:
+                return _err("study must be thermal or daylight")
+            res["status"] = "success"
+            return res
+        except (ValueError, OSError, RuntimeError) as exc:
+            return _bridge_errors(exc)
+
+    @mcp.tool(annotations=READ_ONLY)
+    def check_envelope(pack: str, epw_path: str = "", geometry_guids: list[str] | None = None,
+                       residential: bool = False, dwelling: bool = True, age_band: str = ">=2002",
+                       country: str = "de", sector: str = "residential", user_tables_path: str = "") -> dict:
+        """Check the envelope of the rooms defined in Rhino against a code pack (list_code_packs). sg_bca: ETTV
+        (or RETV with residential=True) per facade and overall, with solar correction factors derived from the
+        site EPW (epw_path required) and shading from the glazing g-value; user_tables_path = a JSON file of your
+        own licensed CF tables to use instead ({"ETTV_walls": {"N": 0.8, ...}}). uk_adl_2021: area-weighted U per
+        element against the limiting values. de_banz_2020 / eu_hotmaps: reference U-values for an age band /
+        country. Indicative design checks, not certification."""
+        from almond_mcp.environment import codes, rooms as rm
+        try:
+            data = _export(send, list(geometry_guids or []))
+            rooms, encs, scene, _notes = studies.prepare_rooms(data)
+            zones = rm.zones_from_rooms(rooms, encs, scene, studies._windows(scene))
+            st = thermal.Settings()
+            for z in zones:
+                thermal.apply_construction(z, st)
+            weather = epw.load(epw_path) if epw_path else None
+            tables = json.loads(Path(user_tables_path).read_text(encoding="utf-8")) if user_tables_path else None
+            res = codes.check_envelope(studies.envelope_surfaces(zones), pack, weather, residential=residential,
+                                       dwelling=dwelling, age_band=age_band, country=country, sector=sector,
+                                       user_tables=tables, north_deg=scene.north_deg)
+            return {"status": "success", **res}
+        except (ValueError, OSError, RuntimeError, json.JSONDecodeError) as exc:
+            return _bridge_errors(exc)
+
     return {"climate_summary": climate_summary, "sun_path": sun_path, "analyze_daylight": analyze_daylight,
             "analyze_solar_radiation": analyze_solar_radiation, "analyze_thermal": analyze_thermal,
             "thermal_comfort": thermal_comfort, "show_environment_result": show_environment_result,
             "list_environment_runs": list_environment_runs, "get_environment_run": get_environment_run,
-            "list_environment_materials": list_environment_materials}
+            "list_environment_materials": list_environment_materials, "list_constructions": list_constructions,
+            "get_construction": get_construction, "list_code_packs": list_code_packs, "define_room": define_room,
+            "assign_construction": assign_construction, "list_rooms": list_rooms, "analyze_rooms": analyze_rooms,
+            "check_envelope": check_envelope}
