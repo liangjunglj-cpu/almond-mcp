@@ -2288,7 +2288,8 @@ def validate_structure(
         scene_id: scene ledger to read placements from (default: tagged Rhino objects).
         floor_load_kn_m2: imposed floor load in kN/m2 (e.g. 2.0 for homes, EN 1991-1-1
             category A) on every bay enclosed by beams on a level; the beams take it by the
-            45-degree rule (two-way, one-way above 2:1). Native engine only. A code floor load
+            45-degree rule (two-way; above 2:1 one-way with triangular end strips on the short
+            beams). Native engine only. A code floor load
             already covers movable furniture and people: combine it with asset_loads only for
             heavy specific items, and set load_kn to 0 to avoid double counting.
         floor_dead_kn_m2: superimposed dead load in kN/m2 (floor build-up, finishes) on the
@@ -2320,8 +2321,10 @@ def validate_structure(
             "pinned_start" | "pinned_end" | "rigid" overrides either mode. Native engine.
         stability: "auto" (default): elastic critical load factor alpha_cr for every ULS
             combination (EN 1993-1-1 5.2.1) and sway imperfections phi = 1/200 x alpha_h x alpha_m
-            (5.3.2) in +/-x and +/-y; alpha_cr < 10 runs a second-order (P-Delta) ULS analysis,
-            alpha_cr <= 1 fails as unstable. "off": first-order without imperfections.
+            (5.3.2, m per sway direction: columns with at least half their row's average load)
+            in +/-x and +/-y; alpha_cr < 10 runs a second-order (P-Delta) ULS analysis with local
+            bow imperfections e0/L (Table 5.1) on the members 5.3.2(6) names, alpha_cr <= 1 fails
+            as unstable. "off": first-order without imperfections.
     Prefer calling get_construction_guidance BEFORE generating the geometry:
     pick a real construction system and size members from its depth/spacing
     rules. This tool cross-checks the analyzed span against that same library

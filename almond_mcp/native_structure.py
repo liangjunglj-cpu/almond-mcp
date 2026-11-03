@@ -62,8 +62,10 @@ ASSUMPTIONS = [
     "(Class 4 flagged as not covered); cross-section 6.2.1(7) with elastic moduli (plastic only for "
     "Class 1/2 when plastic design is requested); flexural buckling about both axes (6.3.1, curves "
     "from Table 6.2, L_cr = the member between its joints, 5.2.2(7)b); compression + bending by "
-    "6.3.3 (6.61)/(6.62) with Annex B factors and Table B.3 Cm. Not checked: lateral-torsional "
-    "buckling, shear (6.2.6), torsion, local bow imperfections.",
+    "6.3.3 (6.61)/(6.62) with Annex B factors and Table B.3 Cm; shear 6.2.6 (V_pl,Rd with the 6.2.6(3) "
+    "shear area, eta = 1.0; webs past hw/tw = 72 epsilon / eta flagged as not covered) and bending with "
+    "high shear 6.2.8. Local bow imperfections (5.3.2(6), Table 5.1) where alpha_cr < 10. Not checked: "
+    "lateral-torsional buckling, torsion.",
     "Preliminary design check, not an engineer's sign-off.",
 ]
 
@@ -564,7 +566,8 @@ def member_table(model: dict, frame, sls, envelope, deflections=None) -> list[di
             "length_m": round(span, 4), "elements": len(idx),
             "section": e0.section.name, "material": e0.material.name, "pinned_ends": pinned,
             "utilization": round(float(u), 4),
-            "status": "fail" if u > 1.0 or det.get("class") == 4 else "warn" if u > 0.8 else "ok",
+            "status": "fail" if u > 1.0 or det.get("class") == 4 or det.get("shear_buckling") else
+                      "warn" if u > 0.8 else "ok",
             "governing_combination": comb, "governing_check": check,
             "cross_section_utilization": round(float(det["cross_section"]), 4) if "cross_section" in det else None,
             "buckling_utilization": round(float(det["buckling"]), 4) if "buckling" in det else None,
@@ -577,6 +580,9 @@ def member_table(model: dict, frame, sls, envelope, deflections=None) -> list[di
             "cm_y": _r(det.get("cm_y"), 3), "cm_z": _r(det.get("cm_z"), 3),
             "kyy": _r(det.get("kyy"), 3), "kzz": _r(det.get("kzz"), 3),
             "eq_6_61": _r(det.get("eq_6_61"), 4), "eq_6_62": _r(det.get("eq_6_62"), 4),
+            "shear_utilization": _r(det.get("shear"), 4),
+            "v_pl_rd_kn": [_r(det["v_pl_rd_y_kn"], 3), _r(det["v_pl_rd_z_kn"], 3)] if "v_pl_rd_y_kn" in det else None,
+            "shear_rho": _r(det.get("rho"), 4), "shear_buckling": det.get("shear_buckling"),
             "buckling_length_m": _r(det.get("length_cr_m"), 3),
             "max_stress_mpa": round(float(det.get("max_stress_mpa", 0.0)), 2),
             "n_tension_kn": round(max(float(N.max()), 0.0), 3), "n_compression_kn": round(max(-float(N.min()), 0.0), 3),
@@ -647,29 +653,66 @@ def subdivide(frame, parts: int, only: set | None = None) -> None:
             tail = len(frame.elements) - 1
 
 
-def sway_imperfection(frame) -> dict:
+ROW_TOL = 0.05              # m: column lines this close across the sway direction stand in one plane
+
+
+def _rows(coords: list, tol: float = ROW_TOL) -> list[list[int]]:
+    """Indices of ``coords`` grouped into clusters no wider than consecutive gaps of ``tol``."""
+    order = sorted(range(len(coords)), key=lambda k: coords[k])
+    rows: list[list[int]] = []
+    for k in order:
+        if rows and coords[k] - coords[rows[-1][-1]] <= tol:
+            rows[-1].append(k)
+        else:
+            rows.append([k])
+    return rows
+
+
+def sway_imperfection(frame, axial: np.ndarray | None = None) -> dict:
     """EN 1993-1-1 5.3.2(3): phi = phi_0 * alpha_h * alpha_m, alpha_h = 2/sqrt(h) in [2/3, 1],
-    alpha_m = sqrt(0.5 (1 + 1/m)), h = height of the structure, m = number of column lines.
+    alpha_m = sqrt(0.5 (1 + 1/m)), h = height of the structure.
+
+    m per sway direction (5.3.2(3)b): the columns in a row, i.e. the column lines standing in one
+    vertical plane parallel to the sway, counting only those that carry a vertical load N_Ed of at least
+    50 % of the average column load in that plane. A column line's load is its largest compression in
+    ``axial`` (element axial forces, tension +); without ``axial`` every column counts. A frame with
+    several rows takes the smallest m (the largest alpha_m: on the safe side for every row).
     No columns (or no height): no sway imperfection."""
     X = np.asarray(frame.nodes, float)
-    lines = set()
-    for e in frame.elements:
+    lines: dict = {}
+    for i, e in enumerate(frame.elements):
         d = X[e.n2] - X[e.n1]
         L = float(np.linalg.norm(d))
         if L > 0 and abs(d[2]) / L > 0.98:
-            lines.add((round(float(X[e.n1][0]), 2), round(float(X[e.n1][1]), 2)))
+            lines.setdefault((round(float(X[e.n1][0]), 2), round(float(X[e.n1][1]), 2)), []).append(i)
     h = float(X[:, 2].max() - X[:, 2].min()) if len(X) else 0.0
     if not lines or h < 0.1:
-        return {"phi": 0.0, "h_m": round(h, 3), "columns": len(lines), "basis": "no columns: no sway imperfection"}
+        return {"phi": 0.0, "phi_x": 0.0, "phi_y": 0.0, "h_m": round(h, 3), "columns": len(lines),
+                "basis": "no columns: no sway imperfection"}
     a_h = min(1.0, max(2 / 3, 2 / math.sqrt(h)))
-    a_m = math.sqrt(0.5 * (1 + 1 / len(lines)))
-    return {"phi": PHI_0 * a_h * a_m, "h_m": round(h, 3), "columns": len(lines), "alpha_h": round(a_h, 4),
-            "alpha_m": round(a_m, 4), "basis": "EN 1993-1-1 5.3.2(3), phi_0 = 1/200"}
+    keys = list(lines)
+    load = [1.0 if axial is None else max(0.0, -float(min(axial[i] for i in lines[k]))) for k in keys]
+    out = {"h_m": round(h, 3), "columns": len(lines), "alpha_h": round(a_h, 4)}
+    for name, axis in (("x", 0), ("y", 1)):
+        ms = []
+        for row in _rows([k[1 - axis] for k in keys]):          # sway along x: rows share y
+            avg = sum(load[k] for k in row) / len(row)
+            ms.append(sum(1 for k in row if load[k] >= 0.5 * avg) if avg > 0 else len(row))
+        m = min(ms)
+        a_m = math.sqrt(0.5 * (1 + 1 / m))
+        out.update({f"phi_{name}": PHI_0 * a_h * a_m, f"m_{name}": m, f"alpha_m_{name}": round(a_m, 4)})
+    gov = "x" if out["phi_x"] >= out["phi_y"] else "y"
+    out.update({"phi": out[f"phi_{gov}"], "alpha_m": out[f"alpha_m_{gov}"],
+                "basis": "EN 1993-1-1 5.3.2(3), phi_0 = 1/200; m per sway direction: columns in a row with "
+                         "N_Ed >= 50 % of the row's average"})
+    return out
 
 
 def _imperfection_loads(asm, frame, combo, phi) -> dict:
-    """Equivalent horizontal forces phi * V at every loaded free node, in +x, -x, +y, -y."""
-    if phi <= 0:
+    """Equivalent horizontal forces phi * V at every loaded free node, in +x, -x, +y, -y. ``phi`` is
+    one value or {"x": phi_x, "y": phi_y}."""
+    px, py = (phi.get("x", 0.0), phi.get("y", 0.0)) if isinstance(phi, dict) else (phi, phi)
+    if px <= 0 and py <= 0:
         return {"": None}
     F = fs.load_vector(asm, combo).reshape(-1, fs.DOF)
     V = np.where(F[:, 2] < 0, -F[:, 2], 0.0)
@@ -679,9 +722,108 @@ def _imperfection_loads(asm, frame, combo, phi) -> dict:
     out = {}
     for label, axis, sign in (("+x", 0, 1), ("-x", 0, -1), ("+y", 1, 1), ("-y", 1, -1)):
         H = np.zeros_like(F)
-        H[:, axis] = sign * phi * V
+        H[:, axis] = sign * (px if axis == 0 else py) * V
         out[label] = H.reshape(-1)
     return out
+
+
+SWAY_DIRECTIONS = {"+x": (1.0, 0.0, 0.0), "-x": (-1.0, 0.0, 0.0), "+y": (0.0, 1.0, 0.0), "-y": (0.0, -1.0, 0.0)}
+
+
+def _moment_resistant(frame, at: dict, node: int, own: set, el, axis: str) -> bool:
+    """5.3.2(6) first condition at one member end: the member's own end is not released about the
+    buckling axis ("y": ry, "z": rz), and the joint resists rotation: a rotationally restrained (or
+    sprung) support, or another bending member framing in without releases at that node."""
+    if el.truss:
+        return False
+    rel = el.releases or (False,) * 12
+    if rel[(4 if axis == "y" else 5) + (0 if el.n1 == node else 6)]:
+        return False
+    sup, spr = frame.supports.get(node), frame.springs.get(node)
+    if (sup and any(sup[3:])) or (spr and any(v > 0 for v in spr[3:])):
+        return True
+    for j in at.get(node, ()):
+        if j in own:
+            continue
+        other = frame.elements[j]
+        r = other.releases or (False,) * 12
+        o = 0 if other.n1 == node else 6
+        if not other.truss and not (r[o + 4] and r[o + 5]):
+            return True
+    return False
+
+
+def bow_plan(frame, members: dict, axial: np.ndarray, fabrication: str = "cold_formed") -> tuple[list, dict]:
+    """Members that need a local bow imperfection under one combination (EN 1993-1-1 5.3.2(6)), for a
+    frame sensitive to second-order effects: per compressed steel member and buckling axis, at least
+    one moment-resistant end and lambda_bar > 0.5 sqrt(A fy / N_Ed) (lambda_bar for the member hinged
+    at its ends, L = the member between its joints). e0 from Table 5.1 (elastic analysis) with the
+    member's Table 6.2 curve. Returns (bows, {reason skipped: count})."""
+    X = np.asarray(frame.nodes, float)
+    at: dict = {}
+    for i, e in enumerate(frame.elements):
+        at.setdefault(e.n1, []).append(i)
+        at.setdefault(e.n2, []).append(i)
+    bows, skipped = [], {}
+
+    def skip(reason):
+        skipped[reason] = skipped.get(reason, 0) + 1
+
+    for g, idx in members.items():
+        e0 = frame.elements[idx[0]]
+        n_ed = max(0.0, -float(min(axial[i] for i in idx)))
+        if n_ed <= 0:
+            continue                                            # not compressed: nothing to imperfect
+        if e0.material.family not in ec3.STEEL_FAMILIES:
+            skip("not steel (Table 5.1 curves are for steel)")
+            continue
+        if any(frame.elements[i].truss for i in idx):
+            skip("truss bar: no moment-resistant end")
+            continue
+        nodes = sorted({n for i in idx for n in (frame.elements[i].n1, frame.elements[i].n2)})
+        A, B = max(((p, q) for p in nodes for q in nodes), key=lambda pq: float(np.linalg.norm(X[pq[0]] - X[pq[1]])))
+        L = float(np.linalg.norm(X[B] - X[A]))
+        if L <= 0:
+            continue
+        R, _ = fs.local_axes(X[e0.n1], X[e0.n2], e0.ref)
+        cy, cz = ec3.buckling_curves(e0.section, e0.material.fy, fabrication)
+        own, axes = set(idx), []
+        ends = [next(frame.elements[i] for i in idx if n in (frame.elements[i].n1, frame.elements[i].n2))
+                for n in (A, B)]
+        for axis, curve, vec in (("y", cy, R[2]), ("z", cz, R[1])):   # about y: bows along local z
+            if not any(_moment_resistant(frame, at, n, own, el, axis) for n, el in zip((A, B), ends)):
+                skip("no moment-resistant end")
+                continue
+            need, lam, limit = ec3.bow_required(e0.section, e0.material.fy, e0.material.E, L, n_ed, axis)
+            if not need:
+                skip("lambda_bar <= 0.5 sqrt(A fy / N_Ed)")
+                continue
+            axes.append({"axis": axis, "curve": curve, "e0": ec3.bow_imperfection(curve, L), "dir": np.asarray(vec),
+                         "lambda_bar": lam, "limit": limit})
+        if axes:
+            bows.append({"member": g, "elements": list(idx), "ends": (A, B), "length": L, "n_ed": n_ed,
+                         "tag": list(e0.tag or []), "axes": axes})
+    return bows, skipped
+
+
+def bow_loads(bows: list, direction, ndof: int) -> tuple[np.ndarray, dict]:
+    """Equivalent loads of the bows (Figure 5.4) bulging towards ``direction`` (global unit vector, the
+    sway's): a uniform load 8 N_Ed e0 / L^2 along the member and 4 N_Ed e0 / L against it at each end
+    (self-equilibrating). Returns (global nodal vector, {element: global uniform load kN/m})."""
+    d = np.asarray(direction, float)
+    H, w = np.zeros(ndof), {}
+    for b in bows:
+        L, N = b["length"], b["n_ed"]
+        for ax in b["axes"]:
+            c = float(d @ ax["dir"])
+            if abs(c) < 1e-9:
+                continue
+            v = c * ax["dir"]
+            for ei in b["elements"]:
+                w[ei] = w.get(ei, np.zeros(3)) + 8 * N * ax["e0"] / L ** 2 * v
+            for n in b["ends"]:
+                H[n * fs.DOF:n * fs.DOF + 3] -= 4 * N * ax["e0"] / L * v
+    return H, w
 
 
 def _solve_design(frame, design_basis, uls, plastic=False, stations=11, stability="auto", design_code=None,
@@ -720,11 +862,18 @@ def _solve_design(frame, design_basis, uls, plastic=False, stations=11, stabilit
     members = ec3.groups(frame)
     sls_res = fs.solve_linear(asm, sls[1], stations=stations, plastic=plastic)
     ec3.apply(frame, sls_res, members, plastic, fabrication)
-    imp = sway_imperfection(frame)
-    report = {"mode": "auto", "alpha_cr": {}, "sway_imperfection": imp, "second_order": [], "iterations": 0,
-              "elements_per_member": STABILITY_SUBDIVISION}
+    report = {"mode": "auto", "alpha_cr": {}, "sway_imperfection": None, "sway_imperfections": {},
+              "second_order": [], "iterations": 0, "elements_per_member": STABILITY_SUBDIVISION,
+              "bow_imperfection": {"basis": "EN 1993-1-1 5.3.2(6): frames with alpha_cr < 10, compressed members with "
+                                            "a moment-resistant end and lambda_bar > 0.5 sqrt(A fy / N_Ed); e0/L "
+                                            "from Table 5.1 (elastic)", "applied": [], "skipped": {}}}
     variants = []                                           # (name, factors, result)
     for name, factors in ulss:
+        axial = fs.axial_forces(asm, factors)
+        imp = sway_imperfection(frame, axial)
+        report["sway_imperfections"][name] = imp
+        if report["sway_imperfection"] is None or imp["phi"] > report["sway_imperfection"]["phi"]:
+            report["sway_imperfection"] = imp
         alpha, _ = fs.critical_load_factor(asm, factors)
         report["alpha_cr"][name] = None if math.isinf(alpha) else round(alpha, 3)
         if alpha <= 1.0:
@@ -732,13 +881,31 @@ def _solve_design(frame, design_basis, uls, plastic=False, stations=11, stabilit
             raise InstabilityError(f"Instability: elastic critical load factor alpha_cr = {alpha:.2f} <= 1 under "
                                    f"{name}: the frame buckles before reaching the design loads.", report)
         second = alpha < ALPHA_CR_FIRST_ORDER
+        bows = []
         if second:
             report["second_order"].append(name)
-        for label, H in _imperfection_loads(asm, frame, factors, imp["phi"]).items():
-            vname = f"{name} {label} sway".strip() if label else name
+            bows, skipped = bow_plan(frame, members, axial, fabrication)
+            bi = report["bow_imperfection"]
+            for k, v in skipped.items():
+                bi["skipped"][k] = bi["skipped"].get(k, 0) + v
+            bi["applied"] += [{"combination": name, "source_guids": b["tag"], "length_m": round(b["length"], 3),
+                               "n_ed_kn": round(b["n_ed"], 3), "axis": ax["axis"], "curve": ax["curve"],
+                               "e0_over_l": f"1/{ec3.BOW_ELASTIC[ax['curve']]}", "e0_mm": round(ax["e0"] * 1000, 2),
+                               "lambda_bar": round(ax["lambda_bar"], 3), "lambda_limit": round(ax["limit"], 3)}
+                              for b in bows for ax in b["axes"]]
+        loads = _imperfection_loads(asm, frame, factors, {"x": imp["phi_x"], "y": imp["phi_y"]})
+        kind = "sway"
+        if bows and "" in loads:                                # no sway imperfection: bows alone, each way
+            loads, kind = {label: None for label in SWAY_DIRECTIONS}, "bow"
+        for label, H in loads.items():
+            vname = f"{name} {label} {kind}".strip() if label else name
+            w = None
+            if bows and label:                                  # bows bulge the way the frame sways
+                Hb, w = bow_loads(bows, SWAY_DIRECTIONS[label], asm.ndof)
+                H = Hb if H is None else H + Hb
             try:
-                r_ = (fs.solve_second_order(asm, factors, extra=H, stations=stations, plastic=plastic) if second
-                      else fs.solve_linear(asm, factors, extra=H, stations=stations, plastic=plastic))
+                r_ = (fs.solve_second_order(asm, factors, extra=H, stations=stations, plastic=plastic, member_loads=w)
+                      if second else fs.solve_linear(asm, factors, extra=H, stations=stations, plastic=plastic))
             except fs.MechanismError as exc:
                 report["method"] = "unstable"
                 raise InstabilityError(f"Instability under {vname}: {exc}", report) from None
@@ -746,6 +913,8 @@ def _solve_design(frame, design_basis, uls, plastic=False, stations=11, stabilit
             report["iterations"] = max(report["iterations"], r_.iterations)
             variants.append((vname, factors, r_))
     report["method"] = "second-order (P-Delta)" if report["second_order"] else "first-order"
+    if not report["second_order"]:
+        report["bow_imperfection"]["skipped"] = {"alpha_cr >= 10: first-order, 5.3.2(6) needs no bows": len(ulss)}
     finite = [a for a in report["alpha_cr"].values() if a is not None]
     report["min_alpha_cr"] = min(finite) if finite else None
     envelope = []
@@ -947,8 +1116,11 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
         "Supports: " + ", ".join(f"{n} {k}" for k, n in sorted(_support_counts(info).items())) + " (global axes; "
         "rollers restrain vertical movement and the named horizontal direction, springs in kN/m and kNm/rad).",
         (f"Stability (EN 1993-1-1 5.2): alpha_cr {stab.get('min_alpha_cr')} -> {stab['method']}; sway imperfection "
-         f"phi = {stab['sway_imperfection']['phi']:.5f} in +/-x, +/-y; member buckling length = member length"
-         if stab.get("mode") == "auto" else "Stability check off: first-order, no sway imperfections."),
+         f"phi_x = {stab['sway_imperfection'].get('phi_x', 0.0):.5f} (m = {stab['sway_imperfection'].get('m_x', 0)}), "
+         f"phi_y = {stab['sway_imperfection'].get('phi_y', 0.0):.5f} (m = {stab['sway_imperfection'].get('m_y', 0)}) "
+         f"in +/-x, +/-y; local bow imperfections on {len(stab['bow_imperfection']['applied'])} member axis(es); "
+         "member buckling length = member length"
+         if stab.get("mode") == "auto" else "Stability check off: first-order, no sway or bow imperfections."),
         f"Load combinations ({r['design_basis']}): deflection at {SLS[0]} ({_label(SLS[1])}); member checks at "
         + ", ".join(f"{n} ({_label(f)})" for n, f, _ in ulss) + ". G = self weight, floor build-up and the weight "
         "of placed items; Q = load_kn, occupancy floor load, contents and occupants."]
@@ -956,7 +1128,8 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
         result["floor_loads"] = info["floor_loads"]
         result["assumptions"] = result["assumptions"] + [
             "Floor loads: every bay enclosed by beams on a level carries the area load; 45-degree two-way "
-            "distribution (one-way above 2:1), centroid fan for non-rectangular bays."]
+            "distribution (above 2:1 one-way onto the long beams, with triangular end strips on the short "
+            "beams), centroid fan for non-rectangular bays."]
     if "asset_loads" in info:
         result["asset_loads"] = info["asset_loads"]
         if info["asset_loads"]["applied"]:
@@ -973,6 +1146,12 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
         failures.append(f"{len(slender)} member(s) have Class 4 (slender) sections, which these checks do not "
                         "cover (EN 1993-1-5/-1-6 effective sections)")
         sug.append("Use thicker walls: Class 4 starts at d/t = 90 x 235/fy for CHS (59.6 for S355)")
+    thin_webs = sorted({tuple(frame.elements[i].tag or [str(i)]) for i, (_, _, er) in enumerate(envelope)
+                        if er.util_detail.get("shear_buckling")})
+    if thin_webs:
+        failures.append(f"{len(thin_webs)} member(s) have webs with hw/tw > 72 epsilon / eta, which need the shear "
+                        "buckling check of EN 1993-1-5 (not covered)")
+        sug.append("Use thicker webs or walls (hw/tw <= 72 epsilon), or add web stiffeners and check to EN 1993-1-5")
     indicative = INDICATIVE_FAMILIES.get(mat.family)
     if umax > 1.0 and not indicative:
         failures.append(f"Utilization ratio {umax:.2f} ({governing}) exceeds 1.0")

@@ -128,15 +128,31 @@ axes polygonized identically. `almond_mcp/native_structure.py` then applies:
     (Class 3 form with elastic moduli, Class 1/2 form with plastic) and Table B.3 C_m:
     0.6 + 0.4ψ ≥ 0.4 for linear moment diagrams, the table's upper bound 1.0 for members
     with transverse load.
+  - **Shear** 6.2.6: V_pl,Rd = A_v (f_y/√3)/γ_M0 along both local axes (CHS: the
+    resultant), with the 6.2.6(3) shear areas: I/H (no root radii) A − 2bt_f + t_w t_f ≥
+    η h_w t_w parallel to the web, A − h_w t_w parallel to the flanges; RHS A·h/(b + h) and
+    A·b/(b + h); CHS 2A/π; solid bars A. η = 1.0, the 6.2.6(3) Note's conservative value (the
+    recommended 1.2 of EN 1993-1-5 is a Nationally Determined Parameter and is not applied).
+    Reported per member as `shear_utilization`, `v_pl_rd_kn` [y, z] and `shear_rho`.
+  - **Shear buckling flag** 6.2.6(6): webs (RHS walls) with h_w/t_w > 72ε/η need
+    EN 1993-1-5 and **fail as not covered**, like Class 4 (`shear_buckling: true`).
+  - **Bending with high shear** 6.2.8: where V_Ed > 0.5 V_pl,Rd at a station, ρ =
+    (2V_Ed/V_pl,Rd − 1)² and the bending resistance there uses (1 − ρ)f_y on the shear area:
+    eq. (6.30) W_pl,y − ρA_w²/(4t_w) for I-sections about the major axis (elastic moduli:
+    W_el,y − ρ t_w h_w³/(6h)); every other case reduces the whole modulus (safe side).
+    The buckling checks (6.3.3) keep the unreduced resistances.
   - γ_M0, γ_M1 from the design code profile.
 
-**Not covered:** shells, large-displacement (geometrically nonlinear) analysis beyond P-Δ, member bow imperfections (5.3.2(6)), lateral-torsional buckling (hollow sections are immune; I-sections are not checked for it), shear resistance (6.2.6) and torsion, Class 4 effective sections, aluminium to EN 1999, dynamics, connections. Results are a preliminary design check, not an engineer's sign-off.
+**Not covered:** shells, large-displacement (geometrically nonlinear) analysis beyond P-Δ, lateral-torsional buckling (hollow sections are immune; I-sections are not checked for it), torsion, shear buckling resistance (EN 1993-1-5; flagged, see above), Class 4 effective sections, aluminium to EN 1999, dynamics, connections. Results are a preliminary design check, not an engineer's sign-off.
 
 ### Validation
 
 - `tests/test_hand_calculations.py` and `tests/test_ec3.py`: closed forms worked from first
   principles and from the standard's text (beam, cantilever, column buckling on curves a and
-  c, Table 5.2 classes by grade, Table B.3 C_m, an Annex B case where k = 1.3).
+  c, Table 5.2 classes by grade, Table B.3 C_m, an Annex B case where k = 1.3, shear areas and
+  V_pl,Rd per section type, ρ and eq. (6.30), the h_w/t_w flag, Table 5.1 bow amplitudes, the
+  5.3.2(6) condition, a bowed propped column against the closed-form second-order solution, the
+  5.3.2(3)b column count).
 - `tools/mutation_check.py` plants known engineering errors one at a time (wrong factors,
   wrong curve, unscaled class limits, buckling length of one analysis element, ...) and
   reports whether the tests catch each.
@@ -156,15 +172,40 @@ With `stability="auto"` (the default), every ULS combination gets:
   Cholesky factor of K. Compression members are split into 4 elements first — one element
   per member overstates α_cr by ~22 % for a pin-ended column; four are within ~0.05 %.
 - **Sway imperfections** (5.3.2): φ = φ₀·α_h·α_m with φ₀ = 1/200, α_h = 2/√h (⅔…1),
-  α_m = √(0.5(1 + 1/m)), h the height of the structure and m the number of column lines,
-  applied as horizontal forces φ·V at every loaded node in +x, −x, +y and −y; the member
-  checks take the worst direction. No columns (no height) → no sway imperfection.
+  α_m = √(0.5(1 + 1/m)), h the height of the structure, applied as horizontal forces φ·V at
+  every loaded node in +x, −x, +y and −y; the member checks take the worst direction. No
+  columns (no height) → no sway imperfection.
+  **m per sway direction (5.3.2(3)b):** the columns in a row, i.e. the column lines standing in
+  one vertical plane parallel to the sway (lines within 50 mm across it), counting only those
+  that carry N_Ed ≥ 50 % of that row's average column load under the ULS combination (a line's
+  load is its largest compression). With several rows the smallest m governs (largest α_m, on
+  the safe side for every row). The report gives `phi_x`/`m_x` and `phi_y`/`m_y` per
+  combination (`sway_imperfections`) and the largest under `sway_imperfection`.
+- **Local bow imperfections** (5.3.2(6)–(7)), in the second-order analysis (α_cr < 10) only:
+  e0 from **Table 5.1, elastic analysis** (a0 L/350, a L/300, b L/250, c L/200, d L/150) with
+  the member's Table 6.2 curve about each axis, applied as the **equivalent loads of
+  Figure 5.4**: a uniform 8N_Ed·e0/L² along the member and 4N_Ed·e0/L against it at each end
+  (self-equilibrating), bulging the way the frame sways in each ±x/±y variant. A compressed
+  steel member gets a bow about an axis only when 5.3.2(6) asks for it: at least one
+  moment-resistant end (its own end not released about that axis, at a rotationally
+  restrained support or a joint with another unreleased bending member) **and** λ̄ >
+  0.5·√(A·f_y/N_Ed), λ̄ in-plane for the member hinged at its ends (i.e. N_Ed > N_cr/4).
+  Skipped otherwise, with the reason counted per member axis in
+  `stability.bow_imperfection.skipped`: "alpha_cr >= 10" (the clause covers frames sensitive
+  to second-order effects only), "no moment-resistant end" (pin-ended members and truss bars:
+  their bow is covered by the 6.3 member check), "lambda_bar <= 0.5 sqrt(A fy / N_Ed)", "not
+  steel". Applied bows are listed in `stability.bow_imperfection.applied` (member, axis,
+  curve, e0, N_Ed, λ̄ and its limit). The 6.3 member checks still run on these members
+  (5.2.2(3)b), which is conservative.
 - **Regime** (5.2.1): α_cr ≥ 10 → first-order results; 1 < α_cr < 10 → a second-order
   (P-Δ) ULS analysis, iterating (K + K_G(N))·u = F until the axial forces settle; α_cr ≤ 1
   (or a second-order stiffness that stops being positive definite) → **FAIL, unstable**.
 - Member buckling checks use L_cr = the member length, also when the stability check has
   split the member into elements: conservative for non-sway frames (α_cr ≥ 10) and permitted
   after a global second-order analysis with sway imperfections (5.2.2(7)b).
+- Extra member loads (the bows) are solved exactly like case loads: equivalent nodal loads
+  through the same static condensation, and the member's own load in the internal force
+  recovery (`member_loads` on `solve_linear` / `solve_second_order`).
 
 `visualize_structure(view="buckling")` draws the first buckling mode of the governing ULS
 combination with its α_cr and a STABLE / SWAY-SENSITIVE / UNSTABLE badge.
@@ -265,7 +306,10 @@ ULS u 0.86 — up from 0.59 unfactored).
   supports (in the reactions, bending no member). Diagonals between supports that would
   cut an already closed bay are rejected.
 - **Distribution:** rectangular bays use 45° lines from the corners — short edges carry a
-  triangle, long edges a trapezoid; above 2:1 the bay spans one way onto its long edges.
+  triangle, long edges a trapezoid. Above 2:1 the bay spans one way onto its long edges
+  (q·s/2 along the middle l − s) with the 45° rule still applied at the short ends: each
+  short beam carries its triangular end strip (q·s²/4), so the bay's load q·s·l is conserved
+  and short beams are never left unloaded. Such bays are counted as `one_way_bays` per level.
   Other convex bays use a centroid fan (each edge a triangle peaking under the centroid).
 - **Exact:** members are split at the load shape's kinks and each part carries a linear
   load, solved exactly (a triangle on a simple span reproduces `WL³/60EI` and `WL/6`).

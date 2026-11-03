@@ -5,7 +5,10 @@ enclosed by beams). Each bay's load reaches its edge members by the usual tribut
 
 - rectangular bay, long/short <= 2 (two-way): 45-degree lines from the corners; short edges
   carry a triangle (peak q*s/2 at midspan), long edges a trapezoid (plateau q*s/2);
-- rectangular bay, long/short > 2 (one-way): the long edges carry q*s/2 uniformly;
+- rectangular bay, long/short > 2 (one-way): the slab spans one way onto the long edges (q*s/2
+  uniformly along the middle l - s), and the 45-degree rule still applies at the short ends:
+  each short edge carries its triangular end strip (peak q*s/2, area s^2/4), the long edges ramp
+  up over the end strips. Every bay sends exactly q*s*l to its edges;
 - any other convex bay: a centroid fan; each edge carries a triangle with its apex under the
   bay centroid and the triangle's area as tributary area.
 
@@ -161,6 +164,13 @@ def _convex(P):
     return all(v >= -1e-9 for v in s)
 
 
+def spanning(s: float, l: float) -> str:
+    """A rectangular bay's spanning: "one-way" above a 2:1 plan ratio, else "two-way"."""
+    if l / s > 2.0:
+        return "one-way"
+    return "two-way"
+
+
 def edge_shapes(frame: fs.Frame, bay: dict, q: float) -> list[tuple[tuple, object, list[tuple[float, float]]]]:
     """Load shape on each bay edge: ((element, t at start, t at end), start vertex, [(t, w kN/m), ...])
     piecewise linear in t along the edge from its start vertex."""
@@ -169,15 +179,14 @@ def edge_shapes(frame: fs.Frame, bay: dict, q: float) -> list[tuple[tuple, objec
     out = []
     if _is_rectangle(P):
         lens = [float(np.linalg.norm(P[(i + 1) % 4] - P[i])) for i in range(4)]
-        s, l = min(lens), max(lens)
+        s = min(lens)
+        # 45-degree lines from the corners at every ratio: two-way up to 2:1; above it the same lines are
+        # one-way spanning onto the long edges (plateau q*s/2 along the middle l - s) with triangular
+        # end strips on the short edges, which therefore keep their tributary end load
         for i in range(4):
             L = lens[i]
-            if l / s > 2.0:                                    # one-way onto the long edges
-                w = q * s / 2 if L > (s + l) / 2 else 0.0
-                pts = [(0.0, w), (1.0, w)]
-            else:                                              # two-way, 45-degree lines
-                r = (s / 2) / L
-                pts = [(0.0, 0.0), (r, q * s / 2), (1 - r, q * s / 2), (1.0, 0.0)] if r < 0.5 else [(0.0, 0.0), (0.5, q * L / 2), (1.0, 0.0)]
+            r = (s / 2) / L
+            pts = [(0.0, 0.0), (r, q * s / 2), (1 - r, q * s / 2), (1.0, 0.0)] if r < 0.5 else [(0.0, 0.0), (0.5, q * L / 2), (1.0, 0.0)]
             out.append((bay["edges"][i], bay["nodes"][i], pts))
         return out
     c = np.asarray(bay["centroid"])
@@ -319,6 +328,11 @@ def apply(frame: fs.Frame, imposed_kn_m2: float = 0.0, dead_kn_m2: float = 0.0, 
             report["warnings"].append(f"{enclosed - loaded:.1f} m2 enclosed by members at z={z:.2f} m could not be "
                                       "resolved into floor bays and carries no floor load.")
         for bay in bays:
+            P = np.asarray(bay["points"], float)
+            if _is_rectangle(P):
+                lens = [float(np.linalg.norm(P[(i + 1) % 4] - P[i])) for i in range(4)]
+                if spanning(min(lens), max(lens)) == "one-way":
+                    lv["one_way_bays"] = lv.get("one_way_bays", 0) + 1
             if not _convex(np.asarray(bay["points"], float)):
                 report["warnings"].append(f"Non-convex bay at z={z:.2f} m ({bay['area']:.1f} m2): centroid-fan "
                                           "distribution is approximate.")
