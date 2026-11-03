@@ -93,7 +93,16 @@ sent by a model JSON (the `almond-mcp solve` protocol).
   cantilever's root, a truss chord's end posts), so column shortening in a tall
   frame does not count as beam deflection; the absolute maximum is reported as
   `max_displacement_mm`. Storey drift is not checked.
-- **Strength:** utilization < 1.0 against yield (S235: fy = 235 MPa).
+- **Strength:** utilization < 1.0 against yield (S235: fy = 235 MPa). On the
+  native engine (EN 1993-1-1, per member) this is the worst of: cross-section
+  6.2.1(7), shear 6.2.6 (V_pl,Rd with the 6.2.6(3) shear area, η = 1.0), bending
+  reduced by high shear 6.2.8, flexural buckling 6.3.1 and compression + bending
+  6.3.3 (Annex B). Class 4 sections and webs past h_w/t_w = 72ε/η (shear
+  buckling, EN 1993-1-5) fail as not covered. With α_cr < 10 the ULS analysis is
+  second order with sway imperfections (5.3.2(3), m per sway direction counting
+  columns with ≥ 50 % of their row's average load) and local bow imperfections
+  (5.3.2(6), Table 5.1) where the clause requires them. Not checked:
+  lateral-torsional buckling, torsion. See [native-solver.md](native-solver.md).
 - Rule-based pathway: mid-span UDL deflection `5wL⁴/384EI`, moment `wL²/8`,
   with load sharing across members.
 

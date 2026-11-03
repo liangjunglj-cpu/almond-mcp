@@ -109,7 +109,7 @@ def test_sway_imperfection_formula(h, m, phi):
     for i in range(m):
         a, b = f.add_node((5.0 * i, 0, 0)), f.add_node((5.0 * i, 0, h))
         f.add_element(a, b, SEC, STEEL)
-    assert ns.sway_imperfection(f)["phi"] == pytest.approx(phi, rel=1e-9)
+    assert ns.sway_imperfection(f)["phi_x"] == pytest.approx(phi, rel=1e-9)          # one row along x: m columns
 
 
 def test_imperfection_forces_total_phi_times_vertical_load():
