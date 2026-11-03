@@ -20,7 +20,7 @@ import sys
 import webbrowser
 from pathlib import Path
 
-from almond_mcp import __version__, paths
+from almond_mcp import __version__, bridge_client, paths
 
 BRIDGE_HOST = "127.0.0.1"
 BRIDGE_PORT = 5000
@@ -196,13 +196,33 @@ def cmd_doctor(args: argparse.Namespace) -> int:
     print("Rhino bridge:")
     try:
         with socket.create_connection((BRIDGE_HOST, BRIDGE_PORT), timeout=2):
-            check(f"bridge listening on {BRIDGE_HOST}:{BRIDGE_PORT}", True)
+            listening = True
+        check(f"bridge listening on {BRIDGE_HOST}:{BRIDGE_PORT}", True)
     except OSError:
+        listening = False
         check(
             f"bridge listening on {BRIDGE_HOST}:{BRIDGE_PORT}",
             False,
             "start Rhino 8 with the RhinoAlmondBridge plugin loaded",
         )
+    if listening:
+        reply = bridge_client.ping()
+        if reply.get("status") == "ok" and reply.get("bridge") == "almondbridge":
+            check("bridge accepts this client's session token", True,
+                  f"almondbridge {reply.get('version')} (protocol {reply.get('protocol')})")
+            expected = reply.get("python_package")
+            if expected and expected != f"almond-mcp@{__version__}":
+                print(f"  note  almondbridge {reply.get('version')} pairs with {expected}; this is almond-mcp {__version__}")
+        elif reply.get("code") == "unauthorized":
+            found = bridge_client.token()
+            check("bridge accepts this client's session token", False,
+                  ("the token in " if found else "no token at ") + str(bridge_client.token_path()) +
+                  (" is not this Rhino session's: restart Rhino, or unset ALMOND_BRIDGE_TOKEN" if found else
+                   ": restart Rhino with almondbridge loaded (it writes the token at startup)"))
+        elif reply.get("code") == "unreachable":
+            check("bridge answers a ping", False, reply.get("message", ""))
+        else:
+            print("  note  this almondbridge predates session tokens (protocol 2): update it in Rhino's Package Manager")
 
     print("\nAll checks passed." if ok else "\nSome checks failed (see above).")
     return 0 if ok else 1

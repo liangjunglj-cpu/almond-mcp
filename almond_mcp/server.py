@@ -24,7 +24,7 @@ from fastmcp import FastMCP
 from fastmcp.resources import ResourceContent, ResourceResult
 from almond_mcp.ghx_parser import GHParser, validate_capsule_manifest
 from almond_mcp.retrieval_store import AlmondStore
-from almond_mcp import asset_passport, asset_loads, conditioning, exchange, paths, drafting, native_structure, structure_study, design_codes
+from almond_mcp import asset_passport, asset_loads, bridge_client, conditioning, exchange, paths, drafting, native_structure, structure_study, design_codes
 
 # ── Constants ────────────────────────────────────────────────────────────────
 
@@ -542,36 +542,9 @@ capsule_sync_report = _sync_capsule_library(retrieval_store, CAPSULE_LIBRARY_DIR
 # ── TCP Helpers ──────────────────────────────────────────────────────────────
 
 def _send_and_receive(payload_bytes: bytes, timeout: float = 60.0) -> str:
-    """Send payload to the Rhino bridge using a length-prefix protocol and receive response."""
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.settimeout(timeout)
-    try:
-        s.connect((BRIDGE_HOST, BRIDGE_PORT))
-
-        # Length-prefix: send 4-byte big-endian length header, then data
-        length = len(payload_bytes)
-        s.sendall(length.to_bytes(4, 'big'))
-        s.sendall(payload_bytes)
-
-        # Receive: read 4-byte length header, then exact data
-        header = b''
-        while len(header) < 4:
-            chunk = s.recv(4 - len(header))
-            if not chunk:
-                raise ConnectionError("Bridge closed connection while reading response header.")
-            header += chunk
-
-        resp_length = int.from_bytes(header, 'big')
-        resp_data = b''
-        while len(resp_data) < resp_length:
-            chunk = s.recv(min(16384, resp_length - len(resp_data)))
-            if not chunk:
-                raise ConnectionError("Bridge closed connection while reading response body.")
-            resp_data += chunk
-
-        return resp_data.decode('utf-8')
-    finally:
-        s.close()
+    """Send one request to the Rhino bridge (length-prefixed JSON with this Rhino session's token) and
+    return its reply. See almond_mcp.bridge_client."""
+    return bridge_client.send(payload_bytes, timeout=timeout, host=BRIDGE_HOST, port=BRIDGE_PORT)
 
 
 _CAPSULE_GEOMETRY_TYPES = {

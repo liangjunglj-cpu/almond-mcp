@@ -12,8 +12,13 @@ using Rhino;
 namespace RhinoAlmondBridge
 {
     /// <summary>
-    /// TCP Server that listens for incoming requests from the MCP server.
+    /// TCP Server that listens for incoming requests from the MCP server, on 127.0.0.1 only.
+    /// Protocol: 4-byte big-endian length + UTF-8 JSON (at most MaxMessageBytes), one request per connection.
+    /// Every request carries "token" (BridgeAuth: this Rhino session's token from
+    /// %LOCALAPPDATA%\Almond\bridge.token) and an explicit "type"; anything else is refused before it
+    /// reaches Rhino.
     /// Supported request types:
+    ///   {"type": "ping"}  -> {"status": "ok", "bridge": "almondbridge", "version": ..., "protocol": 2}
     ///   {"type": "execute", "script": "C# code..."}
     ///   {"type": "validate", "guids": [...], "structure_type": "beam", ...}
     ///   {"type": "run_definition", "capsule_id": "...", "manifest_path": "...", ...}
@@ -27,6 +32,9 @@ namespace RhinoAlmondBridge
     public class BridgeServer
     {
         private readonly int _port;
+        internal const int MaxMessageBytes = 64 * 1024 * 1024;     // a model export is a few MB; refuse anything absurd
+        private const int SocketTimeoutMs = 15000;                  // a silent client must not hold the listener
+        internal const int Protocol = 2;                            // 2: token required, explicit type
         private Thread _listenerThread;
         private volatile bool _running;
         private StructuralValidator _validator;
@@ -110,6 +118,7 @@ namespace RhinoAlmondBridge
         public void Stop()
         {
             _running = false;
+            BridgeAuth.Revoke();          // now, not when the listener thread next wakes: Rhino may exit first
         }
 
         private void ListenLoop()
@@ -128,6 +137,15 @@ namespace RhinoAlmondBridge
             }
 
             listener.Server.ReceiveTimeout = 1000;
+            try { BridgeAuth.Issue(); }
+            catch (Exception ex)
+            {
+                // without a token file no client can authenticate: say why, and do not serve unauthenticated
+                RhinoApp.WriteLine($"RhinoAlmondBridge: Could not write the bridge token ({ex.Message}); the bridge is off.");
+                listener.Stop();
+                _running = false;
+                return;
+            }
 
             while (_running)
             {
@@ -142,17 +160,31 @@ namespace RhinoAlmondBridge
                     using (var client = listener.AcceptTcpClient())
                     using (var stream = client.GetStream())
                     {
+                        client.ReceiveTimeout = SocketTimeoutMs;
+                        client.SendTimeout = SocketTimeoutMs;
                         // Read length-prefixed message: 4-byte big-endian length + payload
                         var headerBytes = ReadExact(stream, 4);
                         if (headerBytes == null) continue;
 
-                        int msgLength = (headerBytes[0] << 24) | (headerBytes[1] << 16) |
-                                        (headerBytes[2] << 8) | headerBytes[3];
+                        long msgLength = ((long)headerBytes[0] << 24) | ((long)headerBytes[1] << 16) |
+                                         ((long)headerBytes[2] << 8) | headerBytes[3];
+                        if (msgLength <= 0 || msgLength > MaxMessageBytes)
+                        {
+                            Reply(stream, Refusal($"Message length {msgLength} bytes is outside 1..{MaxMessageBytes}."));
+                            continue;
+                        }
 
-                        var payloadBytes = ReadExact(stream, msgLength);
+                        var payloadBytes = ReadExact(stream, (int)msgLength);
                         if (payloadBytes == null) continue;
 
                         string json = Encoding.UTF8.GetString(payloadBytes);
+                        // authenticate before anything touches Rhino
+                        string refusal = Authenticate(json);
+                        if (refusal != null)
+                        {
+                            Reply(stream, refusal);
+                            continue;
+                        }
 
                         // Route based on request type
                         string responseJson = null;
@@ -183,17 +215,7 @@ namespace RhinoAlmondBridge
                             responseJson = JsonConvert.SerializeObject(timeout);
                         }
 
-                        // Send length-prefixed response
-                        byte[] respBytes = Encoding.UTF8.GetBytes(responseJson);
-                        byte[] respHeader = new byte[4];
-                        respHeader[0] = (byte)((respBytes.Length >> 24) & 0xFF);
-                        respHeader[1] = (byte)((respBytes.Length >> 16) & 0xFF);
-                        respHeader[2] = (byte)((respBytes.Length >> 8) & 0xFF);
-                        respHeader[3] = (byte)(respBytes.Length & 0xFF);
-
-                        stream.Write(respHeader, 0, 4);
-                        stream.Write(respBytes, 0, respBytes.Length);
-                        stream.Flush();
+                        Reply(stream, responseJson);
                     }
                 }
                 catch (Exception ex)
@@ -204,6 +226,43 @@ namespace RhinoAlmondBridge
             }
 
             listener.Stop();
+            BridgeAuth.Revoke();
+        }
+
+        /// <summary>Length-prefixed UTF-8 reply.</summary>
+        private static void Reply(NetworkStream stream, string json)
+        {
+            byte[] respBytes = Encoding.UTF8.GetBytes(json ?? "");
+            byte[] respHeader = new byte[4];
+            respHeader[0] = (byte)((respBytes.Length >> 24) & 0xFF);
+            respHeader[1] = (byte)((respBytes.Length >> 16) & 0xFF);
+            respHeader[2] = (byte)((respBytes.Length >> 8) & 0xFF);
+            respHeader[3] = (byte)(respBytes.Length & 0xFF);
+            stream.Write(respHeader, 0, 4);
+            stream.Write(respBytes, 0, respBytes.Length);
+            stream.Flush();
+        }
+
+        private static string Refusal(string message) =>
+            JsonConvert.SerializeObject(new { status = "error", code = "refused", message });
+
+        /// <summary>Null when the request is well formed and carries this session's token; else the refusal.</summary>
+        internal static string Authenticate(string json)
+        {
+            JObject jobj;
+            try { jobj = JObject.Parse(json); }
+            catch (Exception) { return Refusal("The request is not a JSON object."); }
+            if (!BridgeAuth.Verify(jobj.Value<string>("token")))
+                return JsonConvert.SerializeObject(new
+                {
+                    status = "error", code = "unauthorized",
+                    message = "The Almond bridge refused a request without this Rhino session's token. The MCP server reads it " +
+                        "from " + BridgeAuth.TokenPath + ", which almondbridge writes when Rhino starts: update almond-mcp to the " +
+                        "version matching almondbridge (uvx almond-mcp@latest), then restart your MCP client.",
+                });
+            if (string.IsNullOrWhiteSpace(jobj.Value<string>("type")))
+                return Refusal("The request has no \"type\".");
+            return null;
         }
 
         /// <summary>
@@ -214,7 +273,7 @@ namespace RhinoAlmondBridge
             try
             {
                 var jobj = JObject.Parse(json);
-                string requestType = jobj.Value<string>("type") ?? "execute";
+                string requestType = jobj.Value<string>("type") ?? "";
 
                 switch (requestType.ToLower())
                 {
@@ -266,12 +325,21 @@ namespace RhinoAlmondBridge
                         RhinoApp.WriteLine("RhinoAlmondBridge: Structure view (Karamba live)...");
                         return StructureView.Handle(jobj);
 
+                    case "ping":
+                        return JsonConvert.SerializeObject(new
+                        {
+                            status = "ok", bridge = "almondbridge", protocol = Protocol,
+                            version = NativeSolver.PluginVersion, python_package = NativeSolver.PackageFor(NativeSolver.PluginVersion),
+                        });
+
                     case "execute":
-                    default:
                         string script = jobj.Value<string>("script") ?? "";
                         var executor = new ScriptExecutor();
                         var execResult = executor.Execute(script);
                         return JsonConvert.SerializeObject(execResult);
+
+                    default:
+                        return Refusal($"Unknown request type '{requestType}'.");
                 }
             }
             catch (Exception ex)
