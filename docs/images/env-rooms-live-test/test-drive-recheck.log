@@ -1,0 +1,16 @@
+﻿geometry success
+7 partial tags: error | RuntimeError: Rhino script failed: Objects not found (nothing was tagged): deadbeef-0000-0000-0000-000000000000
+   tag left on the valid object: <none>
+   define: success
+5 duplicate name: error | RuntimeError: Rhino script failed: A room named 'FX Box' already exists on 1 other object(s) (nothing was tagged). Choose another name, remove that room first, 
+3 height 3000: error | ValueError: room height 3000 m is over 100 m - heights are in metres, not model units (3 m, not 3000)
+8 set-points 26/20: error | ValueError: heating set-point 26 degC must be below the cooling set-point 20 degC
+   curve room: success
+   open curve room: success
+   window construction: success
+16 list_rooms: success ['FX Box', 'FX Plan']
+   notes: ['1 object(s) tagged as rooms have no usable geometry (open curves, points or unsupported types) and were left o']
+10 own window DF: success [('FX Box', 2.97)] 
+15 check sg_bca zurich, residential='false': success ETTV | The weather file is for Zurich.Affoltern, ZH, CHE (47.43, 8.52), not Singapore: ETTV/RETV limits and coefficients are ca
+   notes: ["No construction on: FX Box floor_ground, FX Box roof, FX Box wall_external - the 'typical' preset U-values stand in (ass"]
+cleanup success

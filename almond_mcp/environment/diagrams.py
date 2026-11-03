@@ -341,8 +341,10 @@ def site_diagram(latitude: float, longitude: float, time_zone: float, north_deg:
         if len(pts) > 1:
             c.line(pts, col, CUT if col == RED else OUTLINE)
             c.text(pts[len(pts) // 2][0], pts[len(pts) // 2][1] - 6, name, 8, col, mono=True, anchor="middle")
-    c.text(12, 18, label or f"{latitude:.2f}, {longitude:.2f}", 10, MUTED, mono=True)
-    c.text(12, H - 10, "SUN PATH · STEREOGRAPHIC · 0/30/60° ALTITUDE", 8, MUTED, mono=True)
+    # the site name and caption go in the half away from the north mark, so they never run into the "N"
+    north_up = math.cos(a) > 0
+    c.text(12, H - 22 if north_up else 18, label or f"{latitude:.2f}, {longitude:.2f}", 10, MUTED, mono=True)
+    c.text(12, H - 10 if north_up else 31, "SUN PATH · STEREOGRAPHIC · 0/30/60° ALTITUDE", 8, MUTED, mono=True)
     return c
 
 

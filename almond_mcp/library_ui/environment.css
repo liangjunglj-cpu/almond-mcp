@@ -1,9 +1,11 @@
-/* Environment workspace: diagrams and tables in the archive's paper / ink / red language. */
+/* Environment workspace: diagrams and tables in the archive's paper / ink / red language. The engine's
+   diagrams are drawings in fixed ink colours, so they always sit on a paper sheet, also in a dark panel. */
+.env-page{--sheet:#efeee8}
 .env-strip{margin:18px 0 6px;border-bottom:1px solid var(--line)}
-.env-strip svg{display:block;width:100%;height:auto}
+.env-strip svg{display:block;width:100%;height:auto;background:var(--sheet)}
 .env-diagram{margin:14px 0}
 .env-diagram:empty{display:none}
-.env-diagram svg{display:block;width:100%;height:auto;background:var(--paper)}
+.env-diagram svg{display:block;width:100%;height:auto;background:var(--sheet)}
 .env-list{width:100%;font:12px/1.5 Arial,sans-serif;border:1px solid var(--line);padding:4px;background:transparent}
 .env-list option{padding:4px 2px}
 .env-facts{display:grid;grid-template-columns:auto 1fr;gap:6px 18px;font-size:12px;margin:12px 0;border-top:1px solid var(--ink);padding-top:12px}

@@ -5,7 +5,9 @@ from __future__ import annotations
 import io
 import json
 import math
+import re
 import xml.dom.minidom
+from pathlib import Path
 
 import numpy as np
 import pytest
@@ -302,6 +304,25 @@ def test_diagrams_render(tmp_path):
     out = diagrams.construction_section(asm.properties("ew_rc_etics")).png(str(tmp_path / "s.png"))
     from PIL import Image
     assert Image.open(out).size == (1040, 600)
+
+
+def test_site_diagram_keeps_the_name_away_from_the_north_mark():
+    """Live panel run: a long site name at the top ran into the 'N' of a north-up compass."""
+    name = "Zurich.Affoltern, ZH, CHE"
+    for north, top in ((0.0, False), (200.0, True)):
+        doc = xml.dom.minidom.parseString(diagrams.site_diagram(47.43, 8.52, 1.0, north, name).svg())
+        texts = {t.firstChild.data: float(t.getAttribute("y")) for t in doc.getElementsByTagName("text") if t.firstChild}
+        assert (texts[name] < 150) is top and (texts["N"] < 150) is not top
+
+
+def test_panel_diagrams_sit_on_paper_in_a_dark_panel():
+    """Live panel run: in Rhino's dark theme --paper turns dark and the engine's ink drawings vanished."""
+    ui = Path(diagrams.__file__).resolve().parents[1] / "library_ui"
+    css = (ui / "environment.css").read_text(encoding="utf-8")
+    assert re.search(r"\.env-diagram svg\{[^}]*background:var\(--sheet\)", css)
+    assert re.search(r"\.env-strip svg\{[^}]*background:var\(--sheet\)", css)
+    assert f"--sheet:{diagrams.PAPER}" in css.lower()
+    assert "Climate, Rooms <br>&amp; Comfort" in (ui / "index.html").read_text(encoding="utf-8")   # panel hides the <br>
 
 
 def _panel(req: dict) -> dict:

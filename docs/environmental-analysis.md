@@ -5,6 +5,11 @@ radiation, thermal comfort and energy, per room with layered constructions.
 Everything runs inside the Almond MCP server (numpy, optionally numba), so no Radiance or EnergyPlus
 install is needed. Rhino is only used to export geometry and to draw the coloured results back.
 
+What is simulated is what is visible. With no objects passed, a study exports every visible object in
+the document, so hiding a layer (furniture, planting, context) removes those objects from the run as
+shading and reflecting surfaces. Hidden objects, objects on hidden layers, and Almond's own
+`Almond::…` result layers are left out.
+
 ## Clean-room statement
 
 This is **not** a decompilation or copy of ClimateStudio (Solemma), whose binaries and documentation
