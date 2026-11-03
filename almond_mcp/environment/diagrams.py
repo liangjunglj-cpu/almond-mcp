@@ -394,17 +394,23 @@ def room_plan(rooms: list[dict], title: str = "Rooms", values: dict | None = Non
             pts = [X(p) for p in r["outline"]]
             state = r.get("state", "enclosed")
             fill = STATE_FILL.get(state, PAPER)
+            label = INK
             if values and r["name"] in values and values[r["name"]] is not None:
                 rgb = colorize(np.array([values[r["name"]]], float), vmin, vmax, ramp)[0]
                 fill = "#%02x%02x%02x" % tuple(int(x) for x in rgb[:3])
+                if (0.299 * rgb[0] + 0.587 * rgb[1] + 0.114 * rgb[2]) / 255 < 0.5:
+                    label = "#ffffff"
             c.polygon(pts, fill=fill, hatch="open" if state == "open" and not values else None,
                       stroke=INK, width=CUT if state == "enclosed" else OUTLINE, dash=None if state == "enclosed" else "5 3")
-            cen = np.mean(np.asarray(pts), axis=0)
-            c.text(cen[0], cen[1] - 3, r["name"], 11, INK, anchor="middle", weight="bold")
+            import shapely
+            rp = shapely.Polygon(pts).representative_point()
+            cen = np.array([rp.x, rp.y])
+            c.text(cen[0], cen[1] - 3, r["name"], 11, label, anchor="middle", weight="bold")
             sub = f"{r.get('area', 0):.0f} m²" + (f" · {r['use']}" if r.get("use") else "")
             if values and r["name"] in values and values[r["name"]] is not None:
-                sub = f"{values[r['name']]:.1f} {unit}".strip()
-            c.text(cen[0], cen[1] + 11, sub, 9, MUTED if not values else INK, mono=True, anchor="middle")
+                v = values[r['name']]
+                sub = (f"{v:.0f}" if abs(v) >= 10 or unit == "h" else f"{v:.1f}") + (f" {unit}" if unit else "")
+            c.text(cen[0], cen[1] + 11, sub, 9, MUTED if not values else label, mono=True, anchor="middle")
             for o in r.get("openings", []):
                 nrm = o.get("normal", [0, 0, 0])
                 if abs(nrm[2]) > 0.7:

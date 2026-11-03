@@ -10,6 +10,7 @@ import numpy as np
 RAMPS = {
     "viridis": ["#440154", "#472c7a", "#3b518b", "#2c718e", "#21908d", "#27ad81", "#5cc863", "#aadc32", "#fde725"],
     "magma": ["#000004", "#1c1044", "#4f127b", "#812581", "#b5367a", "#e55064", "#fb8761", "#fec287", "#fcfdbf"],
+    "heat": ["#f7f3e8", "#f6dfb4", "#f3b878", "#ee8550", "#e94329", "#b8281d", "#7a1a14"],   # Almond paper to red
     "coolwarm": ["#3b4cc0", "#6282ea", "#8db0fe", "#b8d0f9", "#dddddd", "#f5c4ad", "#f49a7b", "#de604d", "#b40426"],
 }
 

@@ -126,7 +126,8 @@ def run(req: dict) -> dict:
                               infiltration_ach=float(s.get("infiltration_ach", 0.3)),
                               natural_ventilation_ach=float(s.get("natural_ventilation_ach", 0.0)),
                               shading_g_factor=float(s.get("shading_g_factor", 1.0)),
-                              shading_min_outdoor_c=s.get("shading_min_outdoor_c"))
+                              shading_min_outdoor_c=s.get("shading_min_outdoor_c"),
+                              heat_recovery=float(s.get("heat_recovery", 0.0)))
         res = studies.run_rooms_thermal(data, weather, st, req.get("label", ""), {"epw_path": req["epw_path"], "units_to_m": units},
                                         envelope_pack=req.get("envelope_pack", ""), pack_options=req.get("pack_options"),
                                         cooling=bool(s.get("cooling", True)))
@@ -140,7 +141,7 @@ def run(req: dict) -> dict:
         vrange = (0.0, max(100.0, float(top)))
         unit, title = "h", "Hours above 26 °C (occupied)"
         rs, encs, _, _ = studies.prepare_rooms(data)
-        plan = diagrams.room_plan(_room_outlines(rs, encs), title, values or None, unit, vrange, "magma")
+        plan = diagrams.room_plan(_room_outlines(rs, encs), title, values or None, unit, vrange, "heat")
         heat = [r["thermal"]["heating_kwh_m2"] for r in res["rooms"] if r["method"] != "semi_outdoor"]
         cool = [r["thermal"]["cooling_kwh_m2"] for r in res["rooms"] if r["method"] != "semi_outdoor"]
         tiles = []
@@ -149,7 +150,7 @@ def run(req: dict) -> dict:
                       (f"{max(values.values()):.0f}", "max h > 26 °C", "")]
         if open_rooms:
             tiles.append((f"{np.mean(list(open_rooms.values())):.1f}", "open rooms SET*", "°C"))
-        draw = _draw_rooms(rs, values, unit, title, vrange, "magma", units)
+        draw = _draw_rooms(rs, values, unit, title, vrange, "heat", units)
     else:
         raise ValueError("study must be thermal or daylight")
     return {"result": res, "svg": plan.svg(title), "tiles_svg": diagrams.results_tiles(tiles).svg("Results") if tiles else "",

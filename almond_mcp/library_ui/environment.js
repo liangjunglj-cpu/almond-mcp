@@ -99,7 +99,7 @@ function request(action,input={}){
 function settings(){
   const blinds=el('env-blinds').checked;
   return {construction:el('env-preset').value,schedule:'residential',natural_ventilation_ach:Number(el('env-nv').value)||0,
-    shading_g_factor:blinds?0.15:1,shading_min_outdoor_c:blinds?12:null,cooling:el('env-cooling').checked,daylight_study:el('env-daylight').value,
+    shading_g_factor:blinds?0.15:1,shading_min_outdoor_c:blinds?12:null,cooling:el('env-cooling').checked,heat_recovery:Math.min(Math.max((Number(el('env-hr').value)||0)/100,0),0.95),daylight_study:el('env-daylight').value,
     quality:el('env-quality').value,spacing_m:Number(el('env-spacing').value)||0.5};
 }
 document.querySelectorAll('[data-env]').forEach(b=>b.addEventListener('click',()=>{

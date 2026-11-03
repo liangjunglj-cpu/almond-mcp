@@ -120,6 +120,7 @@ class Settings:
     infiltration_ach: float = 0.3
     ventilation_ach: float | None = None                  # fresh air when occupied; None = per floor area below
     ventilation_l_s_m2: float | None = None               # None = by schedule (VENTILATION_L_S_M2)
+    heat_recovery: float = 0.0                            # efficiency of heat recovery on the mechanical fresh air
     heating_setpoint: float | None = 20.0
     cooling_setpoint: float | None = 26.0
     setback: bool = True                                  # set-points only in occupied hours
@@ -161,6 +162,8 @@ class Settings:
             raise ValueError("air change rates cannot be negative")
         if not 0.0 <= self.shading_g_factor <= 1.0:
             raise ValueError("shading_g_factor must be 0..1")
+        if not 0.0 <= self.heat_recovery <= 0.95:
+            raise ValueError("heat_recovery must be 0..0.95")
         if not 0.0 <= self.frame_fraction < 1.0:
             raise ValueError("frame_fraction must be 0..1")
 
@@ -302,7 +305,8 @@ def simulate(zone: Zone, weather, st: Settings, warmup_days: int = 30) -> dict:
         vent_rate = (st.ventilation_l_s_m2 if st.ventilation_l_s_m2 is not None else
                      prof.get("ventilation_l_s_m2", VENTILATION_L_S_M2.get(prof.get("schedule", st.schedule), 0.42)))
         vent_ach = vent_rate * Af * 3.6 / V                      # l/s m2 -> air changes per hour
-    base_ach = st.infiltration_ach + np.where(occ > 0, vent_ach, 0.0)
+    # heat recovery returns part of the exhaust heat: the fresh air then costs (1 - efficiency) of its flow
+    base_ach = st.infiltration_ach + np.where(occ > 0, vent_ach * (1.0 - st.heat_recovery), 0.0)
     if zone.opening_ach is not None:
         base_ach = base_ach + np.asarray(zone.opening_ach, dtype=float)
     nv_ach = st.natural_ventilation_ach

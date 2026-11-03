@@ -680,7 +680,7 @@ def register(mcp, send: Sender) -> dict:
                       natural_ventilation_ach: float = 0.0, shading_g_factor: float = 1.0,
                       shading_min_outdoor_c: float | None = None, daylight_study: str = "annual",
                       quality: str = "medium", spacing_m: float = 0.5, envelope_pack: str = "",
-                      pack_options: dict | None = None, cooling: bool = True, label: str = "",
+                      pack_options: dict | None = None, cooling: bool = True, heat_recovery: float = 0.0, label: str = "",
                       background: bool = False) -> dict:
         """Analyse the rooms defined in Rhino (define_room) with their constructions (assign_construction).
         study: thermal | daylight. Thermal: enclosed and semi-open rooms as coupled ISO 13790 zones (mass from
@@ -690,7 +690,8 @@ def register(mcp, send: Sender) -> dict:
         per room (sDA/ASE annual, or daylight_factor / point_in_time via daylight_study). envelope_pack
         (sg_bca, uk_adl_2021, de_banz_2020, eu_hotmaps) adds a code check with pack_options such as
         {"residential": true} for RETV, {"dwelling": false}, {"age_band": "1958-1968"}, {"country": "de"}.
-        cooling=False runs every room without mechanical cooling (free-running in warm weather).
+        cooling=False runs every room without mechanical cooling (free-running in warm weather); heat_recovery =
+        efficiency of heat recovery on the mechanical fresh air (0.8 for a typical heat-recovery ventilation unit).
         background=True returns a job_id (poll get_environment_run)."""
         if background:
             fn = getattr(analyze_rooms, "fn", analyze_rooms)
@@ -705,7 +706,7 @@ def register(mcp, send: Sender) -> dict:
                 weather = _weather(epw_path)
                 st = thermal.Settings(construction=construction, schedule=schedule, infiltration_ach=infiltration_ach,
                                       natural_ventilation_ach=natural_ventilation_ach, shading_g_factor=shading_g_factor,
-                                      shading_min_outdoor_c=shading_min_outdoor_c)
+                                      shading_min_outdoor_c=shading_min_outdoor_c, heat_recovery=heat_recovery)
                 res = studies.run_rooms_thermal(data, weather, st, label, {"epw_path": epw_path, "units_to_m": data.get("units_to_m")},
                                                 envelope_pack=envelope_pack, pack_options=pack_options, cooling=cooling)
             else:
