@@ -125,8 +125,11 @@ namespace RhinoAlmondBridge
             // Continuous in Rhino 8 (verified live: index 0 was "Hidden").
             // FindName resolves defaults correctly; Continuous has index -1,
             // which Rhino treats as the continuous default on a layer.
+            // But for an unknown name FindName also returns a non-null
+            // "Continuous" (index -1, verified live), so the name must match.
             var existing = doc.Linetypes.FindName(name);
-            if (existing != null)
+            if (existing != null
+                && string.Equals(existing.Name, name, StringComparison.OrdinalIgnoreCase))
                 return existing.Index;
             if (string.Equals(name, "Continuous", StringComparison.OrdinalIgnoreCase))
                 return -1;

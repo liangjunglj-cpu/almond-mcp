@@ -15,6 +15,11 @@ from typing import Any
 # Assets dropped from their manifest but still placed in a recorded scene.
 RETIRED_LIBRARY_ID = "retired"
 
+# Slack (mm) for validate_scene: a flush placement can land a hair outside its
+# room or inside a neighbour through rotation round-off (sin 180 deg != 0), and
+# the R*Tree stores float32 bounds rounded outward.
+SCENE_TOLERANCE_MM = 0.5
+
 
 def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -1085,35 +1090,35 @@ class AlmondStore:
                     ib.asset_id AS asset_b
                 FROM instance_rtree ra
                 JOIN instance_rtree rb ON ra.instance_rowid < rb.instance_rowid
-                    AND ra.min_x < rb.max_x AND ra.max_x > rb.min_x
-                    AND ra.min_y < rb.max_y AND ra.max_y > rb.min_y
-                    AND ra.min_z < rb.max_z AND ra.max_z > rb.min_z
+                    AND ra.min_x < rb.max_x - :tol AND ra.max_x > rb.min_x + :tol
+                    AND ra.min_y < rb.max_y - :tol AND ra.max_y > rb.min_y + :tol
+                    AND ra.min_z < rb.max_z - :tol AND ra.max_z > rb.min_z + :tol
                 JOIN instances ia ON ia.id = ra.instance_rowid
                 JOIN instances ib ON ib.id = rb.instance_rowid
-                WHERE ia.scene_id = ? AND ib.scene_id = ?
+                WHERE ia.scene_id = :scene AND ib.scene_id = :scene
                 ORDER BY ia.instance_id, ib.instance_id
-                LIMIT ?
+                LIMIT :limit
                 """,
-                (scene_id, scene_id, limit),
+                {"scene": scene_id, "limit": limit, "tol": SCENE_TOLERANCE_MM},
             ).fetchall()
             outside_rows = connection.execute(
                 """
                 SELECT i.instance_id, i.room_id,
-                    i.min_x < r.min_x OR i.max_x > r.max_x AS out_x,
-                    i.min_y < r.min_y OR i.max_y > r.max_y AS out_y,
-                    i.min_z < r.min_z OR i.max_z > r.max_z AS out_z
+                    i.min_x < r.min_x - :tol OR i.max_x > r.max_x + :tol AS out_x,
+                    i.min_y < r.min_y - :tol OR i.max_y > r.max_y + :tol AS out_y,
+                    i.min_z < r.min_z - :tol OR i.max_z > r.max_z + :tol AS out_z
                 FROM instances i
                 JOIN rooms r ON r.room_id = i.room_id
-                WHERE i.scene_id = ?
+                WHERE i.scene_id = :scene
                   AND (
-                    i.min_x < r.min_x OR i.max_x > r.max_x OR
-                    i.min_y < r.min_y OR i.max_y > r.max_y OR
-                    i.min_z < r.min_z OR i.max_z > r.max_z
+                    i.min_x < r.min_x - :tol OR i.max_x > r.max_x + :tol OR
+                    i.min_y < r.min_y - :tol OR i.max_y > r.max_y + :tol OR
+                    i.min_z < r.min_z - :tol OR i.max_z > r.max_z + :tol
                   )
                 ORDER BY i.instance_id
-                LIMIT ?
+                LIMIT :limit
                 """,
-                (scene_id, limit),
+                {"scene": scene_id, "limit": limit, "tol": SCENE_TOLERANCE_MM},
             ).fetchall()
         collisions = [
             {
@@ -1143,6 +1148,7 @@ class AlmondStore:
             "collisions": collisions,
             "outside_room": outside,
             "method": "rtree_world_aabb_broad_phase",
+            "tolerance_mm": SCENE_TOLERANCE_MM,
         }
 
     def _record_revision(
