@@ -1,7 +1,7 @@
 # Environmental analysis (climate, daylight, radiation, thermal comfort)
 
-Almond can analyse a design against a real weather year, the way ClimateStudio, Ladybug Tools or
-DIVA do. It covers climate, sun and shadow, daylight, solar radiation and thermal comfort/energy.
+Almond can analyse a design against a real weather year: climate, sun and shadow, daylight, solar
+radiation, thermal comfort and energy, per room with layered constructions.
 Everything runs inside the Almond MCP server (numpy, optionally numba), so no Radiance or EnergyPlus
 install is needed. Rhino is only used to export geometry and to draw the coloured results back.
 
@@ -13,6 +13,10 @@ are licensed. Nothing from it was disassembled, decompiled or read. What is shar
 papers and standards listed below. The metric definitions (sDA, ASE, UDI, DGP …) are the industry's,
 not any vendor's. Results will differ from ClimateStudio's: different ray tracer, sampling and
 defaults. Compare trends and options, and do not expect identical numbers.
+
+ClimateStudio is a trademark of Solemma; Ladybug Tools, Radiance, EnergyPlus, DIVA, LEED and Green Mark
+belong to their respective owners. They are named only to describe compatibility or comparison;
+Almond is not affiliated with or endorsed by any of them, and uses no code from them.
 
 ## Tools
 
@@ -106,6 +110,98 @@ temperatures. Zones that are not rooms (a wall, a slab, under 2 m² of floor) ar
 §5.4 (including the elevated air speed allowance) and EN 16798-1:2019 Annex B (running mean α 0.8).
 Overheating per CIBSE TM52 (three criteria). Psychrometrics use the ASHRAE Fundamentals
 (Hyland–Wexler) equations.
+
+## Rooms, constructions and code packs
+
+### Rooms (user-defined zones)
+
+Mark the rooms yourself, in the panel (Environment → Rooms) or with `define_room`. A room is:
+
+- a **closed volume** (one polysurface, extrusion or closed mesh);
+- the **surfaces that bound it** (a roof and two walls, a canopy on posts). The room is then the prism
+  over the convex hull of their plan, from their lowest to their highest point;
+- a **closed planar curve** with a height, which is extruded.
+
+The tags are Rhino user text: `almond:room`, `almond:room_use`, `almond:room_set`, `almond:room_heat_c`,
+`almond:room_cool_c` and `almond:room_height`. Room uses (living, bedroom, kitchen, bath, circulation,
+office, classroom, outdoor) set gains, schedule, set-points and fresh air. They are Almond's documented
+assumptions (`rooms.ROOM_USES`) and can be overridden per room.
+
+**Rooms do not have to be enclosed.** Each room's boundary is sampled on a ~0.5 m mesh. Every sample
+probes for a building element within 0.35 m, inside or outside, so walls drawn as solids around a
+room are found. Faces shared with another room count as internal. Faces left open are then sorted:
+
+- **Openings to outside.** The space beyond the face is not enclosed by the building.
+- **Internal openings.** The space beyond is enclosed: rays from it hit the building in nine of ten
+  directions. Typical cases are double-height voids, stair openings and gallery edges.
+
+The open share of the sides and top picks the method. Each result says which method was used.
+
+| State | Open to outside | Method |
+| --- | --- | --- |
+| enclosed | < 5 % | ISO 13790 5R1C with the room's constructions. Smaller gaps are reported, not modelled. |
+| semi-open | 5-30 % | 5R1C plus the air through the openings: single-sided per de Gids and Phaff (1982), cross ventilation by orifice flow. Free-running, no heating or cooling. |
+| open | ≥ 30 % | Semi-outdoor comfort. Air is at outdoor temperature. Mean radiant temperature comes from sky, roof underside and ground, plus sun on the body (SolarCal, cylindrical body). Comfort is SET\*. No loads are reported. |
+
+Internal openings are treated as adiabatic, with no air exchange between the rooms. Define open-plan
+spaces as one room. When nothing is modelled around a closed room volume, its own faces are the
+envelope, which is the classic zone workflow.
+
+Rooms exchange heat through shared walls and floors (H = U·A), across a slab or partition up to 0.35 m
+thick. The coupling uses the previous pass's air temperatures, over three passes; the net exchange
+balances to zero in the tests. Thermal mass comes from the constructions:
+C_m = Σ κ·A and A_m = C_m² / Σ κ²·A (ISO 13790 12.3.1.2). A ceiling sees the soffit side of the floor
+above.
+
+### Constructions
+
+`list_constructions`, `get_construction` and the panel's Constructions step show the library: about 40
+assemblies (external walls, roofs, ground, exposed and intermediate floors, partitions, doors and
+windows) plus construction sets for Europe and Singapore. A custom build-up can be evaluated inline.
+Elements get one with `assign_construction` (user text `almond:construction`). A room takes the
+construction of each element that bounds it; its set fills the rest. Untagged faces fall back to the
+study's preset.
+
+Calculations, each implemented from the procedure of the named standard; no tables are copied:
+
+- U-value by the EN ISO 6946 procedure. Surface resistances depend on heat-flow direction;
+  unventilated air layers use convection plus radiation. Ventilated claddings are left out.
+- Areal heat capacity κ by the EN ISO 13786 periodic method (24 h, surface resistances included).
+  Exposed concrete is about 80 kJ/m²K; a plasterboard partition about 13.
+- Glazing: U_g by the EN 673 procedure (gas Nusselt number, emissivities). Solar and visible
+  transmittance by multiple reflection between the panes. g = τ_e plus the inward share of the absorbed
+  heat. U_w by the EN ISO 10077-1 area-weighted method.
+- Finishes set the daylight reflectances. The top of a roof shows its outside layer, the underside of a
+  floor its soffit, and everything else the inside finish. Window assemblies set τ_v, g and U.
+
+Data provenance: material λ/ρ/c and glass optics come from the EnergyPlus datasets (ASHRAE Handbook of
+Fundamentals values; BSD-style licence). Reflectance defaults come from honeybee-standards (MIT).
+Finishes, frames and the build-ups themselves are labelled Almond assumptions. Every value carries a
+source id (`data/sources.json`). Thermal bridging by studs, ties and fixings is not included: treat
+timber-frame and fixed-insulation U-values as lower bounds.
+
+### Code packs (`list_code_packs`, `check_envelope`, `analyze_rooms(envelope_pack=...)`)
+
+| Pack | Relation | What it checks |
+| --- | --- | --- |
+| `sg_bca` | method | ETTV (non-residential) or RETV (residential) per facade and overall, and RTTV with skylights. The formulas come from the BCA Code on Envelope Thermal Performance. Solar correction factors are derived from the site EPW; shading comes from glazing g and the model. Your own licensed CF tables can be loaded with `user_tables_path`. **Indicative; not a BCA Green Mark assessment.** |
+| `uk_adl_2021` | bundled (OGL v3) | Area-weighted U per element against the Approved Document L limiting values, plus the notional dwelling fabric. |
+| `de_banz_2020` | bundled (public domain) | German flat-rate U-values of unrefurbished elements, by construction age band. |
+| `eu_hotmaps` | bundled (CC BY 4.0) | EU building-stock U-values by country, sector and period (TABULA-based). |
+
+The packs are design checks. None performs a jurisdiction's whole-building compliance calculation (SAP,
+SBEM, GEG, Green Mark scoring). Australian NCC and NZ H1 data are openly licensed (CC BY 4.0) and are
+planned packs; they are not keyed yet.
+
+### Panel workspace
+
+The Almond panel's Environment workspace has five steps: Site → Rooms → Constructions → Study → Results.
+Each step opens with an orientation diagram: the step strip, the sun path, the room plan with enclosure
+state, the section detail of a construction, and the study section. The results show a tinted room plan
+and metric tiles, and the per-room colours are drawn in the viewport. Diagrams come from
+`environment/diagrams.py`, which renders the same drawing to SVG for the panel and to PNG for boards in
+the archive's palette. The panel runs studies out of process (`almond-mcp environment`, JSON on stdin and
+stdout). Its export and draw scripts are the MCP tools' own, so the two always agree.
 
 ## Validation (tests/test_environment.py)
 

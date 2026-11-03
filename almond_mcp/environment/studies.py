@@ -463,7 +463,9 @@ def run_daylight(scene: Scene, grid: SensorGrid, weather, study: str = "annual",
                                "shade_transmittance": float(np.unique([m.shade_transmittance for m in scene.materials if m.kind == "glazing"]).max())}
                               for g in gdesc]
         summ["reference"] = {"leed_v4_eq_daylight_option_1": "sDA300/50% >= 55 % (2 points) or >= 75 % (3 points), with ASE1000,250 <= 10 % - check the rating version you are using",
-                             "leed_v4_1": "sDA300/50% >= 40 % / 55 % / 75 % for 1 / 2 / 3 points; ASE reported"}
+                             "leed_v4_1": "sDA300/50% >= 40 % / 55 % / 75 % for 1 / 2 / 3 points; ASE reported",
+                             "note": "Thresholds quoted for comparison only. LEED is a trademark of the U.S. Green Building "
+                                     "Council; Almond is not affiliated with or endorsed by it, and this is not a LEED assessment."}
         if views:
             vp = np.array([v["position"] for v in views], dtype=float)
             vd = np.array([v["direction"] for v in views], dtype=float)
@@ -735,7 +737,8 @@ def envelope_surfaces(zones: list[thermal.Zone]) -> list[dict]:
 
 
 def run_rooms_thermal(data: dict, weather, settings: thermal.Settings, label: str = "", inputs: dict | None = None,
-                      overrides: dict | None = None, envelope_pack: str = "", pack_options: dict | None = None) -> dict:
+                      overrides: dict | None = None, envelope_pack: str = "", pack_options: dict | None = None,
+                      cooling: bool = True) -> dict:
     """Thermal study of user-defined rooms: enclosed and semi-open rooms by coupled 5R1C zones with their
     constructions, open rooms by semi-outdoor comfort."""
     from . import codes, rooms as rm
@@ -745,6 +748,8 @@ def run_rooms_thermal(data: dict, weather, settings: thermal.Settings, label: st
     zones = rm.zones_from_rooms(rooms, encs, scene, _windows(scene))
     for z in zones:
         z.source.pop("warning", None)                      # the room mesh is re-sampled, not a modelling error
+        if not cooling:
+            z.profile["cooling_setpoint"] = None
         if z.source.get("openings"):
             z.opening_ach = rm.opening_air_changes(z.source["openings"], z.volume, weather)
     solar_info = thermal.solar_on_surfaces(zones, scene, weather, scene.north_deg) if zones else {"surfaces": 0}
@@ -775,6 +780,7 @@ def run_rooms_thermal(data: dict, weather, settings: thermal.Settings, label: st
             for key in ("t_op", "t_air", "heating_w", "cooling_w"):
                 arrays[f"r{k}_{key}"] = res[key]
         out_rooms.append(entry)
+    notes.append("Mechanical cooling to the room set-points." if cooling else "No mechanical cooling: rooms run free in warm weather.")
     result = {"run_id": run_id, "study": "rooms_thermal", "label": label or "rooms", "created": datetime.now().isoformat(timespec="seconds"),
               "weather": {"location": weather.location.label(), "file": weather.source_path},
               "engine": {"method": "rooms: enclosure check per room; enclosed / semi-open rooms as ISO 13790 5R1C zones with "

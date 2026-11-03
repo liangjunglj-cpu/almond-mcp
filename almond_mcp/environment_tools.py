@@ -233,7 +233,7 @@ def register(mcp, send: Sender) -> dict:
                          point_in_time: dict | None = None, views: list[dict] | None = None,
                          ground_reflectance: float = 0.2, north_deg: float | None = None,
                          show_in_rhino: bool = True, label: str = "", background: bool = False) -> dict:
-        """Daylight simulation in the manner of ClimateStudio / Radiance (clean-room, native engine).
+        """Daylight simulation by daylight coefficients (Almond's own native engine).
 
         study: "annual" (climate-based, needs epw_path): sDA300/50% and ASE1000,250h per IES LM-83
           with dynamic shades (a group's shade closes when > 2 % of sensors get > 1000 lux of direct
@@ -680,7 +680,8 @@ def register(mcp, send: Sender) -> dict:
                       natural_ventilation_ach: float = 0.0, shading_g_factor: float = 1.0,
                       shading_min_outdoor_c: float | None = None, daylight_study: str = "annual",
                       quality: str = "medium", spacing_m: float = 0.5, envelope_pack: str = "",
-                      pack_options: dict | None = None, label: str = "", background: bool = False) -> dict:
+                      pack_options: dict | None = None, cooling: bool = True, label: str = "",
+                      background: bool = False) -> dict:
         """Analyse the rooms defined in Rhino (define_room) with their constructions (assign_construction).
         study: thermal | daylight. Thermal: enclosed and semi-open rooms as coupled ISO 13790 zones (mass from
         the constructions, heat flow between rooms through shared walls and floors, air through openings);
@@ -689,6 +690,7 @@ def register(mcp, send: Sender) -> dict:
         per room (sDA/ASE annual, or daylight_factor / point_in_time via daylight_study). envelope_pack
         (sg_bca, uk_adl_2021, de_banz_2020, eu_hotmaps) adds a code check with pack_options such as
         {"residential": true} for RETV, {"dwelling": false}, {"age_band": "1958-1968"}, {"country": "de"}.
+        cooling=False runs every room without mechanical cooling (free-running in warm weather).
         background=True returns a job_id (poll get_environment_run)."""
         if background:
             fn = getattr(analyze_rooms, "fn", analyze_rooms)
@@ -705,7 +707,7 @@ def register(mcp, send: Sender) -> dict:
                                       natural_ventilation_ach=natural_ventilation_ach, shading_g_factor=shading_g_factor,
                                       shading_min_outdoor_c=shading_min_outdoor_c)
                 res = studies.run_rooms_thermal(data, weather, st, label, {"epw_path": epw_path, "units_to_m": data.get("units_to_m")},
-                                                envelope_pack=envelope_pack, pack_options=pack_options)
+                                                envelope_pack=envelope_pack, pack_options=pack_options, cooling=cooling)
             else:
                 return _err("study must be thermal or daylight")
             res["status"] = "success"

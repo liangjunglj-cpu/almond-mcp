@@ -335,7 +335,7 @@ but could not be constructed as drawn is caught too. Details:
 
 ## Environmental analysis: climate, daylight, radiation, thermal comfort
 
-Point any analysis at an EnergyPlus weather file (`.epw`), as you would with ClimateStudio or Ladybug.
+Point any analysis at an EPW weather file (`.epw`), the standard typical-year format for building simulation.
 The engine is native: there is no Radiance or EnergyPlus to install, and it is a clean-room
 implementation of the published methods, not a copy of any plugin.
 

@@ -11,8 +11,8 @@ Rooms do not have to be enclosed. Every room gets an **enclosure check**: its bo
 inside or outside, so walls drawn as solids around a room volume are found wherever their faces are.
 Uncovered boundary is an opening. The share of open area on the sides and top picks the method:
 
-  enclosed   (< 1 % open)    ISO 13790 5R1C (thermal.py), unchanged
-  semi_open  (1-30 % open)   5R1C plus air change through the openings, from wind and stack
+  enclosed   (< 5 % open)    ISO 13790 5R1C (thermal.py), unchanged; small gaps are reported, not modelled
+  semi_open  (5-30 % open)   5R1C plus air change through the openings, from wind and stack
                              (single-sided: de Gids and Phaff 1982; cross ventilation: orifice flow
                              Q = C_d A_eff v sqrt(dCp) between openings on opposite sides)
   open       (>= 30 % open)  semi-outdoor comfort, no heating or cooling loads: air at outdoor dry-bulb;
@@ -41,7 +41,7 @@ from .epw import HOURS
 
 TOLERANCE = 0.35            # m: an element this close to a room boundary encloses it
 CELL = 0.5                  # m: enclosure sampling
-ENCLOSED_MAX = 0.01
+ENCLOSED_MAX = 0.05
 SEMI_OPEN_MAX = 0.30
 KAPPA_DEFAULT = 50_000.0    # J/m2K for opaque surfaces without a construction (a medium-weight finish)
 WIND_LOCAL = 0.5            # local wind / 10 m EPW wind (suburban, sheltered openings)
@@ -261,13 +261,15 @@ class Enclosure:
     tri_open: np.ndarray                 # (k,) bool
     tri_construction: np.ndarray         # (k,) object (assembly id or "")
     tri_element: np.ndarray              # (k,) object (layer / name of the covering element)
-    openings: list[dict]                 # [{"orientation", "normal", "area_m2", "z_min", "z_max"}]
+    openings: list[dict]                 # [{"orientation", "normal", "area_m2", "z_min", "z_max"}] to outside
+    tri_internal: np.ndarray | None = None   # (k,) bool: open towards other parts of the building
+    internal_openings: list[dict] = field(default_factory=list)
     warning: str = ""
 
     def to_json(self) -> dict:
         return {"state": self.state, "open_fraction": round(self.open_fraction, 3), "open_area_m2": round(self.open_area_m2, 2),
                 "boundary_area_m2": round(self.boundary_area_m2, 2), "self_enclosed": self.self_enclosed,
-                "openings": self.openings, "warning": self.warning,
+                "openings": self.openings, "internal_openings": self.internal_openings, "warning": self.warning,
                 "thresholds": {"enclosed_below": ENCLOSED_MAX, "open_from": SEMI_OPEN_MAX, "tolerance_m": TOLERANCE}}
 
 
@@ -335,6 +337,21 @@ def enclosure(room: Room, scene, exclude_objects: set[int] | None = None, ground
         # rooms): its own faces are the envelope (classic zones)
         open_mask[:] = False
         self_enclosed = True
+    # an opening into the rest of the building (a double-height void, a stair, a gallery edge) is not open
+    # to outside: the space beyond it is enclosed when rays from there hit the building in every direction
+    internal = np.zeros(len(cen), bool)
+    if open_mask.any() and len(t):
+        idx = np.flatnonzero(open_mask)
+        beyond = cen[idx] + n[idx] * (tolerance + 0.2)
+        dirs = np.array([[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1],
+                         [0.7, 0.7, 0.2], [-0.7, 0.7, 0.2], [0.7, -0.7, 0.2], [-0.7, -0.7, 0.2]], float)
+        dirs /= np.linalg.norm(dirs, axis=1)[:, None]
+        hits = np.zeros(len(idx), int)
+        for d in dirs:
+            tt, tri = bvh.intersect(beyond, np.repeat(d[None], len(idx), axis=0))
+            hits += (tri >= 0) & (tt < 40.0)
+        internal[idx] = hits >= len(dirs) - 1
+    open_mask &= ~internal
     open_area = float(area[open_mask & sides_top].sum())
     frac = open_area / total_st if total_st > 0 else 0.0
     state = "enclosed" if frac < ENCLOSED_MAX else "semi_open" if frac < semi_open_max else "open"
@@ -355,6 +372,10 @@ def enclosure(room: Room, scene, exclude_objects: set[int] | None = None, ground
         g["normal"] = list(np.asarray(g["normal"]) + n[i] * area[i])
         g["z_min"] = min(g["z_min"], float(tris[i, :, 2].min()))
         g["z_max"] = max(g["z_max"], float(tris[i, :, 2].max()))
+    inner: dict[str, float] = {}
+    for i in np.flatnonzero(internal):
+        key = "up" if n[i, 2] > 0.7 else "down" if n[i, 2] < -0.7 else orientation_of(n[i])
+        inner[key] = inner.get(key, 0.0) + float(area[i])
     ops = []
     for g in openings.values():
         nn = np.asarray(g["normal"])
@@ -369,8 +390,17 @@ def enclosure(room: Room, scene, exclude_objects: set[int] | None = None, ground
     elif state == "open":
         warning = (f"Room {room.name} is an open space ({100 * frac:.0f} % open): it is assessed as semi-outdoor comfort "
                    "(air at outdoor temperature, sun and sky on the occupants); no heating or cooling loads.")
+    if state == "enclosed" and open_area > 0.5:
+        warning = (f"Room {room.name}: {open_area:.1f} m2 of its boundary has no element within {tolerance:g} m (gaps in the "
+                   "model, or small openings); treated as closed.")
+    if inner:
+        note = (f"Room {room.name} opens into other parts of the building ({sum(inner.values()):.0f} m2: "
+                + ", ".join(f"{k} {v:.0f} m2" for k, v in sorted(inner.items(), key=lambda kv: -kv[1]))
+                + "). Those openings are treated as adiabatic, with no air exchange; for open-plan spaces define one room.")
+        warning = (warning + " " + note).strip()
     return Enclosure(state, frac, open_area, float(area.sum()), self_enclosed, tris, open_mask, cons, elem,
-                     sorted(ops, key=lambda g: -g["area_m2"]), warning)
+                     sorted(ops, key=lambda g: -g["area_m2"]), internal,
+                     [{"orientation": k, "area_m2": round(v, 2)} for k, v in sorted(inner.items(), key=lambda kv: -kv[1])], warning)
 
 
 # ── openings airflow ─────────────────────────────────────────────────────────
@@ -557,8 +587,9 @@ def zones_from_rooms(rooms: list[Room], encs: list[Enclosure], scene, windows: l
             if not cons[k] and not e.tri_open[k]:
                 kind = "roof" if nz[k] > 0.7 else "floor_ground" if nz[k] < -0.7 else "wall_external"
                 cons[k] = _set_default(r, kind)
+        # rooms drawn on floors are a slab apart: neighbours within the enclosure tolerance share a face
         z = thermal.zone_from_mesh(r.name, v, f, windows, others, face_construction=cons, face_open=e.tri_open,
-                                   other_names=names)
+                                   other_names=names, neighbour_gap=TOLERANCE, face_adiabatic=e.tri_internal)
         # internal faces between rooms use internal constructions where the element has an external one
         for s in z.surfaces:
             if s.kind == "interzone" and s.construction:

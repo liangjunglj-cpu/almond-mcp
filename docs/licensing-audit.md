@@ -83,6 +83,44 @@ supplied by the user (or authored per `capsules/AUTHORING.md`), so shipping
 the manifests is analogous to wasp-mcp shipping factual pattern knowledge
 derived from examples without shipping the examples.
 
+## Commercial distribution: environment engine, constructions, code packs, panel (2026-11-03)
+
+Goal: the Python package and the Rhino plugin can be sold without third-party IP problems.
+
+| Content | Origin | Licence position | Distributed? |
+| --- | --- | --- | --- |
+| Environment engine (`almond_mcp/environment/*.py`), panel workspace (`library_ui/environment.*`, `EnvironmentWorkspace.cs`) | self-authored; methods implemented from cited papers and standards (no code from Ladybug/Honeybee, Radiance, EnergyPlus, ClimateStudio) | MIT | yes |
+| Material λ/ρ/c, glass optics | EnergyPlus v26.2.0 `datasets/` (ASHRAE HOF, WINDOW glass library) | EnergyPlus licence, BSD-style: redistribution permitted with the notice; the name EnergyPlus may not be used for the product | yes, with `LICENSES/EnergyPlus.txt` and the notice |
+| Generic reflectances | honeybee-standards v2.0.7 | MIT | yes, with notice |
+| DE age-band U-values | BAnz AT 04.12.2020 B1 | official work, Section 5 UrhG (no copyright) | yes, cited |
+| EU stock U-values | Hotmaps building-stock (TABULA-based) | CC BY 4.0 | yes, attributed |
+| England AD L limits / notional fabric | Approved Document L 2021 (2023 amendments) | OGL v3.0 (licence statement in the document) | yes, attributed |
+| Singapore ETTV/RETV/RTTV | BCA Code on Envelope Thermal Performance | BCA terms: no reproduction without written permission; formulas are a method | method only - CF and SC computed by Almond; users may load their own licensed tables at run time (never bundled) |
+| Assembly build-ups, finishes, frames, room-use profiles | self-authored assumptions | MIT | yes, labelled `almond-own` |
+| Aalborg 2021 materials table | Johra, DCE Technical Report 289 | CC BY-SA 4.0 (ShareAlike would bind merged data) | **no** - not bundled; a user-side import (never merged) is a possible follow-up |
+| honeybee-energy-standards, IGDB, bauteilkatalog.ch, SS / EN / ISO / Eurocode tables | various | AGPL / CC BY-ND / proprietary / paid standards | **no** |
+
+Enforcement: `tests/test_rooms_constructions.py::test_library_provenance_and_licences` fails when a bundled
+value lacks a source or a source's licence is not on the allow-list; `tools/license_scan.py` checks the
+Python dependency closure, the plugin's NuGet packages, vendored UI files and the data sources, and
+`tools/verify_release.py` refuses a wheel when it reports anything denied or unknown. Scan result at
+this commit: 0 denied or unknown; to review: certifi (MPL-2.0, used unmodified as a dependency - fine)
+and the BCA method citation (no data shipped).
+
+Trademarks: product names (ClimateStudio, Ladybug Tools, Radiance, EnergyPlus, LEED, Green Mark) appear
+only nominatively in documentation and result notes, with a non-affiliation statement; no logos, no
+third-party names in product or command names, no certification wording (Singapore results say
+"indicative; not a BCA Green Mark assessment", daylight references say "not a LEED assessment").
+
+Open permission requests worth sending before launch (none is needed for the current scope):
+- BCA - permission to bundle the ETTV/RETV tables (CF, SC, material k-values) for a table-based figure.
+- Enterprise Singapore - SS 553 design conditions as defaults (currently user inputs).
+- DESNZ / BRE - SAP 10.2 tables, if a UK SAP-style module is wanted.
+- IWU - TABULA data directly (currently via CC BY Hotmaps).
+- ABCB / MBIE - none needed (CC BY 4.0); Australian NCC and NZ H1 packs are planned, not yet keyed.
+
+This audit is an engineering record, not legal advice: have counsel review it before commercial launch.
+
 ## Rebuild triggers
 
 Re-run this audit if any of these change:

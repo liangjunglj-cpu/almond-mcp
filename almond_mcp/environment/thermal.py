@@ -493,7 +493,8 @@ def zone_from_mesh(name: str, vertices: np.ndarray, triangles: np.ndarray, windo
                    other_zones: list[tuple[np.ndarray, np.ndarray]] | None = None, ground_z: float | None = None,
                    samples_per_surface: int = 9, seed: int = 0, window_tolerance: float = 0.3,
                    face_construction: list[str] | None = None, face_open: np.ndarray | None = None,
-                   other_names: list[str] | None = None) -> Zone:
+                   other_names: list[str] | None = None, neighbour_gap: float = 0.05,
+                   face_adiabatic: np.ndarray | None = None) -> Zone:
     """A Zone from a closed triangle mesh (metres). ``windows``: [{"vertices", "triangles", "name",
     "g_value", "u_value"}] - glazing parallel to a zone face and within ``window_tolerance`` of it (set
     back in the wall depth) is subtracted from that face, clipped to the zone's extent. Faces shared
@@ -510,6 +511,7 @@ def zone_from_mesh(name: str, vertices: np.ndarray, triangles: np.ndarray, windo
     a, b, c, cr, area = a[keep], b[keep], c[keep], cr[keep], area[keep]
     fcons = np.asarray(face_construction if face_construction is not None else [""] * len(keep), dtype=object)[keep]
     fopen = np.asarray(face_open if face_open is not None else np.zeros(len(keep), bool), dtype=bool)[keep]
+    fadia = np.asarray(face_adiabatic if face_adiabatic is not None else np.zeros(len(keep), bool), dtype=bool)[keep]
     normal = cr / (2 * area[:, None])
     vol = float(np.einsum("ij,ij->i", a, np.cross(b, c)).sum() / 6.0)
     if vol < 0:
@@ -537,7 +539,7 @@ def zone_from_mesh(name: str, vertices: np.ndarray, triangles: np.ndarray, windo
     neighbor = np.full(len(cen), "", dtype=object)
     if other_zones:
         from .raytrace import BVH
-        probe = cen + normal * 0.05
+        probe = cen + normal * neighbour_gap
         inside_any = np.zeros(len(cen), dtype=bool)
         for zi, (ov, ot) in enumerate(other_zones):
             ov = np.asarray(ov, dtype=float)
@@ -549,6 +551,7 @@ def zone_from_mesh(name: str, vertices: np.ndarray, triangles: np.ndarray, windo
             inside_any |= hit
         kind[inside_any] = "interzone" if other_names is not None else "adiabatic"
     kind[fopen & ~np.isin(kind, ["interzone", "adiabatic"])] = "opening"
+    kind[fadia & (kind != "interzone")] = "adiabatic"
     rng = np.random.default_rng(seed)
     surfaces: list[Surface] = []
     plane_key = np.concatenate([np.round(normal * 100).astype(np.int64),

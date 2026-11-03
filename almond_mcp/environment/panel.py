@@ -128,7 +128,8 @@ def run(req: dict) -> dict:
                               shading_g_factor=float(s.get("shading_g_factor", 1.0)),
                               shading_min_outdoor_c=s.get("shading_min_outdoor_c"))
         res = studies.run_rooms_thermal(data, weather, st, req.get("label", ""), {"epw_path": req["epw_path"], "units_to_m": units},
-                                        envelope_pack=req.get("envelope_pack", ""), pack_options=req.get("pack_options"))
+                                        envelope_pack=req.get("envelope_pack", ""), pack_options=req.get("pack_options"),
+                                        cooling=bool(s.get("cooling", True)))
         values, open_rooms = {}, {}
         for r in res["rooms"]:
             if r["method"] == "semi_outdoor":

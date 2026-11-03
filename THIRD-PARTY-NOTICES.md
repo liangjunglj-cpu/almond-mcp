@@ -127,6 +127,39 @@ EnergyPlus code or binaries are included or required. The optional `fast` extra 
 (BSD-2-Clause) and llvmlite (BSD-2-Clause) from PyPI; they are not vendored. The false-colour ramps
 are sampled stops of matplotlib's viridis / magma colour maps, whose data is CC0.
 
+### Construction and code-pack data (`almond_mcp/environment/data/`)
+
+Every bundled value records its source in `data/sources.json`; licence texts are in `data/LICENSES/`.
+
+- **Material thermal properties and glass optics**: from the EnergyPlus `datasets/` folder
+  (`ASHRAE_2005_HOF_Materials.idf`, `WindowGlassMaterials.idf`, EnergyPlus v26.2.0). EnergyPlus,
+  Copyright (c) 1996-present, The Board of Trustees of the University of Illinois, The Regents of the
+  University of California through Lawrence Berkeley National Laboratory, Oak Ridge National Laboratory
+  (UT-Battelle), Alliance for Energy Innovation, LLC, and other contributors. All rights reserved.
+  Redistributed under the EnergyPlus licence (BSD-style; `data/LICENSES/EnergyPlus.txt`). Almond is not
+  EnergyPlus and is not endorsed by its developers.
+- **Generic reflectances** (floor 0.20, wall 0.50, ceiling 0.80): honeybee-standards v2.0.7, MIT
+  License, Copyright (c) 2020 Ladybug Tools (`data/LICENSES/honeybee-standards.txt`).
+- **German flat-rate U-values by construction age**: Bekanntmachung der Regeln zur Datenaufnahme und
+  Datenverwendung im Wohngebaeudebestand, BAnz AT 04.12.2020 B1 - an official work, free of copyright
+  under Section 5 UrhG.
+- **EU building-stock U-values**: Hotmaps building-stock dataset (gitlab.com/hotmaps/building-stock,
+  CC BY 4.0), residential part based on the IEE TABULA project (www.episcope.eu); reduced to element
+  averages by Almond.
+- **England limiting and notional U-values**: Approved Document L, 2021 edition incorporating 2023
+  amendments. Contains public sector information licensed under the Open Government Licence v3.0.
+- **Singapore ETTV / RETV / RTTV**: the formulas of the BCA Code on Envelope Thermal Performance for
+  Buildings are implemented (a method, cited); none of the Code's tables are reproduced - solar
+  correction factors are derived from the user's weather file and shading from the model. Results are
+  indicative and are not a BCA Green Mark assessment.
+- **Assembly build-ups, finishes' reflectance and absorptance, window frames and room-use profiles** are
+  Almond's own assumptions (MIT), labelled `almond-own`.
+
+Not bundled (licence does not allow it in a commercial product): EN ISO 10456 / 6946 and Eurocode tables,
+Singapore Standards (SS 530/531/553/554), BCA code tables, the Aalborg 2021 materials table (CC BY-SA;
+not bundled), honeybee-energy-standards (AGPL-3.0), bauteilkatalog.ch, IGDB
+records (CC BY-ND).
+
 ## Browser model viewer
 
 The local Object Archive vendors `@google/model-viewer` 4.3.1 from the official

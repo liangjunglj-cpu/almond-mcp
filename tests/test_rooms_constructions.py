@@ -360,3 +360,44 @@ def test_tools_constructions_and_rooms(server, monkeypatch, tropical_epw):
     assert asg["status"] == "success" and asg["summary"]["kind"] == "wall_external"
     nope = _call(server.assign_construction, guids=["0b6e3f1e-1111-2222-3333-444455556666"], construction="ew_nope")
     assert nope["status"] == "error"
+
+
+def test_internal_openings_are_not_outdoor(tropical):
+    """A double-height hall open to a gallery inside a closed shell: the opening is internal, not to outside."""
+    objs = []
+
+    def add(name, geo, **kw):
+        v, f = geo
+        objs.append({"guid": f"{len(objs):08d}-1111-0000-0000-000000000000", "layer": "B", "name": name, "material": "",
+                     "transparency": 0, "env_material": "", "vertices": v, "faces": f, **kw})
+    # shell 8 x 6 x 6 m with 0.2 m walls, roof and slab
+    for name, geo in (("S", _box(0, -0.2, 0, 8, 0, 6)), ("N", _box(0, 6, 0, 8, 6.2, 6)), ("W", _box(-0.2, -0.2, 0, 0, 6.2, 6)),
+                      ("E", _box(8, -0.2, 0, 8.2, 6.2, 6)), ("Roof", _box(-0.2, -0.2, 6, 8.2, 6.2, 6.2)),
+                      ("Slab", _box(-0.2, -0.2, -0.2, 8.2, 6.2, 0)), ("Gallery", _box(4, 0, 2.8, 8, 6, 3.0))):
+        add(name, geo, construction="ew_rc_etics" if len(name) == 1 else "roof_rc_warm_flat" if name == "Roof"
+            else "floor_ground_rc_xps" if name == "Slab" else "floor_internal_rc_oak")
+    # hall: west half, full height; its east face above the gallery opens onto the gallery space (no room there)
+    objs.append({"guid": "hall0000-1111-0000-0000-000000000000", "layer": "R", "name": "Hall", "room": "Hall",
+                 "room_use": "living", "room_height": "6", "boundary": [0, 0, 0, 4, 0, 0, 4, 6, 0, 0, 6, 0], "vertices": [], "faces": []})
+    data = {"units_to_m": 1.0, "rhino_north_deg": 90.0, "objects": objs}
+    rooms, encs, scene, notes = studies.prepare_rooms(data)
+    e = encs[0]
+    assert e.state == "enclosed" and not e.openings
+    assert e.internal_openings and e.internal_openings[0]["orientation"] == "E" and e.internal_openings[0]["area_m2"] > 10
+    assert any("adiabatic" in n for n in notes)
+    res = studies.run_rooms_thermal(data, tropical, thermal.Settings(), cooling=False)
+    t = res["rooms"][0]["thermal"]
+    assert t["cooling_kwh"] == 0 and res["rooms"][0]["method"] == "5R1C"
+    assert any(c["surface"] == "adiabatic" for c in t["constructions"])
+
+
+def test_licence_scan_is_clean():
+    import importlib.util
+    from pathlib import Path
+    spec = importlib.util.spec_from_file_location("license_scan", Path(__file__).resolve().parents[1] / "tools" / "license_scan.py")
+    mod = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(mod)
+    report = mod.scan()
+    assert report["ok"], report["denied_or_unknown"]
+    assert mod.classify("AGPL-3.0") == "deny" and mod.classify("CC-BY-SA-4.0") == "deny" and mod.classify("MIT") == "allow"
+    assert mod.classify("MPL-2.0") == "review" and mod.classify("Apache-2.0 OR BSD-3-Clause") == "allow"

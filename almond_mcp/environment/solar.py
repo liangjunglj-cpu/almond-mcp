@@ -4,7 +4,7 @@ The algorithm is NOAA's solar calculator (after Meeus, "Astronomical Algorithms"
 between 1950 and 2050, with standard atmospheric refraction. Angles are degrees; azimuth is measured
 clockwise from north (0 = N, 90 = E). Model axes: +Y is north, +X is east, +Z is up, unless a
 ``north_deg`` rotation says otherwise (the angle from +Y to true north, counter-clockwise positive,
-the same convention as ClimateStudio / Ladybug "north" inputs).
+the usual convention of a "north" input in daylighting software).
 """
 from __future__ import annotations
 

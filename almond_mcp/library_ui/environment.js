@@ -99,7 +99,7 @@ function request(action,input={}){
 function settings(){
   const blinds=el('env-blinds').checked;
   return {construction:el('env-preset').value,schedule:'residential',natural_ventilation_ach:Number(el('env-nv').value)||0,
-    shading_g_factor:blinds?0.15:1,shading_min_outdoor_c:blinds?12:null,daylight_study:el('env-daylight').value,
+    shading_g_factor:blinds?0.15:1,shading_min_outdoor_c:blinds?12:null,cooling:el('env-cooling').checked,daylight_study:el('env-daylight').value,
     quality:el('env-quality').value,spacing_m:Number(el('env-spacing').value)||0.5};
 }
 document.querySelectorAll('[data-env]').forEach(b=>b.addEventListener('click',()=>{
@@ -173,7 +173,8 @@ window.almondEnvironmentReceive=p=>{
   if(p.kind==='error'){message(p.message,'error');checklist();return;}
   if(p.kind==='notice'){message(p.message,'ok');checklist();if(p.refresh==='rooms')request('rooms',{});return;}
   if(p.kind==='site'){
-    state.site=p.site;svgInto('env-site-diagram',p.svg);
+    state.site=p.site;state.epw=state.epw||p.site.location;svgInto('env-site-diagram',p.svg);
+    el('env-epw').classList.remove('need');if(el('env-epw').classList.contains('need')||!state.epw.includes('.epw'))text('env-epw',p.site.location);
     const dl=el('env-site-facts');dl.hidden=false;
     dl.replaceChildren(...[['Location',p.site.location],['Latitude',p.site.latitude.toFixed(2)+'°'],['Mean air',p.site.dry_bulb_mean_c+' °C'],
       ['Range',`${p.site.dry_bulb_min_c} – ${p.site.dry_bulb_max_c} °C`],['Global radiation',p.site.ghi_kwh_m2+' kWh/m²']].flatMap(([k,v])=>{
