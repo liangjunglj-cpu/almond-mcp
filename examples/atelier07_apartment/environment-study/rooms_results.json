@@ -1,0 +1,571 @@
+{
+ "defined_through": "Almond panel, Environment workspace (EnvironmentWorkspace actions define_room / assign / run), live in Rhino 8",
+ "rooms": {
+  "Living": "living",
+  "Hall and dining": "living",
+  "Entry": "circulation",
+  "Kitchen": "kitchen",
+  "Study": "office",
+  "Bedroom": "bedroom",
+  "Bathroom": "bath",
+  "Landing": "circulation",
+  "Garden pavilion": "outdoor (test pavilion added for the open-space path)"
+ },
+ "construction_set": "eu_new_build (fills faces with no element)",
+ "constructions": {
+  "external walls (A07 / 01 Envelope)": "ew_rc_sandwich_exposed",
+  "ground slab and ground-floor boards": "floor_ground_rc_xps",
+  "mezzanine and upper oak floors": "floor_internal_rc_exposed_oak",
+  "roof slab": "roof_rc_warm_flat_exposed",
+  "facade glazing": "win_triple_lowe_steel_slim",
+  "partitions": "iw_stud_gypsum",
+  "pavilion roof": "roof_sg_metal_insulated"
+ },
+ "studies": {
+  "thermal_no_blinds": {
+   "run_id": "rooms-20261103-155151-4c7b44",
+   "settings": {
+    "natural_ventilation_ach": 3.0,
+    "shading_g_factor": 1.0,
+    "shading_min_outdoor_c": null,
+    "heat_recovery": 0.8
+   },
+   "interzone": {
+    "links": 28,
+    "net_interzone_kwh": 0.0,
+    "gross_interzone_kwh": 4656.1
+   },
+   "rooms": [
+    {
+     "room": "Garden pavilion",
+     "method": "semi_outdoor",
+     "enclosure": "open",
+     "set_mean_occupied_c": 16.5,
+     "mrt_mean_occupied_c": 22.9,
+     "sky_view": 0.483
+    },
+    {
+     "room": "Landing",
+     "method": "5R1C",
+     "enclosure": "enclosed",
+     "heating_kwh_m2": 28.3,
+     "hours_above_26c_occupied": 0,
+     "c_m_mj_k": 4.62,
+     "tm52_pass": true
+    },
+    {
+     "room": "Bathroom",
+     "method": "5R1C",
+     "enclosure": "enclosed",
+     "heating_kwh_m2": 98.7,
+     "hours_above_26c_occupied": 3,
+     "c_m_mj_k": 3.09,
+     "tm52_pass": true
+    },
+    {
+     "room": "Bedroom",
+     "method": "5R1C",
+     "enclosure": "enclosed",
+     "heating_kwh_m2": 3.0,
+     "hours_above_26c_occupied": 582,
+     "c_m_mj_k": 6.62,
+     "tm52_pass": true
+    },
+    {
+     "room": "Study",
+     "method": "5R1C",
+     "enclosure": "enclosed",
+     "heating_kwh_m2": 15.0,
+     "hours_above_26c_occupied": 34,
+     "c_m_mj_k": 5.98,
+     "tm52_pass": true
+    },
+    {
+     "room": "Kitchen",
+     "method": "5R1C",
+     "enclosure": "enclosed",
+     "heating_kwh_m2": 14.3,
+     "hours_above_26c_occupied": 1043,
+     "c_m_mj_k": 11.32,
+     "tm52_pass": false
+    },
+    {
+     "room": "Entry",
+     "method": "5R1C",
+     "enclosure": "enclosed",
+     "heating_kwh_m2": 59.9,
+     "hours_above_26c_occupied": 0,
+     "c_m_mj_k": 1.17,
+     "tm52_pass": true
+    },
+    {
+     "room": "Hall and dining",
+     "method": "5R1C",
+     "enclosure": "enclosed",
+     "heating_kwh_m2": 39.1,
+     "hours_above_26c_occupied": 8,
+     "c_m_mj_k": 5.07,
+     "tm52_pass": true
+    },
+    {
+     "room": "Living",
+     "method": "5R1C",
+     "enclosure": "enclosed",
+     "heating_kwh_m2": 44.8,
+     "hours_above_26c_occupied": 3610,
+     "c_m_mj_k": 8.97,
+     "tm52_pass": false
+    }
+   ],
+   "notes": [
+    "Room Garden pavilion is an open space (66 % open): it is assessed as semi-outdoor comfort (air at outdoor temperature, sun and sky on the occupants); no heating or cooling loads.",
+    "Room Landing opens into other parts of the building (5 m2: W 5 m2). Those openings are treated as adiabatic, with no air exchange; for open-plan spaces define one room.",
+    "Room Bedroom: 1.0 m2 of its boundary has no element within 0.35 m (gaps in the model, or small openings); treated as closed.",
+    "Room Study opens into other parts of the building (20 m2: S 20 m2). Those openings are treated as adiabatic, with no air exchange; for open-plan spaces define one room.",
+    "Room Hall and dining opens into other parts of the building (6 m2: up 6 m2). Those openings are treated as adiabatic, with no air exchange; for open-plan spaces define one room.",
+    "Room Living: 4.3 m2 of its boundary has no element within 0.35 m (gaps in the model, or small openings); treated as closed. Room Living opens into other parts of the building (21 m2: N 21 m2). Those openings are treated as adiabatic, with no air exchange; for open-plan spaces define one room.",
+    "No mechanical cooling: rooms run free in warm weather."
+   ],
+   "envelope_check": {
+    "pack": "eu_hotmaps",
+    "provenance": {
+     "relation": "bundled",
+     "source": "Hotmaps building-stock dataset: U-values by country, sector and construction period",
+     "licence": "CC-BY-4.0",
+     "attribution": "U-values from the Hotmaps building-stock dataset (CC BY 4.0), residential part based on the IEE TABULA project (www.episcope.eu). Reduced to element averages by Almond."
+    }
+   }
+  },
+  "thermal_blinds": {
+   "run_id": "rooms-20261103-155249-ff22ca",
+   "settings": {
+    "natural_ventilation_ach": 3.0,
+    "shading_g_factor": 0.15,
+    "shading_min_outdoor_c": 12.0,
+    "heat_recovery": 0.8
+   },
+   "interzone": {
+    "links": 28,
+    "net_interzone_kwh": 0.0,
+    "gross_interzone_kwh": 4190.0
+   },
+   "rooms": [
+    {
+     "room": "Garden pavilion",
+     "method": "semi_outdoor",
+     "enclosure": "open",
+     "set_mean_occupied_c": 16.5,
+     "mrt_mean_occupied_c": 22.9,
+     "sky_view": 0.483
+    },
+    {
+     "room": "Landing",
+     "method": "5R1C",
+     "enclosure": "enclosed",
+     "heating_kwh_m2": 30.0,
+     "hours_above_26c_occupied": 0,
+     "c_m_mj_k": 4.62,
+     "tm52_pass": true
+    },
+    {
+     "room": "Bathroom",
+     "method": "5R1C",
+     "enclosure": "enclosed",
+     "heating_kwh_m2": 99.6,
+     "hours_above_26c_occupied": 0,
+     "c_m_mj_k": 3.09,
+     "tm52_pass": true
+    },
+    {
+     "room": "Bedroom",
+     "method": "5R1C",
+     "enclosure": "enclosed",
+     "heating_kwh_m2": 3.0,
+     "hours_above_26c_occupied": 328,
+     "c_m_mj_k": 6.62,
+     "tm52_pass": true
+    },
+    {
+     "room": "Study",
+     "method": "5R1C",
+     "enclosure": "enclosed",
+     "heating_kwh_m2": 15.0,
+     "hours_above_26c_occupied": 28,
+     "c_m_mj_k": 5.98,
+     "tm52_pass": true
+    },
+    {
+     "room": "Kitchen",
+     "method": "5R1C",
+     "enclosure": "enclosed",
+     "heating_kwh_m2": 14.3,
+     "hours_above_26c_occupied": 395,
+     "c_m_mj_k": 11.32,
+     "tm52_pass": true
+    },
+    {
+     "room": "Entry",
+     "method": "5R1C",
+     "enclosure": "enclosed",
+     "heating_kwh_m2": 61.9,
+     "hours_above_26c_occupied": 0,
+     "c_m_mj_k": 1.17,
+     "tm52_pass": true
+    },
+    {
+     "room": "Hall and dining",
+     "method": "5R1C",
+     "enclosure": "enclosed",
+     "heating_kwh_m2": 39.3,
+     "hours_above_26c_occupied": 0,
+     "c_m_mj_k": 5.07,
+     "tm52_pass": true
+    },
+    {
+     "room": "Living",
+     "method": "5R1C",
+     "enclosure": "enclosed",
+     "heating_kwh_m2": 45.8,
+     "hours_above_26c_occupied": 2333,
+     "c_m_mj_k": 8.97,
+     "tm52_pass": false
+    }
+   ],
+   "notes": [
+    "Room Garden pavilion is an open space (66 % open): it is assessed as semi-outdoor comfort (air at outdoor temperature, sun and sky on the occupants); no heating or cooling loads.",
+    "Room Landing opens into other parts of the building (5 m2: W 5 m2). Those openings are treated as adiabatic, with no air exchange; for open-plan spaces define one room.",
+    "Room Bedroom: 1.0 m2 of its boundary has no element within 0.35 m (gaps in the model, or small openings); treated as closed.",
+    "Room Study opens into other parts of the building (20 m2: S 20 m2). Those openings are treated as adiabatic, with no air exchange; for open-plan spaces define one room.",
+    "Room Hall and dining opens into other parts of the building (6 m2: up 6 m2). Those openings are treated as adiabatic, with no air exchange; for open-plan spaces define one room.",
+    "Room Living: 4.3 m2 of its boundary has no element within 0.35 m (gaps in the model, or small openings); treated as closed. Room Living opens into other parts of the building (21 m2: N 21 m2). Those openings are treated as adiabatic, with no air exchange; for open-plan spaces define one room.",
+    "No mechanical cooling: rooms run free in warm weather."
+   ],
+   "envelope_check": {
+    "pack": "uk_adl_2021",
+    "elements": [
+     {
+      "element": "window",
+      "area_m2": 99.59,
+      "u_value": 1.103,
+      "limit": 1.6,
+      "passes": true
+     },
+     {
+      "element": "wall_external",
+      "area_m2": 167.3,
+      "u_value": 0.183,
+      "limit": 0.26,
+      "passes": true
+     },
+     {
+      "element": "roof",
+      "area_m2": 124.39,
+      "u_value": 0.153,
+      "limit": 0.16,
+      "passes": true
+     },
+     {
+      "element": "floor_ground",
+      "area_m2": 128.0,
+      "u_value": 0.216,
+      "limit": 0.18,
+      "passes": false
+     }
+    ],
+    "passes": false,
+    "ground_floor_note": "Ground floors are checked with the floor build-up's own U-value, without the ground's resistance (EN ISO 13370 perimeter/area method): conservative against the limit.",
+    "provenance": {
+     "relation": "bundled",
+     "source": "Approved Document L, Conservation of fuel and power, Volume 1: Dwellings (Table 1.1, Table 4.1) and Volume 2: Buildings other than dwellings (Table 4.1), 2021 edition incorporating 2023 amendments",
+     "licence": "OGL-UK-3.0",
+     "attribution": "Contains public sector information licensed under the Open Government Licence v3.0 (Approved Document L 2021, Crown copyright)."
+    }
+   }
+  },
+  "daylight_annual": {
+   "run_id": "daylight-20261103-155439-accde8",
+   "settings": {},
+   "interzone": null,
+   "rooms": [
+    {
+     "room": "Garden pavilion",
+     "sda_pct": 100.0,
+     "ase_pct": 100.0,
+     "udi_useful_mean_pct": 5.6,
+     "sensors": 36
+    },
+    {
+     "room": "Landing",
+     "sda_pct": 73.2,
+     "ase_pct": 0.0,
+     "udi_useful_mean_pct": 84.0,
+     "sensors": 41
+    },
+    {
+     "room": "Bathroom",
+     "sda_pct": 0.0,
+     "ase_pct": 0.0,
+     "udi_useful_mean_pct": 0.2,
+     "sensors": 20
+    },
+    {
+     "room": "Bedroom",
+     "sda_pct": 100.0,
+     "ase_pct": 84.8,
+     "udi_useful_mean_pct": 88.6,
+     "sensors": 99
+    },
+    {
+     "room": "Study",
+     "sda_pct": 75.8,
+     "ase_pct": 0.0,
+     "udi_useful_mean_pct": 89.2,
+     "sensors": 33
+    },
+    {
+     "room": "Kitchen",
+     "sda_pct": 69.7,
+     "ase_pct": 65.7,
+     "udi_useful_mean_pct": 73.7,
+     "sensors": 198
+    },
+    {
+     "room": "Entry",
+     "sda_pct": 50.0,
+     "ase_pct": 0.0,
+     "udi_useful_mean_pct": 90.1,
+     "sensors": 2
+    },
+    {
+     "room": "Hall and dining",
+     "sda_pct": 96.6,
+     "ase_pct": 91.4,
+     "udi_useful_mean_pct": 92.4,
+     "sensors": 58
+    },
+    {
+     "room": "Living",
+     "sda_pct": 100.0,
+     "ase_pct": 100.0,
+     "udi_useful_mean_pct": 61.9,
+     "sensors": 110
+    }
+   ],
+   "notes": [
+    "Room Garden pavilion is an open space (66 % open): it is assessed as semi-outdoor comfort (air at outdoor temperature, sun and sky on the occupants); no heating or cooling loads.",
+    "Room Landing opens into other parts of the building (5 m2: W 5 m2). Those openings are treated as adiabatic, with no air exchange; for open-plan spaces define one room.",
+    "Room Bedroom: 1.0 m2 of its boundary has no element within 0.35 m (gaps in the model, or small openings); treated as closed.",
+    "Room Study opens into other parts of the building (20 m2: S 20 m2). Those openings are treated as adiabatic, with no air exchange; for open-plan spaces define one room.",
+    "Room Hall and dining opens into other parts of the building (6 m2: up 6 m2). Those openings are treated as adiabatic, with no air exchange; for open-plan spaces define one room.",
+    "Room Living: 4.3 m2 of its boundary has no element within 0.35 m (gaps in the model, or small openings); treated as closed. Room Living opens into other parts of the building (21 m2: N 21 m2). Those openings are treated as adiabatic, with no air exchange; for open-plan spaces define one room.",
+    "Room Garden pavilion: no floor element under it - the daylight study adds an opaque floor (reflectance 0.2) at its boundary"
+   ],
+   "envelope_check": null
+  },
+  "tropical_synthetic": {
+   "run_id": "rooms-20261103-112643-388207",
+   "weather": "SYNTHETIC tropical year at 1.35 N (tests/env_weather.py) - not Singapore data",
+   "settings": "cooling to room set-points, no heat recovery, no window ventilation",
+   "rooms": [
+    {
+     "room": "Garden pavilion",
+     "method": "semi_outdoor",
+     "set_mean_occupied_c": 29.1
+    },
+    {
+     "room": "Landing",
+     "method": "5R1C",
+     "cooling_kwh_m2": 0.0
+    },
+    {
+     "room": "Bathroom",
+     "method": "5R1C",
+     "cooling_kwh_m2": 0.0
+    },
+    {
+     "room": "Bedroom",
+     "method": "5R1C",
+     "cooling_kwh_m2": 97.7
+    },
+    {
+     "room": "Study",
+     "method": "5R1C",
+     "cooling_kwh_m2": 85.1
+    },
+    {
+     "room": "Kitchen",
+     "method": "5R1C",
+     "cooling_kwh_m2": 175.3
+    },
+    {
+     "room": "Entry",
+     "method": "5R1C",
+     "cooling_kwh_m2": 0.0
+    },
+    {
+     "room": "Hall and dining",
+     "method": "5R1C",
+     "cooling_kwh_m2": 56.7
+    },
+    {
+     "room": "Living",
+     "method": "5R1C",
+     "cooling_kwh_m2": 528.5
+    }
+   ],
+   "retv": {
+    "overall_w_m2": 11.28,
+    "limit_w_m2": 25.0,
+    "passes": true,
+    "facades": [
+     {
+      "orientation": "N",
+      "wwr": 0.034,
+      "cf": 0.836,
+      "sc": 0.503,
+      "value_w_m2": 1.49
+     },
+     {
+      "orientation": "E",
+      "wwr": 0.0,
+      "cf": 1.152,
+      "sc": null,
+      "value_w_m2": 0.63
+     },
+     {
+      "orientation": "S",
+      "wwr": 0.865,
+      "cf": 0.835,
+      "sc": 0.505,
+      "value_w_m2": 22.7
+     },
+     {
+      "orientation": "W",
+      "wwr": 0.588,
+      "cf": 1.158,
+      "sc": 0.505,
+      "value_w_m2": 21.22
+     }
+    ],
+    "note": "Indicative: formulas from the BCA Code on Envelope Thermal Performance; CF derived by Almond from the weather file; SC = g / 0.87 from the glazing g-value over the whole window, with no credit for external shading devices (conservative). Not a BCA Green Mark assessment."
+   }
+  },
+  "tropical_singapore": {
+   "run_id": "rooms-20261103-160108-062832",
+   "weather": "Singapore-Changi Intl AP 486980, TMYx 2011-2025 (climate.onebuilding.org; downloaded by the user, not redistributed)",
+   "settings": "cooling to room set-points (air temperature), no heat recovery, no window ventilation; same as tropical_synthetic",
+   "note": "Cooling holds the air at the set-point; operative temperature includes the warmer glass and wall surfaces, so hours above 26 degC operative are close to all occupied hours in cooled rooms. Hours above 28 degC are reported instead.",
+   "rooms": [
+    {
+     "room": "Garden pavilion",
+     "method": "semi_outdoor",
+     "set_mean_occupied_c": 29.4
+    },
+    {
+     "room": "Landing",
+     "method": "5R1C",
+     "cooling_kwh_m2": 0.0,
+     "peak_cooling_w_m2": 0.0,
+     "hours_operative_above_28c_occupied": 6043
+    },
+    {
+     "room": "Bathroom",
+     "method": "5R1C",
+     "cooling_kwh_m2": 0.0,
+     "peak_cooling_w_m2": 0.0,
+     "hours_operative_above_28c_occupied": 4513
+    },
+    {
+     "room": "Bedroom",
+     "method": "5R1C",
+     "cooling_kwh_m2": 91.6,
+     "peak_cooling_w_m2": 88.0,
+     "hours_operative_above_28c_occupied": 250
+    },
+    {
+     "room": "Study",
+     "method": "5R1C",
+     "cooling_kwh_m2": 86.0,
+     "peak_cooling_w_m2": 47.0,
+     "hours_operative_above_28c_occupied": 0
+    },
+    {
+     "room": "Kitchen",
+     "method": "5R1C",
+     "cooling_kwh_m2": 174.1,
+     "peak_cooling_w_m2": 51.0,
+     "hours_operative_above_28c_occupied": 0
+    },
+    {
+     "room": "Entry",
+     "method": "5R1C",
+     "cooling_kwh_m2": 0.0,
+     "peak_cooling_w_m2": 0.0,
+     "hours_operative_above_28c_occupied": 7486
+    },
+    {
+     "room": "Hall and dining",
+     "method": "5R1C",
+     "cooling_kwh_m2": 62.0,
+     "peak_cooling_w_m2": 12.5,
+     "hours_operative_above_28c_occupied": 0
+    },
+    {
+     "room": "Living",
+     "method": "5R1C",
+     "cooling_kwh_m2": 450.3,
+     "peak_cooling_w_m2": 177.8,
+     "hours_operative_above_28c_occupied": 2782
+    }
+   ],
+   "retv": {
+    "overall_w_m2": 10.94,
+    "limit_w_m2": 25.0,
+    "passes": true,
+    "facades": [
+     {
+      "orientation": "N",
+      "wwr": 0.034,
+      "cf": 0.825,
+      "sc": 0.503,
+      "value_w_m2": 1.48
+     },
+     {
+      "orientation": "E",
+      "wwr": 0.0,
+      "cf": 1.259,
+      "sc": null,
+      "value_w_m2": 0.63
+     },
+     {
+      "orientation": "S",
+      "wwr": 0.865,
+      "cf": 0.842,
+      "sc": 0.505,
+      "value_w_m2": 22.88
+     },
+     {
+      "orientation": "W",
+      "wwr": 0.588,
+      "cf": 1.05,
+      "sc": 0.505,
+      "value_w_m2": 19.34
+     }
+    ],
+    "cf_walls": {
+     "N": 0.825,
+     "NE": 1.07,
+     "E": 1.259,
+     "SE": 1.09,
+     "S": 0.842,
+     "SW": 0.934,
+     "W": 1.05,
+     "NW": 0.929
+    },
+    "cf_roof": 2.123,
+    "note": "Indicative: formulas from the BCA Code on Envelope Thermal Performance; CF derived by Almond from the weather file; SC = g / 0.87 from the glazing g-value over the whole window, with no credit for external shading devices (conservative). Not a BCA Green Mark assessment."
+   }
+  }
+ },
+ "refreshed": "2026-11-03: rerun after the independent test drive's fixes (one conductance per shared face, wall construction behind windows, exposed floors over no room, daylight shells)"
+}

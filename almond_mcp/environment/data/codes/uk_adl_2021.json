@@ -1,0 +1,44 @@
+{
+ "pack": "uk_adl_2021",
+ "source": "uk-adl-2021",
+ "relation": "bundled",
+ "description": "England, Approved Document L 2021 (incorporating 2023 amendments): limiting U-values for new fabric elements (W/m2K, area-weighted) and the notional dwelling fabric. Limits are backstops; compliance is shown by the SAP / SBEM energy calculation, which Almond does not perform.",
+ "limits": {
+  "dwellings": {
+   "table": "Volume 1, Table 4.1",
+   "roof": 0.16,
+   "wall_external": 0.26,
+   "floor": 0.18,
+   "party_wall": 0.2,
+   "window": 1.6,
+   "rooflight": 2.2,
+   "door": 1.6,
+   "air_permeability_m3_h_m2_50pa": 8.0
+  },
+  "non_dwellings": {
+   "table": "Volume 2, Table 4.1",
+   "roof_flat": 0.18,
+   "roof_pitched": 0.16,
+   "wall_external": 0.26,
+   "floor": 0.18,
+   "window": 1.6,
+   "rooflight": 2.2,
+   "door": 1.6,
+   "air_permeability_m3_h_m2_50pa": 8.0
+  }
+ },
+ "notional_dwelling": {
+  "table": "Volume 1, Table 1.1",
+  "wall_external": 0.18,
+  "party_wall": 0.0,
+  "floor": 0.13,
+  "roof": 0.11,
+  "door": 1.0,
+  "window": 1.2,
+  "window_frame_factor": 0.7,
+  "roof_window": 1.2,
+  "rooflight": 1.7,
+  "air_permeability_m3_h_m2_50pa": 5.0,
+  "max_opening_area_pct_of_floor": 25
+ }
+}

@@ -68,13 +68,25 @@ def verify(wheel: Path) -> dict:
             counts = archive_catalogue.catalogue()["counts"]
             if counts != {"assets":57, "models":50, "elements":7, "drawing_packages":10, "views":60}:
                 raise ValueError(f"Unified archive coverage changed: {counts}")
-            for filename in ("index.html", "style.css", "app.js", "karamba.js", "karamba-help.js", "panel-theme.js", "panel.css", "analysis-view.mjs", "favicon.svg", "vendor/model-viewer.min.js", "vendor/LICENSE", "vendor/THIRD-PARTY-LICENSES.txt", "vendor/version.json"):
+            for filename in ("index.html", "style.css", "app.js", "karamba.js", "karamba-help.js", "panel-theme.js", "panel.css", "analysis-view.mjs", "environment.js", "environment.css", "favicon.svg", "vendor/model-viewer.min.js", "vendor/LICENSE", "vendor/THIRD-PARTY-LICENSES.txt", "vendor/version.json"):
                 if "almond_mcp/library_ui/" + filename not in names:
                     raise ValueError(f"Archive UI file missing: {filename}")
             if any(a["available"] for a in archive_catalogue.records.values() if a["kind"] == "element"):
                 raise ValueError("Downloaded drawing files must not enter the distribution")
             result["object_archive"] = counts
             result["object_archive_ui"] = "packaged, including offline viewer and licence"
+        env = "almond_mcp/environment/data/"
+        for filename in ("materials.json", "glazing.json", "assemblies.json", "sources.json", "LICENSES/EnergyPlus.txt",
+                         "LICENSES/honeybee-standards.txt", "codes/sg_bca.json", "codes/uk_adl_2021.json"):
+            if env + filename not in names:
+                raise ValueError(f"Environment data file missing: {filename}")
+    # every bundled component and data source under a licence that allows commercial redistribution
+    sys.path.insert(0, str(REPO / "tools"))
+    from license_scan import scan
+    licences = scan()
+    if not licences["ok"]:
+        raise ValueError(f"Licence scan failed: {licences['denied_or_unknown']}")
+    result["licence_scan"] = {"components": len(licences["components"]), "review": [r["component"] for r in licences["review"]]}
     result.update(wheel=wheel.name, wheel_size_mb=round(wheel.stat().st_size / 1_000_000, 2),
                   distribution_check="no third-party model binaries, raw downloads or example projects")
     return result

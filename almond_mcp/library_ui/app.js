@@ -145,12 +145,12 @@ function renderSources() {
   $('source-list').innerHTML = data.sources.map((s,i) => `<article class="source-row"><span>${String(i+1).padStart(2,'0')}</span><div><h2>${esc(s.title)}</h2><p class="source-meta">${esc(s.formats.join(' / ').toUpperCase())}</p></div><div><p>${esc(s.notes)}</p><p class="source-meta">ACCESS / ${esc(s.access)}<br>REUSE / ${esc(s.redistribution)}</p></div><div class="source-links">${external(s.url) ? `<a href="${esc(external(s.url))}" target="_blank" rel="noopener noreferrer">Visit source ↗</a>` : ''}${external(s.terms_url) ? `<a href="${esc(external(s.terms_url))}" target="_blank" rel="noopener noreferrer">Source terms ↗</a>` : ''}</div></article>`).join('');
 }
 function route() {
-  const hash = location.hash.slice(1), page = ['home','library','karamba','sources','about'].includes(hash) ? hash : hash.startsWith('asset=') || hash === 'collection' ? 'library' : 'home';
-  for(const name of ['home','library','karamba','sources','about']) $(name+'-page').hidden = name !== page;
+  const hash = location.hash.slice(1), page = ['home','library','karamba','environment','sources','about'].includes(hash) ? hash : hash.startsWith('asset=') || hash === 'collection' ? 'library' : 'home';
+  for(const name of ['home','library','karamba','environment','sources','about']) $(name+'-page').hidden = name !== page;
   document.querySelectorAll('[data-page]').forEach(a => { if(a.dataset.page === page) a.setAttribute('aria-current','page');else a.removeAttribute('aria-current'); });
   if(data && hash.startsWith('asset=')) { let id;try{id=decodeURIComponent(hash.slice(6));}catch{return;}openObject(id); }
   else if($('object-dialog').open) $('object-dialog').close();
-  if(['home','library','karamba','sources','about'].includes(hash)) window.scrollTo(0,0);
+  if(['home','library','karamba','environment','sources','about'].includes(hash)) window.scrollTo(0,0);
 }
 async function load() {
   $('load-error').hidden=true;

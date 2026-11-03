@@ -60,6 +60,8 @@ def build_bundle(destination: Path):
             write("/"+relative, "ui/"+relative, path.read_bytes(), mime)
     routes["/"] = routes["/index.html"]
     write("/api/materials", "api/materials.json", (ROOT/"Materialfiles/manifest.json").read_bytes(), "application/json")
+    from almond_mcp.environment import panel as env_panel
+    write("/api/environment", "api/environment.json", json.dumps(env_panel.static_catalogue(), ensure_ascii=False).encode(), "application/json")
     catalogue = repo.catalogue()
     catalogue["distribution"] = "rhino"
     catalogue["indexed_at"] = "release-build"

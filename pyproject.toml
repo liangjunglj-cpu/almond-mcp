@@ -26,6 +26,11 @@ dependencies = [
     "contourpy>=1.3,<2",
 ]
 
+[project.optional-dependencies]
+# Compiled ray casting for the environmental analysis (about 100x faster). Without it the same
+# results come from the numpy path: uvx --from "almond-mcp[fast]" almond-mcp
+fast = ["numba>=0.60"]
+
 [project.scripts]
 almond-mcp = "almond_mcp.cli:main"
 

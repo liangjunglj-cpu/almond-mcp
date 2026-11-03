@@ -1,0 +1,240 @@
+{
+ "run_id": "thermal-20261101-221651-9ab363",
+ "study": "thermal",
+ "label": "live thermal office",
+ "created": "2026-11-01T22:16:51",
+ "weather": {
+  "location": "Synthetic Temperate 40N, XX",
+  "file": "Synthetic_Temperate_40N.epw",
+  "data_quality_warnings": []
+ },
+ "engine": {
+  "method": "ISO 13790 hourly 5R1C per zone; solar gains ray traced on each window and wall",
+  "ray_backend": "numpy",
+  "solar_sampling": {
+   "surfaces": 6,
+   "sample_points": 54
+  }
+ },
+ "settings": {
+  "construction": "insulated",
+  "u_values": {},
+  "mass": null,
+  "infiltration_ach": 0.5,
+  "ventilation_ach": 1.0,
+  "heating_setpoint": 20.0,
+  "cooling_setpoint": 26.0,
+  "setback": true,
+  "schedule": "office",
+  "occupancy_w_m2": 7.5,
+  "equipment_w_m2": 10.0,
+  "lighting_w_m2": 8.0,
+  "natural_ventilation_ach": 0.0,
+  "natural_ventilation_on_above": 24.0,
+  "natural_ventilation_min_outdoor": 12.0,
+  "shading_g_factor": 1.0,
+  "shading_on_above_w_m2": 300.0,
+  "window_u": null,
+  "window_g": null,
+  "frame_fraction": 0.2,
+  "clothing_summer": 0.5,
+  "clothing_winter": 1.0,
+  "metabolic_rate": 1.2,
+  "air_speed": 0.1
+ },
+ "zones": [
+  {
+   "zone": "zone office",
+   "floor_area_m2": 48.0,
+   "volume_m3": 144.0,
+   "areas_m2": {
+    "window": 9.0,
+    "wall": 75.0,
+    "roof": 48.0,
+    "ground_floor": 48.0
+   },
+   "heating_kwh": 2005.4,
+   "cooling_kwh": 560.9,
+   "heating_kwh_m2": 41.8,
+   "cooling_kwh_m2": 11.7,
+   "peak_heating_w_m2": 149.9,
+   "peak_cooling_w_m2": 28.8,
+   "solar_gain_kwh_m2": 30.2,
+   "internal_gain_kwh_m2": 75.6,
+   "operative_temperature_c": {
+    "min": 3.9,
+    "mean": 19.8,
+    "max": 27.3,
+    "occupied_mean": 21.9
+   },
+   "occupied_hours": 2610,
+   "hours_above_26c_occupied": 575,
+   "hours_above_28c_occupied": 0,
+   "natural_ventilation_hours": 0,
+   "window_shading_hours": 0,
+   "model": {
+    "H_ve_base_w_k": 38.3,
+    "H_tr_w_w_k": 14.4,
+    "H_tr_op_w_k": 27.39,
+    "H_ground_w_k": 12.0,
+    "H_tr_em_w_k": 40.86,
+    "H_tr_ms_w_k": 1092.0,
+    "H_tr_is_w_k": 745.2,
+    "C_m_mj_k": 7.92,
+    "mass_class": "medium",
+    "solar": {
+     "windows_kwh": 868.3061418288404,
+     "opaque_kwh": 420.22469786702004
+    }
+   },
+   "adaptive_ashrae55": {
+    "comfortable_80_pct": 99.6,
+    "too_warm_pct": 0.0,
+    "too_cool_pct": 0.4,
+    "applicable_pct_of_occupied": 55.6,
+    "note": "valid for occupant-controlled, naturally conditioned spaces - this zone has set-points, so treat as indicative"
+   },
+   "adaptive_en16798_cat_ii": {
+    "comfortable_pct": 98.6,
+    "too_warm_pct": 0.0,
+    "too_cool_pct": 1.4
+   },
+   "tm52": {
+    "applicable": true,
+    "occupied_hours": 1090,
+    "criterion_1": {
+     "hours_exceeding": 0,
+     "pct": 0.0,
+     "limit_pct": 3.0,
+     "pass": true
+    },
+    "criterion_2": {
+     "max_daily_weighted_exceedance": 0.0,
+     "limit": 6.0,
+     "days_over": 0,
+     "pass": true
+    },
+    "criterion_3": {
+     "max_delta_t": -1.0,
+     "limit": 4.0,
+     "pass": true
+    },
+    "pass": true,
+    "failed_criteria": []
+   },
+   "pmv": {
+    "mean": -0.24,
+    "within_0_5_pct": 44.8,
+    "warm_gt_0_5_pct": 12.6,
+    "cool_lt_minus_0_5_pct": 42.6,
+    "mean_ppd": 12.4,
+    "indoor_rh_mean": 37.1,
+    "assumptions": "met 1.2, clo 0.5/1.0 (warm/cool season), air speed 0.1 m/s"
+   },
+   "monthly": [
+    {
+     "month": "Jan",
+     "heating_kwh": 554.2,
+     "cooling_kwh": 0.0,
+     "t_op_mean": 13.9,
+     "t_op_max": 19.7
+    },
+    {
+     "month": "Feb",
+     "heating_kwh": 382.0,
+     "cooling_kwh": 0.0,
+     "t_op_mean": 14.7,
+     "t_op_max": 20.0
+    },
+    {
+     "month": "Mar",
+     "heating_kwh": 242.6,
+     "cooling_kwh": 0.0,
+     "t_op_mean": 15.8,
+     "t_op_max": 20.3
+    },
+    {
+     "month": "Apr",
+     "heating_kwh": 101.9,
+     "cooling_kwh": 0.0,
+     "t_op_mean": 18.1,
+     "t_op_max": 22.5
+    },
+    {
+     "month": "May",
+     "heating_kwh": 1.8,
+     "cooling_kwh": 11.6,
+     "t_op_mean": 22.4,
+     "t_op_max": 26.2
+    },
+    {
+     "month": "Jun",
+     "heating_kwh": 0.0,
+     "cooling_kwh": 113.5,
+     "t_op_mean": 25.2,
+     "t_op_max": 27.0
+    },
+    {
+     "month": "Jul",
+     "heating_kwh": 0.0,
+     "cooling_kwh": 214.9,
+     "t_op_mean": 26.2,
+     "t_op_max": 27.3
+    },
+    {
+     "month": "Aug",
+     "heating_kwh": 0.0,
+     "cooling_kwh": 165.9,
+     "t_op_mean": 25.8,
+     "t_op_max": 27.2
+    },
+    {
+     "month": "Sep",
+     "heating_kwh": 0.0,
+     "cooling_kwh": 54.9,
+     "t_op_mean": 24.3,
+     "t_op_max": 26.6
+    },
+    {
+     "month": "Oct",
+     "heating_kwh": 27.3,
+     "cooling_kwh": 0.0,
+     "t_op_mean": 20.6,
+     "t_op_max": 25.6
+    },
+    {
+     "month": "Nov",
+     "heating_kwh": 218.2,
+     "cooling_kwh": 0.0,
+     "t_op_mean": 16.5,
+     "t_op_max": 22.0
+    },
+    {
+     "month": "Dec",
+     "heating_kwh": 477.3,
+     "cooling_kwh": 0.0,
+     "t_op_mean": 14.1,
+     "t_op_max": 19.7
+    }
+   ]
+  }
+ ],
+ "mode": "conditioned",
+ "inputs": {
+  "epw_path": "Synthetic_Temperate_40N.epw",
+  "zone_guids": [
+   "8cffa4c7-9949-4ec7-9ddc-843fd28897ae"
+  ],
+  "units_to_m": 0.001
+ },
+ "notes": [
+  "zone office: window g-values come from the glazing material (or 0.5 when it has none)"
+ ],
+ "assumptions": [
+  "Zone boundaries between zones are adiabatic; no moisture balance (indoor absolute humidity = outdoor).",
+  "Schedules, U-values and gains are presets unless overridden - see settings.",
+  "A design-stage comparison model, not a compliance simulation."
+ ],
+ "headline": "zone office: heating 41.8 / cooling 11.7 kWh/m2",
+ "timing_s": 1.63
+}

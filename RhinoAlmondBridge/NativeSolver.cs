@@ -40,14 +40,14 @@ namespace RhinoAlmondBridge
         }
 
         /// <summary>The solver command, or null with a reason when none can be found.</summary>
-        internal static Command Resolve(out string reason)
+        internal static Command Resolve(out string reason, string subcommand = "solve")
         {
             reason = null;
             string custom = Environment.GetEnvironmentVariable(EnvCommand);
             if (!string.IsNullOrWhiteSpace(custom))
             {
                 Split(custom.Trim(), out string file, out string rest);
-                return new Command { File = file, Arguments = (rest + " solve").Trim(), Label = custom.Trim() + " solve" };
+                return new Command { File = file, Arguments = (rest + " " + subcommand).Trim(), Label = custom.Trim() + " " + subcommand };
             }
             string uvx = FindUvx();
             if (uvx == null)
@@ -56,7 +56,7 @@ namespace RhinoAlmondBridge
                 return null;
             }
             string package = PackageFor(PluginVersion);
-            return new Command { File = uvx, Arguments = package + " solve", Label = "uvx " + package + " solve" };
+            return new Command { File = uvx, Arguments = package + " " + subcommand, Label = "uvx " + package + " " + subcommand };
         }
 
         /// <summary>
@@ -109,9 +109,9 @@ namespace RhinoAlmondBridge
         }
 
         /// <summary>Run one request. Never throws: failures come back as {"status":"error","message":...}.</summary>
-        internal static async Task<JObject> RunAsync(JObject request, int timeoutMs)
+        internal static async Task<JObject> RunAsync(JObject request, int timeoutMs, string subcommand = "solve")
         {
-            var command = Resolve(out string reason);
+            var command = Resolve(out string reason, subcommand);
             if (command == null) return Error(reason);
             request["protocol"] = Protocol;
             var info = new ProcessStartInfo(command.File, command.Arguments)

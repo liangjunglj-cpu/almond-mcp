@@ -146,6 +146,9 @@ def create_server(port=8767, repository: AssetRepository | None = None):
             if route == "/api/catalogue":
                 content = json.dumps(repo.catalogue(), ensure_ascii=False).encode()
                 filename = "almond-object-archive.json"
+            elif route == "/api/environment":
+                from almond_mcp.environment.panel import static_catalogue
+                content = json.dumps(static_catalogue(), ensure_ascii=False).encode()
             elif route.startswith("/api/assets/"):
                 record = next((a for a in repo.records.values() if a["record_url"] == route), None)
                 if record:

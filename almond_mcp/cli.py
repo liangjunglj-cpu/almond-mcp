@@ -9,6 +9,8 @@ Subcommands:
   design-codes  list the design code profiles and any profile files that fail validation
   solve         one native structural study: JSON request on stdin, JSON reply
                 on stdout (the Rhino panel's solver)
+  environment   the Rhino panel's environment engine: rooms, constructions and
+                studies, JSON request on stdin, JSON reply on stdout
 """
 from __future__ import annotations
 
@@ -269,6 +271,13 @@ def cmd_solve(args: argparse.Namespace) -> int:
                  io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8"))
 
 
+def cmd_environment(args: argparse.Namespace) -> int:
+    import io
+    from almond_mcp.environment.panel import main as environment
+    return environment(io.TextIOWrapper(sys.stdin.buffer, encoding="utf-8-sig"),
+                       io.TextIOWrapper(sys.stdout.buffer, encoding="utf-8"))
+
+
 def cmd_library(args: argparse.Namespace) -> int:
     from almond_mcp.asset_repository import serve_library
     return serve_library(args.port, args.open)
@@ -300,6 +309,7 @@ def main(argv: list[str] | None = None) -> int:
     sub.add_parser("audit-assets", help="verify generated GLBs, embedded passports, contracts and previews offline")
 
     sub.add_parser("solve", help="native structural study: JSON on stdin, JSON on stdout")
+    sub.add_parser("environment", help="environment workspace engine (rooms, constructions, studies): JSON on stdin, JSON on stdout")
     codes = sub.add_parser("design-codes", help="list and validate design code profiles")
     codes.add_argument("--json", action="store_true", help="machine-readable listing")
 
@@ -317,6 +327,7 @@ def main(argv: list[str] | None = None) -> int:
         "library": cmd_library,
         "audit-assets": cmd_audit_assets,
         "solve": cmd_solve,
+        "environment": cmd_environment,
         "design-codes": cmd_design_codes,
     }
     return handlers[args.command](args)

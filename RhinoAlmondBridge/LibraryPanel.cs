@@ -23,6 +23,7 @@ namespace RhinoAlmondBridge
         internal static string StartPage = "home";
         private string _page = StartPage;
         private readonly AnalysisWorkspace _analysis;
+        private readonly EnvironmentWorkspace _environment;
         private bool _disposed;
         private string _lastPalette;
         private string _lastDisplay;
@@ -33,6 +34,13 @@ namespace RhinoAlmondBridge
             _analysis = new AnalysisWorkspace(reply => {
                 if (_ready && _view != null) _view.ExecuteScript("window.almondAnalysisReceive && window.almondAnalysisReceive(" +
                     JsonConvert.SerializeObject(reply,new JsonSerializerSettings{StringEscapeHandling=StringEscapeHandling.EscapeHtml}) + ");");
+            });
+            // Replies are posted, never sent inline: several environment requests answer from inside DocumentLoading,
+            // and a synchronous ExecuteScript there deadlocks the web view.
+            _environment = new EnvironmentWorkspace(reply => {
+                string script = "window.almondEnvironmentReceive && window.almondEnvironmentReceive(" +
+                    JsonConvert.SerializeObject(reply,new JsonSerializerSettings{StringEscapeHandling=StringEscapeHandling.EscapeHtml}) + ");";
+                Eto.Forms.Application.Instance.AsyncInvoke(() => { if (_ready && _view != null && !_disposed) _view.ExecuteScript(script); });
             });
             MinimumSize = new Size(280, 240);
             Content = _body;
@@ -149,6 +157,15 @@ namespace RhinoAlmondBridge
                                 _analysis.Request(analysis.Groups[1].Value,Uri.UnescapeDataString(query.Substring(6)));
                             } catch(Exception ex) { RhinoApp.WriteLine("Almond analysis: {0}",ex.Message); }
                         }
+                        var environment = Regex.Match(e.Uri.AbsolutePath,"^/almond-action/"+_session+"/environment/(catalogue|construction|browse_epw|site|define_room|remove_room|assign|clear_construction|select_room|clear_view|rooms|run)$");
+                        if (_ready && environment.Success)
+                        {
+                            try {
+                                string query=e.Uri.Query;
+                                if(!query.StartsWith("?data=",StringComparison.Ordinal) || query.Length>12000) return;
+                                _environment.Request(environment.Groups[1].Value,Uri.UnescapeDataString(query.Substring(6)));
+                            } catch(Exception ex) { RhinoApp.WriteLine("Almond environment: {0}",ex.Message); }
+                        }
                         return;
                     }
                     // Keep the archive in the panel. Downloads and source pages use the browser.
@@ -178,7 +195,7 @@ namespace RhinoAlmondBridge
         }
         internal void ShowPage(string page)
         {
-            if (page!="home" && page!="library" && page!="karamba") return;
+            if (page!="home" && page!="library" && page!="karamba" && page!="environment") return;
             _page=page;
             if(_ready) _view.ExecuteScript("location.hash="+JsonConvert.SerializeObject(page)+";");
             else if(_view!=null) _view.Url=PanelUrl();

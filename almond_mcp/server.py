@@ -58,7 +58,12 @@ mcp = FastMCP("Almond", instructions=(
     "search_detail_sources returns candidate directories, not verified construction details. "
     "Register placements in the scene ledger and validate_scene_layout. "
     "Use measured dimensions, not nominal prompt targets. Usage suggestions are "
-    "heuristics and clearances are design allowances, not certified code compliance."
+    "heuristics and clearances are design allowances, not certified code compliance. "
+    "For climate and environment (EPW weather files): climate_summary and sun_path for the site, "
+    "analyze_daylight (annual sDA/ASE/UDI, daylight factor, point-in-time, glare), "
+    "analyze_solar_radiation, analyze_thermal (energy and comfort) and thermal_comfort; each accepts "
+    "a shoebox room to study without Rhino. Check the returned material classification before "
+    "trusting numbers, and show_environment_result to draw a saved run in Rhino."
 ))
 
 # ── Library Indexer ──────────────────────────────────────────────────────────
@@ -3818,6 +3823,12 @@ def repository_asset_resource(asset_id: str) -> str:
         urls.update(sheet["svg"] for sheet in record["drawing"]["sheets"])
     record["local_files"] = {url: str(repository.files[url][1]) for url in urls if url in repository.files}
     return json.dumps(record)
+
+
+from almond_mcp import environment_tools  # noqa: E402  (registers after _send_and_receive exists)
+
+# The sender resolves _send_and_receive at call time, so tests can monkeypatch it on this module.
+globals().update(environment_tools.register(mcp, lambda payload, timeout=60.0: _send_and_receive(payload, timeout)))
 
 
 if __name__ == "__main__":
