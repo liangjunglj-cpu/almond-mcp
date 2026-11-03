@@ -12,20 +12,22 @@
   <script type="module" src="/app.js"></script>
   <script type="module" src="/karamba.js"></script>
   <script type="module" src="/karamba-help.js"></script>
+  <script type="module" src="/environment.js"></script>
+  <link rel="stylesheet" href="/environment.css">
 </head>
 <body>
 <a class="skip" href="#collection">Skip to collection</a>
 <header class="masthead">
   <a class="wordmark" href="#home" aria-label="Almond home"><span class="brand-mark" aria-hidden="true">a</span>almond<span class="wordmark-dot">↗</span></a>
   <div class="mast-label">OBJECT ARCHIVE<br>MODELS & DRAWING ELEMENTS</div>
-  <nav aria-label="Main"><a href="#library" data-page="library">Models</a><a href="#karamba" data-page="karamba">Structure</a></nav>
+  <nav aria-label="Main"><a href="#library" data-page="library">Models</a><a href="#karamba" data-page="karamba">Structure</a><a href="#environment" data-page="environment">Environment</a></nav>
   <div class="panel-tools" hidden><a id="panel-browser" href="/" target="_blank" rel="noopener" title="Open in browser" aria-label="Open in browser">↗</a><button id="panel-reload" type="button" title="Reload Almond" aria-label="Reload Almond">↻</button></div>
   <span class="local-label"><i></i> LOCAL COLLECTION</span>
 </header>
 <main>
 <section id="home-page" class="workbench-home">
   <p class="eyebrow">ALMOND / WORKSPACE</p><h1>Make.<br>Understand.</h1>
-  <p class="home-intro">Models for your scene.<br>Analysis for your structure.</p>
+  <p class="home-intro">Models for your scene.<br>Analysis for your structure and its climate.</p>
   <a class="workspace-card" href="#library"><span class="workspace-number">01</span>
     <svg viewBox="0 0 240 100" aria-hidden="true"><path d="M50 70V32l40-20 40 20v38L90 90Zm0-38 40 20 40-20M90 52v38" fill="none" stroke="currentColor" stroke-width="2"/><path d="M155 75V50l28-14 28 14v25l-28 14Zm0-25 28 14 28-14M183 64v25" fill="none" stroke="#e94329" stroke-width="2"/></svg>
     <span class="workspace-title">Models <span>↗</span></span><span class="workspace-copy">Browse, inspect and drag into Rhino.</span><span id="home-model-count" class="workspace-meta">MODELS · LINKED DRAWINGS · SOURCE RECORDS</span>
@@ -33,6 +35,10 @@
   <a class="workspace-card" href="#karamba"><span class="workspace-number">02</span>
     <svg viewBox="0 0 240 100" aria-hidden="true"><path d="M55 83V30h130v53M55 30l130 53M185 30 55 83" fill="none" stroke="currentColor" stroke-width="2"/><path d="M90 5v20m-4-5 4 5 4-5M150 5v20m-4-5 4 5 4-5" fill="none" stroke="#e94329" stroke-width="2"/><path d="M48 88h14M178 88h14" stroke="#237963" stroke-width="5"/></svg>
     <span class="workspace-title">Structural Validation <span>↗</span></span><span class="workspace-copy">Set up, analyse and read the response. Built-in engine; Karamba optional.</span><span class="workspace-meta">SUPPORTS · LOADS · RESULTS</span>
+  </a>
+  <a class="workspace-card" href="#environment"><span class="workspace-number">03</span>
+    <svg viewBox="0 0 240 100" aria-hidden="true"><path d="M40 88h160M70 88V48h100v40M70 48l50-26 50 26" fill="none" stroke="currentColor" stroke-width="2"/><path d="M84 62h26v16H84z" fill="none" stroke="#237963" stroke-width="2"/><circle cx="200" cy="20" r="9" fill="none" stroke="#e94329" stroke-width="2"/><path d="M190 28 112 66" stroke="#e94329" stroke-width="1.5" stroke-dasharray="4 3"/><path d="M80 80h60" stroke="#e94329" stroke-width="1.5" stroke-dasharray="2 3"/></svg>
+    <span class="workspace-title">Climate, Rooms &amp; Comfort <span>↗</span></span><span class="workspace-copy">Rooms, constructions and the climate: daylight, energy and comfort.</span><span class="workspace-meta">SITE · ROOMS · CONSTRUCTIONS · STUDY · RESULTS</span>
   </a>
   <div class="workspace-links"><a href="#sources">Sources ↗</a><a href="#about">About Almond ↗</a></div>
 </section>
@@ -113,6 +119,92 @@
     <div class="analysis-runbar"><ul id="run-checklist" class="run-checklist" aria-label="Before you run"></ul><button id="analysis-run" class="analysis-button primary" type="submit" data-analysis="analyze">Run native analysis ↗</button><div id="analysis-status" class="status" data-state="idle" role="status" aria-live="polite"><span class="st-icon" aria-hidden="true"></span><div class="st-text"><p id="analysis-message"></p><p id="analysis-hint" class="status-hint" hidden></p></div></div></div>
   </form>
   <details class="analysis-details"><summary>Method &amp; engine details</summary><p><strong>Almond native</strong> (built in, no licence): a 3D frame solver for line members. EN 1990 load combinations (SLS G + Q for deflection, ULS for member checks), floor bays and placed models as loads, rigid or simple connections, and an EN 1993-1-1 stability screen (αcr, sway imperfections, P-Δ below 10). Benchmarked against Karamba within 1.3% on deflection.</p><p><strong>Karamba3D</strong> (separate installation and licence): first-order analysis, also for shells.</p><p>L/250 is an indicative deflection screen. This workspace does not establish full project-specific code compliance.</p><p id="engine-detail">Check the engines inside Rhino.</p><a href="https://manual.karamba3d.com/3-in-depth-component-reference/3.6-results/3.7.1-general-results/3.6.1-modelview" target="_blank" rel="noopener noreferrer">Karamba ModelView documentation ↗</a></details>
+</section>
+<section id="environment-page" class="analysis-page env-page" hidden>
+  <p class="eyebrow">03 / ENVIRONMENT WORKSPACE</p><h1>Climate, Rooms<br>&amp; Comfort<span class="red">.</span></h1>
+  <p class="analysis-note" id="env-native-note">Open <strong>AlmondEnvironment</strong> in Rhino to connect this workspace to your model.</p>
+  <div id="env-strip" class="env-strip" aria-hidden="true"></div>
+  <nav class="analysis-tabs env-tabs" role="tablist" aria-label="Environment workspace">
+    <button type="button" role="tab" id="etab-site" data-etab="site" aria-controls="epane-site" aria-selected="true"><svg class="tab-icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M8 2.5 10 9 8 8 6 9z"/></svg><span>Site</span><i class="tab-need" hidden>!</i></button><button type="button" role="tab" id="etab-rooms" data-etab="rooms" aria-controls="epane-rooms" aria-selected="false" tabindex="-1"><svg class="tab-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 2.5h13v11h-13zM8 2.5V9h6.5"/></svg><span>Rooms</span><i class="tab-need" hidden>!</i></button><button type="button" role="tab" id="etab-constructions" data-etab="constructions" aria-controls="epane-constructions" aria-selected="false" tabindex="-1"><svg class="tab-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 2v12M13 2v12M6 2v12M9.5 2v12M6 5l3.5-2L6 8l3.5-2L6 11l3.5-2"/></svg><span>Constructions</span></button><button type="button" role="tab" id="etab-study" data-etab="study" aria-controls="epane-study" aria-selected="false" tabindex="-1"><svg class="tab-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 9 4 4.5 8 2.5l4 2L14.5 9M3 9h10v5H3z"/></svg><span>Study</span></button><button type="button" role="tab" id="etab-results" data-etab="results" aria-controls="epane-results" aria-selected="false" tabindex="-1"><svg class="tab-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 14.5h13M4 12.5V8M8 12.5V3.5M12 12.5V6.5"/></svg><span>Results</span></button>
+  </nav>
+
+  <section id="epane-site" class="analysis-step env-pane" role="tabpanel" aria-labelledby="etab-site" data-epane="site">
+    <h2>01 Site and climate</h2>
+    <p>Point Almond at an EnergyPlus weather file (.epw) for the site. It sets the sun, the sky and the outdoor air for every study.</p>
+    <div class="analysis-fields"><button type="button" class="analysis-button" data-env="browse_epw">Choose weather file ↗</button></div>
+    <p id="env-epw" class="analysis-meta need">Required: a weather file. Typical-year files for most cities are published by climate.onebuilding.org.</p>
+    <div id="env-site-diagram" class="env-diagram"></div>
+    <dl id="env-site-facts" class="env-facts" hidden></dl>
+  </section>
+
+  <section id="epane-rooms" class="analysis-step env-pane" role="tabpanel" aria-labelledby="etab-rooms" data-epane="rooms" hidden>
+    <h2>02 Rooms</h2>
+    <p>A room is a closed volume, the surfaces that bound it, or a closed curve with a height. Select it in Rhino, name it and define it. Rooms may be open, like pavilions and loggias: Almond checks each room's enclosure and says how it will be assessed.</p>
+    <div class="analysis-fields">
+      <label>Name<input id="env-room-name" type="text" maxlength="60" placeholder="Living"></label>
+      <label>Use<select id="env-room-use"></select></label>
+    </div>
+    <div class="analysis-fields">
+      <label>Construction set<select id="env-room-set"><option value="">None · tag elements</option></select></label>
+      <label>Height <span class="unit-label">m · curves only</span><input id="env-room-height" type="number" min="1" max="50" step="any" placeholder="—"></label>
+    </div>
+    <details class="analysis-details"><summary>Set-points</summary>
+      <div class="analysis-fields"><label>Heating <span class="unit-label">°C · blank = use</span><input id="env-room-heat" type="number" min="5" max="30" step="any"></label>
+        <label>Cooling <span class="unit-label">°C · blank = use</span><input id="env-room-cool" type="number" min="18" max="35" step="any"></label></div>
+      <p class="field-help">The room use sets gains, schedule and set-points. Open and semi-open rooms are never heated or cooled.</p>
+    </details>
+    <div class="analysis-fields"><button type="button" class="analysis-button primary" data-env="define_room">Define room from selection ↗</button><button type="button" class="analysis-button" data-env="remove_room">Clear room tags</button></div>
+    <div class="analysis-fields"><button type="button" class="analysis-button" data-env="rooms">Check rooms ↗</button></div>
+    <div id="env-room-plan" class="env-diagram"></div>
+    <table id="env-room-table" class="env-table" hidden><thead><tr><th>Room</th><th>Use</th><th>Area</th><th>Enclosure</th><th></th></tr></thead><tbody></tbody></table>
+    <ul id="env-room-warnings" class="env-warnings"></ul>
+  </section>
+
+  <section id="epane-constructions" class="analysis-step env-pane" role="tabpanel" aria-labelledby="etab-constructions" data-epane="constructions" hidden>
+    <h2>03 Constructions</h2>
+    <p>Give walls, slabs, roofs and windows a layered construction. Each room takes the construction of the elements around it; a room's construction set fills the rest.</p>
+    <div class="analysis-fields">
+      <label>Element<select id="env-kind"><option value="">All</option><option value="wall_external">External walls</option><option value="roof">Roofs</option><option value="floor_ground">Ground floors</option><option value="floor_internal">Intermediate floors</option><option value="floor_exposed">Exposed floors</option><option value="wall_internal">Partitions</option><option value="window">Windows</option><option value="door">Doors</option></select></label>
+      <label>Region<select id="env-region"><option value="">All</option><option value="eu">Europe</option><option value="ch">Switzerland</option><option value="de">Germany</option><option value="uk">UK</option><option value="sg">Singapore</option><option value="tropical">Tropical</option><option value="temperate">Temperate</option></select></label>
+    </div>
+    <label>Construction<select id="env-construction" size="7" class="env-list"></select></label>
+    <div id="env-section" class="env-diagram"></div>
+    <div class="analysis-fields"><button type="button" class="analysis-button primary" data-env="assign">Assign to selection ↗</button><button type="button" class="analysis-button" data-env="clear_construction">Clear from selection</button></div>
+    <details class="analysis-details"><summary>Sources and licences</summary><ul id="env-sources"></ul>
+      <p class="field-help">Layer properties come from openly licensed datasets. Finishes, frames and the assembly build-ups are Almond's assumptions: check them against product data. U-values follow the EN ISO 6946 procedure, thermal mass the EN ISO 13786 periodic method.</p></details>
+  </section>
+
+  <section id="epane-study" class="analysis-step env-pane" role="tabpanel" aria-labelledby="etab-study" data-epane="study" hidden>
+    <h2>04 Study</h2>
+    <div class="analysis-fields"><label>Study<select id="env-study"><option value="thermal">Thermal comfort &amp; energy</option><option value="daylight">Daylight</option></select></label>
+      <label data-for="daylight" hidden>Metric<select id="env-daylight"><option value="annual">Annual · sDA / ASE</option><option value="daylight_factor">Daylight factor</option></select></label></div>
+    <div id="env-study-diagram" class="env-diagram"></div>
+    <div data-for="thermal">
+      <div class="analysis-fields"><label>Untagged faces<select id="env-preset"><option value="typical">Typical</option><option value="insulated">Insulated</option><option value="uninsulated_masonry">Uninsulated masonry</option><option value="lightweight_tropical">Lightweight tropical</option></select></label>
+        <label>Window ventilation <span class="unit-label">ach when warm</span><input id="env-nv" type="number" min="0" max="20" step="any" value="0"></label></div>
+      <label class="analysis-toggle"><input id="env-blinds" type="checkbox"><span>External blinds in summer</span></label>
+      <div class="analysis-fields"><label>Code check<select id="env-pack"><option value="">None</option></select></label>
+        <label id="env-pack-opt-label" hidden>Option<select id="env-pack-opt"></select></label></div>
+      <p id="env-pack-note" class="field-help"></p>
+    </div>
+    <div data-for="daylight" hidden><div class="analysis-fields"><label>Quality<select id="env-quality"><option value="draft">Draft</option><option value="medium" selected>Medium</option><option value="high">High</option></select></label>
+      <label>Grid <span class="unit-label">m</span><input id="env-spacing" type="number" min="0.25" max="2" step="any" value="0.5"></label></div></div>
+  </section>
+
+  <section id="epane-results" class="analysis-step env-pane" role="tabpanel" aria-labelledby="etab-results" data-epane="results" hidden>
+    <h2>05 Results</h2>
+    <p id="env-results-empty" class="field-help">Run a study to see its results here.</p>
+    <div id="env-tiles" class="env-diagram"></div>
+    <div id="env-result-plan" class="env-diagram"></div>
+    <table id="env-result-table" class="env-table" hidden><thead></thead><tbody></tbody></table>
+    <details class="analysis-details" open><summary>Notes &amp; warnings</summary><ul id="env-notes"></ul></details>
+    <details class="analysis-details" id="env-envelope" hidden><summary>Code check</summary><div id="env-envelope-body"></div></details>
+    <div class="analysis-fields"><button type="button" class="analysis-button" data-env="clear_view">Clear viewport results</button></div>
+  </section>
+
+  <div class="analysis-runbar"><ul id="env-checklist" class="run-checklist" aria-label="Before you run"></ul><button id="env-run" class="analysis-button primary" type="button" data-env="run">Run study ↗</button>
+    <div id="env-status" class="status" data-state="idle" role="status" aria-live="polite"><span class="st-icon" aria-hidden="true"></span><div class="st-text"><p id="env-message"></p></div></div></div>
+  <details class="analysis-details"><summary>Method &amp; limits</summary><p>Thermal: each enclosed room is an ISO 13790 hourly 5R1C zone with the U-values and thermal mass of its constructions, solar gains ray traced on the model, and heat flow to neighbouring rooms. Semi-open rooms add the air that flows through their openings and run free. Open rooms are assessed as semi-outdoor comfort: outdoor air, sun and sky on the occupants (SolarCal), SET*. Daylight: daylight coefficients with interreflections, per room on a 0.8 m work plane.</p><p>A design-stage comparison tool. Code checks are indicative and are not certification or a compliance calculation.</p></details>
 </section>
 <section id="library-page" hidden>
   <div class="hero">

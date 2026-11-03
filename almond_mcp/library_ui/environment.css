@@ -1,0 +1,21 @@
+/* Environment workspace: diagrams and tables in the archive's paper / ink / red language. */
+.env-strip{margin:18px 0 6px;border-bottom:1px solid var(--line)}
+.env-strip svg{display:block;width:100%;height:auto}
+.env-diagram{margin:14px 0}
+.env-diagram:empty{display:none}
+.env-diagram svg{display:block;width:100%;height:auto;background:var(--paper)}
+.env-list{width:100%;font:12px/1.5 Arial,sans-serif;border:1px solid var(--line);padding:4px;background:transparent}
+.env-list option{padding:4px 2px}
+.env-facts{display:grid;grid-template-columns:auto 1fr;gap:6px 18px;font-size:12px;margin:12px 0;border-top:1px solid var(--ink);padding-top:12px}
+.env-facts dt{font:9px var(--mono);text-transform:uppercase;color:var(--muted);align-self:center}
+.env-facts dd{margin:0}
+.env-table{width:100%;border-collapse:collapse;font-size:12px;margin:10px 0}
+.env-table th{font:9px var(--mono);text-transform:uppercase;color:var(--muted);text-align:left;padding:6px 4px;border-bottom:1px solid var(--ink)}
+.env-table td{padding:7px 4px;border-bottom:1px solid var(--line);vertical-align:top}
+.env-table tr[data-state=semi_open] td:first-child{border-left:3px solid var(--red);padding-left:6px}
+.env-table tr[data-state=open] td:first-child{border-left:3px dashed var(--red);padding-left:6px}
+.env-link{font:10px var(--mono);text-decoration:underline;text-underline-offset:3px;padding:0}
+.env-warnings{padding-left:17px;margin:8px 0}
+.env-warnings li{font-size:11px;line-height:1.55;color:var(--red);margin:4px 0}
+.env-page .analysis-meta.need{color:var(--red)}
+.rhino-panel .env-strip svg text{font-family:var(--ui-font,"Segoe UI"),Arial,sans-serif}

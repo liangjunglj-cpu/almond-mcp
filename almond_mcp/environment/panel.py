@@ -42,6 +42,14 @@ def catalogue(_req: dict) -> dict:
             "sources": [{k: s[k] for k in ("id", "title", "licence", "attribution")} for s in asm.sources().values()]}
 
 
+def static_catalogue() -> dict:
+    """The catalogue with every section detail pre-rendered, for the archive build and the browser preview
+    (served as /api/environment, so browsing constructions needs no engine process)."""
+    out = catalogue({})
+    out["sections"] = {cid: diagrams.construction_section(asm.properties(cid)).svg(asm.get(cid)["name"]) for cid in asm.library()}
+    return out
+
+
 def construction(req: dict) -> dict:
     p = asm.properties(req.get("custom") or req["id"])
     return {"construction": p, "svg": diagrams.construction_section(p).svg(p["name"])}
@@ -147,7 +155,14 @@ def run(req: dict) -> dict:
             "draw": draw, "label": res.get("label", study)}
 
 
-ACTIONS = {"catalogue": catalogue, "construction": construction, "site": site, "rooms": rooms, "run": run}
+def export_script(req: dict) -> dict:
+    """The C# export script for the panel to run in Rhino (writes the export JSON to req['out'])."""
+    return {"script": rhino.export_script([str(g) for g in req.get("guids") or []], str(req["out"]))}
+
+
+ACTIONS = {"catalogue": catalogue, "construction": construction, "site": site, "rooms": rooms, "run": run,
+           "export_script": export_script}
+PROTOCOL = 1
 
 
 def main(stdin=None, stdout=None) -> int:
@@ -159,10 +174,15 @@ def main(stdin=None, stdout=None) -> int:
         if action not in ACTIONS:
             raise ValueError(f"action must be one of {', '.join(ACTIONS)}")
         reply = {"status": "ok", **ACTIONS[action](req)}
+        if action == "run" and reply.get("draw") and req.get("draw_path"):
+            from pathlib import Path
+            Path(req["draw_path"]).write_text(reply.pop("draw"), encoding="utf-8")
+            reply["draw_script"] = rhino.draw_script(req["draw_path"], "Panel " + reply.get("label", "study"), reply["result"]["run_id"])
     except (ValueError, KeyError, OSError) as exc:
         reply = {"status": "error", "message": f"{type(exc).__name__}: {exc}"}
     except Exception as exc:  # noqa: BLE001 - the panel must always get a readable reply
         reply = {"status": "error", "message": f"{type(exc).__name__}: {exc}", "trace": traceback.format_exc()[-2000:]}
+    reply["protocol"] = PROTOCOL
     stdout.write(json.dumps(studies._jsonable(reply)))
     stdout.flush()
     return 0 if reply["status"] == "ok" else 1
