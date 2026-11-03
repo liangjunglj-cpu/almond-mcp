@@ -271,9 +271,42 @@ def drop_enclosed_sensors(scene: Scene, grid: SensorGrid, lid: float = 0.6, reac
                        spacing=grid.spacing, cells=grid.cells[keep], group=grid.group[keep]), int(enclosed.sum()))
 
 
-def zones_from_export(data: dict, scene: Scene, zone_guids: list[str]) -> list[thermal.Zone]:
+_NOT_BUILDING = ("ground", "context", "shading")
+
+
+def _floor_below(v: np.ndarray, scene: Scene, others: list[tuple[np.ndarray, np.ndarray]],
+                 inset: float = 0.3, storey: float = 0.5) -> float | None:
+    """The z of the lowest building floor under a zone, or None when there is none (the zone's lowest
+    floor is then on the ground). A floor below is a horizontal face of the building - any scene
+    object but ground, context, shading and ignored ones, or another zone - lying wholly ``storey``
+    m or more under the zone, within its plan extent inset by ``inset`` m (so perimeter walls and
+    foundations, and the zone's own slab, do not count)."""
+    lo, hi = v.min(axis=0), v.max(axis=0)
+    fx0, fy0, fx1, fy1 = lo[0] + inset, lo[1] + inset, hi[0] - inset, hi[1] - inset
+    if fx0 >= fx1 or fy0 >= fy1:
+        fx0, fy0, fx1, fy1 = lo[0], lo[1], hi[0], hi[1]
+    names = np.array([m.name for m in scene.materials] or [""])
+    kinds = np.array([m.kind for m in scene.materials] or [""])
+    keep = ~np.isin(names[scene.tri_material], _NOT_BUILDING) & (kinds[scene.tri_material] != "ignore")
+    tris = [scene.vertices[scene.triangles[keep]].reshape(-1, 3, 3)]
+    tris += [np.asarray(ov, dtype=float)[np.asarray(ot, dtype=np.int64)] for ov, ot in others]
+    t = np.concatenate(tris)
+    if not len(t):
+        return None
+    n = np.cross(t[:, 1] - t[:, 0], t[:, 2] - t[:, 0])
+    horiz = np.abs(n[:, 2]) > 0.7 * np.maximum(np.linalg.norm(n, axis=1), 1e-30)
+    tlo, thi = t.min(axis=1), t.max(axis=1)
+    below = (horiz & (thi[:, 2] < lo[2] - storey) & (tlo[:, 0] < fx1) & (thi[:, 0] > fx0)
+             & (tlo[:, 1] < fy1) & (thi[:, 1] > fy0))
+    return float(tlo[below, 2].min()) if below.any() else None
+
+
+def zones_from_export(data: dict, scene: Scene, zone_guids: list[str], ground_z: float | None = None) -> list[thermal.Zone]:
     """Zones from closed Rhino objects (one zone per GUID); glazing in the scene is attached to the
-    zone face it lies on; faces shared between the listed zones are adiabatic."""
+    zone face it lies on; faces shared between the listed zones are adiabatic. A zone's lowest floor
+    is on the ground unless building floors lie under it (see _floor_below) - then it is exposed, or
+    adiabatic where a listed zone is under it. ``ground_z`` (metres) fixes the ground level for
+    every zone instead."""
     scale = float(data.get("units_to_m", 1.0))
     by_guid: dict[str, list[dict]] = {}
     for o in data.get("objects", []):
@@ -306,8 +339,15 @@ def zones_from_export(data: dict, scene: Scene, zone_guids: list[str]) -> list[t
     zones = []
     for i, (g, name, v, t) in enumerate(meshes):
         others = [(mv, mt) for j, (_, _, mv, mt) in enumerate(meshes) if j != i]
-        z = thermal.zone_from_mesh(name, v, t, windows, others)
+        gz = ground_z if ground_z is not None else _floor_below(v, scene, others)
+        z = thermal.zone_from_mesh(name, v, t, windows, others, ground_z=gz)
         z.source["guid"] = g
+        exposed = z.areas().get("exposed_floor", 0.0)
+        if exposed > 0 and gz is not None:
+            where = "the given ground level" if ground_z is not None else "a building floor below it"
+            z.source["note"] = (f"{exposed:.1f} m2 of floor lies above {where} (z {gz:.2f} m) with no listed zone "
+                                "under it, so it is treated as exposed to outside air; list the zone below too "
+                                "to make that floor adiabatic, or pass ground_z_m.")
         zones.append(z)
     return zones
 
@@ -632,8 +672,12 @@ def run_thermal(zones: list[thermal.Zone], scene: Scene, weather, settings: ther
         all_notes += [f"{z.name}: {n}" for n in thermal.apply_construction(z, settings)]
         if z.source.get("warning"):
             all_notes.append(f"{z.name}: {z.source['warning']}")
+        if z.source.get("note"):
+            all_notes.append(f"{z.name}: {z.source['note']}")
         if z.source.get("windows_given") and not z.source.get("windows_assigned"):
-            all_notes.append(f"{z.name}: none of the glazing lies on this zone's faces (within 5 cm), so it has no windows")
+            tol = z.source.get("window_tolerance_m", 0.3)
+            all_notes.append(f"{z.name}: none of the glazing lies on this zone's faces (parallel and within "
+                             f"{100 * tol:.0f} cm), so it has no windows")
         res = thermal.simulate(z, weather, settings)
         summaries.append(thermal.summarize(z, res, weather, settings))
         for k in ("t_op", "t_air", "heating_w", "cooling_w", "solar_w"):

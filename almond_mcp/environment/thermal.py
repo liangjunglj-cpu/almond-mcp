@@ -134,6 +134,7 @@ class Settings:
     clothing_winter: float = 1.0
     metabolic_rate: float = 1.2
     air_speed: float = 0.1
+    tm52_months: list[int] | None = None                  # TM52 season; None = by the site's hemisphere
 
     def validate(self) -> None:
         if self.construction not in CONSTRUCTIONS:
@@ -157,6 +158,8 @@ class Settings:
             raise ValueError("shading_g_factor must be 0..1")
         if not 0.0 <= self.frame_fraction < 1.0:
             raise ValueError("frame_fraction must be 0..1")
+        if self.tm52_months is not None and (not self.tm52_months or any(not 1 <= int(m) <= 12 for m in self.tm52_months)):
+            raise ValueError("tm52_months must be month numbers 1..12")
 
 
 def occupancy(weather, schedule: str) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
@@ -395,7 +398,7 @@ def summarize(zone: Zone, res: dict, weather, st: Settings) -> dict:
             "too_warm_pct": round(100 * float((e["status"][occ] > 0).mean()), 1),
             "too_cool_pct": round(100 * float((e["status"][occ] < 0).mean()), 1),
         }
-        out["tm52"] = comfort.tm52(t_op, t_rm, occ, weather.month)
+        out["tm52"] = comfort.tm52(t_op, t_rm, occ, weather.month, weather.location.latitude, st.tm52_months)
         # PMV with indoor air humidity equal to the outdoor absolute humidity (no moisture model)
         w_out = comfort.humidity_ratio(weather["dry_bulb"], weather["rel_humidity"], weather["pressure"])
         rh_in = np.clip(comfort.rh_from_humidity_ratio(res["t_air"], w_out, weather["pressure"]), 0, 100)
@@ -578,7 +581,7 @@ def zone_from_mesh(name: str, vertices: np.ndarray, triangles: np.ndarray, windo
     ext = np.ptp(pts_all[:, :2], axis=0)
     z = Zone(name=name, floor_area=floor_area, volume=vol, surfaces=surfaces,
              source={"plan_min_width_m": round(float(ext.min()), 3), "open_edges": open_edges, "windows_assigned": sum(1 for s in surfaces if s.kind == "window"),
-                     "windows_given": len(windows)})
+                     "windows_given": len(windows), "window_tolerance_m": window_tolerance, "ground_z_m": round(gz, 3)})
     if open_edges:
         z.source["warning"] = f"{open_edges} open mesh edges: the zone is not watertight, so its volume may be wrong"
     return z

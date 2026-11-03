@@ -74,6 +74,14 @@ def _err(message: str, **extra) -> dict:
     return {"status": "error", "message": message, **extra}
 
 
+def _shoebox(spec: dict, materials: dict | None, north_deg: float | None):
+    """(Shoebox, Scene) for a shoebox study, with the call's material overrides applied."""
+    box = studies.shoebox_from_spec(spec)
+    sc = box.build({k: scenemod.material_from_spec(k, v) for k, v in (materials or {}).items()})
+    sc.north_deg = float(north_deg or 0.0)
+    return box, sc
+
+
 def _weather(epw_path: str):
     if not epw_path:
         raise ValueError("epw_path is required: the full path to an EnergyPlus weather file (.epw), "
@@ -283,9 +291,7 @@ def register(mcp, send: Sender) -> dict:
             inputs = {"epw_path": epw_path, "grid_spacing_m": grid_spacing_m, "work_plane_m": work_plane_m,
                       "materials": materials, "glazing": glazing, "shade_transmittance": shade_transmittance}
             if shoebox:
-                box = studies.shoebox_from_spec(shoebox)
-                sc = box.build({k: scenemod.material_from_spec(k, v) for k, v in (materials or {}).items()})
-                sc.north_deg = float(north_deg or 0.0)
+                box, sc = _shoebox(shoebox, materials, north_deg)
                 grid = box.floor_grid(sc, grid_spacing_m, work_plane_m, edge_offset_m)
                 inputs.update(shoebox=box.__dict__, units_to_m=1.0)
                 show_in_rhino = False
@@ -338,11 +344,10 @@ def register(mcp, send: Sender) -> dict:
             return _start_job("radiation", lambda: fn(**args))
         try:
             weather = _weather(epw_path)
-            inputs = {"epw_path": epw_path, "grid_spacing_m": grid_spacing_m, "offset_m": offset_m, "months": months, "hours": hours}
+            inputs = {"epw_path": epw_path, "grid_spacing_m": grid_spacing_m, "offset_m": offset_m, "months": months,
+                      "hours": hours, "materials": materials}
             if shoebox:
-                box = studies.shoebox_from_spec(shoebox)
-                sc = box.build()
-                sc.north_deg = float(north_deg or 0.0)
+                box, sc = _shoebox(shoebox, materials, north_deg)
                 sel = box.part_mask(sc, "facade") | box.part_mask(sc, "window")
                 g0 = scenemod.grid_from_triangles(sc.vertices, sc.triangles[sel], grid_spacing_m, 0.0, 0.0, face_up=False)
                 inputs.update(shoebox=box.__dict__, units_to_m=1.0)
@@ -379,6 +384,7 @@ def register(mcp, send: Sender) -> dict:
                         shading_g_factor: float = 1.0, shading_min_outdoor_c: float | None = None,
                         clothing_summer: float = 0.5, clothing_winter: float = 1.0,
                         metabolic_rate: float = 1.2, air_speed: float = 0.1, materials: dict | None = None,
+                        ground_z_m: float | None = None, tm52_months: list[int] | None = None,
                         north_deg: float | None = None, label: str = "", background: bool = False) -> dict:
         """Hourly thermal simulation of zones for a year (ISO 13790 5R1C, one node set per zone) with
         solar gains ray traced on the real geometry: heating/cooling energy and peaks (kWh/m2, W/m2),
@@ -387,9 +393,14 @@ def register(mcp, send: Sender) -> dict:
         natural_ventilation_ach to test passive design).
 
         Zones: zone_guids = closed polysurfaces / extrusions / closed meshes in Rhino, one per zone
-        (glazing objects lying on a zone face become its windows; faces shared between listed zones are
-        adiabatic; the lowest floor is ground-coupled to the EPW ground temperature); geometry_guids =
-        context that shades (default all visible). Or shoebox={...} for a room with one exposed facade.
+        (glazing objects parallel to a zone face and within 30 cm of it become its windows; faces
+        shared between listed zones are adiabatic; a zone's lowest floor is ground-coupled to the EPW
+        ground temperature unless building floors lie under it, when it is exposed to outside air -
+        list the zone below to make it adiabatic, or pass ground_z_m, the ground's z coordinate in
+        metres); geometry_guids = context that shades (default all visible). Or
+        shoebox={...} for a room with one exposed facade; materials overrides apply to it too.
+        TM52 is assessed over May-September north of the equator and November-March south of it, or
+        over tm52_months (e.g. [12,1,2]).
         construction: insulated | typical | uninsulated_masonry | lightweight_tropical; u_values
         overrides per kind ({"wall":0.3,"roof":0.2,"ground_floor":0.3,"window":1.4}); thermal_mass:
         very_light | light | medium | heavy | very_heavy. schedule: office | school | residential | always.
@@ -416,14 +427,13 @@ def register(mcp, send: Sender) -> dict:
                                   shading_g_factor=shading_g_factor, shading_min_outdoor_c=shading_min_outdoor_c,
                                   window_u=window_u, window_g=window_g,
                                   clothing_summer=clothing_summer, clothing_winter=clothing_winter,
-                                  metabolic_rate=metabolic_rate, air_speed=air_speed)
+                                  metabolic_rate=metabolic_rate, air_speed=air_speed, tm52_months=tm52_months)
             st.validate()
-            inputs = {"epw_path": epw_path}
+            inputs = {"epw_path": epw_path, "materials": materials}
             if shoebox:
-                box = studies.shoebox_from_spec(shoebox)
-                sc = box.build()
-                sc.north_deg = float(north_deg or 0.0)
-                zones = [thermal.zone_from_shoebox(box, sc, scenemod.LIBRARY[box.glazing])]
+                box, sc = _shoebox(shoebox, materials, north_deg)
+                glass = next(m for m in sc.materials if m.name == box.glazing)
+                zones = [thermal.zone_from_shoebox(box, sc, glass)]
                 inputs["shoebox"] = box.__dict__
             else:
                 if not zone_guids:
@@ -432,8 +442,8 @@ def register(mcp, send: Sender) -> dict:
                 data = _export(send, ids)
                 sc = scenemod.scene_from_export(data, materials)
                 sc.north_deg = _north(data, north_deg)
-                zones = studies.zones_from_export(data, sc, zone_guids)
-                inputs.update(zone_guids=zone_guids, units_to_m=data.get("units_to_m"))
+                zones = studies.zones_from_export(data, sc, zone_guids, ground_z_m)
+                inputs.update(zone_guids=zone_guids, units_to_m=data.get("units_to_m"), ground_z_m=ground_z_m)
             res = studies.run_thermal(zones, sc, weather, st, label, inputs)
             res["status"] = "success"
             return res
@@ -522,7 +532,9 @@ def register(mcp, send: Sender) -> dict:
     def get_environment_run(run_id: str, include_values: bool = False, metric: str = "") -> dict:
         """A saved run's full summary (inputs, assumptions, classification, metrics, image paths).
         include_values adds the per-sensor values (and sensor points, metres) of one metric.
-        Also takes a job_id from a background study: 'running' until it finishes, then its result."""
+        Also takes a job_id from a background study: 'running' with elapsed_s (no progress
+        estimate) until it finishes, then its result. Job ids live in the server's memory and are
+        lost if it restarts; a finished run's run_id is saved to disk."""
         job = _job_status(run_id)
         if job is not None:
             if job.get("status") != "success" or not include_values:
