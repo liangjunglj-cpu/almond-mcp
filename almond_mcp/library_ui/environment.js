@@ -181,6 +181,7 @@ window.almondEnvironmentReceive=p=>{
         const dt=document.createElement('dt'),dd=document.createElement('dd');dt.textContent=k;dd.textContent=v;return [dt,dd];}));
     message('Weather loaded: '+p.site.location+'.','ok');checklist();return;
   }
+  if(p.kind==='construction'){svgInto('env-section',p.svg);message(`${p.construction.name}: U ${p.construction.u_value} W/m²K.`,'ok');checklist();return;}
   if(p.kind==='rooms'){showRooms(p);message(`${p.rooms.length} room(s) checked.`,'ok');checklist();return;}
   if(p.kind==='result'){showResult(p);message(p.result.headline||'Study complete.','ok');checklist();return;}
   checklist();

@@ -35,9 +35,12 @@ namespace RhinoAlmondBridge
                 if (_ready && _view != null) _view.ExecuteScript("window.almondAnalysisReceive && window.almondAnalysisReceive(" +
                     JsonConvert.SerializeObject(reply,new JsonSerializerSettings{StringEscapeHandling=StringEscapeHandling.EscapeHtml}) + ");");
             });
+            // Replies are posted, never sent inline: several environment requests answer from inside DocumentLoading,
+            // and a synchronous ExecuteScript there deadlocks the web view.
             _environment = new EnvironmentWorkspace(reply => {
-                if (_ready && _view != null) _view.ExecuteScript("window.almondEnvironmentReceive && window.almondEnvironmentReceive(" +
-                    JsonConvert.SerializeObject(reply,new JsonSerializerSettings{StringEscapeHandling=StringEscapeHandling.EscapeHtml}) + ");");
+                string script = "window.almondEnvironmentReceive && window.almondEnvironmentReceive(" +
+                    JsonConvert.SerializeObject(reply,new JsonSerializerSettings{StringEscapeHandling=StringEscapeHandling.EscapeHtml}) + ");";
+                Eto.Forms.Application.Instance.AsyncInvoke(() => { if (_ready && _view != null && !_disposed) _view.ExecuteScript(script); });
             });
             MinimumSize = new Size(280, 240);
             Content = _body;
