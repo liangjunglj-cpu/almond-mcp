@@ -81,6 +81,7 @@ class Section:
     buckling_curve: str      # EN 1993-1-1 Table 6.2 curve for flexural buckling
     slender: bool = False    # class 4-ish: use elastic moduli
     dims_mm: tuple = ()
+    Iw: float = 0.0          # warping constant, m6 (I-sections; ~0 for hollow and solid sections)
 
 
 def chs(d_mm: float, t_mm: float) -> Section:
@@ -133,8 +134,9 @@ def i_section(h_mm: float, b_mm: float, tw_mm: float, tf_mm: float) -> Section:
     J = (2 * b * tf ** 3 + (h - tf) * tw ** 3) / 3
     Wpl_y = b * tf * (h - tf) + tw * hw ** 2 / 4
     Wpl_z = tf * b ** 2 / 2 + hw * tw ** 2 / 4
+    Iw = tf * b ** 3 * (h - tf) ** 2 / 24          # two flanges b x tf, centroids h - tf apart
     return Section(f"I {h_mm:g}x{b_mm:g}x{tw_mm:g}x{tf_mm:g}", "i", A, Iy, Iz, J, Iy / (h / 2), Iz / (b / 2),
-                   Wpl_y, Wpl_z, "b" if h / b > 1.2 else "c", dims_mm=(h_mm, b_mm, tw_mm, tf_mm))
+                   Wpl_y, Wpl_z, "b" if h / b > 1.2 else "c", dims_mm=(h_mm, b_mm, tw_mm, tf_mm), Iw=Iw)
 
 
 # ------------------------------------------------------------------ model
@@ -368,6 +370,7 @@ class ElementResult:
     util_detail: dict = field(default_factory=dict)
     Vy: np.ndarray | None = None    # (n,) shear force along local y, kN (pairs with Mz)
     Vz: np.ndarray | None = None    # (n,) shear force along local z, kN (pairs with My)
+    w_local: tuple | None = None    # member load (local wx, wy, wz kN/m) at n1 and at n2, this combination
 
 
 @dataclass
@@ -793,7 +796,8 @@ def _element_result(ei, e, X, R, L, ul, fl, wl, s):
     pts = X[e.n1] + np.outer(s, X[e.n2] - X[e.n1])
     chord = np.outer(1 - s, disp[0]) + np.outer(s, disp[-1])
     sag = float(np.max(np.linalg.norm(disp - chord, axis=1)))
-    return ElementResult(ei, L, fl, pts, disp, N, My, Mz, tors, sag, Vy=Vy, Vz=Vz)
+    return ElementResult(ei, L, fl, pts, disp, N, My, Mz, tors, sag, Vy=Vy, Vz=Vz,
+                         w_local=(np.asarray(wa, float), np.asarray(wb, float)))
 
 
 # ------------------------------------------------------------------ member checks
