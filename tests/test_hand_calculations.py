@@ -370,3 +370,155 @@ def test_member_table_deflection_is_relative_to_the_member_ends():
     row = ns.member_table(m, frame, sls, envelope)[0]
     assert row["deflection_mm"] == pytest.approx(5 * W * L ** 4 / (384 * E * I) * 1000, rel=2e-3)
     assert row["max_displacement_mm"] == pytest.approx((5 * W * L ** 4 / (384 * E * I) + W * L / 2 / kz) * 1000, rel=2e-3)
+
+
+# ------------------------------------------------------------------ 6.3.2 lateral-torsional buckling
+from almond_mcp import ltb  # noqa: E402
+
+IPE = fs.i_section(300, 150, 7.1, 10.7)                     # I 300 x 150 x 7.1 x 10.7, no root radii
+GS = 80.76e6                                                 # kN/m2, the solver's shear modulus for S235
+
+
+def one_piece(L, M, q=0.0, n=201):
+    s = np.linspace(0, L, n)
+    return [{"s0": 0.0, "s1": L, "s": s, "M": M(s), "q0": q, "q1": q}]
+
+
+def test_warping_constant_of_an_i_section():
+    """Iw = tf b^3 (h - tf)^2 / 24 for two equal flanges: 10.7 x 150^3 x 289.3^2 / 24 = 1.2593e11 mm6."""
+    assert IPE.Iw * 1e18 == pytest.approx(10.7 * 150 ** 3 * 289.3 ** 2 / 24, rel=1e-12)
+    assert IPE.Iw * 1e18 == pytest.approx(1.2593e11, rel=1e-4)
+
+
+def test_m_cr_uniform_moment_is_exact():
+    """Uniform moment, fork supports (Timoshenko & Gere): M_cr = pi/L sqrt(E Iz G It (1 + pi^2 E Iw / (L^2 G It))).
+    L = 6 m: 83.163 kNm."""
+    L = 6.0
+    exact = math.pi / L * math.sqrt(E * IPE.Iz * GS * IPE.J * (1 + math.pi ** 2 * E * IPE.Iw / (L ** 2 * GS * IPE.J)))
+    assert exact == pytest.approx(83.163, abs=1e-3)
+    r = ltb.critical_moment(E, GS, IPE.Iz, IPE.J, IPE.Iw, one_piece(L, np.ones_like))
+    assert r["m_cr"] == pytest.approx(exact, rel=1e-6)
+
+
+def test_m_cr_uniform_load_c1_and_load_height():
+    """UDL on a simply supported span (ECCS / NCCI SN003, k = kw = 1): C1 = 1.13 at the shear centre; on the top
+    flange (z_g = h/2 = 0.15 m) M_cr = C1 (pi^2 E Iz / L^2) [sqrt(Iw/Iz + L^2 G It / (pi^2 E Iz) + (C2 z_g)^2)
+    - C2 z_g] with C2 = 0.454: 70.80 kNm. Below the shear centre the same load is stabilising."""
+    L = 6.0
+    k = math.pi ** 2 * E * IPE.Iz / L ** 2
+    root = IPE.Iw / IPE.Iz + L ** 2 * GS * IPE.J / (math.pi ** 2 * E * IPE.Iz)
+    diagram = one_piece(L, lambda s: s * (L - s) / 2, q=1.0)
+    centre = ltb.critical_moment(E, GS, IPE.Iz, IPE.J, IPE.Iw, diagram)["m_cr"]
+    assert centre / (k * math.sqrt(root)) == pytest.approx(1.13, rel=5e-3)
+    top = ltb.critical_moment(E, GS, IPE.Iz, IPE.J, IPE.Iw, diagram, zg=0.15)["m_cr"]
+    eccs = 1.127 * k * (math.sqrt(root + (0.454 * 0.15) ** 2) - 0.454 * 0.15)
+    assert eccs == pytest.approx(70.80, abs=0.01)
+    assert top == pytest.approx(eccs, rel=0.01)
+    assert ltb.critical_moment(E, GS, IPE.Iz, IPE.J, IPE.Iw, diagram, zg=-0.15)["m_cr"] > centre > top
+
+
+def test_m_cr_cantilever_tip_load():
+    """Narrow rectangle (Iw ~ 0) cantilever, tip load at the shear centre (Timoshenko & Gere):
+    P_cr = 4.013 sqrt(E Iz G It) / L^2; 20 x 200 mm, L = 3 m: 14.989 kN, M_cr = P_cr L."""
+    L = 3.0
+    R = fs.rect(20, 200)
+    s = np.linspace(0, L, 61)
+    r = ltb.critical_moment(E, GS, R.Iz, R.J, 0.0, [{"s0": 0.0, "s1": L, "s": s, "M": -(L - s), "q0": 0.0, "q1": 0.0}],
+                            points=[(L, 1.0)], ends=("root", "free"))
+    p_cr = 4.013 * math.sqrt(E * R.Iz * GS * R.J) / L ** 2
+    assert p_cr == pytest.approx(14.989, abs=1e-3)
+    assert r["m_cr"] / L == pytest.approx(p_cr, rel=1e-3)
+
+
+def i_beam(L=6.0, P=40.0, extra=(), **kw):
+    """Simply supported I 300 x 150 x 7.1 x 10.7 (S235) drawn with a midspan point, point load P there (Q)."""
+    sec = {"shape": "i", "height": 0.3, "width": 0.15, "web": 0.0071, "flange": 0.0107}
+    m = model([[0, 0, 3], [L / 2, 0, 3], [L, 0, 3]], [[0, 0, 3], [L, 0, 3]], L)
+    m["members"][0]["section"] = sec
+    m["members"] += [{"source_guids": [f"x{i}"], "points": pts, "section": sec} for i, pts in enumerate(extra)]
+    m["anchor_points"] += [pts[-1] for pts in extra]
+    return ns.validate(m, "beam", P, fixed_supports=False, self_weight=False, stability="off", detail=True, **kw)
+
+
+def test_ltb_midspan_point_load_on_the_top_flange():
+    """EN 1993-1-1 6.3.2.1-6.3.2.2. L = 6 m, P = 40 kN at midspan on the top flange: M_Ed = 1.5 x 40 x 6 / 4
+    = 90 kNm. M_cr against ECCS (C1 = 1.365, C2 = 0.553, z_g = 0.15 m): 80.83 kNm, within 2 %.
+    W_el,y = I_y / (h/2) = 79.99e6 / 150 = 533,266 mm3 (Class 1 but elastic design): lambda_LT = sqrt(W fy / M_cr); curve a (h/b = 2,
+    Table 6.4, alpha_LT = 0.21); chi_LT from (6.56); M_b,Rd = chi_LT W fy; utilization 90 / M_b,Rd.
+    The beam drawn in two pieces is one segment between its supports (forks at both ends)."""
+    row = i_beam()["members"][0]
+    L = 6.0
+    k = math.pi ** 2 * E * IPE.Iz / L ** 2
+    eccs = 1.365 * k * (math.sqrt(IPE.Iw / IPE.Iz + L ** 2 * GS * IPE.J / (math.pi ** 2 * E * IPE.Iz) + (0.553 * 0.15) ** 2)
+                        - 0.553 * 0.15)
+    assert eccs == pytest.approx(80.83, abs=0.01)
+    assert row["m_cr_knm"] == pytest.approx(eccs, rel=0.02)
+    assert row["ltb_length_m"] == pytest.approx(6.0) and row["ltb_ends"] == ["fork", "fork"] and row["ltb_curve"] == "a"
+    wel = IPE.Wel_y
+    assert wel * 1e9 == pytest.approx(533266, rel=1e-4)
+    lam = math.sqrt(wel * FY / row["m_cr_knm"])
+    phi = 0.5 * (1 + 0.21 * (lam - 0.2) + lam ** 2)
+    chi = 1 / (phi + math.sqrt(phi ** 2 - lam ** 2))
+    assert row["lambda_lt"] == pytest.approx(lam, abs=2e-3) and row["chi_lt"] == pytest.approx(chi, abs=2e-3)
+    assert row["ltb_utilization"] == pytest.approx(90.0 / (chi * wel * FY), rel=2e-3)
+    assert row["governing_check"] == "LTB 6.3.2" and row["utilization"] == row["ltb_utilization"]
+
+
+def test_ltb_shear_centre_c1_point_load():
+    """Same diagram with the load at the shear centre: C1 = 1.365 (ECCS, midspan point load), within 1 %."""
+    L = 6.0
+    s = np.linspace(0, L, 201)
+    M = np.where(s < L / 2, s / 2, (L - s) / 2)
+    pieces = [{"s0": 0.0, "s1": 3.0, "s": s[s <= 3], "M": M[s <= 3], "q0": 0.0, "q1": 0.0},
+              {"s0": 3.0, "s1": 6.0, "s": s[s >= 3], "M": M[s >= 3], "q0": 0.0, "q1": 0.0}]
+    k = math.pi ** 2 * E * IPE.Iz / L ** 2
+    base = k * math.sqrt(IPE.Iw / IPE.Iz + L ** 2 * GS * IPE.J / (math.pi ** 2 * E * IPE.Iz))
+    r = ltb.critical_moment(E, GS, IPE.Iz, IPE.J, IPE.Iw, pieces, [(3.0, 1.0)])
+    assert r["m_cr"] / base == pytest.approx(1.365, rel=0.01)
+
+
+def test_a_beam_framing_in_restrains_the_segment():
+    """A secondary beam at midspan is a lateral restraint: two 3 m segments, forks at each end, M_cr far higher."""
+    free = i_beam()["members"][0]
+    held = i_beam(extra=[[[3.0, 0, 3], [3.0, 2.0, 3]]])["members"][0]
+    assert held["ltb_length_m"] == pytest.approx(3.0) and held["m_cr_knm"] > 2.5 * free["m_cr_knm"]
+
+
+def test_continuous_restraint_and_hollow_sections_skip_ltb():
+    row = i_beam(lateral_restraint="continuous")["members"][0]
+    assert row["ltb_utilization"] is None and row["governing_check"] == "cross-section"
+    assert short_box_beam(P=100.0)["members"][0]["ltb_utilization"] is None        # RHS: not susceptible
+    with pytest.raises(ValueError):
+        ec3.apply(fs.Frame(), None, {}, lateral_restraint="sometimes")
+
+
+def test_annex_b_table_b2_kzy_for_unrestrained_members():
+    """EN 1993-1-1 Annex B, Table B.2 (members susceptible to torsional deformation), Class 3 (elastic):
+    k_zy = 1 - 0.05 lambda_z n_z / (C_mLT - 0.25) >= 1 - 0.05 n_z / (C_mLT - 0.25), and M_y,Rk carries chi_LT
+    in (6.61)/(6.62). I 300 x 150 x 7.1 x 10.7, L = 4 m, N = 100 kN, uniform My = 30 kNm (C_mLT = 1.0),
+    M_cr = 120 kNm."""
+    sec, steel, L = IPE, fs.material("S235"), 4.0
+    t = np.linspace(0, 1, 5)
+    N, My, z = np.full(5, -100.0), np.full(5, 30.0), np.zeros(5)
+    det = ec3.member_check(sec, steel, L, t, N, My, z, ltb={"m_cr": 120.0, "m_ed": 30.0, "cm_lt": 1.0, "length": L,
+                                                         "ends": ("fork", "fork"), "zg": 0.0})["detail"]
+    lam_z = math.sqrt(sec.A * FY / (math.pi ** 2 * E * sec.Iz / L ** 2))
+    phi = 0.5 * (1 + 0.34 * (lam_z - 0.2) + lam_z ** 2)                       # curve b about z (h/b > 1.2)
+    chi_z = 1 / (phi + math.sqrt(phi ** 2 - lam_z ** 2))
+    n_z = 100.0 / (chi_z * sec.A * FY)
+    kzy = max(1 - 0.05 * lam_z * n_z / 0.75, 1 - 0.05 * n_z / 0.75)
+    lam_lt = math.sqrt(sec.Wel_y * FY / 120.0)
+    p = 0.5 * (1 + 0.21 * (lam_lt - 0.2) + lam_lt ** 2)                        # curve a (h/b = 2)
+    chi_lt = 1 / (p + math.sqrt(p ** 2 - lam_lt ** 2))
+    assert det["kzy"] == pytest.approx(kzy, rel=1e-9)
+    assert det["eq_6_62"] == pytest.approx(n_z + kzy * 30.0 / (chi_lt * sec.Wel_y * FY), rel=1e-9)
+    assert det["ltb"] == pytest.approx(30.0 / (chi_lt * sec.Wel_y * FY), rel=1e-9)
+
+
+def test_cantilever_i_beam_is_rooted_and_free():
+    """A cantilever's segment: held (v = v' = phi = 0) at the root support, free at the tip."""
+    sec = {"shape": "i", "height": 0.3, "width": 0.15, "web": 0.0071, "flange": 0.0107}
+    m = model([[0, 0, 3], [3, 0, 3]], [[0, 0, 3]], 3.0)
+    m["members"][0]["section"] = sec
+    row = ns.validate(m, "beam", 10.0, fixed_supports=True, self_weight=False, stability="off", detail=True)["members"][0]
+    assert row["ltb_ends"] == ["root", "free"] and math.isfinite(row["m_cr_knm"]) and row["m_cr_knm"] > 0

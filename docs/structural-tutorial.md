@@ -153,7 +153,8 @@ Click **Open full results ↗**, or type `AlmondResults`. The **Almond Results**
 - **A design-stage tool.** It sizes and compares options early. It does not replace a structural engineer's design and sign-off.
 - **Steel is the checked case.** Concrete, timber and aluminium are **indicative**: forces, deflection and stability are computed, but their own codes (EN 1992, EN 1995, EN 1999) are not applied, so there is no capacity pass/fail. Excess deflection and instability still fail.
 - **Gravity loads only.** Self-weight, floors, people, placed items, and the code's sway imperfection. Wind is not checked yet. Snow is entered by you as an area or total load.
-- **Not yet covered:** lateral-torsional buckling and torsion. Class 4 (slender) sections and webs slender enough to buckle in shear (h_w/t_w > 72ε) fail as "not covered" rather than pass unchecked. Shear (EN 1993 6.2.6, 6.2.8) and member bow imperfections (5.3.2(6), in sway-sensitive frames) are checked.
+- **Not yet covered:** torsion. Class 4 (slender) sections and webs slender enough to buckle in shear (h_w/t_w > 72ε) fail as "not covered" rather than pass unchecked. Shear (EN 1993 6.2.6, 6.2.8), member bow imperfections (5.3.2(6), in sway-sensitive frames) and lateral-torsional buckling of I-section beams (6.3.2) are checked.
+- **I-section beams are assumed unrestrained between their joints.** If a deck or slab holds the top flange, set `lateral_restraint` to `continuous` so lateral-torsional buckling is not checked against a restraint that exists.
 - **National Annexes.** Only the Eurocode recommended values ship. A practice can add its country's annex as a profile file (`%LOCALAPPDATA%\Almond\design-codes`); unchecked values are flagged. See [Design codes](design-codes.md).
 
 ## 8. Use it from Claude

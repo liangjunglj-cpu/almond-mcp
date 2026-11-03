@@ -96,13 +96,14 @@ sent by a model JSON (the `almond-mcp solve` protocol).
 - **Strength:** utilization < 1.0 against yield (S235: fy = 235 MPa). On the
   native engine (EN 1993-1-1, per member) this is the worst of: cross-section
   6.2.1(7), shear 6.2.6 (V_pl,Rd with the 6.2.6(3) shear area, η = 1.0), bending
-  reduced by high shear 6.2.8, flexural buckling 6.3.1 and compression + bending
-  6.3.3 (Annex B). Class 4 sections and webs past h_w/t_w = 72ε/η (shear
+  reduced by high shear 6.2.8, flexural buckling 6.3.1, lateral-torsional
+  buckling of I-sections 6.3.2 (numerical M_cr, gravity on the top flange; off
+  with `lateral_restraint="continuous"`) and compression + bending 6.3.3
+  (Annex B, Table B.2 for unrestrained I-sections). Class 4 sections and webs past h_w/t_w = 72ε/η (shear
   buckling, EN 1993-1-5) fail as not covered. With α_cr < 10 the ULS analysis is
   second order with sway imperfections (5.3.2(3), m per sway direction counting
   columns with ≥ 50 % of their row's average load) and local bow imperfections
-  (5.3.2(6), Table 5.1) where the clause requires them. Not checked:
-  lateral-torsional buckling, torsion. See [native-solver.md](native-solver.md).
+  (5.3.2(6), Table 5.1) where the clause requires them. Not checked: torsion. See [native-solver.md](native-solver.md).
 - Rule-based pathway: mid-span UDL deflection `5wL⁴/384EI`, moment `wL²/8`,
   with load sharing across members.
 

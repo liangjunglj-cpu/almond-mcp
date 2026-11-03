@@ -2258,6 +2258,7 @@ def validate_structure(
     design_code: str = "eurocode",
     detail: bool = False,
     fabrication: str = "cold_formed",
+    lateral_restraint: str = "joints",
 ) -> str:
     """
     Validates AI-generated geometry with a structural analysis.
@@ -2331,6 +2332,10 @@ def validate_structure(
         fabrication: hollow steel sections (CHS/RHS) are "cold_formed" (default, EN 10219,
             buckling curve c) or "hot_finished" (EN 10210, curve a; a0 for S460). The difference
             is up to about 23 % in buckling resistance; use hot_finished only when specified.
+        lateral_restraint: steel I-section beams are "joints" (default: unrestrained laterally
+            between their joints, so lateral-torsional buckling, EN 1993-1-1 6.3.2, is checked
+            with gravity loads on the top flange) or "continuous" (a deck, slab or bracing holds
+            the compression flange: no LTB check). Native engine.
         detail: native engine only. Adds "members" (per member: role, length, section, ULS design
             forces N/V/M/T, governing combination and check, slenderness, chi, stress,
             utilization, SLS deflection and span/deflection ratio, pinned ends) and "supports"
@@ -2406,7 +2411,7 @@ def validate_structure(
                                           self_weight, span_m, required=engine == "native", asset_spec=spec,
                                           floor_spec=floor, design=(design_basis, uls_combination, design_code),
                                           connections=connections, stability=stability, detail=detail,
-                                          fabrication=fabrication)
+                                          fabrication=fabrication, lateral_restraint=lateral_restraint)
         if isinstance(result, str):          # hard error (explicit native request, or no bridge)
             return result
     if result is None:
@@ -2501,7 +2506,7 @@ def _floor_spec(imposed, dead, engine):
 
 def _native_validation(guids, structure_type, load_kn, material, fixed_supports, self_weight, span_m, required,
                        asset_spec=None, floor_spec=None, design=("en1990", None, "eurocode"), connections="rigid",
-                       stability="auto", detail=False, fabrication="cold_formed"):
+                       stability="auto", detail=False, fabrication="cold_formed", lateral_restraint="joints"):
     """Native frame check on the bridge's exported line model.
 
     Returns (result_dict, None) when it ran, (None, note) to fall back to the Karamba
@@ -2532,7 +2537,7 @@ def _native_validation(guids, structure_type, load_kn, material, fixed_supports,
                                            asset_loads=asset_spec, floor_loads=floor_spec,
                                            design_basis=design[0], uls=design[1], connections=connections,
                                            stability=stability, design_code=design[2], detail=detail,
-                                           fabrication=fabrication)
+                                           fabrication=fabrication, lateral_restraint=lateral_restraint)
     except ValueError as e:
         return json.dumps({"status": "error", "message": str(e)}), None
     return result, None
@@ -2588,6 +2593,7 @@ def visualize_structure(
     design_code: str = "eurocode",
     fabrication: str = "cold_formed",
     view: str = "deflection",
+    lateral_restraint: str = "joints",
 ) -> str:
     """
     Run a live structural analysis on a line model and SHOW it in every Rhino viewport:
@@ -2718,7 +2724,8 @@ def visualize_structure(
             return _bridge_call(draw, 30.0)
         reply, note = _native_view(request, guids, required=engine == "native", asset_spec=spec, floor_spec=floor,
                                    design=(design_basis, uls_combination, design_code), connections=connections,
-                                   stability=stability, view=view, fabrication=fabrication)
+                                   stability=stability, view=view, fabrication=fabrication,
+                                   lateral_restraint=lateral_restraint)
         if reply is not None:
             return reply
     out = _bridge_call(request, 90.0)
@@ -2751,7 +2758,8 @@ def _bridge_call(message: dict, timeout: float) -> str:
 
 
 def _native_view(request: dict, guids, required: bool, asset_spec=None, floor_spec=None, design=("en1990", None, "eurocode"),
-                 connections="rigid", stability="auto", view="deflection", fabrication="cold_formed"):
+                 connections="rigid", stability="auto", view="deflection", fabrication="cold_formed",
+                 lateral_restraint="joints"):
     """Solve natively and draw through the bridge's structure_draw overlay.
 
     Returns (reply_json, None) when it ran or must stop, (None, note) to fall back to Karamba."""
@@ -2780,7 +2788,8 @@ def _native_view(request: dict, guids, required: bool, asset_spec=None, floor_sp
             self_weight=request["self_weight"], diameter_mm=request.get("beam_diameter_mm"),
             wall_mm=request.get("beam_wall_mm"), span_m=request.get("span_m"), asset_loads=asset_spec,
             floor_loads=floor_spec, design_basis=design[0], uls=design[1], connections=connections,
-            stability=stability, view=view, design_code=design[2], fabrication=fabrication)
+            stability=stability, view=view, design_code=design[2], fabrication=fabrication,
+            lateral_restraint=lateral_restraint)
     except native_structure.InstabilityError as e:
         return json.dumps({"status": "fail", "analysis_method": "native", "message": str(e),
                            "stability": e.report, "hint": "view='buckling' draws the buckling mode."}), None

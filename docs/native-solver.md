@@ -107,6 +107,11 @@ axes polygonized identically. `almond_mcp/native_structure.py` then applies:
 
 - **Supports:** declared Rhino points (snapped to the nearest node within 50 mm), else
   every lowest-Z node. `fixed_supports=False` pins them (translations only).
+- **Sections** from each member's spec (meters): CHS (`diameter`, `wall`), box/RHS (`height`,
+  `width`, `wall`), solid rectangle (`height`, `width`), and doubly symmetric I-sections
+  (`shape` "i", `height`, `width`, `web`, `flange`; no root radii, warping constant
+  I_w = t_f b³ (h − t_f)²/24). The Rhino bridge exports hollow and solid sections; I-sections
+  come from model JSON.
 - **Loads:** `load_kn` shared equally by the free nodes, acting downward; self weight
   γ·A along every member unless `self_weight=False`.
 - **Deflection limit:** span/250. Span = longest member for beam/frame, else overall
@@ -124,10 +129,28 @@ axes polygonized identically. `almond_mcp/native_structure.py` then applies:
   - **Flexural buckling** 6.3.1 about both axes with L_cr = the member length, curves from
     Table 6.2: hollow sections **cold-formed (EN 10219) → curve c by default**, hot-finished
     (EN 10210) → a (a0 for S460) with `fabrication="hot_finished"`; rolled I by h/b and t_f.
+  - **Lateral-torsional buckling** 6.3.2.1–6.3.2.2 for steel I-sections:
+    M_b,Rd = χ_LT W_y f_y/γ_M1 (W_pl,y for Class 1/2 with plastic design, else W_el,y), χ_LT by
+    the **general case 6.3.2.2** with the Table 6.4 curves (I-sections treated as rolled, as for
+    Table 6.2: a for h/b ≤ 2, b above). **M_cr is computed numerically** (`almond_mcp/ltb.py`):
+    an eigen analysis of each segment between lateral restraints with thin-walled beam elements
+    (lateral displacement, its slope, twist and warping per node) under the segment's own ULS
+    moment diagram, member loads and nodal loads, **gravity loads on the top flange** (z_g = +h/2,
+    destabilising; members steeper than 45° take loads at the shear centre). Segments: the
+    members between joints, with pieces of one straight beam that meet nothing else merged (a
+    polyline beam with an intermediate point stays one segment); ends are forks (v = φ = 0,
+    lateral bending and warping free) where a support or another member is, a cantilever is
+    held at its root (v = v′ = φ = 0) and free at its tip. Hollow sections are not susceptible.
+    `lateral_restraint="continuous"` (a deck, slab or bracing holds the compression flange)
+    skips the check. Reported per member: `ltb_utilization`, `m_cr_knm`, `lambda_lt`, `chi_lt`,
+    `ltb_curve`, `cm_lt`, `ltb_length_m`, `ltb_ends`. The λ̄_LT,0 = 0.4 "ignore" rule of
+    6.3.2.2(4) (a Nationally Determined Parameter of 6.3.2.3) is not used: the curve's own 0.2
+    plateau applies.
   - **Compression + bending** 6.3.3 (6.61)/(6.62) with the **Annex B** interaction factors
     (Class 3 form with elastic moduli, Class 1/2 form with plastic) and Table B.3 C_m:
     0.6 + 0.4ψ ≥ 0.4 for linear moment diagrams, the table's upper bound 1.0 for members
-    with transverse load.
+    with transverse load. Table B.1 for members not susceptible to torsional deformation;
+    **Table B.2** (k_zy with C_mLT, M_y,Rk × χ_LT) for unrestrained I-sections.
   - **Shear** 6.2.6: V_pl,Rd = A_v (f_y/√3)/γ_M0 along both local axes (CHS: the
     resultant), with the 6.2.6(3) shear areas: I/H (no root radii) A − 2bt_f + t_w t_f ≥
     η h_w t_w parallel to the web, A − h_w t_w parallel to the flanges; RHS A·h/(b + h) and
@@ -143,7 +166,7 @@ axes polygonized identically. `almond_mcp/native_structure.py` then applies:
     The buckling checks (6.3.3) keep the unreduced resistances.
   - γ_M0, γ_M1 from the design code profile.
 
-**Not covered:** shells, large-displacement (geometrically nonlinear) analysis beyond P-Δ, lateral-torsional buckling (hollow sections are immune; I-sections are not checked for it), torsion, shear buckling resistance (EN 1993-1-5; flagged, see above), Class 4 effective sections, aluminium to EN 1999, dynamics, connections. Results are a preliminary design check, not an engineer's sign-off.
+**Not covered:** shells, large-displacement (geometrically nonlinear) analysis beyond P-Δ, torsion, shear buckling resistance (EN 1993-1-5; flagged, see above), Class 4 effective sections, aluminium to EN 1999, dynamics, connections. Results are a preliminary design check, not an engineer's sign-off.
 
 ### Validation
 
@@ -152,7 +175,8 @@ axes polygonized identically. `almond_mcp/native_structure.py` then applies:
   c, Table 5.2 classes by grade, Table B.3 C_m, an Annex B case where k = 1.3, shear areas and
   V_pl,Rd per section type, ρ and eq. (6.30), the h_w/t_w flag, Table 5.1 bow amplitudes, the
   5.3.2(6) condition, a bowed propped column against the closed-form second-order solution, the
-  5.3.2(3)b column count).
+  5.3.2(3)b column count; M_cr exact for uniform moment, the 4.013 cantilever, C1 = 1.13 / 1.365
+  and the ECCS load-height formula, χ_LT and M_b,Rd end to end, Table B.2 k_zy).
 - `tools/mutation_check.py` plants known engineering errors one at a time (wrong factors,
   wrong curve, unscaled class limits, buckling length of one analysis element, ...) and
   reports whether the tests catch each.
