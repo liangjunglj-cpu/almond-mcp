@@ -1,0 +1,79 @@
+== site CHE_ZH_Zurich.Affoltern.066640_TMYx.2011-2025.epw
+  state: ok | Weather loaded: Zurich.Affoltern, ZH, CHE.
+  facts: LOCATION\nZurich.Affoltern, ZH, CHE\nLATITUDE\n47.43°\nMEAN AIR\n10.6 °C\nRANGE\n-11.4 – 33.1 °C\nGLOBAL RADIATION\n1295 kWh/m²
+  capture panel-site-zurich ok
+== rooms
+  state: ok | 9 room(s) checked.
+  table:
+ROOM\tUSE\tAREA\tENCLOSURE\t\nGarden pavilion\toutdoor\t16.0 m²\tOpen · 66 % open\tSelect\nLanding\tcirculation\t18.0 m²\tEnclosed\tSelect\nBathroom\tbath\t9.6 m²\tEnclosed\tSelect\nBedroom\tbedroom\t32.9 m²\tEnclosed\tSelect\nStudy\toffice\t14.5 m²\tEnclosed\tSelect\nKitchen\tkitchen\t62.0 m²\tEnclosed\tSelect\nEntry\tcirculation\t2.4 m²\tEnclosed\tSelect\nHall and dining\tliving\t23.4 m²\tEnclosed\tSelect\nLiving\tliving\t40.3 m²\tEnclosed\tSelect
+  warnings:
+Room Garden pavilion is an open space (66 % open): it is assessed as semi-outdoor comfort (air at outdoor temperature, sun and sky on the occupants); no heating or cooling loads.\nRoom Landing opens into other parts of the building (5 m2: W 5 m2). Those openings are treated as adiabatic, with no air exchange; for open-plan spaces define one room.\nRoom Bedroom: 1.0 m2 of its boundary has no element within 0.35 m (gaps in the model, or small openings); treated as closed.\nRoom Study opens into other parts of the building (20 m2: S 20 m2). Those openings are treated as adiabatic, with no air exchange; for open-plan spaces define one room.\nRoom Hall and dining opens into other parts of the building (6 m2: up 6 m2). Those openings are treated as adiabatic, with no air exchange; for open-plan spaces define one room.\nRoom Living: 4.3 m2 of its boundary has no element within 0.35 m (gaps in the model, or small openings); treated as closed. Room Living opens into other parts of the building (21 m2: N 21 m2). Those openings are treated as adiabatic, with no air exchange; for open-plan spaces define one room.
+  capture panel-rooms ok
+  clear viewport: ok | Viewport results cleared.
+  viewport model ok
+  cutaway model ok
+== thermal, Zurich, blinds, UK Part L
+  pack option: dwelling
+  checklist: Weather file\nRooms checked\nConstructions
+  capture panel-study-thermal ok
+  clear viewport: ok | Nothing to clear.
+  run button disabled: false
+  state: ok | Garden pavilion: open, SET* mean 16.5 degC; Landing: heating 30.0 / cooling 0.0 kWh/m2, 0 h > 26 degC; Bathroom: heating 99.6 / cooling 0.0 kWh/m2, 0 h > 26 degC; Bedroom: heating 3.0 / cooling 0.0 kWh/m2, 328 h > 26 degC; Study: heating 15.0 / cooling 0.0 kWh/m2, 28 h > 26 degC; Kitchen: heating 14.3 / cooling 0.0 kWh/m2, 395 h > 26 degC; Entry: heating 61.9 / cooling 0.0 kWh/m2, 0 h > 26 degC; Hall and dining: heating 39.3 / cooling 0.0 kWh/m2, 0 h > 26 degC; Living: heating 45.8 / cooling 0.0 kWh/m2, 2333 h > 26 degC (55 s)
+  results table:
+ROOM\tMETHOD\tHEATING\tCOOLING\tH > 26 °C\tCOMFORT\nGarden pavilion\tOpen · semi-outdoor\t—\t—\t—\tSET* 16.5 °C · 143 h hot\nLanding\t5R1C\t30 kWh/m²\t0 kWh/m²\t0\tTM52 pass\nBathroom\t5R1C\t99.6 kWh/m²\t0 kWh/m²\t0\tTM52 pass\nBedroom\t5R1C\t3 kWh/m²\t0 kWh/m²\t328\tTM52 pass\nStudy\t5R1C\t15 kWh/m²\t0 kWh/m²\t28\tTM52 pass\nKitchen\t5R1C\t14.3 kWh/m²\t0 kWh/m²\t395\tTM52 pass\nEntry\t5R1C\t61.9 kWh/m²\t0 kWh/m²\t0\tTM52 pass\nHall and dining\t5R1C\t39.3 kWh/m²\t0 kWh/m²\t0\tTM52 pass\nLiving\t5R1C\t45.8 kWh/m²\t0 kWh/m²\t2333\tTM52 fail
+  envelope:
+Code check\nwindow: U 1.103 vs 1.6 — pass\nwall_external: U 0.183 vs 0.26 — pass\nroof: U 0.153 vs 0.16 — pass\nfloor_ground: U 0.216 vs 0.18 — fail\nEngland, Approved Document L 2021 (incorporating 2023 amendments): limiting U-values for new fabric elements (W/m2K, area-weighted) and the notional dwelling fabric. Limits are backstops; compliance is shown by the SAP / SBEM energy calculation, which Almond does not perform.\nbundled · OGL-UK-3.0
+  notes:
+Room Garden pavilion is an open space (66 % open): it is assessed as semi-outdoor comfort (air at outdoor temperature, sun and sky on the occupants); no heating or cooling loads.\nRoom Landing opens into other parts of the building (5 m2: W 5 m2). Those openings are treated as adiabatic, with no air exchange; for open-plan spaces define one room.\nRoom Bedroom: 1.0 m2 of its boundary has no element within 0.35 m (gaps in the model, or small openings); treated as closed.\nRoom Study opens into other parts of the building (20 m2: S 20 m2). Those openings are treated as adiabatic, with no air exchange; for open-plan spaces define one room.\nRoom Hall and dining opens into other parts of the building (6 m2: up 6 m2). Those openings are treated as adiabatic, with no air exchange; for open-plan spaces define one room.\nRoom Living: 4.3 m2 of its boundary has no element within 0.35 m (gaps in the model, or small openings); treated as closed. Room Living opens into other parts of the building (21 m2: N 21 m2). Those openings are treated as adiabatic, with no air exchange; for open-plan spaces define one room.\nNo mechanical cooling: rooms run free in warm weather.
+  result json 4 chars
+  capture panel-results-thermal-zurich ok
+  viewport thermal-zurich ok
+  cutaway thermal-zurich ok
+== daylight annual, Zurich
+  capture panel-study-daylight ok
+  clear viewport: ok | Viewport results cleared.
+  run button disabled: false
+  state: ok | Garden pavilion: sDA 100.0 %; Landing: sDA 73.2 %; Bathroom: sDA 0.0 %; Bedroom: sDA 100.0 %; Study: sDA 75.8 %; Kitchen: sDA 69.7 %; Entry: sDA 50.0 %; Hall and dining: sDA 96.6 %; Living: sDA 100.0 % (370 s)
+  results table:
+ROOM\tSDA\tASE\tDF\nGarden pavilion\t100 %\t100 %\t—\nLanding\t73.2 %\t0 %\t—\nBathroom\t0 %\t0 %\t—\nBedroom\t100 %\t84.8 %\t—\nStudy\t75.8 %\t0 %\t—\nKitchen\t69.7 %\t65.7 %\t—\nEntry\t50 %\t0 %\t—\nHall and dining\t96.6 %\t91.4 %\t—\nLiving\t100 %\t100 %\t—
+  envelope:
+Code checkwindow: U 1.103 vs 1.6 — passwall_external: U 0.183 vs 0.26 — passroof: U 0.153 vs 0.16 — passfloor_ground: U 0.216 vs 0.18 — failEngland, Approved Document L 2021 (incorporating 2023 amendments): limiting U-values for new fabric elements (W/m2K, area-weighted) and the notional dwelling fabric. Limits are backstops; compliance is shown by the SAP / SBEM energy calculation, which Almond does not perform.bundled · OGL-UK-3.0
+  notes:
+Room Garden pavilion is an open space (66 % open): it is assessed as semi-outdoor comfort (air at outdoor temperature, sun and sky on the occupants); no heating or cooling loads.\nRoom Landing opens into other parts of the building (5 m2: W 5 m2). Those openings are treated as adiabatic, with no air exchange; for open-plan spaces define one room.\nRoom Bedroom: 1.0 m2 of its boundary has no element within 0.35 m (gaps in the model, or small openings); treated as closed.\nRoom Study opens into other parts of the building (20 m2: S 20 m2). Those openings are treated as adiabatic, with no air exchange; for open-plan spaces define one room.\nRoom Hall and dining opens into other parts of the building (6 m2: up 6 m2). Those openings are treated as adiabatic, with no air exchange; for open-plan spaces define one room.\nRoom Living: 4.3 m2 of its boundary has no element within 0.35 m (gaps in the model, or small openings); treated as closed. Room Living opens into other parts of the building (21 m2: N 21 m2). Those openings are treated as adiabatic, with no air exchange; for open-plan spaces define one room.\nRoom Garden pavilion: no floor element under it - the daylight study adds an opaque floor (reflectance 0.2) at its boundary
+  result json 4 chars
+  capture panel-results-daylight-zurich ok
+  viewport daylight-zurich ok
+  cutaway daylight-zurich ok
+== site SGP_SG_Singapore-Changi.Intl.AP.486980_TMYx.2011-2025.epw
+  state: ok | Weather loaded: Singapore-Changi.Intl.AP, SG, SGP.
+  facts: LOCATION\nSingapore-Changi.Intl.AP, SG, SGP\nLATITUDE\n1.37°\nMEAN AIR\n28 °C\nRANGE\n22.9 – 34 °C\nGLOBAL RADIATION\n1768 kWh/m²
+  capture panel-site-singapore ok
+== thermal, Singapore, cooling, BCA RETV
+  pack option: retv
+  checklist: Weather file\nRooms checked\nConstructions
+  clear viewport: ok | Viewport results cleared.
+  run button disabled: false
+  state: ok | Garden pavilion: open, SET* mean 29.4 degC; Landing: heating 0.0 / cooling 0.0 kWh/m2, 8479 h > 26 degC; Bathroom: heating 0.0 / cooling 0.0 kWh/m2, 8708 h > 26 degC; Bedroom: heating 0.0 / cooling 91.6 kWh/m2, 3285 h > 26 degC; Study: heating 0.0 / cooling 86.0 kWh/m2, 2600 h > 26 degC; Kitchen: heating 0.0 / cooling 174.1 kWh/m2, 8760 h > 26 degC; Entry: heating 0.0 / cooling 0.0 kWh/m2, 8760 h > 26 degC; Hall and dining: heating 0.0 / cooling 62.0 kWh/m2, 8760 h > 26 degC; Living: heating 0.0 / cooling 450.3 kWh/m2, 8760 h > 26 degC (59 s)
+  results table:
+ROOM\tMETHOD\tHEATING\tCOOLING\tH > 26 °C\tCOMFORT\nGarden pavilion\tOpen · semi-outdoor\t—\t—\t—\tSET* 29.4 °C · 1847 h hot\nLanding\t5R1C\t0 kWh/m²\t0 kWh/m²\t8479\tTM52 pass\nBathroom\t5R1C\t0 kWh/m²\t0 kWh/m²\t8708\tTM52 pass\nBedroom\t5R1C\t0 kWh/m²\t91.6 kWh/m²\t3285\tTM52 pass\nStudy\t5R1C\t0 kWh/m²\t86 kWh/m²\t2600\tTM52 pass\nKitchen\t5R1C\t0 kWh/m²\t174.1 kWh/m²\t8760\tTM52 pass\nEntry\t5R1C\t0 kWh/m²\t0 kWh/m²\t8760\tTM52 pass\nHall and dining\t5R1C\t0 kWh/m²\t62 kWh/m²\t8760\tTM52 pass\nLiving\t5R1C\t0 kWh/m²\t450.3 kWh/m²\t8760\tTM52 pass
+  envelope:
+Code check\nRETV 10.94 W/m² (limit 25) — meets the limit\nN: 1.48 W/m² · WWR 3 % · CF 0.825\nE: 0.63 W/m² · WWR 0 % · CF 1.259\nS: 22.88 W/m² · WWR 87 % · CF 0.842\nW: 19.34 W/m² · WWR 59 % · CF 1.05\nIndicative: formulas from the BCA Code on Envelope Thermal Performance; CF derived by Almond from the weather file; SC = g / 0.87 from the glazing g-value over the whole window, with no credit for external shading devices (conservative). Not a BCA Green Mark assessment.\nmethod · LicenseRef-Method-Cited
+  notes:
+Room Garden pavilion is an open space (66 % open): it is assessed as semi-outdoor comfort (air at outdoor temperature, sun and sky on the occupants); no heating or cooling loads.\nRoom Landing opens into other parts of the building (5 m2: W 5 m2). Those openings are treated as adiabatic, with no air exchange; for open-plan spaces define one room.\nRoom Bedroom: 1.0 m2 of its boundary has no element within 0.35 m (gaps in the model, or small openings); treated as closed.\nRoom Study opens into other parts of the building (20 m2: S 20 m2). Those openings are treated as adiabatic, with no air exchange; for open-plan spaces define one room.\nRoom Hall and dining opens into other parts of the building (6 m2: up 6 m2). Those openings are treated as adiabatic, with no air exchange; for open-plan spaces define one room.\nRoom Living: 4.3 m2 of its boundary has no element within 0.35 m (gaps in the model, or small openings); treated as closed. Room Living opens into other parts of the building (21 m2: N 21 m2). Those openings are treated as adiabatic, with no air exchange; for open-plan spaces define one room.\nMechanical cooling to the room set-points.
+  result json 4 chars
+  capture panel-results-thermal-singapore ok
+  viewport thermal-singapore ok
+  cutaway thermal-singapore ok
+  clear viewport: ok | Viewport results cleared.
+== site CHE_ZH_Zurich.Affoltern.066640_TMYx.2011-2025.epw
+  state: ok | Weather loaded: Zurich.Affoltern, ZH, CHE.
+  facts: LOCATION\nZurich.Affoltern, ZH, CHE\nLATITUDE\n47.43°\nMEAN AIR\n10.6 °C\nRANGE\n-11.4 – 33.1 °C\nGLOBAL RADIATION\n1295 kWh/m²
+  capture panel-site-zurich ok
+== site SGP_SG_Singapore-Changi.Intl.AP.486980_TMYx.2011-2025.epw
+  state: ok | Weather loaded: Singapore-Changi.Intl.AP, SG, SGP.
+  facts: LOCATION\nSingapore-Changi.Intl.AP, SG, SGP\nLATITUDE\n1.37°\nMEAN AIR\n28 °C\nRANGE\n22.9 – 34 °C\nGLOBAL RADIATION\n1768 kWh/m²
+  capture panel-site-singapore ok
+== site CHE_ZH_Zurich.Affoltern.066640_TMYx.2011-2025.epw
+  state: ok | Weather loaded: Zurich.Affoltern, ZH, CHE.
+  facts: LOCATION\nZurich.Affoltern, ZH, CHE\nLATITUDE\n47.43°\nMEAN AIR\n10.6 °C\nRANGE\n-11.4 – 33.1 °C\nGLOBAL RADIATION\n1295 kWh/m²
+  capture panel-site-zurich ok
