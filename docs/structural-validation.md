@@ -194,6 +194,11 @@ export_structural_report()            # → %LOCALAPPDATA%\Almond\reports\struct
 export_structural_report(path="C:\\project\\checks.md", limit=10)
 ```
 
-The report contains the pathway explanation, a run table (span, deflection
-vs limit, utilization, reactions, member count, PASS/FAIL), per-run verdicts
-and warnings, and the interpretation notes above.
+Runs that return `pass`, `fail` or `indicative` are recorded. The report
+contains the explanation of both routes (native and Karamba), a run table
+(span, deflection vs limit, utilization, reactions, member count,
+PASS/FAIL/INDICATIVE), and per run the loads (point load, floor and asset
+loads), design code and ULS expression, connections, supports and stability,
+the verdict and warnings, and the interpretation notes above. Member counts
+exclude support points. Native concrete, timber and aluminium runs are
+INDICATIVE, with no pass/fail, and their verdicts read LOW CONFIDENCE.

@@ -270,7 +270,7 @@ namespace RhinoAlmondBridge
                     default:
                         string script = jobj.Value<string>("script") ?? "";
                         var executor = new ScriptExecutor();
-                        var execResult = executor.Execute(script);
+                        var execResult = executor.Execute(script, jobj.Value<bool?>("add_dimension") ?? false);
                         return JsonConvert.SerializeObject(execResult);
                 }
             }

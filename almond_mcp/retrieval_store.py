@@ -226,6 +226,17 @@ class AlmondStore:
                 connection.execute(
                     "ALTER TABLE assets ADD COLUMN library_id TEXT NOT NULL DEFAULT 'ikea'"
                 )
+            run_columns = {
+                row["name"]
+                for row in connection.execute("PRAGMA table_info(validation_runs)")
+            }
+            for column, ddl in (
+                ("status", "TEXT NOT NULL DEFAULT ''"),
+                ("object_count", "INTEGER NOT NULL DEFAULT 0"),
+                ("settings_json", "TEXT NOT NULL DEFAULT '{}'"),
+            ):
+                if column not in run_columns:
+                    connection.execute(f"ALTER TABLE validation_runs ADD COLUMN {column} {ddl}")
             connection.execute(
                 """
                 CREATE INDEX IF NOT EXISTS idx_assets_library_category
@@ -963,9 +974,21 @@ class AlmondStore:
         request: dict[str, Any],
         result: dict[str, Any],
         guids: list[str],
+        settings: dict[str, Any] | None = None,
     ) -> int:
-        """Persists one validate_structure run for later report export."""
+        """Persists one validate_structure run for later report export.
+
+        member_count counts the structural members the analysis reported
+        (support points and other non-member objects excluded); object_count
+        is every GUID passed in. settings holds the run options that change
+        the result (floor loads, design code, connections, stability...)."""
         results = result.get("results") or {}
+        members = {
+            g
+            for entry in results.get("per_element_utilization") or []
+            if isinstance(entry, dict)
+            for g in entry.get("source_guids") or []
+        }
         with self._connect() as connection:
             cursor = connection.execute(
                 """
@@ -974,15 +997,16 @@ class AlmondStore:
                     analysis_method, confidence, passed, span_m,
                     max_deflection_mm, deflection_limit_mm, utilization_ratio,
                     max_stress_mpa, yield_stress_mpa, reactions_kn,
-                    verdict, warnings_json, guids_json
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    verdict, warnings_json, guids_json,
+                    status, object_count, settings_json
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     _utc_now(),
                     str(request.get("structure_type", "beam")),
                     str(request.get("material", "Steel")),
                     float(request.get("load_kn", 10.0)),
-                    len(guids),
+                    len(members) if members else len(guids),
                     str(results.get("analysis_method", "unknown")),
                     str(result.get("confidence", "unknown")),
                     1 if result.get("passed") else 0,
@@ -996,6 +1020,9 @@ class AlmondStore:
                     str(result.get("verdict", "")),
                     _json(result.get("warnings") or []),
                     _json(list(guids)),
+                    str(result.get("status", "")),
+                    len(guids),
+                    _json(settings or {}),
                 ),
             )
             return int(cursor.lastrowid)
@@ -1010,7 +1037,10 @@ class AlmondStore:
         runs = []
         for row in rows:
             run = {key: row[key] for key in row.keys()}
-            run["passed"] = bool(run["passed"])
+            run["status"] = run["status"] or ("pass" if run["passed"] else "fail")
+            run["passed"] = None if run["status"] == "indicative" else bool(run["passed"])
+            run["object_count"] = run["object_count"] or len(json.loads(run["guids_json"] or "[]"))
+            run["settings"] = json.loads(run.pop("settings_json") or "{}")
             run["warnings"] = json.loads(run.pop("warnings_json") or "[]")
             run["guids"] = json.loads(run.pop("guids_json") or "[]")
             runs.append(run)

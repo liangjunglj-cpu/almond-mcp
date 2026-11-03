@@ -20,6 +20,10 @@ namespace RhinoAlmondBridge
     {
         private static bool _aiaLayersCreated = false;
 
+        // Set by document events while a script runs. Rhino drops an undo record that holds no
+        // changes, so undoing after a script that changed nothing would undo the user's last action.
+        private bool _docChanged;
+
         /// <summary>
         /// Compiles the provided C# source code using Roslyn, executes it within Rhino,
         /// and returns the result including any created GUIDs or error traces.
@@ -29,7 +33,10 @@ namespace RhinoAlmondBridge
         ///   public static List&lt;Guid&gt; Run(RhinoDoc doc)
         /// The Run method should create geometry and return a list of GUIDs.
         /// </param>
-        public ScriptResult Execute(string csharpCode)
+        /// <param name="addDimension">
+        /// Add an aligned dimension along the bounding box of the returned objects (opt-in).
+        /// </param>
+        public ScriptResult Execute(string csharpCode, bool addDimension = false)
         {
             var result = new ScriptResult { Status = "success" };
 
@@ -55,6 +62,8 @@ namespace RhinoAlmondBridge
             // Execute within an Undo block
             var doc = RhinoDoc.ActiveDoc;
             uint undoSn = doc.BeginUndoRecord("MCP C# Script Execution");
+            _docChanged = false;
+            WatchDocument(true);
 
             try
             {
@@ -66,6 +75,7 @@ namespace RhinoAlmondBridge
                 {
                     result.Status = "error";
                     result.Message = "Script must contain a class with: public static List<Guid> Run(RhinoDoc doc)";
+                    WatchDocument(false);
                     doc.EndUndoRecord(undoSn);
                     return result;
                 }
@@ -78,10 +88,11 @@ namespace RhinoAlmondBridge
                 {
                     result.Guids = guids.Select(g => g.ToString()).ToList();
 
-                    if (guids.Count > 0)
-                        AddScaleDimensions(doc, guids);
+                    if (addDimension && guids.Count > 0)
+                        result.DimensionGuid = AddScaleDimensions(doc, guids);
                 }
 
+                WatchDocument(false);
                 doc.EndUndoRecord(undoSn);
                 doc.Views.Redraw();
             }
@@ -89,8 +100,7 @@ namespace RhinoAlmondBridge
             {
                 // The actual exception is in InnerException
                 var inner = ex.InnerException ?? ex;
-                doc.EndUndoRecord(undoSn);
-                doc.Undo();
+                RollBack(doc, undoSn);
 
                 result.Status = "runtime_error";
                 result.Message = inner.Message;
@@ -98,8 +108,7 @@ namespace RhinoAlmondBridge
             }
             catch (Exception ex)
             {
-                doc.EndUndoRecord(undoSn);
-                doc.Undo();
+                RollBack(doc, undoSn);
 
                 result.Status = "runtime_error";
                 result.Message = ex.Message;
@@ -108,6 +117,53 @@ namespace RhinoAlmondBridge
 
             return result;
         }
+
+        /// <summary>
+        /// Closes the script's undo record and undoes it, but only when the script changed the
+        /// document: an empty record is discarded, and Undo would then revert the user's last action.
+        /// </summary>
+        private void RollBack(RhinoDoc doc, uint undoSn)
+        {
+            WatchDocument(false);
+            doc.EndUndoRecord(undoSn);
+            if (_docChanged)
+                doc.Undo();
+            doc.Views.Redraw();
+        }
+
+        private void WatchDocument(bool on)
+        {
+            if (on)
+            {
+                RhinoDoc.AddRhinoObject += MarkChanged;
+                RhinoDoc.DeleteRhinoObject += MarkChanged;
+                RhinoDoc.ReplaceRhinoObject += MarkChanged;
+                RhinoDoc.UndeleteRhinoObject += MarkChanged;
+                RhinoDoc.ModifyObjectAttributes += MarkChanged;
+                RhinoDoc.LayerTableEvent += MarkChanged;
+                RhinoDoc.MaterialTableEvent += MarkChanged;
+                RhinoDoc.GroupTableEvent += MarkChanged;
+                RhinoDoc.InstanceDefinitionTableEvent += MarkChanged;
+                RhinoDoc.DimensionStyleTableEvent += MarkChanged;
+                RhinoDoc.LightTableEvent += MarkChanged;
+            }
+            else
+            {
+                RhinoDoc.AddRhinoObject -= MarkChanged;
+                RhinoDoc.DeleteRhinoObject -= MarkChanged;
+                RhinoDoc.ReplaceRhinoObject -= MarkChanged;
+                RhinoDoc.UndeleteRhinoObject -= MarkChanged;
+                RhinoDoc.ModifyObjectAttributes -= MarkChanged;
+                RhinoDoc.LayerTableEvent -= MarkChanged;
+                RhinoDoc.MaterialTableEvent -= MarkChanged;
+                RhinoDoc.GroupTableEvent -= MarkChanged;
+                RhinoDoc.InstanceDefinitionTableEvent -= MarkChanged;
+                RhinoDoc.DimensionStyleTableEvent -= MarkChanged;
+                RhinoDoc.LightTableEvent -= MarkChanged;
+            }
+        }
+
+        private void MarkChanged(object sender, EventArgs e) => _docChanged = true;
 
         /// <summary>
         /// Wraps raw C# code in necessary using statements if they're not already present.
@@ -220,8 +276,9 @@ using Rhino.Commands;
 
         /// <summary>
         /// Adds an aligned dimension line spanning the bounding box of created geometry.
+        /// Returns the dimension's id, or null when none was added.
         /// </summary>
-        private void AddScaleDimensions(RhinoDoc doc, List<Guid> guids)
+        private string AddScaleDimensions(RhinoDoc doc, List<Guid> guids)
         {
             var bbox = BoundingBox.Empty;
 
@@ -232,7 +289,7 @@ using Rhino.Commands;
                     bbox.Union(obj.Geometry.GetBoundingBox(true));
             }
 
-            if (!bbox.IsValid) return;
+            if (!bbox.IsValid) return null;
 
             try
             {
@@ -248,12 +305,17 @@ using Rhino.Commands;
                 );
 
                 if (dim != null)
-                    doc.Objects.AddLinearDimension(dim);
+                {
+                    var id = doc.Objects.AddLinearDimension(dim);
+                    if (id != Guid.Empty)
+                        return id.ToString();
+                }
             }
             catch (Exception ex)
             {
                 RhinoApp.WriteLine($"RhinoAlmondBridge: Dimension error: {ex.Message}");
             }
+            return null;
         }
     }
 
@@ -273,5 +335,8 @@ using Rhino.Commands;
 
         [JsonProperty("error_trace")]
         public string ErrorTrace { get; set; }
+
+        [JsonProperty("dimension_guid", NullValueHandling = NullValueHandling.Ignore)]
+        public string DimensionGuid { get; set; }
     }
 }
