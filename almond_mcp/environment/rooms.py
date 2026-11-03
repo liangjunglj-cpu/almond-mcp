@@ -44,6 +44,10 @@ CELL = 0.5                  # m: enclosure sampling
 ENCLOSED_MAX = 0.05
 SEMI_OPEN_MAX = 0.30
 KAPPA_DEFAULT = 50_000.0    # J/m2K for opaque surfaces without a construction (a medium-weight finish)
+SETPOINT_RANGE = (5.0, 40.0)    # degC accepted for room set-points
+MAX_ROOM_HEIGHT_M = 100.0       # a taller 'room' is a unit mistake (heights are metres)
+MAX_ROOM_PLAN_M = 300.0         # a wider one is usually two rooms sharing a name
+INTERZONE_U_DEFAULT = 1.5   # W/m2K for a shared face neither room has a construction for (a light partition)
 WIND_LOCAL = 0.5            # local wind / 10 m EPW wind (suburban, sheltered openings)
 
 # Room uses: Almond assumptions for design-stage studies (people, equipment, lighting W/m2 at full use;
@@ -177,8 +181,43 @@ def _closed(v: np.ndarray, f: np.ndarray) -> bool:
     return bool(len(cnt) and (cnt == 2).all())
 
 
-def rooms_from_export(data: dict) -> list[Room]:
-    """Rooms from the export JSON (objects with a ``room`` field, see rhino.export_script)."""
+def parse_setpoints(heat, cool, where: str = "") -> dict:
+    """Room set-points from tag or tool values ("", None = use default; "off"/"none" = no heating or cooling).
+    Raises ValueError for text that is not a number, values outside 5-40 degC, or heating >= cooling."""
+    out: dict[str, float | None] = {}
+    for value, key in ((heat, "heating_setpoint"), (cool, "cooling_setpoint")):
+        if value is None or str(value).strip() == "":
+            continue
+        if str(value).strip().lower() in ("none", "off"):
+            out[key] = None
+            continue
+        try:
+            t = float(value)
+        except (TypeError, ValueError):
+            raise ValueError(f"{where}{key.replace('_', ' ')} '{value}' is not a temperature in degC (or 'off')") from None
+        if not math.isfinite(t) or not SETPOINT_RANGE[0] <= t <= SETPOINT_RANGE[1]:
+            raise ValueError(f"{where}{key.replace('_', ' ')} {value} degC is outside {SETPOINT_RANGE[0]:g}-{SETPOINT_RANGE[1]:g} degC")
+        out[key] = t
+    h, c = out.get("heating_setpoint"), out.get("cooling_setpoint")
+    if h is not None and c is not None and h >= c:
+        raise ValueError(f"{where}heating set-point {h:g} degC must be below the cooling set-point {c:g} degC")
+    return out
+
+
+def check_height(h: float, where: str = "") -> float:
+    if not math.isfinite(h) or h <= 0:
+        raise ValueError(f"{where}room height {h:g} m must be positive (almond:room_height, metres)")
+    if h > MAX_ROOM_HEIGHT_M:
+        raise ValueError(f"{where}room height {h:g} m is over {MAX_ROOM_HEIGHT_M:g} m - heights are in metres, "
+                         "not model units (3 m, not 3000)")
+    return h
+
+
+def rooms_from_export(data: dict, problems: list[str] | None = None) -> list[Room]:
+    """Rooms from the export JSON (objects with a ``room`` field, see rhino.export_script).
+
+    With ``problems`` (a list), a room that cannot be built is skipped and the reason appended, so one bad
+    room does not stop the others; without it the first problem raises ValueError."""
     scale = float(data.get("units_to_m", 1.0))
     groups: dict[str, list[dict]] = {}
     for o in data.get("objects", []):
@@ -187,48 +226,66 @@ def rooms_from_export(data: dict) -> list[Room]:
             groups.setdefault(name, []).append(o)
     rooms = []
     for name, objs in groups.items():
-        meta = next((o for o in objs if o.get("room_use") or o.get("room_set")), objs[0])
-        use = str(meta.get("room_use") or "living").lower()
-        if use not in ROOM_USES:
-            raise ValueError(f"Room {name}: use '{use}' is not one of {', '.join(ROOM_USES)}")
-        setpoints = {}
-        for k_in, k_out in (("room_heat_c", "heating_setpoint"), ("room_cool_c", "cooling_setpoint")):
-            if meta.get(k_in) not in (None, ""):
-                setpoints[k_out] = None if str(meta[k_in]).lower() in ("none", "off") else float(meta[k_in])
-        guids = list(dict.fromkeys(str(o.get("guid", "")) for o in objs))
-        boundary = [o for o in objs if o.get("boundary")]
-        if boundary:
-            b = boundary[0]
-            pts = np.asarray(b["boundary"], dtype=float).reshape(-1, 3) * scale
-            h = float(b.get("room_height") or 0) * scale if b.get("room_height_units") == "model" else float(b.get("room_height") or 0)
-            if h <= 0:
-                raise ValueError(f"Room {name}: a boundary curve needs almond:room_height (metres)")
-            v, f = prism(pts, float(pts[:, 2].min()), h)
-            rooms.append(Room(name, use, v, f, guids, "boundary", str(meta.get("room_set") or ""), setpoints, True))
-            continue
-        verts, tris, n = [], [], 0
-        for o in objs:
-            vv = np.asarray(o.get("vertices", []), dtype=float).reshape(-1, 3) * scale
-            ff = np.asarray(o.get("faces", []), dtype=np.int64).reshape(-1, 3)
-            if not len(ff):
-                continue
-            verts.append(vv)
-            tris.append(ff + n)
-            n += len(vv)
-        if not verts:
-            raise ValueError(f"Room {name}: no geometry exported")
-        v, f = np.vstack(verts), np.vstack(tris)
-        if len(objs) == 1 and _closed(v, f):
-            rooms.append(Room(name, use, v, f, guids, "volume", str(meta.get("room_set") or ""), setpoints, True))
-        else:
-            hull = _convex_hull(v)
-            z0, z1 = float(v[:, 2].min()), float(v[:, 2].max())
-            if z1 - z0 < 1.5:
-                raise ValueError(f"Room {name}: its surfaces span only {z1 - z0:.2f} m in height - include the roof "
-                                 "or draw a boundary curve with almond:room_height")
-            pv, pf = prism(hull, z0, z1 - z0)
-            rooms.append(Room(name, use, pv, pf, guids, "surfaces", str(meta.get("room_set") or ""), setpoints, False))
+        try:
+            rooms.append(_room(name, objs, scale))
+        except ValueError as exc:
+            if problems is None:
+                raise
+            problems.append(f"Room {name} was skipped: {exc}")
+    # tagged objects the export could not read (open curves, points, ...) carry no geometry
+    tagged = {str(g) for g in data.get("skipped_rooms", [])}
+    if tagged and problems is not None:
+        problems.append(f"{len(tagged)} object(s) tagged as rooms have no usable geometry (open curves, points or "
+                        "unsupported types) and were left out: give a room a closed volume, its bounding surfaces, "
+                        "or a closed planar curve with a height")
     return rooms
+
+
+def _room(name: str, objs: list[dict], scale: float) -> Room:
+    metas = [o for o in objs if o.get("room_use") or o.get("room_set")]
+    meta = metas[0] if metas else objs[0]
+    use = str(meta.get("room_use") or "living").lower()
+    if use not in ROOM_USES:
+        raise ValueError(f"use '{use}' is not one of {', '.join(ROOM_USES)}")
+    if len({str(o.get("room_use") or "").lower() for o in metas}) > 1:
+        raise ValueError(f"its {len(objs)} objects disagree on the room use - two rooms with the same name? "
+                         "Rename one (rooms are grouped by name)")
+    setpoints = parse_setpoints(meta.get("room_heat_c"), meta.get("room_cool_c"))
+    guids = list(dict.fromkeys(str(o.get("guid", "")) for o in objs))
+    boundary = [o for o in objs if o.get("boundary")]
+    if boundary:
+        b = boundary[0]
+        pts = np.asarray(b["boundary"], dtype=float).reshape(-1, 3) * scale
+        if b.get("room_height") in (None, ""):
+            raise ValueError("a boundary curve needs almond:room_height (metres)")
+        h = float(b["room_height"]) * scale if b.get("room_height_units") == "model" else float(b["room_height"])
+        v, f = prism(pts, float(pts[:, 2].min()), check_height(h))
+        return Room(name, use, v, f, guids, "boundary", str(meta.get("room_set") or ""), setpoints, True)
+    verts, tris, n = [], [], 0
+    for o in objs:
+        vv = np.asarray(o.get("vertices", []), dtype=float).reshape(-1, 3) * scale
+        ff = np.asarray(o.get("faces", []), dtype=np.int64).reshape(-1, 3)
+        if not len(ff):
+            continue
+        verts.append(vv)
+        tris.append(ff + n)
+        n += len(vv)
+    if not verts:
+        raise ValueError("no geometry exported")
+    v, f = np.vstack(verts), np.vstack(tris)
+    extent = np.ptp(v, axis=0)
+    check_height(float(extent[2]))
+    if max(extent[:2]) > MAX_ROOM_PLAN_M:
+        raise ValueError(f"it spans {max(extent[:2]):.0f} m in plan - one room per name (rooms are grouped by name)")
+    if len(objs) == 1 and _closed(v, f):
+        return Room(name, use, v, f, guids, "volume", str(meta.get("room_set") or ""), setpoints, True)
+    hull = _convex_hull(v)
+    z0, z1 = float(v[:, 2].min()), float(v[:, 2].max())
+    if z1 - z0 < 1.5:
+        raise ValueError(f"its surfaces span only {z1 - z0:.2f} m in height - include the roof "
+                         "or draw a boundary curve with almond:room_height")
+    pv, pf = prism(hull, z0, z1 - z0)
+    return Room(name, use, pv, pf, guids, "surfaces", str(meta.get("room_set") or ""), setpoints, False)
 
 
 def _subdivide(v: np.ndarray, f: np.ndarray, cell: float = CELL) -> tuple[np.ndarray, np.ndarray]:
@@ -265,6 +322,8 @@ class Enclosure:
     tri_internal: np.ndarray | None = None   # (k,) bool: open towards other parts of the building
     internal_openings: list[dict] = field(default_factory=list)
     warning: str = ""
+    tri_glazing: np.ndarray | None = None    # (k,) bool: covered by a glazing element
+    tri_ground_only: np.ndarray | None = None   # (k,) bool: floor on the ground with no element modelled
 
     def to_json(self) -> dict:
         return {"state": self.state, "open_fraction": round(self.open_fraction, 3), "open_area_m2": round(self.open_area_m2, 2),
@@ -296,13 +355,16 @@ def enclosure(room: Room, scene, exclude_objects: set[int] | None = None, ground
     covered = np.zeros(len(cen), bool)
     hit_obj = np.full(len(cen), -1)
     opaque_hit = np.zeros(len(cen), bool)
+    glazing_hit = np.zeros(len(cen), bool)
     if len(t):
         bvh = BVH(v[t[:, 0]], v[t[:, 1]], v[t[:, 2]])
         # three probes per sub-triangle (centroid and two points towards its corners), both directions
         probes = [cen, 0.6 * cen + 0.4 * a, 0.6 * cen + 0.4 * b]
         votes = np.zeros(len(cen), int)
+        glass_votes = np.zeros(len(cen), int)
         for p in probes:
             got = np.zeros(len(cen), bool)
+            glass = np.zeros(len(cen), bool)
             for sgn in (1.0, -1.0):
                 o = p - sgn * n * tolerance
                 tt, tri = bvh.intersect(o, sgn * n)
@@ -311,9 +373,12 @@ def enclosure(room: Room, scene, exclude_objects: set[int] | None = None, ground
                 hit_obj[newly & (hit_obj < 0)] = scene.tri_object[keep[tri[newly & (hit_obj < 0)]]]
                 kinds = np.array([scene.materials[int(m)].kind for m in scene.tri_material[keep[tri[h]]]]) if h.any() else np.array([])
                 opaque_hit[np.flatnonzero(h)[kinds != "glazing"]] = True
+                glass[np.flatnonzero(h)[kinds == "glazing"]] = True
                 got |= h
             votes += got
+            glass_votes += glass
         covered = votes >= 2
+        glazing_hit = glass_votes >= 2          # mostly over the glass, as for the cover itself
     shared = np.zeros(len(cen), bool)
     for other in neighbours or []:
         if other is room:
@@ -327,6 +392,7 @@ def enclosure(room: Room, scene, exclude_objects: set[int] | None = None, ground
     gz = float(scene.vertices[:, 2].min()) if ground_z is None and len(scene.vertices) else (ground_z or 0.0)
     down = n[:, 2] < -0.7
     on_ground = down & (np.abs(cen[:, 2] - gz) < tolerance)
+    ground_only = on_ground & ~covered          # resting on the ground with no floor element modelled
     covered |= on_ground
     sides_top = ~down
     total_st = float(area[sides_top].sum())
@@ -363,9 +429,20 @@ def enclosure(room: Room, scene, exclude_objects: set[int] | None = None, ground
         # a window's construction belongs to the window surface, not to the wall face it sits in
         cons[i] = "" if cid and asm.get(cid)["kind"] == "window" else cid
         elem[i] = str(info.get("name") or info.get("layer") or "")
+    # the face behind a window belongs to the wall it sits in: take the construction of the opaque faces in
+    # the same plane (by area), so the set default does not stand in for a wall that is modelled
+    glazed = np.flatnonzero(glazing_hit & (cons == ""))
+    walls = np.flatnonzero((cons != "") & ~glazing_hit)
+    for i in glazed:
+        same = walls[(n[walls] @ n[i] > 0.99) & (np.abs((cen[walls] - cen[i]) @ n[i]) < tolerance)]
+        if len(same):
+            by: dict[str, float] = {}
+            for j in same:
+                by[cons[j]] = by.get(cons[j], 0.0) + float(area[j])
+            cons[i] = max(by, key=by.get)
     openings: dict[str, dict] = {}
     for i in np.flatnonzero(open_mask & sides_top):
-        key = "roof" if n[i, 2] > 0.7 else orientation_of(n[i])
+        key = "roof" if n[i, 2] > 0.7 else orientation_of(n[i], scene.north_deg)
         g = openings.setdefault(key, {"orientation": key, "normal": [0.0, 0.0, 0.0], "area_m2": 0.0,
                                       "z_min": float("inf"), "z_max": float("-inf")})
         g["area_m2"] += float(area[i])
@@ -374,7 +451,7 @@ def enclosure(room: Room, scene, exclude_objects: set[int] | None = None, ground
         g["z_max"] = max(g["z_max"], float(tris[i, :, 2].max()))
     inner: dict[str, float] = {}
     for i in np.flatnonzero(internal):
-        key = "up" if n[i, 2] > 0.7 else "down" if n[i, 2] < -0.7 else orientation_of(n[i])
+        key = "up" if n[i, 2] > 0.7 else "down" if n[i, 2] < -0.7 else orientation_of(n[i], scene.north_deg)
         inner[key] = inner.get(key, 0.0) + float(area[i])
     ops = []
     for g in openings.values():
@@ -400,7 +477,8 @@ def enclosure(room: Room, scene, exclude_objects: set[int] | None = None, ground
         warning = (warning + " " + note).strip()
     return Enclosure(state, frac, open_area, float(area.sum()), self_enclosed, tris, open_mask, cons, elem,
                      sorted(ops, key=lambda g: -g["area_m2"]), internal,
-                     [{"orientation": k, "area_m2": round(v, 2)} for k, v in sorted(inner.items(), key=lambda kv: -kv[1])], warning)
+                     [{"orientation": k, "area_m2": round(v, 2)} for k, v in sorted(inner.items(), key=lambda kv: -kv[1])], warning,
+                     tri_glazing=glazing_hit, tri_ground_only=ground_only)
 
 
 # ── openings airflow ─────────────────────────────────────────────────────────
@@ -568,9 +646,15 @@ def zone_mass(zone: thermal.Zone) -> tuple[float, float] | None:
     return c_m ** 2 / k2a, c_m
 
 
-def zones_from_rooms(rooms: list[Room], encs: list[Enclosure], scene, windows: list[dict]) -> list[thermal.Zone]:
-    """Thermal zones for the enclosed and semi-open rooms."""
+def zones_from_rooms(rooms: list[Room], encs: list[Enclosure], scene, windows: list[dict],
+                     problems: list[str] | None = None) -> list[thermal.Zone]:
+    """Thermal zones for the enclosed and semi-open rooms. With ``problems`` (a list), a room that is not a
+    valid zone (too small, implausible height) is left out with the reason appended instead of raising."""
     idx = [i for i, e in enumerate(encs) if e.state != "open"]
+    # ground level: the lowest room floor, not each room's own lowest point - a room raised above it (an upper
+    # storey with no room below, a cantilever, pilotis) has an exposed floor; one beside it (slab steps within
+    # the enclosure tolerance) rests on the ground
+    ground_z = min((rooms[i].floor_z for i in idx), default=0.0)
     zones = []
     for i in idx:
         r, e = rooms[i], encs[i]
@@ -588,8 +672,17 @@ def zones_from_rooms(rooms: list[Room], encs: list[Enclosure], scene, windows: l
                 kind = "roof" if nz[k] > 0.7 else "floor_ground" if nz[k] < -0.7 else "wall_external"
                 cons[k] = _set_default(r, kind)
         # rooms drawn on floors are a slab apart: neighbours within the enclosure tolerance share a face
-        z = thermal.zone_from_mesh(r.name, v, f, windows, others, face_construction=cons, face_open=e.tri_open,
-                                   other_names=names, neighbour_gap=TOLERANCE, face_adiabatic=e.tri_internal)
+        on_ground = r.floor_z - ground_z < TOLERANCE
+        z = thermal.zone_from_mesh(r.name, v, f, windows, others, ground_z=r.floor_z if on_ground else ground_z,
+                                   face_construction=cons,
+                                   face_open=e.tri_open, other_names=names, neighbour_gap=TOLERANCE,
+                                   face_adiabatic=e.tri_internal)
+        if problems is not None:
+            try:
+                z.validate()
+            except ValueError as exc:
+                problems.append(f"Room {r.name} was left out of the thermal study: {exc}")
+                continue
         # internal faces between rooms use internal constructions where the element has an external one
         for s in z.surfaces:
             if s.kind == "interzone" and s.construction:
@@ -617,12 +710,30 @@ def zones_from_rooms(rooms: list[Room], encs: list[Enclosure], scene, windows: l
 def couple(zones: list[thermal.Zone], weather, settings: thermal.Settings, passes: int = 3) -> tuple[list[dict], dict]:
     """Simulate the zones with heat exchange through shared faces. Returns (results per zone, balance)."""
     by_name = {z.name: i for i, z in enumerate(zones)}
-    links = []                                            # (i, j, H W/K)
+    # one conductance per pair of rooms: both rooms see the same element, so each side's estimate of it
+    # (its own construction over its own share of the face) is pooled; an explicit construction beats the
+    # unassigned fallback. Symmetric links make the exchange conserve energy.
+    sides: dict[tuple[int, int], dict[int, list[tuple[float, float, bool]]]] = {}
     for i, z in enumerate(zones):
         for s in z.surfaces:
-            if s.kind == "interzone" and s.neighbor in by_name:
-                u = asm.summary(s.construction)["u_value"] if s.construction else 1.5
-                links.append((i, by_name[s.neighbor], u * s.area))
+            if s.kind == "interzone" and s.neighbor in by_name and by_name[s.neighbor] != i:
+                j = by_name[s.neighbor]
+                u = asm.summary(s.construction)["u_value"] if s.construction else INTERZONE_U_DEFAULT
+                sides.setdefault((min(i, j), max(i, j)), {}).setdefault(i, []).append((u * s.area, s.area, bool(s.construction)))
+    links = []                                            # (i, j, H W/K), both directions
+    for (i, j), per in sides.items():
+        estimates = []
+        for side in per.values():
+            explicit = [h for h, _, e in side if e]
+            area = sum(a for _, a, _ in side)
+            exp_area = sum(a for _, a, e in side if e)
+            # a side's U over the face: its explicit constructions where it has them, scaled to the whole face
+            u = (sum(explicit) / exp_area) if exp_area > 0 else INTERZONE_U_DEFAULT
+            estimates.append((u, area, exp_area > 0))
+        known = [e for e in estimates if e[2]] or estimates
+        u = sum(e[0] for e in known) / len(known)
+        area = sum(e[1] for e in estimates) / len(estimates)
+        links += [(i, j, u * area), (j, i, u * area)]
     results = [None] * len(zones)
     t_air = [None] * len(zones)
     for _ in range(passes if links else 1):

@@ -49,18 +49,18 @@ Site → Rooms → Constructions → Study → Results.
   - façade: triple low-e in slim steel frames (U_w 1.10, g 0.44)
   - partitions: stud walls
   - fallback for anything untagged: the `eu_new_build` set
-- **Study settings:** Zurich-Affoltern TMYx, no mechanical cooling, 80 % heat recovery on the fresh air,
-  windows opened (3 ach) above 24 °C. Blinds are compared with none.
+- **Study settings:** Zurich-Affoltern TMYx, no mechanical cooling, 80 % heat recovery on the fresh air
+  (bypassed in mild weather), windows opened (3 ach) above 24 °C. Blinds are compared with none.
 
 | Room | Heating kWh/m² | h > 26 °C | with summer blinds | sDA | ASE |
 | --- | --- | --- | --- | --- | --- |
-| Living (double height) | 45 | 3620 | 2344 | 100 % | 100 % |
-| Hall and dining | 39 | 4 | 0 | 97 % | 91 % |
-| Kitchen | 14 | 1081 | 397 | 70 % | 66 % |
-| Study | 15 | 21 | 16 | 82 % | 0 % |
-| Bedroom | 3 | 590 | 336 | 100 % | 85 % |
-| Bathroom | 99 | 0 | 0 | 0 % | 0 % |
-| Landing | 29 | 0 | 0 | 76 % | 0 % |
+| Living (double height) | 45 | 3610 | 2333 | 100 % | 100 % |
+| Hall and dining | 39 | 8 | 0 | 97 % | 91 % |
+| Kitchen | 14 | 1043 | 395 | 70 % | 66 % |
+| Study | 15 | 34 | 28 | 76 % | 0 % |
+| Bedroom | 3 | 582 | 328 | 100 % | 85 % |
+| Bathroom | 99 | 3 | 0 | 0 % | 0 % |
+| Landing | 28 | 0 | 0 | 73 % | 0 % |
 | Garden pavilion | open: SET* 16.5 °C mean (daytime), MRT above air | | | | |
 
 What the room-by-room study shows that the floor-by-floor study hid:
@@ -74,8 +74,8 @@ The workspace's enclosure check found that the living room opens onto the mezzan
 onto the stair void. It treats those openings as adiabatic: the warm air that would rise into the upper
 level stays in the living room, which **overstates its overheating**. Defining the open-plan volume as
 one room is the more faithful model. The bathroom and the 2.4 m² entry show high heating per m² because
-small rooms at 22 °C lose heat to cooler neighbours. The rooms' exchange balances within 1 %
-(42 of 4,295 kWh).
+small rooms at 22 °C lose heat to cooler neighbours. The rooms' exchange balances exactly (each shared wall or
+floor has one conductance), with 4,656 kWh passing between rooms a year.
 
 Envelope check against Approved Document L (England, OGL): walls 0.18, roof 0.15 and windows 1.10 pass
 the limits; the ground floor (0.22 against 0.18) does not.
@@ -84,7 +84,7 @@ the limits; the ground floor (0.22 against 0.18) does not.
 from climate.onebuilding.org; download it yourself, it is not redistributed). The rooms are cooled to their
 set-points, with no heat recovery and no window ventilation.
 
-- **RETV:** 10.95 W/m², under the 25 W/m² limit. The south façade gives 22.9 W/m² and the west 19.3 W/m².
+- **RETV:** 10.94 W/m², under the 25 W/m² limit. The south façade gives 22.9 W/m² and the west 19.3 W/m².
 - **Solar correction factors:** derived from the real weather file. East walls (1.26) see more sun than west (1.05)
   because Singapore's afternoons are cloudier.
 - **Cooling:** the double-height living room needs about 450 kWh/m² a year, the kitchen 174, the bedroom 92 and

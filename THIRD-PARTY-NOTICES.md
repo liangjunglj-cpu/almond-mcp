@@ -150,7 +150,8 @@ Every bundled value records its source in `data/sources.json`; licence texts are
   amendments. Contains public sector information licensed under the Open Government Licence v3.0.
 - **Singapore ETTV / RETV / RTTV**: the formulas of the BCA Code on Envelope Thermal Performance for
   Buildings are implemented (a method, cited); none of the Code's tables are reproduced - solar
-  correction factors are derived from the user's weather file and shading from the model. Results are
+  correction factors are derived from the user's weather file and the shading coefficient from the glazing
+  g-value (external shading devices are not credited). Results are
   indicative and are not a BCA Green Mark assessment.
 - **Assembly build-ups, finishes' reflectance and absorptance, window frames and room-use profiles** are
   Almond's own assumptions (MIT), labelled `almond-own`.

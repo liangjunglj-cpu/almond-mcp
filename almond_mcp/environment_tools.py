@@ -159,6 +159,11 @@ def _draw(send: Sender, run_id: str, metric: str = "", vmin=None, vmax=None, uni
             "guids": reply.get("guids") or reply.get("created_guids") or []}
 
 
+# what a bad input can raise in the engine; answered as status=error, never as a crash
+INPUT_ERRORS = (ValueError, KeyError, TypeError, AttributeError, ZeroDivisionError, OverflowError, MemoryError,
+                OSError, RuntimeError)
+
+
 def _bridge_errors(exc: Exception) -> dict:
     if isinstance(exc, ConnectionRefusedError):
         return _err("Rhino is not reachable: open Rhino 8 with the almondbridge plugin, or use shoebox=... to analyse "
@@ -568,8 +573,14 @@ def register(mcp, send: Sender) -> dict:
         from almond_mcp.environment import constructions as asm
         try:
             sets = asm._load("assemblies.json")["sets"]
+            if kind and kind not in asm.KINDS:
+                return _err(f"kind must be one of {', '.join(asm.KINDS)}")
+            regions = sorted({r for a in asm.library().values() for r in a.get("regions", [])} |
+                             {r for st in sets for r in st["regions"]})
+            if region and region not in regions:
+                return _err(f"region must be one of {', '.join(r for r in regions if r != 'any')}")
             return {"status": "success", "constructions": asm.catalogue(kind, region),
-                    "sets": [s for s in sets if not region or region in s["regions"]],
+                    "sets": [s for s in sets if not region or region in s["regions"] or "any" in s["regions"]],
                     "frames": list(asm.frames().values()),
                     "sources": [{k: s[k] for k in ("id", "title", "licence", "attribution")} for s in asm.sources().values()],
                     "note": "Layer data: EnergyPlus / ASHRAE HOF (BSD-style licence); finishes, frames and assembly "
@@ -586,13 +597,17 @@ def register(mcp, send: Sender) -> dict:
         ...]} to evaluate your own build-up. diagram=True adds an SVG section detail."""
         from almond_mcp.environment import constructions as asm
         try:
+            if custom and construction:
+                return _err("Give either construction (a library id) or custom (an inline build-up), not both")
+            if custom is not None and not isinstance(custom, dict):
+                return _err("custom must be an object such as {\"kind\": \"wall_external\", \"layers\": [...]}")
             p = asm.properties(custom if custom else construction)
             out = {"status": "success", **p}
             if diagram:
                 from almond_mcp.environment import diagrams
                 out["section_svg"] = diagrams.construction_section(p).svg()
             return out
-        except (ValueError, KeyError) as exc:
+        except INPUT_ERRORS as exc:
             return _err(str(exc))
 
     @mcp.tool(annotations=READ_ONLY)
@@ -607,14 +622,16 @@ def register(mcp, send: Sender) -> dict:
 
     @mcp.tool(annotations=WRITES)
     def define_room(name: str, guids: list[str], use: str = "living", construction_set: str = "",
-                    heating_setpoint_c: float | None = None, cooling_setpoint_c: float | None = None,
+                    heating_setpoint_c: float | str | None = None, cooling_setpoint_c: float | str | None = None,
                     height_m: float | None = None, remove: bool = False) -> dict:
         """Mark Rhino objects as one room (user text almond:room...). guids: a closed volume, several surfaces
         that bound the room (roof, walls - the room is the prism over their plan), or a closed planar curve
         with height_m. Rooms need not be enclosed: open pavilions and loggias are assessed with a warning.
         use: living | bedroom | kitchen | bath | circulation | office | classroom | outdoor (sets gains,
         schedule and set-points); construction_set fills faces with no construction (list_constructions).
-        remove=True clears the room tags. Undoable in Rhino."""
+        Set-points in degC (5-40, heating below cooling) or "off"; height_m in metres, for a boundary curve only.
+        Room names must be unique: objects are grouped into a room by name. remove=True clears the room tags.
+        Nothing is tagged if any GUID is missing. Undoable in Rhino."""
         from almond_mcp.environment import rooms as rm
         try:
             if not guids:
@@ -630,14 +647,19 @@ def register(mcp, send: Sender) -> dict:
                     from almond_mcp.environment import constructions as asm
                     if construction_set not in {s["id"] for s in asm._load("assemblies.json")["sets"]}:
                         return _err(f"Unknown construction set '{construction_set}' (list_constructions)")
+                sp = rm.parse_setpoints(heating_setpoint_c, cooling_setpoint_c)
+                if height_m is not None:
+                    rm.check_height(float(height_m))
                 tags = {"room": name.strip(), "room_use": use, "room_set": construction_set,
-                        "room_heat_c": "" if heating_setpoint_c is None else f"{float(heating_setpoint_c):g}",
-                        "room_cool_c": "" if cooling_setpoint_c is None else f"{float(cooling_setpoint_c):g}",
+                        "room_heat_c": "" if heating_setpoint_c is None else
+                        ("off" if sp.get("heating_setpoint", 0) is None else f"{sp['heating_setpoint']:g}"),
+                        "room_cool_c": "" if cooling_setpoint_c is None else
+                        ("off" if sp.get("cooling_setpoint", 0) is None else f"{sp['cooling_setpoint']:g}"),
                         "room_height": "" if height_m is None else f"{float(height_m):g}"}
-            reply = _execute(send, rhino.tag_script({g: tags for g in guids}), 60.0)
+            reply = _execute(send, rhino.tag_script({g: tags for g in guids}, unique_room="" if remove else name.strip()), 60.0)
             return {"status": "success", "room": None if remove else name.strip(), "tagged": len(guids),
                     "guids": reply.get("guids") or [], "next_step": "list_rooms to see the enclosure check"}
-        except (ValueError, RuntimeError, OSError) as exc:
+        except INPUT_ERRORS as exc:
             return _bridge_errors(exc)
 
     @mcp.tool(annotations=WRITES)
@@ -652,7 +674,7 @@ def register(mcp, send: Sender) -> dict:
             reply = _execute(send, rhino.tag_script({g: {"construction": construction} for g in guids}), 60.0)
             return {"status": "success", "construction": construction or None, "tagged": len(guids),
                     "guids": reply.get("guids") or [], "summary": asm.summary(construction) if construction else None}
-        except (ValueError, RuntimeError, OSError) as exc:
+        except INPUT_ERRORS as exc:
             return _bridge_errors(exc)
 
     @mcp.tool(annotations=READ_ONLY)
@@ -671,17 +693,17 @@ def register(mcp, send: Sender) -> dict:
                             "floor_area_m2": round(rm._floor_area(r), 2), "height_m": round(r.height, 2),
                             "enclosure": e.to_json(), "constructions_on_boundary": found, "guids": r.guids})
             return {"status": "success", "rooms": out, "warnings": notes}
-        except (ValueError, RuntimeError, OSError) as exc:
+        except INPUT_ERRORS as exc:
             return _bridge_errors(exc)
 
-    @mcp.tool(annotations=READ_ONLY)
+    @mcp.tool(annotations=WRITES)
     def analyze_rooms(epw_path: str, study: str = "thermal", geometry_guids: list[str] | None = None,
                       construction: str = "typical", schedule: str = "residential", infiltration_ach: float = 0.3,
                       natural_ventilation_ach: float = 0.0, shading_g_factor: float = 1.0,
                       shading_min_outdoor_c: float | None = None, daylight_study: str = "annual",
                       quality: str = "medium", spacing_m: float = 0.5, envelope_pack: str = "",
                       pack_options: dict | None = None, cooling: bool = True, heat_recovery: float = 0.0, label: str = "",
-                      background: bool = False) -> dict:
+                      point_in_time: dict | None = None, background: bool = False) -> dict:
         """Analyse the rooms defined in Rhino (define_room) with their constructions (assign_construction).
         study: thermal | daylight. Thermal: enclosed and semi-open rooms as coupled ISO 13790 zones (mass from
         the constructions, heat flow between rooms through shared walls and floors, air through openings);
@@ -692,16 +714,24 @@ def register(mcp, send: Sender) -> dict:
         {"residential": true} for RETV, {"dwelling": false}, {"age_band": "1958-1968"}, {"country": "de"}.
         cooling=False runs every room without mechanical cooling (free-running in warm weather); heat_recovery =
         efficiency of heat recovery on the mechanical fresh air (0.8 for a typical heat-recovery ventilation unit).
+        point_in_time (daylight_study="point_in_time"): {"month", "day", "hour", "sky": "epw" | "cie_overcast" |
+        ...} as in analyze_daylight; per-room mean and minimum lux. Writes a saved run (get_environment_run).
         background=True returns a job_id (poll get_environment_run)."""
         if background:
             fn = getattr(analyze_rooms, "fn", analyze_rooms)
             args = _params(fn, locals())
             return _start_job("rooms", lambda: fn(**args))
         try:
+            if study not in ("thermal", "daylight"):
+                return _err("study must be thermal or daylight")
+            if envelope_pack:
+                from almond_mcp.environment import codes
+                codes.check_options(envelope_pack, pack_options or {})        # before the simulation, not after
             data = _export(send, list(geometry_guids or []))
             if study == "daylight":
                 weather = epw.load(epw_path) if epw_path else None
-                res = studies.run_rooms_daylight(data, weather, daylight_study, quality, label, spacing_m)
+                res = studies.run_rooms_daylight(data, weather, daylight_study, quality, label, spacing_m,
+                                                 point_time=point_in_time)
             elif study == "thermal":
                 weather = _weather(epw_path)
                 st = thermal.Settings(construction=construction, schedule=schedule, infiltration_ach=infiltration_ach,
@@ -713,34 +743,44 @@ def register(mcp, send: Sender) -> dict:
                 return _err("study must be thermal or daylight")
             res["status"] = "success"
             return res
-        except (ValueError, OSError, RuntimeError) as exc:
+        except INPUT_ERRORS as exc:
             return _bridge_errors(exc)
 
     @mcp.tool(annotations=READ_ONLY)
     def check_envelope(pack: str, epw_path: str = "", geometry_guids: list[str] | None = None,
                        residential: bool = False, dwelling: bool = True, age_band: str = ">=2002",
-                       country: str = "de", sector: str = "residential", user_tables_path: str = "") -> dict:
+                       country: str = "de", sector: str = "residential", flat_roof: bool = True,
+                       user_tables_path: str = "") -> dict:
         """Check the envelope of the rooms defined in Rhino against a code pack (list_code_packs). sg_bca: ETTV
         (or RETV with residential=True) per facade and overall, with solar correction factors derived from the
         site EPW (epw_path required) and shading from the glazing g-value; user_tables_path = a JSON file of your
         own licensed CF tables to use instead ({"ETTV_walls": {"N": 0.8, ...}}). uk_adl_2021: area-weighted U per
-        element against the limiting values. de_banz_2020 / eu_hotmaps: reference U-values for an age band /
-        country. Indicative design checks, not certification."""
+        element against the limiting values (flat_roof=False for pitched roofs). de_banz_2020 / eu_hotmaps:
+        reference U-values of the building stock for an age band / country to compare with (they do not check
+        the model). Faces with no construction use the preset U-values and are listed. Indicative design checks,
+        not certification."""
         from almond_mcp.environment import codes, rooms as rm
         try:
             data = _export(send, list(geometry_guids or []))
-            rooms, encs, scene, _notes = studies.prepare_rooms(data)
-            zones = rm.zones_from_rooms(rooms, encs, scene, studies._windows(scene))
+            options = {"residential": residential, "dwelling": dwelling, "age_band": age_band, "country": country,
+                       "sector": sector, "flat_roof": flat_roof}
+            codes.check_options(pack, options)
+            weather = epw.load(epw_path) if epw_path else None
+            tables = codes.load_user_tables(user_tables_path) if user_tables_path else None
+            data = _export(send, list(geometry_guids or []))
+            rooms, encs, scene, notes = studies.prepare_rooms(data)
+            zones = rm.zones_from_rooms(rooms, encs, scene, studies._windows(scene), problems=notes)
             st = thermal.Settings()
             for z in zones:
                 thermal.apply_construction(z, st)
-            weather = epw.load(epw_path) if epw_path else None
-            tables = json.loads(Path(user_tables_path).read_text(encoding="utf-8")) if user_tables_path else None
-            res = codes.check_envelope(studies.envelope_surfaces(zones), pack, weather, residential=residential,
-                                       dwelling=dwelling, age_band=age_band, country=country, sector=sector,
-                                       user_tables=tables, north_deg=scene.north_deg)
-            return {"status": "success", **res}
-        except (ValueError, OSError, RuntimeError, json.JSONDecodeError) as exc:
+            surfaces = studies.envelope_surfaces(zones)
+            res = codes.check_envelope(surfaces, pack, weather, user_tables=tables, north_deg=scene.north_deg, **options)
+            preset = sorted({(s["room"], s["kind"]) for s in surfaces if not s.get("construction")})
+            if preset:
+                notes.append("No construction on: " + ", ".join(f"{r} {k}" for r, k in preset) +
+                             f" - the '{st.construction}' preset U-values stand in (assign_construction or a room construction set)")
+            return {"status": "success", **res, "notes": notes}
+        except INPUT_ERRORS as exc:
             return _bridge_errors(exc)
 
     return {"climate_summary": climate_summary, "sun_path": sun_path, "analyze_daylight": analyze_daylight,

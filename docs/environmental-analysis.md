@@ -143,13 +143,23 @@ The open share of the sides and top picks the method. Each result says which met
 | semi-open | 5-30 % | 5R1C plus the air through the openings: single-sided per de Gids and Phaff (1982), cross ventilation by orifice flow. Free-running, no heating or cooling. |
 | open | ≥ 30 % | Semi-outdoor comfort. Air is at outdoor temperature. Mean radiant temperature comes from sky, roof underside and ground, plus sun on the body (SolarCal, cylindrical body). Comfort is SET\*. No loads are reported. |
 
+Room names are unique (objects are grouped into a room by name, so `define_room` refuses a name already in use),
+heights are metres (up to 100 m) and set-points 5-40 °C with heating below cooling. A room that cannot be built
+(no height, too small, an open curve) is left out with a note, and the other rooms are still analysed.
+The ground is the lowest room floor: a room raised above it with no room below has an exposed floor.
+A face behind a window takes the construction of the wall it sits in. In daylight studies a self-enclosed
+room volume keeps its own windows clear, and a room on the ground with no floor element gets one.
+Heat recovery bypasses in mild weather: it runs below the heating set-point + 2 K, or above the cooling
+set-point when cooling.
+
 Internal openings are treated as adiabatic, with no air exchange between the rooms. Define open-plan
 spaces as one room. When nothing is modelled around a closed room volume, its own faces are the
 envelope, which is the classic zone workflow.
 
 Rooms exchange heat through shared walls and floors (H = U·A), across a slab or partition up to 0.35 m
 thick. The coupling uses the previous pass's air temperatures, over three passes; the net exchange
-balances to zero in the tests. Thermal mass comes from the constructions:
+balances to zero: each pair of rooms has one conductance. Where only one room has a
+construction for the shared face it is used; with none, 1.5 W/m²K (a light partition) stands in. Thermal mass comes from the constructions:
 C_m = Σ κ·A and A_m = C_m² / Σ κ²·A (ISO 13790 12.3.1.2). A ceiling sees the soffit side of the floor
 above.
 
@@ -184,7 +194,7 @@ timber-frame and fixed-insulation U-values as lower bounds.
 
 | Pack | Relation | What it checks |
 | --- | --- | --- |
-| `sg_bca` | method | ETTV (non-residential) or RETV (residential) per facade and overall, and RTTV with skylights. The formulas come from the BCA Code on Envelope Thermal Performance. Solar correction factors are derived from the site EPW; shading comes from glazing g and the model. Your own licensed CF tables can be loaded with `user_tables_path`. **Indicative; not a BCA Green Mark assessment.** |
+| `sg_bca` | method | ETTV (non-residential) or RETV (residential) per facade and overall, and RTTV with skylights. The formulas come from the BCA Code on Envelope Thermal Performance. Solar correction factors are derived from the site EPW, per true orientation (the model's north rotation is applied to the facades). SC = g / 0.87 over the whole window; external shading devices are not credited (conservative). A weather file outside Singapore is flagged. Your own licensed CF tables can be loaded with `user_tables_path`. **Indicative; not a BCA Green Mark assessment.** |
 | `uk_adl_2021` | bundled (OGL v3) | Area-weighted U per element against the Approved Document L limiting values, plus the notional dwelling fabric. |
 | `de_banz_2020` | bundled (public domain) | German flat-rate U-values of unrefurbished elements, by construction age band. |
 | `eu_hotmaps` | bundled (CC BY 4.0) | EU building-stock U-values by country, sector and period (TABULA-based). |

@@ -401,3 +401,156 @@ def test_licence_scan_is_clean():
     assert report["ok"], report["denied_or_unknown"]
     assert mod.classify("AGPL-3.0") == "deny" and mod.classify("CC-BY-SA-4.0") == "deny" and mod.classify("MIT") == "allow"
     assert mod.classify("MPL-2.0") == "review" and mod.classify("Apache-2.0 OR BSD-3-Clause") == "allow"
+
+
+# ── test-drive regressions (2026-11-03) ─────────────────────────────────────
+
+def _guid(n: int) -> str:
+    return f"{n:08d}-0000-0000-0000-00000000ffff"
+
+
+def _add(m: dict, name: str, layer: str, geo, **kw) -> None:
+    v, f = geo
+    m["objects"].append({"guid": _guid(len(m["objects"])), "layer": layer, "name": name, "material": "",
+                         "transparency": 0, "env_material": "", "vertices": v, "faces": f, **kw})
+
+
+def test_north_rotation_maps_facades_to_true_orientations(tropical):
+    assert codes.orientation_of((0, 1, 0)) == "N"
+    assert codes.orientation_of((0, 1, 0), 90.0) == "E"           # true azimuth = model azimuth + north
+    assert codes.orientation_of((1, 0, 0), -90.0) == "N"
+    cf = codes.solar_correction_factors(tropical)["walls"]          # per true orientation, independent of the model
+    win = {"kind": "window", "area": 10.0, "normal": (0, 1, 0), "u_value": 1.0, "g_value": 0.5}
+    for north, orient in ((0.0, "N"), (90.0, "E")):
+        row = codes.envelope_transfer([win], tropical, north_deg=north)["facades"][0]
+        assert row["orientation"] == orient and row["cf"] == cf[orient]
+
+
+def test_interzone_exchange_conserves_heat_with_mixed_constructions(tropical):
+    m = _model()
+    for o in m["objects"]:
+        if o.get("room") == "Bed":
+            o["room_set"] = ""             # its side of the shared wall has no construction, Living's has one
+    res = studies.run_rooms_thermal(m, tropical, thermal.Settings(schedule="residential"))
+    ie = res["engine"]["interzone"]
+    assert ie["gross_interzone_kwh"] > 1 and ie["net_interzone_kwh"] == 0.0
+
+
+def test_room_inputs_are_checked():
+    with pytest.raises(ValueError, match="metres"):
+        rm.check_height(3000)
+    with pytest.raises(ValueError, match="positive"):
+        rm.check_height(-3)
+    with pytest.raises(ValueError, match="below the cooling"):
+        rm.parse_setpoints(26, 20)
+    with pytest.raises(ValueError, match="outside"):
+        rm.parse_setpoints(float("nan"), None)
+    with pytest.raises(ValueError, match="not a temperature"):
+        rm.parse_setpoints("warm", None)
+    assert rm.parse_setpoints("off", "24") == {"heating_setpoint": None, "cooling_setpoint": 24.0}
+
+
+def test_one_bad_room_does_not_stop_the_others():
+    m = _model()
+    m["objects"].append({"guid": _guid(90), "layer": "Rooms", "name": "Tall", "room": "Tall", "room_height": "3000",
+                         "boundary": [40, 0, 0, 44, 0, 0, 44, 4, 0, 40, 4, 0], "vertices": [], "faces": []})
+    _add(m, "Cupboard", "Rooms", _box(50, 0, 0, 51, 1, 1), room="Cupboard")
+    _add(m, "Annex", "Rooms", _box(60, 0, 0, 63, 3, 3), room="Living", room_use="kitchen")   # a second "Living"
+    m["skipped_rooms"] = [_guid(99)]
+    rooms, encs, scene, notes = studies.prepare_rooms(m)
+    names = {r.name for r in rooms}
+    assert {"Bed", "Loggia", "Pavilion", "Study", "Cupboard"} <= names and not {"Tall", "Living"} & names
+    assert any("Tall was skipped" in n and "metres" in n for n in notes)
+    assert any("Living was skipped" in n and "disagree" in n for n in notes)
+    assert any("no usable geometry" in n for n in notes)
+    zones = rm.zones_from_rooms(rooms, encs, scene, studies._windows(scene), problems=notes)
+    assert "Cupboard" not in {z.name for z in zones} and any("Cupboard was left out" in n for n in notes)
+
+
+def test_raised_room_has_an_exposed_floor():
+    m = _model()
+    _add(m, "Studio", "Rooms", _box(50, 0, 3, 54, 4, 6), room="Studio", room_use="office")
+    rooms, encs, scene, _ = studies.prepare_rooms(m)
+    zones = {z.name: z for z in rm.zones_from_rooms(rooms, encs, scene, studies._windows(scene))}
+    assert "exposed_floor" in zones["Studio"].areas() and "ground_floor" not in zones["Studio"].areas()
+    assert "ground_floor" in zones["Bed"].areas()
+
+
+def test_face_behind_a_window_takes_the_wall_construction():
+    m = {"units_to_m": 1.0, "rhino_north_deg": 90.0, "objects": [], "missing": [], "skipped": []}
+    _add(m, "Room", "Rooms", _box(0, 0, 0, 4, 4, 3), room="Room", room_use="living", room_set="eu_new_build")
+    wall = "ew_timber_frame"
+    for name, geo in (("N", _box(-0.2, 4, 0, 4.2, 4.2, 3)), ("E", _box(4, -0.2, 0, 4.2, 4.2, 3)),
+                      ("W", _box(-0.2, -0.2, 0, 0, 4.2, 3)), ("S1", _box(0, -0.2, 0, 1, 0, 3)), ("S2", _box(3, -0.2, 0, 4, 0, 3))):
+        _add(m, f"Wall {name}", "Walls", geo, construction=wall)
+    _add(m, "Roof", "Roof", _box(-0.2, -0.2, 3, 4.2, 4.2, 3.2), construction="roof_rc_warm_flat_exposed")
+    _add(m, "Window", "Glazing", ([1, -0.1, 0, 3, -0.1, 0, 3, -0.1, 3, 1, -0.1, 3], [0, 1, 2, 0, 2, 3]),
+         construction="win_triple_lowe_ar_timber")
+    rooms, encs, scene, _ = studies.prepare_rooms(m)
+    assert encs[0].state == "enclosed"
+    z = rm.zones_from_rooms(rooms, encs, scene, studies._windows(scene))[0]
+    walls = {s.construction for s in z.surfaces if s.kind == "wall"}
+    assert walls == {wall}                     # not the set's default wall standing in behind the window
+
+
+def test_daylight_scene_keeps_own_windows_clear_and_closes_missing_floors():
+    m = _model()
+    rooms, encs, scene, _ = studies.prepare_rooms(m)
+    dscene, notes = studies._daylight_shells(m, rooms, encs, scene, None)
+    shells = {o.get("room_shell") for o in dscene.objects if o.get("room_shell")}
+    assert "Living" in shells                     # the self-enclosed volume became its boundary without the glass
+    living = next(i for i, o in enumerate(dscene.objects) if o.get("room_shell") == "Living")
+    _, area = dscene.normals()
+    box = 2 * (5 * 4 + 5 * 3 + 4 * 3)
+    assert box - 6.0 < float(area[dscene.tri_object == living].sum()) < box - 3.0       # 4.8 m2 window left open
+    vol = [i for i, o in enumerate(dscene.objects) if str(o.get("guid")) == m["objects"][0]["guid"]]
+    kinds = {dscene.materials[int(k)].kind for k in dscene.tri_material[np.isin(dscene.tri_object, vol)]}
+    assert kinds <= {"ignore"}                    # the volume itself no longer blocks its window
+    assert any("Loggia" in n and "no floor element" in n for n in notes)
+
+
+def test_point_in_time_reports_per_room(tropical):
+    res = studies.run_rooms_daylight(_model(), tropical, "point_in_time", "draft", spacing=1.0,
+                                     point_time={"month": 3, "day": 21, "hour": 10, "sky": "cie_overcast",
+                                                 "horizontal_illuminance": 10000})
+    rows = {r["room"]: r for r in res["rooms"]}
+    assert rows["Living"]["mean_lux"] > 0 and "None" not in res["headline"]
+    assert rows["Living"]["floor_area_m2"] == pytest.approx(20.0, abs=0.1)
+    assert rows["Living"]["grid_area_m2"] <= rows["Living"]["floor_area_m2"]
+
+
+def test_custom_builds_reject_impossible_values():
+    for bad in ({"kind": "wall_external", "layers": "concrete"}, {"kind": "wall_external", "layers": ["concrete"]},
+                {"kind": "wall_external", "layers": [{"material": "concrete_2400", "thickness_m": 0.2},
+                                                     {"material": "air_layer", "thickness_m": 0}]},
+                {"kind": "wall_external", "layers": [{"material": "concrete_2400", "thickness_m": "thick"}]}):
+        with pytest.raises(ValueError):
+            asm.properties(bad)
+    win = asm.get("win_triple_lowe_ar_timber")
+    for frame in ({"u_f": -5, "fraction": 0.2}, {"u_f": 1.3, "fraction": 1.5}):
+        with pytest.raises(ValueError, match="frame"):
+            asm.properties({**win, "id": "custom", "frame": frame})
+    with pytest.raises(ValueError, match="gap"):
+        asm.properties({**win, "id": "custom", "glazing": {**win["glazing"], "gaps": ["argon"] * len(win["glazing"]["gaps"])}})
+
+
+def test_pack_options_are_parsed_strictly(tropical):
+    assert codes.flag("false", "x") is False and codes.flag("yes", "x") is True and codes.flag(1, "x") is True
+    with pytest.raises(ValueError):
+        codes.flag("maybe", "residential")
+    with pytest.raises(ValueError, match="Unknown code pack"):
+        codes.check_options("xx", {})
+    with pytest.raises(ValueError, match="Unknown option"):
+        codes.check_options("sg_bca", {"residental": True})
+    with pytest.raises(ValueError, match="Hotmaps"):
+        codes.check_options("eu_hotmaps", {"country": "zz"})
+    win = {"kind": "window", "area": 10.0, "normal": (0, -1, 0), "u_value": 1.0, "g_value": 0.5}
+    assert codes.check_envelope([win], "sg_bca", tropical, residential="false")["index"] == "ETTV"
+    with pytest.raises(ValueError, match="no ETTV_walls value"):
+        codes.envelope_transfer([win], None, user_tables={"ETTV_walls": {"N": 0.8}})
+
+
+def test_tag_script_checks_everything_first():
+    s = rhino.tag_script({"0b6e3f1e-1111-2222-3333-444455556666": {"room": "Living"}}, unique_room="Living")
+    assert "nothing was tagged" in s and 'uniqueRoom = "Living"' in s
+    assert s.index("already exists") < s.index("BeginUndoRecord")

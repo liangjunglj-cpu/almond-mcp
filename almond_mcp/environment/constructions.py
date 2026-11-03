@@ -99,41 +99,68 @@ def get(assembly: str | dict) -> dict:
     return lib[assembly]
 
 
+def _number(value, what: str, lo: float, hi: float) -> float:
+    try:
+        x = float(value)
+    except (TypeError, ValueError):
+        raise ValueError(f"{what} must be a number") from None
+    if not math.isfinite(x) or not lo <= x <= hi:
+        raise ValueError(f"{what} must be between {lo:g} and {hi:g} (is {value})")
+    return x
+
+
 def validate(a: dict) -> None:
+    if not isinstance(a, dict):
+        raise ValueError("A construction is an object with kind and layers (or glazing and frame for a window)")
     kind = a.get("kind")
+    name = a.get("id") or "custom"
     if kind not in KINDS:
-        raise ValueError(f"Construction {a.get('id')}: kind must be one of {', '.join(KINDS)}")
+        raise ValueError(f"Construction {name}: kind must be one of {', '.join(KINDS)}")
     if kind == "window":
         g = a.get("glazing") or {}
+        if not isinstance(g, dict):
+            raise ValueError(f"Window {name}: glazing must be an object with panes and gaps")
         panes = g.get("panes") or []
         gaps = g.get("gaps") or []
-        if not panes or len(gaps) != len(panes) - 1:
-            raise ValueError(f"Window {a.get('id')}: give 1-4 panes and one gap between each pair")
+        if not isinstance(panes, list) or not isinstance(gaps, list) or not panes or len(gaps) != len(panes) - 1:
+            raise ValueError(f"Window {name}: give 1-4 panes and one gap between each pair")
         if len(panes) > 4:
-            raise ValueError(f"Window {a.get('id')}: at most 4 panes")
+            raise ValueError(f"Window {name}: at most 4 panes")
         known = glass_panes()
         for p in panes:
-            if p not in known:
-                raise ValueError(f"Window {a.get('id')}: unknown pane '{p}'")
+            if not isinstance(p, str) or p not in known:
+                raise ValueError(f"Window {name}: unknown pane '{p}'")
         for gap in gaps:
-            if gap.get("gas") not in GASES or not 0.004 <= float(gap.get("width_m", 0)) <= 0.03:
-                raise ValueError(f"Window {a.get('id')}: gaps need gas air/argon/krypton and a width of 4-30 mm")
+            if not isinstance(gap, dict) or gap.get("gas") not in GASES:
+                raise ValueError(f"Window {name}: each gap is an object with gas air/argon/krypton and width_m")
+            _number(gap.get("width_m"), f"Window {name}: gap width_m", 0.004, 0.03)
         fr = a.get("frame") or {}
+        if not isinstance(fr, dict):
+            raise ValueError(f"Window {name}: frame must be an object with a library id or u_f")
         if fr.get("id") not in frames() and "u_f" not in fr:
-            raise ValueError(f"Window {a.get('id')}: frame needs a library id or u_f")
+            raise ValueError(f"Window {name}: frame needs a library id or u_f")
+        if "u_f" in fr:
+            _number(fr["u_f"], f"Window {name}: frame u_f", 0.5, 10.0)
+        for key, lo, hi in (("fraction", 0.0, 0.9), ("psi_g", 0.0, 0.2)):
+            if key in fr:
+                _number(fr[key], f"Window {name}: frame {key}", lo, hi)
         return
     layers = a.get("layers") or []
-    if not layers:
-        raise ValueError(f"Construction {a.get('id')}: needs at least one layer (outside to inside)")
+    if not isinstance(layers, list) or not layers:
+        raise ValueError(f"Construction {name}: layers must be a list of {{material, thickness_m}}, outside to inside")
     mats = materials()
     for L in layers:
+        if not isinstance(L, dict):
+            raise ValueError(f"Construction {name}: each layer is an object {{material, thickness_m}}")
         if L.get("material") not in mats:
-            raise ValueError(f"Construction {a.get('id')}: unknown material '{L.get('material')}'")
+            raise ValueError(f"Construction {name}: unknown material '{L.get('material')}'")
         mat = mats[L["material"]]
         if mat.get("kind") == "air_layer":
+            # EN ISO 6946 unventilated air layers: up to 300 mm
+            if "thickness_m" in L:
+                _number(L["thickness_m"], f"Construction {name}: air layer thickness_m", 0.005, 0.3)
             continue
-        if not 0.0005 <= float(L.get("thickness_m", 0)) <= 2.0:
-            raise ValueError(f"Construction {a.get('id')}: layer {L['material']} needs a thickness of 0.5 mm - 2 m")
+        _number(L.get("thickness_m"), f"Construction {name}: layer {L['material']} thickness_m", 0.0005, 2.0)
 
 
 # ── opaque elements ──────────────────────────────────────────────────────────

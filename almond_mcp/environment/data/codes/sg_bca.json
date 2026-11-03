@@ -2,7 +2,7 @@
  "pack": "sg_bca",
  "source": "bca-envelope-code",
  "relation": "method",
- "description": "Singapore envelope thermal transfer values, implemented from the formulas of the BCA Code on Envelope Thermal Performance for Buildings. Solar correction factors (CF) are computed from the site weather file by Almond and shading coefficients from the modelled geometry; the Code's tables are not reproduced. Indicative only - not a BCA Green Mark assessment. You may load your own copy of the Code's CF tables (user_tables) for a table-based figure; such a file is never bundled.",
+ "description": "Singapore envelope thermal transfer values, implemented from the formulas of the BCA Code on Envelope Thermal Performance for Buildings. Solar correction factors (CF) are computed from the site weather file by Almond and the shading coefficient from the glazing g-value (external shading devices are not credited, which is conservative); the Code's tables are not reproduced. Indicative only - not a BCA Green Mark assessment. You may load your own copy of the Code's CF tables (user_tables) for a table-based figure; such a file is never bundled.",
  "formulas": {
   "ETTV": {
    "applies": "air-conditioned non-residential buildings, walls",
@@ -35,7 +35,7 @@
    "max_w_m2": 50.0
   }
  },
- "shading_coefficient": "SC = SC_glass x SC_external; SC_glass = g / 0.87 (relative to 3 mm clear glass); SC_external = solar on the shaded window / solar on the same window unshaded, ray traced on the model",
+ "shading_coefficient": "SC = SC_glass x SC_external; SC_glass = g / 0.87 (relative to 3 mm clear glass); SC_external = 1 (external shading devices are not credited yet; conservative). SC_glass applies over the whole window area including the frame",
  "cf_method": "CF(orientation) = mean irradiance on a vertical surface of that orientation over the daytime hours of the weather file, divided by the mean over the eight principal orientations (re-derived by Almond)",
  "comfort_defaults": {
   "model": "adaptive (ASHRAE 55 with elevated air speed) for naturally ventilated spaces",

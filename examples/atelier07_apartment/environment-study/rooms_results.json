@@ -23,7 +23,7 @@
  },
  "studies": {
   "thermal_no_blinds": {
-   "run_id": "rooms-20261103-112207-84d04d",
+   "run_id": "rooms-20261103-155151-4c7b44",
    "settings": {
     "natural_ventilation_ach": 3.0,
     "shading_g_factor": 1.0,
@@ -31,9 +31,9 @@
     "heat_recovery": 0.8
    },
    "interzone": {
-    "links": 44,
-    "net_interzone_kwh": 41.18,
-    "gross_interzone_kwh": 4748.8
+    "links": 28,
+    "net_interzone_kwh": 0.0,
+    "gross_interzone_kwh": 4656.1
    },
    "rooms": [
     {
@@ -48,7 +48,7 @@
      "room": "Landing",
      "method": "5R1C",
      "enclosure": "enclosed",
-     "heating_kwh_m2": 28.7,
+     "heating_kwh_m2": 28.3,
      "hours_above_26c_occupied": 0,
      "c_m_mj_k": 4.62,
      "tm52_pass": true
@@ -57,9 +57,9 @@
      "room": "Bathroom",
      "method": "5R1C",
      "enclosure": "enclosed",
-     "heating_kwh_m2": 99.0,
-     "hours_above_26c_occupied": 0,
-     "c_m_mj_k": 3.08,
+     "heating_kwh_m2": 98.7,
+     "hours_above_26c_occupied": 3,
+     "c_m_mj_k": 3.09,
      "tm52_pass": true
     },
     {
@@ -67,7 +67,7 @@
      "method": "5R1C",
      "enclosure": "enclosed",
      "heating_kwh_m2": 3.0,
-     "hours_above_26c_occupied": 590,
+     "hours_above_26c_occupied": 582,
      "c_m_mj_k": 6.62,
      "tm52_pass": true
     },
@@ -76,7 +76,7 @@
      "method": "5R1C",
      "enclosure": "enclosed",
      "heating_kwh_m2": 15.0,
-     "hours_above_26c_occupied": 21,
+     "hours_above_26c_occupied": 34,
      "c_m_mj_k": 5.98,
      "tm52_pass": true
     },
@@ -85,7 +85,7 @@
      "method": "5R1C",
      "enclosure": "enclosed",
      "heating_kwh_m2": 14.3,
-     "hours_above_26c_occupied": 1081,
+     "hours_above_26c_occupied": 1043,
      "c_m_mj_k": 11.32,
      "tm52_pass": false
     },
@@ -93,7 +93,7 @@
      "room": "Entry",
      "method": "5R1C",
      "enclosure": "enclosed",
-     "heating_kwh_m2": 60.2,
+     "heating_kwh_m2": 59.9,
      "hours_above_26c_occupied": 0,
      "c_m_mj_k": 1.17,
      "tm52_pass": true
@@ -103,7 +103,7 @@
      "method": "5R1C",
      "enclosure": "enclosed",
      "heating_kwh_m2": 39.1,
-     "hours_above_26c_occupied": 4,
+     "hours_above_26c_occupied": 8,
      "c_m_mj_k": 5.07,
      "tm52_pass": true
     },
@@ -112,8 +112,8 @@
      "method": "5R1C",
      "enclosure": "enclosed",
      "heating_kwh_m2": 44.8,
-     "hours_above_26c_occupied": 3620,
-     "c_m_mj_k": 8.98,
+     "hours_above_26c_occupied": 3610,
+     "c_m_mj_k": 8.97,
      "tm52_pass": false
     }
    ],
@@ -137,7 +137,7 @@
    }
   },
   "thermal_blinds": {
-   "run_id": "rooms-20261103-112259-282941",
+   "run_id": "rooms-20261103-155249-ff22ca",
    "settings": {
     "natural_ventilation_ach": 3.0,
     "shading_g_factor": 0.15,
@@ -145,9 +145,9 @@
     "heat_recovery": 0.8
    },
    "interzone": {
-    "links": 44,
-    "net_interzone_kwh": 42.24,
-    "gross_interzone_kwh": 4295.0
+    "links": 28,
+    "net_interzone_kwh": 0.0,
+    "gross_interzone_kwh": 4190.0
    },
    "rooms": [
     {
@@ -162,7 +162,7 @@
      "room": "Landing",
      "method": "5R1C",
      "enclosure": "enclosed",
-     "heating_kwh_m2": 30.6,
+     "heating_kwh_m2": 30.0,
      "hours_above_26c_occupied": 0,
      "c_m_mj_k": 4.62,
      "tm52_pass": true
@@ -171,9 +171,9 @@
      "room": "Bathroom",
      "method": "5R1C",
      "enclosure": "enclosed",
-     "heating_kwh_m2": 100.0,
+     "heating_kwh_m2": 99.6,
      "hours_above_26c_occupied": 0,
-     "c_m_mj_k": 3.08,
+     "c_m_mj_k": 3.09,
      "tm52_pass": true
     },
     {
@@ -181,7 +181,7 @@
      "method": "5R1C",
      "enclosure": "enclosed",
      "heating_kwh_m2": 3.0,
-     "hours_above_26c_occupied": 336,
+     "hours_above_26c_occupied": 328,
      "c_m_mj_k": 6.62,
      "tm52_pass": true
     },
@@ -190,7 +190,7 @@
      "method": "5R1C",
      "enclosure": "enclosed",
      "heating_kwh_m2": 15.0,
-     "hours_above_26c_occupied": 16,
+     "hours_above_26c_occupied": 28,
      "c_m_mj_k": 5.98,
      "tm52_pass": true
     },
@@ -199,7 +199,7 @@
      "method": "5R1C",
      "enclosure": "enclosed",
      "heating_kwh_m2": 14.3,
-     "hours_above_26c_occupied": 397,
+     "hours_above_26c_occupied": 395,
      "c_m_mj_k": 11.32,
      "tm52_pass": true
     },
@@ -207,7 +207,7 @@
      "room": "Entry",
      "method": "5R1C",
      "enclosure": "enclosed",
-     "heating_kwh_m2": 62.4,
+     "heating_kwh_m2": 61.9,
      "hours_above_26c_occupied": 0,
      "c_m_mj_k": 1.17,
      "tm52_pass": true
@@ -226,8 +226,8 @@
      "method": "5R1C",
      "enclosure": "enclosed",
      "heating_kwh_m2": 45.8,
-     "hours_above_26c_occupied": 2344,
-     "c_m_mj_k": 8.98,
+     "hours_above_26c_occupied": 2333,
+     "c_m_mj_k": 8.97,
      "tm52_pass": false
     }
    ],
@@ -273,6 +273,7 @@
      }
     ],
     "passes": false,
+    "ground_floor_note": "Ground floors are checked with the floor build-up's own U-value, without the ground's resistance (EN ISO 13370 perimeter/area method): conservative against the limit.",
     "provenance": {
      "relation": "bundled",
      "source": "Approved Document L, Conservation of fuel and power, Volume 1: Dwellings (Table 1.1, Table 4.1) and Volume 2: Buildings other than dwellings (Table 4.1), 2021 edition incorporating 2023 amendments",
@@ -282,7 +283,7 @@
    }
   },
   "daylight_annual": {
-   "run_id": "daylight-20261103-111511-8a9fe2",
+   "run_id": "daylight-20261103-155439-accde8",
    "settings": {},
    "interzone": null,
    "rooms": [
@@ -295,51 +296,51 @@
     },
     {
      "room": "Landing",
-     "sda_pct": 75.6,
+     "sda_pct": 73.2,
      "ase_pct": 0.0,
-     "udi_useful_mean_pct": 83.9,
+     "udi_useful_mean_pct": 84.0,
      "sensors": 41
     },
     {
      "room": "Bathroom",
      "sda_pct": 0.0,
      "ase_pct": 0.0,
-     "udi_useful_mean_pct": 0.1,
+     "udi_useful_mean_pct": 0.2,
      "sensors": 20
     },
     {
      "room": "Bedroom",
      "sda_pct": 100.0,
      "ase_pct": 84.8,
-     "udi_useful_mean_pct": 88.8,
+     "udi_useful_mean_pct": 88.6,
      "sensors": 99
     },
     {
      "room": "Study",
-     "sda_pct": 81.8,
+     "sda_pct": 75.8,
      "ase_pct": 0.0,
-     "udi_useful_mean_pct": 89.8,
+     "udi_useful_mean_pct": 89.2,
      "sensors": 33
     },
     {
      "room": "Kitchen",
      "sda_pct": 69.7,
      "ase_pct": 65.7,
-     "udi_useful_mean_pct": 74.4,
+     "udi_useful_mean_pct": 73.7,
      "sensors": 198
     },
     {
      "room": "Entry",
      "sda_pct": 50.0,
      "ase_pct": 0.0,
-     "udi_useful_mean_pct": 90.4,
+     "udi_useful_mean_pct": 90.1,
      "sensors": 2
     },
     {
      "room": "Hall and dining",
      "sda_pct": 96.6,
      "ase_pct": 91.4,
-     "udi_useful_mean_pct": 92.5,
+     "udi_useful_mean_pct": 92.4,
      "sensors": 58
     },
     {
@@ -356,9 +357,10 @@
     "Room Bedroom: 1.0 m2 of its boundary has no element within 0.35 m (gaps in the model, or small openings); treated as closed.",
     "Room Study opens into other parts of the building (20 m2: S 20 m2). Those openings are treated as adiabatic, with no air exchange; for open-plan spaces define one room.",
     "Room Hall and dining opens into other parts of the building (6 m2: up 6 m2). Those openings are treated as adiabatic, with no air exchange; for open-plan spaces define one room.",
-    "Room Living: 4.3 m2 of its boundary has no element within 0.35 m (gaps in the model, or small openings); treated as closed. Room Living opens into other parts of the building (21 m2: N 21 m2). Those openings are treated as adiabatic, with no air exchange; for open-plan spaces define one room."
+    "Room Living: 4.3 m2 of its boundary has no element within 0.35 m (gaps in the model, or small openings); treated as closed. Room Living opens into other parts of the building (21 m2: N 21 m2). Those openings are treated as adiabatic, with no air exchange; for open-plan spaces define one room.",
+    "Room Garden pavilion: no floor element under it - the daylight study adds an opaque floor (reflectance 0.2) at its boundary"
    ],
-   "envelope_check": {}
+   "envelope_check": null
   },
   "tropical_synthetic": {
    "run_id": "rooms-20261103-112643-388207",
@@ -445,11 +447,11 @@
       "value_w_m2": 21.22
      }
     ],
-    "note": "Indicative: formulas from the BCA Code on Envelope Thermal Performance; CF derived by Almond from the weather file and SC from the glazing g-value and modelled shading. Not a BCA Green Mark assessment."
+    "note": "Indicative: formulas from the BCA Code on Envelope Thermal Performance; CF derived by Almond from the weather file; SC = g / 0.87 from the glazing g-value over the whole window, with no credit for external shading devices (conservative). Not a BCA Green Mark assessment."
    }
   },
   "tropical_singapore": {
-   "run_id": "rooms-20261103-142545-0b7dfd",
+   "run_id": "rooms-20261103-160108-062832",
    "weather": "Singapore-Changi Intl AP 486980, TMYx 2011-2025 (climate.onebuilding.org; downloaded by the user, not redistributed)",
    "settings": "cooling to room set-points (air temperature), no heat recovery, no window ventilation; same as tropical_synthetic",
    "note": "Cooling holds the air at the set-point; operative temperature includes the warmer glass and wall surfaces, so hours above 26 degC operative are close to all occupied hours in cooled rooms. Hours above 28 degC are reported instead.",
@@ -464,33 +466,33 @@
      "method": "5R1C",
      "cooling_kwh_m2": 0.0,
      "peak_cooling_w_m2": 0.0,
-     "hours_operative_above_28c_occupied": 6108
+     "hours_operative_above_28c_occupied": 6043
     },
     {
      "room": "Bathroom",
      "method": "5R1C",
      "cooling_kwh_m2": 0.0,
      "peak_cooling_w_m2": 0.0,
-     "hours_operative_above_28c_occupied": 4379
+     "hours_operative_above_28c_occupied": 4513
     },
     {
      "room": "Bedroom",
      "method": "5R1C",
      "cooling_kwh_m2": 91.6,
-     "peak_cooling_w_m2": 88.1,
+     "peak_cooling_w_m2": 88.0,
      "hours_operative_above_28c_occupied": 250
     },
     {
      "room": "Study",
      "method": "5R1C",
      "cooling_kwh_m2": 86.0,
-     "peak_cooling_w_m2": 46.9,
+     "peak_cooling_w_m2": 47.0,
      "hours_operative_above_28c_occupied": 0
     },
     {
      "room": "Kitchen",
      "method": "5R1C",
-     "cooling_kwh_m2": 173.9,
+     "cooling_kwh_m2": 174.1,
      "peak_cooling_w_m2": 51.0,
      "hours_operative_above_28c_occupied": 0
     },
@@ -499,7 +501,7 @@
      "method": "5R1C",
      "cooling_kwh_m2": 0.0,
      "peak_cooling_w_m2": 0.0,
-     "hours_operative_above_28c_occupied": 7467
+     "hours_operative_above_28c_occupied": 7486
     },
     {
      "room": "Hall and dining",
@@ -511,13 +513,13 @@
     {
      "room": "Living",
      "method": "5R1C",
-     "cooling_kwh_m2": 450.4,
+     "cooling_kwh_m2": 450.3,
      "peak_cooling_w_m2": 177.8,
-     "hours_operative_above_28c_occupied": 2781
+     "hours_operative_above_28c_occupied": 2782
     }
    ],
    "retv": {
-    "overall_w_m2": 10.95,
+    "overall_w_m2": 10.94,
     "limit_w_m2": 25.0,
     "passes": true,
     "facades": [
@@ -561,8 +563,9 @@
      "NW": 0.929
     },
     "cf_roof": 2.123,
-    "note": "Indicative: formulas from the BCA Code on Envelope Thermal Performance; CF derived by Almond from the weather file and SC from the glazing g-value and modelled shading. Not a BCA Green Mark assessment."
+    "note": "Indicative: formulas from the BCA Code on Envelope Thermal Performance; CF derived by Almond from the weather file; SC = g / 0.87 from the glazing g-value over the whole window, with no credit for external shading devices (conservative). Not a BCA Green Mark assessment."
    }
   }
- }
+ },
+ "refreshed": "2026-11-03: rerun after the independent test drive's fixes (one conductance per shared face, wall construction behind windows, exposed floors over no room, daylight shells)"
 }

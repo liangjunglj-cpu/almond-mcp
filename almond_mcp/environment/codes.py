@@ -7,7 +7,8 @@ Every pack declares its relation to its source:
 
 Packs: uk_adl_2021 (OGL v3), de_banz_2020 (public domain, Section 5 UrhG), eu_hotmaps (CC BY 4.0) and
 sg_bca (method: ETTV / RETV / RTTV from the BCA Code on Envelope Thermal Performance, with solar correction
-factors derived from the site weather file and shading from the model). Results are indicative design
+factors derived from the site weather file; SC from the glazing g-value, external shading devices not credited).
+Results are indicative design
 checks, not certification: no pack here performs a jurisdiction's whole-building compliance calculation.
 """
 from __future__ import annotations
@@ -45,9 +46,10 @@ def packs() -> list[dict]:
     return out
 
 
-def orientation_of(normal) -> str:
-    """Nearest of the eight principal orientations for a wall normal (model axes, +Y = north)."""
-    az = (math.degrees(math.atan2(normal[0], normal[1])) + 360.0) % 360.0
+def orientation_of(normal, north_deg: float = 0.0) -> str:
+    """Nearest of the eight true orientations for a wall normal in model axes. ``north_deg`` is the
+    model's north rotation (solar.py convention: true azimuth = model azimuth + north_deg)."""
+    az = (math.degrees(math.atan2(normal[0], normal[1])) + north_deg + 360.0) % 360.0
     return min(ORIENTATIONS, key=lambda k: min(abs(az - ORIENTATIONS[k]), 360 - abs(az - ORIENTATIONS[k])))
 
 
@@ -66,20 +68,86 @@ def plane_irradiance(weather, normal, hours=None, ground_reflectance: float = 0.
     return diffuse + ground + direct
 
 
-def solar_correction_factors(weather, north_deg: float = 0.0) -> dict:
-    """CF per orientation: mean daytime irradiance on that vertical orientation / mean over all eight.
-    Re-derived from the weather file (the BCA tables are not used)."""
+def solar_correction_factors(weather) -> dict:
+    """CF per true orientation: mean daytime irradiance on that vertical orientation / mean over all eight.
+    Re-derived from the weather file (the BCA tables are not used). The sky is in true axes, so no model
+    rotation applies here; facades are mapped to true orientations by orientation_of."""
     from .solar import sun_positions_for
     day = np.flatnonzero(sun_positions_for(weather)["altitude"] > 0)
     means = {}
     for k, az in ORIENTATIONS.items():
-        a = math.radians(az - north_deg)
+        a = math.radians(az)
         means[k] = float(plane_irradiance(weather, (math.sin(a), math.cos(a), 0.0), hours=day).mean())
     ref = sum(means.values()) / len(means)
     roof = float(plane_irradiance(weather, (0.0, 0.0, 1.0), hours=day).mean())
     return {"walls": {k: round(v / ref, 3) for k, v in means.items()}, "roof": round(roof / ref, 3),
             "mean_daytime_w_m2": {k: round(v, 1) for k, v in means.items()} | {"roof": round(roof, 1)},
             "method": pack("sg_bca")["cf_method"]}
+
+
+# options each pack accepts (north_deg is the model rotation, passed by the studies to every pack)
+PACK_OPTIONS = {"sg_bca": {"residential", "user_tables", "north_deg"},
+                "uk_adl_2021": {"dwelling", "flat_roof", "north_deg"},
+                "de_banz_2020": {"age_band", "north_deg"},
+                "eu_hotmaps": {"country", "sector", "north_deg"}}
+FLAGS = {"residential", "dwelling", "flat_roof"}
+TABLE_KEYS = ("ETTV_walls", "RETV_walls", "RTTV")
+
+
+def flag(value, name: str) -> bool:
+    """A yes/no option from JSON or a tool call: true/false, 1/0, "yes"/"no" - never Python truthiness."""
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, (int, float)) and value in (0, 1):
+        return bool(value)
+    if isinstance(value, str) and value.strip().lower() in ("true", "yes", "1", "false", "no", "0"):
+        return value.strip().lower() in ("true", "yes", "1")
+    raise ValueError(f"{name} must be true or false (is {value!r})")
+
+
+def check_options(pack_name: str, options: dict) -> dict:
+    """Validate a pack's options before any simulation: unknown pack or keys, flags, bands and countries."""
+    if pack_name not in PACK_OPTIONS:
+        raise ValueError(f"Unknown code pack '{pack_name}'. Available: {', '.join(PACK_OPTIONS)}")
+    if not isinstance(options, dict):
+        raise ValueError("pack_options must be an object")
+    allowed = PACK_OPTIONS[pack_name]
+    # check_envelope passes every pack's options; only analyze_rooms' free-form pack_options are strict
+    unknown = sorted(set(options) - allowed - set().union(*PACK_OPTIONS.values()))
+    if unknown:
+        raise ValueError(f"Unknown option(s) {', '.join(unknown)} for {pack_name}; it takes {', '.join(sorted(allowed - {'north_deg'}))}")
+    for k in FLAGS & set(options) & allowed:
+        flag(options[k], k)
+    if pack_name == "de_banz_2020" and "age_band" in options and options["age_band"] not in pack("de_banz_2020")["age_bands"]:
+        raise ValueError(f"age_band must be one of {', '.join(pack('de_banz_2020')['age_bands'])}")
+    if pack_name == "eu_hotmaps":
+        v = pack("eu_hotmaps")["values"]
+        c = str(options.get("country", "de")).lower()
+        if c not in v:
+            raise ValueError(f"No Hotmaps values for '{c}'. Countries: {', '.join(sorted(v))}")
+        if options.get("sector", "residential") not in v[c]:
+            raise ValueError(f"sector must be one of {', '.join(v[c])}")
+    return options
+
+
+def load_user_tables(path: str) -> dict:
+    """Your own licensed CF tables: {"ETTV_walls": {"N": 0.8, ...}, "RETV_walls": {...}, "RTTV": {"roof": ...}}."""
+    try:
+        t = json.loads(Path(path).read_text(encoding="utf-8"))
+    except OSError as exc:
+        raise ValueError(f"Cannot read user_tables_path: {exc}") from None
+    except json.JSONDecodeError as exc:
+        raise ValueError(f"user_tables_path is not valid JSON: {exc}") from None
+    if not isinstance(t, dict) or not any(k in t for k in TABLE_KEYS):
+        raise ValueError(f"user tables must be an object with any of {', '.join(TABLE_KEYS)}, each {{orientation: CF}}")
+    for k in TABLE_KEYS:
+        if k in t:
+            if not isinstance(t[k], dict):
+                raise ValueError(f"user tables {k} must be an object {{orientation: CF}}")
+            for o, v in t[k].items():
+                if not isinstance(v, (int, float)) or not 0 <= v <= 5:
+                    raise ValueError(f"user tables {k}.{o} must be a number between 0 and 5")
+    return t
 
 
 def _user_cf(user_tables: dict | None, key: str, orient: str) -> float | None:
@@ -98,7 +166,7 @@ def envelope_transfer(surfaces: list[dict], weather=None, residential: bool = Fa
     p = pack("sg_bca")
     f = p["formulas"]["RETV" if residential else "ETTV"]
     c = f["coefficients"]
-    cf_info = solar_correction_factors(weather, north_deg) if weather is not None else None
+    cf_info = solar_correction_factors(weather) if weather is not None else None
     if cf_info is None and not user_tables:
         raise ValueError("ETTV/RETV need a weather file (to derive the solar correction factors) or user_tables")
     facades: dict[str, dict] = {}
@@ -119,7 +187,7 @@ def envelope_transfer(surfaces: list[dict], weather=None, residential: bool = Fa
             continue
         if kind not in ("wall_external", "window"):
             continue
-        o = orientation_of(s["normal"])
+        o = orientation_of(s["normal"], north_deg)
         fa = facades.setdefault(o, {"wall": 0.0, "ua_wall": 0.0, "fen": 0.0, "ua_fen": 0.0, "sa_fen": 0.0})
         if kind == "window":
             sc = float(s.get("g_value", 0.0)) / SC_REFERENCE_G * float(s.get("shading_factor", 1.0))
@@ -138,6 +206,9 @@ def envelope_transfer(surfaces: list[dict], weather=None, residential: bool = Fa
         cf = _user_cf(user_tables, key, o)
         cf_source = "user table"
         if cf is None:
+            if cf_info is None:
+                raise ValueError(f"The user tables have no {key} value for {o} facades: add it, or give epw_path to "
+                                 "derive the missing factors from the weather file")
             cf = cf_info["walls"][o]
             cf_source = "derived from weather file"
         q = (c["opaque"] * fa["ua_wall"] + c["fenestration_conduction"] * fa["ua_fen"] + c["solar"] * cf * fa["sa_fen"]) / ao
@@ -153,7 +224,13 @@ def envelope_transfer(surfaces: list[dict], weather=None, residential: bool = Fa
            "overall_w_m2": round(total_q / total_a, 2) if total_a else None,
            "cf": cf_info, "source": "bca-envelope-code",
            "note": "Indicative: formulas from the BCA Code on Envelope Thermal Performance; CF derived by Almond from "
-                   "the weather file and SC from the glazing g-value and modelled shading. Not a BCA Green Mark assessment."}
+                   "the weather file; SC = g / 0.87 from the glazing g-value over the whole window, with no credit for "
+                   "external shading devices (conservative). Not a BCA Green Mark assessment."}
+    if weather is not None:
+        loc = weather.location
+        if not (0.5 <= loc.latitude <= 2.0 and 103.0 <= loc.longitude <= 105.0):
+            out["warning"] = (f"The weather file is for {loc.label()} ({loc.latitude:.2f}, {loc.longitude:.2f}), not Singapore: "
+                              "ETTV/RETV limits and coefficients are calibrated for Singapore's climate")
     if out["overall_w_m2"] is not None:
         out["passes"] = out["overall_w_m2"] <= f["max_w_m2"]
     if roof["sky"] > 0:
@@ -187,8 +264,14 @@ def uk_limits(by_kind: dict[str, tuple[float, float]], dwelling: bool = True, fl
         rows.append({"element": kind, "area_m2": round(area, 2), "u_value": round(u, 3), "limit": lim[key],
                      "passes": u <= lim[key] + 1e-9})
     notional = p["notional_dwelling"] if dwelling else None
-    return {"pack": "uk_adl_2021", "table": lim["table"], "elements": rows, "passes": all(r["passes"] for r in rows),
-            "notional_dwelling": notional, "note": p["description"]}
+    out = {"pack": "uk_adl_2021", "table": lim["table"], "elements": rows, "passes": all(r["passes"] for r in rows),
+           "notional_dwelling": notional, "note": p["description"]}
+    if "floor_ground" in by_kind:
+        out["ground_floor_note"] = ("Ground floors are checked with the floor build-up's own U-value, without the ground's "
+                                    "resistance (EN ISO 13370 perimeter/area method): conservative against the limit.")
+    if not flat_roof:
+        out["roof_note"] = "Roofs checked as pitched (flat_roof=False)."
+    return out
 
 
 def de_reference(age_band: str) -> dict:
@@ -233,8 +316,9 @@ def eu_reference(country: str, sector: str = "residential") -> dict:
 def check_envelope(surfaces: list[dict], pack_name: str, weather=None, **options) -> dict:
     """Run a pack's check on a list of envelope surfaces (see envelope_transfer for the fields)."""
     src = constructions.sources()
+    check_options(pack_name, options)
     if pack_name == "sg_bca":
-        res = envelope_transfer(surfaces, weather, residential=bool(options.get("residential", False)),
+        res = envelope_transfer(surfaces, weather, residential=flag(options.get("residential", False), "residential"),
                                 north_deg=float(options.get("north_deg", 0.0)), user_tables=options.get("user_tables"))
     elif pack_name == "uk_adl_2021":
         acc: dict[str, list[float]] = {}
@@ -243,13 +327,14 @@ def check_envelope(surfaces: list[dict], pack_name: str, weather=None, **options
             a[0] += float(s["area"])
             a[1] += float(s["area"]) * float(s["u_value"])
         res = uk_limits({k: (a, ua / a) for k, (a, ua) in acc.items() if a > 0},
-                        dwelling=bool(options.get("dwelling", True)), flat_roof=bool(options.get("flat_roof", True)))
+                        dwelling=flag(options.get("dwelling", True), "dwelling"),
+                        flat_roof=flag(options.get("flat_roof", True), "flat_roof"))
     elif pack_name == "de_banz_2020":
         res = de_reference(options.get("age_band", ">=2002"))
-    elif pack_name == "eu_hotmaps":
-        res = eu_reference(options.get("country", "de"), options.get("sector", "residential"))
+        res["scope"] = "reference values of the building stock to compare with; the model is not checked against them"
     else:
-        raise ValueError(f"Unknown code pack '{pack_name}'")
+        res = eu_reference(options.get("country", "de"), options.get("sector", "residential"))
+        res["scope"] = "reference values of the building stock to compare with; the model is not checked against them"
     p = pack(pack_name)
     s = src.get(p["source"], {})
     res["provenance"] = {"relation": p["relation"], "source": s.get("title"), "licence": s.get("licence"),

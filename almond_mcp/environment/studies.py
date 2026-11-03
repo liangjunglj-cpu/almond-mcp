@@ -688,16 +688,19 @@ def prepare_rooms(data: dict, overrides: dict | None = None) -> tuple[list, list
     """Rooms, their enclosure checks and the analysis scene. Room volumes drawn as zones are left out of
     the scene unless nothing is modelled around them (then their faces are the envelope)."""
     from . import rooms as rm
-    rooms = rm.rooms_from_export(data)
+    problems: list[str] = []
+    rooms = rm.rooms_from_export(data, problems)
     if not rooms:
-        raise ValueError("No rooms in the model: tag closed volumes, surfaces or boundary curves with almond:room "
+        raise ValueError(" ".join(problems) if problems else
+                         "No rooms in the model: tag closed volumes, surfaces or boundary curves with almond:room "
                          "(define_room) first")
     base = scene_from_export(data, overrides)
     if data.get("rhino_north_deg") is not None:
         base.north_deg = float(data["rhino_north_deg"]) - 90.0      # Rhino Sun panel: counter-clockwise from +X
     volume_guids = {g.lower() for r in rooms if r.source in ("volume", "boundary") for g in r.guids}
     exclude = {i for i, o in enumerate(base.objects) if str(o.get("guid", "")).lower() in volume_guids}
-    encs = [rm.enclosure(r, base, exclude, neighbours=rooms) for r in rooms]
+    ground_z = min(r.floor_z for r in rooms)         # as zones_from_rooms: the lowest room floor
+    encs = [rm.enclosure(r, base, exclude, ground_z=ground_z, neighbours=rooms) for r in rooms]
     ignore = dict(overrides or {})
     for r, e in zip(rooms, encs):
         if r.source in ("volume", "boundary") and not e.self_enclosed:
@@ -705,7 +708,7 @@ def prepare_rooms(data: dict, overrides: dict | None = None) -> tuple[list, list
                 ignore[g.lower()] = "ignore"
     scene = scene_from_export(data, ignore) if ignore != (overrides or {}) else base
     scene.north_deg = base.north_deg
-    notes = [e.warning for e in encs if e.warning]
+    notes = problems + [e.warning for e in encs if e.warning]
     return rooms, encs, scene, notes
 
 
@@ -745,7 +748,7 @@ def run_rooms_thermal(data: dict, weather, settings: thermal.Settings, label: st
     settings.validate()
     t0 = time.time()
     rooms, encs, scene, notes = prepare_rooms(data, overrides)
-    zones = rm.zones_from_rooms(rooms, encs, scene, _windows(scene))
+    zones = rm.zones_from_rooms(rooms, encs, scene, _windows(scene), problems=notes)
     for z in zones:
         z.source.pop("warning", None)                      # the room mesh is re-sampled, not a modelling error
         if not cooling:
@@ -793,7 +796,8 @@ def run_rooms_thermal(data: dict, weather, settings: thermal.Settings, label: st
                               "class when less than half the opaque area has a construction.",
                               "No moisture balance; a design-stage comparison model, not a compliance simulation."]}
     if envelope_pack:
-        result["envelope_check"] = codes.check_envelope(envelope_surfaces(zones), envelope_pack, weather, **(pack_options or {}))
+        result["envelope_check"] = codes.check_envelope(envelope_surfaces(zones), envelope_pack, weather,
+                                                        **({"north_deg": scene.north_deg} | (pack_options or {})))
     heads = []
     for e in out_rooms:
         if e["method"] == "semi_outdoor":
@@ -810,17 +814,59 @@ def run_rooms_thermal(data: dict, weather, settings: thermal.Settings, label: st
 
 
 def _construction_table(z: thermal.Zone) -> list[dict]:
-    from . import constructions as asm
+    from . import constructions as asm, rooms as rm
     rows: dict[tuple, dict] = {}
     for s in z.surfaces:
         if s.kind == "opening":
             continue
         key = (s.kind, s.construction)
+        # an unassigned shared face exchanges heat at the coupling default (rooms.couple), not the preset's 0
+        unassigned_shared = s.kind == "interzone" and not s.construction
         r = rows.setdefault(key, {"surface": s.kind, "construction": s.construction or "(preset)",
-                                  "name": asm.get(s.construction)["name"] if s.construction else "settings preset",
-                                  "area_m2": 0.0, "u_value": s.u_value})
+                                  "name": asm.get(s.construction)["name"] if s.construction else
+                                  ("shared face, default partition" if unassigned_shared else "settings preset"),
+                                  "area_m2": 0.0, "u_value": rm.INTERZONE_U_DEFAULT if unassigned_shared else s.u_value})
         r["area_m2"] = round(r["area_m2"] + s.area, 2)
     return sorted(rows.values(), key=lambda r: (r["surface"], -r["area_m2"]))
+
+
+def _daylight_shells(data: dict, rooms, encs, scene: Scene, overrides: dict | None) -> tuple[Scene, list[str]]:
+    """The daylight scene for room studies. A self-enclosed room volume is its own envelope, but as one opaque
+    object it would also cover the window in it: it is replaced by its boundary without the glazed parts.
+    A room resting on the ground with no floor element gets a floor, so the sky's ground does not shine in."""
+    from .scene import LIBRARY
+    notes: list[str] = []
+    ignore = dict(overrides or {})
+    v_parts, mats, objs = [], [], []
+    names = ["wall", "floor", "ceiling"]
+    for r, e in zip(rooms, encs):
+        keep = np.zeros(len(e.tri_points), bool)
+        if e.self_enclosed and r.source == "volume":
+            for g in r.guids:
+                ignore[g.lower()] = "ignore"
+            keep |= ~(e.tri_glazing if e.tri_glazing is not None else np.zeros(len(keep), bool))
+        if e.tri_ground_only is not None and e.tri_ground_only.any():
+            keep |= e.tri_ground_only
+            if not e.self_enclosed:
+                notes.append(f"Room {r.name}: no floor element under it - the daylight study adds an opaque floor "
+                             f"(reflectance {LIBRARY['floor'].reflectance:g}) at its boundary")
+        if not keep.any():
+            continue
+        t = e.tri_points[keep]
+        nz = np.cross(t[:, 1] - t[:, 0], t[:, 2] - t[:, 0])[:, 2]
+        nz = nz / np.maximum(np.linalg.norm(np.cross(t[:, 1] - t[:, 0], t[:, 2] - t[:, 0]), axis=1), 1e-12)
+        # the boundary faces point out of the room: down is the floor, up the ceiling
+        mats.append(np.where(nz < -0.7, 1, np.where(nz > 0.7, 2, 0)))
+        v_parts.append(t.reshape(-1, 3))
+        objs.append({"name": f"{r.name} (room boundary)", "room_shell": r.name, "guid": ""})
+    base = scene_from_export(data, ignore) if ignore != (overrides or {}) else scene
+    base.north_deg = scene.north_deg
+    if not v_parts:
+        return base, notes
+    counts = [len(p) // 3 for p in v_parts]
+    shell = Scene(np.vstack(v_parts), np.arange(sum(counts) * 3).reshape(-1, 3), np.concatenate(mats),
+                  np.repeat(np.arange(len(objs)), counts), [LIBRARY[n] for n in names], objs, scene.north_deg)
+    return base.merged(shell), notes
 
 
 def run_rooms_daylight(data: dict, weather, study: str = "annual", quality: str = "medium", label: str = "",
@@ -828,6 +874,8 @@ def run_rooms_daylight(data: dict, weather, study: str = "annual", quality: str 
     """Daylight per room: one work-plane grid per room, one simulation, metrics per room."""
     from . import rooms as rm
     rooms, encs, scene, notes = prepare_rooms(data, overrides)
+    scene, shell_notes = _daylight_shells(data, rooms, encs, scene, overrides)
+    notes = notes + shell_notes
     grids, owner = [], []
     for k, r in enumerate(rooms):
         g = rm.daylight_grid(r, spacing, height)
@@ -847,7 +895,8 @@ def run_rooms_daylight(data: dict, weather, study: str = "annual", quality: str 
         if not m.any():
             continue
         a = grid.cell_area[m]
-        row = {"room": r.name, "use": r.use, "enclosure": encs[k].state, "sensors": int(m.sum()), "area_m2": round(float(a.sum()), 1)}
+        row = {"room": r.name, "use": r.use, "enclosure": encs[k].state, "sensors": int(m.sum()),
+               "floor_area_m2": round(rm._floor_area(r), 1), "grid_area_m2": round(float(a.sum()), 1)}
         if "df" in arrays:
             v = arrays["df"][m]
             row.update(average_df_pct=round(float(np.average(v, weights=a)), 2),
@@ -860,12 +909,21 @@ def run_rooms_daylight(data: dict, weather, study: str = "annual", quality: str 
             row["ase_pct"] = round(100 * float(a[ase > 250].sum() / a.sum()), 1)
         if "udi_useful" in arrays:
             row["udi_useful_mean_pct"] = round(100 * float(np.average(arrays["udi_useful"][m], weights=a)), 1)
+        if "lux" in arrays:
+            e = arrays["lux"][m]
+            row.update(mean_lux=round(float(np.average(e, weights=a))), min_lux=round(float(e.min())),
+                       area_ge_300_lux_pct=round(100 * float(a[e >= 300].sum() / a.sum()), 1))
         per.append(row)
     res["rooms"] = per
     res["room_names"] = [r.name for r in rooms]
     res["notes"] = notes + res.get("notes", [])
-    res["headline"] = "; ".join(f"{p['room']}: " + (f"sDA {p['sda_pct']} %" if "sda_pct" in p else f"DF {p.get('average_df_pct')} %")
-                                for p in per)
+    def head(p: dict) -> str:
+        if "sda_pct" in p:
+            return f"sDA {p['sda_pct']} %"
+        if "mean_lux" in p:
+            return f"mean {p['mean_lux']} lx"
+        return f"DF {p.get('average_df_pct')} %"
+    res["headline"] = "; ".join(f"{p['room']}: {head(p)}" for p in per)
     result_path = Path(res["run_dir"]) / "result.json"
     if result_path.is_file():
         saved = json.loads(result_path.read_text(encoding="utf-8"))

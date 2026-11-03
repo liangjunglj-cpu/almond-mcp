@@ -184,15 +184,21 @@ public class Script {
       .Append("\",\"rhino_north_deg\":").Append(north.ToString("R", C)).Append(",\"objects\":[");
     bool first = true; int count = 0;
     var skipped = new List<string>();
+    var skippedRooms = new List<string>();
     foreach (var o in objs) {
       int before = count;
       Walk(sb, ref first, doc, o, o.Attributes, o.Id.ToString(), Transform.Identity, mp, 0, ref count);
-      if (count == before) skipped.Add(o.Id.ToString());
+      if (count == before) {
+        skipped.Add(o.Id.ToString());
+        if (!string.IsNullOrEmpty(o.Attributes.GetUserString("almond:room"))) skippedRooms.Add(o.Id.ToString());
+      }
     }
     sb.Append("],\"missing\":[");
     sb.Append(string.Join(",", missing.Select(s => "\"" + Esc(s) + "\"")));
     sb.Append("],\"skipped\":[");
     sb.Append(string.Join(",", skipped.Select(s => "\"" + s + "\"")));
+    sb.Append("],\"skipped_rooms\":[");
+    sb.Append(string.Join(",", skippedRooms.Select(s => "\"" + s + "\"")));
     sb.Append("]}");
     File.WriteAllText(@"__OUT__", sb.ToString(), new UTF8Encoding(false));
     return new List<Guid>();
@@ -306,6 +312,7 @@ public class Script {
 _CS_TAG = r'''
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using Rhino;
 using Rhino.DocObjects;
 
@@ -313,22 +320,38 @@ public class Script {
   public static List<Guid> Run(RhinoDoc doc) {
     // guid, key, value triples; an empty value removes the key
     string[] t = new string[] { __TRIPLES__ };
+    string uniqueRoom = __UNIQUE_ROOM__;
+    // check everything before changing anything, so a bad request leaves the model untouched
+    var objects = new Dictionary<string, RhinoObject>();
+    var missing = new List<string>();
+    for (int i = 0; i + 2 < t.Length; i += 3) {
+      if (objects.ContainsKey(t[i]) || missing.Contains(t[i])) continue;
+      Guid g;
+      RhinoObject o = Guid.TryParse(t[i], out g) ? doc.Objects.FindId(g) : null;
+      if (o == null) missing.Add(t[i]); else objects[t[i]] = o;
+    }
+    if (missing.Count > 0) throw new Exception("Objects not found (nothing was tagged): " + string.Join(", ", missing));
+    if (uniqueRoom.Length > 0) {
+      var ids = new HashSet<Guid>(objects.Values.Select(o => o.Id));
+      int others = 0;
+      foreach (var o in doc.Objects)
+        if (!ids.Contains(o.Id) && string.Equals(o.Attributes.GetUserString("almond:room"), uniqueRoom, StringComparison.OrdinalIgnoreCase)) others++;
+      if (others > 0)
+        throw new Exception("A room named '" + uniqueRoom + "' already exists on " + others + " other object(s) (nothing was tagged). " +
+                            "Choose another name, remove that room first, or select all of its objects together.");
+    }
     uint undo = doc.BeginUndoRecord("Almond environment tags");
     var done = new List<Guid>();
-    var missing = new List<string>();
     try {
       for (int i = 0; i + 2 < t.Length; i += 3) {
-        Guid g;
-        RhinoObject o = Guid.TryParse(t[i], out g) ? doc.Objects.FindId(g) : null;
-        if (o == null) { missing.Add(t[i]); continue; }
+        var o = objects[t[i]];
         var attr = o.Attributes.Duplicate();
         if (t[i + 2].Length == 0) attr.DeleteUserString("almond:" + t[i + 1]);
         else attr.SetUserString("almond:" + t[i + 1], t[i + 2]);
         doc.Objects.ModifyAttributes(o, attr, true);
-        if (!done.Contains(g)) done.Add(g);
+        if (!done.Contains(o.Id)) done.Add(o.Id);
       }
     } finally { doc.EndUndoRecord(undo); }
-    if (missing.Count > 0) throw new Exception("Objects not found: " + string.Join(", ", missing));
     doc.Views.Redraw();
     return done;
   }
@@ -392,8 +415,10 @@ def draw_file(cells_m, colors, units_to_m: float, legend: list[tuple[tuple[float
     return "\n".join(lines) + "\n"
 
 
-def tag_script(assignments: dict[str, dict[str, str]]) -> str:
-    """C# that sets (value) or removes ("") almond:* user text: {guid: {key: value}} with keys from TAG_KEYS."""
+def tag_script(assignments: dict[str, dict[str, str]], unique_room: str = "") -> str:
+    """C# that sets (value) or removes ("") almond:* user text: {guid: {key: value}} with keys from TAG_KEYS.
+    Every object is checked before any is changed. ``unique_room``: refuse when another object already carries
+    that room name (rooms are grouped by name, so a second room of the same name would merge with the first)."""
     triples = []
     for guid, kv in assignments.items():
         if not _GUID.match(str(guid)):
@@ -407,4 +432,7 @@ def tag_script(assignments: dict[str, dict[str, str]]) -> str:
             triples += [str(guid), k, val]
     if not triples:
         raise ValueError("Nothing to tag")
-    return _CS_TAG.replace("__TRIPLES__", ", ".join(json.dumps(x) for x in triples))
+    if len(unique_room) > 120:
+        raise ValueError("Room names must be up to 120 characters")
+    return (_CS_TAG.replace("__TRIPLES__", ", ".join(json.dumps(x) for x in triples))
+            .replace("__UNIQUE_ROOM__", json.dumps(str(unique_room))))

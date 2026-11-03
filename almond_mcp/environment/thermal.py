@@ -305,15 +305,20 @@ def simulate(zone: Zone, weather, st: Settings, warmup_days: int = 30) -> dict:
         vent_rate = (st.ventilation_l_s_m2 if st.ventilation_l_s_m2 is not None else
                      prof.get("ventilation_l_s_m2", VENTILATION_L_S_M2.get(prof.get("schedule", st.schedule), 0.42)))
         vent_ach = vent_rate * Af * 3.6 / V                      # l/s m2 -> air changes per hour
-    # heat recovery returns part of the exhaust heat: the fresh air then costs (1 - efficiency) of its flow
-    base_ach = st.infiltration_ach + np.where(occ > 0, vent_ach * (1.0 - st.heat_recovery), 0.0)
-    if zone.opening_ach is not None:
-        base_ach = base_ach + np.asarray(zone.opening_ach, dtype=float)
-    nv_ach = st.natural_ventilation_ach
-
     occupied = occ > 0
     heat_sp = prof.get("heating_setpoint", st.heating_setpoint)
     cool_sp = prof.get("cooling_setpoint", st.cooling_setpoint)
+    # heat recovery returns part of the exhaust heat: the fresh air then costs (1 - efficiency) of its flow.
+    # Summer bypass: recovery runs while the outdoor air is below the heating set-point + 2 K (heating season)
+    # or above the cooling set-point (recovering coolth); otherwise the fresh air bypasses the exchanger.
+    hr_on = t_out < (heat_sp if heat_sp is not None else 18.0) + 2.0
+    if cool_sp is not None:
+        hr_on |= t_out > cool_sp
+    hr = np.where(hr_on, st.heat_recovery, 0.0)
+    base_ach = st.infiltration_ach + np.where(occ > 0, vent_ach * (1.0 - hr), 0.0)
+    if zone.opening_ach is not None:
+        base_ach = base_ach + np.asarray(zone.opening_ach, dtype=float)
+    nv_ach = st.natural_ventilation_ach
 
     t_air = np.zeros(HOURS)
     t_s = np.zeros(HOURS)
@@ -418,7 +423,9 @@ def summarize(zone: Zone, res: dict, weather, st: Settings) -> dict:
     }
     daily = weather.daily_mean("dry_bulb")
     t_rm = comfort.running_mean_outdoor(daily, 0.8)
-    free_running = st.heating_setpoint is None and st.cooling_setpoint is None
+    prof = zone.profile or {}
+    free_running = (prof.get("heating_setpoint", st.heating_setpoint) is None
+                    and prof.get("cooling_setpoint", st.cooling_setpoint) is None)
     if occ.any():
         a = comfort.adaptive_ashrae55(t_op, t_rm, st.air_speed)
         e = comfort.adaptive_en16798(t_op, t_rm, "II")
