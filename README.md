@@ -333,6 +333,27 @@ spans no real system covers — so geometry that merely solves numerically
 but could not be constructed as drawn is caught too. Details:
 `docs/construction-guidance.md`.
 
+## Environmental analysis: climate, daylight, radiation, thermal comfort
+
+Point any analysis at an EnergyPlus weather file (`.epw`), as you would with ClimateStudio or Ladybug.
+The engine is native: there is no Radiance or EnergyPlus to install, and it is a clean-room
+implementation of the published methods, not a copy of any plugin.
+
+* `climate_summary` / `sun_path`: monthly climate, degree days, wind rose, outdoor comfort,
+  bioclimatic strategy hours, psychrometric bins, sun paths.
+* `analyze_daylight`: annual sDA / ASE (IES LM-83, with dynamic shades), DA, cDA, UDI,
+  EN 17037, daylight factor, point-in-time illuminance, simplified glare (DGPs).
+* `analyze_solar_radiation`: kWh/m² and direct-sun hours on roofs, facades and sites.
+* `analyze_thermal`: ISO 13790 hourly zones with ray-traced solar gains, giving heating/cooling
+  kWh/m², adaptive comfort (ASHRAE 55, EN 16798-1), CIBSE TM52 and PMV.
+* `thermal_comfort`: PMV/PPD, adaptive limits and psychrometrics for one condition.
+
+Each tool takes Rhino geometry (classified by layer names, and every result lists the material
+assignment so you can check it) or a parametric `shoebox` room for studies without Rhino. Results are
+saved with PNG plans and can be drawn in Rhino as coloured meshes (`show_environment_result`).
+Install the `fast` extra for compiled ray casting: `uvx --from "almond-mcp[fast]" almond-mcp`.
+Methods, validation and limits: `docs/environmental-analysis.md`.
+
 ## Materials and cross-application exchange
 
 Almond carries a curated PBR material library (`list_materials`) and stamps

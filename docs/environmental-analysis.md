@@ -1,0 +1,158 @@
+# Environmental analysis (climate, daylight, radiation, thermal comfort)
+
+Almond can analyse a design against a real weather year, the way ClimateStudio, Ladybug Tools or
+DIVA do. It covers climate, sun and shadow, daylight, solar radiation and thermal comfort/energy.
+Everything runs inside the Almond MCP server (numpy, optionally numba), so no Radiance or EnergyPlus
+install is needed. Rhino is only used to export geometry and to draw the coloured results back.
+
+## Clean-room statement
+
+This is **not** a decompilation or copy of ClimateStudio (Solemma), whose binaries and documentation
+are licensed. Nothing from it was disassembled, decompiled or read. What is shared is the set of
+**public methods and standards** that tools like it are built on, implemented here from the published
+papers and standards listed below. The metric definitions (sDA, ASE, UDI, DGP …) are the industry's,
+not any vendor's. Results will differ from ClimateStudio's: different ray tracer, sampling and
+defaults. Compare trends and options, and do not expect identical numbers.
+
+## Tools
+
+| Tool | What it does | Needs Rhino |
+| --- | --- | --- |
+| `climate_summary` | EPW data quality, monthly stats, degree days, design temps, wind rose, outdoor comfort, bioclimatic strategy hours, psychrometric bins | no |
+| `sun_path` | sunrise/noon/sunset, hourly sun positions, sun-path diagram data | no |
+| `analyze_daylight` | `annual` (sDA, ASE, DA, cDA, UDI, EN 17037, DGPs views), `daylight_factor`, `point_in_time` | grid on Rhino floors, or `shoebox` |
+| `analyze_solar_radiation` | kWh/m² and direct-sun hours on any surfaces, any period | Rhino surfaces, or `shoebox` facade |
+| `analyze_thermal` | ISO 13790 hourly zones: heating/cooling kWh/m², peaks, operative temperature, adaptive comfort, TM52, PMV | closed Rhino volumes, or `shoebox` |
+| `thermal_comfort` | PMV/PPD, operative temperature, psychrometrics, adaptive limits for one condition | no |
+| `show_environment_result` | draw a saved run as a coloured mesh + legend on `Almond::Environment::…` | yes |
+| `list_environment_runs`, `get_environment_run` | saved runs (JSON + arrays + PNG plans) | no |
+| `list_environment_materials` | material library, layer-name rules, construction presets | no |
+
+Weather files: any EnergyPlus `.epw` file (for example from climate.onebuilding.org).
+
+### Typical session
+
+1. `climate_summary(epw_path=…)` and `sun_path(epw_path=…, month=12, day=21)` to read the site.
+2. Put floors, walls, ceilings and glazing on named layers (`Glazing`, `Walls`, `Floor` …), cut the
+   openings in the walls, then call `analyze_daylight(epw_path=…, grid_guids=[floor GUIDs])`.
+3. **Read `scene.classification`** in the result. Every object is listed with the material it got
+   and why (layer-name match, user text, transparency, or orientation fallback). Fix layers, or pass
+   `materials={"Building::Feature wall": {"reflectance": 0.3}}`, then run again.
+4. `show_environment_result(run_id, metric="ase_hours")` to see another metric in Rhino.
+5. `analyze_thermal(epw_path=…, zone_guids=[…], free_running=True, natural_ventilation_ach=4)` for
+   passive comfort, or with set-points for loads.
+
+To study without Rhino (quick option testing, teaching), give any analysis tool a `shoebox`, e.g.
+`{"width": 6, "depth": 8, "height": 3, "orientation": 270, "wwr": 0.4, "overhang": 0.8}`.
+
+## Methods
+
+**Weather (epw.py).** Follows the EnergyPlus Auxiliary Programs EPW data dictionary. Missing-value
+sentinels and out-of-range values become gaps. Gaps of up to 6 h are interpolated and longer ones
+take the mean of the same hour in the same month. RH and dew point are derived from each other.
+Night-time irradiance is zeroed, and GHI/DNI/DHI closure is checked. Missing illuminance comes from
+the Perez et al. (1990) luminous efficacy model. 29 February is dropped and sub-hourly files are
+averaged to hourly. Every repair is counted in `data_quality`.
+
+**Sun (solar.py).** NOAA solar position (Meeus 1991), about ±0.01°, with refraction. EPW hours are
+hour-ending, so positions are taken at mid-interval.
+
+**Skies (sky.py).** Tregenza 145 patches and Reinhart subdivisions (577, 2305) plus a ground patch.
+The Perez, Seals & Michalsky (1993) all-weather luminance distribution is normalised so that each
+hour reproduces the file's diffuse horizontal value exactly. Also available: the CIE 1955 overcast
+sky, a uniform sky, and the 15 CIE general standard skies (ISO 15469).
+
+**Daylight (daylight.py).** This is the daylight coefficient method (as in Radiance `rcontrib` /
+five-phase):
+
+* direct sky coefficients: every patch is sampled with stratified shadow rays through clear glazing
+  (Fresnel angular transmittance of a single-pane equivalent, n = 1.52);
+* interreflections: an irradiance-cache radiosity solve. Sensors' eye rays find the surface cells
+  they see, those cells' rays find the next ones (one level per bounce), every cell gets
+  deterministic direct sky coefficients, and E = Dc + F·ρ·E is iterated. Sensors gather from
+  their first hit only, which keeps per-sensor noise low and the sun patch's interreflected light
+  smooth. At medium quality its mean is 2–5 % above a 4,096-path unbiased reference (the cost
+  of the cache's cell discretisation), with 3–5 % median per-sensor noise between runs;
+* the sun is traced exactly each hour, for both direct illuminance and ASE;
+* dynamic shading follows IES LM-83-12. Each aperture group (one per facade orientation) closes a
+  diffusing shade in any hour where more than 2 % of sensors get over 1000 lux of direct sun. The
+  closed state has its own coefficients.
+
+Metrics: sDA300/50 % and ASE1000,250h (LM-83, 08:00–18:00 every day by default), DA, cDA, UDI
+(Nabil & Mardaljevic 2005 bins), EN 17037 daylight provision levels (illuminance method), daylight
+factor (CIE overcast) split into its direct and interreflected parts with the EN 17037 DF targets for
+the site, and simplified DGP (Wienold 2009) for view points. DGPs is reported only for hours
+without direct sun at the eye, where it is valid. The hours with the sun in view are counted
+separately (`sun_in_view_pct`), and DGPs is capped at 1.
+
+**Radiation (radiation.py).** Cumulative Perez solar sky by daylight coefficients plus the sun
+traced every hour. One diffuse bounce is on by default, so light reflected by modelled ground and
+neighbours counts, and `ground_reflectance` applies to modelled ground as well as the ground beyond
+the model. With `bounces=0` only direct sky and sun count. Direct-sun hours use the WMO
+bright-sunshine threshold (DNI ≥ 120 W/m²). The climate summary calls the same count
+`bright_sun_hours`: in typical-year files with modelled radiation it can far exceed measured
+sunshine.
+
+**Thermal (thermal.py).** ISO 13790:2008 simple hourly method (5R1C, Annex C), with Crank–Nicolson
+steps, the standard's 10 W/m² test for exact heating/cooling need, Table 12 thermal-mass classes,
+and the sky-radiation and opaque solar terms. Solar gains are ray traced on the real windows and
+walls with the context (no transposition model). Fresh air is set per floor area by schedule
+(indicative EN 16798-1 Category II: office 1.4, school 4.0, homes 0.42 l/s·m²), so a double-height
+room is not ventilated twice as hard; infiltration defaults to 0.3 air changes per hour. Natural
+ventilation opens when it is warm inside and cooler outside. Ground floors see the EPW ground
+temperatures. Zones that are not rooms (a wall, a slab, under 2 m² of floor) are rejected.
+
+**Comfort (comfort.py).** PMV/PPD per ISO 7730:2005 Annex D. Adaptive comfort per ASHRAE 55-2020
+§5.4 (including the elevated air speed allowance) and EN 16798-1:2019 Annex B (running mean α 0.8).
+Overheating per CIBSE TM52 (three criteria). Psychrometrics use the ASHRAE Fundamentals
+(Hyland–Wexler) equations.
+
+## Validation (tests/test_environment.py)
+
+| Check | Reference | Result |
+| --- | --- | --- |
+| Unobstructed sensor, uniform and CIE skies | E = E_h exactly | ±1 % |
+| Sensor under a square skylight in an opaque plane | analytic view factor (parallel rectangle) | ±3 % |
+| Downward sensor over an infinite ρ = 0.5 plane | E = ρ E_h | ±1.5 % |
+| Sun through horizontal glass | cos θ · τ(θ) | 1e-4 |
+| Shoebox interreflected DF | BRE split-flux formula | same range (0.7 % vs ≈ 0.7 %) |
+| Interreflection cache solve | unbiased path tracer, 2,048–4,096 paths/sensor | +2 to +5 % mean, medium quality |
+| Open horizontal sensor, annual | Σ GHI of the file | ±3 % |
+| Sky matrix | reproduces the file's DHI each hour | 1e-9 |
+| PMV, 8 cases | ISO 7730 algorithm (pythermalcomfort) | ±0.01 |
+| Adaptive EN 16798 / ASHRAE 55 | standard formulas | exact |
+| 5R1C steady state | conductance network by hand | 1e-4 |
+| BVH ray casting | brute force | identical hits |
+
+## Limits (read before trusting a number)
+
+* Materials drive results as much as geometry does, so the result always lists the classification.
+  Defaults follow LM-83 (ceiling 70 %, walls 50 %, floor 20 %, ground 20 %).
+* Glazing transmits specularly and does not reflect. Shades are ideal diffusers. There are no
+  BSDFs, no complex fenestration and no specular materials.
+* Windows drawn over uncut walls let no light in. This is detected and reported.
+* DGPs is not valid with the sun in view. Those hours are counted separately, so treat them as
+  glare. Use DGPs to compare options, not to certify glare.
+* Grid surfaces can be single surfaces or solids. A work-plane grid uses only horizontal faces, and
+  keeps the upper of two stacked faces. Radiation grids drop faces that see no sky from either side
+  (the underside or inner face of a solid). A floor or roof solid's underside is classified as
+  ceiling.
+* Name rules read layer, object and render-material names. Window frame parts (mullion, transom,
+  sill, frame …) are frames, not glass, and "roof slab" is a roof.
+* The thermal model is a single-zone RC network: interzone heat flow is adiabatic, there is no
+  moisture balance, and the schedules are presets. It is good for comparing options and for
+  overheating risk. For compliance, use EnergyPlus.
+* Speed: install the `fast` extra (`uvx --from "almond-mcp[fast]" almond-mcp`) for compiled ray
+  casting, about 100× faster. Without it the numpy path gives the same results, only slower.
+  An annual study on a real model can take longer than an MCP client waits. Pass `background=True`
+  to `analyze_daylight`, `analyze_solar_radiation` or `analyze_thermal`: you get a `job_id` at once,
+  and `get_environment_run(job_id)` reports progress, then returns the result.
+
+## References
+
+Perez R. et al. (1990) Solar Energy 44(5) 271–289 · Perez R., Seals R., Michalsky J. (1993) Solar
+Energy 50(3) 235–245 · Tregenza P. (1987) Lighting Res. Technol. 19(1) · Reinhart C. (2011)
+Daysim / Radiance MF subdivision · IES LM-83-12 · EN 17037:2018 · ISO 15469:2004 · ISO 7730:2005 ·
+ASHRAE 55-2020 · EN 16798-1:2019 · ISO 13790:2008 · CIBSE TM52 (2013) · Nabil & Mardaljevic (2005)
+Lighting Res. Technol. 37(1) · Wienold J. (2009) Building Simulation 2009 · Meeus J. (1991)
+Astronomical Algorithms · Givoni B. (1992) Energy and Buildings 18(1).

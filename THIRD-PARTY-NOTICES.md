@@ -118,6 +118,15 @@ Dense mesh drafting also uses Pillow (MIT-CMU) and ContourPy (BSD-3-Clause),
 installed with their own licence notices, to convert bounded projection masks
 into explicit vector contours.
 
+## Environmental analysis
+
+The environmental engine (`almond_mcp/environment`) is original code implementing published methods
+and standards (Perez sky and luminous-efficacy models, NOAA solar position, ISO 7730, ISO 13790,
+ASHRAE 55, EN 16798-1, IES LM-83, EN 17037, CIBSE TM52). No ClimateStudio, Radiance, DAYSIM or
+EnergyPlus code or binaries are included or required. The optional `fast` extra installs numba
+(BSD-2-Clause) and llvmlite (BSD-2-Clause) from PyPI; they are not vendored. The false-colour ramps
+are sampled stops of matplotlib's viridis / magma colour maps, whose data is CC0.
+
 ## Browser model viewer
 
 The local Object Archive vendors `@google/model-viewer` 4.3.1 from the official
