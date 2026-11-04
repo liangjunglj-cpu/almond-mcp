@@ -250,6 +250,12 @@ stdout). Its export and draw scripts are the MCP tools' own, so the two always a
   ceiling.
 * Name rules read layer, object and render-material names. Window frame parts (mullion, transom,
   sill, frame …) are frames, not glass, and "roof slab" is a roof.
+* "Glass" in a name or render material does not make every object a window. Curtains, drapes,
+  blinds and sheers are textiles: they are opaque `shading` (ρ 0.5), and only a curtain *wall* is
+  glazing. Glass inside the room is not glazing either. Glassware (tumbler, carafe) and shower
+  screens are ignored, since they are small and clear. Mirrors, oven doors, laptops and TVs are
+  opaque `furniture`. Any other object can be set with an `almond:env_material` user text, a
+  `materials` override or a construction.
 * The thermal model is a single-zone RC network: interzone heat flow is adiabatic, there is no
   moisture balance, and the schedules are presets. It is good for comparing options and for
   overheating risk. For compliance, use EnergyPlus.
