@@ -104,3 +104,22 @@ export function bowText(bi) {
   return applied.length + ' member ' + (applied.length === 1 ? 'axis' : 'axes') + ' on ' + members + ' member' +
     (members === 1 ? '' : 's') + ' (e0 ' + amps + ')' + (skipped.length ? '; skipped ' + skipped.join('; ') : '');
 }
+
+// Lateral-torsional buckling cell, EN 1993-1-1 6.3.2: M_Ed / M_b,Rd over the member's segment between lateral
+// restraints. No value: hollow sections (not susceptible) or lateral_restraint "continuous".
+export function ltbCell(row) {
+  const u = row?.ltb_utilization;
+  if (!finite(u)) return {text: '—', state: 'dim', title: 'No LTB check: not an I-section, or the compression flange is held (lateral_restraint "continuous").'};
+  const parts = [];
+  if (finite(row.m_cr_knm)) parts.push('M_cr ' + row.m_cr_knm.toFixed(1) + ' kNm');
+  if (finite(row.lambda_lt)) parts.push('λ̄_LT ' + row.lambda_lt.toFixed(3));
+  if (finite(row.chi_lt)) parts.push('χ_LT ' + row.chi_lt.toFixed(3) + (row.ltb_curve ? ' (curve ' + row.ltb_curve + ')' : ''));
+  if (finite(row.ltb_length_m)) parts.push('segment ' + row.ltb_length_m.toFixed(2) + ' m' + (row.ltb_ends ? ', ' + row.ltb_ends.join(' / ') : ''));
+  if (finite(row.cm_lt)) parts.push('C_mLT ' + row.cm_lt.toFixed(2));
+  return {text: (u * 100).toFixed(1) + '%', state: utilState(u), title: 'M_Ed / M_b,Rd (6.3.2). ' + parts.join(' · ')};
+}
+
+export function restraintText(mode) {
+  return mode === 'continuous' ? 'compression flange held (no LTB check)'
+    : mode === 'joints' ? 'I-section beams free between joints (LTB checked)' : null;
+}

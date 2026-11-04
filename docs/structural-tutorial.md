@@ -135,7 +135,7 @@ Click **Open full results ↗**, or type `AlmondResults`. The **Almond Results**
 
 | Tab | What it lists |
 |---|---|
-| Members | Every member's role, section, Class (EN 1993 Table 5.2), length and utilization, with the check and combination that govern. Also its forces (N, V, M, T), shear utilization V/V_pl,Rd ("· web" marks a web too slender for these checks), stress, slenderness λ̄ and χ, buckling length, the 6.61/6.62 terms, its own sag and L/δ, and its end releases. |
+| Members | Every member's role, section, Class (EN 1993 Table 5.2), length and utilization, with the check and combination that govern. Also its forces (N, V, M, T), shear utilization V/V_pl,Rd ("· web" marks a web too slender for these checks), lateral-torsional buckling M/M_b,Rd with M_cr and χ_LT (I-sections; hover for the segment working), stress, slenderness λ̄ and χ, buckling length, the 6.61/6.62 terms, its own sag and L/δ, and its end releases. |
 | Supports | The reactions at each support (Fx, Fy, Fz, Mx, My, Mz) for the combination you pick, with totals. |
 | Combinations | Each combination's factors, largest deflection and utilization, and the stability details: αcr, sway imperfection φ per direction with its column count m, local bow imperfections (applied, or why not), P-Δ iterations. |
 | Loads | The settings used, the floor bays (and how many span one way, over 2:1), and every placed model counted as a load. |

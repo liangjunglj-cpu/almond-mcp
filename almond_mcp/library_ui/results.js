@@ -1,4 +1,4 @@
-import {finite, fmt, utilState, memberRows, filterRows, sortRows, counts, ends, shearCell, swayText, bowText} from './results-view.mjs';
+import {finite, fmt, utilState, memberRows, filterRows, sortRows, counts, ends, shearCell, swayText, bowText, ltbCell, restraintText} from './results-view.mjs';
 import {engineLabel, stabilityState} from './analysis-view.mjs';
 
 const el = id => document.getElementById(id);
@@ -55,6 +55,9 @@ const MEMBER_COLS = [
   {key: 'n_compression_kn', label: 'N⁻', unit: 'kN'},
   {key: 'v_max_kn', label: 'V', unit: 'kN'},
   {key: 'shear_utilization', label: 'Shear', unit: 'V/Vpl,Rd'},
+  {key: 'ltb_utilization', label: 'LTB', unit: 'M/Mb,Rd'},
+  {key: 'm_cr_knm', label: 'M_cr', unit: 'kNm'},
+  {key: 'chi_lt', label: 'χ_LT', unit: '6.3.2'},
   {key: 'm_max_knm', label: 'M', unit: 'kNm'},
   {key: 't_max_knm', label: 'T', unit: 'kNm'},
   {key: 'max_stress_mpa', label: 'σ', unit: 'MPa'},
@@ -65,11 +68,13 @@ const MEMBER_COLS = [
   {key: 'max_displacement_mm', label: 'Moves', unit: 'mm SLS'},
   {key: 'pinned', label: 'Ends', left: true},
 ];
-function shear(r) {
-  const s = shearCell(r), c = td(s.text, s.state === 'ok' || s.state === 'dim' ? '' : s.state);
+function stateCell(s) {
+  const c = td(s.text, s.state === 'ok' || s.state === 'dim' ? '' : s.state);
   c.title = s.title;
   return c;
 }
+const shear = r => stateCell(shearCell(r));
+const ltb = r => stateCell(ltbCell(r));
 function renderMembers() {
   const table = el('members');
   head(table, MEMBER_COLS, true);
@@ -87,7 +92,7 @@ function renderMembers() {
     tr.append(name, td(r.role || '—', 'l'), td(r.section || '—', 'l'),
       td(r.section_class ? String(r.section_class) : '—', r.section_class === 4 ? 'fail' : ''), td(fmt(r.length_m, 2)), u,
       td(r.governing_check || '—', 'l'), td(r.governing_combination || '—', 'l'),
-      td(fmt(r.n_tension_kn, 1)), td(fmt(r.n_compression_kn, 1)), td(fmt(r.v_max_kn, 1)), shear(r), td(fmt(r.m_max_knm, 2)),
+      td(fmt(r.n_tension_kn, 1)), td(fmt(r.n_compression_kn, 1)), td(fmt(r.v_max_kn, 1)), shear(r), ltb(r), td(fmt(r.m_cr_knm, 1)), td(fmt(r.chi_lt, 2)), td(fmt(r.m_max_knm, 2)),
       td(fmt(r.t_max_knm, 2)), td(fmt(r.max_stress_mpa, 1)), td(fmt(r.slenderness, 2)), td(fmt(r.chi, 2)),
       td(fmt(r.deflection_mm, 1)), td(finite(r.deflection_ratio) ? 'L/' + r.deflection_ratio : '—'),
       td(fmt(r.max_displacement_mm, 1)), td(ends(r.pinned_ends), 'l'));
@@ -176,6 +181,7 @@ function renderLoads() {
     ['Placed models as loads', s.asset_loads ? 'yes' : 'no'], ['Self-weight', s.self_weight ? 'included' : 'excluded'],
     ['Supports', (s.fixed_rotations ? 'fixed' : 'pinned') + (s.explicit_supports ? ', selected points only' : '')],
     ['Connections', s.connections], ['Stability', s.stability],
+    ['Lateral restraint', restraintText(r.results?.lateral_restraint ?? s.lateral_restraint)],
     ['Section override', finite(s.diameter_mm) ? 'CHS ' + s.diameter_mm + ' × ' + s.wall_mm + ' mm' : 'inferred sections'],
     ['Deflection limit', finite(r.results?.deflection_limit_mm) ? fmt(r.results.deflection_limit_mm, 2) + ' mm over ' +
       r.results.span_m + ' m (' + r.results.span_basis + ')' : null],

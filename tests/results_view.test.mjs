@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import {fmt, utilState, memberRows, filterRows, sortRows, counts, ends, shearCell, swayText, bowText} from '../almond_mcp/library_ui/results-view.mjs';
+import {fmt, utilState, memberRows, filterRows, sortRows, counts, ends, shearCell, swayText, bowText, ltbCell, restraintText} from '../almond_mcp/library_ui/results-view.mjs';
 
 const native = {result: {members: [
   {id: 'M10', role: 'beam', section: 'CHS 219.1x8', layer: 'A07 / Structure', utilization: 0.86, source_guids: ['a']},
@@ -70,4 +70,19 @@ test('members outside the checks count as failing whatever their ratio', () => {
   assert.deepEqual(filterRows(rows, 'fail').map(r => r.id), ['W', 'C4']);
   assert.deepEqual(filterRows(rows, 'warn').map(r => r.id), ['OK']);
   assert.deepEqual([counts(rows).fail, counts(rows).warn], [2, 1]);
+});
+test('LTB cell: M/Mb,Rd with the segment working in the tooltip, dash when not checked', () => {
+  const row = {ltb_utilization: 1.4419, m_cr_knm: 79.944, lambda_lt: 1.252, chi_lt: 0.498, ltb_curve: 'a',
+    ltb_length_m: 6, ltb_ends: ['fork', 'fork'], cm_lt: 1};
+  const c = ltbCell(row);
+  assert.deepEqual([c.text, c.state], ['144.2%', 'fail']);
+  assert.equal(c.title, 'M_Ed / M_b,Rd (6.3.2). M_cr 79.9 kNm · λ̄_LT 1.252 · χ_LT 0.498 (curve a) · segment 6.00 m, fork / fork · C_mLT 1.00');
+  assert.equal(ltbCell({ltb_utilization: 0.5}).state, 'ok');
+  assert.deepEqual([ltbCell({}).text, ltbCell({}).state], ['—', 'dim']);
+  assert.match(ltbCell({ltb_utilization: null}).title, /lateral_restraint/);
+});
+test('lateral restraint mode in the settings', () => {
+  assert.match(restraintText('joints'), /LTB checked/);
+  assert.match(restraintText('continuous'), /no LTB check/);
+  assert.equal(restraintText(undefined), null);
 });
