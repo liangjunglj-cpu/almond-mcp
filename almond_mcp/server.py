@@ -63,7 +63,10 @@ mcp = FastMCP("Almond", instructions=(
     "analyze_daylight (annual sDA/ASE/UDI, daylight factor, point-in-time, glare), "
     "analyze_solar_radiation, analyze_thermal (energy and comfort) and thermal_comfort; each accepts "
     "a shoebox room to study without Rhino. Check the returned material classification before "
-    "trusting numbers, and show_environment_result to draw a saved run in Rhino."
+    "trusting numbers, and show_environment_result to draw a saved run in Rhino. For coursework-style "
+    "studies: shadow_study (shadow plans at dates and times), compare_thermal_cases and "
+    "compare_daylight_cases (design cases side by side, with CSVs and report charts), comfort_setpoints "
+    "(set-points from PMV), en17037_view_out and en17037_sunlight."
 ))
 
 # ── Library Indexer ──────────────────────────────────────────────────────────

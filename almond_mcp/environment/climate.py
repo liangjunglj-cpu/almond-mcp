@@ -108,6 +108,110 @@ def psychrometric_bins(w, t_step: float = 1.0, w_step_g: float = 1.0) -> dict:
             "columns": ["dry_bulb_c (bin start)", "humidity_ratio_g_kg (bin start)", "hours"]}
 
 
+def _date(doy: int) -> str:
+    """0-based day of the year -> 'Mar 20' (no leap day)."""
+    from .epw import MONTH_START
+    m = int(np.searchsorted(MONTH_START, doy, side="right"))
+    return f"{MONTH_NAMES[m - 1]} {doy - int(MONTH_START[m - 1]) + 1}"
+
+
+def _period_days(start: str, end: str) -> int | None:
+    """Length in days of an EPW 'm/d' to 'm/d' period, inclusive, also across the year end."""
+    from .epw import MONTH_START
+    try:
+        (m0, d0), (m1, d1) = ((int(x) for x in s.strip().split("/")) for s in (start, end))
+    except ValueError:
+        return None
+    a, b = int(MONTH_START[m0 - 1]) + d0 - 1, int(MONTH_START[m1 - 1]) + d1 - 1
+    return (b - a) % 365 + 1
+
+
+def extreme_weeks(w) -> dict:
+    """The warmest and coldest 7-day periods of the year, by mean dry-bulb temperature computed from the
+    hourly data, and in each the hottest / coldest day by the hourly outdoor extreme. Also the file's own
+    TYPICAL/EXTREME PERIODS header, with each period's real length (the header's 'week' can cross the
+    year end or be longer than 7 days)."""
+    days = w["dry_bulb"].reshape(365, 24)
+    daily = days.mean(axis=1)
+    roll = np.convolve(daily, np.ones(7) / 7, mode="valid")          # start days 0..358, no wrap
+    out = {}
+    for key, k, pick, day_pick in (("warmest_week", int(np.argmax(roll)), "max", np.argmax),
+                                   ("coldest_week", int(np.argmin(roll)), "min", np.argmin)):
+        span = days[k:k + 7]
+        extreme = getattr(span, pick)(axis=1)
+        dk = k + int(day_pick(extreme))
+        out[key] = {"start": _date(k), "end": _date(k + 6), "start_day_of_year": k + 1,
+                    "mean_dry_bulb_c": round(float(roll[k]), 1),
+                    ("hottest_day" if pick == "max" else "coldest_day"): {
+                        "date": _date(dk), "day_of_year": dk + 1,
+                        ("max_dry_bulb_c" if pick == "max" else "min_dry_bulb_c"): round(float(getattr(days[dk], pick)()), 1),
+                        "hour_ending": int(day_pick(days[dk])) + 1}}
+    periods = []
+    for p in getattr(w, "typical_periods", []) or []:
+        n = _period_days(p.get("start", ""), p.get("end", ""))
+        row = dict(p, days=n)
+        if n is not None and "week" in p.get("name", "").lower() and n != 7:
+            row["note"] = f"called a week in the file, but spans {n} days"
+        periods.append(row)
+    out["file_periods"] = periods
+    out["method"] = ("7-day running mean of the daily mean dry-bulb (days from 1 Jan, not wrapping the year end); "
+                     "the hottest / coldest day is the day in that week with the highest / lowest hourly outdoor "
+                     "dry-bulb. EPW hours are hour-ending: hour 13 is 12:00-13:00 local standard time.")
+    return out
+
+
+DIURNAL_VARIABLES = (("dry_bulb", "Dry-bulb", "C"), ("wet_bulb", "Wet-bulb", "C"), ("ghi", "Global horizontal", "W/m2"),
+                     ("dhi", "Diffuse horizontal", "W/m2"), ("dni", "Direct normal", "W/m2"))
+
+
+def diurnal_averages(w) -> dict:
+    """Monthly diurnal averages: for each month the mean of each hour of the day, for dry-bulb and wet-bulb
+    temperature and global horizontal, diffuse horizontal and direct normal irradiance."""
+    wb = comfort.wet_bulb(w["dry_bulb"], w["rel_humidity"], w["pressure"])
+    data = {"dry_bulb": w["dry_bulb"], "wet_bulb": wb, "ghi": w["ghi"], "dhi": w["dhi"], "dni": w["dni"]}
+    hod = w.hour_of_day
+    months = []
+    for m in range(1, 13):
+        sel = w.month == m
+        row = {"month": MONTH_NAMES[m - 1]}
+        for key, _, _ in DIURNAL_VARIABLES:
+            v, h = data[key][sel], hod[sel]
+            row[key] = [round(float(v[h == k].mean()), 1) for k in range(24)]
+        months.append(row)
+    return {"months": months, "hours": "index 0..23 = hour ending 01:00..24:00 local standard time (EPW convention)",
+            "units": {k: u for k, _, u in DIURNAL_VARIABLES}}
+
+
+def diurnal_chart(w, title: str = ""):
+    """The monthly diurnal averages as one chart: 12 months side by side, 24 hours each, temperatures on
+    the left axis and irradiance on the right."""
+    from . import charts
+    from .diagrams import AMBER, GREEN, INK, MUTED, PANEL, RED, Canvas
+    d = diurnal_averages(w)
+    c = Canvas(980, 420, background=charts.PAPER)
+    c.text(16, 22, title or f"Monthly diurnal averages - {w.location.label()}", 12, INK, weight="bold")
+    temps = np.array([m[k] for m in d["months"] for k in ("dry_bulb", "wet_bulb")]).ravel()
+    rad = np.array([m[k] for m in d["months"] for k in ("ghi", "dhi", "dni")]).ravel()
+    f = charts.Frame(c, 50, 52, 880, 300, float(temps.min()) - 1, float(temps.max()) + 1, "Temperature C",
+                     y2=(0.0, max(float(rad.max()), 100.0), "Irradiance W/m2"))
+    seg = f.w / 12
+    styles = {"dry_bulb": (INK, 1.6, None), "wet_bulb": (GREEN, 1.2, None), "ghi": (AMBER, 1.2, None),
+              "dhi": (MUTED, 1.0, "4 2"), "dni": (RED, 1.2, None)}
+    for i, m in enumerate(d["months"]):
+        x0 = f.x0 + i * seg
+        if i % 2:
+            c.rect(x0, f.y0, seg, f.h, fill=PANEL, stroke=None)
+        c.text(x0 + seg / 2, f.y0 + f.h + 15, m["month"], 9, INK, anchor="middle")
+    for i, m in enumerate(d["months"]):
+        x0 = f.x0 + i * seg
+        for key, (col, wid, dash) in styles.items():
+            y = f.y if key in ("dry_bulb", "wet_bulb") else f.yb
+            c.line([(x0 + seg * (h + 0.5) / 24, y(v)) for h, v in enumerate(m[key])], col, wid, dash)
+    charts.legend(c, 50, 396, [(label, styles[k][0], styles[k][2]) for k, label, _ in DIURNAL_VARIABLES], per_row=5, step=170)
+    c.text(964, 22, "HOUR-ENDING, LOCAL STANDARD TIME", 8, MUTED, mono=True, anchor="end")
+    return c
+
+
 def summarize(w, hdd_base: float = 18.0, cdd_base: float = 18.0, thresholds: dict | None = None) -> dict:
     t = w["dry_bulb"]
     days_t = t.reshape(365, 24)
@@ -165,6 +269,7 @@ def summarize(w, hdd_base: float = 18.0, cdd_base: float = 18.0, thresholds: dic
             "ground_temperatures": w.ground_temperatures[:3],
         },
         "monthly": months,
+        "extreme_weeks": extreme_weeks(w),
         "wind_rose": wind_rose(w),
         "strategies": strategy_hours(w, thresholds),
         "notes": ["Design temperatures here are percentiles of this file's hours; ASHRAE's published values "
