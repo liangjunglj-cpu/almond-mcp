@@ -36,7 +36,7 @@ export function stabilityState(result, native) {
   if (!finite(st.min_alpha_cr)) return {value: 'No compression', basis: 'Nothing is in compression: there is no buckling mode.'};
   return {value: 'αcr = ' + st.min_alpha_cr.toFixed(2), basis: st.min_alpha_cr >= 10 ?
     'At least 10: first-order analysis is adequate (sway imperfections included).' :
-    'Below 10: second-order (P-Δ) analysis with sway imperfections was used for the member checks.'};
+    'Below 10: second-order (P-Δ) analysis with sway and local bow imperfections was used for the member checks.'};
 }
 export function utilizationFor(guids, entries) {
   const matches = (entries || []).filter(e => (e.source_guids || []).some(g => guids.includes(g)) && finite(e.utilization));

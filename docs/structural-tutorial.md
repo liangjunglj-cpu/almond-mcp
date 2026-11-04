@@ -135,14 +135,14 @@ Click **Open full results ↗**, or type `AlmondResults`. The **Almond Results**
 
 | Tab | What it lists |
 |---|---|
-| Members | Every member's role, section, Class (EN 1993 Table 5.2), length and utilization, with the check and combination that govern. Also its forces (N, V, M, T), stress, slenderness λ̄ and χ, buckling length, the 6.61/6.62 terms, its own sag and L/δ, and its end releases. |
+| Members | Every member's role, section, Class (EN 1993 Table 5.2), length and utilization, with the check and combination that govern. Also its forces (N, V, M, T), shear utilization V/V_pl,Rd ("· web" marks a web too slender for these checks), lateral-torsional buckling M/M_b,Rd with M_cr and χ_LT (I-sections; hover for the segment working), stress, slenderness λ̄ and χ, buckling length, the 6.61/6.62 terms, its own sag and L/δ, and its end releases. |
 | Supports | The reactions at each support (Fx, Fy, Fz, Mx, My, Mz) for the combination you pick, with totals. |
-| Combinations | Each combination's factors, largest deflection and utilization, and the stability details: αcr, sway imperfection, P-Δ iterations. |
-| Loads | The settings used, the floor bays, and every placed model counted as a load. |
+| Combinations | Each combination's factors, largest deflection and utilization, and the stability details: αcr, sway imperfection φ per direction with its column count m, local bow imperfections (applied, or why not), P-Δ iterations. |
+| Loads | The settings used, the floor bays (and how many span one way, over 2:1), and every placed model counted as a load. |
 | Notes | The verdict, suggestions, warnings and assumptions. |
 
 - **Sort** by clicking a column heading. The table opens with the hardest-working member first.
-- **Filter** with the chips (*Over 100%*, *80–100%*, *Columns*, *Beams*, *Braces*) or type a member name, section or layer.
+- **Filter** with the chips (*Failing*: over 100% or outside the checks, *80–100%*, *Columns*, *Beams*, *Braces*) or type a member name, section or layer.
 - **Click a row** to select that member in Rhino.
 - **Save CSV** writes the member table for a spreadsheet or calculation report.
 
