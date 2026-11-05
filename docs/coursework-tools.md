@@ -48,11 +48,24 @@ the exercises.
 | Hourly data for the spreadsheet | Study → Write hourly CSV per room; Results → Open run folder |
 | Design cases side by side (ID0–ID6) | Results → Keep as case, then Compare |
 | EN 17037 view out and sunlight | Study → View out / Sunlight on windows |
+| Lighting with 300 lx stepped dimming | Study → Thermal → Lighting control (dim continuously, in steps, or switch off) |
+
+### Daylight-linked lighting, checked
+
+The course's lighting runs "300 lx stepped dimming". Almond now models it: `lighting_control` traces the
+daylight at control points over each floor and dims, steps or switches the lights to top up to the target.
+
+**South-facing office shoebox, Zurich:**
+- Lighting falls from 21.2 to 6.7–10.3 kWh/m² at 20 % glazing (on/off to continuous) and to 3.1–3.8 kWh/m²
+  at 70 %.
+- Heating rises a little and cooling falls, because the lights give off less heat.
+
+**The Atelier's rooms, residential schedule, stepped:**
+- Building lighting falls from 6.9 to 5.2 kWh/m². Most lit hours are evenings, so the saving is
+  modest; the windowless bathroom saves almost nothing.
 
 ## Not done yet
 
-- **Daylight-linked lighting.** Lighting energy follows the schedule and power density. Dimming to a lux
-  target (the course's 300 lx stepped dimming) is not modelled.
 - **Air walls and doors between zones.** Internal openings are treated as adiabatic.
 - **Glazing classification by name.** The name rule meant for "curtain wall" also catches interior
   textiles and glass objects (curtains, tumblers, an oven door), which are then treated as clear glazing

@@ -126,6 +126,7 @@ function settings(){
     heating_setpoint:num('env-heat'),cooling_setpoint:num('env-cool'),heating_setback:num('env-heat-back'),cooling_setback:num('env-cool-back'),
     heating_months:season('env-m-heat'),cooling_months:season('env-m-cool'),ventilation_months:season('env-m-vent'),
     natural_ventilation_months:season('env-m-nv'),comfort_months:season('env-m-comfort'),export_csv:el('env-csv').checked,
+    lighting_control:el('env-light-mode').value||null,lighting_target_lux:num('env-light-lux')??300,lighting_steps:Math.round(num('env-light-steps')??3),
     balance_room:el('env-chart-room').value||''};
   const study=el('env-study').value;
   if(study==='view_out')Object.assign(s,{view_height_m:Number(el('env-view-h').value)||1.2,spacing_m:Number(el('env-view-spacing').value)||0.6});
@@ -170,6 +171,7 @@ el('env-pack').addEventListener('change',fillPackOptions);
 el('env-study').addEventListener('change',studyControls);
 el('env-daylight').addEventListener('change',checklist);
 el('env-blinds').addEventListener('change',toggles);
+el('env-light-mode').addEventListener('change',()=>{el('env-light-steps-row').hidden=el('env-light-mode').value!=='stepped';});
 el('env-chart-room').addEventListener('change',()=>{
   if(state.result?.study==='rooms_thermal')request('charts',{run_id:state.result.run_id,room:el('env-chart-room').value});
 });
@@ -204,10 +206,11 @@ function resultRows(res){
     rows:res.windows.map(w=>[w.window,w.sun_hours+' h',w.level].concat(res.range?[`${res.range.best_day_hours[w.window]} h`]:[]))};
   if(res.study==='rooms_daylight')return {head:['Room','sDA','ASE','DF'],
     rows:res.rooms.map(r=>[r.room,r.sda_pct!=null?r.sda_pct+' %':'—',r.ase_pct!=null?r.ase_pct+' %':'—',r.average_df_pct!=null?r.average_df_pct+' %':'—'])};
-  return {head:['Room','Method','Heating','Cooling','h > 26 °C','Adaptive II','Comfort'],rows:(res.rooms||[]).map(r=>{
-    if(r.method==='semi_outdoor')return [r.room,'Open · semi-outdoor','—','—','—','—',`SET* ${r.comfort.set_c.mean_occupied} °C · ${r.comfort.hours_set_above[Object.keys(r.comfort.hours_set_above)[0]]} h hot`];
-    const th=r.thermal,ad=th.adaptive_en16798_hours?.II;
-    return [r.room,r.method,th.heating_kwh_m2+' kWh/m²',th.cooling_kwh_m2+' kWh/m²',String(th.hours_above_26c_occupied),
+  return {head:['Room','Method','Heating','Cooling','Lighting','h > 26 °C','Adaptive II','Comfort'],rows:(res.rooms||[]).map(r=>{
+    if(r.method==='semi_outdoor')return [r.room,'Open · semi-outdoor','—','—','—','—','—',`SET* ${r.comfort.set_c.mean_occupied} °C · ${r.comfort.hours_set_above[Object.keys(r.comfort.hours_set_above)[0]]} h hot`];
+    const th=r.thermal,ad=th.adaptive_en16798_hours?.II,lc=th.lighting_control;
+    return [r.room,r.method,th.heating_kwh_m2+' kWh/m²',th.cooling_kwh_m2+' kWh/m²',
+      th.lighting_kwh_m2!=null?th.lighting_kwh_m2+' kWh/m²'+(lc?` · −${lc.saving_pct} %`:''):'—',String(th.hours_above_26c_occupied),
       ad?`${ad.too_warm_h} h warm · ${ad.too_cool_h} h cool`:'—',
       th.tm52?(th.tm52.pass?'TM52 pass':'TM52 fail'):(th.adaptive_ashrae55?th.adaptive_ashrae55.comfortable_80_pct+' % comfortable':'')];
   })};

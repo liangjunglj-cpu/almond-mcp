@@ -73,6 +73,9 @@ def test_panel_thermal_settings_reach_the_rooms(temperate):
     assert ch["room"] == "Bed" and "Living" in ch["rooms"]
     for key in ("warmest_week", "coldest_week", "balance_hottest_day", "balance_coldest_day"):
         _svg(ch[key])
+    lit = _run(temperate.source_path, "thermal", lighting_control="stepped", lighting_target_lux=300, lighting_steps=3)
+    assert "LIGHTING SAVED" in lit["tiles_svg"]
+    assert all(r["thermal"]["lighting_control"]["mode"] == "stepped" for r in lit["result"]["rooms"] if r.get("thermal"))
     assert brief["csv_dir"] and any(r["thermal"].get("hourly_csv") for r in brief["result"]["rooms"] if r.get("thermal"))
     # another room's charts from the saved run, without simulating again
     again = _panel({"action": "charts", "run_id": brief["result"]["run_id"], "epw_path": temperate.source_path, "room": "Living"})

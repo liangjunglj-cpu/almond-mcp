@@ -651,6 +651,8 @@ def register(mcp, send: Sender) -> dict:
                         ventilation_months: list[int] | None = None, natural_ventilation_months: list[int] | None = None,
                         natural_ventilation_min_outdoor_c: float = 12.0, shading_on_above_w_m2: float = 300.0,
                         custom_schedule: dict | None = None, comfort_months: list[int] | None = None,
+                        lighting_control: str = "", lighting_target_lux: float = 300.0,
+                        lighting_steps: int = 3, lighting_min_power: float = 0.1,
                         export_csv: bool = False,
                         north_deg: float | None = None, label: str = "", background: bool = False) -> dict:
         """Hourly thermal simulation of zones for a year (ISO 13790 5R1C, one node set per zone) with
@@ -680,7 +682,12 @@ def register(mcp, send: Sender) -> dict:
         window that lowers the shade (e.g. 150). custom_schedule = your own day profiles,
         {"occupancy": {"weekday": [24 fractions], "weekend": [24]}, "lighting": {...}, "equipment": {...}}.
         comfort_months = the season for the adaptive EN 16798-1 hour counts (adaptive_en16798_hours: too warm /
-        too cool / comfortable occupied hours per category I-III). Every zone reports its hourly energy balance
+        too cool / comfortable occupied hours per category I-III). lighting_control = continuous | stepped |
+        on_off dims or switches the lights to top up the daylight on the work plane to lighting_target_lux
+        (e.g. 300; stepped in lighting_steps equal steps; continuous down to lighting_min_power), from the
+        daylight traced at control points on a 1 m grid over each floor - shoebox zones here, rooms through
+        analyze_rooms(thermal_settings={"lighting_control": ...}); the lighting saving and the hours daylight
+        alone meets the target are reported per zone. Every zone reports its hourly energy balance
         as annual gains / losses per term (energy_balance_kwh_m2) and lighting / equipment energy;
         export_csv=True also writes each zone's hourly results and balance to a CSV in the run folder.
         background=True starts the study and returns a job_id at once - use it for annual studies on real models,
@@ -709,7 +716,9 @@ def register(mcp, send: Sender) -> dict:
                                   ventilation_months=ventilation_months, natural_ventilation_months=natural_ventilation_months,
                                   natural_ventilation_min_outdoor=natural_ventilation_min_outdoor_c,
                                   shading_on_above_w_m2=shading_on_above_w_m2, custom_schedule=custom_schedule,
-                                  comfort_months=comfort_months)
+                                  comfort_months=comfort_months, lighting_control=lighting_control or None,
+                                  lighting_target_lux=lighting_target_lux, lighting_steps=lighting_steps,
+                                  lighting_min_power=lighting_min_power)
             st.validate()
             inputs = {"epw_path": epw_path, "export_csv": export_csv}
             if shoebox:

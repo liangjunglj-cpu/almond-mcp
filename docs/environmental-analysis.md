@@ -89,10 +89,24 @@ or code was used.
   - Indicative design checks, not certification.
 - **Daylight probes.** `analyze_daylight(probes=[[x, y]], probe_distance_from_window_m=2)` reports every
   metric at the nearest sensor (DA300 2 m from the window, for example).
-- **Not yet modelled.**
-  - Lighting energy follows the lighting schedule and power density; there is no daylight-linked dimming
-    yet.
-  - Air exchange between rooms through internal openings is not modelled (they are adiabatic, see Rooms).
+- **Daylight-linked lighting** (`lighting_control` on `analyze_thermal`, in `analyze_rooms` thermal
+  settings and in the panel). The lights top up the daylight on the work plane to `lighting_target_lux`
+  (e.g. 300 lx).
+  - Daylight is traced at control points on a 1 m grid over each floor at 0.8 m (at most 36 per zone),
+    with daylight coefficients, the Perez sky of every daylight hour and the same dynamic shades as the
+    daylight study.
+  - Each point controls an equal share of the luminaires, so the luminaires near the window dim first.
+  - Modes, Almond's own simple models (`environment/lighting.py`):
+    - `continuous`: output 1 − E/target, power from `lighting_min_power` up, off once daylight alone
+      meets the target;
+    - `stepped`: `lighting_steps` equal steps;
+    - `on_off`.
+  - Each zone reports the lighting with and without control, the saving, and the share of lit occupied
+    hours in which daylight alone meets the target. The lower lighting gain feeds the heat balance.
+  - It works for shoeboxes and for rooms. Rhino zone volumes in `analyze_thermal` have no daylight scene
+    of their own, so use `analyze_rooms` for them.
+- **Not yet modelled.** Air exchange between rooms through internal openings (they are adiabatic, see
+  Rooms).
 
 ### Typical session
 
