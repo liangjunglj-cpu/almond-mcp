@@ -100,6 +100,8 @@ class Zone:
     opening_ach: np.ndarray | None = None            # (8760,) air changes through permanent openings
     coupling_w: np.ndarray | None = None             # (8760,) heat from neighbouring rooms into the air node
     profile: dict | None = None                      # room use: {"schedule", "occupancy_w_m2", ...} overrides
+    daylight_lux: np.ndarray | None = None           # (K, 8760) daylight at the lighting control points
+    daylight_points: np.ndarray | None = None        # (K, 3) where they are, metres
 
     def validate(self) -> None:
         if not self.floor_area > 0:
@@ -168,6 +170,12 @@ class Settings:
     custom_schedule: dict | None = None
     # the season for the adaptive-comfort hour counts, e.g. [5, 6, 7, 8, 9, 10]; None = all year
     comfort_months: list | None = None
+    # daylight-linked lighting (lighting.py): None = lights follow the schedule; "continuous", "stepped" or
+    # "on_off" dims or switches them to top up the daylight at the work plane to lighting_target_lux
+    lighting_control: str | None = None
+    lighting_target_lux: float = 300.0
+    lighting_steps: int = 3
+    lighting_min_power: float = 0.1                       # continuous dimming: power at the lowest output
 
     def validate(self) -> None:
         if self.construction not in CONSTRUCTIONS:
@@ -214,6 +222,16 @@ class Settings:
             if v is not None:
                 if not isinstance(v, (list, tuple)) or not v or not all(isinstance(m, int) and 1 <= m <= 12 for m in v):
                     raise ValueError(f"{name} must be a list of months 1..12, e.g. [11, 12, 1, 2, 3, 4]")
+        if self.lighting_control is not None:
+            from .lighting import MODES
+            if self.lighting_control not in MODES:
+                raise ValueError(f"lighting_control must be one of {', '.join(MODES)} (or None)")
+            if not 50.0 <= float(self.lighting_target_lux) <= 2000.0:
+                raise ValueError("lighting_target_lux must be 50..2000")
+            if not isinstance(self.lighting_steps, int) or not 1 <= self.lighting_steps <= 10:
+                raise ValueError("lighting_steps must be a whole number 1..10")
+            if not 0.0 <= float(self.lighting_min_power) <= 1.0:
+                raise ValueError("lighting_min_power must be 0..1")
         if self.custom_schedule is not None:
             if not isinstance(self.custom_schedule, dict):
                 raise ValueError("custom_schedule must be {'occupancy': {'weekday': [24 values], 'weekend': [24 values]}, ...}")
@@ -376,7 +394,15 @@ def simulate(zone: Zone, weather, st: Settings, warmup_days: int = 30) -> dict:
                 else prof.get("occupancy_w_m2", st.occupancy_w_m2))
     phi_people = Af * occ_w_m2 * occ
     phi_equip = Af * prof.get("equipment_w_m2", st.equipment_w_m2) * equip
-    phi_light = Af * prof.get("lighting_w_m2", st.lighting_w_m2) * light
+    phi_light_full = Af * prof.get("lighting_w_m2", st.lighting_w_m2) * light
+    phi_light = phi_light_full
+    if st.lighting_control is not None:
+        if zone.daylight_lux is None:
+            raise ValueError(f"Zone {zone.name}: lighting_control needs the daylight at its control points "
+                             "(studies.prepare_lighting computes it)")
+        from .lighting import zone_fraction
+        phi_light = phi_light_full * zone_fraction(zone.daylight_lux, st.lighting_target_lux, st.lighting_control,
+                                                   st.lighting_steps, st.lighting_min_power)
     phi_int = phi_people + phi_equip + phi_light
     phi_sol, shaded, sol_info = solar_gains(zone, weather, st)
     win_solar, opaque_solar = sol_info.pop("_windows_w"), sol_info.pop("_opaque_w")
@@ -500,7 +526,7 @@ def simulate(zone: Zone, weather, st: Settings, warmup_days: int = 30) -> dict:
     return {
         "t_air": t_air, "t_surface": t_s, "t_mass": t_m_out, "t_op": t_op, "heating_w": heating, "cooling_w": cooling,
         "solar_w": phi_sol, "internal_w": phi_int, "occupied": occupied, "window_shading": shaded,
-        "natural_ventilation": vent_open, "occupancy": occ, "balance_w": balance,
+        "natural_ventilation": vent_open, "occupancy": occ, "balance_w": balance, "lighting_full_w": phi_light_full,
         "model": {"ventilation_l_s_m2_occupied": round(float(vent_rate), 3), "infiltration_ach": st.infiltration_ach,
                   "people_w_m2_at_full_occupancy": round(float(prof.get("occupancy_w_m2", occ_w_m2)), 2),
                   "H_ve_base_w_k": round(float(RHO_CA * base_ach.mean() * V / 3600.0), 2), "H_tr_w_w_k": round(H_tr_w, 2),
@@ -555,6 +581,19 @@ def summarize(zone: Zone, res: dict, weather, st: Settings) -> dict:
     if bal:
         out["lighting_kwh_m2"] = round(float(bal["lighting_w"].sum() / 1000 / Af), 1)
         out["equipment_kwh_m2"] = round(float(bal["equipment_w"].sum() / 1000 / Af), 1)
+        if st.lighting_control is not None and "lighting_full_w" in res:
+            full = float(res["lighting_full_w"].sum() / 1000 / Af)
+            lit = occ & (res["lighting_full_w"] > 0)
+            lux = zone.daylight_lux
+            out["lighting_control"] = {
+                "mode": st.lighting_control, "target_lux": st.lighting_target_lux,
+                **({"steps": st.lighting_steps} if st.lighting_control == "stepped" else {}),
+                **({"min_power": st.lighting_min_power} if st.lighting_control == "continuous" else {}),
+                "control_points": int(len(lux)), "lighting_kwh_m2_without_control": round(full, 1),
+                "saving_kwh_m2": round(full - out["lighting_kwh_m2"], 1),
+                "saving_pct": round(100 * (1 - out["lighting_kwh_m2"] / full), 1) if full > 0 else 0.0,
+                # share of occupied hours (with lights scheduled on) in which daylight alone meets the target
+                "daylight_meets_target_pct": round(100 * float((lux[:, lit] >= st.lighting_target_lux).mean()), 1) if lit.any() else None}
         out["energy_balance_kwh_m2"] = {k[:-2]: {"gains": round(float(np.maximum(v, 0).sum() / 1000 / Af), 2),
                                                  "losses": round(float(np.minimum(v, 0).sum() / 1000 / Af), 2)}
                                         for k, v in bal.items() if np.any(v)}
@@ -868,5 +907,7 @@ def zone_from_shoebox(box, scene, glazing) -> Zone:
     if W * H - win_area > 1e-6:
         surfaces.append(Surface(kind="wall", area=W * H - win_area, normal=tuple(out_n), name="facade", samples=samples(fac_mask)))
     surfaces.append(Surface(kind="adiabatic", area=2 * D * H + W * H + 2 * W * D, normal=(0, 0, 1), name="internal boundaries"))
+    from .lighting import control_points
     return Zone(name="shoebox", floor_area=W * D, volume=W * D * H, surfaces=surfaces,
-                source={"type": "shoebox", "boundary": "facade exposed; side walls, back wall, floor and ceiling adiabatic"})
+                source={"type": "shoebox", "boundary": "facade exposed; side walls, back wall, floor and ceiling adiabatic"},
+                daylight_points=control_points(box.floor_grid(scene, 1.0, 0.8, 0.3)))

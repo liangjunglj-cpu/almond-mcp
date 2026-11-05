@@ -229,6 +229,12 @@
           <p id="env-pmv-out" class="field-help"></p>
         </details>
       </details>
+      <details class="analysis-details"><summary>Lighting control</summary>
+        <div class="analysis-fields"><label>Lights<select id="env-light-mode"><option value="">Follow the schedule</option><option value="continuous">Dim continuously</option><option value="stepped">Dim in steps</option><option value="on_off">Switch off in daylight</option></select></label>
+          <label>Target <span class="unit-label">lx</span><input id="env-light-lux" type="number" min="50" max="2000" step="any" value="300"></label></div>
+        <div class="analysis-fields" id="env-light-steps-row" hidden><label>Steps<input id="env-light-steps" type="number" min="1" max="10" step="1" value="3"></label></div>
+        <p class="field-help">The lights top up the daylight on the work plane to the target. Daylight is traced at points on a 1 m grid over each room's floor; each point controls its share of the luminaires.</p>
+      </details>
       <label class="analysis-toggle"><input id="env-csv" type="checkbox"><span>Write hourly CSV per room (temperatures, loads, energy balance)</span></label>
       <div class="analysis-fields"><label>Code check<select id="env-pack"><option value="">None</option></select></label>
         <label id="env-pack-opt-label" hidden>Option<select id="env-pack-opt"></select></label></div>

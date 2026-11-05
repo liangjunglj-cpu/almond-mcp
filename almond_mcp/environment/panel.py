@@ -317,6 +317,11 @@ def run(req: dict) -> dict:
         extra = {"charts": thermal_charts(res, arrays, weather, str(panel_s.get("balance_room") or ""))}
         if panel_s.get("export_csv"):
             extra["csv_dir"] = res["run_dir"]
+        lit = [r["thermal"] for r in res["rooms"] if (r.get("thermal") or {}).get("lighting_control")]
+        if lit:                                            # over the building: kWh, not the rooms' per-m2 figures
+            full = sum(t["lighting_control"]["lighting_kwh_m2_without_control"] * t["floor_area_m2"] for t in lit)
+            saved = sum(t["lighting_control"]["saving_kwh_m2"] * t["floor_area_m2"] for t in lit)
+            tiles.append((f"{100 * saved / full:.0f} %" if full else "0 %", "lighting saved", ""))
     elif study == "view_out":
         res = studies.run_rooms_view_out(data, float(s.get("view_height_m") or 1.2), float(s.get("spacing_m") or 0.6),
                                          label=req.get("label", ""))

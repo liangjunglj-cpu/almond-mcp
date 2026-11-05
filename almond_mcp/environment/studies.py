@@ -661,10 +661,37 @@ def building_totals(summaries: list[dict]) -> dict:
     return out
 
 
+def prepare_lighting(zones: list[thermal.Zone], scene: Scene, weather, settings: thermal.Settings,
+                     quality: str = "draft") -> dict | None:
+    """For daylight-linked lighting: the daylight at every zone's control points, traced in one pass on
+    ``scene`` (the daylight scene of the zones). Returns what was done, or None when the lights follow
+    the schedule."""
+    if settings.lighting_control is None:
+        return None
+    from . import lighting
+    missing = [z.name for z in zones if z.daylight_points is None or not len(z.daylight_points)]
+    if missing:
+        raise ValueError(f"lighting_control needs control points on each zone's floor; none for {missing}. It works "
+                         "for shoeboxes and for rooms (analyze_rooms); for Rhino zone volumes use analyze_rooms")
+    t0 = time.time()
+    pts = np.vstack([z.daylight_points for z in zones])
+    lux = lighting.control_illuminance(scene, pts, weather, quality)
+    k = 0
+    for z in zones:
+        n = len(z.daylight_points)
+        z.daylight_lux = lux[k:k + n]
+        k += n
+    return {"control_points": int(len(pts)), "quality": quality, "timing_s": round(time.time() - t0, 1),
+            "method": "daylight at the work plane (0.8 m) on a 1 m grid per zone (at most "
+                      f"{lighting.MAX_POINTS} points), daylight coefficients with the Perez sky of every daylight "
+                      "hour, dynamic shades as in the daylight study; each point controls an equal share of the luminaires"}
+
+
 def run_thermal(zones: list[thermal.Zone], scene: Scene, weather, settings: thermal.Settings, label: str = "",
                 inputs: dict | None = None, notes: list[str] | None = None) -> dict:
     settings.validate()
     t0 = time.time()
+    lighting_info = prepare_lighting(zones, scene, weather, settings)
     solar_info = thermal.solar_on_surfaces(zones, scene, weather, scene.north_deg)
     run_id = new_run_id("thermal")
     summaries, arrays = [], {}
@@ -704,7 +731,8 @@ def run_thermal(zones: list[thermal.Zone], scene: Scene, weather, settings: ther
               "weather": {"location": weather.location.label(), "file": weather.source_path,
                           "data_quality_warnings": weather.report.get("warnings", [])},
               "engine": {"method": "ISO 13790 hourly 5R1C per zone; solar gains ray traced on each window and wall",
-                         "ray_backend": raytrace.backend(), "solar_sampling": solar_info},
+                         "ray_backend": raytrace.backend(), "solar_sampling": solar_info,
+                         **({"lighting_control": lighting_info} if lighting_info else {})},
               "settings": settings.__dict__, "zones": summaries, "building": building,
               "mode": "free-running" if free else "conditioned",
               "inputs": inputs or {}, "notes": all_notes,
@@ -829,6 +857,10 @@ def run_rooms_thermal(data: dict, weather, settings: thermal.Settings, label: st
         if z.source.get("openings"):
             z.opening_ach = rm.opening_air_changes(z.source["openings"], z.volume, weather)
     solar_info = thermal.solar_on_surfaces(zones, scene, weather, scene.north_deg) if zones else {"surfaces": 0}
+    lighting_info = None
+    if settings.lighting_control is not None and zones:
+        shells, _ = _daylight_shells(data, rooms, encs, scene, overrides)
+        lighting_info = prepare_lighting(zones, shells, weather, settings)
     for z in zones:
         notes += [f"{z.name}: {n}" for n in thermal.apply_construction(z, settings)]
     results, balance = rm.couple(zones, weather, settings) if zones else ([], {"links": 0})
@@ -870,7 +902,8 @@ def run_rooms_thermal(data: dict, weather, settings: thermal.Settings, label: st
               "engine": {"method": "rooms: enclosure check per room; enclosed / semi-open rooms as ISO 13790 5R1C zones with "
                                    "constructions, thermal mass from areal heat capacity and heat exchange through shared faces; "
                                    "open rooms as semi-outdoor comfort (SolarCal MRT, SET*)",
-                         "ray_backend": raytrace.backend(), "solar_sampling": solar_info, "interzone": balance},
+                         "ray_backend": raytrace.backend(), "solar_sampling": solar_info, "interzone": balance,
+                         **({"lighting_control": lighting_info} if lighting_info else {})},
               "settings": settings.__dict__, "rooms": out_rooms, "inputs": inputs or {}, "notes": notes,
               "assumptions": ["Room-use gains, schedules and set-points: Almond assumptions (rooms.ROOM_USES), overridable per room.",
                               "Faces with no construction use the preset U-values of the settings; mass falls back to the preset "
