@@ -1882,6 +1882,521 @@
       "placement_priority": "accessory",
       "lod": "high",
       "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-ac-condenser-louvred-1",
+      "category": "building_services",
+      "product": "Air-conditioner outdoor unit",
+      "variant": "Older louvred-grille condenser, weathered; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 770,
+        "depth": 560,
+        "height": 720
+      },
+      "render_material_id": "steel-galvanized",
+      "prompt": "Product photo of an older, larger air-conditioner outdoor condenser unit: grey-beige painted steel, square louvre grille across the front, rust at the corners and screws, dirt streaks, dented top. Single object centred, three-quarter view from slightly above, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos, no labels.",
+      "tags": [
+        "air-conditioning",
+        "condenser",
+        "facade",
+        "services",
+        "detailed",
+        "meshy",
+        "ginkgo-refset-1024"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "floor",
+      "placement_priority": "fixed",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-water-heater-tankless-1",
+      "category": "building_services",
+      "product": "Tankless gas water heater",
+      "variant": "Wall-mounted, with pipe stubs; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 250,
+        "depth": 160,
+        "height": 620
+      },
+      "render_material_id": "aluminium-anodized",
+      "prompt": "Product photo of a wall-mounted tankless gas water heater: cream-white steel box with a small louvred flue hood on top, a plain black control plate, copper and white PVC pipe stubs with brass unions below, faint rust streaks. Single object centred, three-quarter view, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos, no labels.",
+      "tags": [
+        "water-heater",
+        "gas",
+        "facade",
+        "services",
+        "detailed",
+        "meshy",
+        "ginkgo-refset-1024"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "wall",
+      "placement_priority": "fixed",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch",
+      "mount_height_mm": 1150
+    },
+    {
+      "asset_id": "gen-gas-meter-1",
+      "category": "building_services",
+      "product": "Gas meter",
+      "variant": "Residential diaphragm meter with riser pipes; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 270,
+        "depth": 260,
+        "height": 480
+      },
+      "render_material_id": "steel-galvanized",
+      "prompt": "Product photo of a residential diaphragm gas meter: grey painted steel body with a small dial window, two vertical galvanised steel pipes with unions rising from the top, chipped paint. Single object centred, three-quarter view, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos, no labels.",
+      "tags": [
+        "gas",
+        "meter",
+        "facade",
+        "services",
+        "detailed",
+        "meshy",
+        "ginkgo-refset-1024"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "wall",
+      "placement_priority": "fixed",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch",
+      "mount_height_mm": 780
+    },
+    {
+      "asset_id": "gen-electric-meter-board-1",
+      "category": "building_services",
+      "product": "Electric meter board",
+      "variant": "Five glass-domed meters on a steel board; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 1250,
+        "depth": 180,
+        "height": 630
+      },
+      "render_material_id": "aluminium-anodized",
+      "prompt": "Product photo of a row of five round glass-domed electric meters mounted on a weathered white steel board, black bakelite bases, grey conduit wires hanging below each meter. Single object centred, straight-on view slightly from above, whole board in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no numbers, no logos.",
+      "tags": [
+        "electric",
+        "meter",
+        "facade",
+        "services",
+        "detailed",
+        "meshy",
+        "ginkgo-refset-1024"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "wall",
+      "placement_priority": "fixed",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch",
+      "mount_height_mm": 1920
+    },
+    {
+      "asset_id": "gen-bin-galvanized-1",
+      "category": "site_furniture",
+      "product": "Galvanised refuse bin",
+      "variant": "Dented, lid askew; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 550,
+        "depth": 540,
+        "height": 780
+      },
+      "render_material_id": "steel-galvanized",
+      "prompt": "Product photo of a dented galvanised steel garbage bin with a loose lid sitting slightly askew, dull zinc metal, grime at the base. Single object centred, three-quarter view, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos.",
+      "tags": [
+        "bin",
+        "refuse",
+        "alley",
+        "streetscape",
+        "detailed",
+        "meshy",
+        "ginkgo-refset-1024"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "movable",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-garden-hose-coil-1",
+      "category": "household",
+      "product": "Garden hose",
+      "variant": "Loose coil lying flat, with nozzle; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 530,
+        "depth": 620,
+        "height": 110
+      },
+      "render_material_id": "rubber-black",
+      "prompt": "Product photo of a coiled dark green rubber garden hose lying flat on the ground in a loose coil with a brass nozzle, worn. Single object centred, three-quarter view from above, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos.",
+      "tags": [
+        "hose",
+        "garden",
+        "outdoor",
+        "clutter",
+        "detailed",
+        "meshy",
+        "ginkgo-refset-1024"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "accessory",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-mop-broom-bundle-1",
+      "category": "household",
+      "product": "Mop and broom",
+      "variant": "String mop and broom leaning together; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 660,
+        "depth": 430,
+        "height": 1350
+      },
+      "render_material_id": "wood-oak",
+      "prompt": "Product photo of a worn string mop with a wooden handle and a plastic broom with a pale handle leaning together as one bundle, standing upright. Single object centred, three-quarter view, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos.",
+      "tags": [
+        "mop",
+        "broom",
+        "cleaning",
+        "clutter",
+        "detailed",
+        "meshy",
+        "ginkgo-refset-1024"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "floor",
+      "placement_priority": "accessory",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-potted-plant-terracotta-1",
+      "category": "vegetation",
+      "product": "Potted houseplant",
+      "variant": "Small terracotta pot; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 460,
+        "depth": 420,
+        "height": 450
+      },
+      "render_material_id": "foliage-pine",
+      "prompt": "Product photo of a small terracotta pot with a leafy green houseplant, soil visible, a few drooping leaves, slightly chipped pot. Single object centred, three-quarter view, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos.",
+      "tags": [
+        "plant",
+        "pot",
+        "terracotta",
+        "houseplant",
+        "detailed",
+        "meshy",
+        "ginkgo-refset-1024"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "floor",
+      "placement_priority": "accessory",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-refuse-bag-1",
+      "category": "household",
+      "product": "Refuse bag",
+      "variant": "Tied translucent plastic bag; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 580,
+        "depth": 380,
+        "height": 620
+      },
+      "render_material_id": "polycarbonate-opal",
+      "prompt": "Product photo of a tied translucent white plastic garbage bag, slumped and bulging, sitting on the ground. Single object centred, three-quarter view, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos.",
+      "tags": [
+        "refuse",
+        "bag",
+        "clutter",
+        "alley",
+        "detailed",
+        "meshy",
+        "ginkgo-refset-1024"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "accessory",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-laundry-basket-1",
+      "category": "household",
+      "product": "Laundry basket",
+      "variant": "Perforated plastic basket heaped with clothes; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 640,
+        "depth": 520,
+        "height": 500
+      },
+      "render_material_id": "plaster-white",
+      "prompt": "Product photo of a white plastic laundry basket with a perforated lattice, heaped with dark folded clothes and a grey towel draped over the rim. Single object centred, three-quarter view from slightly above, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos.",
+      "tags": [
+        "laundry",
+        "basket",
+        "clothes",
+        "balcony",
+        "detailed",
+        "meshy",
+        "ginkgo-refset-1024"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "floor",
+      "placement_priority": "accessory",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-bed-low-duvet-1",
+      "category": "bed",
+      "product": "Low bed",
+      "variant": "Light timber frame with rumpled duvet; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 1410,
+        "depth": 2000,
+        "height": 530
+      },
+      "render_material_id": "fabric-linen",
+      "prompt": "Product photo of a low Japanese bed with a light wooden frame, a rumpled grey-beige linen duvet and one pillow, a folded blanket at the foot. Single object centred, three-quarter view from slightly above, whole bed in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos.",
+      "tags": [
+        "bed",
+        "duvet",
+        "bedroom",
+        "japanese",
+        "detailed",
+        "meshy",
+        "ginkgo-refset-1024"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "floor",
+      "placement_priority": "primary",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-chest-of-drawers-pine-1",
+      "category": "storage",
+      "product": "Chest of drawers",
+      "variant": "Three-drawer knotty pine; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 920,
+        "depth": 520,
+        "height": 850
+      },
+      "render_material_id": "wood-oak",
+      "prompt": "Product photo of a rustic knotty pine chest of three deep drawers with round dark wooden knobs, honey-coloured aged timber, scuffed edges. Single object centred, three-quarter view, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos.",
+      "tags": [
+        "chest",
+        "drawers",
+        "pine",
+        "bedroom",
+        "detailed",
+        "meshy",
+        "ginkgo-refset-1024"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "floor",
+      "placement_priority": "primary",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-electric-kettle-1",
+      "category": "appliance",
+      "product": "Electric kettle",
+      "variant": "Plastic jug kettle on power base; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 240,
+        "depth": 190,
+        "height": 260
+      },
+      "render_material_id": "plaster-white",
+      "prompt": "Product photo of a white plastic electric kettle with a curved spout sitting on its round power base, slightly yellowed, a black handle. Single object centred, three-quarter view, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos.",
+      "tags": [
+        "kettle",
+        "kitchen",
+        "countertop",
+        "detailed",
+        "meshy",
+        "ginkgo-refset-1024"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "work_surface",
+      "placement_priority": "accessory",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch",
+      "mount_height_mm": 750
+    },
+    {
+      "asset_id": "gen-house-slippers-1",
+      "category": "household",
+      "product": "House slippers",
+      "variant": "Pair of open-toe rubber slippers; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 250,
+        "depth": 300,
+        "height": 90
+      },
+      "render_material_id": "rubber-black",
+      "prompt": "Product photo of a pair of plain black rubber house slippers side by side, open-toe, slightly worn. Single object centred, three-quarter view from above, whole pair in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos.",
+      "tags": [
+        "slippers",
+        "entrance",
+        "balcony",
+        "clutter",
+        "detailed",
+        "meshy",
+        "ginkgo-refset-1024"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "floor",
+      "placement_priority": "accessory",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-table-lamp-pleated-1",
+      "category": "lighting",
+      "product": "Table lamp",
+      "variant": "Pleated paper shade on a brass stem; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 280,
+        "depth": 280,
+        "height": 460
+      },
+      "render_material_id": "fabric-linen",
+      "prompt": "Product photo of a small table lamp with a white conical pleated paper shade and a slim brass stem on a round brass base, switched off. Single object centred, three-quarter view, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos.",
+      "tags": [
+        "lamp",
+        "table-lamp",
+        "paper",
+        "brass",
+        "detailed",
+        "meshy",
+        "ginkgo-refset-1024"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "work_surface",
+      "placement_priority": "accessory",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch",
+      "mount_height_mm": 750
+    },
+    {
+      "asset_id": "gen-washing-machine-front-1",
+      "category": "appliance",
+      "product": "Washing machine",
+      "variant": "Compact front-loading; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 610,
+        "depth": 520,
+        "height": 850
+      },
+      "render_material_id": "plaster-white",
+      "prompt": "Product photo of a compact white front-loading washing machine with a round chrome-rimmed glass door and a small plain control panel with a dial, no lettering. Single object centred, three-quarter view, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos.",
+      "tags": [
+        "washing-machine",
+        "laundry",
+        "appliance",
+        "detailed",
+        "meshy",
+        "ginkgo-refset-1024"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "floor",
+      "placement_priority": "fixed",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
     }
   ],
   "retired": [

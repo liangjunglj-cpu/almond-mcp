@@ -23,7 +23,7 @@ user-facing summary; this file is the reasoning.
 | Newtonsoft.Json, Roslyn, System.* DLLs | NuGet | MIT | yes — inside Yak package only, with notices |
 | IKEA product names in manifests | public catalogue facts | nominative fair use; disclaimer in notices | yes (names only) |
 | OpenSeesPy (benchmark reference solver, `benchmarks/`) | Univ. of California / Oregon State, PyPI `openseespy` | free for research, education and internal use; commercial redistribution of anything that imports it needs a licence (Dr. Minjie Zhu) | **no** — optional `bench` dependency group only; never imported by `almond_mcp`; `benchmarks/` is outside the wheel and sdist |
-| Generated asset library (`GeneratedAssetfiles/models/*.glb` + `.almond.json` contracts) | generated with Meshy from self-authored prompts (`GeneratedAssetfiles/catalogue.json`), normalised by `tools/build_generated_assets.py` | Meshy Terms: output generated on a paid plan belongs to the account; released here under CC BY 4.0 (manifest/contracts MIT) | yes — git repository; manifest in the wheel, model files fetched by `almond-mcp fetch-assets` |
+| Generated asset library (`GeneratedAssetfiles/models/*.glb` + `.almond.json` contracts) | generated with Meshy from self-authored prompts (`GeneratedAssetfiles/catalogue.json`), some with Higgsfield reference images, normalised by `tools/build_generated_assets.py` | Meshy Terms: output generated on a paid plan belongs to the account; Higgsfield claims no ownership of outputs; released here under CC BY 4.0 (manifest/contracts MIT) | yes — git repository; manifest in the wheel, model files fetched by `almond-mcp fetch-assets` |
 
 ## 3D Warehouse analysis
 
@@ -55,10 +55,11 @@ into the distributable set.
 ## Generated (Meshy) asset library
 
 `GeneratedAssetfiles/` is the one library whose model files *are*
-distributed. Every asset was produced from a self-authored prompt through
-Meshy's image and image-to-3D pipelines on a paid plan; Meshy's terms grant
-paid accounts ownership of generated output, so the files are ours to
-license. They are released under CC BY 4.0 (attribution: "Almond generated
+distributed. Every asset was produced from a self-authored prompt: a
+reference image (Meshy's own image models, or Higgsfield for batch 2 and the
+Ginkgo batch) followed by Meshy image-to-3D on a paid plan. Meshy's terms grant
+paid accounts ownership of generated output, and Higgsfield claims no
+ownership of its outputs, so the files are ours to license. They are released under CC BY 4.0 (attribution: "Almond generated
 asset library"), and the manifest, contracts and build tooling are MIT like
 the rest of the repository. Provenance is recorded per asset in the manifest
 (`geometry_source.parameters`: prompt, image task id, mesh task id, model,
@@ -72,6 +73,24 @@ versions used repository download URLs. 3D Warehouse content stays manual.
 
 Raw Meshy downloads (`GeneratedAssetfiles/raw/`) are gitignored; the tracked
 normalised files are derived from them deterministically.
+
+### Ginkgo props (batch `ginkgo-refset-1024`, added 2026-11-05)
+
+Sixteen props generated for the owner's Ginkgo world pass `refset_1024`
+(building services, household and interior objects) were re-derived as library
+geometry. Each came from an original descriptive prompt rendered by Higgsfield
+`gpt_image_2_5` on the owner's account, then uploaded to Meshy 7.1 image-to-3D
+on the owner's paid account. No photographs, third-party images or marketplace
+models were submitted; the owner's scene photographs for that pass were never
+uploaded. The owner approved the CC BY 4.0 release on 2026-11-05, knowing the
+same props also appear inside the owner's paid GRANDWHIS world packs.
+
+Deliberately excluded: the Tripo H3.1 condenser (generated via Higgsfield; that
+rights route has not been reviewed), the four assembled W063–W066 scenes (paid
+products, and scenes rather than placeable objects), and discarded or
+earlier-pass meshes. The library editions carry Almond materials only; the
+provider's PBR textures are not distributed. The retained reference images
+ship in `batches/ginkgo-refset-1024/` as generation evidence.
 
 ## Capsules vs. example files
 

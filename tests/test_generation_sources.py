@@ -13,11 +13,11 @@ def test_shipped_source_register_matches_evidence():
     library = ROOT / "GeneratedAssetfiles"
     result = source_doc.build_register(library)
     assert not result["errors"]
-    assert result["asset_count"] == 50
+    assert result["asset_count"] == 66
     assert result == json.loads((library / "source-register.json").read_text())
     assert all(a["external_reference_ids"] == [] and a["evidence_gaps"] for a in result["assets"])
     higgsfield = [a for a in result["assets"] if a["image_generation"]["provider"] == "higgsfield"]
-    assert len(higgsfield) == 20
+    assert len(higgsfield) == 36  # 20 legacy + 16 Ginkgo props
     assert all(a["image_generation"]["id_type"] == "image_job_id" for a in higgsfield)
     assert "cloudfront.net" not in source_doc.serialise(result)
 

@@ -1,0 +1,103 @@
+{
+  "batch_id": "ginkgo-refset-1024",
+  "image": {
+    "asset_id": "gen-potted-plant-terracotta-1",
+    "provider": "higgsfield",
+    "tool": "generate_image_batch",
+    "submitted_at": "2026-10-24T18:53:16.129Z",
+    "request": {
+      "model": "gpt_image_2_5",
+      "aspect_ratio": "1:1",
+      "prompt": "Product photo of a small terracotta pot with a leafy green houseplant, soil visible, a few drooping leaves, slightly chipped pot. Single object centred, three-quarter view, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos."
+    },
+    "batch_context": "Clean single-object reference images for Meshy image-to-3D props of a photoreal apartment-block world pack.",
+    "status": "COMPLETED",
+    "task_id": "54112069-f28e-46f3-a248-2066fde13576",
+    "provider_model": "gpt_image_2_5",
+    "completed_observed_at": "2026-10-24T18:55:01.053Z",
+    "provider_output_name": "hf_20261024_185329_54112069-f28e-46f3-a248-2066fde13576.png",
+    "output_file": "gen-potted-plant-terracotta-1.png",
+    "output_sha256": "c46759f27185f5854e1e437e5b15d1f9bd9aeb30b6b67316341aa8cb641c2a84",
+    "output_file_modified_at": "2026-10-24T18:55:46+00:00",
+    "seed": null,
+    "consumed_credits": "about 0.25 (Ginkgo MESH_SOURCES.md)",
+    "evidence_source": {
+      "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+      "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+      "extracted_at": "2026-11-05T01:46:49+00:00"
+    }
+  },
+  "mesh": {
+    "asset_id": "gen-potted-plant-terracotta-1",
+    "provider": "meshy",
+    "tool": "meshy_image_to_3d",
+    "submitted_at": "2026-10-24T18:58:14.223Z",
+    "request": {
+      "ai_model": "meshy-7.1",
+      "enable_pbr": true,
+      "texture_resolution": "4k",
+      "target_formats": [
+        "glb"
+      ],
+      "image": "local upload of ref_potted_plant.png"
+    },
+    "input_image_sha256": "c46759f27185f5854e1e437e5b15d1f9bd9aeb30b6b67316341aa8cb641c2a84",
+    "status": "SUCCEEDED",
+    "status_basis": "Downloaded in the Ginkgo session with meshy_download_model; GLB present",
+    "task_id": "01a16f47-acef-73b8-ad74-e2361a5b70b1",
+    "output_file": "gen-potted-plant-terracotta-1.glb",
+    "output_sha256": "f14892a09b5a806a5938fdea3afc2d726fd8a660653d0677e48a2838bb481e5a",
+    "seed": null,
+    "consumed_credits": 30,
+    "evidence_source": {
+      "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+      "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+      "extracted_at": "2026-11-05T01:46:49+00:00"
+    }
+  },
+  "derivation": {
+    "asset_id": "gen-potted-plant-terracotta-1",
+    "source_sha256": "f14892a09b5a806a5938fdea3afc2d726fd8a660653d0677e48a2838bb481e5a",
+    "source_triangles": 1427488,
+    "target_triangles": 80000,
+    "prepared_sha256": "119d457d797acacf8e6c183f421009a7d676c85cfbdfb27020915b3a66fa0228",
+    "software": "Blender 5.1.2",
+    "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Never subdivide to inflate counts.",
+    "weld_tolerance_source_units": 1.9033129215240477e-07,
+    "quality": {
+      "vertices": 39934,
+      "triangles": 80000,
+      "boundary_edges": 0,
+      "nonmanifold_edges_excluding_boundary": 0,
+      "zero_area_faces": 0,
+      "connected_components": 2,
+      "largest_component_vertices": 39371,
+      "nonfinite_coordinates": 0,
+      "self_intersections": "not_tested",
+      "mesh_validation_repair_passes": 0,
+      "use": "Visual entourage; not certified for fabrication or structural analysis",
+      "bounds_relative_change": [
+        2.0230304796160575e-05,
+        7.145212630782162e-05,
+        7.117590620516727e-06
+      ]
+    }
+  },
+  "input_image_file": "batches/ginkgo-refset-1024/gen-potted-plant-terracotta-1.png",
+  "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+  "external_reference_ids": [],
+  "dimension_basis": "Real-world sizes authored in the Ginkgo pass (runs/refset_1024/worlds/jp.py PROPS); height normalised exactly, width and depth measured after uniform scaling. Not a physical survey.",
+  "reference_review": "Ginkgo reference image reviewed in that session for a clean, unbranded single object; re-checked for this import: no lettering, logos or brand marks visible.",
+  "rights": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+  "origin": {
+    "project": "Ginkgo, the owner's own world-generation repository (private)",
+    "pass": "runs/refset_1024",
+    "source_name": "potted_plant",
+    "records": [
+      "runs/refset_1024/MESH_SOURCES.md",
+      "runs/refset_1024/meshy/jobs.json",
+      "runs/refset_1024/pass.json",
+      "Claude Code session transcript c849f85f-3384-47ae-bf45-2e1a471d157c (the tool calls that submitted the image and mesh jobs)"
+    ]
+  }
+}

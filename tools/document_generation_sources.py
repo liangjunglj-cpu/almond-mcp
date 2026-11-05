@@ -80,7 +80,10 @@ def build_register(library: Path) -> dict:
             image, mesh = captured["image"], captured["mesh"]
             if image["request"].get("prompt") != brief.get("prompt"):
                 errors.append(f"{aid}: submitted image prompt differs from catalogue")
-            if image["task_id"] != image_id or mesh["task_id"] != generation["mesh_task_id"] or mesh["request"].get("input_task_id") != image_id:
+            # Meshy-generated images are linked by task ID; uploaded external images by their checksum.
+            linked = (mesh["request"].get("input_task_id") == image_id
+                      or ("input_task_id" not in mesh["request"] and mesh.get("input_image_sha256") == image["output_sha256"]))
+            if image["task_id"] != image_id or mesh["task_id"] != generation["mesh_task_id"] or not linked:
                 errors.append(f"{aid}: captured task chain differs")
             image_path = (library / captured["input_image_file"]).resolve()
             if not image_path.is_relative_to(library.resolve()) or not image_path.is_file() or hashlib.sha256(image_path.read_bytes()).hexdigest() != image["output_sha256"]:

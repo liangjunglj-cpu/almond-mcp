@@ -52,10 +52,10 @@ def verify(path):
                 raise ValueError(f"Checksum mismatch: {route}")
         catalogue = json.loads(archive.read("archive/api/catalogue.json"))
         counts = catalogue["counts"]
-        if counts != {"assets":57,"models":50,"elements":7,"drawing_packages":10,"views":60}:
+        if counts != {"assets":73,"models":66,"elements":7,"drawing_packages":10,"views":60}:
             raise ValueError(f"Unexpected catalogue: {counts}")
         glbs = [n for n in names if n.endswith(".glb")]
-        if len(glbs) != 50 or any(not n.startswith("archive/files/generated/models/") for n in glbs):
+        if len(glbs) != 66 or any(not n.startswith("archive/files/generated/models/") for n in glbs):
             raise ValueError("Generated-model pack is incomplete")
         evidence = json.loads(archive.read("archive/evidence/source-register.json"))
         sources = {a["asset_id"]:a for a in evidence["assets"]}

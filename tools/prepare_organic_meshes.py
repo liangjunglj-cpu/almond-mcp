@@ -39,6 +39,10 @@ for asset in batch['assets']:
         bpy.ops.object.join()
     obj = bpy.context.view_layer.objects.active
     bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
+    if batch.get('strip_source_materials'):
+        # Textured provider meshes: the library assigns Almond materials, so drop the
+        # provider's PBR materials and their embedded texture images before export.
+        obj.data.materials.clear()
     print('VALIDATING', aid, source_triangles, flush=True)
     validation_repairs = int(obj.data.validate(verbose=True, clean_customdata=True))
     if any(not math.isfinite(v) for vert in obj.data.vertices for v in vert.co):
@@ -120,7 +124,7 @@ for asset in batch['assets']:
                     'source_triangles':source_triangles,'target_triangles':asset['target_triangles'],
                     'prepared_sha256':hashlib.sha256(target.read_bytes()).hexdigest(),
                     'software':'Blender '+bpy.app.version_string,
-                    'method':'Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Never subdivide to inflate counts.',
+                    'method':('Remove provider PBR materials and textures; ' if batch.get('strip_source_materials') else '')+'Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Never subdivide to inflate counts.',
                     'weld_tolerance_source_units':weld_tolerance,'quality':quality})
     print('PREPARED', aid, source_triangles, '->', quality['triangles'], quality, flush=True)
 

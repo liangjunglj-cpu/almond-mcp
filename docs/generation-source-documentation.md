@@ -84,3 +84,31 @@ uncertain submission automatically. Review generated images before submitting
 the mesh stage. `prepare_organic_meshes.py` preserves dense originals and derives
 library geometry with recorded checks; `import_organic_batch.py` links that
 evidence to the catalogue and embedded passports.
+
+## Ginkgo batch (external image stage)
+
+`batches/ginkgo-refset-1024.json` imports sixteen props generated in the
+owner's Ginkgo project (pass `runs/refset_1024`, 24 October 2026). Each chain
+is a Higgsfield `gpt_image_2_5` reference image followed by a Meshy 7.1
+image-to-3D task. Meshy received the image as a file upload, so there is no
+`input_task_id` linking the two. The captured mesh record carries
+`input_image_sha256` instead, and the source checker accepts that link only
+when it equals the retained image's checksum.
+
+`tools/stage_ginkgo_batch.py` builds the raw records from the requests that
+the Ginkgo session actually submitted (prompts, settings, job and task IDs,
+timestamps). It cross-checks every ID against Ginkgo's `jobs.json`, and it
+refuses a reference image modified after its Meshy upload. It copies the
+untouched provider files without regenerating anything. Account-scoped result
+URLs and local paths are dropped. The provider file name is kept because it
+carries the job timestamp.
+
+The import keeps known gaps visible:
+
+- Seeds were not returned.
+- Meshy's own status record was not re-queried: the task IDs no longer resolve
+  through the currently connected Meshy key. Success rests on the downloaded
+  GLB.
+- Image credits are Ginkgo's estimate.
+- Heights are the sizes authored in the Ginkgo scene scripts, not surveys.
+

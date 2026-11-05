@@ -2,7 +2,7 @@
 
 Open, redistributable 3D architectural assets for [Almond MCP](../README.md):
 entourage, site furniture, fixtures and unbranded
-furniture placeholders. **50 assets**, all generated with
+furniture placeholders. **66 assets**, all generated with
 [Meshy](https://www.meshy.ai) from prompts written for this project and
 normalised to real-world millimetres with an authored Almond spatial
 contract. Unlike the IKEA / drawing libraries (3D Warehouse content that
@@ -44,7 +44,7 @@ get_generated_asset(asset_id="gen-street-lamp-1")
 place_generated_asset(asset_id="gen-street-lamp-1", x_mm=0, y_mm=0)
 ```
 
-Version 0.6 bundles all 50 models, contracts and previews in the wheel.
+The wheel bundles all 66 models, contracts and previews.
 Run `almond-mcp audit-assets` to check checksums and agreement between embedded,
 sidecar and manifest passports. Wheel installs use a versioned user-data pack;
 explicit library directory overrides continue to take precedence.
@@ -129,6 +129,47 @@ Contact sheets: [entourage](previews/sheet-1-entourage.png) · [site furniture](
 | <img src="previews/gen-task-lamp-balanced-arm-1.png" width="96" alt=""> | `gen-task-lamp-balanced-arm-1` | Task lamp (two-arm balanced desk lamp) | lighting | 321 x 116 x 450 | `aluminium-anodized` | 80,000 |
 | <img src="previews/gen-side-table-wire-1.png" width="96" alt=""> | `gen-side-table-wire-1` | Side table (stacking wire side table) | table | 378 x 378 x 500 | `steel-painted-charcoal` | 4,235 |
 
+## Ginkgo props (batch `ginkgo-refset-1024`)
+
+Sixteen building-services, household and interior props first generated for the
+owner's Ginkgo world pass `refset_1024` (24 October 2026). Each has an original
+single-object prompt, rendered as a reference image by Higgsfield `gpt_image_2_5`.
+That image was then uploaded to Meshy 7.1 image-to-3D (PBR, 4K). Blender re-derived
+library editions from the dense Meshy downloads: 40k triangles for simple hard-surface
+pieces, 80k for the rest. The provider textures are removed and Almond materials
+assigned. Heights are the real-world sizes authored in Ginkgo's scene scripts. Wall
+pieces (water heater, gas meter, meter board) and countertop pieces (kettle, lamp) carry
+the mount heights used in those scenes.
+
+`batches/ginkgo-refset-1024.json` keeps the exact prompts, settings and IDs.
+`batches/ginkgo-refset-1024/` keeps the per-asset request records and the reference
+images Meshy received. Meshy got each image as a file upload, so the evidence links
+the two stages by the image's SHA-256 rather than by a task ID.
+`tools/stage_ginkgo_batch.py` rebuilt the raw records from the Ginkgo session's own
+tool calls, and `tools/import_organic_batch.py` imported them.
+
+Not included: Ginkgo's Tripo-generated condenser, the assembled W063–W066 scenes (paid
+GRANDWHIS products), and meshes Ginkgo discarded. See `docs/licensing-audit.md`.
+
+| Preview | asset_id | Product | Category | W x D x H (mm) | Material | Triangles |
+| --- | --- | --- | --- | --- | --- | --- |
+| <img src="previews/gen-ac-condenser-louvred-1.png" width="96" alt=""> | `gen-ac-condenser-louvred-1` | Air-conditioner outdoor unit (older louvred-grille condenser, weathered) | building_services | 774 x 560 x 720 | `steel-galvanized` | 80,000 |
+| <img src="previews/gen-water-heater-tankless-1.png" width="96" alt=""> | `gen-water-heater-tankless-1` | Tankless gas water heater (wall-mounted, with pipe stubs) | building_services | 252 x 160 x 620 | `aluminium-anodized` | 40,000 |
+| <img src="previews/gen-gas-meter-1.png" width="96" alt=""> | `gen-gas-meter-1` | Gas meter (residential diaphragm meter with riser pipes) | building_services | 275 x 261 x 480 | `steel-galvanized` | 40,000 |
+| <img src="previews/gen-electric-meter-board-1.png" width="96" alt=""> | `gen-electric-meter-board-1` | Electric meter board (five glass-domed meters on a steel board) | building_services | 1252 x 176 x 630 | `aluminium-anodized` | 80,000 |
+| <img src="previews/gen-bin-galvanized-1.png" width="96" alt=""> | `gen-bin-galvanized-1` | Galvanised refuse bin (dented, lid askew) | site_furniture | 548 x 538 x 780 | `steel-galvanized` | 80,000 |
+| <img src="previews/gen-garden-hose-coil-1.png" width="96" alt=""> | `gen-garden-hose-coil-1` | Garden hose (loose coil lying flat, with nozzle) | household | 518 x 610 x 110 | `rubber-black` | 80,000 |
+| <img src="previews/gen-mop-broom-bundle-1.png" width="96" alt=""> | `gen-mop-broom-bundle-1` | Mop and broom (string mop and broom leaning together) | household | 656 x 434 x 1350 | `wood-oak` | 80,000 |
+| <img src="previews/gen-potted-plant-terracotta-1.png" width="96" alt=""> | `gen-potted-plant-terracotta-1` | Potted houseplant (small terracotta pot) | vegetation | 465 x 417 x 450 | `foliage-pine` | 80,000 |
+| <img src="previews/gen-refuse-bag-1.png" width="96" alt=""> | `gen-refuse-bag-1` | Refuse bag (tied translucent plastic bag) | household | 578 x 377 x 620 | `polycarbonate-opal` | 79,998 |
+| <img src="previews/gen-laundry-basket-1.png" width="96" alt=""> | `gen-laundry-basket-1` | Laundry basket (perforated plastic basket heaped with clothes) | household | 645 x 523 x 500 | `plaster-white` | 80,000 |
+| <img src="previews/gen-bed-low-duvet-1.png" width="96" alt=""> | `gen-bed-low-duvet-1` | Low bed (light timber frame with rumpled duvet) | bed | 1408 x 1999 x 530 | `fabric-linen` | 80,000 |
+| <img src="previews/gen-chest-of-drawers-pine-1.png" width="96" alt=""> | `gen-chest-of-drawers-pine-1` | Chest of drawers (three-drawer knotty pine) | storage | 921 x 520 x 850 | `wood-oak` | 80,000 |
+| <img src="previews/gen-electric-kettle-1.png" width="96" alt=""> | `gen-electric-kettle-1` | Electric kettle (plastic jug kettle on power base) | appliance | 240 x 195 x 260 | `plaster-white` | 40,000 |
+| <img src="previews/gen-house-slippers-1.png" width="96" alt=""> | `gen-house-slippers-1` | House slippers (pair of open-toe rubber slippers) | household | 239 x 292 x 90 | `rubber-black` | 39,998 |
+| <img src="previews/gen-table-lamp-pleated-1.png" width="96" alt=""> | `gen-table-lamp-pleated-1` | Table lamp (pleated paper shade on a brass stem) | lighting | 282 x 283 x 460 | `fabric-linen` | 80,000 |
+| <img src="previews/gen-washing-machine-front-1.png" width="96" alt=""> | `gen-washing-machine-front-1` | Washing machine (compact front-loading) | appliance | 609 x 524 x 850 | `plaster-white` | 80,000 |
+
 ## Batch 2: design-idiom furniture and lighting
 
 The second batch (ids with `batch: 2` in the catalogue) describes design language
@@ -172,7 +213,7 @@ contact sheets are legacy renders.
 Regenerate with `blender --factory-startup -b --python tools/render_generated_previews.py -- GeneratedAssetfiles/models GeneratedAssetfiles/previews --archive`.
 `--clay` is an optional neutral study; `--asset <asset_id>` renders a single
 inspection sample into a separate output folder. The full archive needs all
-50 records. `previews/render-record.json` records Blender/version/settings,
+66 records. `previews/render-record.json` records Blender/version/settings,
 script checksum (LF-normalized), and each source GLB and rendered PNG checksum.
 This is a post-generation preview derivation, not a change to Meshy history.
 

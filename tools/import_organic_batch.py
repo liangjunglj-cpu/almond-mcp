@@ -1,4 +1,5 @@
-"""Import reviewed organic batch derivatives and exact, sanitized request evidence."""
+"""Import reviewed batch derivatives (organic Meshy batches, or external image + Meshy batches such as
+Ginkgo props) with exact, sanitized request evidence."""
 from datetime import datetime, timezone
 import hashlib
 import json
@@ -37,21 +38,35 @@ def main():
         evidence={'batch_id':batch['batch_id'],'image':image,'mesh':mesh,'derivation':q,
                   'input_image_file':'batches/'+batch['batch_id']+'/'+aid+'.png',
                   'external_reference_status':batch['external_reference_status'],'external_reference_ids':[],
-                  'dimension_basis':'Authored nominal height for architectural studies; width and depth measured after uniform normalization. Not a physical survey.',
+                  'dimension_basis':batch.get('dimension_basis','Authored nominal height for architectural studies; width and depth measured after uniform normalization. Not a physical survey.'),
                   'reference_review':asset.get('reference_review','Reference image visually reviewed for neutral architectural use.'),
-                  'rights':'Generated for the Almond library using the owner-configured Meshy account; public pack distribution authorized by owner. CC BY 4.0. API balance verified; subscription contract not independently audited.'}
+                  'rights':batch.get('rights','Generated for the Almond library using the owner-configured Meshy account; public pack distribution authorized by owner. CC BY 4.0. API balance verified; subscription contract not independently audited.')}
+        if 'origin' in batch:
+            evidence['origin']={'project':batch['origin']['project'],'pass':batch['origin']['pass'],
+                                'source_name':asset.get('ginkgo_name'),'records':batch['origin']['records']}
         write(evidence_dir/(aid+'.json'),evidence)
+        variant=asset['variant']+'; '+batch['variant_suffix'] if 'variant_suffix' in batch else 'Organic form; detailed geometry edition'
+        tags=(asset['tags']+['detailed','meshy',batch['batch_id']]) if 'tags' in asset else ['organic','detailed','meshy',batch['batch_id'],asset['product'].lower()]
         brief={'asset_id':aid,'category':asset['category'],'product':asset['product'],
-               'variant':'Organic form; detailed geometry edition',
+               'variant':variant,
                'dimensions_mm':{'width':asset['width_hint_mm'],'depth':asset['depth_hint_mm'],'height':asset['height_mm']},
                'render_material_id':asset['material'],'prompt':asset['prompt'],
-               'tags':['organic','detailed','meshy',batch['batch_id'],asset['product'].lower()],
+               'tags':tags,
                'drawing_roles':['interior_perspective','exterior_perspective','axonometric'],
-               'geometry_mode':'3d_entourage','support_plane':'floor','placement_priority':'accessory','lod':'high',
-               'recipe_override':'captured_organic_batch'}
-        history={'image_provider':'meshy','image_task_id':image['task_id'],'image_model':image['request']['ai_model'],
-                 'mesh_provider':'meshy','mesh_task_id':mesh['task_id'],'mesh_model':mesh['request']['ai_model'],
-                 'generated_at':mesh['submitted_at'][:10],'captured_generation':evidence}
+               'geometry_mode':'3d_entourage','support_plane':asset.get('support_plane','floor'),
+               'placement_priority':asset.get('placement_priority','accessory'),'lod':'high',
+               'recipe_override':batch.get('recipe_override','captured_organic_batch')}
+        if 'mount_height_mm' in asset:
+            brief['mount_height_mm']=asset['mount_height_mm']
+        if batch.get('image_provider','meshy')=='meshy':
+            history={'image_provider':'meshy','image_task_id':image['task_id'],'image_model':image['request']['ai_model']}
+        else:
+            # External image stage (e.g. Higgsfield), uploaded to Meshy as a file: the link is the image hash.
+            if mesh.get('input_image_sha256')!=image['output_sha256']:
+                raise ValueError('Mesh input image differs from the retained reference image: '+aid)
+            history={'image_provider':batch['image_provider'],'image_job_id':image['task_id'],'image_model':image['request']['model']}
+        history.update({'mesh_provider':'meshy','mesh_task_id':mesh['task_id'],'mesh_model':mesh['request']['ai_model'],
+                        'generated_at':mesh['submitted_at'][:10],'captured_generation':evidence})
         record=normalise(brief,prepared,library/'models',load_material_colours(),{aid:history})
         record['geometry_source']['parameters']['captured_generation']=evidence
         record['license_note']=evidence['rights']

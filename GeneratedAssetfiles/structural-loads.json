@@ -20,7 +20,9 @@
     "site_furniture": {"self_kg": 40,  "use_kg": 0,   "use": "", "ground_only": true},
     "vegetation":     {"self_kg": 0,   "use_kg": 0,   "use": "", "ground_only": true},
     "vehicle":        {"self_kg": 0,   "use_kg": 0,   "use": "", "ground_only": true},
-    "column":         {"self_kg": 0,   "use_kg": 0,   "use": "", "structural_element": true}
+    "column":         {"self_kg": 0,   "use_kg": 0,   "use": "", "structural_element": true},
+    "building_services": {"self_kg": 20, "use_kg": 0,  "use": ""},
+    "household":      {"self_kg": 2,   "use_kg": 0,   "use": ""}
   },
   "assets": {
     "gen-kitchen-range-1":                 {"self_kg": 55,  "use_kg": 15,  "use": "cookware"},
@@ -72,6 +74,22 @@
     "gen-tree-conifer-1":                  {"self_kg": 0,   "use_kg": 0,   "use": "", "ground_only": true},
     "gen-tree-deciduous-medium-1":         {"self_kg": 0,   "use_kg": 0,   "use": "", "ground_only": true},
     "gen-bicycle-1":                       {"self_kg": 12,  "use_kg": 0,   "use": ""},
-    "gen-car-sedan-1":                     {"self_kg": 1400, "use_kg": 0,  "use": "", "ground_only": true}
+    "gen-car-sedan-1":                     {"self_kg": 1400, "use_kg": 0,  "use": "", "ground_only": true},
+    "gen-ac-condenser-louvred-1":          {"self_kg": 45,  "use_kg": 0,   "use": "", "note": "older outdoor unit; often on a bracket or plinth"},
+    "gen-water-heater-tankless-1":         {"self_kg": 18,  "use_kg": 3,   "use": "water in the heat exchanger", "note": "wall mounted: carried by the wall, not the floor"},
+    "gen-gas-meter-1":                     {"self_kg": 5,   "use_kg": 0,   "use": "", "note": "wall mounted on its riser pipes"},
+    "gen-electric-meter-board-1":          {"self_kg": 12,  "use_kg": 0,   "use": "", "note": "wall mounted: carried by the wall, not the floor"},
+    "gen-bin-galvanized-1":                {"self_kg": 8,   "use_kg": 20,  "use": "refuse"},
+    "gen-garden-hose-coil-1":              {"self_kg": 4,   "use_kg": 0,   "use": ""},
+    "gen-mop-broom-bundle-1":              {"self_kg": 2,   "use_kg": 0,   "use": ""},
+    "gen-potted-plant-terracotta-1":       {"self_kg": 8,   "use_kg": 2,   "use": "watering", "note": "pot, soil and plant"},
+    "gen-refuse-bag-1":                    {"self_kg": 0,   "use_kg": 8,   "use": "refuse"},
+    "gen-laundry-basket-1":                {"self_kg": 1,   "use_kg": 6,   "use": "clothes"},
+    "gen-bed-low-duvet-1":                 {"self_kg": 40,  "use_kg": 160, "use": "two occupants"},
+    "gen-chest-of-drawers-pine-1":         {"self_kg": 35,  "use_kg": 40,  "use": "clothes"},
+    "gen-electric-kettle-1":               {"self_kg": 1.2, "use_kg": 1.7, "use": "water"},
+    "gen-house-slippers-1":                {"self_kg": 0.4, "use_kg": 0,   "use": ""},
+    "gen-table-lamp-pleated-1":            {"self_kg": 2,   "use_kg": 0,   "use": ""},
+    "gen-washing-machine-front-1":         {"self_kg": 60,  "use_kg": 30,  "use": "laundry and water during a cycle"}
   }
 }

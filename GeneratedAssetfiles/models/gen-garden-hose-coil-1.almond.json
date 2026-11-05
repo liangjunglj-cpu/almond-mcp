@@ -1,0 +1,306 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-garden-hose-coil-1",
+  "library_id": "generated_assets",
+  "name": "Garden hose (Loose coil lying flat, with nozzle; generated prop; detailed geometry edition)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-garden-hose-coil-1.glb",
+  "dimensions_mm": {
+    "width": 517.6,
+    "depth": 610.3,
+    "height": 110.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "ground",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -258.8,
+        -305.15,
+        0.0
+      ],
+      "max": [
+        258.8,
+        305.15,
+        110.0
+      ]
+    },
+    "footprint": [
+      [
+        -258.8,
+        -305.15
+      ],
+      [
+        258.8,
+        -305.15
+      ],
+      [
+        258.8,
+        305.15
+      ],
+      [
+        -258.8,
+        305.15
+      ]
+    ],
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "accessory"
+  },
+  "materials": [
+    {
+      "material_id": "rubber-black",
+      "objects": [
+        "gen-garden-hose-coil-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-garden-hose-coil-1",
+    "library_id": "generated_assets",
+    "name": "Garden hose (Loose coil lying flat, with nozzle; generated prop; detailed geometry edition)",
+    "category": "household",
+    "tags": [
+      "hose",
+      "garden",
+      "outdoor",
+      "clutter",
+      "detailed",
+      "meshy",
+      "ginkgo-refset-1024"
+    ],
+    "dimensions_mm": {
+      "width": 517.6,
+      "depth": 610.3,
+      "height": 110.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 530.0,
+      "depth": 620.0,
+      "height": 110.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "ground",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -258.8,
+          -305.15,
+          0.0
+        ],
+        "max": [
+          258.8,
+          305.15,
+          110.0
+        ]
+      },
+      "footprint": [
+        [
+          -258.8,
+          -305.15
+        ],
+        [
+          258.8,
+          -305.15
+        ],
+        [
+          258.8,
+          305.15
+        ],
+        [
+          -258.8,
+          305.15
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "accessory"
+    },
+    "materials": [
+      {
+        "material_id": "rubber-black",
+        "objects": [
+          "gen-garden-hose-coil-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "Product photo of a coiled dark green rubber garden hose lying flat on the ground in a loose coil with a brass nozzle, worn. Single object centred, three-quarter view from above, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos.",
+        "image_task_id": null,
+        "image_model": "gpt_image_2_5",
+        "mesh_task_id": "01a16f47-9f55-70ee-bf92-3e3dc39b569d",
+        "mesh_model": "meshy-7.1",
+        "generated_at": "2026-10-24",
+        "orientation_correction": null,
+        "scale_applied": 320.722522,
+        "captured_generation": {
+          "batch_id": "ginkgo-refset-1024",
+          "image": {
+            "asset_id": "gen-garden-hose-coil-1",
+            "provider": "higgsfield",
+            "tool": "generate_image_batch",
+            "submitted_at": "2026-10-24T18:54:27.982Z",
+            "request": {
+              "model": "gpt_image_2_5",
+              "aspect_ratio": "1:1",
+              "prompt": "Product photo of a coiled dark green rubber garden hose lying flat on the ground in a loose coil with a brass nozzle, worn. Single object centred, three-quarter view from above, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos."
+            },
+            "batch_context": "Resubmitting rate-limited clean prop reference images for Meshy image-to-3D.",
+            "status": "COMPLETED",
+            "task_id": "0eefcab7-5db6-4e0d-a1d0-32271de41b48",
+            "provider_model": "gpt_image_2_5",
+            "completed_observed_at": "2026-10-24T18:56:02.127Z",
+            "provider_output_name": "hf_20261024_185453_0eefcab7-5db6-4e0d-a1d0-32271de41b48.png",
+            "output_file": "gen-garden-hose-coil-1.png",
+            "output_sha256": "51b57eacefb452b4f390a337eb246213ad1b540a65c8eba733a0cf5ecb252000",
+            "output_file_modified_at": "2026-10-24T18:56:36+00:00",
+            "seed": null,
+            "consumed_credits": "about 0.25 (Ginkgo MESH_SOURCES.md)",
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "mesh": {
+            "asset_id": "gen-garden-hose-coil-1",
+            "provider": "meshy",
+            "tool": "meshy_image_to_3d",
+            "submitted_at": "2026-10-24T18:58:10.548Z",
+            "request": {
+              "ai_model": "meshy-7.1",
+              "enable_pbr": true,
+              "texture_resolution": "4k",
+              "target_formats": [
+                "glb"
+              ],
+              "image": "local upload of ref_hose_coil.png"
+            },
+            "input_image_sha256": "51b57eacefb452b4f390a337eb246213ad1b540a65c8eba733a0cf5ecb252000",
+            "status": "SUCCEEDED",
+            "status_basis": "Downloaded in the Ginkgo session with meshy_download_model; GLB present",
+            "task_id": "01a16f47-9f55-70ee-bf92-3e3dc39b569d",
+            "output_file": "gen-garden-hose-coil-1.glb",
+            "output_sha256": "d0ca88c0ebdad999952bd71b3c10d5a9ff8fbf3bc234452e3222fd399a414caf",
+            "seed": null,
+            "consumed_credits": 30,
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-garden-hose-coil-1",
+            "source_sha256": "d0ca88c0ebdad999952bd71b3c10d5a9ff8fbf3bc234452e3222fd399a414caf",
+            "source_triangles": 770376,
+            "target_triangles": 80000,
+            "prepared_sha256": "c349cdbad6aef80f9cc58f34b92d0fe35f33da3bb4663a1153d5a1c1063df8ae",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.9031870365142822e-07,
+            "quality": {
+              "vertices": 39726,
+              "triangles": 80000,
+              "boundary_edges": 0,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 1,
+              "largest_component_vertices": 39726,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                0.00033202121033961194,
+                0.00010879988775509564,
+                0.0004761228970297817
+              ]
+            }
+          },
+          "input_image_file": "batches/ginkgo-refset-1024/gen-garden-hose-coil-1.png",
+          "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+          "external_reference_ids": [],
+          "dimension_basis": "Real-world sizes authored in the Ginkgo pass (runs/refset_1024/worlds/jp.py PROPS); height normalised exactly, width and depth measured after uniform scaling. Not a physical survey.",
+          "reference_review": "Ginkgo reference image reviewed in that session for a clean, unbranded single object; re-checked for this import: no lettering, logos or brand marks visible.",
+          "rights": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private)",
+            "pass": "runs/refset_1024",
+            "source_name": "hose_coil",
+            "records": [
+              "runs/refset_1024/MESH_SOURCES.md",
+              "runs/refset_1024/meshy/jobs.json",
+              "runs/refset_1024/pass.json",
+              "Claude Code session transcript c849f85f-3384-47ae-bf45-2e1a471d157c (the tool calls that submitted the image and mesh jobs)"
+            ]
+          }
+        }
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "interior"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.023,
+      "triangle_count": 80000,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "18043223963DB69BDC40EAA8A86D07C23D596AC3AF4926143BAE58A8566B4C1D"
+}

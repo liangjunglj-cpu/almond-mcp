@@ -416,6 +416,134 @@
       "material_names": [
         "ALMOND::stone-granite-paving"
       ]
+    },
+    {
+      "asset_id": "gen-ac-condenser-louvred-1",
+      "model_sha256": "6feea12919f9e38051a230c4e8ece9c838d88a39ad7a471ebefa31a4185ddefa",
+      "preview_sha256": "23718127f4540c76c19374ab61129fca33df05eda5bb667ffea305cec8bbb7b2",
+      "material_names": [
+        "ALMOND::steel-galvanized"
+      ]
+    },
+    {
+      "asset_id": "gen-bed-low-duvet-1",
+      "model_sha256": "f66f75ae24de8c93e9a0fa4f90df229b0a251f7659dd3100a4097af36aa337ec",
+      "preview_sha256": "79961ce72be8bb72722800648f2c154e48359dadb271f04389fed27946de90c0",
+      "material_names": [
+        "ALMOND::fabric-linen"
+      ]
+    },
+    {
+      "asset_id": "gen-bin-galvanized-1",
+      "model_sha256": "5bae99b3f114619d98642f6f177d60f00aa43b4b43f2b4cce4eb8436206994c6",
+      "preview_sha256": "4039d6bb9e968209a5e73377f4d33d2777374548abda2c1081646f5215e58783",
+      "material_names": [
+        "ALMOND::steel-galvanized"
+      ]
+    },
+    {
+      "asset_id": "gen-chest-of-drawers-pine-1",
+      "model_sha256": "283ee6d3520adc466a7e05d29c038b804a842f41ac0a80eec48d7a3ac0e903f4",
+      "preview_sha256": "1f3b37051f170b21166ca66add10511ab4921f027877e936144418a713510f0e",
+      "material_names": [
+        "ALMOND::wood-oak"
+      ]
+    },
+    {
+      "asset_id": "gen-electric-kettle-1",
+      "model_sha256": "805a1d8a43923be758c065bb59f9a0affacc1dfac91fce284658c8ff6419940e",
+      "preview_sha256": "a5ea877cb5231212d749b2bc60d753838f07b381d36ae5657e1a9eaddd6688fa",
+      "material_names": [
+        "ALMOND::plaster-white"
+      ]
+    },
+    {
+      "asset_id": "gen-electric-meter-board-1",
+      "model_sha256": "317c6abc92151fb16e74d5abb901f4eb24800b13c308759923addb32de34f4eb",
+      "preview_sha256": "6473e877229e8eb5d881285122aa176e02de57cfa92c3caa2a35858b3b880bbd",
+      "material_names": [
+        "ALMOND::aluminium-anodized"
+      ]
+    },
+    {
+      "asset_id": "gen-garden-hose-coil-1",
+      "model_sha256": "18043223963db69bdc40eaa8a86d07c23d596ac3af4926143bae58a8566b4c1d",
+      "preview_sha256": "9d9f8472c76837597b4f8b486a3f47c468ceb210ffe807cbb85f90ff55cad271",
+      "material_names": [
+        "ALMOND::rubber-black"
+      ]
+    },
+    {
+      "asset_id": "gen-gas-meter-1",
+      "model_sha256": "76cb8597f5898b3f53f04aee504fc5adbeaeb67b99066ff58b7be14ac588735d",
+      "preview_sha256": "7de916f976aca4f668269dc6c060c26b40f3960b63e7d722aad2e331b50b1a58",
+      "material_names": [
+        "ALMOND::steel-galvanized"
+      ]
+    },
+    {
+      "asset_id": "gen-house-slippers-1",
+      "model_sha256": "ded3e364f06914f4c6fc844132807b6d1abcda99f026ef404e22f7029e03b712",
+      "preview_sha256": "12914170758cde47cfb30286106e8e4372249d2722662582e1b7ab2c68b19771",
+      "material_names": [
+        "ALMOND::rubber-black"
+      ]
+    },
+    {
+      "asset_id": "gen-laundry-basket-1",
+      "model_sha256": "82f5bd17436091cc69f2f6fdf353a5a3cd7151448a9fb4be53b2924988651fe4",
+      "preview_sha256": "6f577210ea7d7bb84928a3f3eb623eaeee73357c867e4aecc08265d9ba1d04e6",
+      "material_names": [
+        "ALMOND::plaster-white"
+      ]
+    },
+    {
+      "asset_id": "gen-mop-broom-bundle-1",
+      "model_sha256": "021378274cfa81bb14593ada9c3d5db0e5fe6f4fff487e80cb71870b5e9cd66f",
+      "preview_sha256": "25b0f612cae07692c7e747b0ae43ba90c9b3f35760a32a998cd2f328d2e5742f",
+      "material_names": [
+        "ALMOND::wood-oak"
+      ]
+    },
+    {
+      "asset_id": "gen-potted-plant-terracotta-1",
+      "model_sha256": "9cc6637fa86fa243e1ba72ecccd0c93ce04f82582aca820e840d4c3fb8e9fd2a",
+      "preview_sha256": "ca1fab06e653bb14148d36c96677cdfd2e85ac1747ae4b02a0f2b296f7ddf8b7",
+      "material_names": [
+        "ALMOND::foliage-pine"
+      ]
+    },
+    {
+      "asset_id": "gen-refuse-bag-1",
+      "model_sha256": "3ef319b577dfafc7dacee8638a50832ce152d7c6ca6b1970ae08356b2e47afcc",
+      "preview_sha256": "2de06e506115df05410bc7ec3d6df8705988f01db21042971a49bc019856e62a",
+      "material_names": [
+        "ALMOND::polycarbonate-opal"
+      ]
+    },
+    {
+      "asset_id": "gen-table-lamp-pleated-1",
+      "model_sha256": "525adcf8ddc8bc2698c5ca0d82e20091ff6e45b6181a82923cf6178b2aed55f4",
+      "preview_sha256": "eb6d35491fbf313d84097353e1042b8993df2e4978c56338716092301018b17d",
+      "material_names": [
+        "ALMOND::fabric-linen"
+      ]
+    },
+    {
+      "asset_id": "gen-washing-machine-front-1",
+      "model_sha256": "06ac93d237a4b8d7c47965ab5ddc95291963c40373c5125d0082cba8a2c0c26a",
+      "preview_sha256": "e18ed1d11e187e6c1e42ca9096a26ce381a16536b0b90052ed834d9eba4efc94",
+      "material_names": [
+        "ALMOND::plaster-white"
+      ]
+    },
+    {
+      "asset_id": "gen-water-heater-tankless-1",
+      "model_sha256": "44d13326e635b5343c47097649a6f2d507f50f44b3479ae574c20f2c931ff5e8",
+      "preview_sha256": "c3820aa38786f138b998aed5dfaf1fe8f27715a5109eea404ae261baef807a72",
+      "material_names": [
+        "ALMOND::aluminium-anodized"
+      ]
     }
   ],
   "additional_batches": [
@@ -442,6 +570,44 @@
         "gen-driftwood-1",
         "gen-folded-throw-1",
         "gen-weathered-boulder-1"
+      ]
+    },
+    {
+      "schema_version": 1,
+      "created_at": "2026-11-05T02:15:30.076567+00:00",
+      "renderer": "Blender 5.1.2",
+      "engine": "BLENDER_WORKBENCH",
+      "script": "tools/render_generated_previews.py",
+      "script_sha256_lf": "0d7a86154a5cf8143512eaead6085ff5f6c4635bb511362b543fc665a730e058",
+      "colour_mode": "embedded_material_base_colour",
+      "transparent_background": true,
+      "resolution": [
+        640,
+        640
+      ],
+      "view_transform": "Standard",
+      "look": "None",
+      "studio_light": "paint.sl",
+      "studio_light_intensity": 1.0,
+      "notes": "Preview-only derivation from the unchanged GLBs. Studio shading of assigned material colours; not photographic textures or a full PBR render.",
+      "batch_id": "ginkgo-refset-1024",
+      "asset_ids": [
+        "gen-ac-condenser-louvred-1",
+        "gen-bed-low-duvet-1",
+        "gen-bin-galvanized-1",
+        "gen-chest-of-drawers-pine-1",
+        "gen-electric-kettle-1",
+        "gen-electric-meter-board-1",
+        "gen-garden-hose-coil-1",
+        "gen-gas-meter-1",
+        "gen-house-slippers-1",
+        "gen-laundry-basket-1",
+        "gen-mop-broom-bundle-1",
+        "gen-potted-plant-terracotta-1",
+        "gen-refuse-bag-1",
+        "gen-table-lamp-pleated-1",
+        "gen-washing-machine-front-1",
+        "gen-water-heater-tankless-1"
       ]
     }
   ]

@@ -8,7 +8,7 @@
   ],
   "scope": "Audit of local records, not verification with Meshy or proof of complete generation history.",
   "status": "consistent_with_documented_gaps",
-  "asset_count": 50,
+  "asset_count": 66,
   "errors": [],
   "assets": [
     {
@@ -2618,6 +2618,2454 @@
       ],
       "declared_license": "CC-BY-4.0",
       "rights_evidence": "Generated for the Almond library using the owner-configured Meshy account; public pack distribution authorized by owner. CC BY 4.0. API balance verified; subscription contract not independently audited.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-ac-condenser-louvred-1",
+      "name": "Air-conditioner outdoor unit",
+      "model_file": "models/gen-ac-condenser-louvred-1.glb",
+      "model_sha256": "6FEEA12919F9E38051A230C4E8ECE9C838D88A39AD7A471EBEFA31A4185DDEFA",
+      "contract_file": "models/gen-ac-condenser-louvred-1.almond.json",
+      "contract_sha256": "7EEE5336B085390BB58ED3DA2EE0CD039F6D7BB867C29938F7C2EBADC0F94B87",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "Product photo of an older, larger air-conditioner outdoor condenser unit: grey-beige painted steel, square louvre grille across the front, rust at the corners and screws, dirt streaks, dented top. Single object centred, three-quarter view from slightly above, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos, no labels.",
+        "image_task_id": null,
+        "image_model": "gpt_image_2_5",
+        "mesh_task_id": "01a16f47-7cfd-7151-9f74-fc60a7fab22c",
+        "mesh_model": "meshy-7.1",
+        "generated_at": "2026-10-24",
+        "orientation_correction": null,
+        "scale_applied": 406.873959,
+        "captured_generation": {
+          "batch_id": "ginkgo-refset-1024",
+          "image": {
+            "asset_id": "gen-ac-condenser-louvred-1",
+            "provider": "higgsfield",
+            "tool": "generate_image_batch",
+            "submitted_at": "2026-10-24T18:53:16.129Z",
+            "request": {
+              "model": "gpt_image_2_5",
+              "aspect_ratio": "1:1",
+              "prompt": "Product photo of an older, larger air-conditioner outdoor condenser unit: grey-beige painted steel, square louvre grille across the front, rust at the corners and screws, dirt streaks, dented top. Single object centred, three-quarter view from slightly above, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos, no labels."
+            },
+            "batch_context": "Clean single-object reference images for Meshy image-to-3D props of a photoreal apartment-block world pack.",
+            "status": "COMPLETED",
+            "task_id": "b516a4c3-ecd2-4740-9b1d-0257719736fe",
+            "provider_model": "gpt_image_2_5",
+            "completed_observed_at": "2026-10-24T18:55:01.053Z",
+            "provider_output_name": "hf_20261024_185329_b516a4c3-ecd2-4740-9b1d-0257719736fe.png",
+            "output_file": "gen-ac-condenser-louvred-1.png",
+            "output_sha256": "217636e05fd4b9c03e1db2d86db78aa9f22d827ba49c4e1fac15275773990679",
+            "output_file_modified_at": "2026-10-24T18:55:45+00:00",
+            "seed": null,
+            "consumed_credits": "about 0.25 (Ginkgo MESH_SOURCES.md)",
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "mesh": {
+            "asset_id": "gen-ac-condenser-louvred-1",
+            "provider": "meshy",
+            "tool": "meshy_image_to_3d",
+            "submitted_at": "2026-10-24T18:58:01.159Z",
+            "request": {
+              "ai_model": "meshy-7.1",
+              "enable_pbr": true,
+              "texture_resolution": "4k",
+              "target_formats": [
+                "glb"
+              ],
+              "image": "local upload of ref_ac_outdoor_old.png"
+            },
+            "input_image_sha256": "217636e05fd4b9c03e1db2d86db78aa9f22d827ba49c4e1fac15275773990679",
+            "status": "SUCCEEDED",
+            "status_basis": "Downloaded in the Ginkgo session with meshy_download_model; GLB present",
+            "task_id": "01a16f47-7cfd-7151-9f74-fc60a7fab22c",
+            "output_file": "gen-ac-condenser-louvred-1.glb",
+            "output_sha256": "236b431febb8bbb5ef29a606f76849fb80942aa80a01c5396bca01921b999411",
+            "seed": null,
+            "consumed_credits": 30,
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-ac-condenser-louvred-1",
+            "source_sha256": "236b431febb8bbb5ef29a606f76849fb80942aa80a01c5396bca01921b999411",
+            "source_triangles": 891242,
+            "target_triangles": 80000,
+            "prepared_sha256": "053868c800aea07189b426d84e0abe75f662e4f2de11643f3a6fe259f57298d5",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.902113914489746e-07,
+            "quality": {
+              "vertices": 39194,
+              "triangles": 80000,
+              "boundary_edges": 0,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 2,
+              "largest_component_vertices": 39055,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                1.7046784901161236e-05,
+                4.936894791913782e-06,
+                4.5334922009114405e-05
+              ]
+            }
+          },
+          "input_image_file": "batches/ginkgo-refset-1024/gen-ac-condenser-louvred-1.png",
+          "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+          "external_reference_ids": [],
+          "dimension_basis": "Real-world sizes authored in the Ginkgo pass (runs/refset_1024/worlds/jp.py PROPS); height normalised exactly, width and depth measured after uniform scaling. Not a physical survey.",
+          "reference_review": "Ginkgo reference image reviewed in that session for a clean, unbranded single object; re-checked for this import: no lettering, logos or brand marks visible.",
+          "rights": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private)",
+            "pass": "runs/refset_1024",
+            "source_name": "ac_outdoor_old",
+            "records": [
+              "runs/refset_1024/MESH_SOURCES.md",
+              "runs/refset_1024/meshy/jobs.json",
+              "runs/refset_1024/pass.json",
+              "Claude Code session transcript c849f85f-3384-47ae-bf45-2e1a471d157c (the tool calls that submitted the image and mesh jobs)"
+            ]
+          }
+        }
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "gpt_image_2_5",
+        "image_job_id": "b516a4c3-ecd2-4740-9b1d-0257719736fe",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-7.1",
+        "mesh_task_id": "01a16f47-7cfd-7151-9f74-fc60a7fab22c",
+        "generated_at": "2026-10-24"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "b516a4c3-ecd2-4740-9b1d-0257719736fe",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here.",
+        "input_file": "batches/ginkgo-refset-1024/gen-ac-condenser-louvred-1.png",
+        "sha256": "217636e05fd4b9c03e1db2d86db78aa9f22d827ba49c4e1fac15275773990679"
+      },
+      "catalogue_recipe_override": "captured_organic_batch",
+      "recipe_evidence": "Exact submitted API requests and downloaded input-image checksum retained in captured_generation.",
+      "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Provider seed was not returned where null.",
+        "Dimensions are authored study sizes, not verified physical measurements.",
+        "Mesh self-intersections and fabrication suitability have not been certified."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-water-heater-tankless-1",
+      "name": "Tankless gas water heater",
+      "model_file": "models/gen-water-heater-tankless-1.glb",
+      "model_sha256": "44D13326E635B5343C47097649A6F2D507F50F44B3479AE574C20F2C931FF5E8",
+      "contract_file": "models/gen-water-heater-tankless-1.almond.json",
+      "contract_sha256": "782AAD2657CEA2105EE148307E278B51B5866417A6B237BE5363F1D3736ABDB7",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "Product photo of a wall-mounted tankless gas water heater: cream-white steel box with a small louvred flue hood on top, a plain black control plate, copper and white PVC pipe stubs with brass unions below, faint rust streaks. Single object centred, three-quarter view, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos, no labels.",
+        "image_task_id": null,
+        "image_model": "gpt_image_2_5",
+        "mesh_task_id": "01a16f47-8475-7331-8588-d82c8ee064a6",
+        "mesh_model": "meshy-7.1",
+        "generated_at": "2026-10-24",
+        "orientation_correction": null,
+        "scale_applied": 325.801948,
+        "captured_generation": {
+          "batch_id": "ginkgo-refset-1024",
+          "image": {
+            "asset_id": "gen-water-heater-tankless-1",
+            "provider": "higgsfield",
+            "tool": "generate_image_batch",
+            "submitted_at": "2026-10-24T18:54:27.982Z",
+            "request": {
+              "model": "gpt_image_2_5",
+              "aspect_ratio": "1:1",
+              "prompt": "Product photo of a wall-mounted tankless gas water heater: cream-white steel box with a small louvred flue hood on top, a plain black control plate, copper and white PVC pipe stubs with brass unions below, faint rust streaks. Single object centred, three-quarter view, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos, no labels."
+            },
+            "batch_context": "Resubmitting rate-limited clean prop reference images for Meshy image-to-3D.",
+            "status": "COMPLETED",
+            "task_id": "9e508599-95ea-41c1-b043-6d7e35a8db23",
+            "provider_model": "gpt_image_2_5",
+            "completed_observed_at": "2026-10-24T18:56:02.127Z",
+            "provider_output_name": "hf_20261024_185453_9e508599-95ea-41c1-b043-6d7e35a8db23.png",
+            "output_file": "gen-water-heater-tankless-1.png",
+            "output_sha256": "386e7a15fb4e0601cbc095f60f4039b51b5807fff2cbeb04f00e6f48401b1951",
+            "output_file_modified_at": "2026-10-24T18:56:35+00:00",
+            "seed": null,
+            "consumed_credits": "about 0.25 (Ginkgo MESH_SOURCES.md)",
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "mesh": {
+            "asset_id": "gen-water-heater-tankless-1",
+            "provider": "meshy",
+            "tool": "meshy_image_to_3d",
+            "submitted_at": "2026-10-24T18:58:02.997Z",
+            "request": {
+              "ai_model": "meshy-7.1",
+              "enable_pbr": true,
+              "texture_resolution": "4k",
+              "target_formats": [
+                "glb"
+              ],
+              "image": "local upload of ref_water_heater.png"
+            },
+            "input_image_sha256": "386e7a15fb4e0601cbc095f60f4039b51b5807fff2cbeb04f00e6f48401b1951",
+            "status": "SUCCEEDED",
+            "status_basis": "Downloaded in the Ginkgo session with meshy_download_model; GLB present",
+            "task_id": "01a16f47-8475-7331-8588-d82c8ee064a6",
+            "output_file": "gen-water-heater-tankless-1.glb",
+            "output_sha256": "e94d53e9ce56a750915aed639964d5ebe4a5293b2b87375b4c4477dec02f5828",
+            "seed": null,
+            "consumed_credits": 30,
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-water-heater-tankless-1",
+            "source_sha256": "e94d53e9ce56a750915aed639964d5ebe4a5293b2b87375b4c4477dec02f5828",
+            "source_triangles": 329032,
+            "target_triangles": 40000,
+            "prepared_sha256": "35147b05f9485ecd9d082526f080e04360d902dc921642855503e2314ec92161",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.9031699895858763e-07,
+            "quality": {
+              "vertices": 19970,
+              "triangles": 40000,
+              "boundary_edges": 0,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 2,
+              "largest_component_vertices": 18272,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                4.073859064845652e-05,
+                0.0002951904622843122,
+                9.113716443906766e-05
+              ]
+            }
+          },
+          "input_image_file": "batches/ginkgo-refset-1024/gen-water-heater-tankless-1.png",
+          "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+          "external_reference_ids": [],
+          "dimension_basis": "Real-world sizes authored in the Ginkgo pass (runs/refset_1024/worlds/jp.py PROPS); height normalised exactly, width and depth measured after uniform scaling. Not a physical survey.",
+          "reference_review": "Ginkgo reference image reviewed in that session for a clean, unbranded single object; re-checked for this import: no lettering, logos or brand marks visible.",
+          "rights": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private)",
+            "pass": "runs/refset_1024",
+            "source_name": "water_heater",
+            "records": [
+              "runs/refset_1024/MESH_SOURCES.md",
+              "runs/refset_1024/meshy/jobs.json",
+              "runs/refset_1024/pass.json",
+              "Claude Code session transcript c849f85f-3384-47ae-bf45-2e1a471d157c (the tool calls that submitted the image and mesh jobs)"
+            ]
+          }
+        }
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "gpt_image_2_5",
+        "image_job_id": "9e508599-95ea-41c1-b043-6d7e35a8db23",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-7.1",
+        "mesh_task_id": "01a16f47-8475-7331-8588-d82c8ee064a6",
+        "generated_at": "2026-10-24"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "9e508599-95ea-41c1-b043-6d7e35a8db23",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here.",
+        "input_file": "batches/ginkgo-refset-1024/gen-water-heater-tankless-1.png",
+        "sha256": "386e7a15fb4e0601cbc095f60f4039b51b5807fff2cbeb04f00e6f48401b1951"
+      },
+      "catalogue_recipe_override": "captured_organic_batch",
+      "recipe_evidence": "Exact submitted API requests and downloaded input-image checksum retained in captured_generation.",
+      "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Provider seed was not returned where null.",
+        "Dimensions are authored study sizes, not verified physical measurements.",
+        "Mesh self-intersections and fabrication suitability have not been certified."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-gas-meter-1",
+      "name": "Gas meter",
+      "model_file": "models/gen-gas-meter-1.glb",
+      "model_sha256": "76CB8597F5898B3F53F04AEE504FC5ADBEAEB67B99066FF58B7BE14AC588735D",
+      "contract_file": "models/gen-gas-meter-1.almond.json",
+      "contract_sha256": "85A13EF8B88156B69DB66AC6806039D0026274245763AD5FFF43D0016DFD3200",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "Product photo of a residential diaphragm gas meter: grey painted steel body with a small dial window, two vertical galvanised steel pipes with unions rising from the top, chipped paint. Single object centred, three-quarter view, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos, no labels.",
+        "image_task_id": null,
+        "image_model": "gpt_image_2_5",
+        "mesh_task_id": "01a16f47-8a24-7085-a3c3-42150c261a71",
+        "mesh_model": "meshy-7.1",
+        "generated_at": "2026-10-24",
+        "orientation_correction": null,
+        "scale_applied": 252.258616,
+        "captured_generation": {
+          "batch_id": "ginkgo-refset-1024",
+          "image": {
+            "asset_id": "gen-gas-meter-1",
+            "provider": "higgsfield",
+            "tool": "generate_image_batch",
+            "submitted_at": "2026-10-24T18:53:16.129Z",
+            "request": {
+              "model": "gpt_image_2_5",
+              "aspect_ratio": "1:1",
+              "prompt": "Product photo of a residential diaphragm gas meter: grey painted steel body with a small dial window, two vertical galvanised steel pipes with unions rising from the top, chipped paint. Single object centred, three-quarter view, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos, no labels."
+            },
+            "batch_context": "Clean single-object reference images for Meshy image-to-3D props of a photoreal apartment-block world pack.",
+            "status": "COMPLETED",
+            "task_id": "8efcc2af-3118-4c2a-bf40-a05efc36439b",
+            "provider_model": "gpt_image_2_5",
+            "completed_observed_at": "2026-10-24T18:55:01.053Z",
+            "provider_output_name": "hf_20261024_185330_8efcc2af-3118-4c2a-bf40-a05efc36439b.png",
+            "output_file": "gen-gas-meter-1.png",
+            "output_sha256": "e31ab06b88cc9a86f6ede5cc6f19b12e99b708b2b2dad36f57247d6377bffd9a",
+            "output_file_modified_at": "2026-10-24T18:55:45+00:00",
+            "seed": null,
+            "consumed_credits": "about 0.25 (Ginkgo MESH_SOURCES.md)",
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "mesh": {
+            "asset_id": "gen-gas-meter-1",
+            "provider": "meshy",
+            "tool": "meshy_image_to_3d",
+            "submitted_at": "2026-10-24T18:58:04.836Z",
+            "request": {
+              "ai_model": "meshy-7.1",
+              "enable_pbr": true,
+              "texture_resolution": "4k",
+              "target_formats": [
+                "glb"
+              ],
+              "image": "local upload of ref_gas_meter.png"
+            },
+            "input_image_sha256": "e31ab06b88cc9a86f6ede5cc6f19b12e99b708b2b2dad36f57247d6377bffd9a",
+            "status": "SUCCEEDED",
+            "status_basis": "Downloaded in the Ginkgo session with meshy_download_model; GLB present",
+            "task_id": "01a16f47-8a24-7085-a3c3-42150c261a71",
+            "output_file": "gen-gas-meter-1.glb",
+            "output_sha256": "8ee96494748173688e07a0a411ab1b2c59fb1c8994ce2ac40315ef891843afed",
+            "seed": null,
+            "consumed_credits": 30,
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-gas-meter-1",
+            "source_sha256": "8ee96494748173688e07a0a411ab1b2c59fb1c8994ce2ac40315ef891843afed",
+            "source_triangles": 536650,
+            "target_triangles": 40000,
+            "prepared_sha256": "9e56d7b0b5b067c738811057b533bdb48fb67c37502b0dda6479a963ceda22b3",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.9032599925994872e-07,
+            "quality": {
+              "vertices": 19968,
+              "triangles": 40000,
+              "boundary_edges": 0,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 1,
+              "largest_component_vertices": 19968,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                0.0002693490621506537,
+                8.579396963975976e-05,
+                0.00023688278786613954
+              ]
+            }
+          },
+          "input_image_file": "batches/ginkgo-refset-1024/gen-gas-meter-1.png",
+          "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+          "external_reference_ids": [],
+          "dimension_basis": "Real-world sizes authored in the Ginkgo pass (runs/refset_1024/worlds/jp.py PROPS); height normalised exactly, width and depth measured after uniform scaling. Not a physical survey.",
+          "reference_review": "Ginkgo reference image reviewed in that session for a clean, unbranded single object; re-checked for this import: no lettering, logos or brand marks visible.",
+          "rights": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private)",
+            "pass": "runs/refset_1024",
+            "source_name": "gas_meter",
+            "records": [
+              "runs/refset_1024/MESH_SOURCES.md",
+              "runs/refset_1024/meshy/jobs.json",
+              "runs/refset_1024/pass.json",
+              "Claude Code session transcript c849f85f-3384-47ae-bf45-2e1a471d157c (the tool calls that submitted the image and mesh jobs)"
+            ]
+          }
+        }
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "gpt_image_2_5",
+        "image_job_id": "8efcc2af-3118-4c2a-bf40-a05efc36439b",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-7.1",
+        "mesh_task_id": "01a16f47-8a24-7085-a3c3-42150c261a71",
+        "generated_at": "2026-10-24"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "8efcc2af-3118-4c2a-bf40-a05efc36439b",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here.",
+        "input_file": "batches/ginkgo-refset-1024/gen-gas-meter-1.png",
+        "sha256": "e31ab06b88cc9a86f6ede5cc6f19b12e99b708b2b2dad36f57247d6377bffd9a"
+      },
+      "catalogue_recipe_override": "captured_organic_batch",
+      "recipe_evidence": "Exact submitted API requests and downloaded input-image checksum retained in captured_generation.",
+      "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Provider seed was not returned where null.",
+        "Dimensions are authored study sizes, not verified physical measurements.",
+        "Mesh self-intersections and fabrication suitability have not been certified."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-electric-meter-board-1",
+      "name": "Electric meter board",
+      "model_file": "models/gen-electric-meter-board-1.glb",
+      "model_sha256": "317C6ABC92151FB16E74D5ABB901F4EB24800B13C308759923ADDB32DE34F4EB",
+      "contract_file": "models/gen-electric-meter-board-1.almond.json",
+      "contract_sha256": "D11A1641DE0FFFCC076B6FF4DDDD67747A8E1A84C03E9EF3A94AAACBF1DB41FB",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "Product photo of a row of five round glass-domed electric meters mounted on a weathered white steel board, black bakelite bases, grey conduit wires hanging below each meter. Single object centred, straight-on view slightly from above, whole board in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no numbers, no logos.",
+        "image_task_id": null,
+        "image_model": "gpt_image_2_5",
+        "mesh_task_id": "01a16f47-90ee-76ad-9308-c9a945e8a2df",
+        "mesh_model": "meshy-7.1",
+        "generated_at": "2026-10-24",
+        "orientation_correction": null,
+        "scale_applied": 658.091766,
+        "captured_generation": {
+          "batch_id": "ginkgo-refset-1024",
+          "image": {
+            "asset_id": "gen-electric-meter-board-1",
+            "provider": "higgsfield",
+            "tool": "generate_image_batch",
+            "submitted_at": "2026-10-24T18:53:16.129Z",
+            "request": {
+              "model": "gpt_image_2_5",
+              "aspect_ratio": "1:1",
+              "prompt": "Product photo of a row of five round glass-domed electric meters mounted on a weathered white steel board, black bakelite bases, grey conduit wires hanging below each meter. Single object centred, straight-on view slightly from above, whole board in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no numbers, no logos."
+            },
+            "batch_context": "Clean single-object reference images for Meshy image-to-3D props of a photoreal apartment-block world pack.",
+            "status": "COMPLETED",
+            "task_id": "3211234c-6626-4040-80c6-8052d57c3838",
+            "provider_model": "gpt_image_2_5",
+            "completed_observed_at": "2026-10-24T18:55:01.053Z",
+            "provider_output_name": "hf_20261024_185330_3211234c-6626-4040-80c6-8052d57c3838.png",
+            "output_file": "gen-electric-meter-board-1.png",
+            "output_sha256": "1b7558e00bb9a776e71f39e4686fc4dc287579df62f1957bf347deab469e41bb",
+            "output_file_modified_at": "2026-10-24T18:55:46+00:00",
+            "seed": null,
+            "consumed_credits": "about 0.25 (Ginkgo MESH_SOURCES.md)",
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "mesh": {
+            "asset_id": "gen-electric-meter-board-1",
+            "provider": "meshy",
+            "tool": "meshy_image_to_3d",
+            "submitted_at": "2026-10-24T18:58:06.738Z",
+            "request": {
+              "ai_model": "meshy-7.1",
+              "enable_pbr": true,
+              "texture_resolution": "4k",
+              "target_formats": [
+                "glb"
+              ],
+              "image": "local upload of ref_electric_meters.png"
+            },
+            "input_image_sha256": "1b7558e00bb9a776e71f39e4686fc4dc287579df62f1957bf347deab469e41bb",
+            "status": "SUCCEEDED",
+            "status_basis": "Downloaded in the Ginkgo session with meshy_download_model; GLB present",
+            "task_id": "01a16f47-90ee-76ad-9308-c9a945e8a2df",
+            "output_file": "gen-electric-meter-board-1.glb",
+            "output_sha256": "5f7992b4281e54f8224a938c0c664a996cb3783cc71fce92763c898b8e3093bc",
+            "seed": null,
+            "consumed_credits": 30,
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-electric-meter-board-1",
+            "source_sha256": "5f7992b4281e54f8224a938c0c664a996cb3783cc71fce92763c898b8e3093bc",
+            "source_triangles": 394030,
+            "target_triangles": 80000,
+            "prepared_sha256": "45c775f55f8236cd1a956c8daae562665b069121766ac8b4a5b9fba62694c984",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.9030489921569822e-07,
+            "quality": {
+              "vertices": 39970,
+              "triangles": 80000,
+              "boundary_edges": 0,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 1,
+              "largest_component_vertices": 39970,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                3.8586984710283155e-05,
+                4.675869817549787e-06,
+                8.952534756441871e-05
+              ]
+            }
+          },
+          "input_image_file": "batches/ginkgo-refset-1024/gen-electric-meter-board-1.png",
+          "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+          "external_reference_ids": [],
+          "dimension_basis": "Real-world sizes authored in the Ginkgo pass (runs/refset_1024/worlds/jp.py PROPS); height normalised exactly, width and depth measured after uniform scaling. Not a physical survey.",
+          "reference_review": "Ginkgo reference image reviewed in that session for a clean, unbranded single object; re-checked for this import: no lettering, logos or brand marks visible.",
+          "rights": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private)",
+            "pass": "runs/refset_1024",
+            "source_name": "electric_meters",
+            "records": [
+              "runs/refset_1024/MESH_SOURCES.md",
+              "runs/refset_1024/meshy/jobs.json",
+              "runs/refset_1024/pass.json",
+              "Claude Code session transcript c849f85f-3384-47ae-bf45-2e1a471d157c (the tool calls that submitted the image and mesh jobs)"
+            ]
+          }
+        }
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "gpt_image_2_5",
+        "image_job_id": "3211234c-6626-4040-80c6-8052d57c3838",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-7.1",
+        "mesh_task_id": "01a16f47-90ee-76ad-9308-c9a945e8a2df",
+        "generated_at": "2026-10-24"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "3211234c-6626-4040-80c6-8052d57c3838",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here.",
+        "input_file": "batches/ginkgo-refset-1024/gen-electric-meter-board-1.png",
+        "sha256": "1b7558e00bb9a776e71f39e4686fc4dc287579df62f1957bf347deab469e41bb"
+      },
+      "catalogue_recipe_override": "captured_organic_batch",
+      "recipe_evidence": "Exact submitted API requests and downloaded input-image checksum retained in captured_generation.",
+      "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Provider seed was not returned where null.",
+        "Dimensions are authored study sizes, not verified physical measurements.",
+        "Mesh self-intersections and fabrication suitability have not been certified."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-bin-galvanized-1",
+      "name": "Galvanised refuse bin",
+      "model_file": "models/gen-bin-galvanized-1.glb",
+      "model_sha256": "5BAE99B3F114619D98642F6F177D60F00AA43B4B43F2B4CCE4EB8436206994C6",
+      "contract_file": "models/gen-bin-galvanized-1.almond.json",
+      "contract_sha256": "6F0A238C689CE054E760565542ACF9BCEE88B7F035B62835DBBEAA81BE3902E4",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "Product photo of a dented galvanised steel garbage bin with a loose lid sitting slightly askew, dull zinc metal, grime at the base. Single object centred, three-quarter view, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos.",
+        "image_task_id": null,
+        "image_model": "gpt_image_2_5",
+        "mesh_task_id": "01a16f47-9821-71b5-b197-5d5b5ee34883",
+        "mesh_model": "meshy-7.1",
+        "generated_at": "2026-10-24",
+        "orientation_correction": null,
+        "scale_applied": 409.88792,
+        "captured_generation": {
+          "batch_id": "ginkgo-refset-1024",
+          "image": {
+            "asset_id": "gen-bin-galvanized-1",
+            "provider": "higgsfield",
+            "tool": "generate_image_batch",
+            "submitted_at": "2026-10-24T18:53:16.129Z",
+            "request": {
+              "model": "gpt_image_2_5",
+              "aspect_ratio": "1:1",
+              "prompt": "Product photo of a dented galvanised steel garbage bin with a loose lid sitting slightly askew, dull zinc metal, grime at the base. Single object centred, three-quarter view, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos."
+            },
+            "batch_context": "Clean single-object reference images for Meshy image-to-3D props of a photoreal apartment-block world pack.",
+            "status": "COMPLETED",
+            "task_id": "d26e9b5f-1b6e-4875-9d39-d1adbbad7e2b",
+            "provider_model": "gpt_image_2_5",
+            "completed_observed_at": "2026-10-24T18:55:01.053Z",
+            "provider_output_name": "hf_20261024_185329_d26e9b5f-1b6e-4875-9d39-d1adbbad7e2b.png",
+            "output_file": "gen-bin-galvanized-1.png",
+            "output_sha256": "c62978d3da0c8a27103bcf71f9024825190810bbf801aeb49d8da9bdb456eafe",
+            "output_file_modified_at": "2026-10-24T18:55:46+00:00",
+            "seed": null,
+            "consumed_credits": "about 0.25 (Ginkgo MESH_SOURCES.md)",
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "mesh": {
+            "asset_id": "gen-bin-galvanized-1",
+            "provider": "meshy",
+            "tool": "meshy_image_to_3d",
+            "submitted_at": "2026-10-24T18:58:08.641Z",
+            "request": {
+              "ai_model": "meshy-7.1",
+              "enable_pbr": true,
+              "texture_resolution": "4k",
+              "target_formats": [
+                "glb"
+              ],
+              "image": "local upload of ref_bin_galv.png"
+            },
+            "input_image_sha256": "c62978d3da0c8a27103bcf71f9024825190810bbf801aeb49d8da9bdb456eafe",
+            "status": "SUCCEEDED",
+            "status_basis": "Downloaded in the Ginkgo session with meshy_download_model; GLB present",
+            "task_id": "01a16f47-9821-71b5-b197-5d5b5ee34883",
+            "output_file": "gen-bin-galvanized-1.glb",
+            "output_sha256": "71424121396ac25d84157ec7efed7ccea7cee04f580f8e89e6bb2e3976f59fbc",
+            "seed": null,
+            "consumed_credits": 30,
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-bin-galvanized-1",
+            "source_sha256": "71424121396ac25d84157ec7efed7ccea7cee04f580f8e89e6bb2e3976f59fbc",
+            "source_triangles": 594554,
+            "target_triangles": 80000,
+            "prepared_sha256": "b5f98d678fdcd5254bfec601d3e71544ced16b9137c0ad0218329a751d1f43b3",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.9030100107192991e-07,
+            "quality": {
+              "vertices": 39918,
+              "triangles": 80000,
+              "boundary_edges": 0,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 1,
+              "largest_component_vertices": 39918,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                0.00019593517889943113,
+                5.6835328985763565e-05,
+                2.6685701631930882e-05
+              ]
+            }
+          },
+          "input_image_file": "batches/ginkgo-refset-1024/gen-bin-galvanized-1.png",
+          "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+          "external_reference_ids": [],
+          "dimension_basis": "Real-world sizes authored in the Ginkgo pass (runs/refset_1024/worlds/jp.py PROPS); height normalised exactly, width and depth measured after uniform scaling. Not a physical survey.",
+          "reference_review": "Ginkgo reference image reviewed in that session for a clean, unbranded single object; re-checked for this import: no lettering, logos or brand marks visible.",
+          "rights": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private)",
+            "pass": "runs/refset_1024",
+            "source_name": "bin_galv",
+            "records": [
+              "runs/refset_1024/MESH_SOURCES.md",
+              "runs/refset_1024/meshy/jobs.json",
+              "runs/refset_1024/pass.json",
+              "Claude Code session transcript c849f85f-3384-47ae-bf45-2e1a471d157c (the tool calls that submitted the image and mesh jobs)"
+            ]
+          }
+        }
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "gpt_image_2_5",
+        "image_job_id": "d26e9b5f-1b6e-4875-9d39-d1adbbad7e2b",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-7.1",
+        "mesh_task_id": "01a16f47-9821-71b5-b197-5d5b5ee34883",
+        "generated_at": "2026-10-24"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "d26e9b5f-1b6e-4875-9d39-d1adbbad7e2b",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here.",
+        "input_file": "batches/ginkgo-refset-1024/gen-bin-galvanized-1.png",
+        "sha256": "c62978d3da0c8a27103bcf71f9024825190810bbf801aeb49d8da9bdb456eafe"
+      },
+      "catalogue_recipe_override": "captured_organic_batch",
+      "recipe_evidence": "Exact submitted API requests and downloaded input-image checksum retained in captured_generation.",
+      "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Provider seed was not returned where null.",
+        "Dimensions are authored study sizes, not verified physical measurements.",
+        "Mesh self-intersections and fabrication suitability have not been certified."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-garden-hose-coil-1",
+      "name": "Garden hose",
+      "model_file": "models/gen-garden-hose-coil-1.glb",
+      "model_sha256": "18043223963DB69BDC40EAA8A86D07C23D596AC3AF4926143BAE58A8566B4C1D",
+      "contract_file": "models/gen-garden-hose-coil-1.almond.json",
+      "contract_sha256": "30E84A32A5B225A784210B706547EAD1D3A4FF180C63D10DB3B71C809E470D91",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "Product photo of a coiled dark green rubber garden hose lying flat on the ground in a loose coil with a brass nozzle, worn. Single object centred, three-quarter view from above, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos.",
+        "image_task_id": null,
+        "image_model": "gpt_image_2_5",
+        "mesh_task_id": "01a16f47-9f55-70ee-bf92-3e3dc39b569d",
+        "mesh_model": "meshy-7.1",
+        "generated_at": "2026-10-24",
+        "orientation_correction": null,
+        "scale_applied": 320.722522,
+        "captured_generation": {
+          "batch_id": "ginkgo-refset-1024",
+          "image": {
+            "asset_id": "gen-garden-hose-coil-1",
+            "provider": "higgsfield",
+            "tool": "generate_image_batch",
+            "submitted_at": "2026-10-24T18:54:27.982Z",
+            "request": {
+              "model": "gpt_image_2_5",
+              "aspect_ratio": "1:1",
+              "prompt": "Product photo of a coiled dark green rubber garden hose lying flat on the ground in a loose coil with a brass nozzle, worn. Single object centred, three-quarter view from above, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos."
+            },
+            "batch_context": "Resubmitting rate-limited clean prop reference images for Meshy image-to-3D.",
+            "status": "COMPLETED",
+            "task_id": "0eefcab7-5db6-4e0d-a1d0-32271de41b48",
+            "provider_model": "gpt_image_2_5",
+            "completed_observed_at": "2026-10-24T18:56:02.127Z",
+            "provider_output_name": "hf_20261024_185453_0eefcab7-5db6-4e0d-a1d0-32271de41b48.png",
+            "output_file": "gen-garden-hose-coil-1.png",
+            "output_sha256": "51b57eacefb452b4f390a337eb246213ad1b540a65c8eba733a0cf5ecb252000",
+            "output_file_modified_at": "2026-10-24T18:56:36+00:00",
+            "seed": null,
+            "consumed_credits": "about 0.25 (Ginkgo MESH_SOURCES.md)",
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "mesh": {
+            "asset_id": "gen-garden-hose-coil-1",
+            "provider": "meshy",
+            "tool": "meshy_image_to_3d",
+            "submitted_at": "2026-10-24T18:58:10.548Z",
+            "request": {
+              "ai_model": "meshy-7.1",
+              "enable_pbr": true,
+              "texture_resolution": "4k",
+              "target_formats": [
+                "glb"
+              ],
+              "image": "local upload of ref_hose_coil.png"
+            },
+            "input_image_sha256": "51b57eacefb452b4f390a337eb246213ad1b540a65c8eba733a0cf5ecb252000",
+            "status": "SUCCEEDED",
+            "status_basis": "Downloaded in the Ginkgo session with meshy_download_model; GLB present",
+            "task_id": "01a16f47-9f55-70ee-bf92-3e3dc39b569d",
+            "output_file": "gen-garden-hose-coil-1.glb",
+            "output_sha256": "d0ca88c0ebdad999952bd71b3c10d5a9ff8fbf3bc234452e3222fd399a414caf",
+            "seed": null,
+            "consumed_credits": 30,
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-garden-hose-coil-1",
+            "source_sha256": "d0ca88c0ebdad999952bd71b3c10d5a9ff8fbf3bc234452e3222fd399a414caf",
+            "source_triangles": 770376,
+            "target_triangles": 80000,
+            "prepared_sha256": "c349cdbad6aef80f9cc58f34b92d0fe35f33da3bb4663a1153d5a1c1063df8ae",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.9031870365142822e-07,
+            "quality": {
+              "vertices": 39726,
+              "triangles": 80000,
+              "boundary_edges": 0,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 1,
+              "largest_component_vertices": 39726,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                0.00033202121033961194,
+                0.00010879988775509564,
+                0.0004761228970297817
+              ]
+            }
+          },
+          "input_image_file": "batches/ginkgo-refset-1024/gen-garden-hose-coil-1.png",
+          "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+          "external_reference_ids": [],
+          "dimension_basis": "Real-world sizes authored in the Ginkgo pass (runs/refset_1024/worlds/jp.py PROPS); height normalised exactly, width and depth measured after uniform scaling. Not a physical survey.",
+          "reference_review": "Ginkgo reference image reviewed in that session for a clean, unbranded single object; re-checked for this import: no lettering, logos or brand marks visible.",
+          "rights": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private)",
+            "pass": "runs/refset_1024",
+            "source_name": "hose_coil",
+            "records": [
+              "runs/refset_1024/MESH_SOURCES.md",
+              "runs/refset_1024/meshy/jobs.json",
+              "runs/refset_1024/pass.json",
+              "Claude Code session transcript c849f85f-3384-47ae-bf45-2e1a471d157c (the tool calls that submitted the image and mesh jobs)"
+            ]
+          }
+        }
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "gpt_image_2_5",
+        "image_job_id": "0eefcab7-5db6-4e0d-a1d0-32271de41b48",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-7.1",
+        "mesh_task_id": "01a16f47-9f55-70ee-bf92-3e3dc39b569d",
+        "generated_at": "2026-10-24"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "0eefcab7-5db6-4e0d-a1d0-32271de41b48",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here.",
+        "input_file": "batches/ginkgo-refset-1024/gen-garden-hose-coil-1.png",
+        "sha256": "51b57eacefb452b4f390a337eb246213ad1b540a65c8eba733a0cf5ecb252000"
+      },
+      "catalogue_recipe_override": "captured_organic_batch",
+      "recipe_evidence": "Exact submitted API requests and downloaded input-image checksum retained in captured_generation.",
+      "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Provider seed was not returned where null.",
+        "Dimensions are authored study sizes, not verified physical measurements.",
+        "Mesh self-intersections and fabrication suitability have not been certified."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-mop-broom-bundle-1",
+      "name": "Mop and broom",
+      "model_file": "models/gen-mop-broom-bundle-1.glb",
+      "model_sha256": "021378274CFA81BB14593ADA9C3D5DB0E5FE6F4FFF487E80CB71870B5E9CD66F",
+      "contract_file": "models/gen-mop-broom-bundle-1.almond.json",
+      "contract_sha256": "9A40C342B5B9774F9B6D9F68128DF2D941A5A1C57CF3E7DFC0F6CCD4CE47BA89",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "Product photo of a worn string mop with a wooden handle and a plastic broom with a pale handle leaning together as one bundle, standing upright. Single object centred, three-quarter view, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos.",
+        "image_task_id": null,
+        "image_model": "gpt_image_2_5",
+        "mesh_task_id": "01a16f47-a6b2-74c2-8db4-961ed74e6107",
+        "mesh_model": "meshy-7.1",
+        "generated_at": "2026-10-24",
+        "orientation_correction": null,
+        "scale_applied": 707.426752,
+        "captured_generation": {
+          "batch_id": "ginkgo-refset-1024",
+          "image": {
+            "asset_id": "gen-mop-broom-bundle-1",
+            "provider": "higgsfield",
+            "tool": "generate_image_batch",
+            "submitted_at": "2026-10-24T18:54:27.982Z",
+            "request": {
+              "model": "gpt_image_2_5",
+              "aspect_ratio": "1:1",
+              "prompt": "Product photo of a worn string mop with a wooden handle and a plastic broom with a pale handle leaning together as one bundle, standing upright. Single object centred, three-quarter view, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos."
+            },
+            "batch_context": "Resubmitting rate-limited clean prop reference images for Meshy image-to-3D.",
+            "status": "COMPLETED",
+            "task_id": "3b353e13-85df-4b90-bfba-cdaa61989114",
+            "provider_model": "gpt_image_2_5",
+            "completed_observed_at": "2026-10-24T18:56:02.127Z",
+            "provider_output_name": "hf_20261024_185454_3b353e13-85df-4b90-bfba-cdaa61989114.png",
+            "output_file": "gen-mop-broom-bundle-1.png",
+            "output_sha256": "0e9a792457c5fb48dff79f883b80da8cce6fef16ea8ca920b8da2e4c00f5a64e",
+            "output_file_modified_at": "2026-10-24T18:56:36+00:00",
+            "seed": null,
+            "consumed_credits": "about 0.25 (Ginkgo MESH_SOURCES.md)",
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "mesh": {
+            "asset_id": "gen-mop-broom-bundle-1",
+            "provider": "meshy",
+            "tool": "meshy_image_to_3d",
+            "submitted_at": "2026-10-24T18:58:12.384Z",
+            "request": {
+              "ai_model": "meshy-7.1",
+              "enable_pbr": true,
+              "texture_resolution": "4k",
+              "target_formats": [
+                "glb"
+              ],
+              "image": "local upload of ref_mop.png"
+            },
+            "input_image_sha256": "0e9a792457c5fb48dff79f883b80da8cce6fef16ea8ca920b8da2e4c00f5a64e",
+            "status": "SUCCEEDED",
+            "status_basis": "Downloaded in the Ginkgo session with meshy_download_model; GLB present",
+            "task_id": "01a16f47-a6b2-74c2-8db4-961ed74e6107",
+            "output_file": "gen-mop-broom-bundle-1.glb",
+            "output_sha256": "8ba3d827266030e81634b30f5dd927b4847238ce989fb21a3e3523450cc799cc",
+            "seed": null,
+            "consumed_credits": 30,
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-mop-broom-bundle-1",
+            "source_sha256": "8ba3d827266030e81634b30f5dd927b4847238ce989fb21a3e3523450cc799cc",
+            "source_triangles": 6161668,
+            "target_triangles": 80000,
+            "prepared_sha256": "9a55d64bff20b374b3e1b5a20253fc421b96ace32c04fb62d95629ccb3f90739",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.9054670333862305e-07,
+            "quality": {
+              "vertices": 35048,
+              "triangles": 80000,
+              "boundary_edges": 0,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 2,
+              "largest_component_vertices": 34965,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                0.00012650175819436523,
+                0.0006832566552414804,
+                0.0014997294831351129
+              ]
+            }
+          },
+          "input_image_file": "batches/ginkgo-refset-1024/gen-mop-broom-bundle-1.png",
+          "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+          "external_reference_ids": [],
+          "dimension_basis": "Real-world sizes authored in the Ginkgo pass (runs/refset_1024/worlds/jp.py PROPS); height normalised exactly, width and depth measured after uniform scaling. Not a physical survey.",
+          "reference_review": "Ginkgo reference image reviewed in that session for a clean, unbranded single object; re-checked for this import: no lettering, logos or brand marks visible.",
+          "rights": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private)",
+            "pass": "runs/refset_1024",
+            "source_name": "mop",
+            "records": [
+              "runs/refset_1024/MESH_SOURCES.md",
+              "runs/refset_1024/meshy/jobs.json",
+              "runs/refset_1024/pass.json",
+              "Claude Code session transcript c849f85f-3384-47ae-bf45-2e1a471d157c (the tool calls that submitted the image and mesh jobs)"
+            ]
+          }
+        }
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "gpt_image_2_5",
+        "image_job_id": "3b353e13-85df-4b90-bfba-cdaa61989114",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-7.1",
+        "mesh_task_id": "01a16f47-a6b2-74c2-8db4-961ed74e6107",
+        "generated_at": "2026-10-24"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "3b353e13-85df-4b90-bfba-cdaa61989114",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here.",
+        "input_file": "batches/ginkgo-refset-1024/gen-mop-broom-bundle-1.png",
+        "sha256": "0e9a792457c5fb48dff79f883b80da8cce6fef16ea8ca920b8da2e4c00f5a64e"
+      },
+      "catalogue_recipe_override": "captured_organic_batch",
+      "recipe_evidence": "Exact submitted API requests and downloaded input-image checksum retained in captured_generation.",
+      "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Provider seed was not returned where null.",
+        "Dimensions are authored study sizes, not verified physical measurements.",
+        "Mesh self-intersections and fabrication suitability have not been certified."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-potted-plant-terracotta-1",
+      "name": "Potted houseplant",
+      "model_file": "models/gen-potted-plant-terracotta-1.glb",
+      "model_sha256": "9CC6637FA86FA243E1BA72ECCCD0C93CE04F82582ACA820E840D4C3FB8E9FD2A",
+      "contract_file": "models/gen-potted-plant-terracotta-1.almond.json",
+      "contract_sha256": "9A4108353C3790776BDA77C1318630A5AE965A124EE6F6E351F15156590A6E43",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "Product photo of a small terracotta pot with a leafy green houseplant, soil visible, a few drooping leaves, slightly chipped pot. Single object centred, three-quarter view, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos.",
+        "image_task_id": null,
+        "image_model": "gpt_image_2_5",
+        "mesh_task_id": "01a16f47-acef-73b8-ad74-e2361a5b70b1",
+        "mesh_model": "meshy-7.1",
+        "generated_at": "2026-10-24",
+        "orientation_correction": null,
+        "scale_applied": 244.256337,
+        "captured_generation": {
+          "batch_id": "ginkgo-refset-1024",
+          "image": {
+            "asset_id": "gen-potted-plant-terracotta-1",
+            "provider": "higgsfield",
+            "tool": "generate_image_batch",
+            "submitted_at": "2026-10-24T18:53:16.129Z",
+            "request": {
+              "model": "gpt_image_2_5",
+              "aspect_ratio": "1:1",
+              "prompt": "Product photo of a small terracotta pot with a leafy green houseplant, soil visible, a few drooping leaves, slightly chipped pot. Single object centred, three-quarter view, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos."
+            },
+            "batch_context": "Clean single-object reference images for Meshy image-to-3D props of a photoreal apartment-block world pack.",
+            "status": "COMPLETED",
+            "task_id": "54112069-f28e-46f3-a248-2066fde13576",
+            "provider_model": "gpt_image_2_5",
+            "completed_observed_at": "2026-10-24T18:55:01.053Z",
+            "provider_output_name": "hf_20261024_185329_54112069-f28e-46f3-a248-2066fde13576.png",
+            "output_file": "gen-potted-plant-terracotta-1.png",
+            "output_sha256": "c46759f27185f5854e1e437e5b15d1f9bd9aeb30b6b67316341aa8cb641c2a84",
+            "output_file_modified_at": "2026-10-24T18:55:46+00:00",
+            "seed": null,
+            "consumed_credits": "about 0.25 (Ginkgo MESH_SOURCES.md)",
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "mesh": {
+            "asset_id": "gen-potted-plant-terracotta-1",
+            "provider": "meshy",
+            "tool": "meshy_image_to_3d",
+            "submitted_at": "2026-10-24T18:58:14.223Z",
+            "request": {
+              "ai_model": "meshy-7.1",
+              "enable_pbr": true,
+              "texture_resolution": "4k",
+              "target_formats": [
+                "glb"
+              ],
+              "image": "local upload of ref_potted_plant.png"
+            },
+            "input_image_sha256": "c46759f27185f5854e1e437e5b15d1f9bd9aeb30b6b67316341aa8cb641c2a84",
+            "status": "SUCCEEDED",
+            "status_basis": "Downloaded in the Ginkgo session with meshy_download_model; GLB present",
+            "task_id": "01a16f47-acef-73b8-ad74-e2361a5b70b1",
+            "output_file": "gen-potted-plant-terracotta-1.glb",
+            "output_sha256": "f14892a09b5a806a5938fdea3afc2d726fd8a660653d0677e48a2838bb481e5a",
+            "seed": null,
+            "consumed_credits": 30,
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-potted-plant-terracotta-1",
+            "source_sha256": "f14892a09b5a806a5938fdea3afc2d726fd8a660653d0677e48a2838bb481e5a",
+            "source_triangles": 1427488,
+            "target_triangles": 80000,
+            "prepared_sha256": "119d457d797acacf8e6c183f421009a7d676c85cfbdfb27020915b3a66fa0228",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.9033129215240477e-07,
+            "quality": {
+              "vertices": 39934,
+              "triangles": 80000,
+              "boundary_edges": 0,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 2,
+              "largest_component_vertices": 39371,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                2.0230304796160575e-05,
+                7.145212630782162e-05,
+                7.117590620516727e-06
+              ]
+            }
+          },
+          "input_image_file": "batches/ginkgo-refset-1024/gen-potted-plant-terracotta-1.png",
+          "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+          "external_reference_ids": [],
+          "dimension_basis": "Real-world sizes authored in the Ginkgo pass (runs/refset_1024/worlds/jp.py PROPS); height normalised exactly, width and depth measured after uniform scaling. Not a physical survey.",
+          "reference_review": "Ginkgo reference image reviewed in that session for a clean, unbranded single object; re-checked for this import: no lettering, logos or brand marks visible.",
+          "rights": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private)",
+            "pass": "runs/refset_1024",
+            "source_name": "potted_plant",
+            "records": [
+              "runs/refset_1024/MESH_SOURCES.md",
+              "runs/refset_1024/meshy/jobs.json",
+              "runs/refset_1024/pass.json",
+              "Claude Code session transcript c849f85f-3384-47ae-bf45-2e1a471d157c (the tool calls that submitted the image and mesh jobs)"
+            ]
+          }
+        }
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "gpt_image_2_5",
+        "image_job_id": "54112069-f28e-46f3-a248-2066fde13576",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-7.1",
+        "mesh_task_id": "01a16f47-acef-73b8-ad74-e2361a5b70b1",
+        "generated_at": "2026-10-24"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "54112069-f28e-46f3-a248-2066fde13576",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here.",
+        "input_file": "batches/ginkgo-refset-1024/gen-potted-plant-terracotta-1.png",
+        "sha256": "c46759f27185f5854e1e437e5b15d1f9bd9aeb30b6b67316341aa8cb641c2a84"
+      },
+      "catalogue_recipe_override": "captured_organic_batch",
+      "recipe_evidence": "Exact submitted API requests and downloaded input-image checksum retained in captured_generation.",
+      "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Provider seed was not returned where null.",
+        "Dimensions are authored study sizes, not verified physical measurements.",
+        "Mesh self-intersections and fabrication suitability have not been certified."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-refuse-bag-1",
+      "name": "Refuse bag",
+      "model_file": "models/gen-refuse-bag-1.glb",
+      "model_sha256": "3EF319B577DFAFC7DACEE8638A50832CE152D7C6CA6B1970AE08356B2E47AFCC",
+      "contract_file": "models/gen-refuse-bag-1.almond.json",
+      "contract_sha256": "E9C41AA03BF25AF269CC66E2E676C4A4EFD2CC48EC36FE7945B7232CE8672025",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "Product photo of a tied translucent white plastic garbage bag, slumped and bulging, sitting on the ground. Single object centred, three-quarter view, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos.",
+        "image_task_id": null,
+        "image_model": "gpt_image_2_5",
+        "mesh_task_id": "01a16f47-b3be-75b4-823e-1c74a5b87dd3",
+        "mesh_model": "meshy-7.1",
+        "generated_at": "2026-10-24",
+        "orientation_correction": null,
+        "scale_applied": 325.878307,
+        "captured_generation": {
+          "batch_id": "ginkgo-refset-1024",
+          "image": {
+            "asset_id": "gen-refuse-bag-1",
+            "provider": "higgsfield",
+            "tool": "generate_image_batch",
+            "submitted_at": "2026-10-24T18:53:16.129Z",
+            "request": {
+              "model": "gpt_image_2_5",
+              "aspect_ratio": "1:1",
+              "prompt": "Product photo of a tied translucent white plastic garbage bag, slumped and bulging, sitting on the ground. Single object centred, three-quarter view, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos."
+            },
+            "batch_context": "Clean single-object reference images for Meshy image-to-3D props of a photoreal apartment-block world pack.",
+            "status": "COMPLETED",
+            "task_id": "0a669b7b-4171-45bc-824f-93faf8fd5f8e",
+            "provider_model": "gpt_image_2_5",
+            "completed_observed_at": "2026-10-24T18:55:01.053Z",
+            "provider_output_name": "hf_20261024_185329_0a669b7b-4171-45bc-824f-93faf8fd5f8e.png",
+            "output_file": "gen-refuse-bag-1.png",
+            "output_sha256": "f9e105b22992b67e02d71a086db32b93fc2769d0e24f571bb8c5ab1293a1d366",
+            "output_file_modified_at": "2026-10-24T18:55:47+00:00",
+            "seed": null,
+            "consumed_credits": "about 0.25 (Ginkgo MESH_SOURCES.md)",
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "mesh": {
+            "asset_id": "gen-refuse-bag-1",
+            "provider": "meshy",
+            "tool": "meshy_image_to_3d",
+            "submitted_at": "2026-10-24T18:58:16.130Z",
+            "request": {
+              "ai_model": "meshy-7.1",
+              "enable_pbr": true,
+              "texture_resolution": "4k",
+              "target_formats": [
+                "glb"
+              ],
+              "image": "local upload of ref_trash_bag.png"
+            },
+            "input_image_sha256": "f9e105b22992b67e02d71a086db32b93fc2769d0e24f571bb8c5ab1293a1d366",
+            "status": "SUCCEEDED",
+            "status_basis": "Downloaded in the Ginkgo session with meshy_download_model; GLB present",
+            "task_id": "01a16f47-b3be-75b4-823e-1c74a5b87dd3",
+            "output_file": "gen-refuse-bag-1.glb",
+            "output_sha256": "2b3a7428573912ae30d7af075a55cf13723226913462228eac1b3db2b92d8c9d",
+            "seed": null,
+            "consumed_credits": 30,
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-refuse-bag-1",
+            "source_sha256": "2b3a7428573912ae30d7af075a55cf13723226913462228eac1b3db2b92d8c9d",
+            "source_triangles": 1174196,
+            "target_triangles": 80000,
+            "prepared_sha256": "e198cab529a6c44ec9ecf5b801b47c553a61d85ebea75c3366744ba737d6a699",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.902208089828491e-07,
+            "quality": {
+              "vertices": 39755,
+              "triangles": 79998,
+              "boundary_edges": 0,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 1,
+              "largest_component_vertices": 39755,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                7.179105726535574e-05,
+                0.00016501215304727933,
+                0.00018011042009596112
+              ]
+            }
+          },
+          "input_image_file": "batches/ginkgo-refset-1024/gen-refuse-bag-1.png",
+          "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+          "external_reference_ids": [],
+          "dimension_basis": "Real-world sizes authored in the Ginkgo pass (runs/refset_1024/worlds/jp.py PROPS); height normalised exactly, width and depth measured after uniform scaling. Not a physical survey.",
+          "reference_review": "Ginkgo reference image reviewed in that session for a clean, unbranded single object; re-checked for this import: no lettering, logos or brand marks visible.",
+          "rights": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private)",
+            "pass": "runs/refset_1024",
+            "source_name": "trash_bag",
+            "records": [
+              "runs/refset_1024/MESH_SOURCES.md",
+              "runs/refset_1024/meshy/jobs.json",
+              "runs/refset_1024/pass.json",
+              "Claude Code session transcript c849f85f-3384-47ae-bf45-2e1a471d157c (the tool calls that submitted the image and mesh jobs)"
+            ]
+          }
+        }
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "gpt_image_2_5",
+        "image_job_id": "0a669b7b-4171-45bc-824f-93faf8fd5f8e",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-7.1",
+        "mesh_task_id": "01a16f47-b3be-75b4-823e-1c74a5b87dd3",
+        "generated_at": "2026-10-24"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "0a669b7b-4171-45bc-824f-93faf8fd5f8e",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here.",
+        "input_file": "batches/ginkgo-refset-1024/gen-refuse-bag-1.png",
+        "sha256": "f9e105b22992b67e02d71a086db32b93fc2769d0e24f571bb8c5ab1293a1d366"
+      },
+      "catalogue_recipe_override": "captured_organic_batch",
+      "recipe_evidence": "Exact submitted API requests and downloaded input-image checksum retained in captured_generation.",
+      "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Provider seed was not returned where null.",
+        "Dimensions are authored study sizes, not verified physical measurements.",
+        "Mesh self-intersections and fabrication suitability have not been certified."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-laundry-basket-1",
+      "name": "Laundry basket",
+      "model_file": "models/gen-laundry-basket-1.glb",
+      "model_sha256": "82F5BD17436091CC69F2F6FDF353A5A3CD7151448A9FB4BE53B2924988651FE4",
+      "contract_file": "models/gen-laundry-basket-1.almond.json",
+      "contract_sha256": "D95F1C522054523B4AF87C6640E5F69790887092211810108268CA26922A8877",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "Product photo of a white plastic laundry basket with a perforated lattice, heaped with dark folded clothes and a grey towel draped over the rim. Single object centred, three-quarter view from slightly above, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos.",
+        "image_task_id": null,
+        "image_model": "gpt_image_2_5",
+        "mesh_task_id": "01a16f47-c229-7548-9402-79e276cc58e0",
+        "mesh_model": "meshy-7.1",
+        "generated_at": "2026-10-24",
+        "orientation_correction": null,
+        "scale_applied": 339.271118,
+        "captured_generation": {
+          "batch_id": "ginkgo-refset-1024",
+          "image": {
+            "asset_id": "gen-laundry-basket-1",
+            "provider": "higgsfield",
+            "tool": "generate_image_batch",
+            "submitted_at": "2026-10-24T18:53:16.129Z",
+            "request": {
+              "model": "gpt_image_2_5",
+              "aspect_ratio": "1:1",
+              "prompt": "Product photo of a white plastic laundry basket with a perforated lattice, heaped with dark folded clothes and a grey towel draped over the rim. Single object centred, three-quarter view from slightly above, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos."
+            },
+            "batch_context": "Clean single-object reference images for Meshy image-to-3D props of a photoreal apartment-block world pack.",
+            "status": "COMPLETED",
+            "task_id": "2a7b4c2e-5d5b-4982-8499-c243ccc8c2ae",
+            "provider_model": "gpt_image_2_5",
+            "completed_observed_at": "2026-10-24T18:55:01.053Z",
+            "provider_output_name": "hf_20261024_185330_2a7b4c2e-5d5b-4982-8499-c243ccc8c2ae.png",
+            "output_file": "gen-laundry-basket-1.png",
+            "output_sha256": "be4e242d8509d00f15b46aff865007df9ef0066c3fbc92087e14a6eaaf85cdd4",
+            "output_file_modified_at": "2026-10-24T18:55:47+00:00",
+            "seed": null,
+            "consumed_credits": "about 0.25 (Ginkgo MESH_SOURCES.md)",
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "mesh": {
+            "asset_id": "gen-laundry-basket-1",
+            "provider": "meshy",
+            "tool": "meshy_image_to_3d",
+            "submitted_at": "2026-10-24T18:58:22.158Z",
+            "request": {
+              "ai_model": "meshy-7.1",
+              "enable_pbr": true,
+              "texture_resolution": "4k",
+              "target_formats": [
+                "glb"
+              ],
+              "image": "local upload of ref_laundry_basket.png"
+            },
+            "input_image_sha256": "be4e242d8509d00f15b46aff865007df9ef0066c3fbc92087e14a6eaaf85cdd4",
+            "status": "SUCCEEDED",
+            "status_basis": "Downloaded in the Ginkgo session with meshy_download_model; GLB present",
+            "task_id": "01a16f47-c229-7548-9402-79e276cc58e0",
+            "output_file": "gen-laundry-basket-1.glb",
+            "output_sha256": "4afd7867fcb796e0c10ea8f27584300d6df5649e05e1ab3e4e518a2786dfeee0",
+            "seed": null,
+            "consumed_credits": 30,
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-laundry-basket-1",
+            "source_sha256": "4afd7867fcb796e0c10ea8f27584300d6df5649e05e1ab3e4e518a2786dfeee0",
+            "source_triangles": 5387576,
+            "target_triangles": 80000,
+            "prepared_sha256": "c6a5a36e9c6b708e94d6b4bd4ba9dfe853fcfcb235165edfd2cefcf9aeb1abd1",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.9025299549102782e-07,
+            "quality": {
+              "vertices": 36478,
+              "triangles": 80000,
+              "boundary_edges": 0,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 2,
+              "largest_component_vertices": 36309,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                0.00027193701487595727,
+                0.0003901093884675556,
+                0.0015016214393936396
+              ]
+            }
+          },
+          "input_image_file": "batches/ginkgo-refset-1024/gen-laundry-basket-1.png",
+          "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+          "external_reference_ids": [],
+          "dimension_basis": "Real-world sizes authored in the Ginkgo pass (runs/refset_1024/worlds/jp.py PROPS); height normalised exactly, width and depth measured after uniform scaling. Not a physical survey.",
+          "reference_review": "Ginkgo reference image reviewed in that session for a clean, unbranded single object; re-checked for this import: no lettering, logos or brand marks visible.",
+          "rights": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private)",
+            "pass": "runs/refset_1024",
+            "source_name": "laundry_basket",
+            "records": [
+              "runs/refset_1024/MESH_SOURCES.md",
+              "runs/refset_1024/meshy/jobs.json",
+              "runs/refset_1024/pass.json",
+              "Claude Code session transcript c849f85f-3384-47ae-bf45-2e1a471d157c (the tool calls that submitted the image and mesh jobs)"
+            ]
+          }
+        }
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "gpt_image_2_5",
+        "image_job_id": "2a7b4c2e-5d5b-4982-8499-c243ccc8c2ae",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-7.1",
+        "mesh_task_id": "01a16f47-c229-7548-9402-79e276cc58e0",
+        "generated_at": "2026-10-24"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "2a7b4c2e-5d5b-4982-8499-c243ccc8c2ae",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here.",
+        "input_file": "batches/ginkgo-refset-1024/gen-laundry-basket-1.png",
+        "sha256": "be4e242d8509d00f15b46aff865007df9ef0066c3fbc92087e14a6eaaf85cdd4"
+      },
+      "catalogue_recipe_override": "captured_organic_batch",
+      "recipe_evidence": "Exact submitted API requests and downloaded input-image checksum retained in captured_generation.",
+      "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Provider seed was not returned where null.",
+        "Dimensions are authored study sizes, not verified physical measurements.",
+        "Mesh self-intersections and fabrication suitability have not been certified."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-bed-low-duvet-1",
+      "name": "Low bed",
+      "model_file": "models/gen-bed-low-duvet-1.glb",
+      "model_sha256": "F66F75AE24DE8C93E9A0FA4F90DF229B0A251F7659DD3100A4097AF36AA337EC",
+      "contract_file": "models/gen-bed-low-duvet-1.almond.json",
+      "contract_sha256": "762207B1B06F933593508185D7D2CDEAC8ECF3E5E686C568312D6A7F10C91C3F",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "Product photo of a low Japanese bed with a light wooden frame, a rumpled grey-beige linen duvet and one pillow, a folded blanket at the foot. Single object centred, three-quarter view from slightly above, whole bed in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos.",
+        "image_task_id": null,
+        "image_model": "gpt_image_2_5",
+        "mesh_task_id": "01a16f47-ca08-74b7-a9ef-c87acdd3173b",
+        "mesh_model": "meshy-7.1",
+        "generated_at": "2026-10-24",
+        "orientation_correction": null,
+        "scale_applied": 1049.851049,
+        "captured_generation": {
+          "batch_id": "ginkgo-refset-1024",
+          "image": {
+            "asset_id": "gen-bed-low-duvet-1",
+            "provider": "higgsfield",
+            "tool": "generate_image_batch",
+            "submitted_at": "2026-10-24T18:54:27.982Z",
+            "request": {
+              "model": "gpt_image_2_5",
+              "aspect_ratio": "1:1",
+              "prompt": "Product photo of a low Japanese bed with a light wooden frame, a rumpled grey-beige linen duvet and one pillow, a folded blanket at the foot. Single object centred, three-quarter view from slightly above, whole bed in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos."
+            },
+            "batch_context": "Resubmitting rate-limited clean prop reference images for Meshy image-to-3D.",
+            "status": "COMPLETED",
+            "task_id": "80ca1c2a-ecd5-41dd-97ad-41af88fd54a0",
+            "provider_model": "gpt_image_2_5",
+            "completed_observed_at": "2026-10-24T18:56:02.127Z",
+            "provider_output_name": "hf_20261024_185452_80ca1c2a-ecd5-41dd-97ad-41af88fd54a0.png",
+            "output_file": "gen-bed-low-duvet-1.png",
+            "output_sha256": "4506be8f251b07d7b67eb7f1adb52ef80c6961274c9aa70b7cf581ef906dba1e",
+            "output_file_modified_at": "2026-10-24T18:56:37+00:00",
+            "seed": null,
+            "consumed_credits": "about 0.25 (Ginkgo MESH_SOURCES.md)",
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "mesh": {
+            "asset_id": "gen-bed-low-duvet-1",
+            "provider": "meshy",
+            "tool": "meshy_image_to_3d",
+            "submitted_at": "2026-10-24T18:58:22.162Z",
+            "request": {
+              "ai_model": "meshy-7.1",
+              "enable_pbr": true,
+              "texture_resolution": "4k",
+              "target_formats": [
+                "glb"
+              ],
+              "image": "local upload of ref_bed_duvet.png"
+            },
+            "input_image_sha256": "4506be8f251b07d7b67eb7f1adb52ef80c6961274c9aa70b7cf581ef906dba1e",
+            "status": "SUCCEEDED",
+            "status_basis": "Downloaded in the Ginkgo session with meshy_download_model; GLB present",
+            "task_id": "01a16f47-ca08-74b7-a9ef-c87acdd3173b",
+            "output_file": "gen-bed-low-duvet-1.glb",
+            "output_sha256": "9c99ac89053627d0fba38f63b75bb40aab98fbcffdc652724d3170aa59f22bbd",
+            "seed": null,
+            "consumed_credits": 30,
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-bed-low-duvet-1",
+            "source_sha256": "9c99ac89053627d0fba38f63b75bb40aab98fbcffdc652724d3170aa59f22bbd",
+            "source_triangles": 522710,
+            "target_triangles": 80000,
+            "prepared_sha256": "cde9c6070d210903d61788389a4fb92b0e7d9606f21b55d0f6bd0c659c5d26da",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.9042329788208008e-07,
+            "quality": {
+              "vertices": 39914,
+              "triangles": 80000,
+              "boundary_edges": 0,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 2,
+              "largest_component_vertices": 39368,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                0.000151279691083671,
+                2.760759700971537e-05,
+                1.086213086907791e-05
+              ]
+            }
+          },
+          "input_image_file": "batches/ginkgo-refset-1024/gen-bed-low-duvet-1.png",
+          "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+          "external_reference_ids": [],
+          "dimension_basis": "Real-world sizes authored in the Ginkgo pass (runs/refset_1024/worlds/jp.py PROPS); height normalised exactly, width and depth measured after uniform scaling. Not a physical survey.",
+          "reference_review": "Ginkgo reference image reviewed in that session for a clean, unbranded single object; re-checked for this import: no lettering, logos or brand marks visible.",
+          "rights": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private)",
+            "pass": "runs/refset_1024",
+            "source_name": "bed_duvet",
+            "records": [
+              "runs/refset_1024/MESH_SOURCES.md",
+              "runs/refset_1024/meshy/jobs.json",
+              "runs/refset_1024/pass.json",
+              "Claude Code session transcript c849f85f-3384-47ae-bf45-2e1a471d157c (the tool calls that submitted the image and mesh jobs)"
+            ]
+          }
+        }
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "gpt_image_2_5",
+        "image_job_id": "80ca1c2a-ecd5-41dd-97ad-41af88fd54a0",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-7.1",
+        "mesh_task_id": "01a16f47-ca08-74b7-a9ef-c87acdd3173b",
+        "generated_at": "2026-10-24"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "80ca1c2a-ecd5-41dd-97ad-41af88fd54a0",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here.",
+        "input_file": "batches/ginkgo-refset-1024/gen-bed-low-duvet-1.png",
+        "sha256": "4506be8f251b07d7b67eb7f1adb52ef80c6961274c9aa70b7cf581ef906dba1e"
+      },
+      "catalogue_recipe_override": "captured_organic_batch",
+      "recipe_evidence": "Exact submitted API requests and downloaded input-image checksum retained in captured_generation.",
+      "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Provider seed was not returned where null.",
+        "Dimensions are authored study sizes, not verified physical measurements.",
+        "Mesh self-intersections and fabrication suitability have not been certified."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-chest-of-drawers-pine-1",
+      "name": "Chest of drawers",
+      "model_file": "models/gen-chest-of-drawers-pine-1.glb",
+      "model_sha256": "283EE6D3520ADC466A7E05D29C038B804A842F41AC0A80EEC48D7A3AC0E903F4",
+      "contract_file": "models/gen-chest-of-drawers-pine-1.almond.json",
+      "contract_sha256": "2E3CE690F9D0A6B865E7BCEDDA7623ABED7A5CB0D8A20318EDC7AD22A889AB31",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "Product photo of a rustic knotty pine chest of three deep drawers with round dark wooden knobs, honey-coloured aged timber, scuffed edges. Single object centred, three-quarter view, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos.",
+        "image_task_id": null,
+        "image_model": "gpt_image_2_5",
+        "mesh_task_id": "01a16f47-d0f8-76da-9270-26771f010052",
+        "mesh_model": "meshy-7.1",
+        "generated_at": "2026-10-24",
+        "orientation_correction": null,
+        "scale_applied": 484.007261,
+        "captured_generation": {
+          "batch_id": "ginkgo-refset-1024",
+          "image": {
+            "asset_id": "gen-chest-of-drawers-pine-1",
+            "provider": "higgsfield",
+            "tool": "generate_image_batch",
+            "submitted_at": "2026-10-24T18:54:34.783Z",
+            "request": {
+              "model": "gpt_image_2_5",
+              "aspect_ratio": "1:1",
+              "prompt": "Product photo of a rustic knotty pine chest of three deep drawers with round dark wooden knobs, honey-coloured aged timber, scuffed edges. Single object centred, three-quarter view, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos."
+            },
+            "batch_context": "Resubmitting rate-limited clean interior prop reference images for Meshy image-to-3D.",
+            "status": "COMPLETED",
+            "task_id": "6e165b58-0062-4aeb-88aa-f089e4124034",
+            "provider_model": "gpt_image_2_5",
+            "completed_observed_at": "2026-10-24T18:56:02.127Z",
+            "provider_output_name": "hf_20261024_185456_6e165b58-0062-4aeb-88aa-f089e4124034.png",
+            "output_file": "gen-chest-of-drawers-pine-1.png",
+            "output_sha256": "1b84d122af6555b139117038d6aa9520d7dbad352e731df879a261a47012298f",
+            "output_file_modified_at": "2026-10-24T18:56:37+00:00",
+            "seed": null,
+            "consumed_credits": "about 0.25 (Ginkgo MESH_SOURCES.md)",
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "mesh": {
+            "asset_id": "gen-chest-of-drawers-pine-1",
+            "provider": "meshy",
+            "tool": "meshy_image_to_3d",
+            "submitted_at": "2026-10-24T18:58:23.745Z",
+            "request": {
+              "ai_model": "meshy-7.1",
+              "enable_pbr": true,
+              "texture_resolution": "4k",
+              "target_formats": [
+                "glb"
+              ],
+              "image": "local upload of ref_dresser.png"
+            },
+            "input_image_sha256": "1b84d122af6555b139117038d6aa9520d7dbad352e731df879a261a47012298f",
+            "status": "SUCCEEDED",
+            "status_basis": "Downloaded in the Ginkgo session with meshy_download_model; GLB present",
+            "task_id": "01a16f47-d0f8-76da-9270-26771f010052",
+            "output_file": "gen-chest-of-drawers-pine-1.glb",
+            "output_sha256": "11afda2b0a7f433e40148b181fe36e0f8331d91a968706a1a6f60dfcf744a139",
+            "seed": null,
+            "consumed_credits": 30,
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-chest-of-drawers-pine-1",
+            "source_sha256": "11afda2b0a7f433e40148b181fe36e0f8331d91a968706a1a6f60dfcf744a139",
+            "source_triangles": 341750,
+            "target_triangles": 80000,
+            "prepared_sha256": "3041b67f3ad63365477dfec7f5117a56447bec33509377fe721b5295fdabca6b",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.9029479026794432e-07,
+            "quality": {
+              "vertices": 39996,
+              "triangles": 80000,
+              "boundary_edges": 0,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 1,
+              "largest_component_vertices": 39996,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                2.4431369276763814e-05,
+                7.705449171697475e-05,
+                7.181208636781254e-05
+              ]
+            }
+          },
+          "input_image_file": "batches/ginkgo-refset-1024/gen-chest-of-drawers-pine-1.png",
+          "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+          "external_reference_ids": [],
+          "dimension_basis": "Real-world sizes authored in the Ginkgo pass (runs/refset_1024/worlds/jp.py PROPS); height normalised exactly, width and depth measured after uniform scaling. Not a physical survey.",
+          "reference_review": "Ginkgo reference image reviewed in that session for a clean, unbranded single object; re-checked for this import: no lettering, logos or brand marks visible.",
+          "rights": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private)",
+            "pass": "runs/refset_1024",
+            "source_name": "dresser",
+            "records": [
+              "runs/refset_1024/MESH_SOURCES.md",
+              "runs/refset_1024/meshy/jobs.json",
+              "runs/refset_1024/pass.json",
+              "Claude Code session transcript c849f85f-3384-47ae-bf45-2e1a471d157c (the tool calls that submitted the image and mesh jobs)"
+            ]
+          }
+        }
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "gpt_image_2_5",
+        "image_job_id": "6e165b58-0062-4aeb-88aa-f089e4124034",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-7.1",
+        "mesh_task_id": "01a16f47-d0f8-76da-9270-26771f010052",
+        "generated_at": "2026-10-24"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "6e165b58-0062-4aeb-88aa-f089e4124034",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here.",
+        "input_file": "batches/ginkgo-refset-1024/gen-chest-of-drawers-pine-1.png",
+        "sha256": "1b84d122af6555b139117038d6aa9520d7dbad352e731df879a261a47012298f"
+      },
+      "catalogue_recipe_override": "captured_organic_batch",
+      "recipe_evidence": "Exact submitted API requests and downloaded input-image checksum retained in captured_generation.",
+      "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Provider seed was not returned where null.",
+        "Dimensions are authored study sizes, not verified physical measurements.",
+        "Mesh self-intersections and fabrication suitability have not been certified."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-electric-kettle-1",
+      "name": "Electric kettle",
+      "model_file": "models/gen-electric-kettle-1.glb",
+      "model_sha256": "805A1D8A43923BE758C065BB59F9A0AFFACC1DFAC91FCE284658C8FF6419940E",
+      "contract_file": "models/gen-electric-kettle-1.almond.json",
+      "contract_sha256": "4D59D5A606B21C6CC1A3E64222BB5447D809972CA51BAE7B7BA18C40BE780BF2",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "Product photo of a white plastic electric kettle with a curved spout sitting on its round power base, slightly yellowed, a black handle. Single object centred, three-quarter view, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos.",
+        "image_task_id": null,
+        "image_model": "gpt_image_2_5",
+        "mesh_task_id": "01a16f47-d7af-76e8-912e-aa9bd244c680",
+        "mesh_model": "meshy-7.1",
+        "generated_at": "2026-10-24",
+        "orientation_correction": null,
+        "scale_applied": 138.807587,
+        "captured_generation": {
+          "batch_id": "ginkgo-refset-1024",
+          "image": {
+            "asset_id": "gen-electric-kettle-1",
+            "provider": "higgsfield",
+            "tool": "generate_image_batch",
+            "submitted_at": "2026-10-24T18:54:34.783Z",
+            "request": {
+              "model": "gpt_image_2_5",
+              "aspect_ratio": "1:1",
+              "prompt": "Product photo of a white plastic electric kettle with a curved spout sitting on its round power base, slightly yellowed, a black handle. Single object centred, three-quarter view, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos."
+            },
+            "batch_context": "Resubmitting rate-limited clean interior prop reference images for Meshy image-to-3D.",
+            "status": "COMPLETED",
+            "task_id": "26e58667-3c2c-436b-8091-74f395e276a7",
+            "provider_model": "gpt_image_2_5",
+            "completed_observed_at": "2026-10-24T18:56:02.127Z",
+            "provider_output_name": "hf_20261024_185456_26e58667-3c2c-436b-8091-74f395e276a7.png",
+            "output_file": "gen-electric-kettle-1.png",
+            "output_sha256": "c89340a5c97dacb08ed47b3282d5bd80d1c9983f2a7fe49b922c427a3fae848e",
+            "output_file_modified_at": "2026-10-24T18:56:37+00:00",
+            "seed": null,
+            "consumed_credits": "about 0.25 (Ginkgo MESH_SOURCES.md)",
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "mesh": {
+            "asset_id": "gen-electric-kettle-1",
+            "provider": "meshy",
+            "tool": "meshy_image_to_3d",
+            "submitted_at": "2026-10-24T18:58:25.588Z",
+            "request": {
+              "ai_model": "meshy-7.1",
+              "enable_pbr": true,
+              "texture_resolution": "4k",
+              "target_formats": [
+                "glb"
+              ],
+              "image": "local upload of ref_kettle.png"
+            },
+            "input_image_sha256": "c89340a5c97dacb08ed47b3282d5bd80d1c9983f2a7fe49b922c427a3fae848e",
+            "status": "SUCCEEDED",
+            "status_basis": "Downloaded in the Ginkgo session with meshy_download_model; GLB present",
+            "task_id": "01a16f47-d7af-76e8-912e-aa9bd244c680",
+            "output_file": "gen-electric-kettle-1.glb",
+            "output_sha256": "25ed07e418ba188ca6922cf70694c938f6876a03ef6fda839fcb21d4b5428978",
+            "seed": null,
+            "consumed_credits": 30,
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-electric-kettle-1",
+            "source_sha256": "25ed07e418ba188ca6922cf70694c938f6876a03ef6fda839fcb21d4b5428978",
+            "source_triangles": 224352,
+            "target_triangles": 40000,
+            "prepared_sha256": "138f0c13fbdd4b65b7f0bfdc732be36e3c14073e36ac0b03708be2b32b1034b4",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.8732030391693114e-07,
+            "quality": {
+              "vertices": 19908,
+              "triangles": 40000,
+              "boundary_edges": 0,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 1,
+              "largest_component_vertices": 19908,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                7.728361347263153e-06,
+                6.370789293161353e-05,
+                5.6893514813887564e-05
+              ]
+            }
+          },
+          "input_image_file": "batches/ginkgo-refset-1024/gen-electric-kettle-1.png",
+          "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+          "external_reference_ids": [],
+          "dimension_basis": "Real-world sizes authored in the Ginkgo pass (runs/refset_1024/worlds/jp.py PROPS); height normalised exactly, width and depth measured after uniform scaling. Not a physical survey.",
+          "reference_review": "Ginkgo reference image reviewed in that session for a clean, unbranded single object; re-checked for this import: no lettering, logos or brand marks visible.",
+          "rights": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private)",
+            "pass": "runs/refset_1024",
+            "source_name": "kettle",
+            "records": [
+              "runs/refset_1024/MESH_SOURCES.md",
+              "runs/refset_1024/meshy/jobs.json",
+              "runs/refset_1024/pass.json",
+              "Claude Code session transcript c849f85f-3384-47ae-bf45-2e1a471d157c (the tool calls that submitted the image and mesh jobs)"
+            ]
+          }
+        }
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "gpt_image_2_5",
+        "image_job_id": "26e58667-3c2c-436b-8091-74f395e276a7",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-7.1",
+        "mesh_task_id": "01a16f47-d7af-76e8-912e-aa9bd244c680",
+        "generated_at": "2026-10-24"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "26e58667-3c2c-436b-8091-74f395e276a7",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here.",
+        "input_file": "batches/ginkgo-refset-1024/gen-electric-kettle-1.png",
+        "sha256": "c89340a5c97dacb08ed47b3282d5bd80d1c9983f2a7fe49b922c427a3fae848e"
+      },
+      "catalogue_recipe_override": "captured_organic_batch",
+      "recipe_evidence": "Exact submitted API requests and downloaded input-image checksum retained in captured_generation.",
+      "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Provider seed was not returned where null.",
+        "Dimensions are authored study sizes, not verified physical measurements.",
+        "Mesh self-intersections and fabrication suitability have not been certified."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-house-slippers-1",
+      "name": "House slippers",
+      "model_file": "models/gen-house-slippers-1.glb",
+      "model_sha256": "DED3E364F06914F4C6FC844132807B6D1ABCDA99F026EF404E22F7029E03B712",
+      "contract_file": "models/gen-house-slippers-1.almond.json",
+      "contract_sha256": "01C3F88E84C4304C20A96EE3858AC67F6060EB6D97523B5CFC8B7B1FAC2B6F92",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "Product photo of a pair of plain black rubber house slippers side by side, open-toe, slightly worn. Single object centred, three-quarter view from above, whole pair in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos.",
+        "image_task_id": null,
+        "image_model": "gpt_image_2_5",
+        "mesh_task_id": "01a16f47-de71-73cd-ab48-721864b7f65c",
+        "mesh_model": "meshy-7.1",
+        "generated_at": "2026-10-24",
+        "orientation_correction": null,
+        "scale_applied": 153.477348,
+        "captured_generation": {
+          "batch_id": "ginkgo-refset-1024",
+          "image": {
+            "asset_id": "gen-house-slippers-1",
+            "provider": "higgsfield",
+            "tool": "generate_image_batch",
+            "submitted_at": "2026-10-24T18:54:34.783Z",
+            "request": {
+              "model": "gpt_image_2_5",
+              "aspect_ratio": "1:1",
+              "prompt": "Product photo of a pair of plain black rubber house slippers side by side, open-toe, slightly worn. Single object centred, three-quarter view from above, whole pair in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos."
+            },
+            "batch_context": "Resubmitting rate-limited clean interior prop reference images for Meshy image-to-3D.",
+            "status": "COMPLETED",
+            "task_id": "de65bc71-c54c-409d-9863-411b4a099e9d",
+            "provider_model": "gpt_image_2_5",
+            "completed_observed_at": "2026-10-24T18:56:02.127Z",
+            "provider_output_name": "hf_20261024_185457_de65bc71-c54c-409d-9863-411b4a099e9d.png",
+            "output_file": "gen-house-slippers-1.png",
+            "output_sha256": "2a63e0657ecfae69c280fee029cbdcb4b6efbfb8361953306f55b322a6a82580",
+            "output_file_modified_at": "2026-10-24T18:56:50+00:00",
+            "seed": null,
+            "consumed_credits": "about 0.25 (Ginkgo MESH_SOURCES.md)",
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "mesh": {
+            "asset_id": "gen-house-slippers-1",
+            "provider": "meshy",
+            "tool": "meshy_image_to_3d",
+            "submitted_at": "2026-10-24T18:58:27.200Z",
+            "request": {
+              "ai_model": "meshy-7.1",
+              "enable_pbr": true,
+              "texture_resolution": "4k",
+              "target_formats": [
+                "glb"
+              ],
+              "image": "local upload of ref_slippers.png"
+            },
+            "input_image_sha256": "2a63e0657ecfae69c280fee029cbdcb4b6efbfb8361953306f55b322a6a82580",
+            "status": "SUCCEEDED",
+            "status_basis": "Downloaded in the Ginkgo session with meshy_download_model; GLB present",
+            "task_id": "01a16f47-de71-73cd-ab48-721864b7f65c",
+            "output_file": "gen-house-slippers-1.glb",
+            "output_sha256": "59e1a2b512e2cdb219a1a8121125ec57566574ea0badffec0a5828888c068d3a",
+            "seed": null,
+            "consumed_credits": 30,
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-house-slippers-1",
+            "source_sha256": "59e1a2b512e2cdb219a1a8121125ec57566574ea0badffec0a5828888c068d3a",
+            "source_triangles": 300650,
+            "target_triangles": 40000,
+            "prepared_sha256": "5750753816b454bc4dbc8d7393e007f3f5947ca26a277341099e419f0430ffa8",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.9029390811920166e-07,
+            "quality": {
+              "vertices": 19999,
+              "triangles": 39998,
+              "boundary_edges": 0,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 2,
+              "largest_component_vertices": 10007,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                6.143792248123622e-05,
+                6.264482700944245e-07,
+                0.00035501816242030124
+              ]
+            }
+          },
+          "input_image_file": "batches/ginkgo-refset-1024/gen-house-slippers-1.png",
+          "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+          "external_reference_ids": [],
+          "dimension_basis": "Real-world sizes authored in the Ginkgo pass (runs/refset_1024/worlds/jp.py PROPS); height normalised exactly, width and depth measured after uniform scaling. Not a physical survey.",
+          "reference_review": "Ginkgo reference image reviewed in that session for a clean, unbranded single object; re-checked for this import: no lettering, logos or brand marks visible.",
+          "rights": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private)",
+            "pass": "runs/refset_1024",
+            "source_name": "slippers",
+            "records": [
+              "runs/refset_1024/MESH_SOURCES.md",
+              "runs/refset_1024/meshy/jobs.json",
+              "runs/refset_1024/pass.json",
+              "Claude Code session transcript c849f85f-3384-47ae-bf45-2e1a471d157c (the tool calls that submitted the image and mesh jobs)"
+            ]
+          }
+        }
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "gpt_image_2_5",
+        "image_job_id": "de65bc71-c54c-409d-9863-411b4a099e9d",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-7.1",
+        "mesh_task_id": "01a16f47-de71-73cd-ab48-721864b7f65c",
+        "generated_at": "2026-10-24"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "de65bc71-c54c-409d-9863-411b4a099e9d",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here.",
+        "input_file": "batches/ginkgo-refset-1024/gen-house-slippers-1.png",
+        "sha256": "2a63e0657ecfae69c280fee029cbdcb4b6efbfb8361953306f55b322a6a82580"
+      },
+      "catalogue_recipe_override": "captured_organic_batch",
+      "recipe_evidence": "Exact submitted API requests and downloaded input-image checksum retained in captured_generation.",
+      "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Provider seed was not returned where null.",
+        "Dimensions are authored study sizes, not verified physical measurements.",
+        "Mesh self-intersections and fabrication suitability have not been certified."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-table-lamp-pleated-1",
+      "name": "Table lamp",
+      "model_file": "models/gen-table-lamp-pleated-1.glb",
+      "model_sha256": "525ADCF8DDC8BC2698C5CA0D82E20091FF6E45B6181A82923CF6178B2AED55F4",
+      "contract_file": "models/gen-table-lamp-pleated-1.almond.json",
+      "contract_sha256": "9E1D1936160BE070C91D8520917CCB193DAD4254A047A8038438532716CD418E",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "Product photo of a small table lamp with a white conical pleated paper shade and a slim brass stem on a round brass base, switched off. Single object centred, three-quarter view, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos.",
+        "image_task_id": null,
+        "image_model": "gpt_image_2_5",
+        "mesh_task_id": "01a16f49-03e1-70df-9fca-0d6c21f8c1d4",
+        "mesh_model": "meshy-7.1",
+        "generated_at": "2026-10-24",
+        "orientation_correction": null,
+        "scale_applied": 241.247704,
+        "captured_generation": {
+          "batch_id": "ginkgo-refset-1024",
+          "image": {
+            "asset_id": "gen-table-lamp-pleated-1",
+            "provider": "higgsfield",
+            "tool": "generate_image_batch",
+            "submitted_at": "2026-10-24T18:55:33.529Z",
+            "request": {
+              "model": "gpt_image_2_5",
+              "aspect_ratio": "1:1",
+              "prompt": "Product photo of a small table lamp with a white conical pleated paper shade and a slim brass stem on a round brass base, switched off. Single object centred, three-quarter view, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos."
+            },
+            "batch_context": "Resubmitting the last two rate-limited prop reference images for Meshy image-to-3D.",
+            "status": "COMPLETED",
+            "task_id": "b599c462-2e31-4b54-a6f8-cc09194f97d8",
+            "provider_model": "gpt_image_2_5",
+            "completed_observed_at": "2026-10-24T18:56:55.774Z",
+            "provider_output_name": "hf_20261024_185559_b599c462-2e31-4b54-a6f8-cc09194f97d8.png",
+            "output_file": "gen-table-lamp-pleated-1.png",
+            "output_sha256": "e76700cb1dc1df657838436d0ed4c58c20507d512ec20b38708701797835c1a6",
+            "output_file_modified_at": "2026-10-24T18:58:29+00:00",
+            "seed": null,
+            "consumed_credits": "about 0.25 (Ginkgo MESH_SOURCES.md)",
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "mesh": {
+            "asset_id": "gen-table-lamp-pleated-1",
+            "provider": "meshy",
+            "tool": "meshy_image_to_3d",
+            "submitted_at": "2026-10-24T18:59:47.609Z",
+            "request": {
+              "ai_model": "meshy-7.1",
+              "enable_pbr": true,
+              "texture_resolution": "4k",
+              "target_formats": [
+                "glb"
+              ],
+              "image": "local upload of ref_table_lamp.png"
+            },
+            "input_image_sha256": "e76700cb1dc1df657838436d0ed4c58c20507d512ec20b38708701797835c1a6",
+            "status": "SUCCEEDED",
+            "status_basis": "Downloaded in the Ginkgo session with meshy_download_model; GLB present",
+            "task_id": "01a16f49-03e1-70df-9fca-0d6c21f8c1d4",
+            "output_file": "gen-table-lamp-pleated-1.glb",
+            "output_sha256": "337eaa9cdba8a6435aecab109af7769e8375958ec5f4ae7719b85abc311ab83a",
+            "seed": null,
+            "consumed_credits": 30,
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-table-lamp-pleated-1",
+            "source_sha256": "337eaa9cdba8a6435aecab109af7769e8375958ec5f4ae7719b85abc311ab83a",
+            "source_triangles": 1991252,
+            "target_triangles": 80000,
+            "prepared_sha256": "35f21fd0f455dcdab737ca516a3388ac795694cd1a2c38cdc0010f9dbb7364b4",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.90698504447937e-07,
+            "quality": {
+              "vertices": 39786,
+              "triangles": 80000,
+              "boundary_edges": 0,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 2,
+              "largest_component_vertices": 38857,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                0.000470765830165097,
+                0.0002259077142608714,
+                0.00012121060577172523
+              ]
+            }
+          },
+          "input_image_file": "batches/ginkgo-refset-1024/gen-table-lamp-pleated-1.png",
+          "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+          "external_reference_ids": [],
+          "dimension_basis": "Real-world sizes authored in the Ginkgo pass (runs/refset_1024/worlds/jp.py PROPS); height normalised exactly, width and depth measured after uniform scaling. Not a physical survey.",
+          "reference_review": "Ginkgo reference image reviewed in that session for a clean, unbranded single object; re-checked for this import: no lettering, logos or brand marks visible.",
+          "rights": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private)",
+            "pass": "runs/refset_1024",
+            "source_name": "table_lamp",
+            "records": [
+              "runs/refset_1024/MESH_SOURCES.md",
+              "runs/refset_1024/meshy/jobs.json",
+              "runs/refset_1024/pass.json",
+              "Claude Code session transcript c849f85f-3384-47ae-bf45-2e1a471d157c (the tool calls that submitted the image and mesh jobs)"
+            ]
+          }
+        }
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "gpt_image_2_5",
+        "image_job_id": "b599c462-2e31-4b54-a6f8-cc09194f97d8",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-7.1",
+        "mesh_task_id": "01a16f49-03e1-70df-9fca-0d6c21f8c1d4",
+        "generated_at": "2026-10-24"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "b599c462-2e31-4b54-a6f8-cc09194f97d8",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here.",
+        "input_file": "batches/ginkgo-refset-1024/gen-table-lamp-pleated-1.png",
+        "sha256": "e76700cb1dc1df657838436d0ed4c58c20507d512ec20b38708701797835c1a6"
+      },
+      "catalogue_recipe_override": "captured_organic_batch",
+      "recipe_evidence": "Exact submitted API requests and downloaded input-image checksum retained in captured_generation.",
+      "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Provider seed was not returned where null.",
+        "Dimensions are authored study sizes, not verified physical measurements.",
+        "Mesh self-intersections and fabrication suitability have not been certified."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+      "missing_recorded_fields": []
+    },
+    {
+      "asset_id": "gen-washing-machine-front-1",
+      "name": "Washing machine",
+      "model_file": "models/gen-washing-machine-front-1.glb",
+      "model_sha256": "06AC93D237A4B8D7C47965AB5DDC95291963C40373C5125D0082CBA8A2C0C26A",
+      "contract_file": "models/gen-washing-machine-front-1.almond.json",
+      "contract_sha256": "5643C99E83D4BD12321ED742FD7A118905882A07B58CD0EE0C295926B9D03049",
+      "generator": "meshy",
+      "recorded_generation": {
+        "prompt": "Product photo of a compact white front-loading washing machine with a round chrome-rimmed glass door and a small plain control panel with a dial, no lettering. Single object centred, three-quarter view, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos.",
+        "image_task_id": null,
+        "image_model": "gpt_image_2_5",
+        "mesh_task_id": "01a16f49-0f98-73e4-b813-88b931a6fda6",
+        "mesh_model": "meshy-7.1",
+        "generated_at": "2026-10-24",
+        "orientation_correction": null,
+        "scale_applied": 446.671684,
+        "captured_generation": {
+          "batch_id": "ginkgo-refset-1024",
+          "image": {
+            "asset_id": "gen-washing-machine-front-1",
+            "provider": "higgsfield",
+            "tool": "generate_image_batch",
+            "submitted_at": "2026-10-24T18:55:33.529Z",
+            "request": {
+              "model": "gpt_image_2_5",
+              "aspect_ratio": "1:1",
+              "prompt": "Product photo of a compact white front-loading washing machine with a round chrome-rimmed glass door and a small plain control panel with a dial, no lettering. Single object centred, three-quarter view, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos."
+            },
+            "batch_context": "Resubmitting the last two rate-limited prop reference images for Meshy image-to-3D.",
+            "status": "COMPLETED",
+            "task_id": "d43a29b0-f483-4245-9d96-3b50aab5de7d",
+            "provider_model": "gpt_image_2_5",
+            "completed_observed_at": "2026-10-24T18:56:55.774Z",
+            "provider_output_name": "hf_20261024_185600_d43a29b0-f483-4245-9d96-3b50aab5de7d.png",
+            "output_file": "gen-washing-machine-front-1.png",
+            "output_sha256": "d16cda2b580d04a7f37e12e5583407615460328a5fcc3a0a85ddf4fda4c2eb12",
+            "output_file_modified_at": "2026-10-24T18:58:31+00:00",
+            "seed": null,
+            "consumed_credits": "about 0.25 (Ginkgo MESH_SOURCES.md)",
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "mesh": {
+            "asset_id": "gen-washing-machine-front-1",
+            "provider": "meshy",
+            "tool": "meshy_image_to_3d",
+            "submitted_at": "2026-10-24T18:59:49.188Z",
+            "request": {
+              "ai_model": "meshy-7.1",
+              "enable_pbr": true,
+              "texture_resolution": "4k",
+              "target_formats": [
+                "glb"
+              ],
+              "image": "local upload of ref_washing_machine.png"
+            },
+            "input_image_sha256": "d16cda2b580d04a7f37e12e5583407615460328a5fcc3a0a85ddf4fda4c2eb12",
+            "status": "SUCCEEDED",
+            "status_basis": "Downloaded in the Ginkgo session with meshy_download_model; GLB present",
+            "task_id": "01a16f49-0f98-73e4-b813-88b931a6fda6",
+            "output_file": "gen-washing-machine-front-1.glb",
+            "output_sha256": "1120d4fe4e348d841ff77b62411fb1bd167aa8b3e3a6f46b05672f0c2e9b87ac",
+            "seed": null,
+            "consumed_credits": 30,
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-washing-machine-front-1",
+            "source_sha256": "1120d4fe4e348d841ff77b62411fb1bd167aa8b3e3a6f46b05672f0c2e9b87ac",
+            "source_triangles": 376116,
+            "target_triangles": 80000,
+            "prepared_sha256": "f4ba3177560abdae6ae04686f911b2b29cfbc9bda8cf3b97f5cebc816f38e45d",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.9029899835586548e-07,
+            "quality": {
+              "vertices": 39980,
+              "triangles": 80000,
+              "boundary_edges": 0,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 1,
+              "largest_component_vertices": 39980,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                1.163076331650254e-05,
+                6.813572433199827e-05,
+                1.3844136447558254e-05
+              ]
+            }
+          },
+          "input_image_file": "batches/ginkgo-refset-1024/gen-washing-machine-front-1.png",
+          "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+          "external_reference_ids": [],
+          "dimension_basis": "Real-world sizes authored in the Ginkgo pass (runs/refset_1024/worlds/jp.py PROPS); height normalised exactly, width and depth measured after uniform scaling. Not a physical survey.",
+          "reference_review": "Ginkgo reference image reviewed in that session for a clean, unbranded single object; re-checked for this import: no lettering, logos or brand marks visible.",
+          "rights": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private)",
+            "pass": "runs/refset_1024",
+            "source_name": "washing_machine",
+            "records": [
+              "runs/refset_1024/MESH_SOURCES.md",
+              "runs/refset_1024/meshy/jobs.json",
+              "runs/refset_1024/pass.json",
+              "Claude Code session transcript c849f85f-3384-47ae-bf45-2e1a471d157c (the tool calls that submitted the image and mesh jobs)"
+            ]
+          }
+        }
+      },
+      "recorded_task_history": {
+        "image_provider": "higgsfield",
+        "image_model": "gpt_image_2_5",
+        "image_job_id": "d43a29b0-f483-4245-9d96-3b50aab5de7d",
+        "mesh_provider": "meshy",
+        "mesh_model": "meshy-7.1",
+        "mesh_task_id": "01a16f49-0f98-73e4-b813-88b931a6fda6",
+        "generated_at": "2026-10-24"
+      },
+      "image_generation": {
+        "provider": "higgsfield",
+        "provider_basis": "provenance",
+        "id": "d43a29b0-f483-4245-9d96-3b50aab5de7d",
+        "id_type": "image_job_id",
+        "source_image_url_recorded": false,
+        "source_image_url_policy": "Consult original provenance when needed; account-scoped URLs omitted here.",
+        "input_file": "batches/ginkgo-refset-1024/gen-washing-machine-front-1.png",
+        "sha256": "d16cda2b580d04a7f37e12e5583407615460328a5fcc3a0a85ddf4fda4c2eb12"
+      },
+      "catalogue_recipe_override": "captured_organic_batch",
+      "recipe_evidence": "Exact submitted API requests and downloaded input-image checksum retained in captured_generation.",
+      "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+      "external_reference_ids": [],
+      "evidence_gaps": [
+        "Provider seed was not returned where null.",
+        "Dimensions are authored study sizes, not verified physical measurements.",
+        "Mesh self-intersections and fabrication suitability have not been certified."
+      ],
+      "declared_license": "CC-BY-4.0",
+      "rights_evidence": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
       "missing_recorded_fields": []
     }
   ]
