@@ -209,3 +209,60 @@ def sunlight_hours(scene, points: np.ndarray, normals: np.ndarray, latitude: flo
 
 def sunlight_level(hours: float) -> str:
     return LEVEL_NAMES[_level(hours, SUN_LEVELS_H)]
+
+
+def sunlight_study(scene, location, month: int, day: int, out_dir, date_range: list | None = None,
+                   min_altitude_deg: float = 10.0, window_guids: list[str] | None = None) -> dict:
+    """Exposure to sunlight per window on month/day, and with ``date_range`` = [[m0, d0], [m1, d1]] every day
+    of the range (hours per day, the best day and a chart in ``out_dir``). Shared by the MCP tool and the
+    Rhino panel. Raises ValueError when the model has no windows."""
+    from pathlib import Path
+
+    from . import charts, epw, solar
+    from .climate import _date
+    if not 0 <= min_altitude_deg < 60:
+        raise ValueError("min_altitude_deg must be 0..60")
+    solar.hour_index(month, day, 12)
+    objs, chosen_by = window_objects(scene, window_guids)
+    wins = window_reference_points(scene, objects=objs)
+    if not wins:
+        raise ValueError("No windows found: give window_guids, or put windows on glazing (a layer named like 'Glazing', "
+                         "almond:env_material, or a window construction).")
+    P = np.array([w["point"] for w in wins])
+    N = np.array([w["outward_normal"] for w in wins])
+    loc = location
+
+    def hours(doy: int) -> np.ndarray:
+        return sunlight_hours(scene, P, N, loc.latitude, loc.longitude, loc.time_zone, scene.north_deg, doy, min_altitude_deg)
+
+    h = hours(int(epw.MONTH_START[month - 1] + day))
+    rows = [{"window": f"{k + 1}. {w['object']}", "guid": w["guid"], "area_m2": w["area_m2"],
+             "sun_hours": round(float(x), 2), "level": sunlight_level(float(x))} for k, (w, x) in enumerate(zip(wins, h))]
+    out = {"site": loc.label(), "date": f"{epw.MONTH_NAMES[month - 1]} {day}", "min_altitude_deg": min_altitude_deg,
+           "windows_chosen_by": chosen_by, "windows": rows,
+           "levels_h": {"minimum": SUN_LEVELS_H[0], "medium": SUN_LEVELS_H[1], "high": SUN_LEVELS_H[2]},
+           "headline": "; ".join(f"{r['window']}: {r['sun_hours']} h ({r['level']})" for r in rows[:8]),
+           "notes": ["Reference point: the centre of each window, 5 cm inside the pane; sun steps of 5 min, local "
+                     "standard time. Indicative, by Almond's implementation of EN 17037 Annex A; levels quoted by value."]}
+    if date_range:
+        (m0, d0), (m1, d1) = date_range
+        a, b = int(epw.MONTH_START[m0 - 1] + d0), int(epw.MONTH_START[m1 - 1] + d1)
+        if not 1 <= a <= b <= 365 or b - a > 120:
+            raise ValueError("date_range must run forwards within one year and span at most 120 days")
+        days = list(range(a, b + 1))
+        per = np.array([hours(dd) for dd in days])          # (days, windows)
+        best = int(np.argmax(per.max(axis=1)))
+        out["range"] = {"from": _date(a - 1), "to": _date(b - 1), "best_day": _date(days[best] - 1),
+                        "best_day_hours": {r["window"]: round(float(x), 2) for r, x in zip(rows, per[best])},
+                        "per_day": [{"date": _date(dd - 1), **{r["window"]: round(float(x), 2) for r, x in zip(rows, hh)}}
+                                    for dd, hh in zip(days, per)]}
+        series = [{"label": r["window"][:24], "y": per[:, k], "colour": charts.SERIES[k % len(charts.SERIES)], "width": 1.4}
+                  for k, r in enumerate(rows[:8])]
+        for lvl, col in zip(SUN_LEVELS_H, (charts.MUTED, charts.AMBER, charts.GREEN)):
+            series.append({"label": f"{lvl:g} h level", "y": np.full(len(days), lvl), "colour": col, "width": 1.0, "dash": "5 3"})
+        ticks = [(k / max(len(days) - 1, 1), _date(dd - 1)) for k, dd in enumerate(days) if (dd - a) % 7 == 0]
+        c = charts.line_chart(series, ticks, f"Direct sunlight on the windows per day ({loc.label()})", "Hours",
+                              width=860, height=380, y_range=(0.0, max(5.0, float(per.max()) + 0.5)))
+        out["files"] = {"chart": charts.save(c, Path(out_dir) / "sunlight-per-day")}
+        out["chart_svg"] = c.svg("Direct sunlight per day")
+    return out

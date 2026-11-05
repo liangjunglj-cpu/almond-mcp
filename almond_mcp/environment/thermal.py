@@ -371,9 +371,10 @@ def simulate(zone: Zone, weather, st: Settings, warmup_days: int = 30) -> dict:
     t_e = (H_op * t_out + H_gr * t_ground) / H_op_total if H_op_total > 0 else t_out
     prof = zone.profile or {}
     occ, equip, light = occupancy(weather, prof.get("schedule", st.schedule), st.custom_schedule)
+    # people_per_m2, when given, beats a room use's default gain: it is the more specific input
     occ_w_m2 = (st.people_per_m2 * people_sensible_w(st.metabolic_rate) if st.people_per_m2 is not None
-                else st.occupancy_w_m2)
-    phi_people = Af * prof.get("occupancy_w_m2", occ_w_m2) * occ
+                else prof.get("occupancy_w_m2", st.occupancy_w_m2))
+    phi_people = Af * occ_w_m2 * occ
     phi_equip = Af * prof.get("equipment_w_m2", st.equipment_w_m2) * equip
     phi_light = Af * prof.get("lighting_w_m2", st.lighting_w_m2) * light
     phi_int = phi_people + phi_equip + phi_light

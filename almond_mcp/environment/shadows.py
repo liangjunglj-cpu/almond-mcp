@@ -168,3 +168,48 @@ def plan_sheet(images: list[tuple[np.ndarray, str]], sun_azimuths: list[float], 
     d.text((pad + 12, by - 16), f"{metres:g} m", fill=EDGE, font=mono)
     sheet.save(path)
     return path
+
+
+def study(scene, location, month: int, day: int, times: list[str] | None, out_png: str, pixels: int = 560) -> dict:
+    """Shadow plans of ``scene`` at clock times (local standard time) on month/day, laid out on one sheet.
+    Returns the shots (time, sun altitude / azimuth, solar time, shadow share), notes for times with the
+    sun below the horizon, the plan info and the sheet path. Shared by the MCP tool and the Rhino panel."""
+    from . import epw, solar
+    if not 160 <= int(pixels) <= 2000:
+        raise ValueError("pixels must be 160..2000")
+    solar.hour_index(month, day, 12)                     # validates month and day
+    doy = int(epw.MONTH_START[month - 1] + day)
+    shots, rows, notes = [], [], []
+    for t in times or ["09:00", "12:00", "15:00"]:
+        try:
+            hh, mm = (int(x) for x in str(t).strip().split(":"))
+        except ValueError:
+            raise ValueError(f"time {t!r} is not HH:MM") from None
+        if not (0 <= hh <= 23 and 0 <= mm <= 59):
+            raise ValueError(f"time {t!r} is not HH:MM")
+        sp = solar.sun_position(location.latitude, location.longitude, location.time_zone, doy, hh + mm / 60.0)
+        alt, az = float(sp["altitude"]), float(sp["azimuth"])
+        st = (12.0 + float(sp["hour_angle"]) / 15.0) % 24.0
+        row = {"time": f"{hh:02d}:{mm:02d}", "altitude": round(alt, 2), "azimuth": round(az, 2),
+               "solar_time": f"{int(st * 60 + 0.5) // 60 % 24:02d}:{int(st * 60 + 0.5) % 60:02d}"}
+        if alt <= 0:
+            notes.append(f"{row['time']}: the sun is below the horizon (altitude {alt:.1f} deg); skipped")
+            continue
+        shots.append((alt, az))
+        rows.append(row)
+    if not shots:
+        raise ValueError("The sun is below the horizon at every requested time.")
+    sc = scene.clean()
+    suns = [solar.direction_vector(a, z, sc.north_deg) for a, z in shots]
+    extent = extent_for(sc, suns)
+    plans, infos = [], []
+    for s, row in zip(suns, rows):
+        img, info = shadow_plan(sc, s, int(pixels), extent)
+        plans.append((img, f"{row['time']} LST  ·  sun {row['altitude']:.0f}° alt, {row['azimuth']:.0f}° az"))
+        infos.append(info)
+        row["shadow_share_of_ground_pct"] = info["shadow_share_of_ground_pct"]
+    sheet = plan_sheet(plans, [z for _, z in shots], sc.north_deg,
+                       f"Shadows - {location.label()} - {epw.MONTH_NAMES[month - 1]} {day}", infos[0]["cell_m"], out_png)
+    return {"shots": rows, "suns": shots, "notes": notes, "plan": infos[0], "sheet": sheet, "north_deg": sc.north_deg,
+            "date": f"{epw.MONTH_NAMES[month - 1]} {day}",
+            "time_convention": f"local standard time, UTC{location.time_zone:+g}, no daylight saving"}

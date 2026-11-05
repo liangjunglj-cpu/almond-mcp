@@ -809,15 +809,20 @@ def envelope_surfaces(zones: list[thermal.Zone]) -> list[dict]:
 
 def run_rooms_thermal(data: dict, weather, settings: thermal.Settings, label: str = "", inputs: dict | None = None,
                       overrides: dict | None = None, envelope_pack: str = "", pack_options: dict | None = None,
-                      cooling: bool = True) -> dict:
+                      cooling: bool = True, setpoints: dict | None = None) -> dict:
     """Thermal study of user-defined rooms: enclosed and semi-open rooms by coupled 5R1C zones with their
-    constructions, open rooms by semi-outdoor comfort."""
+    constructions, open rooms by semi-outdoor comfort. ``setpoints`` ({"heating_setpoint", "cooling_setpoint"})
+    replaces the room uses' defaults in every room that has no set-point of its own. inputs["export_csv"]
+    writes one hourly CSV per room (named columns, energy balance included)."""
     from . import codes, rooms as rm
     settings.validate()
     t0 = time.time()
     rooms, encs, scene, notes = prepare_rooms(data, overrides)
     zones = rm.zones_from_rooms(rooms, encs, scene, _windows(scene), problems=notes)
+    own = {r.name: r.setpoints for r in rooms}
     for z in zones:
+        if setpoints and z.source.get("enclosure") != "semi_open":
+            z.profile.update({k: v for k, v in setpoints.items() if k not in own.get(z.name, {})})
         z.source.pop("warning", None)                      # the room mesh is re-sampled, not a modelling error
         if not cooling:
             z.profile["cooling_setpoint"] = None
@@ -850,6 +855,14 @@ def run_rooms_thermal(data: dict, weather, settings: thermal.Settings, label: st
             entry.update(method="5R1C" + (" + openings" if enc.state == "semi_open" else ""), thermal=summ)
             for key in ("t_op", "t_air", "heating_w", "cooling_w"):
                 arrays[f"r{k}_{key}"] = res[key]
+            for key, v in res["balance_w"].items():
+                arrays[f"r{k}_bal_{key}"] = v
+            if (inputs or {}).get("export_csv"):
+                from . import cases
+                d = runs_dir() / run_id
+                d.mkdir(parents=True, exist_ok=True)
+                safe = "".join(ch if ch.isalnum() or ch in "-_" else "_" for ch in room.name)[:40] or f"room{k}"
+                summ["hourly_csv"] = cases.write_csv(d / f"hourly-{k:02d}-{safe}.csv", cases.hourly_columns(weather, res))
         out_rooms.append(entry)
     notes.append("Mechanical cooling to the room set-points." if cooling else "No mechanical cooling: rooms run free in warm weather.")
     result = {"run_id": run_id, "study": "rooms_thermal", "label": label or "rooms", "created": datetime.now().isoformat(timespec="seconds"),
@@ -1000,3 +1013,55 @@ def run_rooms_daylight(data: dict, weather, study: str = "annual", quality: str 
         result_path.write_text(json.dumps(_jsonable(saved), indent=1), encoding="utf-8")
     np.save(Path(res["run_dir"]) / "room_owner.npy", owner)
     return res
+
+
+def run_rooms_view_out(data: dict, view_height_m: float = 1.2, spacing: float = 0.6, edge: float = 0.3,
+                       label: str = "", overrides: dict | None = None) -> dict:
+    """EN 17037 view out per room: viewpoints on a grid view_height_m above each room's floor, traced on the
+    room-study scene (en17037.view_out). Returns each room's share of floor at each level, and saves the
+    level, sight-angle and outside-distance maps as a run."""
+    from . import en17037 as en, rooms as rm
+    if not 0.2 <= spacing <= 5:
+        raise ValueError("grid spacing must be 0.2..5 m")
+    if not 0.3 <= view_height_m <= 3:
+        raise ValueError("view height must be 0.3..3 m")
+    t0 = time.time()
+    rooms, encs, scene, notes = prepare_rooms(data, overrides)
+    scene, shell_notes = _daylight_shells(data, rooms, encs, scene, overrides)
+    grids, owner = [], []
+    for k, r in enumerate(rooms):
+        g = rm.daylight_grid(r, spacing, view_height_m, edge)
+        if g.n:
+            grids.append(g)
+            owner.append(np.full(g.n, k))
+    if not grids:
+        raise ValueError("Could not place viewpoints on any room floor")
+    owner = np.concatenate(owner)
+    grid = SensorGrid(np.vstack([g.points for g in grids]), np.vstack([g.normals for g in grids]),
+                      np.concatenate([g.cell_area for g in grids]), spacing, np.vstack([g.cells for g in grids]), owner)
+    v = en.view_out(scene, grid.points)
+    per = []
+    for k, r in enumerate(rooms):
+        m = owner == k
+        if not m.any():
+            continue
+        s = en.view_summary({key: val[m] for key, val in v.items()}, grid.cell_area[m])
+        per.append({"room": r.name, "use": r.use, "viewpoints": int(m.sum()), **s["area_at_least_pct"],
+                    "sight_angle_mean_deg": s["sight_angle_deg"]["mean"], "outside_distance_m_median": s["outside_distance_m_median"],
+                    "layers_seen_pct": s["layers_seen_pct"], "level_of_most_points": s["level_of_most_points"]})
+    run_id = new_run_id("viewout")
+    arrays = {"view_level": v["level"].astype(float), "sight_angle_deg": v["sight_angle_deg"],
+              "outside_distance_m": np.minimum(v["outside_distance_m"], 999.0)}
+    whole = en.view_summary(v, grid.cell_area)
+    result = {"run_id": run_id, "study": "rooms_view_out", "label": label or "view out", "created": datetime.now().isoformat(timespec="seconds"),
+              "rooms": per, "metrics": whole, "display_metrics": list(arrays),
+              "inputs": {"view_height_m": view_height_m, "grid_spacing_m": spacing, "edge_offset_m": edge, "units_to_m": data.get("units_to_m")},
+              "grid": {"sensors": grid.n, "area_m2": round(grid.area, 2), "spacing_m": grid.spacing},
+              "headline": "; ".join(f"{p['room']}: medium on {p['medium']} %, high on {p['high']} %" for p in per),
+              "notes": notes + shell_notes + ["Indicative, by Almond's implementation of the EN 17037 Annex A view-out principles; "
+                                              "thresholds quoted by value. Glazing is treated as clear."],
+              "timing_s": round(time.time() - t0, 2)}
+    run_dir = save_run(run_id, result, grid, arrays)
+    np.save(run_dir / "room_owner.npy", owner)
+    result["run_dir"] = str(run_dir)
+    return result

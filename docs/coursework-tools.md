@@ -32,6 +32,23 @@ Almond already avoids some of the problems the course notes record:
 - Rooms do not have to be zero-thickness closed volumes, and windows within 0.3 m of a room face count.
 - Every input that was assumed is listed with the result.
 
+## In the Rhino panel
+
+The Environment workspace takes the same order as the course: Site → Rooms → Constructions → Study →
+Results → Compare. The layout, names and visuals are Almond's own; only the sequence of tasks follows
+the exercises.
+
+| The exercise step | Where it is in the panel |
+| --- | --- |
+| Climate analysis: extreme weeks, diurnal averages | Site → Climate (chart and CSV) |
+| Sun path and shadows on 20 March | Site → Sun & shadow plans |
+| Occupants, fresh air, set-points, setbacks, seasons | Study → Thermal → People & fresh air, Set-points & seasons |
+| Heating set-point from PMV | Study → Thermal → Set-points from comfort (PMV) |
+| Operative temperature in the warmest / coldest week, energy balance on the hottest / coldest day | Results → charts (pick the room for the balance) |
+| Hourly data for the spreadsheet | Study → Write hourly CSV per room; Results → Open run folder |
+| Design cases side by side (ID0–ID6) | Results → Keep as case, then Compare |
+| EN 17037 view out and sunlight | Study → View out / Sunlight on windows |
+
 ## Not done yet
 
 - **Daylight-linked lighting.** Lighting energy follows the schedule and power density. Dimming to a lux

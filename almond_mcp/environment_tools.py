@@ -164,12 +164,6 @@ INPUT_ERRORS = (ValueError, KeyError, TypeError, AttributeError, ZeroDivisionErr
                 OSError, RuntimeError)
 
 
-def climate_date(day_of_year: int) -> str:
-    """1-based day of the year -> 'Mar 20'."""
-    from almond_mcp.environment.climate import _date
-    return _date(int(day_of_year) - 1)
-
-
 def _bridge_errors(exc: Exception) -> dict:
     if isinstance(exc, ConnectionRefusedError):
         return _err("Rhino is not reachable: open Rhino 8 with the almondbridge plugin, or use shoebox=... to analyse "
@@ -260,62 +254,29 @@ def register(mcp, send: Sender) -> dict:
         from almond_mcp.environment import shadows
         try:
             loc = _weather(epw_path).location
-            if not 160 <= int(pixels) <= 2000:
-                return _err("pixels must be 160..2000")
-            solar.hour_index(month, day, 12)                 # validates month and day
-            doy = int(epw.MONTH_START[month - 1] + day)
             run_id = studies.new_run_id("sun")
             d = studies.runs_dir() / run_id
             d.mkdir(parents=True, exist_ok=True)
-            shots, rows, notes = [], [], []
-            for t in times or ["09:00", "12:00", "15:00"]:
-                try:
-                    hh, mm = (int(x) for x in str(t).strip().split(":"))
-                except ValueError:
-                    return _err(f"time {t!r} is not HH:MM")
-                if not (0 <= hh <= 23 and 0 <= mm <= 59):
-                    return _err(f"time {t!r} is not HH:MM")
-                sp = solar.sun_position(loc.latitude, loc.longitude, loc.time_zone, doy, hh + mm / 60.0)
-                alt, az = float(sp["altitude"]), float(sp["azimuth"])
-                solar_time = (12.0 + float(sp["hour_angle"]) / 15.0) % 24.0
-                row = {"time": f"{hh:02d}:{mm:02d}", "altitude": round(alt, 2), "azimuth": round(az, 2),
-                       "solar_time": f"{int(solar_time * 60 + 0.5) // 60 % 24:02d}:{int(solar_time * 60 + 0.5) % 60:02d}"}
-                if alt <= 0:
-                    notes.append(f"{row['time']}: the sun is below the horizon (altitude {alt:.1f} deg); skipped")
-                    continue
-                shots.append((alt, az, str(d / f"rhino-{month:02d}{day:02d}-{hh:02d}{mm:02d}.png")))
-                rows.append(row)
-            if not shots:
-                return _err("The sun is below the horizon at every requested time.", notes=notes)
             if shoebox:
                 sc = scenemod.Shoebox(**shoebox).build()
                 sc.north_deg = float(north_deg or 0.0)
             else:
                 data, sc = _geometry(send, [], geometry_guids, None, None, north_deg)
                 sc = shadows.without_room_volumes(sc, data)
-            sc = sc.clean()
-            suns = [solar.direction_vector(a, z, sc.north_deg) for a, z, _ in shots]
-            extent = shadows.extent_for(sc, suns)
-            plans, infos = [], []
-            for (a, z, _), s, row in zip(shots, suns, rows):
-                img, info = shadows.shadow_plan(sc, s, int(pixels), extent)
-                plans.append((img, f"{row['time']} LST  ·  sun {row['altitude']:.0f}° alt, {row['azimuth']:.0f}° az"))
-                infos.append(info)
-                row["shadow_share_of_ground_pct"] = info["shadow_share_of_ground_pct"]
-            sheet = shadows.plan_sheet(plans, [z for _, z, _ in shots], sc.north_deg,
-                                       f"Shadows - {loc.label()} - {epw.MONTH_NAMES[month - 1]} {day}",
-                                       infos[0]["cell_m"], str(d / f"shadow-plans-{month:02d}{day:02d}.png"))
-            files = {"shadow_plans": sheet}
+            st = shadows.study(sc, loc, month, day, times, str(d / f"shadow-plans-{month:02d}{day:02d}.png"), int(pixels))
+            rows, notes = st["shots"], st["notes"]
+            files = {"shadow_plans": st["sheet"]}
             if rhino_view and not shoebox:
+                shots = [(a, z, str(d / f"rhino-{month:02d}{day:02d}-{r['time'].replace(':', '')}.png")) for (a, z), r in zip(st["suns"], rows)]
                 _execute(send, rhino.sun_views_script(shots, rhino_view, 1600, 1000, rhino_display_mode, True), 300.0)
                 for (_, _, p), row in zip(shots, rows):
                     if Path(p).is_file():
                         row["rhino_png"] = p
                 if not all("rhino_png" in r for r in rows):
                     notes.append(f"Some Rhino captures were not written: is display mode '{rhino_display_mode}' available?")
-            result = {"status": "success", "run_id": run_id, "site": loc.label(), "date": f"{epw.MONTH_NAMES[month - 1]} {day}",
-                      "time_convention": f"local standard time, UTC{loc.time_zone:+g}, no daylight saving",
-                      "north_deg": sc.north_deg, "shots": rows, "files": files, "plan": infos[0], "notes": notes}
+            result = {"status": "success", "run_id": run_id, "site": loc.label(), "date": st["date"],
+                      "time_convention": st["time_convention"], "north_deg": st["north_deg"], "shots": rows, "files": files,
+                      "plan": st["plan"], "notes": notes}
             studies.save_run(run_id, dict(result, study="shadow_study", label=f"shadows {month}/{day}"), None, {})
             return result
         except (ValueError, OSError) as exc:
@@ -603,56 +564,17 @@ def register(mcp, send: Sender) -> dict:
         carries a window construction (assign_construction) when the model has any, or else every glazing
         object (check the list: glass objects inside the building would count too).
         Indicative design check, not a certification."""
-        from almond_mcp.environment import charts, en17037 as en
+        from almond_mcp.environment import en17037 as en
         try:
-            if not 0 <= min_altitude_deg < 60:
-                return _err("min_altitude_deg must be 0..60")
             loc = _weather(epw_path).location
-            solar.hour_index(month, day, 12)
             sc, _, inputs = _en_scene([], geometry_guids, shoebox, north_deg, 0, 1, 0, need_grid=False)
-            objs, chosen_by = en.window_objects(sc, window_guids)
-            wins = en.window_reference_points(sc, objects=objs)
-            if not wins:
-                return _err("No windows found: give window_guids, or put windows on glazing (a layer named like 'Glazing', "
-                            "almond:env_material, or a window construction).")
-            P = np.array([w["point"] for w in wins])
-            N = np.array([w["outward_normal"] for w in wins])
-            doy = int(epw.MONTH_START[month - 1] + day)
-            h = en.sunlight_hours(sc, P, N, loc.latitude, loc.longitude, loc.time_zone, sc.north_deg, doy, min_altitude_deg)
-            rows = [{"window": f"{k + 1}. {w['object']}", "guid": w["guid"], "area_m2": w["area_m2"],
-                     "sun_hours": round(float(x), 2), "level": en.sunlight_level(float(x))}
-                    for k, (w, x) in enumerate(zip(wins, h))]
             run_id = studies.new_run_id("sunlight")
             d = studies.runs_dir() / run_id
             d.mkdir(parents=True, exist_ok=True)
+            st = en.sunlight_study(sc, loc, month, day, d, date_range, min_altitude_deg, window_guids)
+            st.pop("chart_svg", None)
             result = {"status": "success", "run_id": run_id, "study": "en17037_sunlight", "label": label or "sunlight",
-                      "site": loc.label(), "date": f"{epw.MONTH_NAMES[month - 1]} {day}", "min_altitude_deg": min_altitude_deg,
-                      "windows_chosen_by": chosen_by, "windows": rows, "levels_h": {"minimum": en.SUN_LEVELS_H[0], "medium": en.SUN_LEVELS_H[1],
-                                                    "high": en.SUN_LEVELS_H[2]}, "inputs": inputs,
-                      "headline": "; ".join(f"{r['window']}: {r['sun_hours']} h ({r['level']})" for r in rows[:8]),
-                      "notes": ["Reference point: the centre of each window, 5 cm inside the pane; sun steps of 5 min, local "
-                                "standard time. Indicative, by Almond's implementation of EN 17037 Annex A; levels quoted by value."]}
-            if date_range:
-                (m0, d0), (m1, d1) = date_range
-                a, b = int(epw.MONTH_START[m0 - 1] + d0), int(epw.MONTH_START[m1 - 1] + d1)
-                if not 1 <= a <= b <= 365 or b - a > 120:
-                    return _err("date_range must run forwards within one year and span at most 120 days")
-                days = list(range(a, b + 1))
-                per = np.array([en.sunlight_hours(sc, P, N, loc.latitude, loc.longitude, loc.time_zone, sc.north_deg, dd,
-                                                  min_altitude_deg) for dd in days])           # (days, windows)
-                best = int(np.argmax(per.max(axis=1)))
-                result["range"] = {"from": climate_date(a), "to": climate_date(b), "best_day": climate_date(days[best]),
-                                   "best_day_hours": {r["window"]: round(float(x), 2) for r, x in zip(rows, per[best])},
-                                   "per_day": [{"date": climate_date(dd), **{r["window"]: round(float(x), 2) for r, x in zip(rows, hh)}}
-                                               for dd, hh in zip(days, per)]}
-                series = [{"label": r["window"][:24], "y": per[:, k], "colour": charts.SERIES[k % len(charts.SERIES)], "width": 1.4}
-                          for k, r in enumerate(rows[:8])]
-                for lvl, col in zip(en.SUN_LEVELS_H, (charts.MUTED, charts.AMBER, charts.GREEN)):
-                    series.append({"label": f"{lvl:g} h level", "y": np.full(len(days), lvl), "colour": col, "width": 1.0, "dash": "5 3"})
-                ticks = [(k / max(len(days) - 1, 1), climate_date(dd)) for k, dd in enumerate(days) if (dd - a) % 7 == 0]
-                c = charts.line_chart(series, ticks, f"Direct sunlight on the windows per day ({loc.label()})", "Hours",
-                                      width=860, height=380, y_range=(0.0, max(5.0, float(per.max()) + 0.5)))
-                result["files"] = {"chart": charts.save(c, d / "sunlight-per-day")}
+                      **st, "inputs": inputs}
             studies.save_run(run_id, result, None, {})
             return result
         except (ValueError, OSError, RuntimeError) as exc:

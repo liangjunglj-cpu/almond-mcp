@@ -265,13 +265,39 @@ planned packs; they are not keyed yet.
 
 ### Panel workspace
 
-The Almond panel's Environment workspace has five steps: Site → Rooms → Constructions → Study → Results.
-Each step opens with an orientation diagram: the step strip, the sun path, the room plan with enclosure
+The Almond panel's Environment workspace has six steps: Site → Rooms → Constructions → Study → Results →
+Compare. Each step opens with an orientation diagram: the step strip, the sun path, the room plan with enclosure
 state, the section detail of a construction, and the study section. The results show a tinted room plan
 and metric tiles, and the per-room colours are drawn in the viewport. Diagrams come from
 `environment/diagrams.py`, which renders the same drawing to SVG for the panel and to PNG for boards in
 the archive's palette. The panel runs studies out of process (`almond-mcp environment`, JSON on stdin and
 stdout). Its export and draw scripts are the MCP tools' own, so the two always agree.
+
+The steps follow the order a comfort course works in, with Almond's own layout and wording:
+
+- **Site.** The weather file, sun path and climate headline. The climate block then shows the warmest and
+  coldest week and day, the file's own periods (with a "week" longer than 7 days flagged), and the monthly
+  diurnal chart, with its CSV. Sun & shadow plans draws ray-traced plans at clock times on a date.
+- **Study.**
+  - **Thermal** adds occupants (people/m², activity) and fresh air per person and per m². It also takes
+    set-points for all rooms, with setbacks. A room's own set-points still win.
+  - **Seasons** set when heating, cooling, mechanical and window ventilation run, and which months the
+    comfort hours count.
+  - The **blind trigger** sets the irradiance at which the blinds close.
+  - **Hourly CSV** writes one file per room.
+  - **Set-points from comfort (PMV)** fills in the heating and cooling set-points for an activity,
+    clothing and category.
+  - **View out** and **Sunlight on windows** (EN 17037) are studies of their own.
+- **Results.** For thermal, Results adds:
+  - the whole-building totals and the adaptive hour counts;
+  - operative temperature of the rooms through the warmest and coldest week;
+  - one room's hourly energy balance on the hottest and coldest day (pick the room);
+  - a button that opens the run folder with the CSV files.
+- **Compare.** *Keep as case* stores a thermal, daylight or view-out result under a name. Change the model
+  or the settings, run again, and keep that too. Compare lists the cases side by side, with a bar chart
+  per figure and, for thermal, the operative temperature of one room, or each case's first room, across
+  the cases through the warmest and coldest week. Kept cases live in the panel's browser storage. The runs
+  themselves stay in the runs folder.
 
 ## Validation (tests/test_environment.py)
 

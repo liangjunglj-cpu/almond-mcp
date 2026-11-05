@@ -24,6 +24,8 @@ namespace RhinoAlmondBridge
     {
         private static readonly Regex Id = new Regex("^[a-z0-9_]{1,64}$");
         private static readonly string[] RoomKeys = { "room", "room_use", "room_set", "room_heat_c", "room_cool_c", "room_height" };
+        private static readonly Regex RunId = new Regex("^[a-z]{2,16}-[0-9]{8}-[0-9]{6}-[0-9a-f]{6}$");
+        private static readonly HashSet<string> Studies = new HashSet<string> { "thermal", "daylight", "view_out", "sunlight", "shadows" };
         private readonly Action<JObject> _send;
         private static Action<RhinoDoc> _pending;
         internal bool Busy { get; private set; }
@@ -37,18 +39,8 @@ namespace RhinoAlmondBridge
             JObject input;
             try { input = string.IsNullOrWhiteSpace(json) ? new JObject() : JObject.Parse(json); }
             catch (Exception ex) { Send("error", "Bad request: " + ex.Message); return; }
-            switch (action)
-            {
-                case "catalogue": Engine(new JObject { ["action"] = "catalogue" }, "catalogue"); return;
-                case "construction":
-                    if (!Id.IsMatch((string)input["id"] ?? "")) { Send("error", "Pick a construction from the list."); return; }
-                    Engine(new JObject { ["action"] = "construction", ["id"] = input["id"] }, "construction"); return;
-                case "browse_epw": BrowseEpw(); return;
-                case "site":
-                    _epw = (string)input["epw_path"] ?? _epw;
-                    if (!File.Exists(_epw)) { Send("error", "Choose an EnergyPlus weather file (.epw) first."); return; }
-                    Engine(new JObject { ["action"] = "site", ["epw_path"] = _epw }, "site"); return;
-            }
+            try { if (EngineRequest(action, input)) return; }
+            catch (InvalidOperationException ex) { Send("error", ex.Message); return; }
             if (Rhino.Commands.Command.InCommand()) { Send("error", "Finish the current Rhino command first."); return; }
             Busy = true;
             Eto.Forms.Application.Instance.AsyncInvoke(() => {
@@ -62,6 +54,55 @@ namespace RhinoAlmondBridge
             });
         }
 
+        // Requests the engine answers without the document. Returns false for document actions.
+        private bool EngineRequest(string action, JObject input)
+        {
+            switch (action)
+            {
+                case "catalogue": Engine(new JObject { ["action"] = "catalogue" }, "catalogue"); return true;
+                case "construction":
+                    if (!Id.IsMatch((string)input["id"] ?? "")) { Send("error", "Pick a construction from the list."); return true; }
+                    Engine(new JObject { ["action"] = "construction", ["id"] = input["id"] }, "construction"); return true;
+                case "browse_epw": BrowseEpw(); return true;
+                case "site":
+                    _epw = (string)input["epw_path"] ?? _epw;
+                    if (!File.Exists(_epw)) { Send("error", "Choose an EnergyPlus weather file (.epw) first."); return true; }
+                    Engine(new JObject { ["action"] = "site", ["epw_path"] = _epw }, "site"); return true;
+                case "climate":
+                    if (!File.Exists(_epw)) { Send("error", "Choose an EnergyPlus weather file (.epw) first."); return true; }
+                    Engine(new JObject { ["action"] = "climate", ["epw_path"] = _epw }, "climate"); return true;
+                case "setpoints":
+                    {
+                        var req = new JObject { ["action"] = "setpoints", ["category"] = Category(input["category"]) };
+                        foreach (var k in new[] { "met", "clo_heating", "clo_cooling", "rh", "air_speed" }) req[k] = Number(input[k]);
+                        Engine(req, "setpoints"); return true;
+                    }
+                case "charts":
+                    if (!RunId.IsMatch((string)input["run_id"] ?? "") || !File.Exists(_epw)) { Send("error", "Run a thermal study first."); return true; }
+                    Engine(new JObject { ["action"] = "charts", ["run_id"] = input["run_id"], ["epw_path"] = _epw, ["room"] = Clean(input["room"]) }, "charts"); return true;
+                case "compare":
+                    {
+                        var kept = new JArray();
+                        foreach (var c in (input["cases"] as JArray) ?? new JArray())
+                        {
+                            if (!RunId.IsMatch((string)c["run_id"] ?? "")) { Send("error", "A kept case has no valid run."); return true; }
+                            kept.Add(new JObject { ["name"] = Clean(c["name"], 40), ["run_id"] = c["run_id"] });
+                        }
+                        Engine(new JObject { ["action"] = "compare", ["cases"] = kept, ["room"] = Clean(input["room"]),
+                            ["epw_path"] = File.Exists(_epw) ? _epw : "" }, "compare"); return true;
+                    }
+                case "open_folder":
+                    if (!RunId.IsMatch((string)input["run_id"] ?? "")) { Send("error", "Run a study first."); return true; }
+                    Engine(new JObject { ["action"] = "run_dir", ["run_id"] = input["run_id"] }, "notice", reply => {
+                        string dir = (string)reply["run_dir"] ?? "";
+                        if (!Directory.Exists(dir)) { Send("error", "The run folder is gone."); return; }
+                        System.Diagnostics.Process.Start("explorer.exe", "\"" + dir + "\"");
+                        Send("notice", "Opened " + dir);
+                    }); return true;
+            }
+            return false;
+        }
+
         internal static Result Run(RhinoDoc doc)
         {
             var action = _pending; _pending = null;
@@ -72,8 +113,16 @@ namespace RhinoAlmondBridge
 
         private void Send(string kind, string message) => _send(new JObject { ["kind"] = kind, ["message"] = message });
 
-        // Engine calls that need no document: run out of process and answer when done.
-        private void Engine(JObject request, string kind)
+        private static string Category(JToken t)
+        {
+            string c = ((string)t ?? "II").Trim();
+            if (c != "I" && c != "II" && c != "III" && c != "IV") throw new InvalidOperationException("Pick a comfort category.");
+            return c;
+        }
+
+        // Engine calls that need no document: run out of process and answer when done (to the panel, or to
+        // `then` when the reply is for the workspace itself).
+        private void Engine(JObject request, string kind, Action<JObject> then = null)
         {
             Busy = true;
             _send(new JObject { ["kind"] = "progress", ["message"] = "Working…" });
@@ -84,6 +133,11 @@ namespace RhinoAlmondBridge
                 Eto.Forms.Application.Instance.AsyncInvoke(() => {
                     Busy = false;
                     if ((string)reply["status"] != "ok") { Send("error", (string)reply["message"] ?? "The environment engine failed."); return; }
+                    if (then != null)
+                    {
+                        try { then(reply); } catch (Exception ex) { Send("error", ex.Message); }
+                        return;
+                    }
                     reply["kind"] = kind;
                     _send(reply);
                 });
@@ -252,7 +306,9 @@ namespace RhinoAlmondBridge
 
         private void RunStudy(RhinoDoc doc, JObject input)
         {
-            if (!File.Exists(_epw) && (string)input["study"] != "daylight") throw new InvalidOperationException("Choose a weather file on the Site tab first.");
+            string study = (string)input["study"] ?? "thermal";
+            if (!Studies.Contains(study)) throw new InvalidOperationException("Pick a study.");
+            if (!File.Exists(_epw) && study != "daylight" && study != "view_out") throw new InvalidOperationException("Choose a weather file on the Site tab first.");
             Export(doc, data => {
                 string drawPath = Temp(".txt");
                 var request = new JObject { ["action"] = "run", ["export"] = data, ["epw_path"] = _epw, ["study"] = input["study"] ?? "thermal",
