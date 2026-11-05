@@ -136,3 +136,22 @@ def test_compare_kept_cases(temperate):
                                                                       {"name": "v", "run_id": v["result"]["run_id"]}]})), out)
     assert "one study type" in json.loads(out.getvalue())["message"]
     assert np.isfinite([r.get("heating_kwh_m2", 0) for r in cmp["rows"]]).all()
+
+
+def test_panel_routes_every_action_the_page_sends():
+    """The Rhino panel only forwards /almond-action/<session>/environment/<action> for actions on its
+    allow-list. An action the page sends but the list lacks is dropped silently and the page stays busy
+    (climate, setpoints, charts, compare and open_folder were missing)."""
+    import re
+    from pathlib import Path
+    root = Path(__file__).resolve().parents[1]
+    js = (root / "almond_mcp/library_ui/environment.js").read_text(encoding="utf-8")
+    html = (root / "almond_mcp/library_ui/index.html").read_text(encoding="utf-8")
+    cs_panel = (root / "RhinoAlmondBridge/LibraryPanel.cs").read_text(encoding="utf-8")
+    cs_ws = (root / "RhinoAlmondBridge/EnvironmentWorkspace.cs").read_text(encoding="utf-8")
+    allowed = set(re.search(r'/environment/\(([a-z_|]+)\)\$', cs_panel).group(1).split("|"))
+    handled = set(re.findall(r'case "([a-z_]+)":', cs_ws))
+    local = {"keep", "clear_cases", "shadows"}                    # handled in the page (shadows sends "run")
+    sent = set(re.findall(r"request\('([a-z_]+)'", js)) | (set(re.findall(r'data-env="([a-z_]+)"', html)) - local)
+    assert sent <= allowed, f"page actions the panel drops: {sorted(sent - allowed)}"
+    assert allowed <= handled, f"allowed actions the workspace does not handle: {sorted(allowed - handled)}"
