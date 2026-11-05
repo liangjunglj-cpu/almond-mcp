@@ -84,8 +84,9 @@ the **exact** `sun_state.json` vector (energy scaled from the panel's
 
 - `execute_rhino_script` C# only; `SetCameraLocations(target, camera)` -
   target FIRST.
-- The bridge stamps a `LinearDimension` per create/assign batch;
+- Bridges up to 0.7.0rc2 stamp a `LinearDimension` per create/assign batch;
   `purge_dims()` (inside `save()`) sweeps them - TextEntity labels survive.
+  Later bridges add none, so the sweep only matters on older installs.
 - `view.CaptureToBitmap(...)` ignores the display-mode background (black
   sky); `Rhino.Display.ViewCapture` honors it - use it for all captures.
 - The Rendered display mode's background is the display-mode
