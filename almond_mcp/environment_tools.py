@@ -176,7 +176,8 @@ def register(mcp, send: Sender) -> dict:
 
     @mcp.tool(annotations=READ_ONLY)
     def climate_summary(epw_path: str, hdd_base_c: float = 18.0, cdd_base_c: float = 18.0,
-                        strategy_thresholds: dict | None = None, include_psychrometric_bins: bool = False) -> dict:
+                        strategy_thresholds: dict | None = None, include_psychrometric_bins: bool = False,
+                        diurnal_chart: bool = False) -> dict:
         """Climate analysis of an EPW weather file (no Rhino needed): location and data quality (every
         repaired or missing value is counted), monthly temperatures / humidity / solar radiation /
         sunshine / wind, heating and cooling degree days, design temperatures, a 16-sector wind rose,
@@ -184,11 +185,20 @@ def register(mcp, send: Sender) -> dict:
         (comfort, natural ventilation, thermal mass + night flush, evaporative cooling, passive solar,
         dehumidification, active heating/cooling; thresholds returned and adjustable through
         strategy_thresholds, e.g. {"comfort": {"t_max": 27}}). include_psychrometric_bins adds the
-        hourly temperature x humidity-ratio histogram for drawing a psychrometric chart."""
+        hourly temperature x humidity-ratio histogram for drawing a psychrometric chart.
+        extreme_weeks gives the warmest and coldest 7-day periods computed from the data, the hottest /
+        coldest day in each (by the hourly outdoor extreme), and the file's own typical/extreme periods
+        with their real length (a file's "week" can cross the year end and run longer than 7 days).
+        diurnal_chart=True also writes the monthly diurnal averages (dry-bulb, wet-bulb, global and diffuse
+        horizontal, direct normal) as a chart (PNG + SVG) and a CSV, and returns their paths."""
         try:
             w = _weather(epw_path)
-            return {"status": "success", **studies.climate_report(w, hdd_base_c, cdd_base_c, strategy_thresholds,
-                                                                  include_psychrometric_bins)}
+            out = {"status": "success", **studies.climate_report(w, hdd_base_c, cdd_base_c, strategy_thresholds,
+                                                                 include_psychrometric_bins)}
+            if diurnal_chart:
+                ch = studies.climate_charts(w)
+                out["diurnal"] = {"run_id": ch["run_id"], "files": ch["files"], "hours": ch["diurnal"]["hours"]}
+            return out
         except (ValueError, OSError) as exc:
             return _err(str(exc))
 
@@ -228,6 +238,53 @@ def register(mcp, send: Sender) -> dict:
             return _err(str(exc))
 
     @mcp.tool(annotations=WRITES)
+    def shadow_study(epw_path: str, month: int = 3, day: int = 20, times: list[str] | None = None,
+                     geometry_guids: list[str] | None = None, shoebox: dict | None = None, pixels: int = 560,
+                     north_deg: float | None = None, rhino_view: str = "", rhino_display_mode: str = "Rendered") -> dict:
+        """Sun and shadow study for a date (default 20 March at 09:00, 12:00 and 15:00). Times are LOCAL
+        STANDARD TIME (the EPW time zone, no daylight saving): 12:00 is clock noon, not solar noon; each shot
+        reports its solar time too. For each time Almond ray traces a shadow plan of the model seen from above
+        (every visible Rhino object, or geometry_guids, or a shoebox), with roofs, the ground, the shadows,
+        the sun's direction, north and a scale bar, and lays the times side by side on one sheet (PNG). The
+        plans use the analysis scene itself, so they show exactly what the daylight and thermal studies see;
+        closed room volumes are left out, glazing casts no shadow.
+        rhino_view (e.g. "Perspective") also captures that Rhino viewport with the document sun set to each
+        position, in rhino_display_mode; whether shadows appear there depends on that display mode's own
+        shadow settings. The sun, ground plane and display mode are restored afterwards."""
+        from almond_mcp.environment import shadows
+        try:
+            loc = _weather(epw_path).location
+            run_id = studies.new_run_id("sun")
+            d = studies.runs_dir() / run_id
+            d.mkdir(parents=True, exist_ok=True)
+            if shoebox:
+                sc = scenemod.Shoebox(**shoebox).build()
+                sc.north_deg = float(north_deg or 0.0)
+            else:
+                data, sc = _geometry(send, [], geometry_guids, None, None, north_deg)
+                sc = shadows.without_room_volumes(sc, data)
+            st = shadows.study(sc, loc, month, day, times, str(d / f"shadow-plans-{month:02d}{day:02d}.png"), int(pixels))
+            rows, notes = st["shots"], st["notes"]
+            files = {"shadow_plans": st["sheet"]}
+            if rhino_view and not shoebox:
+                shots = [(a, z, str(d / f"rhino-{month:02d}{day:02d}-{r['time'].replace(':', '')}.png")) for (a, z), r in zip(st["suns"], rows)]
+                _execute(send, rhino.sun_views_script(shots, rhino_view, 1600, 1000, rhino_display_mode, True), 300.0)
+                for (_, _, p), row in zip(shots, rows):
+                    if Path(p).is_file():
+                        row["rhino_png"] = p
+                if not all("rhino_png" in r for r in rows):
+                    notes.append(f"Some Rhino captures were not written: is display mode '{rhino_display_mode}' available?")
+            result = {"status": "success", "run_id": run_id, "site": loc.label(), "date": st["date"],
+                      "time_convention": st["time_convention"], "north_deg": st["north_deg"], "shots": rows, "files": files,
+                      "plan": st["plan"], "notes": notes}
+            studies.save_run(run_id, dict(result, study="shadow_study", label=f"shadows {month}/{day}"), None, {})
+            return result
+        except (ValueError, OSError) as exc:
+            return _err(str(exc))
+        except Exception as exc:  # noqa: BLE001
+            return _bridge_errors(exc)
+
+    @mcp.tool(annotations=WRITES)
     def analyze_daylight(epw_path: str = "", study: str = "annual", grid_guids: list[str] | None = None,
                          geometry_guids: list[str] | None = None, shoebox: dict | None = None,
                          quality: str = "medium", grid_spacing_m: float = 0.6, work_plane_m: float = 0.76,
@@ -237,8 +294,12 @@ def register(mcp, send: Sender) -> dict:
                          weekdays_only: bool = False, da_threshold_lux: float = 300.0,
                          point_in_time: dict | None = None, views: list[dict] | None = None,
                          ground_reflectance: float = 0.2, north_deg: float | None = None,
+                         probes: list[list[float]] | None = None, probe_distance_from_window_m: float | None = None,
                          show_in_rhino: bool = True, label: str = "", background: bool = False) -> dict:
         """Daylight simulation by daylight coefficients (Almond's own native engine).
+        probes = points [x, y] (or [x, y, z]) in metres where every metric is reported from the nearest
+        sensor (e.g. DA300 2 m from the window); with a shoebox, probe_distance_from_window_m puts one on the
+        room's centreline at that distance from the facade.
 
         study: "annual" (climate-based, needs epw_path): sDA300/50% and ASE1000,250h per IES LM-83
           with dynamic shades (a group's shade closes when > 2 % of sensors get > 1000 lux of direct
@@ -294,6 +355,9 @@ def register(mcp, send: Sender) -> dict:
                 grid = box.floor_grid(sc, grid_spacing_m, work_plane_m, edge_offset_m)
                 inputs.update(shoebox=box.__dict__, units_to_m=1.0)
                 show_in_rhino = False
+                if probe_distance_from_window_m is not None:
+                    probes = list(probes or []) + [box.to_scene([box.width / 2, float(probe_distance_from_window_m),
+                                                                 work_plane_m])[0].tolist()]
             else:
                 if not grid_guids:
                     return _err("Give grid_guids (the floor surfaces to analyse), or a shoebox to study without Rhino.")
@@ -306,7 +370,7 @@ def register(mcp, send: Sender) -> dict:
             res = studies.run_daylight(sc, grid, weather, study, quality, label, (float(occ[0]), float(occ[1])),
                                        weekdays_only, dynamic_shading, aperture_grouping, da_threshold_lux,
                                        point_time=point_in_time, views=views, ground_reflectance=ground_reflectance,
-                                       inputs=inputs, dropped=dropped)
+                                       inputs=inputs, dropped=dropped, probes=probes)
             res["status"] = "success"
             if show_in_rhino:
                 try:
@@ -316,6 +380,203 @@ def register(mcp, send: Sender) -> dict:
             res["next_steps"] = ("show_environment_result(run_id, metric=...) to draw another metric; "
                                  "list_environment_runs to compare options.")
             return res
+        except (ValueError, OSError, RuntimeError) as exc:
+            return _bridge_errors(exc)
+
+    @mcp.tool(annotations=WRITES)
+    def compare_daylight_cases(epw_path: str, cases: list[dict], base: dict | None = None, quality: str = "medium",
+                               grid_spacing_m: float = 0.6, work_plane_m: float = 0.76, edge_offset_m: float = 0.5,
+                               probe_distance_from_window_m: float = 2.0, view_out: bool = True,
+                               view_height_m: float = 1.2, label: str = "", background: bool = False) -> dict:
+        """Daylight of shoebox design cases side by side. base = {"shoebox": {...}, "materials": {...},
+        "glazing": "...", "shade_transmittance": 0.15}; each case = {"id": "ID3", "shoebox": {...overrides},
+        "materials": {...}, "glazing": ..., "shade_transmittance": ..., "static_shade_transmittance": 0.14}
+        (shade_transmittance: the dynamic shade that closes against direct sun; static_shade_transmittance: a blind
+        kept down all year, multiplying the glazing's transmittance). Per case: mean daylight factor (CIE
+        overcast), annual sDA300/50 %, ASE, DA300 at probe_distance_from_window_m on the centreline, EN 17037
+        daylight provision (area meeting the minimum-level target 300 lx and minimum 100 lx, and the level met),
+        and with view_out the EN 17037 view-out shares. Writes a bar chart per metric (PNG + SVG) and a CSV
+        table in the run folder. background=True returns a job_id (poll get_environment_run)."""
+        if background:
+            fn = getattr(compare_daylight_cases, "fn", compare_daylight_cases)
+            args = _params(fn, locals())
+            return _start_job("daylight-cases", lambda: fn(**args))
+        from almond_mcp.environment import cases as cs, charts, en17037 as en
+        try:
+            weather = _weather(epw_path)
+            base = base or {}
+            if not cases or len(cases) > 12:
+                return _err("Give 1..12 cases")
+            run_id = studies.new_run_id("dlcases")
+            d = studies.runs_dir() / run_id
+            d.mkdir(parents=True, exist_ok=True)
+            rows = []
+            for k, case in enumerate(cases):
+                bad = sorted(set(case) - {"id", "label", "shoebox", "materials", "glazing", "shade_transmittance",
+                                          "static_shade_transmittance"})
+                if bad:
+                    return _err(f"case {k + 1}: unknown key(s) {bad}")
+                spec = {**(base.get("shoebox") or {}), **(case.get("shoebox") or {})}
+                if not spec:
+                    return _err("Every case needs a shoebox (in base or in the case)")
+                mats = {**(base.get("materials") or {}), **(case.get("materials") or {})}
+                glazing = case.get("glazing", base.get("glazing"))
+                if glazing:
+                    spec["glazing"] = glazing
+                static = case.get("static_shade_transmittance", base.get("static_shade_transmittance"))
+                if static is not None:
+                    if not 0.0 < float(static) <= 1.0:
+                        return _err(f"case {k + 1}: static_shade_transmittance must be in (0, 1]")
+                    gname = spec.get("glazing") or scenemod.DEFAULT_GLAZING
+                    tau = scenemod.material_from_spec(gname, mats.get(gname)).transmittance
+                    mats[gname] = {**(mats.get(gname) if isinstance(mats.get(gname), dict) else {}),
+                                   "transmittance": round(float(tau) * float(static), 4)}
+                shade = case.get("shade_transmittance", base.get("shade_transmittance"))
+                cid = str(case.get("id") or f"case {k + 1}")
+                row = {"id": cid, "label": str(case.get("label") or cid)}
+                for study in ("daylight_factor", "annual"):
+                    box = studies.shoebox_from_spec(spec)
+                    sc = box.build({n: scenemod.material_from_spec(n, v) for n, v in mats.items()})
+                    grid = box.floor_grid(sc, grid_spacing_m, work_plane_m, edge_offset_m)
+                    studies.apply_shade_transmittance(sc, shade)
+                    probe = box.to_scene([box.width / 2, probe_distance_from_window_m, work_plane_m])[0].tolist()
+                    res = studies.run_daylight(sc, grid, weather, study, quality, f"{cid} {study}", probes=[probe],
+                                               inputs={"shoebox": box.__dict__, "case": cid})
+                    m = res["metrics"]
+                    if study == "daylight_factor":
+                        row.update(mean_df_pct=m["average_df_pct"], median_df_pct=m["median_df_pct"], df_run=res["run_id"])
+                    else:
+                        p = res["probes"][0]
+                        prov = m.get("en17037", {})
+                        row.update(sda_pct=m["sda_pct"], ase_pct=m["ase_pct"], da_at_probe_pct=p.get("da"),
+                                   en17037_area_target_300lx_pct=prov.get("minimum", {}).get("area_meeting_target_pct"),
+                                   en17037_area_minimum_100lx_pct=prov.get("minimum", {}).get("area_meeting_minimum_pct"),
+                                   en17037_level=prov.get("level"), annual_run=res["run_id"])
+                if view_out:
+                    box = studies.shoebox_from_spec(spec)
+                    sc = box.build({n: scenemod.material_from_spec(n, v) for n, v in mats.items()})
+                    vg = box.floor_grid(sc, grid_spacing_m, view_height_m, edge_offset_m)
+                    vs = en.view_summary(en.view_out(sc, vg.points), vg.cell_area)
+                    row.update(view_out_area_pct=vs["area_at_least_pct"], view_out_level=vs["level_of_most_points"])
+                rows.append(row)
+            ids = [r["id"] for r in rows]
+            files = {}
+            for key, title, unit, refs in (
+                    ("mean_df_pct", "Mean daylight factor", "DF %", [(2.0, "2 %", charts.GREEN)]),
+                    ("sda_pct", "Spatial daylight autonomy sDA300/50%", "% of floor", [(55.0, "55 %", charts.GREEN)]),
+                    ("da_at_probe_pct", f"Daylight autonomy DA300 at {probe_distance_from_window_m:g} m from the window", "% of hours", []),
+                    ("en17037_area_target_300lx_pct", "EN 17037 minimum level: area reaching 300 lx", "% of floor", [(50.0, "50 %", charts.GREEN)]),
+                    ("en17037_area_minimum_100lx_pct", "EN 17037 minimum level: area reaching 100 lx", "% of floor", [(95.0, "95 %", charts.GREEN)])):
+                c = charts.bar_chart(ids, [r.get(key) for r in rows], title, unit, width=560, height=300, refs=refs)
+                files[key] = charts.save(c, d / f"bars-{key.replace('_pct', '')}")
+            keys = ["id", "label", "mean_df_pct", "median_df_pct", "sda_pct", "ase_pct", "da_at_probe_pct",
+                    "en17037_area_target_300lx_pct", "en17037_area_minimum_100lx_pct", "en17037_level", "view_out_level"]
+            lines = [",".join(keys)] + [",".join(str(r.get(k, "")) for k in keys) for r in rows]
+            (d / "daylight-cases.csv").write_text("\n".join(lines) + "\n", encoding="utf-8")
+            files["table_csv"] = str(d / "daylight-cases.csv")
+            result = {"status": "success", "run_id": run_id, "study": "daylight_cases", "label": label or "daylight cases",
+                      "weather": weather.location.label(), "cases": rows, "files": files,
+                      "settings": {"quality": quality, "grid_spacing_m": grid_spacing_m, "work_plane_m": work_plane_m,
+                                   "edge_offset_m": edge_offset_m, "probe_distance_from_window_m": probe_distance_from_window_m,
+                                   "view_height_m": view_height_m},
+                      "notes": ["Reference lines on the charts are common targets (DF 2 %, sDA 55 %, EN 17037 minimum level "
+                                "50 % / 95 % of the area), drawn for orientation only."]}
+            studies.save_run(run_id, result, None, {})
+            return result
+        except (ValueError, OSError, RuntimeError, TypeError) as exc:
+            return _bridge_errors(exc)
+
+    def _en_scene(grid_guids, geometry_guids, shoebox, north_deg, height, spacing, edge, need_grid=True):
+        """(scene, grid or None, inputs) for the EN 17037 tools: a shoebox, or Rhino geometry."""
+        from almond_mcp.environment import shadows
+        if shoebox:
+            box = studies.shoebox_from_spec(shoebox)
+            sc = box.build()
+            sc.north_deg = float(north_deg or 0.0)
+            grid = box.floor_grid(sc, spacing, height, edge) if need_grid else None
+            return sc, grid, {"shoebox": box.__dict__, "units_to_m": 1.0}
+        if need_grid and not grid_guids:
+            raise ValueError("Give grid_guids (the floor surfaces of the rooms to assess), or a shoebox.")
+        data, sc = _geometry(send, list(grid_guids or []), geometry_guids, None, None, north_deg)
+        sc = shadows.without_room_volumes(sc, data)
+        grid = studies.grid_from_export(data, sc, grid_guids, spacing, height, edge) if need_grid else None
+        return sc, grid, {"grid_guids": grid_guids, "units_to_m": data.get("units_to_m")}
+
+    @mcp.tool(annotations=WRITES)
+    def en17037_view_out(grid_guids: list[str] | None = None, geometry_guids: list[str] | None = None,
+                         shoebox: dict | None = None, view_height_m: float = 1.2, grid_spacing_m: float = 0.6,
+                         edge_offset_m: float = 0.5, north_deg: float | None = None, show_in_rhino: bool = True,
+                         label: str = "") -> dict:
+        """EN 17037 view out, ray traced at viewpoints on a grid view_height_m above the floors (grid_guids in
+        Rhino, or a shoebox): horizontal sight angle through the windows, outside distance to the first
+        obstruction, and the layers seen (sky, landscape, ground). Each viewpoint gets the lowest of the three
+        levels (none / minimum / medium / high; thresholds 14 / 28 / 54 deg, 6 / 20 / 50 m, landscape / + one /
+        all layers, per EN 17037 Annex A). Returns the share of the floor reaching each level, a plan PNG per
+        metric, and draws the level map in Rhino. Indicative design check by Almond's own implementation;
+        not a certification."""
+        from almond_mcp.environment import en17037 as en
+        try:
+            if not 0.2 <= grid_spacing_m <= 5:
+                return _err("grid_spacing_m must be 0.2..5")
+            sc, grid, inputs = _en_scene(grid_guids, geometry_guids, shoebox, north_deg, view_height_m, grid_spacing_m, edge_offset_m)
+            if shoebox:
+                show_in_rhino = False
+            t0 = time.time()
+            v = en.view_out(sc, grid.points)
+            run_id = studies.new_run_id("viewout")
+            arrays = {"view_level": v["level"].astype(float), "sight_angle_deg": v["sight_angle_deg"],
+                      "outside_distance_m": np.minimum(v["outside_distance_m"], 999.0)}
+            summ = en.view_summary(v, grid.cell_area)
+            result = {"run_id": run_id, "study": "en17037_view_out", "label": label or "view out",
+                      "metrics": summ, "inputs": {**inputs, "view_height_m": view_height_m, "grid_spacing_m": grid_spacing_m,
+                                                  "edge_offset_m": edge_offset_m},
+                      "grid": {"sensors": grid.n, "area_m2": round(grid.area, 2), "spacing_m": grid.spacing},
+                      "display_metrics": list(arrays), "timing_s": round(time.time() - t0, 2),
+                      "headline": "view out: " + ", ".join(f"{k} on {p} %" for k, p in summ["area_at_least_pct"].items()),
+                      "notes": ["Indicative, by Almond's implementation of the EN 17037 Annex A view-out principles; "
+                                "thresholds quoted by value. Glazing is treated as clear; frames and mullions modelled as "
+                                "geometry reduce the sight angle."]}
+            run_dir = studies.save_run(run_id, result, grid, arrays)
+            result["images"] = studies._images(run_dir, grid, arrays, list(arrays), result["label"])
+            result["run_dir"] = str(run_dir)
+            result["status"] = "success"
+            if show_in_rhino:
+                try:
+                    result["rhino"] = _draw(send, run_id, "view_level", units_to_m=inputs.get("units_to_m"))
+                except Exception as exc:  # noqa: BLE001
+                    result["rhino"] = _err(f"Results saved, but drawing them failed: {exc}")
+            return result
+        except (ValueError, OSError, RuntimeError) as exc:
+            return _bridge_errors(exc)
+
+    @mcp.tool(annotations=WRITES)
+    def en17037_sunlight(epw_path: str, month: int = 3, day: int = 21, date_range: list[list[int]] | None = None,
+                         geometry_guids: list[str] | None = None, shoebox: dict | None = None,
+                         min_altitude_deg: float = 10.0, window_guids: list[str] | None = None,
+                         north_deg: float | None = None, label: str = "") -> dict:
+        """EN 17037 exposure to sunlight: hours of direct sun on a reference point at the centre of each window
+        (on its inside face) on month/day, with the sun above min_altitude_deg and not blocked by the building
+        or its surroundings (every visible Rhino object, or geometry_guids, or a shoebox). Levels: >= 1.5 h
+        minimum, 3 h medium, 4 h high. The standard uses a day between 1 February and 21 March and a minimum
+        sun altitude that depends on the location: set min_altitude_deg to the value that applies (Almond's
+        default 10). date_range=[[2, 1], [3, 21]] also scans every day in the range, reports each window's
+        hours per day and the best day, and writes a chart. Windows: window_guids, or else the glazing that
+        carries a window construction (assign_construction) when the model has any, or else every glazing
+        object (check the list: glass objects inside the building would count too).
+        Indicative design check, not a certification."""
+        from almond_mcp.environment import en17037 as en
+        try:
+            loc = _weather(epw_path).location
+            sc, _, inputs = _en_scene([], geometry_guids, shoebox, north_deg, 0, 1, 0, need_grid=False)
+            run_id = studies.new_run_id("sunlight")
+            d = studies.runs_dir() / run_id
+            d.mkdir(parents=True, exist_ok=True)
+            st = en.sunlight_study(sc, loc, month, day, d, date_range, min_altitude_deg, window_guids)
+            st.pop("chart_svg", None)
+            result = {"status": "success", "run_id": run_id, "study": "en17037_sunlight", "label": label or "sunlight",
+                      **st, "inputs": inputs}
+            studies.save_run(run_id, result, None, {})
+            return result
         except (ValueError, OSError, RuntimeError) as exc:
             return _bridge_errors(exc)
 
@@ -384,6 +645,13 @@ def register(mcp, send: Sender) -> dict:
                         shading_g_factor: float = 1.0, shading_min_outdoor_c: float | None = None,
                         clothing_summer: float = 0.5, clothing_winter: float = 1.0,
                         metabolic_rate: float = 1.2, air_speed: float = 0.1, materials: dict | None = None,
+                        heating_setback_c: float | None = None, cooling_setback_c: float | None = None,
+                        people_per_m2: float | None = None, ventilation_l_s_person: float | None = None,
+                        heating_months: list[int] | None = None, cooling_months: list[int] | None = None,
+                        ventilation_months: list[int] | None = None, natural_ventilation_months: list[int] | None = None,
+                        natural_ventilation_min_outdoor_c: float = 12.0, shading_on_above_w_m2: float = 300.0,
+                        custom_schedule: dict | None = None, comfort_months: list[int] | None = None,
+                        export_csv: bool = False,
                         north_deg: float | None = None, label: str = "", background: bool = False) -> dict:
         """Hourly thermal simulation of zones for a year (ISO 13790 5R1C, one node set per zone) with
         solar gains ray traced on the real geometry: heating/cooling energy and peaks (kWh/m2, W/m2),
@@ -402,6 +670,19 @@ def register(mcp, send: Sender) -> dict:
         shading_min_outdoor_c keeps the shading up on days colder than that (summer mode, e.g. 12).
         Fresh air when occupied: ventilation_l_s_m2 per floor area (default by schedule, EN 16798-1
         Cat II: office 1.4, school 4.0, residential 0.42) or ventilation_ach; infiltration_ach always.
+        Brief-style inputs: people_per_m2 (their sensible heat at metabolic_rate replaces occupancy_w_m2;
+        60 % of the metabolic heat, an Almond assumption) and ventilation_l_s_person (added to
+        ventilation_l_s_m2, e.g. 5 l/s per person + 1 l/s m2); heating_setback_c / cooling_setback_c are the
+        set-points outside occupied hours (e.g. 21 occupied / 18 setback; default: off when unoccupied);
+        heating_months / cooling_months / ventilation_months / natural_ventilation_months limit each system to
+        a season (e.g. heating [11,12,1,2,3,4], natural ventilation [5,...,10]); natural_ventilation_above_c and
+        natural_ventilation_min_outdoor_c set when windows open; shading_on_above_w_m2 is the irradiance on the
+        window that lowers the shade (e.g. 150). custom_schedule = your own day profiles,
+        {"occupancy": {"weekday": [24 fractions], "weekend": [24]}, "lighting": {...}, "equipment": {...}}.
+        comfort_months = the season for the adaptive EN 16798-1 hour counts (adaptive_en16798_hours: too warm /
+        too cool / comfortable occupied hours per category I-III). Every zone reports its hourly energy balance
+        as annual gains / losses per term (energy_balance_kwh_m2) and lighting / equipment energy;
+        export_csv=True also writes each zone's hourly results and balance to a CSV in the run folder.
         background=True starts the study and returns a job_id at once - use it for annual studies on real models,
         which can take longer than the client waits; poll get_environment_run(job_id)."""
         if background:
@@ -421,9 +702,16 @@ def register(mcp, send: Sender) -> dict:
                                   shading_g_factor=shading_g_factor, shading_min_outdoor_c=shading_min_outdoor_c,
                                   window_u=window_u, window_g=window_g,
                                   clothing_summer=clothing_summer, clothing_winter=clothing_winter,
-                                  metabolic_rate=metabolic_rate, air_speed=air_speed)
+                                  metabolic_rate=metabolic_rate, air_speed=air_speed,
+                                  heating_setback=heating_setback_c, cooling_setback=cooling_setback_c,
+                                  people_per_m2=people_per_m2, ventilation_l_s_person=ventilation_l_s_person,
+                                  heating_months=heating_months, cooling_months=cooling_months,
+                                  ventilation_months=ventilation_months, natural_ventilation_months=natural_ventilation_months,
+                                  natural_ventilation_min_outdoor=natural_ventilation_min_outdoor_c,
+                                  shading_on_above_w_m2=shading_on_above_w_m2, custom_schedule=custom_schedule,
+                                  comfort_months=comfort_months)
             st.validate()
-            inputs = {"epw_path": epw_path}
+            inputs = {"epw_path": epw_path, "export_csv": export_csv}
             if shoebox:
                 box = studies.shoebox_from_spec(shoebox)
                 sc = box.build()
@@ -443,6 +731,54 @@ def register(mcp, send: Sender) -> dict:
             res["status"] = "success"
             return res
         except (ValueError, OSError, RuntimeError) as exc:
+            return _bridge_errors(exc)
+
+    @mcp.tool(annotations=WRITES)
+    def compare_thermal_cases(epw_path: str, cases: list[dict], base: dict | None = None,
+                              zone_guids: list[str] | None = None, geometry_guids: list[str] | None = None,
+                              balance_case: str = "", label: str = "") -> dict:
+        """Run design cases side by side (one zone each) on the same weather year and compare them.
+        base = {"shoebox": {...}, "settings": {...}}; each case = {"id": "ID2", "settings": {...overrides},
+        "shoebox": {...overrides}} merged over the base. settings use the thermal setting names
+        (heating_setpoint, cooling_setpoint, heating_setback, people_per_m2, ventilation_l_s_person,
+        ventilation_l_s_m2, equipment_w_m2, lighting_w_m2, u_values, window_u, window_g, shading_g_factor,
+        shading_on_above_w_m2, infiltration_ach, heat_recovery, schedule, custom_schedule, comfort_months,
+        ...; "free_running": true clears both set-points); shoebox uses its fields (width, depth, height,
+        orientation, wwr, sill, overhang, fins, obstruction_height, obstruction_distance, glazing). Without a
+        shoebox, zone_guids[0] is the zone in Rhino and cases vary settings only.
+        Returns a table (heating / cooling / lighting kWh/m2, peaks, operative min / max, hours > 26 degC,
+        adaptive Cat II too-warm / too-cool hours in comfort_months, TM52) and writes, in the run folder: an
+        hourly CSV per case (temperatures and every energy-balance term, named columns), one CSV with each
+        case's operative temperature next to the outdoor air, charts of operative temperature through the
+        warmest and coldest week (from the weather data), and balance_case's (default the first) hourly energy
+        balance on the hottest and coldest day, as charts and CSVs in kWh/m2."""
+        from almond_mcp.environment import cases as cs
+        try:
+            weather = _weather(epw_path)
+            base = base or {}
+            rhino_zone = None
+            if not (base.get("shoebox") or all(c.get("shoebox") for c in cases or [])):
+                if not zone_guids:
+                    return _err("Give base={'shoebox': {...}} (or a shoebox in every case), or zone_guids for a Rhino zone.")
+                ids = list(dict.fromkeys(list(geometry_guids or []) + list(zone_guids))) if geometry_guids else []
+                rhino_zone = _export(send, ids)
+
+            def make_zones(m):
+                if m["shoebox"]:
+                    box = studies.shoebox_from_spec(m["shoebox"])
+                    sc = box.build()
+                    return [thermal.zone_from_shoebox(box, sc, scenemod.LIBRARY[box.glazing])], sc
+                sc = scenemod.scene_from_export(rhino_zone)
+                sc.north_deg = _north(rhino_zone, None)
+                return studies.zones_from_export(rhino_zone, sc, zone_guids[:1]), sc
+
+            run_id = studies.new_run_id("cases")
+            out = cs.run_thermal_cases(weather, base, cases, make_zones, studies.runs_dir() / run_id, balance_case)
+            result = {"status": "success", "run_id": run_id, "study": "thermal_cases", "label": label or "thermal cases",
+                      "weather": weather.location.label(), **out}
+            studies.save_run(run_id, result, None, {})
+            return result
+        except (ValueError, OSError, RuntimeError, TypeError) as exc:
             return _bridge_errors(exc)
 
     @mcp.tool(annotations=READ_ONLY)
@@ -488,6 +824,26 @@ def register(mcp, send: Sender) -> dict:
                                                     "comfortable": bool(e["comfortable"][0])}
             return out
         except (ValueError, TypeError) as exc:
+            return _err(str(exc))
+
+    @mcp.tool(annotations=READ_ONLY)
+    def comfort_setpoints(metabolic_rate: float = 1.2, clothing_heating: float = 1.0, clothing_cooling: float = 0.5,
+                          relative_humidity: float = 50.0, air_speed: float = 0.1, category: str = "II",
+                          radiant_minus_air_k: float = 0.0) -> dict:
+        """Heating and cooling set-points from PMV for an activity and clothing: the lowest operative
+        temperature that keeps PMV at or above the EN 16798-1 / ISO 7730 category's lower limit with the
+        winter clothing (heating set-point), and the highest that keeps PMV at or below the upper limit with
+        the summer clothing (cooling set-point). Category I +/-0.2, II +/-0.5, III +/-0.7, IV +/-1.0.
+        Typical inputs: seated office 1.2 met, bedroom (sleeping) 0.8 met; clothing 1.0 clo winter, 0.5
+        summer; radiant_minus_air_k < 0 for cold windows. Use the result as heating_setpoint_c /
+        cooling_setpoint_c, and state the assumptions with it."""
+        try:
+            if not (0.7 <= metabolic_rate <= 4 and 0 <= clothing_heating <= 2 and 0 <= clothing_cooling <= 2
+                    and 0 <= relative_humidity <= 100 and 0 <= air_speed <= 2 and -10 <= radiant_minus_air_k <= 10):
+                return _err("Inputs out of range: met 0.7..4, clo 0..2, RH 0..100 %, air speed 0..2 m/s, radiant offset -10..10 K.")
+            return {"status": "success", **comfort.pmv_setpoints(metabolic_rate, clothing_heating, clothing_cooling,
+                                                                  relative_humidity, air_speed, category, radiant_minus_air_k)}
+        except ValueError as exc:
             return _err(str(exc))
 
     @mcp.tool(annotations=WRITES)
@@ -703,8 +1059,14 @@ def register(mcp, send: Sender) -> dict:
                       shading_min_outdoor_c: float | None = None, daylight_study: str = "annual",
                       quality: str = "medium", spacing_m: float = 0.5, envelope_pack: str = "",
                       pack_options: dict | None = None, cooling: bool = True, heat_recovery: float = 0.0, label: str = "",
-                      point_in_time: dict | None = None, background: bool = False) -> dict:
+                      point_in_time: dict | None = None, thermal_settings: dict | None = None,
+                      background: bool = False) -> dict:
         """Analyse the rooms defined in Rhino (define_room) with their constructions (assign_construction).
+        thermal_settings: any further thermal setting by name, e.g. {"heating_months": [11,12,1,2,3,4],
+        "natural_ventilation_months": [5,6,7,8,9,10], "natural_ventilation_on_above": 18,
+        "natural_ventilation_min_outdoor": 10, "comfort_months": [5,...,10], "heating_setback": 16,
+        "custom_schedule": {...}}; the result's "building" gives whole-building heating / cooling / lighting
+        kWh/m2 over the simulated rooms.
         study: thermal | daylight. Thermal: enclosed and semi-open rooms as coupled ISO 13790 zones (mass from
         the constructions, heat flow between rooms through shared walls and floors, air through openings);
         open rooms as semi-outdoor comfort (MRT with sun on the body, SET*). Rooms without a construction set
@@ -734,9 +1096,11 @@ def register(mcp, send: Sender) -> dict:
                                                  point_time=point_in_time)
             elif study == "thermal":
                 weather = _weather(epw_path)
-                st = thermal.Settings(construction=construction, schedule=schedule, infiltration_ach=infiltration_ach,
-                                      natural_ventilation_ach=natural_ventilation_ach, shading_g_factor=shading_g_factor,
-                                      shading_min_outdoor_c=shading_min_outdoor_c, heat_recovery=heat_recovery)
+                from almond_mcp.environment import cases as cs
+                st = cs.settings_from({"construction": construction, "schedule": schedule, "infiltration_ach": infiltration_ach,
+                                       "natural_ventilation_ach": natural_ventilation_ach, "shading_g_factor": shading_g_factor,
+                                       "shading_min_outdoor_c": shading_min_outdoor_c, "heat_recovery": heat_recovery,
+                                       **(thermal_settings or {})})
                 res = studies.run_rooms_thermal(data, weather, st, label, {"epw_path": epw_path, "units_to_m": data.get("units_to_m")},
                                                 envelope_pack=envelope_pack, pack_options=pack_options, cooling=cooling)
             else:
@@ -790,4 +1154,6 @@ def register(mcp, send: Sender) -> dict:
             "list_environment_materials": list_environment_materials, "list_constructions": list_constructions,
             "get_construction": get_construction, "list_code_packs": list_code_packs, "define_room": define_room,
             "assign_construction": assign_construction, "list_rooms": list_rooms, "analyze_rooms": analyze_rooms,
-            "check_envelope": check_envelope}
+            "check_envelope": check_envelope, "shadow_study": shadow_study, "compare_thermal_cases": compare_thermal_cases,
+            "comfort_setpoints": comfort_setpoints, "compare_daylight_cases": compare_daylight_cases,
+            "en17037_view_out": en17037_view_out, "en17037_sunlight": en17037_sunlight}

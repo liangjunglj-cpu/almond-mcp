@@ -157,7 +157,7 @@ namespace RhinoAlmondBridge
                                 _analysis.Request(analysis.Groups[1].Value,Uri.UnescapeDataString(query.Substring(6)));
                             } catch(Exception ex) { RhinoApp.WriteLine("Almond analysis: {0}",ex.Message); }
                         }
-                        var environment = Regex.Match(e.Uri.AbsolutePath,"^/almond-action/"+_session+"/environment/(catalogue|construction|browse_epw|site|define_room|remove_room|assign|clear_construction|select_room|clear_view|rooms|run)$");
+                        var environment = Regex.Match(e.Uri.AbsolutePath,"^/almond-action/"+_session+"/environment/(catalogue|construction|browse_epw|site|climate|setpoints|define_room|remove_room|assign|clear_construction|select_room|clear_view|rooms|run|charts|compare|open_folder)$");
                         if (_ready && environment.Success)
                         {
                             try {

@@ -125,7 +125,7 @@
   <p class="analysis-note" id="env-native-note">Open <strong>AlmondEnvironment</strong> in Rhino to connect this workspace to your model.</p>
   <div id="env-strip" class="env-strip" aria-hidden="true"></div>
   <nav class="analysis-tabs env-tabs" role="tablist" aria-label="Environment workspace">
-    <button type="button" role="tab" id="etab-site" data-etab="site" aria-controls="epane-site" aria-selected="true"><svg class="tab-icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M8 2.5 10 9 8 8 6 9z"/></svg><span>Site</span><i class="tab-need" hidden>!</i></button><button type="button" role="tab" id="etab-rooms" data-etab="rooms" aria-controls="epane-rooms" aria-selected="false" tabindex="-1"><svg class="tab-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 2.5h13v11h-13zM8 2.5V9h6.5"/></svg><span>Rooms</span><i class="tab-need" hidden>!</i></button><button type="button" role="tab" id="etab-constructions" data-etab="constructions" aria-controls="epane-constructions" aria-selected="false" tabindex="-1"><svg class="tab-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 2v12M13 2v12M6 2v12M9.5 2v12M6 5l3.5-2L6 8l3.5-2L6 11l3.5-2"/></svg><span>Constructions</span></button><button type="button" role="tab" id="etab-study" data-etab="study" aria-controls="epane-study" aria-selected="false" tabindex="-1"><svg class="tab-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 9 4 4.5 8 2.5l4 2L14.5 9M3 9h10v5H3z"/></svg><span>Study</span></button><button type="button" role="tab" id="etab-results" data-etab="results" aria-controls="epane-results" aria-selected="false" tabindex="-1"><svg class="tab-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 14.5h13M4 12.5V8M8 12.5V3.5M12 12.5V6.5"/></svg><span>Results</span></button>
+    <button type="button" role="tab" id="etab-site" data-etab="site" aria-controls="epane-site" aria-selected="true"><svg class="tab-icon" viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.5"/><path d="M8 2.5 10 9 8 8 6 9z"/></svg><span>Site</span><i class="tab-need" hidden>!</i></button><button type="button" role="tab" id="etab-rooms" data-etab="rooms" aria-controls="epane-rooms" aria-selected="false" tabindex="-1"><svg class="tab-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 2.5h13v11h-13zM8 2.5V9h6.5"/></svg><span>Rooms</span><i class="tab-need" hidden>!</i></button><button type="button" role="tab" id="etab-constructions" data-etab="constructions" aria-controls="epane-constructions" aria-selected="false" tabindex="-1"><svg class="tab-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 2v12M13 2v12M6 2v12M9.5 2v12M6 5l3.5-2L6 8l3.5-2L6 11l3.5-2"/></svg><span>Constructions</span></button><button type="button" role="tab" id="etab-study" data-etab="study" aria-controls="epane-study" aria-selected="false" tabindex="-1"><svg class="tab-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 9 4 4.5 8 2.5l4 2L14.5 9M3 9h10v5H3z"/></svg><span>Study</span></button><button type="button" role="tab" id="etab-results" data-etab="results" aria-controls="epane-results" aria-selected="false" tabindex="-1"><svg class="tab-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 14.5h13M4 12.5V8M8 12.5V3.5M12 12.5V6.5"/></svg><span>Results</span></button><button type="button" role="tab" id="etab-compare" data-etab="compare" aria-controls="epane-compare" aria-selected="false" tabindex="-1"><svg class="tab-icon" viewBox="0 0 16 16" aria-hidden="true"><path d="M1.5 14.5h13M3.5 12.5V6M6 12.5V9M10 12.5V4M12.5 12.5V7.5"/></svg><span>Compare</span></button>
   </nav>
 
   <section id="epane-site" class="analysis-step env-pane" role="tabpanel" aria-labelledby="etab-site" data-epane="site">
@@ -135,6 +135,20 @@
     <p id="env-epw" class="analysis-meta need">Required: a weather file. Typical-year files for most cities are published by climate.onebuilding.org.</p>
     <div id="env-site-diagram" class="env-diagram"></div>
     <dl id="env-site-facts" class="env-facts" hidden></dl>
+    <details class="analysis-details" id="env-climate" hidden><summary>Climate · extreme weeks and daily averages</summary>
+      <dl id="env-weeks" class="env-facts"></dl>
+      <ul id="env-periods" class="env-warnings env-plain"></ul>
+      <div id="env-diurnal" class="env-diagram"></div>
+      <div class="analysis-fields"><button type="button" class="analysis-button" data-env="open_folder" data-run="climate">Open chart &amp; CSV folder ↗</button></div>
+    </details>
+    <details class="analysis-details" id="env-sun"><summary>Sun &amp; shadow plans</summary>
+      <p class="field-help">Shadow plans of the model seen from above, ray traced on the same geometry the studies use. Times are local standard time (no daylight saving).</p>
+      <div class="analysis-fields"><label>Date<span class="env-date"><select id="env-sun-month" aria-label="Month"></select><input id="env-sun-day" type="number" min="1" max="31" value="20" aria-label="Day"></span></label>
+        <label>Times <span class="unit-label">HH:MM, …</span><input id="env-sun-times" type="text" maxlength="60" value="09:00, 12:00, 15:00"></label></div>
+      <div class="analysis-fields"><button type="button" class="analysis-button" data-env="shadows">Draw shadow plans ↗</button></div>
+      <img id="env-shadow-img" class="env-image" alt="Shadow plans" hidden>
+      <table id="env-shadow-table" class="env-table" hidden><thead><tr><th>Time</th><th>Solar time</th><th>Sun</th><th>Ground in shadow</th></tr></thead><tbody></tbody></table>
+    </details>
   </section>
 
   <section id="epane-rooms" class="analysis-step env-pane" role="tabpanel" aria-labelledby="etab-rooms" data-epane="rooms" hidden>
@@ -176,7 +190,7 @@
 
   <section id="epane-study" class="analysis-step env-pane" role="tabpanel" aria-labelledby="etab-study" data-epane="study" hidden>
     <h2>04 Study</h2>
-    <div class="analysis-fields"><label>Study<select id="env-study"><option value="thermal">Thermal comfort &amp; energy</option><option value="daylight">Daylight</option></select></label>
+    <div class="analysis-fields"><label>Study<select id="env-study"><option value="thermal">Thermal comfort &amp; energy</option><option value="daylight">Daylight</option><option value="view_out">View out · EN 17037</option><option value="sunlight">Sunlight on windows · EN 17037</option></select></label>
       <label data-for="daylight" hidden>Metric<select id="env-daylight"><option value="annual">Annual · sDA / ASE</option><option value="daylight_factor">Daylight factor</option></select></label></div>
     <div id="env-study-diagram" class="env-diagram"></div>
     <div data-for="thermal">
@@ -184,13 +198,51 @@
         <label>Window ventilation <span class="unit-label">ach when warm</span><input id="env-nv" type="number" min="0" max="20" step="any" value="0"></label></div>
       <div class="analysis-fields"><label>Heat recovery <span class="unit-label">% · 0 = none</span><input id="env-hr" type="number" min="0" max="95" step="any" value="0"></label></div>
       <label class="analysis-toggle"><input id="env-blinds" type="checkbox"><span>External blinds in summer</span></label>
+      <div class="analysis-fields" data-when="env-blinds" hidden><label>Blinds close above <span class="unit-label">W/m²</span><input id="env-shade-on" type="number" min="0" max="1000" step="any" value="300"></label></div>
       <label class="analysis-toggle"><input id="env-cooling" type="checkbox"><span>Mechanical cooling to the room set-points</span></label>
+      <details class="analysis-details"><summary>People &amp; fresh air</summary>
+        <div class="analysis-fields"><label>Occupants <span class="unit-label">people/m²</span><input id="env-people" type="number" min="0" max="2" step="any"></label>
+          <label>Activity <span class="unit-label">met</span><input id="env-met" type="number" min="0.7" max="4" step="any" value="1.2"></label></div>
+        <div class="analysis-fields"><label>Fresh air <span class="unit-label">l/s·person</span><input id="env-vent-person" type="number" min="0" max="100" step="any"></label>
+          <label>Fresh air <span class="unit-label">l/s·m²</span><input id="env-vent-area" type="number" min="0" max="20" step="any"></label></div>
+        <p class="field-help">Blank: the room use decides. Per-person air needs an occupant density; heat per person follows the activity level.</p>
+      </details>
+      <details class="analysis-details"><summary>Set-points &amp; seasons</summary>
+        <div class="analysis-fields"><label>Heating <span class="unit-label">°C</span><input id="env-heat" type="number" min="5" max="30" step="any"></label>
+          <label>Cooling <span class="unit-label">°C</span><input id="env-cool" type="number" min="18" max="35" step="any"></label></div>
+        <div class="analysis-fields"><label>Heating setback <span class="unit-label">°C</span><input id="env-heat-back" type="number" min="0" max="30" step="any"></label>
+          <label>Cooling setback <span class="unit-label">°C</span><input id="env-cool-back" type="number" min="18" max="40" step="any"></label></div>
+        <p class="field-help">Set-points apply to every room; blank keeps each room use's own, and a room's set-points on the Rooms tab win. Setbacks hold outside occupied hours; blank switches the system off then.</p>
+        <table class="env-table env-seasons"><thead><tr><th>Season</th><th>From</th><th>To</th></tr></thead><tbody>
+          <tr><td>Heating</td><td><select id="env-m-heat-0" data-season="heating_months"></select></td><td><select id="env-m-heat-1"></select></td></tr>
+          <tr><td>Cooling</td><td><select id="env-m-cool-0" data-season="cooling_months"></select></td><td><select id="env-m-cool-1"></select></td></tr>
+          <tr><td>Mechanical ventilation</td><td><select id="env-m-vent-0" data-season="ventilation_months"></select></td><td><select id="env-m-vent-1"></select></td></tr>
+          <tr><td>Window ventilation</td><td><select id="env-m-nv-0" data-season="natural_ventilation_months"></select></td><td><select id="env-m-nv-1"></select></td></tr>
+          <tr><td>Comfort hours counted</td><td><select id="env-m-comfort-0" data-season="comfort_months"></select></td><td><select id="env-m-comfort-1"></select></td></tr>
+        </tbody></table>
+        <details class="analysis-details env-inner"><summary>Set-points from comfort (PMV)</summary>
+          <div class="analysis-fields"><label>Activity <span class="unit-label">met</span><input id="env-pmv-met" type="number" min="0.7" max="4" step="any" value="1.2"></label>
+            <label>Category<select id="env-pmv-cat"><option value="I">I · ±0.2</option><option value="II" selected>II · ±0.5</option><option value="III">III · ±0.7</option><option value="IV">IV · ±1.0</option></select></label></div>
+          <div class="analysis-fields"><label>Clothing winter <span class="unit-label">clo</span><input id="env-pmv-clo-w" type="number" min="0" max="2" step="any" value="1.0"></label>
+            <label>Clothing summer <span class="unit-label">clo</span><input id="env-pmv-clo-s" type="number" min="0" max="2" step="any" value="0.5"></label></div>
+          <div class="analysis-fields"><button type="button" class="analysis-button" data-env="setpoints">Find set-points ↗</button></div>
+          <p id="env-pmv-out" class="field-help"></p>
+        </details>
+      </details>
+      <label class="analysis-toggle"><input id="env-csv" type="checkbox"><span>Write hourly CSV per room (temperatures, loads, energy balance)</span></label>
       <div class="analysis-fields"><label>Code check<select id="env-pack"><option value="">None</option></select></label>
         <label id="env-pack-opt-label" hidden>Option<select id="env-pack-opt"></select></label></div>
       <p id="env-pack-note" class="field-help"></p>
     </div>
     <div data-for="daylight" hidden><div class="analysis-fields"><label>Quality<select id="env-quality"><option value="draft">Draft</option><option value="medium" selected>Medium</option><option value="high">High</option></select></label>
       <label>Grid <span class="unit-label">m</span><input id="env-spacing" type="number" min="0.25" max="2" step="any" value="0.5"></label></div></div>
+    <div data-for="view_out" hidden><div class="analysis-fields"><label>Eye height <span class="unit-label">m</span><input id="env-view-h" type="number" min="0.3" max="3" step="any" value="1.2"></label>
+      <label>Grid <span class="unit-label">m</span><input id="env-view-spacing" type="number" min="0.2" max="5" step="any" value="0.6"></label></div>
+      <p class="field-help">Each viewpoint gets the lowest of three levels: horizontal sight angle through the windows, distance to the first obstruction outside, and layers seen (sky, landscape, ground). Thresholds 14 / 28 / 54°, 6 / 20 / 50 m.</p></div>
+    <div data-for="sunlight" hidden><div class="analysis-fields"><label>Date<span class="env-date"><select id="env-sl-month" aria-label="Month"></select><input id="env-sl-day" type="number" min="1" max="31" value="21" aria-label="Day"></span></label>
+      <label>Lowest sun <span class="unit-label">°</span><input id="env-sl-alt" type="number" min="0" max="59" step="any" value="10"></label></div>
+      <label class="analysis-toggle"><input id="env-sl-range" type="checkbox" checked><span>Also scan 1 February – 21 March and report the best day</span></label>
+      <p class="field-help">Hours of direct sun at the centre of each window, inside the pane. Levels 1.5 / 3 / 4 h. The lowest sun altitude depends on the site's latitude: set the value that applies.</p></div>
   </section>
 
   <section id="epane-results" class="analysis-step env-pane" role="tabpanel" aria-labelledby="etab-results" data-epane="results" hidden>
@@ -199,14 +251,37 @@
     <div id="env-tiles" class="env-diagram"></div>
     <div id="env-result-plan" class="env-diagram"></div>
     <table id="env-result-table" class="env-table" hidden><thead></thead><tbody></tbody></table>
+    <p id="env-building" class="analysis-meta" hidden></p>
+    <div id="env-charts" hidden>
+      <div class="analysis-fields"><label>Energy balance of<select id="env-chart-room"></select></label></div>
+      <div id="env-chart-warm" class="env-diagram"></div><div id="env-chart-cold" class="env-diagram"></div>
+      <div id="env-chart-hot" class="env-diagram"></div><div id="env-chart-cday" class="env-diagram"></div>
+    </div>
+    <div id="env-chart-sun" class="env-diagram"></div>
+    <div class="analysis-fields" id="env-keep" hidden><label>Case name<input id="env-case-name" type="text" maxlength="40" placeholder="ID0"></label>
+      <button type="button" class="analysis-button primary" data-env="keep">Keep as case</button></div>
+    <div class="analysis-fields"><button type="button" class="analysis-button" data-env="open_folder" data-run="result" id="env-open-run" hidden>Open run folder ↗</button></div>
     <details class="analysis-details" open><summary>Notes &amp; warnings</summary><ul id="env-notes"></ul></details>
     <details class="analysis-details" id="env-envelope" hidden><summary>Code check</summary><div id="env-envelope-body"></div></details>
     <div class="analysis-fields"><button type="button" class="analysis-button" data-env="clear_view">Clear viewport results</button></div>
   </section>
 
+  <section id="epane-compare" class="analysis-step env-pane" role="tabpanel" aria-labelledby="etab-compare" data-epane="compare" hidden>
+    <h2>06 Compare</h2>
+    <p>Keep a result as a case, change the model or the settings, run again and keep that too. Cases of one study type are compared side by side.</p>
+    <table id="env-case-table" class="env-table"><thead><tr><th>Case</th><th>Study</th><th>Kept</th><th></th></tr></thead><tbody></tbody></table>
+    <p id="env-cases-empty" class="field-help">No cases kept yet.</p>
+    <div class="analysis-fields"><label>Room<select id="env-compare-room"><option value="">All rooms</option></select></label>
+      <button type="button" class="analysis-button primary" data-env="compare">Compare cases ↗</button></div>
+    <table id="env-compare-table" class="env-table" hidden><thead></thead><tbody></tbody></table>
+    <div id="env-compare-bars"></div>
+    <div id="env-compare-warm" class="env-diagram"></div><div id="env-compare-cold" class="env-diagram"></div>
+    <div class="analysis-fields"><button type="button" class="analysis-button" data-env="clear_cases">Forget all cases</button></div>
+  </section>
+
   <div class="analysis-runbar"><ul id="env-checklist" class="run-checklist" aria-label="Before you run"></ul><button id="env-run" class="analysis-button primary" type="button" data-env="run">Run study ↗</button>
     <div id="env-status" class="status" data-state="idle" role="status" aria-live="polite"><span class="st-icon" aria-hidden="true"></span><div class="st-text"><p id="env-message"></p></div></div></div>
-  <details class="analysis-details"><summary>Method &amp; limits</summary><p>Thermal: each enclosed room is an ISO 13790 hourly 5R1C zone with the U-values and thermal mass of its constructions, solar gains ray traced on the model, and heat flow to neighbouring rooms. Semi-open rooms add the air that flows through their openings and run free. Open rooms are assessed as semi-outdoor comfort: outdoor air, sun and sky on the occupants (SolarCal), SET*. Daylight: daylight coefficients with interreflections, per room on a 0.8 m work plane.</p><p>A design-stage comparison tool. Code checks are indicative and are not certification or a compliance calculation.</p></details>
+  <details class="analysis-details"><summary>Method &amp; limits</summary><p>Thermal: each enclosed room is an ISO 13790 hourly 5R1C zone with the U-values and thermal mass of its constructions, solar gains ray traced on the model, and heat flow to neighbouring rooms. Semi-open rooms add the air that flows through their openings and run free. Open rooms are assessed as semi-outdoor comfort: outdoor air, sun and sky on the occupants (SolarCal), SET*. Daylight: daylight coefficients with interreflections, per room on a 0.8 m work plane. View out and sunlight: Almond's own implementation of the EN 17037 Annex A principles, ray traced on the model; levels quoted by value.</p><p>A design-stage comparison tool. Code checks are indicative and are not certification or a compliance calculation.</p></details>
 </section>
 <section id="library-page" hidden>
   <div class="hero">

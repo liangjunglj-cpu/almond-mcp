@@ -51,6 +51,17 @@ CONSTRUCTIONS = {    # U-values W/m2K, external solar absorptance, thermal mass 
                              "absorptance_wall": 0.5, "absorptance_roof": 0.6, "mass": "light"},
 }
 
+MET_W_M2 = 58.15     # W/m2 of body surface per met (ISO 8996 / ISO 7730 definition)
+BODY_AREA_M2 = 1.8   # DuBois area of a standard adult
+SENSIBLE_SHARE = 0.6  # Almond assumption: share of metabolic heat given off as sensible heat near 22-24 degC
+
+
+def people_sensible_w(metabolic_rate: float) -> float:
+    """Sensible heat per person (W) at a metabolic rate (met); the latent share is not a room gain here
+    (no moisture balance)."""
+    return float(metabolic_rate) * MET_W_M2 * BODY_AREA_M2 * SENSIBLE_SHARE
+
+
 SCHEDULES = ("office", "school", "residential", "bedroom", "always")
 # Fresh-air supply when occupied, l/s per m2 of floor - indicative EN 16798-1:2019 Category II values
 # (offices 7 l/s per person at 10 m2 + 0.7 l/s m2 for a low-polluting building; dwellings ~0.42).
@@ -141,6 +152,22 @@ class Settings:
     clothing_winter: float = 1.0
     metabolic_rate: float = 1.2
     air_speed: float = 0.1
+    # set-points outside occupied hours (setback); None = no heating / cooling then (as before)
+    heating_setback: float | None = None
+    cooling_setback: float | None = None
+    # people per m2 of floor: their sensible heat (metabolic_rate) replaces occupancy_w_m2, and
+    # ventilation_l_s_person adds per-person fresh air to ventilation_l_s_m2
+    people_per_m2: float | None = None
+    ventilation_l_s_person: float | None = None
+    # months (1..12) in which each system is available; None = all year
+    heating_months: list | None = None
+    cooling_months: list | None = None
+    ventilation_months: list | None = None
+    natural_ventilation_months: list | None = None
+    # your own day profiles: {"occupancy" | "equipment" | "lighting": {"weekday": [24 fractions], "weekend": [24]}}
+    custom_schedule: dict | None = None
+    # the season for the adaptive-comfort hour counts, e.g. [5, 6, 7, 8, 9, 10]; None = all year
+    comfort_months: list | None = None
 
     def validate(self) -> None:
         if self.construction not in CONSTRUCTIONS:
@@ -166,10 +193,59 @@ class Settings:
             raise ValueError("heat_recovery must be 0..0.95")
         if not 0.0 <= self.frame_fraction < 1.0:
             raise ValueError("frame_fraction must be 0..1")
+        for name in ("heating_setback", "cooling_setback"):
+            v = getattr(self, name)
+            if v is not None and not 0.0 <= float(v) <= 40.0:
+                raise ValueError(f"{name} must be 0..40 degC")
+        if (self.heating_setback is not None and self.cooling_setback is not None
+                and self.heating_setback >= self.cooling_setback):
+            raise ValueError("the heating setback must be below the cooling setback")
+        if self.people_per_m2 is not None and not 0.0 <= self.people_per_m2 <= 2.0:
+            raise ValueError("people_per_m2 must be 0..2")
+        if self.ventilation_l_s_person is not None:
+            if not 0.0 <= self.ventilation_l_s_person <= 100.0:
+                raise ValueError("ventilation_l_s_person must be 0..100")
+            if self.people_per_m2 is None:
+                raise ValueError("ventilation_l_s_person needs people_per_m2")
+        if self.ventilation_ach is not None and self.ventilation_l_s_person is not None:
+            raise ValueError("give ventilation_ach or per-person / per-area rates, not both")
+        for name in ("heating_months", "cooling_months", "ventilation_months", "natural_ventilation_months", "comfort_months"):
+            v = getattr(self, name)
+            if v is not None:
+                if not isinstance(v, (list, tuple)) or not v or not all(isinstance(m, int) and 1 <= m <= 12 for m in v):
+                    raise ValueError(f"{name} must be a list of months 1..12, e.g. [11, 12, 1, 2, 3, 4]")
+        if self.custom_schedule is not None:
+            if not isinstance(self.custom_schedule, dict):
+                raise ValueError("custom_schedule must be {'occupancy': {'weekday': [24 values], 'weekend': [24 values]}, ...}")
+            for key, prof in self.custom_schedule.items():
+                if key not in ("occupancy", "equipment", "lighting"):
+                    raise ValueError(f"custom_schedule key '{key}' must be occupancy, equipment or lighting")
+                if not isinstance(prof, dict) or set(prof) - {"weekday", "weekend"} or "weekday" not in prof:
+                    raise ValueError(f"custom_schedule['{key}'] needs 'weekday' (and optionally 'weekend') lists of 24 values")
+                for day, vals in prof.items():
+                    if (not isinstance(vals, (list, tuple)) or len(vals) != 24
+                            or not all(isinstance(x, (int, float)) and 0.0 <= x <= 1.0 for x in vals)):
+                        raise ValueError(f"custom_schedule['{key}']['{day}'] must be 24 fractions 0..1, "
+                                         "one per hour from 00:00-01:00")
 
 
-def occupancy(weather, schedule: str) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
-    """(occupancy fraction, equipment fraction, lighting fraction) per hour."""
+def occupancy(weather, schedule: str, custom: dict | None = None) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    """(occupancy fraction, equipment fraction, lighting fraction) per hour. ``custom`` replaces any of the
+    three by your own weekday / weekend day profiles (24 values, hour 0 = 00:00-01:00)."""
+    occ, equip, light = _preset_schedule(weather, schedule)
+    if custom:
+        hod = weather.hour_of_day
+        workday = weather.weekday() < 5
+        out = {"occupancy": occ, "equipment": equip, "lighting": light}
+        for key, prof in custom.items():
+            wk = np.asarray(prof["weekday"], dtype=float)
+            we = np.asarray(prof.get("weekend", prof["weekday"]), dtype=float)
+            out[key] = np.where(workday, wk[hod], we[hod])
+        occ, equip, light = out["occupancy"], out["equipment"], out["lighting"]
+    return occ, equip, light
+
+
+def _preset_schedule(weather, schedule: str) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     hod = weather.hour_of_day
     wd = weather.weekday()
     workday = wd < 5
@@ -254,7 +330,8 @@ def solar_gains(zone: Zone, weather, st: Settings) -> tuple[np.ndarray, np.ndarr
             gain = s.absorptance * R_SE * s.u_value * s.area * I - f_r * R_SE * s.u_value * s.area * H_R_EXT * DT_SKY
             opaque_total += gain
         phi += gain
-    return phi, shaded, {"windows_kwh": float(win_total.sum() / 1000), "opaque_kwh": float(opaque_total.sum() / 1000)}
+    return phi, shaded, {"windows_kwh": float(win_total.sum() / 1000), "opaque_kwh": float(opaque_total.sum() / 1000),
+                         "_windows_w": win_total, "_opaque_w": opaque_total}
 
 
 def simulate(zone: Zone, weather, st: Settings, warmup_days: int = 30) -> dict:
@@ -293,21 +370,37 @@ def simulate(zone: Zone, weather, st: Settings, warmup_days: int = 30) -> dict:
     t_ground = np.asarray(g, dtype=float)[weather.month - 1] if g is not None else t_out
     t_e = (H_op * t_out + H_gr * t_ground) / H_op_total if H_op_total > 0 else t_out
     prof = zone.profile or {}
-    occ, equip, light = occupancy(weather, prof.get("schedule", st.schedule))
-    phi_int = Af * (prof.get("occupancy_w_m2", st.occupancy_w_m2) * occ + prof.get("equipment_w_m2", st.equipment_w_m2) * equip
-                    + prof.get("lighting_w_m2", st.lighting_w_m2) * light)
+    occ, equip, light = occupancy(weather, prof.get("schedule", st.schedule), st.custom_schedule)
+    # people_per_m2, when given, beats a room use's default gain: it is the more specific input
+    occ_w_m2 = (st.people_per_m2 * people_sensible_w(st.metabolic_rate) if st.people_per_m2 is not None
+                else prof.get("occupancy_w_m2", st.occupancy_w_m2))
+    phi_people = Af * occ_w_m2 * occ
+    phi_equip = Af * prof.get("equipment_w_m2", st.equipment_w_m2) * equip
+    phi_light = Af * prof.get("lighting_w_m2", st.lighting_w_m2) * light
+    phi_int = phi_people + phi_equip + phi_light
     phi_sol, shaded, sol_info = solar_gains(zone, weather, st)
+    win_solar, opaque_solar = sol_info.pop("_windows_w"), sol_info.pop("_opaque_w")
     V = zone.volume
     if st.ventilation_ach is not None:
         vent_ach = float(st.ventilation_ach)
         vent_rate = vent_ach * V / 3.6 / Af
+    elif st.ventilation_l_s_person is not None:
+        vent_rate = st.ventilation_l_s_person * st.people_per_m2 + (st.ventilation_l_s_m2 or 0.0)
+        vent_ach = vent_rate * Af * 3.6 / V
     else:
         vent_rate = (st.ventilation_l_s_m2 if st.ventilation_l_s_m2 is not None else
                      prof.get("ventilation_l_s_m2", VENTILATION_L_S_M2.get(prof.get("schedule", st.schedule), 0.42)))
         vent_ach = vent_rate * Af * 3.6 / V                      # l/s m2 -> air changes per hour
     occupied = occ > 0
+
+    def available(months) -> np.ndarray:
+        return np.ones(HOURS, dtype=bool) if months is None else np.isin(weather.month, months)
+    heat_ok, cool_ok = available(st.heating_months), available(st.cooling_months)
+    nv_ok = available(st.natural_ventilation_months)
     heat_sp = prof.get("heating_setpoint", st.heating_setpoint)
     cool_sp = prof.get("cooling_setpoint", st.cooling_setpoint)
+    heat_off = st.heating_setback if heat_sp is not None else None      # the unoccupied set-points
+    cool_off = st.cooling_setback if cool_sp is not None else None
     # heat recovery returns part of the exhaust heat: the fresh air then costs (1 - efficiency) of its flow.
     # Summer bypass: recovery runs while the outdoor air is below the heating set-point + 2 K (heating season)
     # or above the cooling set-point (recovering coolth); otherwise the fresh air bypasses the exchanger.
@@ -315,14 +408,16 @@ def simulate(zone: Zone, weather, st: Settings, warmup_days: int = 30) -> dict:
     if cool_sp is not None:
         hr_on |= t_out > cool_sp
     hr = np.where(hr_on, st.heat_recovery, 0.0)
-    base_ach = st.infiltration_ach + np.where(occ > 0, vent_ach * (1.0 - hr), 0.0)
-    if zone.opening_ach is not None:
-        base_ach = base_ach + np.asarray(zone.opening_ach, dtype=float)
+    mech_ach = np.where(occupied & available(st.ventilation_months), vent_ach * (1.0 - hr), 0.0)
+    open_ach = np.asarray(zone.opening_ach, dtype=float) if zone.opening_ach is not None else np.zeros(HOURS)
+    base_ach = st.infiltration_ach + mech_ach + open_ach
     nv_ach = st.natural_ventilation_ach
 
     t_air = np.zeros(HOURS)
     t_s = np.zeros(HOURS)
     t_m_out = np.zeros(HOURS)
+    t_m_end = np.zeros(HOURS)
+    t_m_start = np.zeros(HOURS)
     q_hc = np.zeros(HOURS)
     vent_open = np.zeros(HOURS, dtype=bool)
 
@@ -358,14 +453,16 @@ def simulate(zone: Zone, weather, st: Settings, warmup_days: int = 30) -> dict:
         h_ve = max(RHO_CA * ach * V / 3600.0, 1e-3)
         ta0, ts0, tm0, tma0 = step(i, h_ve, 0.0, t_m_prev)
         opened = False
-        if nv_ach > 0 and ta0 > st.natural_ventilation_on_above and st.natural_ventilation_min_outdoor <= t_out[i] < ta0 - 1.0:
+        if (nv_ach > 0 and nv_ok[i] and ta0 > st.natural_ventilation_on_above
+                and st.natural_ventilation_min_outdoor <= t_out[i] < ta0 - 1.0):
             h_ve_nv = RHO_CA * (ach + nv_ach) * V / 3600.0
             ta_nv, ts_nv, tm_nv, tma_nv = step(i, h_ve_nv, 0.0, t_m_prev)
             # do not ventilate below the heating set-point
             if heat_sp is None or ta_nv >= heat_sp:
                 h_ve, (ta0, ts0, tm0, tma0), opened = h_ve_nv, (ta_nv, ts_nv, tm_nv, tma_nv), True
-        hs = heat_sp if heat_sp is not None and (occupied[i] or not st.setback) else None
-        cs = cool_sp if cool_sp is not None and (occupied[i] or not st.setback) else None
+        on = occupied[i] or not st.setback
+        hs = (heat_sp if on else heat_off) if heat_sp is not None and heat_ok[i] else None
+        cs = (cool_sp if on else cool_off) if cool_sp is not None and cool_ok[i] else None
         phi = 0.0
         ta, ts, tm, tma = ta0, ts0, tm0, tma0
         target = None
@@ -378,23 +475,56 @@ def simulate(zone: Zone, weather, st: Settings, warmup_days: int = 30) -> dict:
             ta10 = step(i, h_ve, phi10, t_m_prev)[0]
             phi = phi10 * (target - ta0) / (ta10 - ta0) if ta10 != ta0 else 0.0
             ta, ts, tm, tma = step(i, h_ve, phi, t_m_prev)
-        t_m_prev = tm
         if n >= record_from:
             t_air[i], t_s[i], t_m_out[i], q_hc[i], vent_open[i] = ta, ts, tma, phi, opened
+            t_m_start[i], t_m_end[i] = t_m_prev, tm
+        t_m_prev = tm
     t_op = 0.3 * t_air + 0.7 * t_s
     heating = np.maximum(q_hc, 0.0)
     cooling = np.maximum(-q_hc, 0.0)
+    # hourly energy balance of the zone (W, + = heat into the room); the terms add up to zero each hour
+    ha = RHO_CA * V / 3600.0
+    d_air = t_out - t_air
+    coupling = np.asarray(zone.coupling_w, dtype=float) if zone.coupling_w is not None else np.zeros(HOURS)
+    balance = {
+        "people_w": phi_people, "equipment_w": phi_equip, "lighting_w": phi_light,
+        "window_solar_w": win_solar, "window_conduction_w": H_tr_w * (t_out - t_s),
+        "opaque_conduction_w": H_tr_em * (t_e - t_m_out) + opaque_solar,
+        "infiltration_w": ha * st.infiltration_ach * d_air, "ventilation_w": ha * mech_ach * d_air,
+        "openings_w": ha * open_ach * d_air, "natural_ventilation_w": ha * np.where(vent_open, nv_ach, 0.0) * d_air,
+        "interzone_w": coupling, "heating_w": heating, "cooling_w": -cooling,
+        # ISO 13790 C.2 puts a share H_tr,w / (9.1 A_t) of the surface gains straight out through the windows
+        "gains_lost_through_windows_w": -(1.0 - f_m - f_st) * (0.5 * phi_int + phi_sol),
+        "thermal_mass_w": -C_m * (t_m_end - t_m_start) / 3600.0,
+    }
     return {
         "t_air": t_air, "t_surface": t_s, "t_mass": t_m_out, "t_op": t_op, "heating_w": heating, "cooling_w": cooling,
         "solar_w": phi_sol, "internal_w": phi_int, "occupied": occupied, "window_shading": shaded,
-        "natural_ventilation": vent_open,
+        "natural_ventilation": vent_open, "occupancy": occ, "balance_w": balance,
         "model": {"ventilation_l_s_m2_occupied": round(float(vent_rate), 3), "infiltration_ach": st.infiltration_ach,
+                  "people_w_m2_at_full_occupancy": round(float(prof.get("occupancy_w_m2", occ_w_m2)), 2),
                   "H_ve_base_w_k": round(float(RHO_CA * base_ach.mean() * V / 3600.0), 2), "H_tr_w_w_k": round(H_tr_w, 2),
                   "H_tr_op_w_k": round(H_op, 2), "H_ground_w_k": round(H_gr, 2), "H_tr_em_w_k": round(H_tr_em, 2),
                   "H_tr_ms_w_k": round(H_tr_ms, 2), "H_tr_is_w_k": round(H_tr_is, 2), "C_m_mj_k": round(C_m / 1e6, 2),
                   "A_m_m2": round(A_m, 2), "mass_class": mass, "solar": sol_info,
                   "opening_ach_mean": round(float(np.mean(zone.opening_ach)), 2) if zone.opening_ach is not None else 0.0},
     }
+
+
+def adaptive_hours(t_op: np.ndarray, t_rm: np.ndarray, occupied: np.ndarray, month: np.ndarray,
+                   months: list | None = None) -> dict:
+    """EN 16798-1 adaptive comfort as hour counts: occupied hours in the season (``months``, default all
+    year) that are too warm, too cool or comfortable, per category I-III. The adaptive model applies only
+    where the running mean outdoor temperature is 10-30 degC; hours outside it are counted separately."""
+    sel = occupied & (np.isin(month, months) if months else np.ones_like(occupied, dtype=bool))
+    out = {"months": list(months) if months else "all", "occupied_hours": int(sel.sum())}
+    for cat in ("I", "II", "III"):
+        e = comfort.adaptive_en16798(t_op, t_rm, cat)
+        out[cat] = {"too_warm_h": int((sel & (e["status"] > 0)).sum()), "too_cool_h": int((sel & (e["status"] < 0)).sum()),
+                    "comfortable_h": int((sel & (e["status"] == 0)).sum())}
+    trm_h = np.repeat(t_rm, 24) if len(t_rm) * 24 == len(t_op) else t_rm
+    out["outside_model_range_h"] = int((sel & ((trm_h < 10) | (trm_h > 30))).sum())
+    return out
 
 
 def summarize(zone: Zone, res: dict, weather, st: Settings) -> dict:
@@ -421,6 +551,14 @@ def summarize(zone: Zone, res: dict, weather, st: Settings) -> dict:
         "window_shading_hours": int(res["window_shading"].sum()),
         "model": res["model"],
     }
+    bal = res.get("balance_w")
+    if bal:
+        out["lighting_kwh_m2"] = round(float(bal["lighting_w"].sum() / 1000 / Af), 1)
+        out["equipment_kwh_m2"] = round(float(bal["equipment_w"].sum() / 1000 / Af), 1)
+        out["energy_balance_kwh_m2"] = {k[:-2]: {"gains": round(float(np.maximum(v, 0).sum() / 1000 / Af), 2),
+                                                 "losses": round(float(np.minimum(v, 0).sum() / 1000 / Af), 2)}
+                                        for k, v in bal.items() if np.any(v)}
+        out["energy_balance_closure_w"] = round(float(np.abs(sum(bal.values())).max()), 3)
     daily = weather.daily_mean("dry_bulb")
     t_rm = comfort.running_mean_outdoor(daily, 0.8)
     prof = zone.profile or {}
@@ -444,6 +582,7 @@ def summarize(zone: Zone, res: dict, weather, st: Settings) -> dict:
             "too_cool_pct": round(100 * float((e["status"][occ] < 0).mean()), 1),
         }
         out["tm52"] = comfort.tm52(t_op, t_rm, occ, weather.month)
+        out["adaptive_en16798_hours"] = adaptive_hours(t_op, t_rm, occ, weather.month, st.comfort_months)
         # PMV with indoor air humidity equal to the outdoor absolute humidity (no moisture model)
         w_out = comfort.humidity_ratio(weather["dry_bulb"], weather["rel_humidity"], weather["pressure"])
         rh_in = np.clip(comfort.rh_from_humidity_ratio(res["t_air"], w_out, weather["pressure"]), 0, 100)

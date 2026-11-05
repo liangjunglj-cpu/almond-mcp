@@ -333,7 +333,7 @@ def _panel(req: dict) -> dict:
 
 def test_panel_engine(tropical_epw):
     cat = _panel({"action": "catalogue"})
-    assert cat["status"] == "ok" and set(cat["steps"]) == {"site", "rooms", "constructions", "study", "results"}
+    assert cat["status"] == "ok" and set(cat["steps"]) == {"site", "rooms", "constructions", "study", "results", "compare"}
     assert any(c["id"] == "ew_rc_etics" for c in cat["constructions"]) and cat["packs"]
     con = _panel({"action": "construction", "id": "roof_rc_warm_flat"})
     assert con["status"] == "ok" and con["svg"].startswith("<svg") and con["construction"]["u_value"] < 0.2

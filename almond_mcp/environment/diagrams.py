@@ -28,7 +28,8 @@ MONO = "'Courier New', monospace"
 CUT, OUTLINE, HAIR = 2.0, 1.2, 0.6
 
 STATE_FILL = {"enclosed": "#f7f6f1", "semi_open": "#f3e4dc", "open": PAPER}
-STEPS = [("site", "Site"), ("rooms", "Rooms"), ("constructions", "Constructions"), ("study", "Study"), ("results", "Results")]
+STEPS = [("site", "Site"), ("rooms", "Rooms"), ("constructions", "Constructions"), ("study", "Study"), ("results", "Results"),
+         ("compare", "Compare")]
 
 
 def _hex(c: str) -> tuple[int, int, int]:
@@ -289,11 +290,15 @@ def _icon(c: Canvas, key: str, x: float, y: float, s: float, color: str):
         for xx, hh in ((3.5, 5), (8, 10), (12.5, 7)):
             c.line(P([(xx, 14), (xx, 14 - hh)]), color, 2.4)
         c.line(P([(1.5, 14.5), (14.5, 14.5)]), color, w)
+    elif key == "compare":
+        for xx, hh in ((3.5, 6.5), (6, 3.5), (10, 8.5), (12.5, 5)):
+            c.line(P([(xx, 12.5), (xx, 12.5 - hh)]), color, 1.8)
+        c.line(P([(1.5, 14.5), (14.5, 14.5)]), color, w)
 
 
 def step_strip(active: str = "site", done: tuple[str, ...] = ()) -> Canvas:
-    """Site -> Rooms -> Constructions -> Study -> Results, the current step in red."""
-    W, H = 720, 74
+    """Site -> Rooms -> Constructions -> Study -> Results -> Compare, the current step in red."""
+    W, H = 126 * len(STEPS), 74
     c = Canvas(W, H)
     n = len(STEPS)
     cw = W / n

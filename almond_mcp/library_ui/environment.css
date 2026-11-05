@@ -21,3 +21,10 @@
 .env-warnings li{font-size:11px;line-height:1.55;color:var(--red);margin:4px 0}
 .env-page .analysis-meta.need{color:var(--red)}
 .rhino-panel .env-strip svg text{font-family:var(--ui-font,"Segoe UI"),Arial,sans-serif}
+.env-date{display:grid;grid-template-columns:1fr 64px;gap:6px}
+.env-image{display:block;width:100%;height:auto;margin:12px 0;border:1px solid var(--line)}
+.env-plain li{color:var(--muted)}
+.env-seasons td{padding:4px}
+.env-seasons select{width:100%}
+.env-inner{margin-top:10px}
+#env-compare-bars{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:0 14px}

@@ -748,6 +748,13 @@ class Shoebox:
         scene.vertices = (scene.vertices - centre) @ rot.T
         return scene
 
+    def to_scene(self, local_points) -> np.ndarray:
+        """Points in the box's own frame (x along the facade from its left end, y into the room from the
+        facade, z up from the floor) in the built scene's coordinates."""
+        theta = math.radians(180.0 - self.orientation)
+        rot = np.array([[math.cos(theta), -math.sin(theta), 0], [math.sin(theta), math.cos(theta), 0], [0, 0, 1]])
+        return (np.asarray(local_points, dtype=float).reshape(-1, 3) - np.array([self.width / 2, 0.0, 0.0])) @ rot.T
+
     def floor_grid(self, scene: Scene, spacing: float = 0.5, work_plane: float = 0.76, edge_offset: float = 0.0) -> SensorGrid:
         sel = np.array([o.get("part") == "floor" for o in scene.objects])[scene.tri_object]
         return grid_from_triangles(scene.vertices, scene.triangles[sel], spacing, work_plane, edge_offset)
