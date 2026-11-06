@@ -72,12 +72,19 @@ DEFAULT_GLAZING = "glazing_double_lowe"
 # Keyword rules, first match wins (applied to the layer path, object name and render-material name).
 _RULES = (
     (r"\b(ignore|annotation|sensor|grid|dim|text)\b", "ignore"),
+    # glass inside the room is not a window (render materials are often just "Glass"): glassware and
+    # shower screens are clear and small, so light passes them as if they were not there; mirrors,
+    # oven doors and device screens are opaque fittings
+    (r"(tumbler|glassware|drinking glass|wine ?glass|carafe|shower ?(screen|glass|door|enclosure)(?! ?(shoe|frame|handle|hinge|rail|seal)))", "ignore"),
+    (r"(\bmirror\b(?![ _-]?glass)|\boven\b|microwave|laptop|television|\btv\b)", "furniture"),
+    # curtains, drapes and blinds hang at the window but are textiles, not glass (a curtain wall is glazing)
+    (r"(curtain(?![ _-]?wall)|\bdrape|\bblinds?\b(?![ _-]?(wall|fa[cç]ade))|\bsheers?\b)", "shading"),
     (r"low.?e", DEFAULT_GLAZING),
     (r"triple", "glazing_triple_lowe"),
     (r"tint", "glazing_tinted"),
     # a window's frame parts are named after the window but are not glass
     (r"(mullion|transom|\bsill|\bframe\b|jamb|lintel|reveal|handle|muntin)", "frame"),
-    (r"(glass|glaz|window|curtain|skylight|fenestration|clerestor)", None),   # generic glazing
+    (r"(glass|glaz|window|curtain[ _-]?wall|skylight|fenestration|clerestor)", None),   # generic glazing
     (r"(opening|void|hole)", "opening"),
     (r"(ceiling|soffit)", "ceiling"),
     (r"(roof)", "roof"),                                  # before "slab": a roof slab is a roof
