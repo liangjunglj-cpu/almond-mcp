@@ -92,7 +92,10 @@ sent by a model JSON (the `almond-mcp solve` protocol).
   member's deflection relative to what supports it (beam ends on columns, a
   cantilever's root, a truss chord's end posts), so column shortening in a tall
   frame does not count as beam deflection; the absolute maximum is reported as
-  `max_displacement_mm`. Storey drift is not checked.
+  `max_displacement_mm`. For beam/frame each member is checked against its own span
+  (between its supports, however it was drawn in pieces), so `max_deflection_mm` and
+  `deflection_limit_mm` are the governing member's (`governing_deflection` names it).
+  Storey drift is not checked.
 - **Strength:** utilization < 1.0 against yield (S235: fy = 235 MPa).
 - Rule-based pathway: mid-span UDL deflection `5wL⁴/384EI`, moment `wL²/8`,
   with load sharing across members.

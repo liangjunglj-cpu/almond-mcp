@@ -74,8 +74,13 @@ def test_validation_result_contract():
     assert out["verdict"].startswith(ns.METHOD_PREFIX + "FAILED")
     r = out["results"]
     assert r["analysis_method"] == "native" and r["span_basis"] == "member"
-    assert r["deflection_limit_mm"] == pytest.approx(3100 / 250)       # longest member 3.1 m
-    assert r["max_deflection_mm"] == pytest.approx(183.013, rel=0.02)
+    # each member against its own span: the governing one is the 6.2 m beam on y = 5 m (column to wall),
+    # drawn as two 3.1 m pieces
+    assert r["deflection_limit_mm"] == pytest.approx(6200 / 250)
+    assert r["governing_deflection"]["span_m"] == pytest.approx(6.2) and r["governing_deflection"]["member"] == "M10"
+    assert "in member M10 (span 6.20 m)" in out["verdict"]
+    assert r["largest_deflection_mm"] == pytest.approx(183.013, rel=0.02)   # the 2 x 6.2 m cantilever (y = 2.5 m)
+    assert r["max_deflection_mm"] == r["governing_deflection"]["deflection_mm"] == pytest.approx(172.3, rel=0.02)
     assert len(r["per_element_utilization"]) == 20
     assert r["support_mode"] == "pinned" and len(r["support_points_m"]) == 9
     assert r["reactions_kn"] > 150                                    # imposed load + self weight

@@ -14,13 +14,30 @@ so the two engines are comparable:
   drawn along one line form a continuous member); columns stay continuous; a curve's user text
   ``almond:release``
   ("pinned" | "pinned_start" | "pinned_end" | "rigid") overrides either mode for that member;
-- imposed load: ``load_kn`` split equally over the free (unsupported) nodes, acting -Z;
+- imposed load: ``load_kn`` split equally over the free (unsupported) joints, acting -Z; the
+  vertices along a curved member are not joints (a curve only between supports carries it as a
+  uniform line load);
 - self weight: gamma x A along every member, -Z;
-- deflection limit: span / the design code's ratio (250 for the Eurocode profile), span = longest
-  member for beam/frame, else overall extent, unless the caller names the structural span
-  (members split at every node are shorter); the deflection checked is each member's deflection
-  relative to what supports it (``member_deflections``), so column shortening in a tall frame or
-  rigid-body sway does not count as beam deflection; the absolute maximum is reported alongside;
+- curved members: the bridge polylines curves to the document tolerance; each smooth run is analysed
+  as equal chords within its length / CURVE_SAGITTA_RATIO of the curve, turning at most
+  MAX_CURVE_TURN each, at most MAX_CURVE_SEGMENTS (``simplify_curve``), and is one member for the
+  EN 1993 checks;
+- size: the dense solver works within a fixed memory budget (DENSE_BUDGET_GB, so a model's verdict does
+  not depend on what else is open). Before assembly the worst case (every bending member compressed
+  and refined for stability) is estimated; over budget, curved members are coarsened, then the
+  stability refinement is reduced, and only a model that still does not fit is refused with an
+  error result (``check_size``);
+- deflection limit: span / the design code's ratio (250 for the Eurocode profile); for beam/frame
+  every member against its own span: the drawn member (one curve or line, however split at joints,
+  and the pieces carrying on in line) between the points that support it, twice the overhang for a
+  cantilever; a surface-like frame (vault, gridshell, arch: ``is_surface``) instead gets a global check
+  (largest node displacement against the span between its supports) and a local one (each member's
+  sag between its joints against its length), ``surface_deflections``; other types the overall
+  extent; the caller's span overrides. The member deflection checked is each member's deflection
+  relative to what supports it (``member_deflection_spans``),
+  so column shortening in a tall frame or rigid-body sway does not count as beam deflection; the
+  governing member (largest deflection / limit) is named in the verdict, the largest deflection and
+  the absolute maximum displacement are reported alongside;
 - joints: points closer than WELD_RATIO x the model's extent are welded into one node (a piece of a
   few mm beside members of many metres cannot be solved accurately);
 - load cases: permanent G (self weight, floor build-up, the weight of placed items) and
@@ -38,6 +55,8 @@ The result dict has the same shape as the bridge's ``validate`` reply, with
 from __future__ import annotations
 
 import math
+import os
+import sys
 import time
 
 import numpy as np
@@ -54,10 +73,16 @@ ASSUMPTIONS = [
     "Linear-elastic 3D frame analysis (Almond native solver); second-order (P-Delta) where the stability "
     "check calls for it (see Stability).",
     "Joints as stated under Connections; supports as described in support_mode.",
-    "Imposed load shared equally by the free nodes, acting downward; self weight included when enabled.",
+    "Imposed load shared equally by the free joints, acting downward (along a curve between supports: a uniform "
+    "line load); self weight included when enabled.",
+    "Curved members analysed as equal straight chords close to the curve (a warning gives the tolerance when "
+    "a curve was simplified).",
     "Deflection checked per member relative to its supports (beam ends on columns, a cantilever's root, a truss "
     "chord's end posts), not the absolute displacement: column shortening and rigid-body sway are excluded. "
-    "Storey drift is not checked.",
+    "For beam/frame each member is checked against its own span between those supports (a cantilever: twice "
+    "its length); a frame working as a surface (vault, gridshell, arch, no columns) is checked globally (largest "
+    "displacement against the span between its supports) and locally (member sag between its joints). Storey "
+    "drift is not checked.",
     "Member checks per member (EN 1993-1-1): section class from Table 5.2 for the actual stresses "
     "(Class 4 flagged as not covered); cross-section 6.2.1(7) with elastic moduli (plastic only for "
     "Class 1/2 when plastic design is requested); flexural buckling about both axes (6.3.1, curves "
@@ -132,6 +157,162 @@ WELD_RATIO = 2e-4          # points closer than this x the model's diagonal exte
 COLLINEAR_COS = 0.9995     # pieces meeting within ~1.8 degrees of a straight line are one member
 STEEP_SIN = 0.7            # members at least ~45 degrees from horizontal support what they meet
 RELEASES = ("rigid", "pinned", "pinned_start", "pinned_end")
+CURVE_SAGITTA_RATIO = 500  # a curved piece is analysed as chords within its arc length / this of the curve
+MAX_CURVE_SEGMENTS = 24    # ...and at most this many straight elements per curved piece
+MAX_CURVE_TURN = 0.1       # rad: ...and each chord turns at most this much (long, strongly curved runs)
+SMOOTH_COS = math.cos(0.15)  # a polyline turning more than ~8.6 degrees at a vertex has a corner there (the
+                           # bridge polylines curves with at most 0.1 rad per vertex)
+DENSE_BUDGET_GB = 6.0      # memory the dense matrices may take: fixed, so the verdict is the model's alone
+DENSE_COPIES = {"linear": 6, "stability": 10}   # measured peaks in n x n float64 matrices: assembly (K, K_ff,
+                           # factor, inverse, index copies) 5.9; alpha_cr (+ K_G and its eigenproblem) 9.7
+CURVE_FALLBACK_SEGMENTS = (8, 4, 2, 1)   # coarser curves, tried in turn when a model exceeds the budget
+
+
+class ModelTooLargeError(ValueError):
+    """The model needs more memory or time than the dense solver can give it."""
+    def __init__(self, message, size):
+        super().__init__(message)
+        self.size = size
+
+
+def _available_memory() -> float:
+    """Free physical memory in bytes (0 when unknown)."""
+    try:
+        if sys.platform == "win32":
+            import ctypes
+
+            class _Status(ctypes.Structure):
+                _fields_ = [("length", ctypes.c_ulong), ("load", ctypes.c_ulong)] + [
+                    (k, ctypes.c_ulonglong) for k in ("total", "avail", "page_total", "page_avail", "virt_total",
+                                                      "virt_avail", "ext")]
+            s = _Status()
+            s.length = ctypes.sizeof(_Status)
+            return float(s.avail) if ctypes.windll.kernel32.GlobalMemoryStatusEx(ctypes.byref(s)) else 0.0
+        return float(os.sysconf("SC_AVPHYS_PAGES") * os.sysconf("SC_PAGE_SIZE"))
+    except (AttributeError, OSError, ValueError):
+        return 0.0
+
+
+def max_dof(stage: str = "linear") -> int:
+    """The most DOF a dense ``stage`` ("linear" or "stability") fits in DENSE_BUDGET_GB."""
+    return int(math.sqrt(DENSE_BUDGET_GB * 1e9 / (8.0 * DENSE_COPIES[stage])))
+
+
+def check_size(nodes: int, elements: int, stage: str = "linear", added: int = 0) -> dict:
+    """Refuse a model the dense solver cannot handle within its budget, before assembling it: ``stage``
+    "linear" (one stiffness factorisation) or "stability" (also geometric stiffness and its eigenvalues;
+    ``added`` of the nodes come from refining the compressed members). Raises ModelTooLargeError
+    carrying the size; returns the size, with the free memory for a warning, otherwise."""
+    dof = 6 * int(nodes)
+    need = DENSE_COPIES[stage] * 8.0 * dof ** 2
+    free = _available_memory()
+    size = {"nodes": int(nodes), "elements": int(elements), "dof": dof, "stage": stage,
+            "memory_gb": round(need / 1e9, 2), "budget_gb": DENSE_BUDGET_GB, "max_dof": max_dof(stage),
+            "free_memory_gb": round(free / 1e9, 2) if free else None}
+    if dof <= max_dof(stage):
+        return size
+    what = f" ({added} added to refine compressed members for the stability check)" if added else ""
+    hint = " or run with stability='off'" if stage == "stability" else ""
+    raise ModelTooLargeError(
+        f"Model too large for the dense solver: {nodes} nodes / {elements} elements{what} = {dof} DOF, needing about "
+        f"{need / 1e9:.1f} GB against its {DENSE_BUDGET_GB:g} GB budget (at most {max_dof(stage)} DOF for the "
+        f"{stage} analysis). Analyse fewer members at a time{hint}.", size)
+
+
+def _memory_warning(size: dict) -> list[str]:
+    free = size.get("free_memory_gb")
+    if free and size["memory_gb"] > 0.8 * free:
+        return [f"The analysis needs about {size['memory_gb']:.1f} GB and {free:.1f} GB is free now: it may be slow "
+                "(swapping). Close other programs if it takes long."]
+    return []
+
+
+def _turns(P: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """(cos, sin) of the turning angle at every interior vertex of a polyline (zero-length legs: straight)."""
+    d = np.diff(P, axis=0)
+    seg = np.linalg.norm(d, axis=1)
+    u = d / np.where(seg > 0, seg, 1.0)[:, None]
+    cos = np.einsum("ij,ij->i", u[:-1], u[1:])
+    sin = np.linalg.norm(np.cross(u[:-1], u[1:]), axis=1)
+    flat = (seg[:-1] == 0) | (seg[1:] == 0)
+    return np.where(flat, 1.0, cos), np.where(flat, 0.0, sin)
+
+
+def _resample(P: np.ndarray, eps: float, max_segments: int) -> np.ndarray | None:
+    """Points at equal arc length along the polyline P: the fewest chords (at most max_segments) that keep
+    every vertex of P within eps and turn at most MAX_CURVE_TURN each; None when that needs as many
+    chords as P already has."""
+    seg = np.linalg.norm(np.diff(P, axis=0), axis=1)
+    s = np.concatenate([[0.0], np.cumsum(seg)])
+    total = float(s[-1])
+    if total <= 0:
+        return None
+    cos, sin = _turns(P)
+    turn = float(np.sum(np.arctan2(sin, cos)))
+    for n in range(min(max(1, math.ceil(turn / MAX_CURVE_TURN - 1e-9)), max_segments), max_segments + 1):
+        if n >= len(P) - 1:
+            return None
+        Q = np.stack([np.interp(np.linspace(0.0, total, n + 1), s, P[:, k]) for k in range(3)], axis=1)
+        j = np.minimum((s / (total / n)).astype(int), n - 1)    # the chord each vertex lies along
+        a, c = Q[j], Q[j + 1] - Q[j]
+        L2 = np.einsum("ij,ij->i", c, c)
+        t = np.clip(np.einsum("ij,ij->i", P - a, c) / np.where(L2 > 0, L2, 1.0), 0.0, 1.0)
+        if float(np.max(np.linalg.norm(P - a - t[:, None] * c, axis=1))) <= eps or n == max_segments:
+            return Q
+    return None
+
+
+def simplify_curve(points: list, keep=(), ratio: float | None = CURVE_SAGITTA_RATIO,
+                   max_segments: int = MAX_CURVE_SEGMENTS) -> tuple[list, set]:
+    """The analysis discretisation of one polylined member piece: (points, joints), joints = the indices
+    in the returned points where one smooth run ends (besides the two ends).
+
+    The polyline is cut into smooth runs at the vertex indices in ``keep`` (other members, supports),
+    at corners (turning more than ~8.6 degrees, SMOOTH_COS: a polyline drawn with corners) and where it runs straight
+    on (a node drawn on purpose; a polylined smooth curve turns at every vertex). Each smooth run is
+    resampled at equal arc length into the fewest chords, at most ``max_segments``, that stay within its
+    arc length / ``ratio`` of the drawn polyline. Equal chords keep loads and stiffness evenly spread.
+    The ends and run boundaries are the original point objects. ``ratio`` 0 or None keeps every vertex."""
+    n = len(points)
+    if n <= 2:
+        return list(points), set()
+    P = np.asarray(points, float)
+    cos, sin = _turns(P)
+    cuts = sorted({0, n - 1} | {int(k) for k in keep}
+                  | {int(i) + 1 for i in np.flatnonzero((sin < 1e-6) | (cos < SMOOTH_COS))})
+    out, joints = [points[0]], set()
+    for i, j in zip(cuts, cuts[1:]):
+        Q = _resample(P[i:j + 1], float(np.sum(np.linalg.norm(np.diff(P[i:j + 1], axis=0), axis=1))) / ratio,
+                      max_segments) if ratio and j - i > 1 else None
+        out += [points[k] for k in range(i + 1, j)] if Q is None else [[float(v) for v in q] for q in Q[1:-1]]
+        out.append(points[j])
+        if j != n - 1:
+            joints.add(len(out) - 1)
+    return out, joints
+
+
+class _Grid:
+    """Points by cell of side ``h``: the points within h of a query are in the 27 cells around it."""
+    def __init__(self, h: float):
+        self.h, self.cells = float(h), {}
+
+    def _cell(self, p):
+        return tuple(int(math.floor(v / self.h)) for v in p)
+
+    def add(self, p, item):
+        self.cells.setdefault(self._cell(p), []).append((p, item))
+
+    def near(self, p, r=None):
+        """Items whose point lies within r (default h) of p, in insertion order."""
+        r = self.h if r is None else r
+        cx, cy, cz = self._cell(p)
+        reach = max(1, int(math.ceil(r / self.h)))
+        found = []
+        for dx in range(-reach, reach + 1):
+            for dy in range(-reach, reach + 1):
+                for dz in range(-reach, reach + 1):
+                    found += [(q, it) for q, it in self.cells.get((cx + dx, cy + dy, cz + dz), ()) if math.dist(p, q) <= r]
+        return found
 
 
 def _member_ends(model: dict, tol: float) -> list:
@@ -172,8 +353,18 @@ def _continued(model: dict, tol: float) -> dict:
             if n > 0:
                 ends.append((i, which, np.asarray(a, float), d / n))
     reach = max(tol, 1e-3)
-    return {(i, w): any(j != i and np.linalg.norm(q - p) <= reach and float(d @ e) < -0.996 for (j, _, q, e) in ends)
+    grid = _Grid(reach)
+    for i, _, p, d in ends:
+        grid.add(tuple(p), (i, d))
+    return {(i, w): any(j != i and float(d @ e) < -0.996 for _, (j, e) in grid.near(tuple(p)))
             for (i, w, p, d) in ends}
+
+
+def _group(frame, run: list) -> None:
+    """The chords of one smooth curved run are one member (EN 1993 checks, stability refinement)."""
+    if len(run) > 1:
+        for ei in run:
+            frame.elements[ei].group = run[0]
 
 
 def _orientation(m: dict) -> str:
@@ -201,12 +392,17 @@ def _release_ends(m: dict, connections: str) -> tuple[bool, bool, str, bool]:
 
 def build_frame(model: dict, load_kn: float, material: str = "Steel", fixed_supports: bool = True,
                 self_weight: bool = True, diameter_mm=None, wall_mm=None, asset_loads: dict | None = None,
-                floor_loads: dict | None = None, connections: str = "rigid"):
+                floor_loads: dict | None = None, connections: str = "rigid",
+                curve_ratio: float | None = CURVE_SAGITTA_RATIO, max_curve_segments: int = MAX_CURVE_SEGMENTS):
     """``asset_loads``: {"placements": [...], "table": LoadTable, "catalogue": {...}} adds the
     gravity loads of placed library assets (see asset_loads.apply); its report is info["asset_loads"].
     ``floor_loads``: {"imposed": kN/m2, "dead": kN/m2, "levels": [z m] | None} loads every enclosed
     floor bay (see floor_loads.apply); its report is info["floor_loads"].
     ``connections``: "rigid" or "simple" (see module notes); per-member ``release`` overrides.
+    ``curve_ratio`` / ``max_curve_segments``: a curved member piece (the bridge polylines curves to the
+    document tolerance, often dozens of vertices) is analysed as at most that many chords within its
+    arc length / curve_ratio of the curve (see simplify_curve); None keeps every vertex. The chords of
+    one smooth run form one member for the EN 1993 checks (buckling length = the run between joints).
     All coordinates in meters (the bridge's exported conditioned model)."""
     connections = (connections or "rigid").lower()
     if connections not in CONNECTIONS:
@@ -220,12 +416,28 @@ def build_frame(model: dict, load_kn: float, material: str = "Steel", fixed_supp
     pts_all = [p for m in model.get("members", []) for p in (m.get("points") or [])]
     extent = float(np.linalg.norm(np.ptp(np.asarray(pts_all, float), axis=0))) if pts_all else 0.0
     weld = max(tol, WELD_RATIO * extent)
+    grid = _Grid(weld)
 
-    def node(p):
-        for i, q in enumerate(frame.nodes):
-            if math.dist(p, q) <= weld:
-                return i
-        return frame.add_node(p)
+    def node(p):                                        # the first node within the weld distance, else a new one
+        near = grid.near(p)
+        if near:
+            return min(i for _, i in near)
+        i = frame.add_node(p)
+        grid.add(frame.nodes[i], i)
+        return i
+
+    # vertices a curve simplification must keep: other members' ends and declared supports on a curve
+    joints = _Grid(weld)
+    for m in model.get("members", []):
+        pts = m.get("points") or []
+        for q in pts[:1] + pts[-1:]:
+            joints.add(q, None)
+    declared_points = [s.get("point_m") or s.get("point") for s in model.get("supports") or []]
+    for p in declared_points + list(model.get("anchor_points") or []):
+        if p is not None:
+            joints.add(p, None)
+    drawn_vertices, curved_pieces = 0, 0
+    joint_nodes, curve_nodes = set(), set()
 
     lineage = []
     pinned_ends, user_members, unordered, welded = 0, 0, 0, 0
@@ -239,7 +451,19 @@ def build_frame(model: dict, load_kn: float, material: str = "Steel", fixed_supp
             unordered += 1
             rel0 = rel1 = True                                  # direction unknown: pin both ends
         pts = m.get("points") or []
-        for a, b in zip(pts, pts[1:]):
+        breaks = set()                                          # vertices where one smooth run ends
+        if len(pts) > 2:
+            drawn = len(pts)
+            pts, breaks = simplify_curve(pts, {k for k in range(1, drawn - 1) if joints.near(pts[k])},
+                                         curve_ratio, max_curve_segments)
+            if len(pts) < drawn:
+                drawn_vertices += drawn
+                curved_pieces += 1
+        run = []                                                # elements of the current smooth run
+        for v, (a, b) in enumerate(zip(pts, pts[1:])):
+            if v in breaks:
+                _group(frame, run)
+                run = []
             if math.dist(a, b) <= tol:
                 continue
             at = lambda q, c: c is not None and math.dist(q, c) <= max(tol, 1e-3)
@@ -251,6 +475,8 @@ def build_frame(model: dict, load_kn: float, material: str = "Steel", fixed_supp
                 ra = (rel0 and at(a, c0)) or (rel1 and at(a, c1))
                 rb = (rel0 and at(b, c0)) or (rel1 and at(b, c1))
             na, nb = node(a), node(b)
+            for n_, at_ in ((na, v), (nb, v + 1)):             # drawn joints vs vertices along a curve
+                (joint_nodes if at_ in (0, len(pts) - 1) or at_ in breaks else curve_nodes).add(n_)
             if na == nb:                                        # shorter than the weld distance
                 welded += 1
                 continue
@@ -258,6 +484,12 @@ def build_frame(model: dict, load_kn: float, material: str = "Steel", fixed_supp
                                    releases=fs.release_mask(ra, rb, minor))
             pinned_ends += int(ra) + int(rb)
             lineage.append(ei)
+            run.append(ei)
+        _group(frame, run)
+    if curved_pieces:
+        warnings.append(f"{curved_pieces} curved member piece(s) drawn with {drawn_vertices} polyline vertices were "
+                        f"analysed as chords within 1/{curve_ratio:g} of their length (at most {max_curve_segments} "
+                        "per piece).")
     if welded:
         warnings.append(f"{welded} member piece(s) shorter than {weld * 1000:.1f} mm were collapsed into a single "
                         "joint (points this close are one node for the analysis).")
@@ -306,13 +538,25 @@ def build_frame(model: dict, load_kn: float, material: str = "Steel", fixed_supp
         if any(springs):
             frame.spring(n, *springs)
 
-    free = [i for i in range(len(frame.nodes)) if i not in support_nodes] or list(range(len(frame.nodes)))
-    if load_kn > 0:
-        for n in free:
-            frame.load(n, fz=-load_kn / len(free), case="Q")
+    # load_kn: equal shares at the free joints (where members meet or end, not the vertices along a curve,
+    # whose number is only a matter of discretisation); only curves between supports (a lone arch): spread
+    # evenly along the members; nothing free: every node
+    free = [i for i in range(len(frame.nodes)) if i not in support_nodes]
+    joints_free = [n for n in free if n not in curve_nodes - joint_nodes]
+    if joints_free or not free:
+        free = joints_free or list(range(len(frame.nodes)))
+        if load_kn > 0:
+            for n in free:
+                frame.load(n, fz=-load_kn / len(free), case="Q")
+    elif load_kn > 0:
+        X = np.asarray(frame.nodes, float)
+        lengths = [float(np.linalg.norm(X[e.n2] - X[e.n1])) for e in frame.elements]
+        for ei in range(len(frame.elements)):
+            frame.udl(ei, (0.0, 0.0, -load_kn / sum(lengths)), case="Q")
     if self_weight:
         frame.gravity = (0.0, 0.0, -1.0)
     info = {"support_nodes": support_nodes, "support_labels": {n: chosen[n][2] for n in support_nodes},
+            "curved_pieces": curved_pieces,
             "loaded_nodes": free if load_kn > 0 else [], "material": mat,
             "connections": {"mode": connections, "pinned_ends": pinned_ends, "user_released_members": user_members}}
     if floor_loads and (floor_loads.get("imposed") or floor_loads.get("dead")):
@@ -432,7 +676,18 @@ def _member_groups(frame) -> list[list[int]]:
 
 
 def member_deflections(frame, res) -> list[np.ndarray]:
-    """Deflection at every station of every element (m): the displacement across the member relative to
+    """Deflection at every station of every element (m); see member_deflection_spans."""
+    return member_deflection_spans(frame, res)[0]
+
+
+def member_deflection_spans(frame, res) -> tuple[list[np.ndarray], list[np.ndarray]]:
+    """(deflections, spans): at every station of every element (m), the deflection and the span it is
+    checked against. The span is the member's own: the distance between the two points that support it
+    on either side of the station, along the member (one drawn curve or line and the pieces that carry
+    on in line from it, however it was split at joints); beyond its last support (a cantilever) twice
+    the overhang; a member supported nowhere: its length.
+
+    The deflection is the displacement across the member relative to
     what supports it, which is what a span/limit check reads (not the absolute displacement, which in a
     tall frame is mostly column shortening).
 
@@ -467,9 +722,11 @@ def member_deflections(frame, res) -> list[np.ndarray]:
         b = P[int(np.argmax(np.linalg.norm(P - a, axis=1)))]
         axis = (b - a) / (np.linalg.norm(b - a) or 1.0)
         own = [n for n in nodes if n in supported or any(lo in reach and i not in members for lo, i in down.get(n, []))]
-        info.append({"els": g, "nodes": nodes, "a": a, "axis": axis, "own": own})
+        tn = (P - a) @ axis
+        info.append({"els": g, "nodes": nodes, "a": a, "axis": axis, "own": own, "t": (float(tn.min()), float(tn.max()))})
     base = {n: U[n] for n in reach}                     # supported points move with their support path
     out = [np.zeros(len(res.elements[i].stations)) for i in range(len(els))]
+    spans = [np.zeros(len(res.elements[i].stations)) for i in range(len(els))]
     done = [False] * len(groups)
 
     def measure(gi, refs):
@@ -477,6 +734,9 @@ def member_deflections(frame, res) -> list[np.ndarray]:
         ts = np.array([(X[n] - g["a"]) @ g["axis"] for n in refs])
         order = np.argsort(ts)
         ts, vs = ts[order], np.array([base[refs[k]] for k in order])
+        u = np.unique(np.round(ts, 9))
+        # span per interval: left overhang (x2), the gaps between supports, right overhang (x2)
+        gaps = np.concatenate([[2 * (u[0] - g["t"][0])], np.diff(u), [2 * (g["t"][1] - u[-1])]])
         cand = {}
         for i in g["els"]:
             er = res.elements[i]
@@ -485,6 +745,9 @@ def member_deflections(frame, res) -> list[np.ndarray]:
             rel = er.disp - ref
             perp = rel - np.outer(rel @ g["axis"], g["axis"])
             out[i] = np.linalg.norm(perp, axis=1)
+            k = np.searchsorted(u, t, side="right")     # a station on a support: the span after it, except
+            k = np.where((k == len(u)) & (t <= u[-1] + 1e-9), len(u) - 1, k)    # on the last support
+            spans[i] = gaps[k]
             for n, s in ((els[i].n1, 0), (els[i].n2, -1)):
                 if n not in base and (n not in cand or out[i][s] > np.linalg.norm(U[n] - cand[n])):
                     cand[n] = er.disp[s] - perp[s]
@@ -511,18 +774,156 @@ def member_deflections(frame, res) -> list[np.ndarray]:
         if not done[gi]:
             for i in g["els"]:
                 out[i] = np.linalg.norm(res.elements[i].disp, axis=1)
-    return out
+                spans[i] = np.full(len(out[i]), g["t"][1] - g["t"][0])
+    return out, spans
 
 
-def member_table(model: dict, frame, sls, envelope, deflections=None) -> list[dict]:
-    """Every member (one per source curve), aggregated over its analysis elements: geometry, section,
-    ULS design forces and checks from each piece's governing combination, and SLS displacements."""
-    names = {tuple(m.get("source_guids") or []): m for m in model.get("members") or []}
+def _drawn_members(model: dict, frame) -> dict:
+    """{source GUIDs: (id, element indices)} per drawn member, in element order; id = the curve's name or Mn
+    (the ids member_table and the deflection verdict use)."""
+    names = {tuple(m.get("source_guids") or []): m.get("name") for m in model.get("members") or []}
+    return {key: (names.get(key) or f"M{n}", idx) for n, (key, idx) in enumerate(_tag_groups(frame).items(), start=1)}
+
+
+SPAN_FLOOR = 1e-3           # m: a span shorter than this (a station on a cantilever's root) checks nothing
+
+
+def governing_deflection(deflections, spans, span: float | None = None) -> tuple[int, int, float]:
+    """(element, station, span m) with the largest deflection / span: each station against its own span,
+    or every station against ``span`` when given."""
+    best = (-1.0, 0, 0, float(span or 0.0))
+    for i, d in enumerate(deflections):
+        L = np.full(len(d), float(span)) if span else np.maximum(spans[i], SPAN_FLOOR)
+        r = np.where(L > SPAN_FLOOR, d / L, 0.0)
+        k = int(np.argmax(r))
+        if r[k] > best[0]:
+            best = (float(r[k]), i, k, float(L[k]))
+    return best[1:]
+
+
+def is_surface(frame) -> bool:
+    """A frame carried as a surface, not by a beam/column hierarchy (a vault, gridshell, arch or curved roof):
+    no straight near-vertical member, no taller than it is wide (not a tower), and at least half the member
+    length curved or inclined."""
+    X = np.asarray(frame.nodes, float)
+    if not len(X) or np.ptp(X[:, 2]) > max(np.ptp(X[:, 0]), np.ptp(X[:, 1])):
+        return False
+    total = shaped = 0.0
+    for idx in _tag_groups(frame).values():
+        nodes = sorted({n for i in idx for n in (frame.elements[i].n1, frame.elements[i].n2)})
+        P = X[nodes]
+        a = P[int(np.argmax(np.linalg.norm(P - P[0], axis=1)))]
+        b = P[int(np.argmax(np.linalg.norm(P - a, axis=1)))]
+        chord = float(np.linalg.norm(b - a))
+        length = sum(float(np.linalg.norm(X[frame.elements[i].n2] - X[frame.elements[i].n1])) for i in idx)
+        if chord <= 0:
+            continue
+        d = (b - a) / chord
+        off = P - a - np.outer((P - a) @ d, d)
+        straight = float(np.max(np.linalg.norm(off, axis=1))) <= 0.01 * chord
+        slope = abs(float(d[2]))
+        if straight and slope > 0.9:
+            return False                                # a column: the frame has a load path hierarchy
+        total += length
+        shaped += length if (not straight or 0.1 < slope) else 0.0
+    return total > 0 and shaped >= 0.5 * total
+
+
+def _tag_groups(frame) -> dict:
     groups: dict = {}
     for i, e in enumerate(frame.elements):
         groups.setdefault(tuple(e.tag or []), []).append(i)
+    return groups
+
+
+def surface_deflections(frame, res) -> dict:
+    """Deflection of a surface-like frame, in two parts.
+
+    Global: the largest node displacement against the structure's span, twice the largest plan distance
+    from any node to its nearest support (the crown of a vault or arch: the distance between its supports;
+    an overhang: twice its reach). Local: every member's sag between its own joints (relative to the chord
+    through its displaced ends) against its length between them. Returns {"global": (node, displacement m,
+    span m), "local": (element, station, sag m, length m)}, the local one with the largest sag / length."""
+    X = np.asarray(frame.nodes, float)
+    U = res.displacements[:, :3]
+    sup = [n for n in frame.supports if frame.vertically_supported(n)] or list(frame.supports)
+    free = [n for n in range(len(X)) if n not in frame.supports]
+    best_g = (None, 0.0, 0.0)
+    if sup and free:
+        reach = np.min(np.linalg.norm(X[free][:, None, :2] - X[sup][None, :, :2], axis=2), axis=1)
+        u = np.linalg.norm(U[free], axis=1)
+        k = int(np.argmax(u))
+        best_g = (free[k], float(u[k]), 2.0 * float(np.max(reach)))
+    best_l = (-1.0, None, 0, 0.0, 0.0)
+    for idx in ec3.groups(frame).values():              # the member between its joints, however refined
+        ends = [frame.elements[i].n1 for i in idx] + [frame.elements[i].n2 for i in idx]
+        A = max(ends, key=lambda n: np.linalg.norm(X[n] - X[ends[0]]))
+        B = max(ends, key=lambda n: np.linalg.norm(X[n] - X[A]))
+        c = X[B] - X[A]
+        L = float(np.linalg.norm(c))
+        if L <= SPAN_FLOOR:
+            continue
+        axis = c / L
+        for i in idx:
+            er = res.elements[i]
+            t = np.clip((er.stations - X[A]) @ axis / L, 0.0, 1.0)
+            rel = er.disp - (np.outer(1 - t, U[A]) + np.outer(t, U[B]))
+            sag = np.linalg.norm(rel - np.outer(rel @ axis, axis), axis=1)
+            k = int(np.argmax(sag))
+            if sag[k] / L > best_l[0]:
+                best_l = (float(sag[k] / L), i, k, float(sag[k]), L)
+    return {"global": best_g, "local": best_l[1:]}
+
+
+def deflection_check(model: dict, frame, res, structure_type: str = "frame", span_m: float | None = None) -> dict:
+    """What the SLS deflection is checked against, and the governing deflection.
+
+    span_m given: every member's deflection against it ("user"). beam/frame: a surface-like frame
+    (is_surface) gets the global and local checks of surface_deflections ("surface"); otherwise each
+    member against its own span (member_deflection_spans, "member"). Other types: the overall extent.
+    Returns {basis, kind (member | global | local), span, deflection (m), largest (m), element, node,
+    deflections, spans}."""
+    deflections, spans = member_deflection_spans(frame, res)
+    largest = max(float(np.max(d)) for d in deflections)
+    out = {"deflections": deflections, "spans": spans, "largest": largest, "node": None, "kind": "member"}
+    if not span_m and structure_type in ("beam", "frame") and is_surface(frame):
+        sd = surface_deflections(frame, res)
+        gn, gu, gspan = sd["global"]
+        le, lk, lsag, llen = sd["local"]
+        gspan = gspan if gspan > SPAN_FLOOR else 0.0
+        out["surface"] = {"global": {"node_m": [round(float(v), 4) for v in frame.nodes[gn]] if gn is not None else None,
+                                     "deflection_mm": round(gu * 1000, 3), "span_m": round(gspan, 3)},
+                          "local": {"element": le, "deflection_mm": round(lsag * 1000, 3), "span_m": round(llen, 3)}}
+        out["largest"] = max(gu, lsag)
+        if gn is not None and gspan and (le is None or gu / gspan >= lsag / llen):
+            el = next((i for i, e in enumerate(frame.elements) if gn in (e.n1, e.n2)), 0)
+            out.update(basis="surface", kind="global", span=gspan, deflection=gu, element=el, node=gn)
+        elif le is not None:
+            out.update(basis="surface", kind="local", span=llen, deflection=lsag, element=le)
+        if "basis" in out:
+            return out
+    if span_m:
+        span, basis = float(span_m), "user"
+    elif structure_type in ("beam", "frame"):
+        span, basis = 0.0, "member"
+    else:
+        span, basis = float(model.get("max_span_m") or 0.0), "extent"
+    if basis != "member" and span < 0.001:
+        span, basis = 5.0, "default"
+    gi, gk, span = governing_deflection(deflections, spans, None if basis == "member" else span)
+    if span <= SPAN_FLOOR:                                  # nothing deflects (or no measurable span)
+        span = float(model.get("max_member_span_m") or model.get("max_span_m") or 5.0)
+    out.update(basis=basis, span=span, deflection=float(deflections[gi][gk]), element=gi)
+    return out
+
+
+def member_table(model: dict, frame, sls, envelope, deflections=None, spans=None) -> list[dict]:
+    """Every member (one per source curve), aggregated over its analysis elements: geometry, section,
+    ULS design forces and checks from each piece's governing combination, and SLS displacements.
+    ``spans`` (member_deflection_spans): each member's deflection ratio is against its own span."""
+    names = {tuple(m.get("source_guids") or []): m for m in model.get("members") or []}
     rows = []
-    for n, (key, idx) in enumerate(groups.items(), start=1):
+    for key, (mid, idx) in _drawn_members(model, frame).items():
         src = names.get(key, {})
         ends = [frame.nodes[frame.elements[i].n1] for i in idx] + [frame.nodes[frame.elements[i].n2] for i in idx]
         A, B = max(((p, q) for p in ends for q in ends), key=lambda pq: math.dist(*pq))
@@ -535,8 +936,15 @@ def member_table(model: dict, frame, sls, envelope, deflections=None) -> list[di
         t = np.clip((pts - A) @ chord / span ** 2, 0.0, 1.0)
         dA, dB = disp[int(np.argmin(np.linalg.norm(pts - A, axis=1)))], disp[int(np.argmin(np.linalg.norm(pts - B, axis=1)))]
         sag = float(np.max(np.linalg.norm(disp - (np.outer(1 - t, dA) + np.outer(t, dB)), axis=1)))
+        dspan = span
         if deflections is not None:                     # relative to what supports the member (cantilevers too)
             sag = max(float(np.max(deflections[i])) for i in idx)
+        if deflections is not None and spans is not None:   # at its worst point against its own span
+            gi, gk, dspan = governing_deflection([deflections[i] for i in idx], [spans[i] for i in idx])
+            if dspan > SPAN_FLOOR:
+                sag = float(deflections[idx[gi]][gk])
+            else:
+                dspan = span
         # ULS: the governing piece and the design forces of every piece's governing combination
         gi = max(idx, key=lambda i: envelope[i][0])
         u, comb, ger = envelope[gi]
@@ -559,7 +967,7 @@ def member_table(model: dict, frame, sls, envelope, deflections=None) -> list[di
                     elif np.linalg.norm(p - B) < 1e-6:
                         pinned["end"] = True
         rows.append({
-            "id": src.get("name") or f"M{n}", "source_guids": list(key), "layer": src.get("layer"),
+            "id": mid, "source_guids": list(key), "layer": src.get("layer"),
             "role": _role(A, B), "start_m": [round(float(v), 4) for v in A], "end_m": [round(float(v), 4) for v in B],
             "length_m": round(span, 4), "elements": len(idx),
             "section": e0.section.name, "material": e0.material.name, "pinned_ends": pinned,
@@ -583,8 +991,8 @@ def member_table(model: dict, frame, sls, envelope, deflections=None) -> list[di
             "v_max_kn": round(float(V), 3), "m_max_knm": round(float(M.max()), 3),
             "t_max_knm": round(max(abs(float(envelope[i][2].T)) for i in idx), 3),
             "max_displacement_mm": round(float(np.max(np.linalg.norm(disp, axis=1))) * 1000.0, 3),
-            "deflection_mm": round(sag * 1000.0, 3),
-            "deflection_ratio": round(span / sag) if sag > 1e-9 else None,
+            "deflection_mm": round(sag * 1000.0, 3), "deflection_span_m": round(dspan, 4),
+            "deflection_ratio": round(dspan / sag) if sag > 1e-9 else None,
         })
     return rows
 
@@ -629,22 +1037,92 @@ class InstabilityError(ValueError):
         self.report = report
 
 
+def _split_plan(frame, parts: int, only: set | None = None) -> dict:
+    """{element: equal pieces} for subdivide: ``parts`` per bending member; a curved run already drawn as
+    k chords (one member, ``group``) gets ceil(parts / k) per chord."""
+    if parts < 2:
+        return {}
+    X = np.asarray(frame.nodes, float)
+    lengths = [float(np.linalg.norm(X[e.n2] - X[e.n1])) for e in frame.elements]
+    short = 0.01 * max(lengths, default=0.0)                   # stubs: splitting them only worsens conditioning
+    chords: dict = {}
+    for e in frame.elements:
+        if e.group is not None:
+            chords[e.group] = chords.get(e.group, 0) + 1
+    plan = {}
+    for ei, e in enumerate(frame.elements):
+        if e.truss or (only is not None and ei not in only) or lengths[ei] < short:
+            continue
+        k = math.ceil(parts / chords[e.group]) if e.group is not None else parts
+        if k > 1:
+            plan[ei] = k
+    return plan
+
+
 def subdivide(frame, parts: int, only: set | None = None) -> None:
     """Split bending members (all, or the element indices in ``only``) into ``parts`` equal elements
     (in place; loads, releases and lineage follow). Geometric stiffness is only accurate with interior
     nodes; first-order results are exact either way."""
-    if parts < 2:
-        return
-    X = np.asarray(frame.nodes, float)
-    lengths = [float(np.linalg.norm(X[e.n2] - X[e.n1])) for e in frame.elements]
-    short = 0.01 * max(lengths, default=0.0)                   # stubs: splitting them only worsens conditioning
-    for ei in range(len(frame.elements)):
-        if frame.elements[ei].truss or (only is not None and ei not in only) or lengths[ei] < short:
-            continue
+    for ei, k in _split_plan(frame, parts, only).items():
         tail = ei
-        for j in range(1, parts):
-            frame.split_element(tail, 1.0 / (parts - j + 1))
+        for j in range(1, k):
+            frame.split_element(tail, 1.0 / (k - j + 1))
             tail = len(frame.elements) - 1
+
+
+def _refine_compressed(frame, compressed: set | None) -> tuple[int, dict]:
+    """Subdivide the compressed members (None: every bending member) for the geometric stiffness, into
+    STABILITY_SUBDIVISION elements per member, fewer (down to 2) if that would exceed the budget.
+    Returns (elements per member, size); raises ModelTooLargeError if even 2 do not fit."""
+    for parts in range(STABILITY_SUBDIVISION, 1, -1):
+        added = sum(k - 1 for k in _split_plan(frame, parts, compressed).values())
+        if 6 * (len(frame.nodes) + added) <= max_dof("stability") or parts == 2:
+            size = check_size(len(frame.nodes) + added, len(frame.elements) + added, "stability", added)
+            subdivide(frame, parts, compressed)
+            return parts, size
+
+
+def _worst_dof(frame, parts: int) -> int:
+    """DOF of the analysis if every bending member were compressed and refined into ``parts`` (0: as built)."""
+    return 6 * (len(frame.nodes) + sum(k - 1 for k in _split_plan(frame, parts).values()))
+
+
+def build_within_budget(model: dict, *args, stability: bool = True, curve_ratio=CURVE_SAGITTA_RATIO,
+                        max_curve_segments: int = MAX_CURVE_SEGMENTS):
+    """build_frame (``args`` as there, after model) with curved members coarsened (CURVE_FALLBACK_SEGMENTS chords
+    per piece at most) until the worst case of the analysis fits the dense solver's budget: every bending
+    member compressed and refined into STABILITY_SUBDIVISION elements, else 3, else 2 (a run of k chords
+    needs no more than that refinement, so curves are not coarsened below it). Deterministic: the same
+    model always gets the same discretisation. Raises ModelTooLargeError when even the first-order
+    analysis cannot fit."""
+    caps = [max_curve_segments] + [c for c in CURVE_FALLBACK_SEGMENTS if c < max_curve_segments]
+    built: dict = {}
+
+    def build(cap):
+        if cap not in built:
+            built[cap] = build_frame(model, *args, curve_ratio=curve_ratio, max_curve_segments=cap)
+        return built[cap]
+
+    chosen = None
+    for parts in range(STABILITY_SUBDIVISION, 1, -1) if stability else (0,):
+        for cap in [c for c in caps if c >= parts] or caps[:1]:
+            frame, info, _ = build(cap)
+            if _worst_dof(frame, parts) <= max_dof("stability" if parts else "linear"):
+                chosen = cap
+                break
+            if not info["curved_pieces"]:
+                break
+        if chosen is not None:
+            break
+    if chosen is None:              # the worst case never fits: the refinement of what is actually compressed decides
+        fallback = [c for c in caps if c <= 2] or caps[-1:]
+        chosen = next((c for c in fallback if 6 * len(build(c)[0].nodes) <= max_dof("linear")), fallback[-1])
+    frame, info, warnings = build(chosen)
+    if chosen != max_curve_segments and info["curved_pieces"]:
+        warnings = warnings + [f"Curved members were coarsened to at most {chosen} chord(s) per piece so the analysis "
+                               f"fits the dense solver's {DENSE_BUDGET_GB:g} GB budget ({len(frame.nodes)} nodes)."]
+    check_size(len(frame.nodes), len(frame.elements))
+    return frame, info, warnings
 
 
 def sway_imperfection(frame) -> dict:
@@ -695,6 +1173,7 @@ def _solve_design(frame, design_basis, uls, plastic=False, stations=11, stabilit
     code = design_profile(design_basis, design_code)
     frame.gamma_m = (code.gamma_M0, code.gamma_M1)
     sls, ulss = combinations(design_basis, uls, code)
+    size = check_size(len(frame.nodes), len(frame.elements))
     if (stability or "auto").lower() == "off":
         res = fs.solve_combinations(frame, {sls[0]: sls[1], **dict(ulss)}, stations=stations, plastic=plastic)
         members = ec3.groups(frame)
@@ -704,7 +1183,9 @@ def _solve_design(frame, design_basis, uls, plastic=False, stations=11, stabilit
         for i in range(len(frame.elements)):
             best = max(((res[n].elements[i].utilization, n) for n, _ in ulss), key=lambda t: t[0])
             envelope.append((best[0], best[1], res[best[1]].elements[i]))
-        return res[sls[0]], [(n, f, res[n]) for n, f in ulss], envelope, {"mode": "off", "method": "first-order"}
+        return res[sls[0]], [(n, f, res[n]) for n, f in ulss], envelope, {"mode": "off", "method": "first-order",
+                                                                          "dense_size": size,
+                                                                          "warnings": _memory_warning(size)}
     if (stability or "").lower() != "auto":
         raise ValueError("stability must be 'auto' or 'off'.")
     # buckling needs interior nodes in the compression members: refine those (in place), then re-assemble
@@ -714,15 +1195,19 @@ def _solve_design(frame, design_basis, uls, plastic=False, stations=11, stabilit
         N = fs.axial_forces(asm, factors)
         if N.size and N.min() < 0:
             compressed |= {i for i in range(len(N)) if N[i] < 0.01 * N.min()}
+    parts, notes = STABILITY_SUBDIVISION, []
     if compressed:
-        subdivide(frame, STABILITY_SUBDIVISION, compressed)
+        parts, size = _refine_compressed(frame, compressed)
         asm = fs.prepare(frame)
+        if parts < STABILITY_SUBDIVISION:
+            notes.append(f"Compressed members were refined into {parts} elements each for alpha_cr (not "
+                         f"{STABILITY_SUBDIVISION}) to fit the dense solver's budget: alpha_cr may be ~1 % high.")
     members = ec3.groups(frame)
     sls_res = fs.solve_linear(asm, sls[1], stations=stations, plastic=plastic)
     ec3.apply(frame, sls_res, members, plastic, fabrication)
     imp = sway_imperfection(frame)
     report = {"mode": "auto", "alpha_cr": {}, "sway_imperfection": imp, "second_order": [], "iterations": 0,
-              "elements_per_member": STABILITY_SUBDIVISION}
+              "elements_per_member": parts, "dense_size": size, "warnings": notes + _memory_warning(size)}
     variants = []                                           # (name, factors, result)
     for name, factors in ulss:
         alpha, _ = fs.critical_load_factor(asm, factors)
@@ -767,28 +1252,50 @@ def view_result(model: dict, load_kn: float = 10.0, material: str = "Steel", fix
                 stations: int = 13, asset_loads: dict | None = None,
                 floor_loads: dict | None = None, design_basis: str = "en1990",
                 uls: str | None = None, connections: str = "rigid", stability: str = "auto",
-                view: str = "deflection", design_code=None, fabrication: str = "cold_formed") -> tuple[dict, float]:
+                view: str = "deflection", design_code=None, fabrication: str = "cold_formed",
+                curve_ratio: float | None = CURVE_SAGITTA_RATIO,
+                max_curve_segments: int = MAX_CURVE_SEGMENTS) -> tuple[dict, float]:
     """Solve and package the result for the bridge's ``structure_draw`` overlay.
 
     Returns (result, span_m): per-element start/end points and sampled global displacements in
     meters (SLS characteristic), ULS utilization envelope, supports, loaded nodes and the max
-    displacement. Raises frame_solver.MechanismError for unstable models."""
-    frame, info, warnings = build_frame(model, load_kn, material, fixed_supports, self_weight, diameter_mm, wall_mm,
-                                        asset_loads, floor_loads, connections)
+    displacement; span_m is the caller's or the span of the member whose deflection / span is largest.
+    Raises frame_solver.MechanismError for unstable models, ModelTooLargeError (a ValueError) for a model
+    beyond the dense solver."""
+    args = {k: v for k, v in locals().items() if k != "model"}
+    try:
+        return _view_result(model, **args)
+    except MemoryError:
+        raise ModelTooLargeError("Model too large for the dense solver: it ran out of memory. Show fewer members "
+                                 "at a time.", {}) from None
+
+
+def _view_result(model, load_kn, material, fixed_supports, self_weight, diameter_mm, wall_mm, span_m, stations,
+                 asset_loads, floor_loads, design_basis, uls, connections, stability, view, design_code, fabrication,
+                 curve_ratio, max_curve_segments):
     want_mode = (view or "deflection").lower() == "buckling"
+    frame, info, warnings = build_within_budget(model, load_kn, material, fixed_supports, self_weight, diameter_mm,
+                                                wall_mm, asset_loads, floor_loads, connections,
+                                                stability=want_mode or (stability or "auto").lower() != "off",
+                                                curve_ratio=curve_ratio, max_curve_segments=max_curve_segments)
     if (view or "deflection").lower() not in ("deflection", "buckling"):
         raise ValueError("view must be 'deflection' or 'buckling'.")
     code = design_profile(design_basis, design_code)
     res, ulss, envelope, stab = _solve_design(frame, design_basis, uls, stations=stations,
                                               stability="off" if want_mode else stability, design_code=code,
                                               fabrication=_fabrication(fabrication))
-    span = float(span_m or model.get("max_member_span_m") or model.get("max_span_m") or 5.0)
+    warnings += stab.pop("warnings", [])
+    span = float(span_m or 0.0)
+    if not span and not want_mode:                          # the governing deflection's span
+        span = deflection_check(model, frame, res)["span"]
+    if span <= SPAN_FLOOR:
+        span = float(model.get("max_member_span_m") or model.get("max_span_m") or 5.0)
     buckling = None
     if want_mode:
         asm = fs.prepare(frame)
         N = fs.axial_forces(asm, combinations(design_basis, uls, code)[1][0][1])
         if N.size and N.min() < 0:
-            subdivide(frame, STABILITY_SUBDIVISION, {i for i in range(len(N)) if N[i] < 0.01 * N.min()})
+            _refine_compressed(frame, {i for i in range(len(N)) if N[i] < 0.01 * N.min()})
             asm = fs.prepare(frame)
         name, factors = combinations(design_basis, uls, code)[1][0]
         alpha, mode = fs.critical_load_factor(asm, factors)
@@ -832,7 +1339,8 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
              asset_loads: dict | None = None, floor_loads: dict | None = None,
              design_basis: str = "en1990", uls: str | None = None, connections: str = "rigid",
              stability: str = "auto", design_code=None, detail: bool = False,
-             fabrication: str = "cold_formed") -> dict:
+             fabrication: str = "cold_formed", curve_ratio: float | None = CURVE_SAGITTA_RATIO,
+             max_curve_segments: int = MAX_CURVE_SEGMENTS) -> dict:
     """Run the native check and return a bridge-compatible validation result.
 
     ``detail``: add "members" (every member's geometry, section, ULS design forces and checks, SLS
@@ -846,14 +1354,17 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
               "results": {"analysis_method": "native"}}
     t0 = time.perf_counter()
     try:
-        frame, info, notes = build_frame(model, load_kn, material, fixed_supports, self_weight, diameter_mm, wall_mm,
-                                         asset_loads, floor_loads, connections)
+        frame, info, notes = build_within_budget(model, load_kn, material, fixed_supports, self_weight, diameter_mm,
+                                                 wall_mm, asset_loads, floor_loads, connections,
+                                                 stability=(stability or "auto").lower() != "off",
+                                                 curve_ratio=curve_ratio, max_curve_segments=max_curve_segments)
         result["warnings"] += notes
         code = design_profile(design_basis, design_code)
         result["design_code"] = code.summary()
         result["warnings"] += _code_warnings(code, uls, info)
         res, ulss, envelope, stab = _solve_design(frame, design_basis, uls, plastic=plastic, stability=stability,
                                                   design_code=code, fabrication=_fabrication(fabrication))
+        result["warnings"] += stab.pop("warnings", [])
     except InstabilityError as exc:
         result["verdict"] = METHOD_PREFIX + f"FAILED: {exc}"
         result["status"] = "fail"
@@ -874,6 +1385,19 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
                                          "bases or rigid joints for stability.")
         result["results"]["mechanism_nodes_m"] = [list(frame.nodes[n]) for n in exc.nodes] if "frame" in locals() else []
         return result
+    except ModelTooLargeError as exc:
+        result["verdict"] = str(exc)
+        result["results"]["model_size"] = exc.size
+        result["suggestions"] = ["Validate a part of the model (fewer members)" + (
+            " or use stability='off' (no refinement of compressed members)." if exc.size.get("stage") == "stability"
+            else ".")]
+        return result
+    except MemoryError:
+        nodes = len(frame.nodes) if "frame" in locals() else None
+        result["verdict"] = (f"Model too large for the dense solver: it ran out of memory ({nodes} nodes, "
+                             f"{6 * nodes if nodes else '?'} DOF). Validate fewer members at a time.")
+        result["results"]["model_size"] = {"nodes": nodes, "dof": 6 * nodes if nodes else None}
+        return result
     except ValueError as exc:
         result["verdict"] = str(exc)
         return result
@@ -882,17 +1406,20 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
     limit_ratio = float(limit_ratio or code.deflection_limit_ratio)
     if mat.family in INDICATIVE_FAMILIES:
         result["confidence"] = "low"
-    if span_m:
-        span, basis = float(span_m), "user"
-    elif structure_type in ("beam", "frame") and model.get("max_member_span_m", 0) > 0.001:
-        span, basis = float(model["max_member_span_m"]), "member"
-    else:
-        span, basis = float(model.get("max_span_m") or 0.0), "extent"
-    if span < 0.001:
-        span, basis = 5.0, "default"
+    dc = deflection_check(model, frame, res, structure_type, span_m)
+    deflections, spans, span, basis, gi = dc["deflections"], dc["spans"], dc["span"], dc["basis"], dc["element"]
+    dmax_mm, dcheck_mm = dc["largest"] * 1000.0, dc["deflection"] * 1000.0
     limit_mm = span * 1000.0 / limit_ratio
-    deflections = member_deflections(frame, res)
-    dmax_mm = max(float(np.max(d)) for d in deflections) * 1000.0
+    drawn = _drawn_members(model, frame)
+    gtag = tuple(frame.elements[gi].tag or [])
+    gname = drawn.get(gtag, (None,))[0] or f"element {gi}"
+    if dc["kind"] == "global":
+        at = ", ".join(f"{v:.2f}" for v in frame.nodes[dc["node"]])
+        where = f" at ({at}) on member {gname} (global, span {span:.2f} m between the supports either side)"
+    elif dc["kind"] == "local":
+        where = f" in member {gname} (local sag over its {span:.2f} m between joints)"
+    else:
+        where = f" in member {gname}" + (f" (span {span:.2f} m)" if basis == "member" else "")
     umax = max(u for u, _, _ in envelope)
     governing = max(envelope, key=lambda t: t[0])[1]
     stress = max(er.util_detail.get("max_stress_mpa", 0.0) for _, _, er in envelope)
@@ -904,12 +1431,22 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
     elem_util = list(per_member.values())
     r = result["results"]
     r.update({
-        "max_deflection_mm": round(dmax_mm, 3), "deflection_measure": "member, relative to its supports",
+        "max_deflection_mm": round(dcheck_mm, 3), "largest_deflection_mm": round(dmax_mm, 3),
+        "deflection_measure": ("surface: node displacement against the span between supports (global) and member "
+                               "sag between its joints (local)" if basis == "surface" else
+                               "member, relative to its supports"),
+        "governing_deflection": {"member": gname, "source_guids": list(gtag), "kind": dc["kind"],
+                                 "node_m": [round(float(v), 4) for v in frame.nodes[dc["node"]]]
+                                 if dc["node"] is not None else None,
+                                 "deflection_mm": round(dcheck_mm, 3),
+                                 "span_m": round(span, 3), "limit_mm": round(limit_mm, 3),
+                                 "utilization": round(dcheck_mm / limit_mm, 4) if limit_mm > 0 else None},
         "max_displacement_mm": round(res.max_displacement * 1000.0, 3),
         "displacement_available": True, "utilization_available": True,
         "deflection_limit_mm": round(limit_mm, 3), "utilization_ratio": round(umax, 4),
         "max_stress_mpa": round(stress, 2), "yield_stress_mpa": mat.fy / 1000.0, "span_m": round(span, 3),
-        "span_basis": basis, "reactions_kn": round(float(res.reactions[:, 2].sum()), 3),
+        "span_basis": basis, **({"surface_deflection": dc["surface"]} if "surface" in dc else {}),
+        "reactions_kn": round(float(res.reactions[:, 2].sum()), 3),
         "design_basis": (design_basis or "en1990").lower(),
         "deflection_combination": SLS[0], "utilization_combination": governing,
         "combinations": [{"name": SLS[0], "factors": SLS[1], "max_deflection_mm": round(dmax_mm, 3),
@@ -964,8 +1501,9 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
                 "Asset loads: estimated self weight + in-use load per placed asset (structural-loads.json), "
                 "carried by the nearest member or shared by the lever rule between two parallel members."]
     failures, sug = [], []
-    if dmax_mm > limit_mm:
-        failures.append(f"Deflection {dmax_mm:.1f}mm ({SLS[0]}) exceeds L/{limit_ratio:g} limit ({limit_mm:.1f}mm)")
+    if dcheck_mm > limit_mm:
+        failures.append(f"Deflection {dcheck_mm:.1f}mm ({SLS[0]}){where} exceeds L/{limit_ratio:g} limit "
+                        f"({limit_mm:.1f}mm)")
         sug += ["Increase member depth or use a stiffer cross-section", "Add intermediate supports to reduce effective span"]
     slender = sorted({tuple(frame.elements[i].tag or [str(i)]) for i, (_, _, er) in enumerate(envelope)
                       if er.util_detail.get("class") == 4})
@@ -983,15 +1521,15 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
         result["status"] = "indicative"
         result["verdict"] = METHOD_PREFIX + (
             f"INDICATIVE ONLY ({mat.name}): forces, deflection and stability are computed, but member capacity "
-            f"is not checked to {indicative}, so there is no pass/fail. Deflection {dmax_mm:.1f}mm ({SLS[0]}, "
-            f"limit {limit_mm:.1f}mm); utilization {umax:.2f} against the characteristic strength, for comparison only.")
+            f"is not checked to {indicative}, so there is no pass/fail. Deflection {dcheck_mm:.1f}mm ({SLS[0]}, "
+            f"limit {limit_mm:.1f}mm){where}; utilization {umax:.2f} against the characteristic strength, for comparison only.")
         sug.append(f"Have the members designed to {indicative.split(' (')[0]} (an engineer); use the forces "
                    "in the results as the starting point.")
     else:
         result["passed"] = not failures
         result["status"] = "pass" if not failures else "fail"
         result["verdict"] = METHOD_PREFIX + (
-            f"PASSED: Configured checks satisfied. Deflection {dmax_mm:.1f}mm ({SLS[0]}, limit {limit_mm:.1f}mm), "
+            f"PASSED: Configured checks satisfied. Deflection {dcheck_mm:.1f}mm ({SLS[0]}, limit {limit_mm:.1f}mm){where}, "
             f"Utilization {umax:.2f} ({governing})" if not failures else "FAILED: " + "; ".join(failures))
     result["suggestions"] = sug
     worst = sorted(elem_util, key=lambda e: -e["utilization"])
@@ -1002,7 +1540,7 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
                 seen.append(g)
     result["worst_member_guids"] = seen[:5]
     if detail:
-        result["members"] = member_table(model, frame, res, envelope, deflections)
+        result["members"] = member_table(model, frame, res, envelope, deflections, spans)
         result["supports"] = support_table(frame, info, res, ulss, fixed_supports)
     if res.auto_restrained:
         result["warnings"].append(f"{len(res.auto_restrained)} unstiffened rotation(s) at pin-jointed nodes were restrained.")
