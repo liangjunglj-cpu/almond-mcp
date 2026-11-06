@@ -1,0 +1,29 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Headless regression runner for ScriptExecutor's Undo handling (issue #35).
+       Links the production ScriptExecutor.cs and drives it inside Rhino.Inside,
+       i.e. a real RhinoCommon Undo stack, outside any Rhino command - exactly the
+       context the bridge runs scripts in. Needs Rhino 8 installed and licensed.
+       Run: dotnet run -c Release -p tests/script_executor_undo  (see README.md) -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>net48</TargetFramework>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>AlmondScriptUndoTests</AssemblyName>
+    <RootNamespace>AlmondScriptUndoTests</RootNamespace>
+    <PlatformTarget>x64</PlatformTarget>
+    <Nullable>disable</Nullable>
+    <IsPackable>false</IsPackable>
+    <EnableDefaultCompileItems>false</EnableDefaultCompileItems>
+    <!-- Override to point the runner at another executor, e.g. the pre-fix one, to see the cases fail. -->
+    <ExecutorSource Condition="'$(ExecutorSource)' == ''">../../RhinoAlmondBridge/ScriptExecutor.cs</ExecutorSource>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System.Drawing" />
+    <PackageReference Include="RhinoCommon" Version="8.0.23304.9001" ExcludeAssets="runtime" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="4.8.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+    <Compile Include="Program.cs" />
+    <Compile Include="NativeUndoTests.cs" />
+    <Compile Include="$(ExecutorSource)" Link="ScriptExecutor.cs" />
+  </ItemGroup>
+</Project>

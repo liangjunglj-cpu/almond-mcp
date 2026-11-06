@@ -63,6 +63,7 @@ You are setting up **Almond MCP** — this specific project, not a generic
 | `doctor`: bridge not listening on 5000 | Rhino isn't running, or the plugin didn't load — restart Rhino, run `AlmondMCPStatus` |
 | Bridge replies `unauthorized` / `doctor`: token not accepted | The bridge only accepts requests carrying this Rhino session's token (written to `%LOCALAPPDATA%\Almond\bridge.token` at Rhino start). Update `almond-mcp` to the version matching almondbridge and restart the MCP client; after a Rhino restart nothing else is needed. Never disable or bypass the check |
 | "file is outside its configured library" on placement | bridge older than 0.2.4 — `yak install almondbridge` again and restart Rhino |
+| Ctrl+Z says nothing to undo after a script error (Delete still works) | bridge older than 0.7.1 leaked an Undo record after rolling back a failed script - update almondbridge; restart Rhino to clear the stuck state |
 | `validate_structure` says rule_based / low confidence | Karamba3D 3.1 not installed — optional; install only if the user wants FEA |
 | Claude/Codex doesn't show the tools | MCP client wasn't fully restarted (Claude Desktop: quit from the system tray, not just the window) |
 
