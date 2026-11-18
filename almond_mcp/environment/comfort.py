@@ -281,6 +281,44 @@ def adaptive_ashrae55(t_op: np.ndarray, t_pma_daily: np.ndarray, air_speed: floa
 
 
 EN16798_CATEGORIES = {"I": (2.0, 3.0), "II": (3.0, 4.0), "III": (4.0, 5.0)}
+# PMV range per EN 16798-1 / ISO 7730 category for mechanically conditioned spaces
+PMV_CATEGORIES = {"I": 0.2, "II": 0.5, "III": 0.7, "IV": 1.0}
+
+
+def temperature_for_pmv(target: float, met: float, clo: float, rh: float = 50.0, vel: float = 0.1,
+                        radiant_offset_k: float = 0.0) -> float:
+    """The operative temperature (air temperature with mean radiant = air + radiant_offset_k) at which
+    PMV equals ``target``, by bisection (PMV rises with temperature)."""
+    def f(t):
+        return float(pmv_ppd(t, t + radiant_offset_k, vel, rh, met, clo)["pmv"]) - target
+    lo, hi = 0.0, 45.0
+    if f(lo) > 0 or f(hi) < 0:
+        raise ValueError(f"No temperature in 0..45 degC gives PMV {target:+.1f} for {met} met and {clo} clo")
+    for _ in range(60):
+        mid = 0.5 * (lo + hi)
+        if f(mid) < 0:
+            lo = mid
+        else:
+            hi = mid
+    t = 0.5 * (lo + hi)
+    return float(operative_temperature(t, t + radiant_offset_k, vel))
+
+
+def pmv_setpoints(met: float, clo_heating: float = 1.0, clo_cooling: float = 0.5, rh: float = 50.0,
+                  vel: float = 0.1, category: str = "II", radiant_offset_k: float = 0.0) -> dict:
+    """Design set-points from PMV: the lowest operative temperature that keeps PMV at or above the
+    category's lower limit with winter clothing (heating) and the highest that keeps it at or below the
+    upper limit with summer clothing (cooling)."""
+    if category not in PMV_CATEGORIES:
+        raise ValueError("category must be I, II, III or IV")
+    lim = PMV_CATEGORIES[category]
+    heat = temperature_for_pmv(-lim, met, clo_heating, rh, vel, radiant_offset_k)
+    cool = temperature_for_pmv(lim, met, clo_cooling, rh, vel, radiant_offset_k)
+    return {"category": category, "pmv_range": [-lim, lim],
+            "heating_setpoint_c": round(heat, 1), "cooling_setpoint_c": round(cool, 1),
+            "inputs": {"met": met, "clo_heating": clo_heating, "clo_cooling": clo_cooling, "rh_pct": rh,
+                       "air_speed_m_s": vel, "mean_radiant_minus_air_k": radiant_offset_k},
+            "method": "PMV (ISO 7730) solved for the category limit; temperatures are operative."}
 
 
 def adaptive_en16798(t_op: np.ndarray, t_rm_daily: np.ndarray, category: str = "II") -> dict:
