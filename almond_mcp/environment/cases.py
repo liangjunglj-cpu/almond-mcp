@@ -124,6 +124,7 @@ def run_thermal_cases(weather, base: dict, cases: list[dict], make_zones, out_di
         st = settings_from(m["settings"])
         zones, sc = make_zones(m)
         thermal.solar_on_surfaces(zones, sc, weather, sc.north_deg)
+        studies.prepare_lighting(zones, sc, weather, st)
         z = zones[0]
         thermal.apply_construction(z, st)
         res = thermal.simulate(z, weather, st)
@@ -132,6 +133,7 @@ def run_thermal_cases(weather, base: dict, cases: list[dict], make_zones, out_di
         rows.append({"id": cid, "label": m["label"], "zone": z.name, "floor_area_m2": summ["floor_area_m2"],
                      "heating_kwh_m2": summ["heating_kwh_m2"], "cooling_kwh_m2": summ["cooling_kwh_m2"],
                      "lighting_kwh_m2": summ.get("lighting_kwh_m2"),
+                     "lighting_saving_pct": (summ.get("lighting_control") or {}).get("saving_pct"),
                      "peak_heating_w_m2": summ["peak_heating_w_m2"], "peak_cooling_w_m2": summ["peak_cooling_w_m2"],
                      "operative_max_c": summ["operative_temperature_c"]["max"],
                      "operative_min_c": summ["operative_temperature_c"]["min"],
