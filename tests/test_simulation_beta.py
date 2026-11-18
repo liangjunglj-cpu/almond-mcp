@@ -82,18 +82,49 @@ def test_hierarchy_keeps_every_control_the_scripts_use(script):
     assert not missing, missing
 
 
+def _collapsed_ids(html: str) -> tuple[set[str], int]:
+    """Ids inside a collapsed ("advanced") section, nested sections included, and the number of sections."""
+    from html.parser import HTMLParser
+
+    class P(HTMLParser):
+        def __init__(self):
+            super().__init__()
+            self.stack, self.ids, self.sections = [], set(), 0
+
+        def handle_starttag(self, tag, attrs):
+            a = dict(attrs)
+            if tag == "details":
+                advanced = "advanced" in (a.get("class") or "").split()
+                assert not (advanced and "open" in a), "an advanced section must start collapsed"
+                self.stack.append(advanced)
+                self.sections += advanced
+            if a.get("id") and any(self.stack):
+                self.ids.add(a["id"])
+
+        def handle_endtag(self, tag):
+            if tag == "details":
+                self.stack.pop()
+
+    p = P()
+    p.feed(html)
+    return p.ids, p.sections
+
+
 def test_advanced_options_are_collapsed_and_primary_ones_are_not():
     html = (UI / "index.html").read_text(encoding="utf-8")
-    sections = re.findall(r'<details[^>]*class="analysis-details advanced"[^>]*>(.*?)</details>', html, re.S)
-    assert len(sections) >= 8 and not re.search(r'<details[^>]*advanced[^>]*\bopen\b', html)
-    hidden = " ".join(sections)
+    hidden, sections = _collapsed_ids(html)
+    assert sections >= 14
     for advanced in ("env-preset", "env-nv", "env-hr", "env-blinds", "env-pack", "env-quality", "env-spacing", "env-room-set",
                      "env-room-heat", "analysis-uls", "analysis-stability", "analysis-fabrication", "analysis-connections",
-                     "floor-imposed", "section-override"):
-        assert f'id="{advanced}"' in hidden, advanced
+                     "floor-imposed", "section-override",
+                     # the coursework (#45) and lighting (#47) controls: all behind a collapsed section
+                     "env-shade-on", "env-csv", "env-people", "env-vent-person", "env-heat", "env-heat-back", "env-m-heat-0",
+                     "env-pmv-met", "env-light-mode", "env-light-lux", "env-view-h", "env-sl-alt", "env-sun-times"):
+        assert advanced in hidden, advanced
     for primary in ("env-room-name", "env-room-use", "env-study", "env-cooling", "analysis-type", "analysis-material",
-                    "analysis-load", "self-weight", "support-restraint", "analysis-code", "analysis-run", "env-run"):
-        assert f'id="{primary}"' in html and f'id="{primary}"' not in hidden, primary
+                    "analysis-load", "self-weight", "support-restraint", "analysis-code", "analysis-run", "env-run",
+                    "env-case-name", "env-compare-room"):
+        assert f'id="{primary}"' in html and primary not in hidden, primary
 
 
 def test_panel_takes_rhino_colours_not_the_brand_palette():
