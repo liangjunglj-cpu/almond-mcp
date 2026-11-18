@@ -6,7 +6,7 @@ docs, the panel headings and home cards, the Rhino command messages (`AlmondStru
 `AlmondEnvironment`), the **Almond Results (BETA)** panel tab and the structural viewport legend. Users
 can tell the features are still under test. This page lists what has to happen before the label comes off.
 
-**Test run:** `uv run pytest` with the .NET archive host built (`ALMOND_ARCHIVE_TEST_HOST`): **672 passed,
+**Test run:** `uv run pytest` with the .NET archive host built (`ALMOND_ARCHIVE_TEST_HOST`): **701 passed,
 1 skipped** (numba not installed), plus the Node panel tests. Without the archive host 93 panel tests skip,
 and that is what happens on a plain checkout, so build it before calling a release green. A headless
 Rhino 8 (Rhino.Inside) run placed the tutorial model with the bridge's real `ScriptExecutor` in a mm
@@ -41,7 +41,7 @@ works but missing tests or evidence a stable label needs.
 | Rooms and constructions (`define_room`, `assign_construction`, `list_rooms`, `analyze_rooms`, `list_constructions`, `get_construction`) | beta | `test_rooms_constructions.py` (U-values vs hand calculation, EN ISO 13786, enclosure states, coupled rooms, panel engine), `test_simulation_beta.py` (tutorial rooms through the real engines) | Review fixes (`fix/environment-review`: name rules, TM52 season, ground floors) merged into this branch. Result plan for **cooled** rooms shows ~8760 h > 26 °C (operative temperature; read > 28 °C or the cooling load instead). External shading not credited in SC (documented, conservative). Pitched-roof R_se nit | Change or relabel the cooled-room headline metric |
 | Code packs (`list_code_packs`, `check_envelope`: sg_bca, uk_adl_2021, de_banz_2020, eu_hotmaps) | beta | `test_rooms_constructions.py` (ETTV worked example, CF from EPW, pack options) | Indicative only, not certification (stated in every reply). AU NCC and NZ H1 packs deferred. `check_envelope` exported the model twice per call: **fixed here** | Keep the "indicative" wording when the BETA label comes off |
 | Results drawing and runs (`show_environment_result`, `list_environment_runs`, `get_environment_run`, `list_environment_materials`) | ready | `test_environment.py` | — | — |
-| Coursework tools (climate charts, shadow studies, thermal cases, EN 17037 view/sunlight, compare) | not on master | On open PR #45 (`feat/comfort-course-tools`, CI green) with `test_course_tools.py`, `test_env_panel_workflow.py` | This is the 6-step panel (… Results → Compare) in the user's installed dev build | Merge #45 (then #47 daylight-linked lighting), rebase this branch's panel changes onto it |
+| Coursework tools (climate charts, shadow studies, thermal cases, EN 17037 view/sunlight, compare) and daylight-linked lighting | beta | #45 and #47 merged into this branch: `test_course_tools.py`, `test_env_panel_workflow.py`, `test_lighting_control.py`. Checked live in Rhino on the tutorial: weather file, thermal run, two kept cases compared (window ventilation 1163 h → 0 h above 26 °C), daylight factor | A panel daylight run never showed its results and kept daylight cases could not be compared (study key mismatch in #45): **fixed here** with a regression test. For a beginner the thermal table is hard to read: "1163 h > 26 °C" next to "TM52 pass" and "20 h warm" | Plain-language verdicts per room (see the beginner plan) |
 | Panel workspace (`AlmondEnvironment`) | beta | `test_analysis_workspace.py` (archive host), `test_simulation_beta.py` (hierarchy keeps every scripted control, allow-list, BETA labels), `panel_theme.test.mjs` | Checked live in Rhino 8 (dark) through the panel's DOM and its buttons; light theme only in a browser with approximate colours; doc screenshots in `docs/images/tutorial/` predate the restyle | A light-theme pass in Rhino and refreshed tutorial screenshots |
 
 ## Structure: Structural Validation
@@ -97,14 +97,15 @@ the frame's utilization overlay with the (BETA) legend):
 
 ## Release blockers in order
 
-1. Merge the open simulation PRs (#45, #47 environment; #37, #40, #41, #42, #32, #33 structure; #48
-   bridge dimension stamp) and the local fix branches (`fix/deflection-verdicts`,
-   `fix/structural-report-verdicts`, `fix/solver-input-validation`) into this branch.
-   `fix/environment-review` and #46 are already merged here (their name rules conflicted and were combined;
-   the Atelier 07 example numbers #46 committed were computed before that combination, so rerun them). #45 and the
-   structure PRs touch `index.html`, `karamba.js`, `environment.js` and `results.*`, so expect conflicts
-   with the hierarchy changes here.
-2. Repeat the live Rhino 8 pass on the merged build, in light and dark, with refreshed screenshots.
+1. Environment: done on this branch. `fix/environment-review`, #46, #45 and #47 are merged here, with
+   their conflicts resolved beginner-first (every coursework and lighting control sits in a collapsed
+   section; a test enforces it). The Atelier 07 example numbers #46 committed were computed before the
+   name-rule combination: rerun them. Structure: merge #37, #40, #41, #42, #32, #33, #48 (bridge dimension
+   stamp) and the local fix branches (`fix/deflection-verdicts`, `fix/structural-report-verdicts`,
+   `fix/solver-input-validation`); they touch `index.html`, `karamba.js` and `results.*`, so expect
+   conflicts with the hierarchy changes here.
+2. Repeat the live Rhino 8 pass after the structure merges, in light and dark, with refreshed screenshots
+   (the environment side was re-checked live after its merges).
 3. Thermal benchmark (ASHRAE 140 style) and one real-EPW climate check in CI.
 4. Fix the cooled-room headline metric; resolve or document the shell-roof α_cr gap.
 5. Then remove the (BETA) labels in one change (search the repo for `(BETA)` and `beta-tag`) and bump
