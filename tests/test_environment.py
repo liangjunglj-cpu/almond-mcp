@@ -778,6 +778,48 @@ def test_name_rules_read_real_model_names(name, expected):
     assert S.classify(["A07 / Model", name, ""])[0] == expected
 
 
+# objects from the Atelier 07 model that the old "glass|curtain" rule sent to clear glazing (EN 17037 run)
+@pytest.mark.parametrize("layer,name,material,expected", [
+    ("A07 / 11 Architectural details", "Full-height linen curtain fold", "A07 / Linen", "shading"),
+    ("A07 / 10 Objects and graphics", "Dining tumbler", "A07 / Glass", "ignore"),
+    ("A07 / 09 Bathroom", "Shower screen", "A07 / Glass", "ignore"),
+    ("A07 / 09 Bathroom", "Mirror", "A07 / Skyglass", "furniture"),
+    ("A07 / 06 Kitchen", "Oven viewing glass", "A07 / Skyglass", "furniture"),
+    ("A07 / 06 Kitchen", "Oven black glass", "A07 / Ink", "furniture"),
+    ("A07 / 10 Objects and graphics", "Laptop lit display", "A07 / Skyglass", "furniture"),
+    ("A07 / 03 Facade", "Glazed facade pane", "A07 / Glass", "glazing_double_lowe"),
+    ("A07 / 13 Urban context", "City recessed window", "A07 / Skyglass", "glazing_double_lowe"),
+])
+def test_interior_glass_and_textiles_are_not_windows(layer, name, material, expected):
+    assert S.classify([layer, name, material], transparency=0.9 if material.endswith("Glass") else 0.0)[0] == expected
+
+
+@pytest.mark.parametrize("name,expected", [
+    ("Curtain wall", "glazing_double_lowe"), ("Curtainwall panel", "glazing_double_lowe"),
+    ("Curtain_wall unit", "glazing_double_lowe"), ("Low-e curtain wall", "glazing_double_lowe"),
+    ("Curtain wall mullion", "frame"), ("Sheer curtain", "shading"), ("Drapes", "shading"),
+    ("Roller blind", "shading"), ("Venetian blinds", "shading"), ("Blind wall", "wall"),
+    ("Mirror glass facade", "glazing_double_lowe"), ("Woven screen", "shading"), ("Shower screen shoe", "shading"),
+])
+def test_curtain_walls_stay_glazing_and_textiles_shade(name, expected):
+    assert S.classify(["Model", name, ""])[0] == expected
+
+
+def test_curtain_in_front_of_a_window_is_opaque_shading():
+    """A curtain in front of a window used to be a second pane: light crossed it at tau 0.7."""
+    def export(curtain_name):
+        quad = lambda x0, x1, y, z0, z1: [x0, y, z0, x1, y, z0, x1, y, z1, x0, y, z1]
+        return {"units_to_m": 1.0, "objects": [
+            {"guid": "w", "layer": "Glazing", "name": "Window", "material": "", "transparency": 0, "env_material": "",
+             "vertices": quad(0, 2, 0, 0, 2), "faces": [0, 1, 2, 0, 2, 3]},
+            {"guid": "c", "layer": "Details", "name": curtain_name, "material": "Linen", "transparency": 0, "env_material": "",
+             "vertices": quad(0, 2, 0.2, 0, 2), "faces": [0, 1, 2, 0, 2, 3]}]}
+    sc = S.scene_from_export(export("Full-height linen curtain fold"))
+    kinds = {o["guid"]: o["material"] for o in sc.objects}
+    assert kinds == {"w": "glazing_double_lowe", "c": "shading"}
+    assert [m.kind for m in sc.materials if m.name == "shading"] == ["opaque"]
+
+
 def test_slab_solid_underside_is_a_ceiling():
     v, f = _box_mesh(0, 0, 3.0, 4, 4, 3.25)
     data = {"units_to_m": 1.0, "objects": [{"guid": "s", "layer": "Floors", "name": "Upper slab", "material": "", "transparency": 0,

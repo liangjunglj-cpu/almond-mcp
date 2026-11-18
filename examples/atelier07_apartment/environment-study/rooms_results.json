@@ -23,7 +23,7 @@
  },
  "studies": {
   "thermal_no_blinds": {
-   "run_id": "rooms-20261103-155151-4c7b44",
+   "run_id": "rooms-20261104-104022-16686e",
    "settings": {
     "natural_ventilation_ach": 3.0,
     "shading_g_factor": 1.0,
@@ -33,7 +33,7 @@
    "interzone": {
     "links": 28,
     "net_interzone_kwh": 0.0,
-    "gross_interzone_kwh": 4656.1
+    "gross_interzone_kwh": 4437.1
    },
    "rooms": [
     {
@@ -48,35 +48,35 @@
      "room": "Landing",
      "method": "5R1C",
      "enclosure": "enclosed",
-     "heating_kwh_m2": 28.3,
+     "heating_kwh_m2": 26.3,
      "hours_above_26c_occupied": 0,
-     "c_m_mj_k": 4.62,
+     "c_m_mj_k": 4.73,
      "tm52_pass": true
     },
     {
      "room": "Bathroom",
      "method": "5R1C",
      "enclosure": "enclosed",
-     "heating_kwh_m2": 98.7,
-     "hours_above_26c_occupied": 3,
-     "c_m_mj_k": 3.09,
+     "heating_kwh_m2": 87.7,
+     "hours_above_26c_occupied": 0,
+     "c_m_mj_k": 3.2,
      "tm52_pass": true
     },
     {
      "room": "Bedroom",
      "method": "5R1C",
      "enclosure": "enclosed",
-     "heating_kwh_m2": 3.0,
-     "hours_above_26c_occupied": 582,
-     "c_m_mj_k": 6.62,
+     "heating_kwh_m2": 3.6,
+     "hours_above_26c_occupied": 447,
+     "c_m_mj_k": 6.64,
      "tm52_pass": true
     },
     {
      "room": "Study",
      "method": "5R1C",
      "enclosure": "enclosed",
-     "heating_kwh_m2": 15.0,
-     "hours_above_26c_occupied": 34,
+     "heating_kwh_m2": 14.9,
+     "hours_above_26c_occupied": 32,
      "c_m_mj_k": 5.98,
      "tm52_pass": true
     },
@@ -84,8 +84,8 @@
      "room": "Kitchen",
      "method": "5R1C",
      "enclosure": "enclosed",
-     "heating_kwh_m2": 14.3,
-     "hours_above_26c_occupied": 1043,
+     "heating_kwh_m2": 14.4,
+     "hours_above_26c_occupied": 1039,
      "c_m_mj_k": 11.32,
      "tm52_pass": false
     },
@@ -93,7 +93,7 @@
      "room": "Entry",
      "method": "5R1C",
      "enclosure": "enclosed",
-     "heating_kwh_m2": 59.9,
+     "heating_kwh_m2": 60.1,
      "hours_above_26c_occupied": 0,
      "c_m_mj_k": 1.17,
      "tm52_pass": true
@@ -102,8 +102,8 @@
      "room": "Hall and dining",
      "method": "5R1C",
      "enclosure": "enclosed",
-     "heating_kwh_m2": 39.1,
-     "hours_above_26c_occupied": 8,
+     "heating_kwh_m2": 39.6,
+     "hours_above_26c_occupied": 7,
      "c_m_mj_k": 5.07,
      "tm52_pass": true
     },
@@ -111,9 +111,9 @@
      "room": "Living",
      "method": "5R1C",
      "enclosure": "enclosed",
-     "heating_kwh_m2": 44.8,
-     "hours_above_26c_occupied": 3610,
-     "c_m_mj_k": 8.97,
+     "heating_kwh_m2": 46.8,
+     "hours_above_26c_occupied": 3419,
+     "c_m_mj_k": 9.0,
      "tm52_pass": false
     }
    ],
@@ -137,7 +137,7 @@
    }
   },
   "thermal_blinds": {
-   "run_id": "rooms-20261103-155249-ff22ca",
+   "run_id": "rooms-20261104-104048-70033b",
    "settings": {
     "natural_ventilation_ach": 3.0,
     "shading_g_factor": 0.15,
@@ -147,7 +147,7 @@
    "interzone": {
     "links": 28,
     "net_interzone_kwh": 0.0,
-    "gross_interzone_kwh": 4190.0
+    "gross_interzone_kwh": 4032.2
    },
    "rooms": [
     {
@@ -162,35 +162,35 @@
      "room": "Landing",
      "method": "5R1C",
      "enclosure": "enclosed",
-     "heating_kwh_m2": 30.0,
+     "heating_kwh_m2": 28.0,
      "hours_above_26c_occupied": 0,
-     "c_m_mj_k": 4.62,
+     "c_m_mj_k": 4.73,
      "tm52_pass": true
     },
     {
      "room": "Bathroom",
      "method": "5R1C",
      "enclosure": "enclosed",
-     "heating_kwh_m2": 99.6,
+     "heating_kwh_m2": 88.4,
      "hours_above_26c_occupied": 0,
-     "c_m_mj_k": 3.09,
+     "c_m_mj_k": 3.2,
      "tm52_pass": true
     },
     {
      "room": "Bedroom",
      "method": "5R1C",
      "enclosure": "enclosed",
-     "heating_kwh_m2": 3.0,
-     "hours_above_26c_occupied": 328,
-     "c_m_mj_k": 6.62,
+     "heating_kwh_m2": 3.6,
+     "hours_above_26c_occupied": 232,
+     "c_m_mj_k": 6.64,
      "tm52_pass": true
     },
     {
      "room": "Study",
      "method": "5R1C",
      "enclosure": "enclosed",
-     "heating_kwh_m2": 15.0,
-     "hours_above_26c_occupied": 28,
+     "heating_kwh_m2": 14.9,
+     "hours_above_26c_occupied": 29,
      "c_m_mj_k": 5.98,
      "tm52_pass": true
     },
@@ -198,8 +198,8 @@
      "room": "Kitchen",
      "method": "5R1C",
      "enclosure": "enclosed",
-     "heating_kwh_m2": 14.3,
-     "hours_above_26c_occupied": 395,
+     "heating_kwh_m2": 14.4,
+     "hours_above_26c_occupied": 394,
      "c_m_mj_k": 11.32,
      "tm52_pass": true
     },
@@ -216,7 +216,7 @@
      "room": "Hall and dining",
      "method": "5R1C",
      "enclosure": "enclosed",
-     "heating_kwh_m2": 39.3,
+     "heating_kwh_m2": 39.8,
      "hours_above_26c_occupied": 0,
      "c_m_mj_k": 5.07,
      "tm52_pass": true
@@ -225,9 +225,9 @@
      "room": "Living",
      "method": "5R1C",
      "enclosure": "enclosed",
-     "heating_kwh_m2": 45.8,
-     "hours_above_26c_occupied": 2333,
-     "c_m_mj_k": 8.97,
+     "heating_kwh_m2": 47.9,
+     "hours_above_26c_occupied": 2196,
+     "c_m_mj_k": 9.0,
      "tm52_pass": false
     }
    ],
@@ -244,15 +244,8 @@
     "pack": "uk_adl_2021",
     "elements": [
      {
-      "element": "window",
-      "area_m2": 99.59,
-      "u_value": 1.103,
-      "limit": 1.6,
-      "passes": true
-     },
-     {
       "element": "wall_external",
-      "area_m2": 167.3,
+      "area_m2": 170.51,
       "u_value": 0.183,
       "limit": 0.26,
       "passes": true
@@ -262,6 +255,13 @@
       "area_m2": 124.39,
       "u_value": 0.153,
       "limit": 0.16,
+      "passes": true
+     },
+     {
+      "element": "window",
+      "area_m2": 96.37,
+      "u_value": 1.105,
+      "limit": 1.6,
       "passes": true
      },
      {
@@ -283,7 +283,7 @@
    }
   },
   "daylight_annual": {
-   "run_id": "daylight-20261103-155439-accde8",
+   "run_id": "daylight-20261104-102707-73fff7",
    "settings": {},
    "interzone": null,
    "rooms": [
@@ -296,16 +296,16 @@
     },
     {
      "room": "Landing",
-     "sda_pct": 73.2,
+     "sda_pct": 78.0,
      "ase_pct": 0.0,
-     "udi_useful_mean_pct": 84.0,
+     "udi_useful_mean_pct": 84.1,
      "sensors": 41
     },
     {
      "room": "Bathroom",
      "sda_pct": 0.0,
      "ase_pct": 0.0,
-     "udi_useful_mean_pct": 0.2,
+     "udi_useful_mean_pct": 0.1,
      "sensors": 20
     },
     {
@@ -317,16 +317,16 @@
     },
     {
      "room": "Study",
-     "sda_pct": 75.8,
+     "sda_pct": 78.8,
      "ase_pct": 0.0,
-     "udi_useful_mean_pct": 89.2,
+     "udi_useful_mean_pct": 89.6,
      "sensors": 33
     },
     {
      "room": "Kitchen",
-     "sda_pct": 69.7,
+     "sda_pct": 69.2,
      "ase_pct": 65.7,
-     "udi_useful_mean_pct": 73.7,
+     "udi_useful_mean_pct": 74.1,
      "sensors": 198
     },
     {
@@ -338,7 +338,7 @@
     },
     {
      "room": "Hall and dining",
-     "sda_pct": 96.6,
+     "sda_pct": 98.3,
      "ase_pct": 91.4,
      "udi_useful_mean_pct": 92.4,
      "sensors": 58
@@ -347,7 +347,7 @@
      "room": "Living",
      "sda_pct": 100.0,
      "ase_pct": 100.0,
-     "udi_useful_mean_pct": 61.9,
+     "udi_useful_mean_pct": 61.8,
      "sensors": 110
     }
    ],
@@ -363,7 +363,7 @@
    "envelope_check": null
   },
   "tropical_synthetic": {
-   "run_id": "rooms-20261103-112643-388207",
+   "run_id": "rooms-20261104-104142-61eadd",
    "weather": "SYNTHETIC tropical year at 1.35 N (tests/env_weather.py) - not Singapore data",
    "settings": "cooling to room set-points, no heat recovery, no window ventilation",
    "rooms": [
@@ -385,17 +385,17 @@
     {
      "room": "Bedroom",
      "method": "5R1C",
-     "cooling_kwh_m2": 97.7
+     "cooling_kwh_m2": 93.9
     },
     {
      "room": "Study",
      "method": "5R1C",
-     "cooling_kwh_m2": 85.1
+     "cooling_kwh_m2": 85.0
     },
     {
      "room": "Kitchen",
      "method": "5R1C",
-     "cooling_kwh_m2": 175.3
+     "cooling_kwh_m2": 174.9
     },
     {
      "room": "Entry",
@@ -410,20 +410,20 @@
     {
      "room": "Living",
      "method": "5R1C",
-     "cooling_kwh_m2": 528.5
+     "cooling_kwh_m2": 511.6
     }
    ],
    "retv": {
-    "overall_w_m2": 11.28,
+    "overall_w_m2": 10.97,
     "limit_w_m2": 25.0,
     "passes": true,
     "facades": [
      {
       "orientation": "N",
-      "wwr": 0.034,
+      "wwr": 0.0,
       "cf": 0.836,
-      "sc": 0.503,
-      "value_w_m2": 1.49
+      "sc": null,
+      "value_w_m2": 0.62
      },
      {
       "orientation": "E",
@@ -434,10 +434,10 @@
      },
      {
       "orientation": "S",
-      "wwr": 0.865,
+      "wwr": 0.858,
       "cf": 0.835,
       "sc": 0.505,
-      "value_w_m2": 22.7
+      "value_w_m2": 22.51
      },
      {
       "orientation": "W",
@@ -451,7 +451,7 @@
    }
   },
   "tropical_singapore": {
-   "run_id": "rooms-20261103-160108-062832",
+   "run_id": "rooms-20261104-104115-94abcb",
    "weather": "Singapore-Changi Intl AP 486980, TMYx 2011-2025 (climate.onebuilding.org; downloaded by the user, not redistributed)",
    "settings": "cooling to room set-points (air temperature), no heat recovery, no window ventilation; same as tropical_synthetic",
    "note": "Cooling holds the air at the set-point; operative temperature includes the warmer glass and wall surfaces, so hours above 26 degC operative are close to all occupied hours in cooled rooms. Hours above 28 degC are reported instead.",
@@ -466,34 +466,34 @@
      "method": "5R1C",
      "cooling_kwh_m2": 0.0,
      "peak_cooling_w_m2": 0.0,
-     "hours_operative_above_28c_occupied": 6043
+     "hours_operative_above_28c_occupied": 6237
     },
     {
      "room": "Bathroom",
      "method": "5R1C",
      "cooling_kwh_m2": 0.0,
      "peak_cooling_w_m2": 0.0,
-     "hours_operative_above_28c_occupied": 4513
+     "hours_operative_above_28c_occupied": 4137
     },
     {
      "room": "Bedroom",
      "method": "5R1C",
-     "cooling_kwh_m2": 91.6,
-     "peak_cooling_w_m2": 88.0,
-     "hours_operative_above_28c_occupied": 250
+     "cooling_kwh_m2": 88.4,
+     "peak_cooling_w_m2": 85.1,
+     "hours_operative_above_28c_occupied": 221
     },
     {
      "room": "Study",
      "method": "5R1C",
-     "cooling_kwh_m2": 86.0,
-     "peak_cooling_w_m2": 47.0,
+     "cooling_kwh_m2": 85.8,
+     "peak_cooling_w_m2": 46.8,
      "hours_operative_above_28c_occupied": 0
     },
     {
      "room": "Kitchen",
      "method": "5R1C",
-     "cooling_kwh_m2": 174.1,
-     "peak_cooling_w_m2": 51.0,
+     "cooling_kwh_m2": 173.5,
+     "peak_cooling_w_m2": 50.8,
      "hours_operative_above_28c_occupied": 0
     },
     {
@@ -513,22 +513,22 @@
     {
      "room": "Living",
      "method": "5R1C",
-     "cooling_kwh_m2": 450.3,
-     "peak_cooling_w_m2": 177.8,
-     "hours_operative_above_28c_occupied": 2782
+     "cooling_kwh_m2": 436.9,
+     "peak_cooling_w_m2": 172.5,
+     "hours_operative_above_28c_occupied": 2647
     }
    ],
    "retv": {
-    "overall_w_m2": 10.94,
+    "overall_w_m2": 10.64,
     "limit_w_m2": 25.0,
     "passes": true,
     "facades": [
      {
       "orientation": "N",
-      "wwr": 0.034,
+      "wwr": 0.0,
       "cf": 0.825,
-      "sc": 0.503,
-      "value_w_m2": 1.48
+      "sc": null,
+      "value_w_m2": 0.62
      },
      {
       "orientation": "E",
@@ -539,10 +539,10 @@
      },
      {
       "orientation": "S",
-      "wwr": 0.865,
+      "wwr": 0.858,
       "cf": 0.842,
       "sc": 0.505,
-      "value_w_m2": 22.88
+      "value_w_m2": 22.69
      },
      {
       "orientation": "W",
@@ -567,5 +567,5 @@
    }
   }
  },
- "refreshed": "2026-11-03: rerun after the independent test drive's fixes (one conductance per shared face, wall construction behind windows, exposed floors over no room, daylight shells)"
+ "refreshed": "2026-11-04: rerun with the narrowed glazing name rules (curtains are shading, interior glass is not glazing); before that, 2026-11-03: rerun after the independent test drive's fixes (one conductance per shared face, wall construction behind windows, exposed floors over no room, daylight shells)"
 }

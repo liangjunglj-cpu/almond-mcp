@@ -54,13 +54,13 @@ Site → Rooms → Constructions → Study → Results.
 
 | Room | Heating kWh/m² | h > 26 °C | with summer blinds | sDA | ASE |
 | --- | --- | --- | --- | --- | --- |
-| Living (double height) | 45 | 3610 | 2333 | 100 % | 100 % |
-| Hall and dining | 39 | 8 | 0 | 97 % | 91 % |
-| Kitchen | 14 | 1043 | 395 | 70 % | 66 % |
-| Study | 15 | 34 | 28 | 76 % | 0 % |
-| Bedroom | 3 | 582 | 328 | 100 % | 85 % |
-| Bathroom | 99 | 3 | 0 | 0 % | 0 % |
-| Landing | 28 | 0 | 0 | 73 % | 0 % |
+| Living (double height) | 47 | 3419 | 2196 | 100 % | 100 % |
+| Hall and dining | 40 | 7 | 0 | 98 % | 91 % |
+| Kitchen | 14 | 1039 | 394 | 69 % | 66 % |
+| Study | 15 | 32 | 29 | 79 % | 0 % |
+| Bedroom | 4 | 447 | 232 | 100 % | 85 % |
+| Bathroom | 88 | 0 | 0 | 0 % | 0 % |
+| Landing | 26 | 0 | 0 | 78 % | 0 % |
 | Garden pavilion | open: SET* 16.5 °C mean (daytime), MRT above air | | | | |
 
 What the room-by-room study shows that the floor-by-floor study hid:
@@ -75,7 +75,7 @@ onto the stair void. It treats those openings as adiabatic: the warm air that wo
 level stays in the living room, which **overstates its overheating**. Defining the open-plan volume as
 one room is the more faithful model. The bathroom and the 2.4 m² entry show high heating per m² because
 small rooms at 22 °C lose heat to cooler neighbours. The rooms' exchange balances exactly (each shared wall or
-floor has one conductance), with 4,656 kWh passing between rooms a year.
+floor has one conductance), with 4,437 kWh passing between rooms a year.
 
 Envelope check against Approved Document L (England, OGL): walls 0.18, roof 0.15 and windows 1.10 pass
 the limits; the ground floor (0.22 against 0.18) does not.
@@ -84,17 +84,17 @@ the limits; the ground floor (0.22 against 0.18) does not.
 from climate.onebuilding.org; download it yourself, it is not redistributed). The rooms are cooled to their
 set-points, with no heat recovery and no window ventilation.
 
-- **RETV:** 10.94 W/m², under the 25 W/m² limit. The south façade gives 22.9 W/m² and the west 19.3 W/m².
+- **RETV:** 10.64 W/m², under the 25 W/m² limit. The south façade gives 22.7 W/m² and the west 19.3 W/m².
 - **Solar correction factors:** derived from the real weather file. East walls (1.26) see more sun than west (1.05)
   because Singapore's afternoons are cloudier.
-- **Cooling:** the double-height living room needs about 450 kWh/m² a year, the kitchen 174, the bedroom 92 and
+- **Cooling:** the double-height living room needs about 437 kWh/m² a year, the kitchen 174, the bedroom 88 and
   the study 86.
 - **Comfort:** cooling holds the *air* at 26 °C. The glass and wall surfaces stay warmer, so the operative
   temperature in cooled rooms is above 26 °C almost all year. Hours above 28 °C operative are the useful figure:
-  none in the kitchen, hall or study, 250 in the bedroom and 2,781 in the living room. The living room's large area
+  none in the kitchen, hall or study, 221 in the bedroom and 2,647 in the living room. The living room's large area
   of sun-warmed glass shows up there even with cooling.
 
-The same run on a synthetic tropical year at 1.35° N (a test fixture) gave RETV 11.28 W/m² and about 530 kWh/m²
+The same run on a synthetic tropical year at 1.35° N (a test fixture) gave RETV 10.97 W/m² and about 510 kWh/m²
 in the living room. Both runs are kept in `rooms_results.json`. They are indicative only, not a BCA Green Mark
 assessment.
 
@@ -107,6 +107,33 @@ Board 04 (`A07-board-04-rooms-constructions.png`) shows:
 The diagram system is the panel's own. `rooms_results.json` records the rooms, constructions,
 settings, run IDs and per-room results. `scripts/board_rooms.py` with `scripts/rooms.json` redraws the
 board from the saved runs.
+
+### Rerun with the narrowed glazing rules (2026-11-04)
+
+The room numbers above come from a rerun on 2026-11-04. Before then, the name rules treated anything called
+"curtain" or "glass" as clear double glazing. In this model that covered:
+- the 40 full-height linen curtain folds;
+- the six dining tumblers;
+- the shower screen and the bathroom mirror;
+- the oven glass and the laptop display.
+
+That was 14 m² of false windows. They are now opaque shading (curtains), ignored (tumblers, shower screen),
+or furniture (mirror, oven, laptop). The real façade glazing has its own construction, so it is unchanged.
+
+The rerun used the same live model and settings. With the old rules it reproduced the earlier numbers exactly.
+
+What changed:
+- **Bathroom and landing:** they lose a false 1.3 m² window each.
+- **Bedroom:** overheating falls from 582 to 447 h (328 to 232 h with blinds).
+- **Living room:** overheating falls from 3,610 to 3,419 h (2,333 to 2,196 h with blinds).
+- **Daylight:** sDA rises by 3 to 5 points in the landing, study and hall. The curtains now reflect light into
+  the room instead of absorbing 30 % of it as glass would.
+- **RETV:** in Singapore it falls from 10.94 to 10.64 W/m², because the north "window" (the mirror and
+  shower screen) is gone.
+
+The conclusions stand. The floor-by-floor study at the top of this page (`results.json`, boards 01–03, the
+video) is unaffected: `scripts/analyze.py` sets every object's material from its render material and does
+not export the curtain layer.
 
 ## Inputs
 
