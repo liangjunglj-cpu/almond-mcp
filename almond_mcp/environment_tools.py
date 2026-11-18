@@ -788,8 +788,9 @@ def register(mcp, send: Sender) -> dict:
         analysis needs before it can run. part: all | environment | structure. environment: an enclosed room
         (closed volume, tagged as a room, with a construction set), a window (planar glazing surface with a window
         construction), an open loggia (closed curve + height), a neighbouring block as context, a north arrow, and
-        numbered text dots for room, glazing, open room, context, site (weather file) and how to run. structure:
-        a 6 x 4 m frame (four columns, four beams as line axes) with support points and dots for members,
+        numbered text dots for room, glazing, open room, context, site (weather file) and how to run, explained in a
+        notes block beside it. structure: a 6 x 4 m frame (four columns, four beams as line axes, sized with
+        almond:section so it passes 10 kN + 2.0/1.0 kN/m2) with support points, dots and notes for members,
         supports, loads and how to run. origin: [x, y, z] in metres; default beside the visible model. Placed on
         'Almond Tutorial::<Part>' layers; placing a part again replaces it. The weather file is never part of
         the model: pass one to analyze_rooms. Undoable in Rhino."""

@@ -13,6 +13,19 @@ Rhino 8 (Rhino.Inside) run placed the tutorial model with the bridge's real `Scr
 document (12/12 checks: sizes, tags, placement beside the user's model, replacement on re-place) and the
 environment export of it gave the same rooms and daylight factor as the Python spec (3.4 % in the studio).
 
+**Live Rhino 8 (2026-11-18):** this branch's bridge build installed into the dev package
+(`0.7.1-dev.env`, previous build backed up) with the panel engine running this checkout. In the real panel
+(dark theme, read through the web view's DevTools): Rhino's accent `#4889FF`, tab colour `#444444`, Segoe UI,
+the beige strip hidden, "(BETA)" in both headings, all 9 advanced sections collapsed. From the panel's own
+buttons: **Place tutorial model** placed both parts (17 + 18 objects); the room check found the studio
+enclosed and the loggia open (52 %); a daylight-factor study gave 3.43 % in the studio (37.9 % in the
+loggia); **Use Rhino selection** + **Run native analysis** on the frame with 10 kN + 2.0 / 1.0 kN/m² passed
+at 9.24 mm (limit 24 mm), 50.5 %, α_cr 67.1, the same as the Python solver (9.2 mm, α_cr 67.1). Without the
+tutorial's `almond:section` sizes the same frame fails (72.0 mm, 303 %, live and in Python). The viewport
+legend reads "(BETA) ALMOND // NATIVE FEA …". One capture of the live panel (Site tab, below left) came
+through; the others waited while the Rhino window was behind other windows, so the remaining panel images
+come from the archive host.
+
 Status key: **ready** = tested, no known blocker; **beta** = works and is tested, gaps listed; **gap** =
 works but missing tests or evidence a stable label needs.
 
@@ -29,7 +42,7 @@ works but missing tests or evidence a stable label needs.
 | Code packs (`list_code_packs`, `check_envelope`: sg_bca, uk_adl_2021, de_banz_2020, eu_hotmaps) | beta | `test_rooms_constructions.py` (ETTV worked example, CF from EPW, pack options) | Indicative only, not certification (stated in every reply). AU NCC and NZ H1 packs deferred. `check_envelope` exported the model twice per call: **fixed here** | Keep the "indicative" wording when the BETA label comes off |
 | Results drawing and runs (`show_environment_result`, `list_environment_runs`, `get_environment_run`, `list_environment_materials`) | ready | `test_environment.py` | — | — |
 | Coursework tools (climate charts, shadow studies, thermal cases, EN 17037 view/sunlight, compare) | not on master | On open PR #45 (`feat/comfort-course-tools`, CI green) with `test_course_tools.py`, `test_env_panel_workflow.py` | This is the 6-step panel (… Results → Compare) in the user's installed dev build | Merge #45 (then #47 daylight-linked lighting), rebase this branch's panel changes onto it |
-| Panel workspace (`AlmondEnvironment`) | beta | `test_analysis_workspace.py` (archive host), `test_simulation_beta.py` (hierarchy keeps every scripted control, allow-list, BETA labels), `panel_theme.test.mjs` | The restyle was checked in a browser with Rhino's real dark palette and an approximate light one, **not yet inside a live Rhino panel**; doc screenshots in `docs/images/tutorial/` predate the restyle | One live Rhino pass over every tab (light and dark), refreshed screenshots |
+| Panel workspace (`AlmondEnvironment`) | beta | `test_analysis_workspace.py` (archive host), `test_simulation_beta.py` (hierarchy keeps every scripted control, allow-list, BETA labels), `panel_theme.test.mjs` | Checked live in Rhino 8 (dark) through the panel's DOM and its buttons; light theme only in a browser with approximate colours; doc screenshots in `docs/images/tutorial/` predate the restyle | A light-theme pass in Rhino and refreshed tutorial screenshots |
 
 ## Structure: Structural Validation
 
@@ -69,20 +82,28 @@ Not simulation, so not labelled: `check_egress` (rule check against curated egre
   (members, supports, loads, run). One spec (`almond_mcp/tutorial.py`) drives the panel button, the MCP
   tool and the tests.
 - **Bug fixed:** `check_envelope` exported the whole Rhino model twice per call.
+- **Found live, fixed elsewhere:** the bridge on master stamps an aligned dimension over every script's
+  output (two per tutorial placement, on the Default layer). Open PR #48 (`fix/no-auto-dimensions`) removes it.
 
 Panel pages as served by the archive host with Rhino's dark palette (read from Rhino 8) and an
 approximate light one, at panel width:
 
-<img src="images/simulation-beta/environment-study-dark.jpg" alt="Environment Study tab, dark: Rhino-style tabs, BETA tag, Thermal settings expanded" width="240"> <img src="images/simulation-beta/structure-model-dark.jpg" alt="Structure Model tab, dark: tutorial button, Section collapsed" width="240"> <img src="images/simulation-beta/home-light.jpg" alt="Home, light: BETA tags on both simulation workspaces" width="240"> <img src="images/simulation-beta/environment-site-light.jpg" alt="Environment Site tab, light" width="240">
+The tutorial in live Rhino 8 after running both studies from the panel (daylight factor drawn in the studio,
+the frame's utilization overlay with the (BETA) legend):
+
+<img src="images/simulation-beta/tutorial-environment-live.jpg" alt="Live Rhino: the environment tutorial with numbered dots, notes block and daylight factor grid" width="480"> <img src="images/simulation-beta/tutorial-structure-live.jpg" alt="Live Rhino: the structure tutorial frame passing, with the (BETA) legend" width="480">
+
+<img src="images/simulation-beta/panel-environment-live.jpg" alt="The Environment workspace in the live Rhino 8 panel, dark theme" width="240"> <img src="images/simulation-beta/environment-study-dark.jpg" alt="Environment Study tab, dark: Rhino-style tabs, BETA tag, Thermal settings expanded" width="240"> <img src="images/simulation-beta/structure-model-dark.jpg" alt="Structure Model tab, dark: tutorial button, Section collapsed" width="240"> <img src="images/simulation-beta/home-light.jpg" alt="Home, light: BETA tags on both simulation workspaces" width="240"> <img src="images/simulation-beta/environment-site-light.jpg" alt="Environment Site tab, light" width="240">
 
 ## Release blockers in order
 
-1. Merge the open simulation PRs (#45, #46, #47 environment; #37, #40, #41, #42, #32, #33 structure) and
+1. Merge the open simulation PRs (#45, #46, #47 environment; #37, #40, #41, #42, #32, #33 structure; #48
+   bridge dimension stamp) and
    the local fix branches (`fix/environment-review`, `fix/deflection-verdicts`,
    `fix/structural-report-verdicts`, `fix/solver-input-validation`), then rebase this branch. #45 and the
    structure PRs touch `index.html`, `karamba.js`, `environment.js` and `results.*`, so expect conflicts
    with the hierarchy changes here.
-2. One live Rhino 8 pass of both panels on the merged build (light and dark), with refreshed screenshots.
+2. Repeat the live Rhino 8 pass on the merged build, in light and dark, with refreshed screenshots.
 3. Thermal benchmark (ASHRAE 140 style) and one real-EPW climate check in CI.
 4. Fix the cooled-room headline metric; resolve or document the shell-roof α_cr gap.
 5. Then remove the (BETA) labels in one change (search the repo for `(BETA)` and `beta-tag`) and bump

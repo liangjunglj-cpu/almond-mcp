@@ -125,7 +125,8 @@ Overheating per CIBSE TM52 (three criteria). Psychrometrics use the ASHRAE Funda
 ### Tutorial model
 
 **Place tutorial model** (Environment workspace in the Almond panel, or the `place_simulation_tutorial`
-MCP tool) puts a small annotated scene beside your model, on `Almond Tutorial::Environment` layers:
+MCP tool) puts a small annotated scene beside your model, on `Almond Tutorial::Environment` layers. A numbered
+dot marks each item and a notes block beside the model says what each number needs:
 
 1. **Room** - a closed 6 x 5 x 3 m volume, tagged as a room (use: living; construction set: Europe, new build).
 2. **Glazing** - a planar surface on the room's south face, on a `Glazing` layer, with a triple low-e window

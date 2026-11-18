@@ -36,7 +36,10 @@ _LAYERS = {
 
 ENV_ROOM = "Tutorial Studio"
 ENV_LOGGIA = "Tutorial Loggia"
-STRUCTURE_X = 16.0          # the structure part sits beside the environment part
+BEAM_SECTION = "box 100x200x6"      # almond:section, mm: width x depth x wall (RHS 200 x 100 x 6)
+COLUMN_SECTION = "box 150x150x8"    # SHS 150 x 150 x 8: with the beams it passes 10 kN + 2.0/1.0 kN/m2
+STRUCTURE_X = 32.0          # the structure part sits beside the environment part and its notes
+NOTE_HEIGHT = 0.28          # m: the notes block's text height
 
 
 def _environment() -> dict:
@@ -69,6 +72,7 @@ def _environment() -> dict:
             {"layer": "Environment::Notes", "text": TITLE + " - Climate, Rooms & Comfort", "at": (-3, -6, 0), "height": 0.45},
             {"layer": "Environment::Notes", "text": "N", "at": (-3.25, 3.3, 0), "height": 0.5},
         ],
+        "notes_at": (11.5, 8.0, 0),
         "dots": [
             {"layer": "Environment::Notes", "at": (3, 2.5, 3.4), "text":
              "1 ROOM - a closed volume\nTagged as a room: Rooms tab > Define room from selection.\n"
@@ -84,7 +88,7 @@ def _environment() -> dict:
             {"layer": "Environment::Notes", "at": (-3, 1.5, 0.3), "text":
              "5 SITE - a weather file (.epw), not geometry\nSite tab > Choose weather file (climate.onebuilding.org).\n"
              "North = Rhino Sun panel north (default +Y)."},
-            {"layer": "Environment::Notes", "at": (11, 2.5, 0.5), "text":
+            {"layer": "Environment::Notes", "at": (11.5, 8.8, 0), "text":
              "6 RUN - Study tab\nThermal: rooms + weather file.\nDaylight factor: rooms + glazing. Annual daylight: + weather file.\n"
              "Hide or delete 'Almond Tutorial' before analysing your own model."},
         ],
@@ -95,23 +99,28 @@ def _structure() -> dict:
     x = STRUCTURE_X
     base = [(x, 0, 0), (x + 6, 0, 0), (x + 6, 4, 0), (x, 4, 0)]
     top = [(p[0], p[1], 3.0) for p in base]
-    columns = [{"layer": "Structure::Members", "name": f"Column {i + 1}", "a": b, "b": t} for i, (b, t) in enumerate(zip(base, top))]
-    beams = [{"layer": "Structure::Members", "name": f"Beam {i + 1}", "a": top[i], "b": top[(i + 1) % 4]} for i in range(4)]
+    columns = [{"layer": "Structure::Members", "name": f"Column {i + 1}", "a": b, "b": t, "tags": {"section": COLUMN_SECTION}}
+               for i, (b, t) in enumerate(zip(base, top))]
+    beams = [{"layer": "Structure::Members", "name": f"Beam {i + 1}", "a": top[i], "b": top[(i + 1) % 4],
+              "tags": {"section": BEAM_SECTION}} for i in range(4)]
     return {
         "boxes": [], "surfaces": [], "curves": [],
         "lines": columns + beams,
         "points": [{"layer": "Structure::Supports", "name": f"Support {i + 1}", "at": p} for i, p in enumerate(base)],
         "texts": [{"layer": "Structure::Notes", "text": TITLE + " - Structure", "at": (x, -6, 0), "height": 0.45}],
+        "notes_at": (x + 8.5, 6.0, 0),
         "dots": [
             {"layer": "Structure::Notes", "at": (x + 3, 0, 3.4), "text":
              "1 MEMBERS - lines or curves on the member axes\nColumns and beams share end points: snap them.\n"
-             "Material and section: Structure tab > Model."},
+             "Each carries its section as user text almond:section\n"
+             f"(beams {BEAM_SECTION}, columns {COLUMN_SECTION}, mm). Material: Structure tab > Model."},
             {"layer": "Structure::Notes", "at": (x, 0, -0.4), "text":
              "2 SUPPORTS - point objects at the bases\nFixed or pinned: Structure tab > Supports."},
             {"layer": "Structure::Notes", "at": (x + 3, 2, 3.2), "text":
-             "3 LOADS - Structure tab > Loads\nThe 6 x 4 m bay enclosed by beams takes a floor load (kN/m2).\n"
-             "Self-weight is included by default."},
-            {"layer": "Structure::Notes", "at": (x + 7.5, 2, 0.5), "text":
+             "3 LOADS - Structure tab > Loads\nThe 6 x 4 m bay enclosed by beams takes a floor load (kN/m2):\n"
+             "open Floor loads and model loads. Self-weight is included by default.\n"
+             "With 10 kN + 2.0 / 1.0 kN/m2 these sections pass; without them (CHS 114.3 x 4) it fails."},
+            {"layer": "Structure::Notes", "at": (x + 8.5, 6.8, 0), "text":
              "4 RUN - select the members and support points\n(SelLayer 'Almond Tutorial::Structure::*'), then\n"
              "Model > Use Rhino selection > Run native analysis."},
         ],
@@ -124,7 +133,17 @@ def spec(part: str = "all") -> dict:
     if any(p not in PARTS for p in parts):
         raise ValueError(f"part must be all, {' or '.join(PARTS)}")
     build = {"environment": _environment, "structure": _structure}
-    return {p: build[p]() for p in parts}
+    out = {p: build[p]() for p in parts}
+    for name, part in out.items():
+        # In the model each dot is a short numbered label; the full explanation of every number is one flat
+        # notes block beside the part, so the dots stay readable when the model is zoomed out.
+        layer = part["dots"][0]["layer"]
+        for d in part["dots"]:
+            d["label"] = d["text"].split("\n")[0].split(" - ")[0]         # "1 ROOM": the notes block says the rest
+        heading = "WHAT EACH NUMBER MEANS - " + ("Climate, Rooms & Comfort" if name == "environment" else "Structural Validation")
+        part["texts"].append({"layer": layer, "at": part.pop("notes_at"), "height": NOTE_HEIGHT, "top": True,
+                              "text": heading + "\n\n" + "\n\n".join(d["text"] for d in part["dots"])})
+    return out
 
 
 def requirements() -> dict:
@@ -249,15 +268,19 @@ def script(part: str = "all", origin: tuple[float, float, float] | None = None) 
                         f"A({lay(c['layer'])}, {_cs(c['name'])}, {_tags(c['tags'])})));")
         for ln in p["lines"]:
             body.append(f"    Keep(doc.Objects.AddLine(new Line({_pt(ln['a'])}, {_pt(ln['b'])}), "
-                        f"A({lay(ln['layer'])}, {_cs(ln['name'])}, new string[0])));")
+                        f"A({lay(ln['layer'])}, {_cs(ln['name'])}, {_tags(ln.get('tags') or {})})));")
         for pt in p["points"]:
             body.append(f"    Keep(doc.Objects.AddPoint({_pt(pt['at'])}, A({lay(pt['layer'])}, {_cs(pt['name'])}, new string[0])));")
         for t in p["texts"]:
-            body.append(f"    {{ var te = new TextEntity {{ Plane = new Plane({_pt(t['at'])}, Vector3d.ZAxis), PlainText = {_cs(t['text'])}, "
-                        f"TextHeight = {float(t['height'])!r} * S }}; "
+            top = " TextVerticalAlignment = TextVerticalAlignment.Top," if t.get("top") else ""
+            body.append(f"    {{ var te = new TextEntity {{ Plane = new Plane({_pt(t['at'])}, Vector3d.ZAxis), PlainText = {_cs(t['text'])},{top} "
+                        f"TextHeight = {float(t['height'])!r} * S, "
+                        # a white mask behind dark text: readable on any viewport background, light or dark
+                        f"MaskEnabled = true, MaskUsesViewportColor = false, MaskColor = System.Drawing.Color.White, "
+                        f"MaskOffset = 0.12 * S }}; "
                         f"Keep(doc.Objects.AddText(te, A({lay(t['layer'])}, \"Tutorial text\", new string[0]))); }}")
         for d in p["dots"]:
-            body.append(f"    {{ var dot = new TextDot({_cs(d['text'])}, {_pt(d['at'])}) {{ FontHeight = 11 }}; "
+            body.append(f"    {{ var dot = new TextDot({_cs(d['label'])}, {_pt(d['at'])}) {{ FontHeight = 12 }}; "
                         f"Keep(doc.Objects.AddTextDot(dot, A({lay(d['layer'])}, \"Tutorial note\", new string[0]))); }}")
     o = origin or (0.0, 0.0, 0.0)
     return (_CS.replace("__BODY__", "\n".join(body)).replace("__ROOT__", ROOT)
@@ -297,6 +320,10 @@ def export_like(part: str = "environment") -> dict:
 def structure_model() -> dict:
     """The structure part as the line model validate_structure's native path reads (metres)."""
     p = spec("structure")["structure"]
-    members = [{"source_guids": [ln["name"]], "points": [list(ln["a"]), list(ln["b"])]} for ln in p["lines"]]
+    def section(text: str) -> dict:          # almond:section box W x D x T (mm) as the bridge exports it (m)
+        w, d, t = (float(v) / 1000 for v in text.split()[1].split("x"))
+        return {"shape": "box", "width": w, "height": d, "wall": t, "source": "user"}
+    members = [{"source_guids": [ln["name"]], "points": [list(ln["a"]), list(ln["b"])], "section": section(ln["tags"]["section"])}
+               for ln in p["lines"]]
     return {"members": members, "anchor_points": [list(q["at"]) for q in p["points"]], "tolerance_m": 0.001,
             "max_member_span_m": 6.0, "max_span_m": 6.0, "warnings": []}

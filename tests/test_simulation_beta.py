@@ -65,7 +65,7 @@ def test_panel_and_plugin_say_beta():
     assert '"Almond Results (BETA)"' in (BRIDGE / "RhinoAlmondBridgePlugin.cs").read_text(encoding="utf-8")
     assert "(BETA)" in (BRIDGE / "EnvironmentWorkspace.cs").read_text(encoding="utf-8")
     assert "Structural Validation (BETA)" in (BRIDGE / "LibraryCommands.cs").read_text(encoding="utf-8")
-    assert '"  (BETA)"' in (BRIDGE / "StructureView.cs").read_text(encoding="utf-8")
+    assert '"(BETA)  " + title' in (BRIDGE / "StructureView.cs").read_text(encoding="utf-8")
 
 
 def _ids(html: str) -> set[str]:
@@ -117,8 +117,10 @@ def test_tutorial_script_places_every_part_on_its_own_layers():
     assert '"room", "Tutorial Studio"' in cs and '"construction", "win_triple_lowe_ar_timber"' in cs
     assert '"room_height", "3"' in cs and "AddTextDot" in cs and "if (true)" in cs     # beside the model by default
     for part in tutorial.spec("all").values():
+        notes = next(x["text"] for x in part["texts"] if x.get("top"))
+        assert json.dumps(notes) in cs and "TextVerticalAlignment.Top" in cs
         for dot in part["dots"]:
-            assert json.dumps(dot["text"]) in cs
+            assert json.dumps(dot["label"]) in cs and "\n" not in dot["label"] and dot["text"] in notes
     env_only = tutorial.script("environment", (0, 0, 0))
     assert "Structure" not in env_only.split("public static List<Guid> Run")[1].split("doc.Views.Redraw")[0].replace("Almond simulation", "")
     assert "if (false)" in env_only
@@ -148,10 +150,18 @@ def test_tutorial_thermal_uses_its_window_construction():
     assert loggia["method"] == "semi_outdoor"
 
 
-def test_tutorial_frame_passes_the_native_check():
-    out = ns.validate(tutorial.structure_model(), "frame", 0.0, "Steel", True, True,
-                      floor_loads={"imposed_kn_m2": 2.0, "dead_kn_m2": 1.0})
+def test_tutorial_frame_passes_with_its_sections_and_fails_without():
+    """The panel defaults (10 kN total) plus the 2.0 + 1.0 kN/m2 floor load the dots suggest: the frame's
+    almond:section sizes pass, the default CHS 114.3 x 4 fails (as a live Rhino run showed: 72 mm, 303 %)."""
+    loads = {"imposed": 2.0, "dead": 1.0}
+    out = ns.validate(tutorial.structure_model(), "frame", 10.0, "Steel", True, True, floor_loads=loads)
     assert out["status"] == "pass", out.get("verdict")
+    bare = tutorial.structure_model()
+    for m in bare["members"]:
+        m.pop("section")
+    weak = ns.validate(bare, "frame", 10.0, "Steel", True, True, floor_loads=loads)
+    assert weak["status"] == "fail" and weak["results"]["max_deflection_mm"] > 50
+    assert '"section", "box 100x200x6"' in tutorial.script("structure")
 
 
 def test_panel_engine_builds_the_tutorial_script():

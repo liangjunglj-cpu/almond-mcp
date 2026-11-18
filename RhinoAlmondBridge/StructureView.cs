@@ -415,7 +415,7 @@ namespace RhinoAlmondBridge
         {
             // The structural engines are in beta: every legend says so.
             string title = Data.Title ?? "";
-            if (title.IndexOf("BETA", StringComparison.OrdinalIgnoreCase) < 0) title = (title + "  (BETA)").Trim();
+            if (title.IndexOf("BETA", StringComparison.OrdinalIgnoreCase) < 0) title = ("(BETA)  " + title).Trim();   // first: long titles are cut at the end
             int size = fs;
             while (size > 8 && e.Display.Measure2dText(title, new Point2d(0, 0), false, 0, size, "Consolas").Width > maxW) size--;
             e.Display.Draw2dText(title, c, new Point2d(x, y), false, size, "Consolas");
