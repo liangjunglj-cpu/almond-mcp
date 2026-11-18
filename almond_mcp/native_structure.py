@@ -575,6 +575,7 @@ def member_table(model: dict, frame, sls, envelope, deflections=None) -> list[di
             "chi_y": _r(det.get("chi_y"), 3), "chi_z": _r(det.get("chi_z"), 3),
             "lambda_y": _r(det.get("lambda_y"), 3), "lambda_z": _r(det.get("lambda_z"), 3),
             "cm_y": _r(det.get("cm_y"), 3), "cm_z": _r(det.get("cm_z"), 3),
+            "cm_y_basis": det.get("cm_y_basis"), "cm_z_basis": det.get("cm_z_basis"),
             "kyy": _r(det.get("kyy"), 3), "kzz": _r(det.get("kzz"), 3),
             "eq_6_61": _r(det.get("eq_6_61"), 4), "eq_6_62": _r(det.get("eq_6_62"), 4),
             "buckling_length_m": _r(det.get("length_cr_m"), 3),

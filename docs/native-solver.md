@@ -125,9 +125,18 @@ axes polygonized identically. `almond_mcp/native_structure.py` then applies:
     Table 6.2: hollow sections **cold-formed (EN 10219) → curve c by default**, hot-finished
     (EN 10210) → a (a0 for S460) with `fabrication="hot_finished"`; rolled I by h/b and t_f.
   - **Compression + bending** 6.3.3 (6.61)/(6.62) with the **Annex B** interaction factors
-    (Class 3 form with elastic moduli, Class 1/2 form with plastic) and Table B.3 C_m:
-    0.6 + 0.4ψ ≥ 0.4 for linear moment diagrams, the table's upper bound 1.0 for members
-    with transverse load.
+    (Class 3 form with elastic moduli, Class 1/2 form with plastic) and Table B.3 C_m read
+    from each member's own moment diagram: the end moments M_h and ψM_h, the mid-span moment
+    M_s, and the transverse load on the member taken from the change of slope between its
+    stations (none → row 1, 0.6 + 0.4ψ; spread evenly → the uniform-load column; one or two
+    point loads standing out → the concentrated-load column; anything mixed → the uniform
+    column, which is never lower). Rows 2 (α_s = M_s/M_h) and 3 (α_h = M_h/M_s) meet row 1 as
+    the load goes to zero, so C_m has no cliff. C_m ≥ 0.4. A member with a free end (a
+    cantilever) buckles in a sway mode: C_m = 0.9 (Table B.3 note); frame sway is in the
+    global second-order analysis, so other members take the non-sway rows. Diagrams the
+    table does not draw (a concentrated moment inside the member, a peak away from both the
+    ends and mid-span) take its upper bound 1.0. The member results report the case used
+    (`cm_y_basis`, `cm_z_basis`).
   - γ_M0, γ_M1 from the design code profile.
 
 **Not covered:** shells, large-displacement (geometrically nonlinear) analysis beyond P-Δ, member bow imperfections (5.3.2(6)), lateral-torsional buckling (hollow sections are immune; I-sections are not checked for it), shear resistance (6.2.6) and torsion, Class 4 effective sections, aluminium to EN 1999, dynamics, connections. Results are a preliminary design check, not an engineer's sign-off.
@@ -136,7 +145,9 @@ axes polygonized identically. `almond_mcp/native_structure.py` then applies:
 
 - `tests/test_hand_calculations.py` and `tests/test_ec3.py`: closed forms worked from first
   principles and from the standard's text (beam, cantilever, column buckling on curves a and
-  c, Table 5.2 classes by grade, Table B.3 C_m, an Annex B case where k = 1.3).
+  c, Table 5.2 classes by grade, every Table B.3 C_m sub-case, one solved member per Table
+  B.3 row: end moments, UDL with fixed ends, mid-span point load, cantilever, curved member,
+  an Annex B case where k = 1.3).
 - `tools/mutation_check.py` plants known engineering errors one at a time (wrong factors,
   wrong curve, unscaled class limits, buckling length of one analysis element, ...) and
   reports whether the tests catch each.
