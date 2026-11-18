@@ -112,12 +112,16 @@ and the sky-radiation and opaque solar terms. Solar gains are ray traced on the 
 walls with the context (no transposition model). Fresh air is set per floor area by schedule
 (indicative EN 16798-1 Category II: office 1.4, school 4.0, homes 0.42 l/s·m²), so a double-height
 room is not ventilated twice as hard; infiltration defaults to 0.3 air changes per hour. Natural
-ventilation opens when it is warm inside and cooler outside. Ground floors see the EPW ground
-temperatures. Zones that are not rooms (a wall, a slab, under 2 m² of floor) are rejected.
+ventilation opens when it is warm inside and cooler outside. A zone's lowest floor sees the EPW
+ground temperatures unless building floors lie under it (another storey, not terrain or perimeter
+foundations): then it is exposed to outside air, or adiabatic over a listed zone, and the run says so.
+`ground_z_m` sets the ground level instead. Glazing parallel to a zone face and within 30 cm of it
+(set back in the wall depth) becomes that face's window. Zones that are not rooms (a wall, a slab, under 2 m² of floor) are rejected.
 
 **Comfort (comfort.py).** PMV/PPD per ISO 7730:2005 Annex D. Adaptive comfort per ASHRAE 55-2020
 §5.4 (including the elevated air speed allowance) and EN 16798-1:2019 Annex B (running mean α 0.8).
-Overheating per CIBSE TM52 (three criteria). Psychrometrics use the ASHRAE Fundamentals
+Overheating per CIBSE TM52 (three criteria) over the non-heating season: May–September north of the
+equator, November–March south of it, or `tm52_months`. Psychrometrics use the ASHRAE Fundamentals
 (Hyland–Wexler) equations.
 
 ## Rooms, constructions and code packs
@@ -270,16 +274,23 @@ stdout). Its export and draw scripts are the MCP tools' own, so the two always a
   keeps the upper of two stacked faces. Radiation grids drop faces that see no sky from either side
   (the underside or inner face of a solid). A floor or roof solid's underside is classified as
   ceiling.
-* Name rules read layer, object and render-material names. Window frame parts (mullion, transom,
-  sill, frame …) are frames, not glass, and "roof slab" is a roof.
+* Name rules read layer, object and render-material names as whole words (camelCase and `_` split
+  words), so "Lower floor" is a floor, not low-e glass, and "Whole building" is not a hole. The
+  object's own names (last layer, object name, render material) are tried first; parent layers count
+  only when those match nothing, nearest first, except that a parent such as "Ignore" or
+  "Annotation" still excludes everything under it. Window frame parts (mullion, transom, sill, frame …)
+  are frames, not glass, "roof slab" is a roof, and "triple low-e" is triple glazing.
 * The thermal model is a single-zone RC network: interzone heat flow is adiabatic, there is no
   moisture balance, and the schedules are presets. It is good for comparing options and for
   overheating risk. For compliance, use EnergyPlus.
 * Speed: install the `fast` extra (`uvx --from "almond-mcp[fast]" almond-mcp`) for compiled ray
   casting, about 100× faster. Without it the numpy path gives the same results, only slower.
   An annual study on a real model can take longer than an MCP client waits. Pass `background=True`
-  to `analyze_daylight`, `analyze_solar_radiation` or `analyze_thermal`: you get a `job_id` at once,
-  and `get_environment_run(job_id)` reports progress, then returns the result.
+  to `analyze_daylight`, `analyze_solar_radiation` or `analyze_thermal`: you get a `job_id` at once.
+  `get_environment_run(job_id)` answers `running` with the seconds elapsed (there is no percentage
+  or time remaining) until the study ends, then returns the result. Jobs live in the MCP server's
+  memory: if the server restarts, the job id is gone and an unfinished study is lost. A finished
+  study is also saved to disk, so its `run_id` keeps working.
 
 ## References
 

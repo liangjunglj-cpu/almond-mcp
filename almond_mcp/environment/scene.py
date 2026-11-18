@@ -69,26 +69,44 @@ LIBRARY: dict[str, Material] = {m.name: m for m in (
 )}
 DEFAULT_GLAZING = "glazing_double_lowe"
 
-# Keyword rules, first match wins (applied to the layer path, object name and render-material name).
+# Keyword rules, first match wins. They run on normalised names (see _normalise: camelCase split,
+# lower case, every run of punctuation or "_" one space), so \b is a word boundary between any two
+# words. Short keywords that hide inside other words carry \b: "low e" not in "Lower" or "below",
+# "hole" not in "Whole", "site" not in "Composite", "fin" not in "finish", "ground" not in
+# "Underground".
 _RULES = (
-    (r"\b(ignore|annotation|sensor|grid|dim|text)\b", "ignore"),
-    (r"low.?e", DEFAULT_GLAZING),
-    (r"triple", "glazing_triple_lowe"),
-    (r"tint", "glazing_tinted"),
+    (r"\b(ignore|annotations?|sensors?|grids?|dims?|dimensions?|text)\b", "ignore"),
+    (r"\btriple ?(glaz|glass|panes?\b|low ?e\b)", "glazing_triple_lowe"),   # before low-e: "triple low-e"
+    (r"\blow ?e(missivity)?\b", DEFAULT_GLAZING),
+    (r"\btint(s|ed)?\b", "glazing_tinted"),
     # a window's frame parts are named after the window but are not glass
-    (r"(mullion|transom|\bsill|\bframe\b|jamb|lintel|reveal|handle|muntin)", "frame"),
-    (r"(glass|glaz|window|curtain|skylight|fenestration|clerestor)", None),   # generic glazing
-    (r"(opening|void|hole)", "opening"),
+    (r"(mullion|transom|sill(s|plate)?\b|\bframes?\b|jamb|lintel|reveal|handle|muntin)", "frame"),
+    (r"(\bglass|glaz|window|curtain|skylight|fenestration|clerestor)", None),   # generic glazing
+    (r"(opening|\bvoids?\b|\bholes?\b)", "opening"),
     (r"(ceiling|soffit)", "ceiling"),
     (r"(roof)", "roof"),                                  # before "slab": a roof slab is a roof
     (r"(floor|slab)", "floor"),
-    (r"(ground|terrain|landscape|topo|site)", "ground"),
+    (r"(\bground|terrain|landscape|\btopo|\bsites?\b)", "ground"),
     (r"(context|neighbo|surrounding|existing|massing)", "context"),
-    (r"(shad|louv|fin|overhang|brise|canopy|awning|screen)", "shading"),
-    (r"(furni|desk|table|chair|shelf|cabinet|sofa)", "furniture"),
+    (r"(shad(e|es|ed|ing|ings)?\b|louv|\bfins?\b|overhang|brise|canop|awning|\bscreen)", "shading"),
+    (r"(furni|desk|\btable|chair|shel(f|ves)|cabinet|sofa)", "furniture"),
     (r"(partition)", "partition"),
-    (r"(wall|column|beam)", "wall"),
+    (r"(wall|column|beam|spandrel)", "wall"),
 )
+
+
+def _normalise(text: str) -> str:
+    """'LowE_Glass::Site-Terrain' -> 'low e glass site terrain'."""
+    text = re.sub(r"(?<=[a-z0-9])(?=[A-Z])|(?<=[A-Z])(?=[A-Z][a-z])", " ", text)
+    return re.sub(r"[\W_]+", " ", text.lower()).strip()
+
+
+def _match(text: str) -> tuple[str, str | None] | None:
+    text = _normalise(text)
+    for pattern, mat in _RULES:
+        if re.search(pattern, text):
+            return pattern, mat
+    return None
 
 
 def material_from_spec(name: str, spec: dict | str | None) -> Material:
@@ -114,15 +132,26 @@ def material_from_spec(name: str, spec: dict | str | None) -> Material:
 
 
 def classify(texts: list[str], user_material: str = "", transparency: float = 0.0) -> tuple[str | None, str]:
-    """(library material name or None for "by orientation", reason)."""
+    """(library material name or None for "by orientation", reason). ``texts`` is [layer path,
+    object name, render-material name, ...]. The object's own names - the last layer of the path,
+    the object name and the render material - are matched first, together; a parent layer counts
+    only when they match nothing, nearest parent first (so "Lower Level::Walls" is a wall, and an
+    unnamed object on "Glazing::South" is glass). The ignore rule is the exception: a parent layer
+    like "Ignore" or "Annotation" excludes everything under it."""
     if user_material:
         return user_material, "user text almond:env_material"
-    joined = " / ".join(t for t in texts if t).lower()
-    for pattern, mat in _RULES:
-        if re.search(pattern, joined):
-            if mat is None:
-                return DEFAULT_GLAZING, f"name matches '{pattern.strip('()')}'"
-            return mat, f"name matches '{pattern.strip('()')}'"
+    layers = [p for p in str(texts[0] if texts else "").split("::")]
+    ignore_pattern = _RULES[0][0]
+    for p in reversed(layers[:-1]):
+        if re.search(ignore_pattern, _normalise(p)):
+            return "ignore", f"parent layer '{p}' matches '{ignore_pattern}'"
+    own = " / ".join(t for t in [layers[-1], *texts[1:]] if t)
+    candidates = [(own, "name")] + [(p, f"parent layer '{p}'") for p in reversed(layers[:-1]) if p]
+    for text, where in candidates:
+        hit = _match(text)
+        if hit is not None:
+            pattern, mat = hit
+            return (mat or DEFAULT_GLAZING), f"{where} matches '{pattern.strip('()')}'"
     if transparency >= 0.3:
         return DEFAULT_GLAZING, f"render material is {transparency:.0%} transparent"
     return None, "by surface orientation (no matching layer/name)"

@@ -297,16 +297,36 @@ def adaptive_en16798(t_op: np.ndarray, t_rm_daily: np.ndarray, category: str = "
             "category": category}
 
 
-def tm52(t_op: np.ndarray, t_rm_daily: np.ndarray, occupied: np.ndarray, month: np.ndarray) -> dict:
-    """CIBSE TM52 overheating criteria for the non-heating season (May-September), occupied hours.
-    A room fails when it fails two or more of the three criteria."""
+TM52_SEASON_NORTH = [5, 6, 7, 8, 9]          # May-September, as in TM52 (written for the UK)
+TM52_SEASON_SOUTH = [11, 12, 1, 2, 3]         # the same months six months on
+
+
+def tm52_season(latitude: float, season_months=None) -> tuple[list[int], str]:
+    """(months, description) of TM52's non-heating season: ``season_months`` when given, else
+    May-September north of the equator and November-March south of it."""
+    if season_months is not None:
+        months = [int(m) for m in season_months]
+        if not months or any(not 1 <= m <= 12 for m in months):
+            raise ValueError("TM52 season months must be 1..12")
+        return months, "given months"
+    if latitude < 0:
+        return list(TM52_SEASON_SOUTH), "November-March (southern hemisphere)"
+    return list(TM52_SEASON_NORTH), "May-September (northern hemisphere)"
+
+
+def tm52(t_op: np.ndarray, t_rm_daily: np.ndarray, occupied: np.ndarray, month: np.ndarray,
+         latitude: float = 0.0, season_months=None) -> dict:
+    """CIBSE TM52 overheating criteria over the occupied hours of the non-heating season (see
+    tm52_season). A room fails when it fails two or more of the three criteria."""
+    months, label = tm52_season(latitude, season_months)
     t_rm = np.repeat(np.asarray(t_rm_daily, dtype=float), 24)
     t_max = 0.33 * t_rm + 21.8
     dT = np.round(np.asarray(t_op, dtype=float) - t_max)
-    season = (month >= 5) & (month <= 9) & np.asarray(occupied, dtype=bool)
+    season = np.isin(month, months) & np.asarray(occupied, dtype=bool)
     occ_hours = int(season.sum())
     if occ_hours == 0:
-        return {"applicable": False, "reason": "no occupied hours between May and September"}
+        return {"applicable": False, "reason": f"no occupied hours in the season ({label})",
+                "season": label, "season_months": months}
     exceed = int(((dT >= 1) & season).sum())
     c1_pct = 100.0 * exceed / occ_hours
     day = np.repeat(np.arange(365), 24)
@@ -314,7 +334,7 @@ def tm52(t_op: np.ndarray, t_rm_daily: np.ndarray, occupied: np.ndarray, month: 
     c2_max = float(we.max())
     c3_max = float(np.where(season, dT, -99).max())
     fails = [c1_pct > 3.0, c2_max > 6.0, c3_max > 4.0]
-    return {"applicable": True, "occupied_hours": occ_hours,
+    return {"applicable": True, "season": label, "season_months": months, "occupied_hours": occ_hours,
             "criterion_1": {"hours_exceeding": exceed, "pct": round(c1_pct, 2), "limit_pct": 3.0, "pass": not fails[0]},
             "criterion_2": {"max_daily_weighted_exceedance": round(c2_max, 1), "limit": 6.0,
                             "days_over": int((we > 6.0).sum()), "pass": not fails[1]},
