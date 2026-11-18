@@ -329,7 +329,10 @@ window.almondEnvironmentReceive=p=>{
   if(p.kind==='rooms'){showRooms(p);message(`${p.rooms.length} room(s) checked.`,'ok');checklist();return;}
   if(p.kind==='charts'){showCharts(p.charts);message(`Charts for ${p.charts.room}.`,'ok');checklist();return;}
   if(p.kind==='compare'){showCompare(p);message(`${p.rows.length} case(s) compared.`,'ok');checklist();return;}
-  if(p.kind==='result'){showResult(p);message(p.result.headline||'Study complete.','ok');checklist();return;}
+  if(p.kind==='result'){
+    // a result the page cannot draw must say so, not leave the workspace busy
+    try{showResult(p);}catch(e){message('The study ran, but its results could not be shown: '+e.message,'error');checklist();return;}
+    message(p.result.headline||'Study complete.','ok');checklist();return;}
   checklist();
 };
 for(const id of ['env-sun-month','env-sl-month'])monthSelect(id,'',id==='env-sun-month'?'3':'3');

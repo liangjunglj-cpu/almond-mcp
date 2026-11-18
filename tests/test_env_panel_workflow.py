@@ -158,3 +158,17 @@ def test_panel_routes_every_action_the_page_sends():
     sent = set(re.findall(r"request\('([a-z_]+)'", js)) | (set(re.findall(r'data-env="([a-z_]+)"', html)) - local)
     assert sent <= allowed, f"page actions the panel drops: {sorted(sent - allowed)}"
     assert allowed <= handled, f"allowed actions the workspace does not handle: {sorted(allowed - handled)}"
+
+
+def test_daylight_runs_are_room_studies_the_panel_can_show_and_compare(temperate):
+    """Live Rhino run: a panel daylight study answered with study 'daylight_factor', so the page's result
+    table (keyed rooms_daylight) threw and the workspace stayed busy, and kept daylight cases could not be
+    compared."""
+    a = _run("", "daylight", daylight_study="daylight_factor", quality="draft", spacing_m=1.0)
+    b = _run("", "daylight", daylight_study="daylight_factor", quality="draft", spacing_m=1.0)
+    assert a["result"]["study"] == "rooms_daylight" and a["result"]["daylight_study"] == "daylight_factor"
+    saved, _ = studies.load_run(a["result"]["run_id"])
+    assert saved["study"] == "rooms_daylight"
+    cmp = _panel({"action": "compare", "cases": [{"name": "ID0", "run_id": a["result"]["run_id"]},
+                                                 {"name": "ID1", "run_id": b["result"]["run_id"]}]})
+    assert cmp["study"] == "rooms_daylight" and [r["case"] for r in cmp["rows"]] == ["ID0", "ID1"]

@@ -1076,6 +1076,8 @@ def run_rooms_daylight(data: dict, weather, study: str = "annual", quality: str 
     res["rooms"] = per
     res["room_names"] = [r.name for r in rooms]
     res["notes"] = notes + res.get("notes", [])
+    # a per-room study: the panel and case comparison key it as rooms_daylight; the metric stays in daylight_study
+    res["daylight_study"], res["study"] = study, "rooms_daylight"
     def head(p: dict) -> str:
         if "sda_pct" in p:
             return f"sDA {p['sda_pct']} %"
@@ -1086,7 +1088,8 @@ def run_rooms_daylight(data: dict, weather, study: str = "annual", quality: str 
     result_path = Path(res["run_dir"]) / "result.json"
     if result_path.is_file():
         saved = json.loads(result_path.read_text(encoding="utf-8"))
-        saved.update(rooms=per, room_names=res["room_names"], headline=res["headline"], notes=res["notes"])
+        saved.update(rooms=per, room_names=res["room_names"], headline=res["headline"], notes=res["notes"],
+                     study=res["study"], daylight_study=study)
         result_path.write_text(json.dumps(_jsonable(saved), indent=1), encoding="utf-8")
     np.save(Path(res["run_dir"]) / "room_owner.npy", owner)
     return res
