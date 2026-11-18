@@ -63,7 +63,10 @@ mcp = FastMCP("Almond", instructions=(
     "analyze_daylight (annual sDA/ASE/UDI, daylight factor, point-in-time, glare), "
     "analyze_solar_radiation, analyze_thermal (energy and comfort) and thermal_comfort; each accepts "
     "a shoebox room to study without Rhino. Check the returned material classification before "
-    "trusting numbers, and show_environment_result to draw a saved run in Rhino."
+    "trusting numbers, and show_environment_result to draw a saved run in Rhino. "
+    "All simulation tools (environment and structure, marked (BETA)) are still under test: present "
+    "their results to the user as beta, indicative design-stage results. place_simulation_tutorial "
+    "places an annotated example model that shows what each analysis needs."
 ))
 
 # ── Library Indexer ──────────────────────────────────────────────────────────
@@ -2238,7 +2241,7 @@ def validate_structure(
     fabrication: str = "cold_formed",
 ) -> str:
     """
-    Validates AI-generated geometry with a structural analysis.
+    (BETA) Validates AI-generated geometry with a structural analysis.
     Call this AFTER execute_rhino_script to verify the generated structure is buildable.
 
     engine="auto" (default) analyses line models (beams, columns, trusses, frames) with
@@ -2516,7 +2519,7 @@ def _native_validation(guids, structure_type, load_kn, material, fixed_supports,
 @mcp.tool()
 def list_design_codes() -> str:
     """
-    Lists the design code profiles validate_structure / visualize_structure accept as design_code.
+    (BETA) Lists the design code profiles validate_structure / visualize_structure accept as design_code.
 
     A profile holds the numbers a design code or National Annex sets (load factors gamma_G,
     gamma_Q, psi_0, xi; the ULS expression; material factors gamma_M0, gamma_M1; the deflection
@@ -2565,7 +2568,7 @@ def visualize_structure(
     view: str = "deflection",
 ) -> str:
     """
-    Run a live structural analysis on a line model and SHOW it in every Rhino viewport:
+    (BETA) Run a live structural analysis on a line model and SHOW it in every Rhino viewport:
     the undeformed wireframe, the exaggerated deformed shape coloured blue -> red by
     displacement (or by utilization), supports, load arrows and a legend panel with
     max deflection, the L/limit check and PASS/FAIL. Nothing is baked into the document.
@@ -2879,7 +2882,7 @@ def _render_validation_report(runs: list[dict]) -> str:
 @mcp.tool()
 def export_structural_report(path: str = "", limit: int = 50) -> str:
     """
-    Renders the persisted validate_structure history to a Markdown report.
+    (BETA) Renders the persisted validate_structure history to a Markdown report.
 
     Every successful validate_structure call is recorded in the local state
     database (inputs, analysis method, confidence, numbers, warnings). This

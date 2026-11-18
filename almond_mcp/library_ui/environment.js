@@ -1,4 +1,4 @@
-// Environment workspace: site, rooms, constructions, study, results. Data and diagrams come from the
+// Environment workspace (BETA): site, rooms, constructions, study, results. Data and diagrams come from the
 // environment engine (almond-mcp environment) through the Rhino panel; the catalogue is a static file.
 const el=id=>document.getElementById(id);
 const token=new URLSearchParams(location.search).get('bridge')||'';
@@ -115,6 +115,14 @@ document.querySelectorAll('[data-env]').forEach(b=>b.addEventListener('click',()
     request('run',{study:el('env-study').value,settings:settings(),envelope_pack:el('env-pack').value,pack_options:packOptions()});
   }else request(a,{});
 }));
+// Tutorial model (BETA): a button in each simulation workspace; the reply comes back on this channel.
+function tutorialStatus(s,state){document.querySelectorAll('[data-tutorial-status]').forEach(n=>{n.hidden=!s;n.textContent=s;n.dataset.state=state;});}
+document.querySelectorAll('[data-tutorial]').forEach(b=>b.addEventListener('click',()=>{
+  if(!native){tutorialStatus('Open Almond in Rhino (AlmondEnvironment or AlmondStructure) to place the tutorial model.','info');return;}
+  if(busy){tutorialStatus('Almond is still working. Wait for it to finish, then try again.','info');return;}
+  busy=true;checklist();tutorialStatus('Placing the tutorial model…','busy');
+  location.href='/almond-action/'+token+'/environment/tutorial?data='+encodeURIComponent(JSON.stringify({part:b.dataset.tutorial}));
+}));
 ['env-kind','env-region'].forEach(id=>el(id).addEventListener('change',fillConstructions));
 el('env-construction').addEventListener('change',showSection);
 el('env-pack').addEventListener('change',fillPackOptions);
@@ -168,6 +176,10 @@ function showResult(p){
 }
 window.almondEnvironmentReceive=p=>{
   if(p.kind==='progress'){message(p.message,'busy');return;}
+  if(p.kind==='tutorial'){
+    tutorialStatus(p.message,p.state);if(p.state==='busy')return;
+    busy=false;checklist();if(p.state==='ok'&&p.part!=='structure')request('rooms',{});return;
+  }
   if(p.kind==='epw'){state.epw=p.epw_path;text('env-epw',p.epw_path);el('env-epw').classList.remove('need');checklist();return;}
   busy=false;
   if(p.kind==='error'){message(p.message,'error');checklist();return;}

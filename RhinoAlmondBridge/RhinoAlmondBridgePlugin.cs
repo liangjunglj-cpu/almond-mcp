@@ -28,7 +28,7 @@ namespace RhinoAlmondBridge
         {
             RhinoApp.WriteLine("RhinoAlmondBridge: Loading MCP Bridge plugin...");
             Rhino.UI.Panels.RegisterPanel(this, typeof(AlmondLibraryPanel), "Almond", Icon("almond.ico"));
-            Rhino.UI.Panels.RegisterPanel(this, typeof(AlmondResultsPanel), "Almond Results", Icon("results.ico"));
+            Rhino.UI.Panels.RegisterPanel(this, typeof(AlmondResultsPanel), "Almond Results (BETA)", Icon("results.ico"));
 
             _server = new BridgeServer(port: 5000);
             _server.Start();

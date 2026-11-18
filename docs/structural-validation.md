@@ -1,4 +1,8 @@
-# Structural validation: process, inputs, and verified behavior
+# Structural validation: process, inputs, and verified behavior (BETA)
+
+> **(BETA)** This feature is still under test. Its tools, panel workspace and viewport legends are
+> labelled (BETA); results are indicative design-stage checks, not certification or code compliance.
+> Stable-release status: [simulation-stable-readiness.md](simulation-stable-readiness.md).
 
 How Almond's `validate_structure` works, what goes in, what comes out, and
 the dimension matrix it has been verified against (live sessions,

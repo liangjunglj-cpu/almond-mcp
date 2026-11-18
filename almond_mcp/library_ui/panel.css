@@ -4,7 +4,7 @@
 .rhino-panel button:focus-visible,.rhino-panel a:focus-visible,.rhino-panel input:focus-visible,.rhino-panel select:focus-visible,.rhino-panel summary:focus-visible{outline-offset:1px}
 .rhino-panel .masthead{position:sticky;top:0;z-index:4;min-height:38px;margin:0;padding:4px 8px;gap:6px;background:var(--paper);border-color:var(--line)}
 .rhino-panel .wordmark{font-size:16px;letter-spacing:-.7px;gap:5px}
-.rhino-panel .brand-mark{font-family:Arial,sans-serif;font-size:18px;width:16px;height:20px;background:#e94329;color:white;padding-bottom:3px}
+.rhino-panel .brand-mark{font-family:Arial,sans-serif;font-size:18px;width:16px;height:20px;background:var(--ink);color:var(--paper);padding-bottom:3px}
 .rhino-panel .masthead nav{font-size:12px;gap:2px}
 .rhino-panel .masthead nav a{padding:5px 7px;border:1px solid transparent;border-radius:3px}
 .rhino-panel .masthead nav a[aria-current]{background:var(--control);border-color:var(--line);color:var(--ink)}
@@ -68,3 +68,91 @@
 /* Linework is an intentionally light drawing sheet; material previews use the host surface. */
 .rhino-panel .view-image{background:#f3f3ef}
 @media(max-width:330px){.rhino-panel .wordmark{font-size:0;gap:0}.rhino-panel .masthead nav{margin-left:0;flex:1}.rhino-panel .filters button{padding:5px;font-size:10px}.rhino-panel .placement-tools{flex-wrap:wrap}}
+
+/* ── Rhino default style ─────────────────────────────────────────────────────────────────────────────
+   Every Almond page inside Rhino follows Rhino's own panels: its colours (panel-theme.js reads them from
+   Rhino, light and dark), its UI font at 12 px, flat 1 px controls, tabs like Rhino's panel tabs and
+   collapsible sections like the Properties panel. No brand palette: --red is Rhino's highlight colour
+   here; --ok / --warn / --err are kept for states only. */
+.rhino-panel .brand-mark{background:var(--ink);color:var(--paper);transform:none;border-radius:3px;font:700 13px/1 var(--ui-font,"Segoe UI"),Arial,sans-serif;width:18px;height:18px;padding:0}
+.rhino-panel .wordmark{font:600 13px var(--ui-font,"Segoe UI"),Arial,sans-serif;letter-spacing:0}
+.rhino-panel .wordmark-dot,.rhino-panel .mast-label,.rhino-panel .local-label{display:none}
+.rhino-panel button:hover,.rhino-panel a:hover{color:inherit}
+.rhino-panel button:focus-visible,.rhino-panel a:focus-visible,.rhino-panel input:focus-visible,.rhino-panel select:focus-visible,.rhino-panel summary:focus-visible{outline:1px solid var(--accent);outline-offset:1px}
+.rhino-panel input[type=text],.rhino-panel input[type=number],.rhino-panel input[type=search]{background:var(--field);border:1px solid var(--line);border-radius:2px;padding:4px 5px;font:inherit;font-size:12px;color:var(--ink)}
+.rhino-panel select{border-radius:2px}
+.rhino-panel input:disabled,.rhino-panel select:disabled,.rhino-panel button:disabled{opacity:.55}
+.rhino-panel .analysis-toggle input,.rhino-panel .diagram-toggles input{width:13px;height:13px;accent-color:var(--accent)}
+.rhino-panel .place-model,.rhino-panel .analysis-button,.rhino-panel .download,.rhino-panel .view-tabs button,.rhino-panel .solid-button{border-radius:2px;padding:4px 8px;min-height:24px;font-size:12px;font-weight:400}
+.rhino-panel .analysis-button:hover:enabled{border-color:var(--accent);color:var(--ink);background:var(--hover)}
+.rhino-panel .analysis-button.primary{font-weight:600;border-color:var(--accent)}
+.rhino-panel .analysis-button:disabled{cursor:default}
+
+/* page heading: a plain title, like a Rhino panel caption */
+.rhino-panel .analysis-page{padding:8px 0 16px}
+.rhino-panel .analysis-page h1{font-size:14px;font-weight:600;margin:0 0 6px;display:flex;align-items:center;flex-wrap:wrap;gap:6px}
+.rhino-panel .beta-tag{font-size:10px;padding:0 4px;line-height:16px}
+.rhino-panel .analysis-note{border-left:0;border:1px solid var(--line);border-radius:2px;background:var(--panel);padding:6px 8px;font-size:11px}
+.rhino-panel .engine-line{padding:4px 0;gap:6px}
+.rhino-panel .tutorial-row{margin:6px 0 2px}
+.rhino-panel .tutorial-row .analysis-button{width:auto;flex:none}
+
+/* tabs: Rhino's panel tabs - inactive tabs on the tab colour, the active tab joins the page */
+.rhino-panel .env-strip{display:none}
+.rhino-panel .analysis-tabs{gap:1px;margin-top:8px;padding:0;border-bottom:1px solid var(--line);background:var(--paper)}
+.rhino-panel .analysis-tabs button{flex:1 1 0;min-width:0;padding:4px 1px 3px;gap:2px;font-size:11px;color:var(--ink);background:var(--tab);border:1px solid var(--line);border-bottom:0;border-radius:3px 3px 0 0;margin-bottom:0}
+.rhino-panel .analysis-tabs button:hover{background:var(--hover)}
+.rhino-panel .analysis-tabs button[aria-selected=true]{background:var(--paper);color:var(--ink);font-weight:600;margin-bottom:-1px;padding-bottom:4px;border-bottom:0;box-shadow:none}
+.rhino-panel .analysis-tabs .tab-icon{width:16px;height:16px;stroke:currentColor}
+.rhino-panel .analysis-tabs button[aria-selected=true] .tab-icon{stroke:currentColor}
+.rhino-panel .analysis-tabs button>span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:100%}
+.rhino-panel .tab-need{top:2px;right:2px;width:11px;height:11px;border-radius:0;font-size:0;background:var(--warn);-webkit-mask:var(--warn-mask) center/contain no-repeat;mask:var(--warn-mask) center/contain no-repeat}
+.rhino-panel .tab-dot{top:4px;right:4px;width:5px;height:5px}
+.rhino-panel{--warn-mask:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath fill-rule='evenodd' d='M8 .6 15.6 14.8H.4zM7 5.2h2v5.2H7zm0 6.4h2v2H7z'/%3E%3C/svg%3E")}
+
+/* panes and fields: compact, like a Rhino panel */
+.rhino-panel .analysis-step{padding:8px 0}
+.rhino-panel .analysis-page h2{font-size:12px;font-weight:600;margin:2px 0 6px}
+.rhino-panel .analysis-step p,.rhino-panel .analysis-details p{font-size:12px;line-height:1.45;margin:6px 0}
+.rhino-panel .analysis-step label{margin:6px 0}
+.rhino-panel .analysis-fields{gap:6px}
+.rhino-panel .unit-label{color:var(--muted)}
+
+/* collapsible sections: Rhino's expander headers (Properties panel), closed by default */
+.rhino-panel .analysis-details{padding:0;border:0;border-top:1px solid var(--line);margin:6px 0 0}
+.rhino-panel .analysis-details>summary{list-style:none;display:flex;align-items:center;gap:6px;padding:5px 2px;font-size:12px;font-weight:600;color:var(--ink);cursor:default;user-select:none}
+.rhino-panel .analysis-details>summary::-webkit-details-marker{display:none}
+.rhino-panel .analysis-details>summary:before{content:'';width:0;height:0;border-left:4px solid var(--ink);border-top:4px solid transparent;border-bottom:4px solid transparent;transition:transform .1s}
+.rhino-panel .analysis-details[open]>summary:before{transform:rotate(90deg)}
+.rhino-panel .analysis-details>summary:hover{background:var(--hover)}
+.rhino-panel .analysis-details[open]{padding-bottom:6px}
+.rhino-panel .analysis-details>:not(summary){margin-left:12px}
+.rhino-panel .analysis-details.advanced>summary{font-weight:400}
+
+/* status, checklist, runbar */
+.rhino-panel .run-checklist li{border-radius:2px;padding:2px 6px}
+.rhino-panel .analysis-runbar{padding:6px 0 4px}
+.rhino-panel .status{border-left-width:2px;padding:5px 7px}
+.rhino-panel .analysis-meta.error{color:var(--err)}
+.rhino-panel .env-page .analysis-meta.need{color:var(--warn)}
+.rhino-panel .tutorial-status[data-state=error]{color:var(--err)}
+.rhino-panel .tutorial-status[data-state=ok]{color:var(--ink)}
+.rhino-panel .help-panel{border-left:1px solid var(--line);border-radius:2px}
+
+/* home */
+.rhino-panel .workspace-card{border-radius:2px;padding:8px 10px}
+.rhino-panel .workspace-card svg{height:48px;color:var(--ink)}
+.rhino-panel .workspace-card svg [stroke]:not([stroke=currentColor]){stroke:var(--muted)}
+.rhino-panel .workspace-card:hover{background:var(--hover)}
+.rhino-panel .workspace-card:hover .workspace-title{color:var(--ink)}
+.rhino-panel .workspace-title{font-size:13px;font-weight:600}
+.rhino-panel .workspace-number{color:var(--muted)}
+.rhino-panel .beta-note{font-size:11px;color:var(--muted);margin:4px 0 8px}
+
+/* results colours follow the state tokens, not fixed brand colours */
+.rhino-panel #analysis-outcome[data-state=pass]{color:var(--ok)}
+.rhino-panel #analysis-outcome[data-state=fail]{color:var(--err)}
+.rhino-panel #analysis-outcome[data-state=indicative]{color:var(--warn)}
+.rhino-panel .analysis-step input[type=text]{display:block;width:100%;min-width:0;margin-top:3px;padding:5px}
+.rhino-panel .analysis-step select,.rhino-panel .analysis-step input[type=number]{margin-top:3px;min-height:24px}
+.rhino-panel .unit-label{float:none;margin-left:4px;padding-top:0;font:10px var(--ui-font,"Segoe UI"),Arial,sans-serif}

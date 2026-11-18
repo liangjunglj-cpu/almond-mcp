@@ -48,6 +48,11 @@ namespace RhinoAlmondBridge
                     _epw = (string)input["epw_path"] ?? _epw;
                     if (!File.Exists(_epw)) { Send("error", "Choose an EnergyPlus weather file (.epw) first."); return; }
                     Engine(new JObject { ["action"] = "site", ["epw_path"] = _epw }, "site"); return;
+                case "tutorial":
+                    string part = (string)input["part"] ?? "all";
+                    if (part != "all" && part != "environment" && part != "structure") { Send("error", "Unknown tutorial part."); return; }
+                    if (Rhino.Commands.Command.InCommand()) { Send("error", "Finish the current Rhino command first."); return; }
+                    PlaceTutorial(part); return;
             }
             if (Rhino.Commands.Command.InCommand()) { Send("error", "Finish the current Rhino command first."); return; }
             Busy = true;
@@ -98,6 +103,37 @@ namespace RhinoAlmondBridge
             _epw = dialog.FileName;
             _send(new JObject { ["kind"] = "epw", ["epw_path"] = _epw });
             Engine(new JObject { ["action"] = "site", ["epw_path"] = _epw }, "site");
+        }
+
+        // The tutorial model (BETA): the script comes from the Python package (almond_mcp.tutorial), the same one
+        // the place_simulation_tutorial MCP tool sends, and runs as one undo record.
+        private void PlaceTutorial(string part)
+        {
+            Busy = true;
+            _send(new JObject { ["kind"] = "tutorial", ["state"] = "busy", ["message"] = "Placing the tutorial model…" });
+            Task.Run(async () => {
+                JObject reply;
+                try { reply = await NativeSolver.RunAsync(new JObject { ["action"] = "tutorial_script", ["part"] = part }, 120000, "environment").ConfigureAwait(false); }
+                catch (Exception ex) { reply = new JObject { ["status"] = "error", ["message"] = ex.Message }; }
+                Eto.Forms.Application.Instance.AsyncInvoke(() => {
+                    Busy = false;
+                    try
+                    {
+                        if ((string)reply["status"] != "ok") throw new InvalidOperationException((string)reply["message"] ?? "The tutorial script could not be built.");
+                        var doc = RhinoDoc.ActiveDoc;
+                        var placed = new ScriptExecutor().Execute((string)reply["script"]);
+                        if (placed.Status != "success") throw new InvalidOperationException("Tutorial: " + placed.Message);
+                        var box = Rhino.Geometry.BoundingBox.Empty;
+                        foreach (var g in placed.Guids)
+                            if (Guid.TryParse(g, out Guid id) && doc?.Objects.FindId(id) is RhinoObject o) box.Union(o.Geometry.GetBoundingBox(true));
+                        if (box.IsValid) { box.Inflate(box.Diagonal.Length * 0.08); doc.Views.ActiveView?.ActiveViewport.ZoomBoundingBox(box); doc.Views.Redraw(); }
+                        string where = part == "all" ? "Almond Tutorial" : "Almond Tutorial::" + char.ToUpper(part[0]) + part.Substring(1);
+                        _send(new JObject { ["kind"] = "tutorial", ["state"] = "ok", ["part"] = part,
+                            ["message"] = $"Tutorial model placed on {where} ({placed.Guids.Count} objects). Read the numbered dots, then follow them in this workspace. Ctrl+Z removes it." });
+                    }
+                    catch (Exception ex) { _send(new JObject { ["kind"] = "tutorial", ["state"] = "error", ["message"] = ex.Message }); }
+                });
+            });
         }
 
         // Document actions run inside the AlmondEnvironmentAction command.
@@ -295,7 +331,12 @@ namespace RhinoAlmondBridge
         public override string EnglishName => "AlmondEnvironment";
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
-            try { AlmondLibraryCommand.OpenPanel(doc, "environment"); return Result.Success; }
+            try
+            {
+                AlmondLibraryCommand.OpenPanel(doc, "environment");
+                RhinoApp.WriteLine("Almond Climate, Rooms & Comfort (BETA): still under test. Results are indicative design-stage comparisons. Use Place tutorial model to see what each study needs.");
+                return Result.Success;
+            }
             catch (Exception ex) { RhinoApp.WriteLine(ex.Message); return Result.Failure; }
         }
     }

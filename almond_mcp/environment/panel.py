@@ -9,6 +9,7 @@ Requests ({"action": ...}):
   run           {export, epw_path, study: thermal | daylight, settings, envelope_pack, pack_options}
                                   the study, per-room results, the tinted plan, metric tiles and a draw file
                                   (coloured quads in rhino.draw_file format) for the viewport
+  tutorial_script {part}          the C# script that places the simulation tutorial model (almond_mcp.tutorial)
 
 ``export`` is the JSON the environment export script writes (rhino.export_script). Diagrams come from
 diagrams.py, so the panel and the boards share one visual language.
@@ -162,8 +163,15 @@ def export_script(req: dict) -> dict:
     return {"script": rhino.export_script([str(g) for g in req.get("guids") or []], str(req["out"]))}
 
 
+def tutorial_script(req: dict) -> dict:
+    """The C# script that places the tutorial model (environment and/or structure part) beside the model."""
+    from .. import tutorial
+    part = str(req.get("part") or "all")
+    return {"script": tutorial.script(part), "part": part, "requirements": tutorial.requirements()}
+
+
 ACTIONS = {"catalogue": catalogue, "construction": construction, "site": site, "rooms": rooms, "run": run,
-           "export_script": export_script}
+           "export_script": export_script, "tutorial_script": tutorial_script}
 PROTOCOL = 1
 
 

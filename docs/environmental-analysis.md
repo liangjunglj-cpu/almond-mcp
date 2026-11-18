@@ -1,4 +1,8 @@
-# Environmental analysis (climate, daylight, radiation, thermal comfort)
+# Environmental analysis (climate, daylight, radiation, thermal comfort) (BETA)
+
+> **(BETA)** This feature is still under test. Its tools, panel workspace and viewport legends are
+> labelled (BETA); results are indicative design-stage checks, not certification or code compliance.
+> Stable-release status: [simulation-stable-readiness.md](simulation-stable-readiness.md).
 
 Almond can analyse a design against a real weather year: climate, sun and shadow, daylight, solar
 radiation, thermal comfort and energy, per room with layered constructions.
@@ -117,6 +121,23 @@ Overheating per CIBSE TM52 (three criteria). Psychrometrics use the ASHRAE Funda
 (Hyland–Wexler) equations.
 
 ## Rooms, constructions and code packs
+
+### Tutorial model
+
+**Place tutorial model** (Environment workspace in the Almond panel, or the `place_simulation_tutorial`
+MCP tool) puts a small annotated scene beside your model, on `Almond Tutorial::Environment` layers:
+
+1. **Room** - a closed 6 x 5 x 3 m volume, tagged as a room (use: living; construction set: Europe, new build).
+2. **Glazing** - a planar surface on the room's south face, on a `Glazing` layer, with a triple low-e window
+   construction. The layer name alone would already make it glass.
+3. **Open room** - a closed curve with a 3 m height under a roof surface: assessed as semi-outdoor comfort.
+4. **Context** - a neighbouring block. Every visible object shades and reflects.
+5. **Site** - the weather file (.epw) is not geometry: choose it on the Site tab. North is the Sun panel's north.
+6. **Run** - thermal needs rooms + a weather file; daylight factor needs rooms + glazing; annual daylight also
+   needs the weather file.
+
+Placing it again replaces the previous tutorial, so the room names stay unique. Hide or delete the
+`Almond Tutorial` layer before you analyse your own model: studies export every visible object.
 
 ### Rooms (user-defined zones)
 

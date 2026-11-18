@@ -1,5 +1,12 @@
 # Almond MCP for Rhino
 
+> **Simulation features are in beta (BETA).** Structural Validation and Climate, Rooms & Comfort
+> (environmental analysis) are still under test. Their tools, panel workspaces and viewport legends are
+> labelled (BETA); treat their results as indicative design-stage checks, not certification or code
+> compliance. **Place tutorial model** in either workspace (or the `place_simulation_tutorial` tool) puts
+> an annotated example in Rhino that shows what each analysis needs. Stable-release status per feature:
+> [docs/simulation-stable-readiness.md](docs/simulation-stable-readiness.md).
+
 **0.7.0-rc.2 — structural analysis pre-release.** The Structure workspace now runs
 Almond's own 3D frame solver: floor and placed-model loads, EN 1990 combinations,
 rigid/simple joints, stability (αcr, sway imperfections, P-Δ), EN 1993-1-1 member
@@ -309,7 +316,7 @@ meshy-t2 smart-topology mesh, untextured), save the GLB as
 `provenance.json`, and run the build script. Provenance and licensing are
 documented in `docs/licensing-audit.md`.
 
-## Structural validation with reports
+## Structural validation with reports (BETA)
 
 `validate_structure(guids, structure_type, load_kn, material)` checks
 generated geometry through three pathways in strict order of confidence —
@@ -333,7 +340,7 @@ spans no real system covers — so geometry that merely solves numerically
 but could not be constructed as drawn is caught too. Details:
 `docs/construction-guidance.md`.
 
-## Environmental analysis: climate, daylight, radiation, thermal comfort
+## Environmental analysis: climate, daylight, radiation, thermal comfort (BETA)
 
 Point any analysis at an EPW weather file (`.epw`), the standard typical-year format for building simulation.
 The engine is native: there is no Radiance or EnergyPlus to install, and it is a clean-room

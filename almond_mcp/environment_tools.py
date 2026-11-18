@@ -177,7 +177,7 @@ def register(mcp, send: Sender) -> dict:
     @mcp.tool(annotations=READ_ONLY)
     def climate_summary(epw_path: str, hdd_base_c: float = 18.0, cdd_base_c: float = 18.0,
                         strategy_thresholds: dict | None = None, include_psychrometric_bins: bool = False) -> dict:
-        """Climate analysis of an EPW weather file (no Rhino needed): location and data quality (every
+        """(BETA) Climate analysis of an EPW weather file (no Rhino needed): location and data quality (every
         repaired or missing value is counted), monthly temperatures / humidity / solar radiation /
         sunshine / wind, heating and cooling degree days, design temperatures, a 16-sector wind rose,
         outdoor adaptive-comfort hours, and indicative passive-strategy hours on the bioclimatic chart
@@ -196,7 +196,7 @@ def register(mcp, send: Sender) -> dict:
     def sun_path(epw_path: str = "", latitude: float | None = None, longitude: float | None = None,
                  time_zone: float | None = None, month: int = 6, day: int = 21, north_deg: float = 0.0,
                  include_diagram: bool = False) -> dict:
-        """Sun positions for a site (from an EPW file or latitude/longitude/time_zone, east and north
+        """(BETA) Sun positions for a site (from an EPW file or latitude/longitude/time_zone, east and north
         positive, time zone in hours from UTC): sunrise, solar noon, sunset and day length for
         month/day, the hourly altitude/azimuth through that day, and with include_diagram the sun-path
         diagram arcs (21st of each month) and hourly analemmas. Azimuth is clockwise from true north;
@@ -238,7 +238,7 @@ def register(mcp, send: Sender) -> dict:
                          point_in_time: dict | None = None, views: list[dict] | None = None,
                          ground_reflectance: float = 0.2, north_deg: float | None = None,
                          show_in_rhino: bool = True, label: str = "", background: bool = False) -> dict:
-        """Daylight simulation by daylight coefficients (Almond's own native engine).
+        """(BETA) Daylight simulation by daylight coefficients (Almond's own native engine).
 
         study: "annual" (climate-based, needs epw_path): sDA300/50% and ASE1000,250h per IES LM-83
           with dynamic shades (a group's shade closes when > 2 % of sensors get > 1000 lux of direct
@@ -327,7 +327,7 @@ def register(mcp, send: Sender) -> dict:
                                 quality: str = "draft", materials: dict | None = None,
                                 ground_reflectance: float = 0.2, north_deg: float | None = None,
                                 show_in_rhino: bool = True, label: str = "", background: bool = False) -> dict:
-        """Incident solar irradiation (kWh/m2) and direct-sun hours on surfaces - roofs, facades,
+        """(BETA) Incident solar irradiation (kWh/m2) and direct-sun hours on surfaces - roofs, facades,
         ground, a site - over the year or a period (months e.g. [6,7,8]; hours [start, end] local
         standard time). Perez cumulative sky by daylight coefficients plus the sun traced hourly, with
         every object in the model shading and (bounces >= 1, the default) reflecting - modelled ground
@@ -385,7 +385,7 @@ def register(mcp, send: Sender) -> dict:
                         clothing_summer: float = 0.5, clothing_winter: float = 1.0,
                         metabolic_rate: float = 1.2, air_speed: float = 0.1, materials: dict | None = None,
                         north_deg: float | None = None, label: str = "", background: bool = False) -> dict:
-        """Hourly thermal simulation of zones for a year (ISO 13790 5R1C, one node set per zone) with
+        """(BETA) Hourly thermal simulation of zones for a year (ISO 13790 5R1C, one node set per zone) with
         solar gains ray traced on the real geometry: heating/cooling energy and peaks (kWh/m2, W/m2),
         operative temperatures, and comfort - adaptive ASHRAE 55 and EN 16798-1 (Cat II) hours, CIBSE
         TM52 overheating criteria, PMV/PPD. free_running=True removes both set-points (use with
@@ -449,7 +449,7 @@ def register(mcp, send: Sender) -> dict:
     def thermal_comfort(air_temperature_c: float, mean_radiant_temperature_c: float | None = None,
                         relative_humidity: float = 50.0, air_speed: float = 0.1, metabolic_rate: float = 1.2,
                         clothing: float = 0.5, outdoor_running_mean_c: float | None = None) -> dict:
-        """Comfort calculator for one condition: PMV/PPD (ISO 7730, with its validity range), operative
+        """(BETA) Comfort calculator for one condition: PMV/PPD (ISO 7730, with its validity range), operative
         temperature, psychrometrics (humidity ratio, dew point, wet bulb, enthalpy), and - when
         outdoor_running_mean_c (the prevailing / running mean outdoor temperature) is given - the
         adaptive ASHRAE 55 (80 / 90 %, with the elevated-air-speed allowance) and EN 16798-1
@@ -493,7 +493,7 @@ def register(mcp, send: Sender) -> dict:
     @mcp.tool(annotations=WRITES)
     def show_environment_result(run_id: str = "", metric: str = "", clear: bool = False,
                                 min_value: float | None = None, max_value: float | None = None) -> dict:
-        """Draw a saved daylight or radiation run in Rhino as a vertex-coloured mesh with a legend, on
+        """(BETA) Draw a saved daylight or radiation run in Rhino as a vertex-coloured mesh with a legend, on
         layer Almond::Environment::<label metric> (replacing that layer's previous drawing). metric:
         one of the run's display_metrics (e.g. da, ase_hours, udi_useful, mean_lux, df, lux, kwh_m2,
         sun_hours). clear=True removes the drawings (of this run's label, or all when run_id is empty)."""
@@ -519,13 +519,13 @@ def register(mcp, send: Sender) -> dict:
 
     @mcp.tool(annotations=READ_ONLY)
     def list_environment_runs(limit: int = 20) -> dict:
-        """Saved environmental analysis runs, newest first, with their headline results."""
+        """(BETA) Saved environmental analysis runs, newest first, with their headline results."""
         return {"status": "success", "runs": studies.list_runs(max(1, min(int(limit), 200))),
                 "directory": str(studies.runs_dir())}
 
     @mcp.tool(annotations=READ_ONLY)
     def get_environment_run(run_id: str, include_values: bool = False, metric: str = "") -> dict:
-        """A saved run's full summary (inputs, assumptions, classification, metrics, image paths).
+        """(BETA) A saved run's full summary (inputs, assumptions, classification, metrics, image paths).
         include_values adds the per-sensor values (and sensor points, metres) of one metric.
         Also takes a job_id from a background study: 'running' until it finishes, then its result."""
         job = _job_status(run_id)
@@ -548,7 +548,7 @@ def register(mcp, send: Sender) -> dict:
 
     @mcp.tool(annotations=READ_ONLY)
     def list_environment_materials() -> dict:
-        """The environmental material library (visible reflectance; glazing transmittance, shade
+        """(BETA) The environmental material library (visible reflectance; glazing transmittance, shade
         transmittance, g and U) and the layer-name rules that pick them. Use the names in
         analyze_* materials overrides or as Rhino user text almond:env_material."""
         lib = [{"name": m.name, "kind": m.kind, **({"reflectance": m.reflectance} if m.kind == "opaque" else
@@ -565,7 +565,7 @@ def register(mcp, send: Sender) -> dict:
 
     @mcp.tool(annotations=READ_ONLY)
     def list_constructions(kind: str = "", region: str = "") -> dict:
-        """The construction library: layered assemblies (walls, roofs, floors, partitions, windows) with their
+        """(BETA) The construction library: layered assemblies (walls, roofs, floors, partitions, windows) with their
         U-value, areal heat capacity, finishes and glazing g / visible transmittance, plus construction sets
         (defaults per surface kind) and the sources and licences of the material data. kind: wall_external |
         wall_internal | roof | floor_ground | floor_exposed | floor_internal | window | door; region: eu, ch, de,
@@ -590,7 +590,7 @@ def register(mcp, send: Sender) -> dict:
 
     @mcp.tool(annotations=READ_ONLY)
     def get_construction(construction: str = "", custom: dict | None = None, diagram: bool = True) -> dict:
-        """One construction in full: its layers (outside to inside, with conductivity, density, specific heat,
+        """(BETA) One construction in full: its layers (outside to inside, with conductivity, density, specific heat,
         thermal resistance and source), U-value by the EN ISO 6946 procedure, areal heat capacity each side
         (EN ISO 13786 periodic method), finishes; windows: U_g, U_w, g, visible transmittance. custom = an
         inline assembly {"kind": "wall_external", "layers": [{"material": "concrete_2400", "thickness_m": 0.2},
@@ -612,7 +612,7 @@ def register(mcp, send: Sender) -> dict:
 
     @mcp.tool(annotations=READ_ONLY)
     def list_code_packs() -> dict:
-        """Regional code packs for envelope checks: what each contains, whether its values are bundled (licence
+        """(BETA) Regional code packs for envelope checks: what each contains, whether its values are bundled (licence
         recorded) or only its method is implemented, and the attribution to show. Packs: sg_bca (ETTV / RETV /
         RTTV, method; indicative, not a Green Mark assessment), uk_adl_2021 (Approved Document L limiting
         U-values, OGL), de_banz_2020 (German age-band U-values, public domain), eu_hotmaps (EU stock U-values,
@@ -624,7 +624,7 @@ def register(mcp, send: Sender) -> dict:
     def define_room(name: str, guids: list[str], use: str = "living", construction_set: str = "",
                     heating_setpoint_c: float | str | None = None, cooling_setpoint_c: float | str | None = None,
                     height_m: float | None = None, remove: bool = False) -> dict:
-        """Mark Rhino objects as one room (user text almond:room...). guids: a closed volume, several surfaces
+        """(BETA) Mark Rhino objects as one room (user text almond:room...). guids: a closed volume, several surfaces
         that bound the room (roof, walls - the room is the prism over their plan), or a closed planar curve
         with height_m. Rooms need not be enclosed: open pavilions and loggias are assessed with a warning.
         use: living | bedroom | kitchen | bath | circulation | office | classroom | outdoor (sets gains,
@@ -664,7 +664,7 @@ def register(mcp, send: Sender) -> dict:
 
     @mcp.tool(annotations=WRITES)
     def assign_construction(guids: list[str], construction: str) -> dict:
-        """Give Rhino elements (walls, slabs, roofs, windows) a construction from list_constructions (user text
+        """(BETA) Give Rhino elements (walls, slabs, roofs, windows) a construction from list_constructions (user text
         almond:construction). An empty construction removes it. Rooms pick up the construction of each element
         that bounds them; analyses use its U-value, thermal mass, finishes and glazing. Undoable in Rhino."""
         from almond_mcp.environment import constructions as asm
@@ -679,7 +679,7 @@ def register(mcp, send: Sender) -> dict:
 
     @mcp.tool(annotations=READ_ONLY)
     def list_rooms(geometry_guids: list[str] | None = None) -> dict:
-        """The rooms defined in Rhino with their enclosure check: enclosed / semi-open / open, open share of the
+        """(BETA) The rooms defined in Rhino with their enclosure check: enclosed / semi-open / open, open share of the
         sides and top, openings by orientation, and the constructions found on their boundaries. geometry_guids:
         what to export (default every visible object)."""
         from almond_mcp.environment import rooms as rm
@@ -704,7 +704,7 @@ def register(mcp, send: Sender) -> dict:
                       quality: str = "medium", spacing_m: float = 0.5, envelope_pack: str = "",
                       pack_options: dict | None = None, cooling: bool = True, heat_recovery: float = 0.0, label: str = "",
                       point_in_time: dict | None = None, background: bool = False) -> dict:
-        """Analyse the rooms defined in Rhino (define_room) with their constructions (assign_construction).
+        """(BETA) Analyse the rooms defined in Rhino (define_room) with their constructions (assign_construction).
         study: thermal | daylight. Thermal: enclosed and semi-open rooms as coupled ISO 13790 zones (mass from
         the constructions, heat flow between rooms through shared walls and floors, air through openings);
         open rooms as semi-outdoor comfort (MRT with sun on the body, SET*). Rooms without a construction set
@@ -751,7 +751,7 @@ def register(mcp, send: Sender) -> dict:
                        residential: bool = False, dwelling: bool = True, age_band: str = ">=2002",
                        country: str = "de", sector: str = "residential", flat_roof: bool = True,
                        user_tables_path: str = "") -> dict:
-        """Check the envelope of the rooms defined in Rhino against a code pack (list_code_packs). sg_bca: ETTV
+        """(BETA) Check the envelope of the rooms defined in Rhino against a code pack (list_code_packs). sg_bca: ETTV
         (or RETV with residential=True) per facade and overall, with solar correction factors derived from the
         site EPW (epw_path required) and shading from the glazing g-value; user_tables_path = a JSON file of your
         own licensed CF tables to use instead ({"ETTV_walls": {"N": 0.8, ...}}). uk_adl_2021: area-weighted U per
@@ -761,7 +761,6 @@ def register(mcp, send: Sender) -> dict:
         not certification."""
         from almond_mcp.environment import codes, rooms as rm
         try:
-            data = _export(send, list(geometry_guids or []))
             options = {"residential": residential, "dwelling": dwelling, "age_band": age_band, "country": country,
                        "sector": sector, "flat_roof": flat_roof}
             codes.check_options(pack, options)
@@ -783,6 +782,33 @@ def register(mcp, send: Sender) -> dict:
         except INPUT_ERRORS as exc:
             return _bridge_errors(exc)
 
+    @mcp.tool(annotations=WRITES)
+    def place_simulation_tutorial(part: str = "all", origin: list[float] | None = None) -> dict:
+        """(BETA) Place Almond's simulation tutorial model in Rhino: a small annotated scene that shows what each
+        analysis needs before it can run. part: all | environment | structure. environment: an enclosed room
+        (closed volume, tagged as a room, with a construction set), a window (planar glazing surface with a window
+        construction), an open loggia (closed curve + height), a neighbouring block as context, a north arrow, and
+        numbered text dots for room, glazing, open room, context, site (weather file) and how to run. structure:
+        a 6 x 4 m frame (four columns, four beams as line axes) with support points and dots for members,
+        supports, loads and how to run. origin: [x, y, z] in metres; default beside the visible model. Placed on
+        'Almond Tutorial::<Part>' layers; placing a part again replaces it. The weather file is never part of
+        the model: pass one to analyze_rooms. Undoable in Rhino."""
+        from almond_mcp import tutorial
+        try:
+            if origin is not None and (len(origin) != 3 or not all(math.isfinite(float(v)) for v in origin)):
+                return _err("origin must be [x, y, z] in metres")
+            reply = _execute(send, tutorial.script(part, tuple(float(v) for v in origin) if origin else None), 60.0)
+            return {"status": "success", "part": part, "objects": len(reply.get("guids") or []),
+                    "layers": [f"{tutorial.ROOT}::{p.capitalize()}" for p in tutorial.spec(part)],
+                    "rooms": [tutorial.ENV_ROOM, tutorial.ENV_LOGGIA] if part in ("all", "environment") else [],
+                    "requirements": tutorial.requirements(),
+                    "next_step": ("list_rooms, then analyze_rooms(epw_path=..., study='thermal') or "
+                                  "analyze_rooms(epw_path='', study='daylight', daylight_study='daylight_factor')")
+                    if part != "structure" else
+                    "validate_structure on the members and support points on 'Almond Tutorial::Structure'"}
+        except INPUT_ERRORS as exc:
+            return _bridge_errors(exc)
+
     return {"climate_summary": climate_summary, "sun_path": sun_path, "analyze_daylight": analyze_daylight,
             "analyze_solar_radiation": analyze_solar_radiation, "analyze_thermal": analyze_thermal,
             "thermal_comfort": thermal_comfort, "show_environment_result": show_environment_result,
@@ -790,4 +816,4 @@ def register(mcp, send: Sender) -> dict:
             "list_environment_materials": list_environment_materials, "list_constructions": list_constructions,
             "get_construction": get_construction, "list_code_packs": list_code_packs, "define_room": define_room,
             "assign_construction": assign_construction, "list_rooms": list_rooms, "analyze_rooms": analyze_rooms,
-            "check_envelope": check_envelope}
+            "check_envelope": check_envelope, "place_simulation_tutorial": place_simulation_tutorial}

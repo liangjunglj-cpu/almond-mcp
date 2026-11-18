@@ -1,4 +1,8 @@
-# Native frame solver
+# Native frame solver (BETA)
+
+> **(BETA)** This feature is still under test. Its tools, panel workspace and viewport legends are
+> labelled (BETA); results are indicative design-stage checks, not certification or code compliance.
+> Stable-release status: [simulation-stable-readiness.md](simulation-stable-readiness.md).
 
 `validate_structure` analyses line models (beams, columns, trusses, frames) with
 Almond's own 3D frame solver by default. Users no longer need Karamba3D for these;
