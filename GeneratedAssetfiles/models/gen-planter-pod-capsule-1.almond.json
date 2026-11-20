@@ -1,0 +1,340 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-planter-pod-capsule-1",
+  "library_id": "generated_assets",
+  "name": "Planter pod (Y2K glossy bowl planter on a chrome ring base with a stylised round-leaf plant; generated Y2K prop; detailed geometry edition)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-planter-pod-capsule-1.glb",
+  "dimensions_mm": {
+    "width": 703.2,
+    "depth": 773.0,
+    "height": 1100.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "ground",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -351.6,
+        -386.5,
+        0.0
+      ],
+      "max": [
+        351.6,
+        386.5,
+        1100.0
+      ]
+    },
+    "footprint": [
+      [
+        -351.6,
+        -386.5
+      ],
+      [
+        351.6,
+        -386.5
+      ],
+      [
+        351.6,
+        386.5
+      ],
+      [
+        -351.6,
+        386.5
+      ]
+    ],
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "movable"
+  },
+  "materials": [
+    {
+      "material_id": "polycarbonate-opal",
+      "objects": [
+        "gen-planter-pod-capsule-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-planter-pod-capsule-1",
+    "library_id": "generated_assets",
+    "name": "Planter pod (Y2K glossy bowl planter on a chrome ring base with a stylised round-leaf plant; generated Y2K prop; detailed geometry edition)",
+    "category": "site_furniture",
+    "tags": [
+      "planter",
+      "plant",
+      "street furniture",
+      "y2k",
+      "retro-futurist",
+      "sci-fi",
+      "detailed",
+      "meshy",
+      "y2k-twofronts-2026-09"
+    ],
+    "dimensions_mm": {
+      "width": 703.2,
+      "depth": 773.0,
+      "height": 1100.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 703.0,
+      "depth": 773.0,
+      "height": 1100.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "ground",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -351.6,
+          -386.5,
+          0.0
+        ],
+        "max": [
+          351.6,
+          386.5,
+          1100.0
+        ]
+      },
+      "footprint": [
+        [
+          -351.6,
+          -386.5
+        ],
+        [
+          351.6,
+          -386.5
+        ],
+        [
+          351.6,
+          386.5
+        ],
+        [
+          -351.6,
+          386.5
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "movable"
+    },
+    "materials": [
+      {
+        "material_id": "polycarbonate-opal",
+        "objects": [
+          "gen-planter-pod-capsule-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "Y2K futurist planter pod, a glossy white bowl-shaped capsule planter on a chrome ring base with a translucent cyan glass rim, holding a stylised round-leafed plant with glossy pale green leaves and small magenta glowing berries, rounded soft forms, clean single street prop, no text",
+        "mesh_task_id": "01a07476-f3a8-7346-b6de-13758c9b6f10",
+        "mesh_model": "meshy-6",
+        "generated_at": "2026-09-06",
+        "orientation_correction": null,
+        "scale_applied": 2749.893156,
+        "generation_route": "meshy_text_to_3d",
+        "preview_task_id": "01a07473-abad-7565-b9b9-ba3995a65c71",
+        "preview_model": "meshy-6",
+        "captured_generation": {
+          "batch_id": "y2k-twofronts-2026-09",
+          "route": "meshy_text_to_3d",
+          "preview": {
+            "asset_id": "gen-planter-pod-capsule-1",
+            "provider": "meshy",
+            "tool": "meshy_text_to_3d",
+            "submitted_at": "2026-09-06T02:02:06.418Z",
+            "request": {
+              "prompt": "Y2K futurist planter pod, a glossy white bowl-shaped capsule planter on a chrome ring base with a translucent cyan glass rim, holding a stylised round-leafed plant with glossy pale green leaves and small magenta glowing berries, rounded soft forms, clean single street prop, no text",
+              "ai_model": "meshy-6",
+              "target_formats": [
+                "glb",
+                "obj",
+                "fbx"
+              ],
+              "auto_size": true,
+              "origin_at": "bottom",
+              "response_format": "json"
+            },
+            "task_id": "01a07473-abad-7565-b9b9-ba3995a65c71",
+            "status": "SUCCEEDED",
+            "status_basis": "meshy_get_task_status reported SUCCEEDED at 2026-09-06T02:05:09.210Z",
+            "consumed_credits": 20,
+            "provider_model": "meshy-6",
+            "seed": null,
+            "evidence_source": {
+              "pass_records": [
+                "runs/twofronts/meshy/README.md",
+                "ProjectY2K: docs/MESHY_NOTES.md",
+                "ProjectY2K: twofronts/world/place_assets.py"
+              ],
+              "session_records": "Tool calls of Ginkgo Claude Code session b7a7d8b6-56a0-48d3-ac67-77626f9af289 (submissions, results and downloads)",
+              "extracted_at": "2026-11-20T17:30:15+00:00"
+            }
+          },
+          "mesh": {
+            "asset_id": "gen-planter-pod-capsule-1",
+            "provider": "meshy",
+            "tool": "meshy_text_to_3d_refine",
+            "submitted_at": "2026-09-06T02:05:45.589Z",
+            "request": {
+              "preview_task_id": "01a07473-abad-7565-b9b9-ba3995a65c71",
+              "ai_model": "meshy-6",
+              "enable_pbr": true,
+              "texture_prompt": "glossy white bowl planter, mirror chrome ring base, translucent cyan glass rim, glossy pale green round leaves, small magenta glowing berries, clean Y2K finish",
+              "target_formats": [
+                "glb",
+                "obj",
+                "fbx"
+              ],
+              "response_format": "json"
+            },
+            "task_id": "01a07476-f3a8-7346-b6de-13758c9b6f10",
+            "status": "SUCCEEDED",
+            "status_basis": "meshy_get_task_status reported SUCCEEDED at 2026-09-06T02:11:26.210Z",
+            "consumed_credits": 10,
+            "provider_model": "meshy-6",
+            "input_link": "preview_task_id",
+            "output_file": "gen-planter-pod-capsule-1.obj",
+            "output_format": "obj",
+            "output_sha256": "df705be4f1ff3040a8d10838791446aedb30edd28b80b9c6c1e10bb664900cab",
+            "output_file_modified_at": "2026-09-06T02:11:57+00:00",
+            "seed": null,
+            "evidence_source": {
+              "pass_records": [
+                "runs/twofronts/meshy/README.md",
+                "ProjectY2K: docs/MESHY_NOTES.md",
+                "ProjectY2K: twofronts/world/place_assets.py"
+              ],
+              "session_records": "Tool calls of Ginkgo Claude Code session b7a7d8b6-56a0-48d3-ac67-77626f9af289 (submissions, results and downloads)",
+              "extracted_at": "2026-11-20T17:30:15+00:00"
+            },
+            "download": {
+              "tool": "meshy_download_model",
+              "format": "obj",
+              "reported_file_size_bytes": 141084821
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-planter-pod-capsule-1",
+            "source_sha256": "df705be4f1ff3040a8d10838791446aedb30edd28b80b9c6c1e10bb664900cab",
+            "source_triangles": 860409,
+            "target_triangles": 50000,
+            "prepared_sha256": "37835e09f2fe37d64f4edd763dfcb736d9c62b462522d8476ea3e0942db5dd63",
+            "software": "Blender 5.1.2",
+            "source_format": "obj",
+            "source_file": "gen-planter-pod-capsule-1.obj",
+            "method": "Remove provider PBR materials and textures; Import the provider OBJ geometry (Y-up to Z-up, -Z forward; material library and texture maps not loaded) and export GLB; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Remove wire edges, split edges shared by more than two faces and remove zero-area faces (counts in quality.topology_repairs). Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 4.0000000596046445e-08,
+            "quality": {
+              "vertices": 25092,
+              "triangles": 49994,
+              "boundary_edges": 162,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 52,
+              "largest_component_vertices": 23700,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 1,
+              "topology_repairs": {
+                "wire_edges_removed": 2,
+                "nonmanifold_edges_split": 52,
+                "zero_area_faces_removed": 0,
+                "loose_vertices_removed": 0
+              },
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                0.0003728467314294522,
+                1.2510179098056375e-05,
+                3.8817524331546955e-05
+              ]
+            }
+          },
+          "input_image_file": null,
+          "external_reference_status": "Text prompts only: no image was given to any stage.",
+          "external_reference_ids": [],
+          "dimension_basis": "Heights are the target heights at which Project Y2K's Neon Front scene placed each prop (twofronts/world/place_assets.py: planter pod 1.1 m, vending machine 2.4 m, kiosk 2.6 m, holo sign 3.4 m, hover scooter 1.2 m, hover car 1.6 m); Meshy's OBJ units are arbitrary, so each mesh was scaled uniformly to that height and its width and depth measured after scaling. Y2K's later ginkgo_props_v061 pass used 1.9 m for the vending machine and 1.78 m for the scooter. Speculative designs; not a physical survey.",
+          "reference_review": "Reviewed on 2026-11-20: text-to-3D has no input image. The library geometry was checked in its archive preview (640 px) and in untextured front, side, back and three-quarter views (rendered 900 px, viewed at 450 px) The prompt asks for no text or letters. Meshy's texture atlases for this route are fragmented per triangle and are not distributed. No lettering, logos or brand marks in the geometry.",
+          "rights": "Meshy-6 text-to-3D preview and refine on the owner's Meshy account on 2026-09-06 (the same account, by the account ID in the result URLs, as the library's other Meshy batches). This was the account's first recorded use (MESHY_NOTES: balance 3,320 credits, no prior tasks). Whether the account was on a paid plan on 2026-09-06 is unknown: neither MESHY_NOTES, the Ginkgo README nor session b7a7d8b6 records the plan, and paid status is not asserted here; the owner should confirm it. Text prompts only. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-20 (\"increase the range of models, from the ones i used for my project y2k games, (except for the operatives and bosses)\"). Provider textures are not distributed.",
+          "origin": {
+            "project": "Project Y2K ('Two Fronts'), the owner's game project (private); generated from a Ginkgo session",
+            "pass": "runs/twofronts",
+            "source_name": "planter",
+            "records": [
+              "runs/twofronts/meshy/README.md and ProjectY2K docs/MESHY_NOTES.md (task ledger, rounds 1 and 2)",
+              "ProjectY2K: twofronts/world/place_assets.py (scene target heights)",
+              "ProjectY2K: twofronts/meshy/models/<prop>/model.obj (byte-identical to the Ginkgo downloads, SHA-256 checked 2026-11-20)",
+              "Claude Code session transcript b7a7d8b6-56a0-48d3-ac67-77626f9af289 (the tool calls that submitted the previews and refines and downloaded the OBJs)"
+            ]
+          }
+        }
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "landscape",
+        "streetscape"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.0,
+      "triangle_count": 49994,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "C46F1622751D7236EA66293CC4CFD618D6C8106AE24DD0A88E1713119C8166EB"
+}

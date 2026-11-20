@@ -688,6 +688,486 @@
       "material_names": [
         "ALMOND::ceramic-teal"
       ]
+    },
+    {
+      "asset_id": "gen-fishing-boat-coastal-a-1",
+      "model_sha256": "9c0a0dbea9f144253a4fae38bb706dea4e0e0a576f42524e31826e58868c6fd1",
+      "preview_sha256": "9f719ea9b32b06a23b8bfc2116a14d7b8b4960d5323c863b16ccda70ec41ec64",
+      "material_names": [
+        "ALMOND::plaster-white"
+      ]
+    },
+    {
+      "asset_id": "gen-fishing-boat-coastal-b-1",
+      "model_sha256": "929fdbb154c56f48ff6fab0dfd076ca2227c7c961fc0b656d1b427228deb5cac",
+      "preview_sha256": "36adb799e24729c2d8e2384baa197ef3847b5eba69b658015f523d006a829cf3",
+      "material_names": [
+        "ALMOND::plaster-white"
+      ]
+    },
+    {
+      "asset_id": "gen-fishing-boat-wheelhouse-1",
+      "model_sha256": "40ef07a1a76c372cc012b573da7c6eadfeb171b0da3f2c077e6dacd8bf4faf41",
+      "preview_sha256": "fe2c33fc034e40f67713052809a78fa453b4f5a49420483487677387c847c1f2",
+      "material_names": [
+        "ALMOND::plaster-white"
+      ]
+    },
+    {
+      "asset_id": "gen-fishing-trawler-offshore-1",
+      "model_sha256": "eaa61bca3814628ba834fa0d6edb4a947dc41b8aacd7fb93d93e3bb660d07d95",
+      "preview_sha256": "dff03a098729f66f02995c0c2255093cddc891a2b192c014686ccfb79c65c2b1",
+      "material_names": [
+        "ALMOND::plaster-white"
+      ]
+    },
+    {
+      "asset_id": "gen-work-boat-tarp-1",
+      "model_sha256": "120bef5687a68d4c40fddf96d58c23b0e50469299475dad76f92611a84096ffc",
+      "preview_sha256": "020086778694ab5d40bfafb64cccc3a93d45e7ebd623a6c462118951a47b8188",
+      "material_names": [
+        "ALMOND::wood-walnut"
+      ]
+    },
+    {
+      "asset_id": "gen-cardboard-box-stack-1",
+      "model_sha256": "dd992cbdace3eee02a5e4a1562626023fbfb6eaf07d41fecddfec586922ab43e",
+      "preview_sha256": "d5ea2c0bf35f87d52531704af58db4a74211e9d73975d667c1ca14df72b92c42",
+      "material_names": [
+        "ALMOND::wood-oak"
+      ]
+    },
+    {
+      "asset_id": "gen-ivy-clump-1",
+      "model_sha256": "360f16367360105f1e3cf780a07581060c84a40e429f8c821613659d399cd7b0",
+      "preview_sha256": "6a8c4846986aec952d50c528a190a7871df989305afafdd3eb730a36ef3dceed",
+      "material_names": [
+        "ALMOND::foliage-pine"
+      ]
+    },
+    {
+      "asset_id": "gen-refuse-bag-heap-1",
+      "model_sha256": "7ecc5a38738dde4ba60330f29db8ab79d9c1533b3ff556c55d18d3aa74979116",
+      "preview_sha256": "fca8174e752386444b8f60d2d8254f84f59bd9d497fab4627cc22a67b73aedc9",
+      "material_names": [
+        "ALMOND::rubber-black"
+      ]
+    },
+    {
+      "asset_id": "gen-rubble-pile-1",
+      "model_sha256": "241e28a8ea571f00b91f03073bc0fb51af37f743b470faf9f965905e55c7ec1d",
+      "preview_sha256": "325daac582ae5aec18a0ac177ea8ea52388c1f8ffb29c2a7ee9172a3aa0a3e61",
+      "material_names": [
+        "ALMOND::brick-red"
+      ]
+    },
+    {
+      "asset_id": "gen-tree-broadleaf-green-1",
+      "model_sha256": "fc815781681cb6f5181dea977e0ee3cc4f0f210f7f74fc1e40d37035a54042f1",
+      "preview_sha256": "6cbc027d34b92e09989949caff2a83f4dd10b287c4b18ae11f57760865332fd3",
+      "material_names": [
+        "ALMOND::foliage-pine"
+      ]
+    },
+    {
+      "asset_id": "gen-tree-maple-red-1",
+      "model_sha256": "0eeb52c05d739379406fb9636463082471318369f8f5fffc12be2b20dab80fe8",
+      "preview_sha256": "74d280f3691989883d60bd766251c66dc7dac7068ea2ed0b173f1fc4c913fb22",
+      "material_names": [
+        "ALMOND::foliage-pine"
+      ]
+    },
+    {
+      "asset_id": "gen-holo-sign-pod-1",
+      "model_sha256": "4853650371c91e1b78a1050c3eaf5bd4e8a94de3919909c657257ccda05f26f5",
+      "preview_sha256": "cd7b228d997c57173fb0e19cd74bf944e0588cd8623e45d75bf137fcaced3607",
+      "material_names": [
+        "ALMOND::aluminium-anodized"
+      ]
+    },
+    {
+      "asset_id": "gen-hover-car-bubble-1",
+      "model_sha256": "0ee186f3eab9b2fdac21c277858862407a9b4982008befba585c7b283a97d7cd",
+      "preview_sha256": "2e3264d0b2660be4672c144d0f530cc66ebcbc35d91c4314f21229b3f0e3a366",
+      "material_names": [
+        "ALMOND::polycarbonate-opal"
+      ]
+    },
+    {
+      "asset_id": "gen-hover-scooter-1",
+      "model_sha256": "9e32af67c3d76fdccfc5b0e14e13ca878c8a7fcda97cc881a7c7a5fe00c9ab95",
+      "preview_sha256": "c144561d824b588c38ac5332d5bdc83883f4a40ee98e86b246ec92cf064c91d7",
+      "material_names": [
+        "ALMOND::polycarbonate-opal"
+      ]
+    },
+    {
+      "asset_id": "gen-kiosk-pod-1",
+      "model_sha256": "176ca76e4ae6bcbaa6acf67128e86099ad251f46df625e5b99d8c0b10b287443",
+      "preview_sha256": "188861a846c9bee692373500950e053af689ad2ff1d2ceec7e7d000215cb4ee6",
+      "material_names": [
+        "ALMOND::polycarbonate-opal"
+      ]
+    },
+    {
+      "asset_id": "gen-planter-pod-capsule-1",
+      "model_sha256": "c46f1622751d7236ea66293cc4cfd618d6c8106ae24dd0a88e1713119c8166eb",
+      "preview_sha256": "8f691be91c95db0835f628ee70a222644473844295fa4a33c67a16be48cccb29",
+      "material_names": [
+        "ALMOND::polycarbonate-opal"
+      ]
+    },
+    {
+      "asset_id": "gen-vending-machine-capsule-1",
+      "model_sha256": "995a43df94d39678bf887a8b90022d406bf92250aae7edbf0a64c0a7a212d7d8",
+      "preview_sha256": "370e505861e7a379671bc46fef1bd9e420f314692da949e9d5339d5d6b37dc48",
+      "material_names": [
+        "ALMOND::polycarbonate-opal"
+      ]
+    },
+    {
+      "asset_id": "gen-lounge-chair-inflatable-cushion-1",
+      "model_sha256": "0f934e4e0526c430daf9cb21388ed76f801c2cd426fbe9a19666f0654b2a5aee",
+      "preview_sha256": "9ad04822c193c3c25b2f1883d52a50428c836fcc430747a85ec177f66cf49717",
+      "material_names": [
+        "ALMOND::fabric-linen"
+      ]
+    },
+    {
+      "asset_id": "gen-pressure-canister-1",
+      "model_sha256": "a59e674595b5713fee9ea10c40f87fd7c17d0d230d4e06e64ba3f2b9276b2c0e",
+      "preview_sha256": "df8a49dba5ac8ea2ee2b5301faadd20f1918982d29ac423f8d24be53de06c217",
+      "material_names": [
+        "ALMOND::steel-galvanized"
+      ]
+    },
+    {
+      "asset_id": "gen-water-bladder-strapped-1",
+      "model_sha256": "d401b02eb264a8360bd1c2d85ca49aa106347ba4520b8de957b6037debf9ec52",
+      "preview_sha256": "dbdd67d61fc86807a53a001c4ae04eb1a4a50e84c62aab61e74c437f4225eef6",
+      "material_names": [
+        "ALMOND::polycarbonate-opal"
+      ]
+    },
+    {
+      "asset_id": "gen-statue-plaster-togate-1",
+      "model_sha256": "dee270d18e397de1d25650c77ffe8b58d2964a265fe803b6a76a2831f018f508",
+      "preview_sha256": "f71f915dc46ece725faad512cdc09255d8d0074cca6a36c935a4ce42531002b9",
+      "material_names": [
+        "ALMOND::plaster-white"
+      ]
+    },
+    {
+      "asset_id": "gen-dress-form-mannequin-1",
+      "model_sha256": "6fd80fdee60407d2e5fc87033231bf2dcaca47cfbfcf6d1c3c39f1f9e8db29b9",
+      "preview_sha256": "fd77a7e08d590fbd69e5ae39a4794023337662a04b88581e452d407191d8385d",
+      "material_names": [
+        "ALMOND::fabric-linen"
+      ]
+    },
+    {
+      "asset_id": "gen-capsule-tram-overgrown-1",
+      "model_sha256": "ab7450c2e6468034a1d0e03848d945f769186d89c6d71c5145f23076319ec7ef",
+      "preview_sha256": "eb58b1ba3bf54da1870ca58cbc74452b415378d461eff4fdd16169fa6b535b34",
+      "material_names": [
+        "ALMOND::plaster-white"
+      ]
+    },
+    {
+      "asset_id": "gen-drone-launcher-vehicle-1",
+      "model_sha256": "67dd7142ec9701cb3c5513d696801210003b4013cd66704e4221a4af9c78658e",
+      "preview_sha256": "879a61ead9702fa0735b3f40b9c99adf4d2db9a60894664416e21af0bd7ca62b",
+      "material_names": [
+        "ALMOND::ceramic-teal"
+      ]
+    },
+    {
+      "asset_id": "gen-drone-quadcopter-1",
+      "model_sha256": "c0ff93bb23955fa316b5fbf28f66a64140f53740fa543d6fac8e86ed4a721b16",
+      "preview_sha256": "b66b22e1daa797f0e0827299085e799bae94cf2a0eae337ec81542a37ea4c169",
+      "material_names": [
+        "ALMOND::ceramic-teal"
+      ]
+    },
+    {
+      "asset_id": "gen-flower-clump-magenta-1",
+      "model_sha256": "b98b1f45a6406942eb2827afce12b9388a90ffecdae57948ac06dbb9685c324f",
+      "preview_sha256": "acc64ea2ff854c1f8e70d60ed64d70285f1c15823af0e11ea340bf905688174a",
+      "material_names": [
+        "ALMOND::foliage-pine"
+      ]
+    },
+    {
+      "asset_id": "gen-planter-box-galvanised-1",
+      "model_sha256": "039492ed45f01132033aad603c7d6b56a758d03aeca9caa43a4eddbebce40210",
+      "preview_sha256": "f1e58acc78f1657009ac983e182e67430fc0e9a8ae26aff4e0dffbb92f81ce4e",
+      "material_names": [
+        "ALMOND::steel-galvanized"
+      ]
+    },
+    {
+      "asset_id": "gen-rover-six-wheel-1",
+      "model_sha256": "69edba8ebbfab608b0af0236ed8c6b9ff7a289a789fedb554bd36571aab7e955",
+      "preview_sha256": "7c3494aa68a3c81ef556a68295c0f51721ec2ff8e7776550ef0cd6b3cee7d251",
+      "material_names": [
+        "ALMOND::plaster-white"
+      ]
+    },
+    {
+      "asset_id": "gen-shuttle-craft-1",
+      "model_sha256": "b2a91654adea31b5dc523fb813fe539b2ac284c9c8b9209da1117d75eebedaa9",
+      "preview_sha256": "af83b2ad3be89b15c51812c3fd36fdba5173dd90fcc2d068712c269a997b4354",
+      "material_names": [
+        "ALMOND::steel-painted-charcoal"
+      ]
+    },
+    {
+      "asset_id": "gen-water-tanks-rooftop-pair-1",
+      "model_sha256": "903b7c42a31f84cfc6f5396399ca4bb6707e025157a3dc4dd0f1e93d9a0fd1f4",
+      "preview_sha256": "12785a2796a04a7a1e5ab5a2ee139ca36e036dd3bbdd81bd5a227bf9c744930b",
+      "material_names": [
+        "ALMOND::steel-galvanized"
+      ]
+    },
+    {
+      "asset_id": "gen-bench-street-slab-1",
+      "model_sha256": "2bbc50ff1fe5053e8dcd39c747242b5cea1513950a314a986671e8cdb17af942",
+      "preview_sha256": "61a1c95b20cec653ecf842d232432cd084211b0cc44709aa74deba486e4e5856",
+      "material_names": [
+        "ALMOND::concrete-smooth"
+      ]
+    },
+    {
+      "asset_id": "gen-gateway-arch-street-1",
+      "model_sha256": "421b749d1b178b5f531724cb37b3d91a0457da933473963a60ddcbf6f71b01da",
+      "preview_sha256": "4f3b33b10aaa0d58f5abd5e47104187b03862fdebd6c964bbd56998fd7f7ac2a",
+      "material_names": [
+        "ALMOND::concrete-smooth"
+      ]
+    },
+    {
+      "asset_id": "gen-info-kiosk-capsule-1",
+      "model_sha256": "8d2778169ef34d8664acab3720f00aab7237b6e479bc6220758ca3b165bc0ef9",
+      "preview_sha256": "2005e5b990f0a7c42eff9adb59a105282a643b082159927bda68954dc8d9fe43",
+      "material_names": [
+        "ALMOND::plaster-white"
+      ]
+    },
+    {
+      "asset_id": "gen-planter-sculpted-shrubs-1",
+      "model_sha256": "80e8abe337091cb51eacb6ab62d4a7eb7859239069a95f831750f76060625463",
+      "preview_sha256": "983a2985dac51a18ed083371a3ef8a9610713c4cc430cffe7b2f5110b93fc17f",
+      "material_names": [
+        "ALMOND::concrete-smooth"
+      ]
+    },
+    {
+      "asset_id": "gen-street-lamp-wayfinding-1",
+      "model_sha256": "8db84488637d87a85adbc9d607c3d11f6237059d816090600a7fd39df29ee6cd",
+      "preview_sha256": "e8c558f4724bb83aa1be5023ef5a81af47f7b168dabf74140b1a19447ae14fb3",
+      "material_names": [
+        "ALMOND::aluminium-anodized"
+      ]
+    },
+    {
+      "asset_id": "gen-air-handler-1",
+      "model_sha256": "da7f6e2624f61f74d8088a74833c4417ff66bffc889c51a686471d0b5090cb3f",
+      "preview_sha256": "b77135be190671f7a91df9e058e8680f57f979afe41904468ac261ba1023cd0d",
+      "material_names": [
+        "ALMOND::steel-galvanized"
+      ]
+    },
+    {
+      "asset_id": "gen-antenna-mast-beacon-1",
+      "model_sha256": "730a9765adfb6554ef44b4cf9303dd3907782b7f2590adec3763b53b40d66007",
+      "preview_sha256": "197dce8fc05ffd5ea0b5e3f6a82de333c76acf3930be1e8f1dc61b871fbc7527",
+      "material_names": [
+        "ALMOND::steel-galvanized"
+      ]
+    },
+    {
+      "asset_id": "gen-barrel-steel-1",
+      "model_sha256": "11408fb5a772ccefc0bb3a8dc4d025c3f8f5496398b161953f05ab525e4a5149",
+      "preview_sha256": "aadc711bb943cc8c74635f89ee3e929d964a27dedb0a54216739ca568d54ad91",
+      "material_names": [
+        "ALMOND::steel-painted-vermilion"
+      ]
+    },
+    {
+      "asset_id": "gen-bollard-banded-1",
+      "model_sha256": "6c1b2028884017579d8385a2efdcb54d7a12c32bba8ab6caff4a1f8056184c78",
+      "preview_sha256": "4509cf7c93ee13b9e0251334c897574cdfcb4b3eee514f3f4ae274c3ee8c11f9",
+      "material_names": [
+        "ALMOND::steel-painted-charcoal"
+      ]
+    },
+    {
+      "asset_id": "gen-crate-stack-banded-1",
+      "model_sha256": "1f68e45a67ff0bbb546df2faa3ae8d954c2ff131d38144268ca213ba10431d50",
+      "preview_sha256": "872f2f713face56803a16110f14483dc0f309b5b8ca055b21262cbbbeeec205c",
+      "material_names": [
+        "ALMOND::wood-oak"
+      ]
+    },
+    {
+      "asset_id": "gen-fence-panel-mesh-1",
+      "model_sha256": "59b257c6f207dfb91d1681308dc5f39922bfe7e94aa8fd499cddeefc2788007b",
+      "preview_sha256": "4bfc969378cafd44c445117a5cd9a3af3d50339000de97aa1889602c0c06cb4d",
+      "material_names": [
+        "ALMOND::steel-mesh"
+      ]
+    },
+    {
+      "asset_id": "gen-floodlight-mast-1",
+      "model_sha256": "746bd5b1e27af9603110ec64e2cd18c37fffb4e0f06f94acf3e2669f2f99d4ca",
+      "preview_sha256": "aa6826701f49081ad81158c884963cfda87c7584dd4ca84cf3122206b5c9c7d3",
+      "material_names": [
+        "ALMOND::steel-galvanized"
+      ]
+    },
+    {
+      "asset_id": "gen-market-stall-awning-1",
+      "model_sha256": "7c640ff0558efc010ce208a1b8825377f8771387745365648e0b13beb7e311c5",
+      "preview_sha256": "b5e96c700f197ac508724692886f1bfec3551d2984edd3e23e590ac0f93ef1a4",
+      "material_names": [
+        "ALMOND::fabric-linen"
+      ]
+    },
+    {
+      "asset_id": "gen-market-stall-counter-1",
+      "model_sha256": "65bb6c36093b4ab661ecc845ec10b242b8d592601249f9c692bb21bb7daed5d1",
+      "preview_sha256": "6d5a5901b76b087037f6a58aaed9fa75357f2a9eac081ba5dfe31c0dd54fed4a",
+      "material_names": [
+        "ALMOND::steel-painted-sage"
+      ]
+    },
+    {
+      "asset_id": "gen-pipe-run-stands-1",
+      "model_sha256": "574dd84628691d1190205fc8ecf7fa41c032f44281b039eca9db8a05057b3716",
+      "preview_sha256": "c0186a337a817de21a1ec892e843660c597d119ffb12a84dd2c357ed8ad21c83",
+      "material_names": [
+        "ALMOND::steel-galvanized"
+      ]
+    },
+    {
+      "asset_id": "gen-produce-bin-1",
+      "model_sha256": "b216b2fea8dff9e7b3ee9b51b9a69bc92802ed2d0ac19fc8a4d8db0af493749a",
+      "preview_sha256": "9380dd4c92ef353b3fda7f41760ffa23c3a9ba598c11e708a15a850480bf59e1",
+      "material_names": [
+        "ALMOND::steel-galvanized"
+      ]
+    },
+    {
+      "asset_id": "gen-shipping-container-1",
+      "model_sha256": "927d8cf52bc49a80c2c24f18f2f49e1599cedd55103876800d4958d649fa3fa3",
+      "preview_sha256": "4e90a5e39b912a5268ecceeae39bfa8dccd1b0f1a752d59e1f270be52c30f36d",
+      "material_names": [
+        "ALMOND::metal-corrugated"
+      ]
+    },
+    {
+      "asset_id": "gen-shipping-container-open-1",
+      "model_sha256": "62a50df25d067fa794b9f747c3293d976699ecab1b1d26b29f2dc25855c593b1",
+      "preview_sha256": "7de78b86403d8047217333bab04a465b91cafe2568f99b92e3f1f8a51ad9d668",
+      "material_names": [
+        "ALMOND::metal-corrugated"
+      ]
+    },
+    {
+      "asset_id": "gen-sign-mast-lit-1",
+      "model_sha256": "8aab03a9331693c48b40a45023212ab340e9d07c2614d7ebe249417bc2c74f64",
+      "preview_sha256": "35bb451caa6bb58cf57a8695581f6a55232f5197e8acb97e4e6e454a8d1e0cef",
+      "material_names": [
+        "ALMOND::steel-painted-charcoal"
+      ]
+    },
+    {
+      "asset_id": "gen-ac-unit-wall-stack-1",
+      "model_sha256": "658b067284ad0717058d6582e94b1d27b0eb56e680afcb3a92b2d9daaa2dddaf",
+      "preview_sha256": "9f163a37ab5c2026813b959d089b04b0c89a6430e82bf63543382cef493cdf4a",
+      "material_names": [
+        "ALMOND::steel-galvanized"
+      ]
+    },
+    {
+      "asset_id": "gen-antenna-cluster-roof-1",
+      "model_sha256": "00176d2236616771dcc44a0441198566500365a43ccc92e8365e678136807b70",
+      "preview_sha256": "589fbec0bbaad83f741b5dbe7791dae7752bf8e16652f9998051d8ab32ac2ded",
+      "material_names": [
+        "ALMOND::aluminium-anodized"
+      ]
+    },
+    {
+      "asset_id": "gen-pipe-bundle-vertical-1",
+      "model_sha256": "e3a140d38b8c661578b15262a13504282585120ad350313ed4e4a10c94dc0eb7",
+      "preview_sha256": "78c1cef1b3bbf3d2d42ada30ad077e843bb540caab583049ce7b2a3b373a87ad",
+      "material_names": [
+        "ALMOND::steel-galvanized"
+      ]
+    },
+    {
+      "asset_id": "gen-satellite-dish-1",
+      "model_sha256": "af8906dbd01accbb969837ab0d76cf8ef7d5eee972489d20a32fb0238f638fd5",
+      "preview_sha256": "1cbbb129e38403adc81733c31eafb53a62df3d72aaf2fb67e57c00fb553c7c82",
+      "material_names": [
+        "ALMOND::aluminium-anodized"
+      ]
+    },
+    {
+      "asset_id": "gen-scaffold-bay-1",
+      "model_sha256": "76e2a35ac8e0739f936bbcf3e6cfd8ed886bced924840df7b51d5f4e5267d0c3",
+      "preview_sha256": "49970e7ea80a406e8550cd0551bf0ebb32162e9e78be92ec44093030e4acebdd",
+      "material_names": [
+        "ALMOND::steel-galvanized"
+      ]
+    },
+    {
+      "asset_id": "gen-commuter-railcar-lead-1",
+      "model_sha256": "f7923a3513126a60c9b6f3d03ed9808c0d35f734189739299079be0b7b76713e",
+      "preview_sha256": "e7b351e4f3f2c2608613f97aa71e238e8e4062164a53faa8ec180665c1f6395f",
+      "material_names": [
+        "ALMOND::plaster-white"
+      ]
+    },
+    {
+      "asset_id": "gen-commuter-railcar-mid-1",
+      "model_sha256": "2d2920937f5ce2bf591eb1024412f76974abfd85c9a48dacdc8d4fd64e15fc7a",
+      "preview_sha256": "290f956450a6825c3ac2f5d69d9746f9d122d9d0e7eaf094f89f1e34de3ee0ab",
+      "material_names": [
+        "ALMOND::plaster-white"
+      ]
+    },
+    {
+      "asset_id": "gen-shrine-lantern-1",
+      "model_sha256": "7dca24e3af6a4d841df26bac159246d978115f3477b56b9634eb4bfbcf83d0de",
+      "preview_sha256": "112c6fcb2a85809fffddda5765468271011b54f5a1a9b0232707884df0133d81",
+      "material_names": [
+        "ALMOND::steel-painted-vermilion"
+      ]
+    },
+    {
+      "asset_id": "gen-utility-pole-1",
+      "model_sha256": "9c7ec74754bd071c68adc7bdd35b89cc7323c26b8e81a7b22911adc3b7ad372c",
+      "preview_sha256": "8163d904d97958d6a442427bfcfaaaa13b36d813d64e255af7e77c9f0e09785c",
+      "material_names": [
+        "ALMOND::concrete-smooth"
+      ]
+    },
+    {
+      "asset_id": "gen-vending-row-1",
+      "model_sha256": "c183cc83a3c59d39f635a97fbf872167e7ba399e0740aa3d8530451badaac976",
+      "preview_sha256": "be70ce68b08555d8396c61922dede193dfb979b03f541f05370ca74956ae5803",
+      "material_names": [
+        "ALMOND::steel-painted-vermilion"
+      ]
+    },
+    {
+      "asset_id": "gen-wall-ac-rig-1",
+      "model_sha256": "5ff4b22485132ced370adb90bb20e3d7d10cf64cc061131ea8407b3d384f2359",
+      "preview_sha256": "8a071f160b6ca874628e269d5e89289b83316d8a661d63019b67a7e5265e4d0e",
+      "material_names": [
+        "ALMOND::steel-galvanized"
+      ]
     }
   ],
   "additional_batches": [
@@ -752,6 +1232,330 @@
         "gen-table-lamp-pleated-1",
         "gen-washing-machine-front-1",
         "gen-water-heater-tankless-1"
+      ]
+    },
+    {
+      "schema_version": 1,
+      "created_at": "2026-11-20T17:02:34.207980+00:00",
+      "renderer": "Blender 5.1.2",
+      "engine": "BLENDER_WORKBENCH",
+      "script": "tools/render_generated_previews.py",
+      "script_sha256_lf": "0d7a86154a5cf8143512eaead6085ff5f6c4635bb511362b543fc665a730e058",
+      "colour_mode": "embedded_material_base_colour",
+      "transparent_background": true,
+      "resolution": [
+        640,
+        640
+      ],
+      "view_transform": "Standard",
+      "look": "None",
+      "studio_light": "paint.sl",
+      "studio_light_intensity": 1.0,
+      "notes": "Preview-only derivation from the unchanged GLBs. Studio shading of assigned material colours; not photographic textures or a full PBR render.",
+      "batch_id": "ginkgo-daxi-2026-11",
+      "asset_ids": [
+        "gen-fishing-boat-coastal-a-1",
+        "gen-fishing-boat-coastal-b-1",
+        "gen-fishing-boat-wheelhouse-1",
+        "gen-fishing-trawler-offshore-1",
+        "gen-work-boat-tarp-1"
+      ]
+    },
+    {
+      "schema_version": 1,
+      "created_at": "2026-11-20T17:42:36.074015+00:00",
+      "renderer": "Blender 5.1.2",
+      "engine": "BLENDER_WORKBENCH",
+      "script": "tools/render_generated_previews.py",
+      "script_sha256_lf": "0d7a86154a5cf8143512eaead6085ff5f6c4635bb511362b543fc665a730e058",
+      "colour_mode": "embedded_material_base_colour",
+      "transparent_background": true,
+      "resolution": [
+        640,
+        640
+      ],
+      "view_transform": "Standard",
+      "look": "None",
+      "studio_light": "paint.sl",
+      "studio_light_intensity": 1.0,
+      "notes": "Preview-only derivation from the unchanged GLBs. Studio shading of assigned material colours; not photographic textures or a full PBR render.",
+      "batch_id": "y2k-props-v038",
+      "asset_ids": [
+        "gen-cardboard-box-stack-1",
+        "gen-ivy-clump-1",
+        "gen-refuse-bag-heap-1",
+        "gen-rubble-pile-1"
+      ]
+    },
+    {
+      "schema_version": 1,
+      "created_at": "2026-11-20T17:42:47.461957+00:00",
+      "renderer": "Blender 5.1.2",
+      "engine": "BLENDER_WORKBENCH",
+      "script": "tools/render_generated_previews.py",
+      "script_sha256_lf": "0d7a86154a5cf8143512eaead6085ff5f6c4635bb511362b543fc665a730e058",
+      "colour_mode": "embedded_material_base_colour",
+      "transparent_background": true,
+      "resolution": [
+        640,
+        640
+      ],
+      "view_transform": "Standard",
+      "look": "None",
+      "studio_light": "paint.sl",
+      "studio_light_intensity": 1.0,
+      "notes": "Preview-only derivation from the unchanged GLBs. Studio shading of assigned material colours; not photographic textures or a full PBR render.",
+      "batch_id": "y2k-trees-refset-0923b",
+      "asset_ids": [
+        "gen-tree-broadleaf-green-1",
+        "gen-tree-maple-red-1"
+      ]
+    },
+    {
+      "schema_version": 1,
+      "created_at": "2026-11-20T17:43:04.302251+00:00",
+      "renderer": "Blender 5.1.2",
+      "engine": "BLENDER_WORKBENCH",
+      "script": "tools/render_generated_previews.py",
+      "script_sha256_lf": "0d7a86154a5cf8143512eaead6085ff5f6c4635bb511362b543fc665a730e058",
+      "colour_mode": "embedded_material_base_colour",
+      "transparent_background": true,
+      "resolution": [
+        640,
+        640
+      ],
+      "view_transform": "Standard",
+      "look": "None",
+      "studio_light": "paint.sl",
+      "studio_light_intensity": 1.0,
+      "notes": "Preview-only derivation from the unchanged GLBs. Studio shading of assigned material colours; not photographic textures or a full PBR render.",
+      "batch_id": "y2k-twofronts-2026-09",
+      "asset_ids": [
+        "gen-holo-sign-pod-1",
+        "gen-hover-car-bubble-1",
+        "gen-hover-scooter-1",
+        "gen-kiosk-pod-1",
+        "gen-planter-pod-capsule-1",
+        "gen-vending-machine-capsule-1"
+      ]
+    },
+    {
+      "schema_version": 1,
+      "created_at": "2026-11-20T18:01:06.999077+00:00",
+      "renderer": "Blender 5.1.2",
+      "engine": "BLENDER_WORKBENCH",
+      "script": "tools/render_generated_previews.py",
+      "script_sha256_lf": "0d7a86154a5cf8143512eaead6085ff5f6c4635bb511362b543fc665a730e058",
+      "colour_mode": "embedded_material_base_colour",
+      "transparent_background": true,
+      "resolution": [
+        640,
+        640
+      ],
+      "view_transform": "Standard",
+      "look": "None",
+      "studio_light": "paint.sl",
+      "studio_light_intensity": 1.0,
+      "notes": "Preview-only derivation from the unchanged GLBs. Studio shading of assigned material colours; not photographic textures or a full PBR render.",
+      "batch_id": "ginkgo-refset-1003",
+      "asset_ids": [
+        "gen-lounge-chair-inflatable-cushion-1",
+        "gen-pressure-canister-1",
+        "gen-water-bladder-strapped-1"
+      ]
+    },
+    {
+      "schema_version": 1,
+      "created_at": "2026-11-20T18:01:18.116479+00:00",
+      "renderer": "Blender 5.1.2",
+      "engine": "BLENDER_WORKBENCH",
+      "script": "tools/render_generated_previews.py",
+      "script_sha256_lf": "0d7a86154a5cf8143512eaead6085ff5f6c4635bb511362b543fc665a730e058",
+      "colour_mode": "embedded_material_base_colour",
+      "transparent_background": true,
+      "resolution": [
+        640,
+        640
+      ],
+      "view_transform": "Standard",
+      "look": "None",
+      "studio_light": "paint.sl",
+      "studio_light_intensity": 1.0,
+      "notes": "Preview-only derivation from the unchanged GLBs. Studio shading of assigned material colours; not photographic textures or a full PBR render.",
+      "batch_id": "ginkgo-refset-0924",
+      "asset_ids": [
+        "gen-statue-plaster-togate-1"
+      ]
+    },
+    {
+      "schema_version": 1,
+      "created_at": "2026-11-20T18:01:27.513008+00:00",
+      "renderer": "Blender 5.1.2",
+      "engine": "BLENDER_WORKBENCH",
+      "script": "tools/render_generated_previews.py",
+      "script_sha256_lf": "0d7a86154a5cf8143512eaead6085ff5f6c4635bb511362b543fc665a730e058",
+      "colour_mode": "embedded_material_base_colour",
+      "transparent_background": true,
+      "resolution": [
+        640,
+        640
+      ],
+      "view_transform": "Standard",
+      "look": "None",
+      "studio_light": "paint.sl",
+      "studio_light_intensity": 1.0,
+      "notes": "Preview-only derivation from the unchanged GLBs. Studio shading of assigned material colours; not photographic textures or a full PBR render.",
+      "batch_id": "ginkgo-lausanne-market",
+      "asset_ids": [
+        "gen-dress-form-mannequin-1"
+      ]
+    },
+    {
+      "schema_version": 1,
+      "created_at": "2026-11-20T18:31:02.834100+00:00",
+      "renderer": "Blender 5.1.2",
+      "engine": "BLENDER_WORKBENCH",
+      "script": "tools/render_generated_previews.py",
+      "script_sha256_lf": "0d7a86154a5cf8143512eaead6085ff5f6c4635bb511362b543fc665a730e058",
+      "colour_mode": "embedded_material_base_colour",
+      "transparent_background": true,
+      "resolution": [
+        640,
+        640
+      ],
+      "view_transform": "Standard",
+      "look": "None",
+      "studio_light": "paint.sl",
+      "studio_light_intensity": 1.0,
+      "notes": "Preview-only derivation from the unchanged GLBs. Studio shading of assigned material colours; not photographic textures or a full PBR render.",
+      "batch_id": "ginkgo-refset-1007",
+      "asset_ids": [
+        "gen-capsule-tram-overgrown-1",
+        "gen-drone-launcher-vehicle-1",
+        "gen-drone-quadcopter-1",
+        "gen-flower-clump-magenta-1",
+        "gen-planter-box-galvanised-1",
+        "gen-rover-six-wheel-1",
+        "gen-shuttle-craft-1",
+        "gen-water-tanks-rooftop-pair-1"
+      ]
+    },
+    {
+      "schema_version": 1,
+      "created_at": "2026-11-20T19:00:57.771550+00:00",
+      "renderer": "Blender 5.1.2",
+      "engine": "BLENDER_WORKBENCH",
+      "script": "tools/render_generated_previews.py",
+      "script_sha256_lf": "0d7a86154a5cf8143512eaead6085ff5f6c4635bb511362b543fc665a730e058",
+      "colour_mode": "embedded_material_base_colour",
+      "transparent_background": true,
+      "resolution": [
+        640,
+        640
+      ],
+      "view_transform": "Standard",
+      "look": "None",
+      "studio_light": "paint.sl",
+      "studio_light_intensity": 1.0,
+      "notes": "Preview-only derivation from the unchanged GLBs. Studio shading of assigned material colours; not photographic textures or a full PBR render.",
+      "batch_id": "y2k-street-kit-v004",
+      "asset_ids": [
+        "gen-bench-street-slab-1",
+        "gen-gateway-arch-street-1",
+        "gen-info-kiosk-capsule-1",
+        "gen-planter-sculpted-shrubs-1",
+        "gen-street-lamp-wayfinding-1"
+      ]
+    },
+    {
+      "schema_version": 1,
+      "created_at": "2026-11-20T19:01:09.436182+00:00",
+      "renderer": "Blender 5.1.2",
+      "engine": "BLENDER_WORKBENCH",
+      "script": "tools/render_generated_previews.py",
+      "script_sha256_lf": "0d7a86154a5cf8143512eaead6085ff5f6c4635bb511362b543fc665a730e058",
+      "colour_mode": "embedded_material_base_colour",
+      "transparent_background": true,
+      "resolution": [
+        640,
+        640
+      ],
+      "view_transform": "Standard",
+      "look": "None",
+      "studio_light": "paint.sl",
+      "studio_light_intensity": 1.0,
+      "notes": "Preview-only derivation from the unchanged GLBs. Studio shading of assigned material colours; not photographic textures or a full PBR render.",
+      "batch_id": "y2k-district-kit-v016",
+      "asset_ids": [
+        "gen-air-handler-1",
+        "gen-antenna-mast-beacon-1",
+        "gen-barrel-steel-1",
+        "gen-bollard-banded-1",
+        "gen-crate-stack-banded-1",
+        "gen-fence-panel-mesh-1",
+        "gen-floodlight-mast-1",
+        "gen-market-stall-awning-1",
+        "gen-market-stall-counter-1",
+        "gen-pipe-run-stands-1",
+        "gen-produce-bin-1",
+        "gen-shipping-container-1",
+        "gen-shipping-container-open-1",
+        "gen-sign-mast-lit-1"
+      ]
+    },
+    {
+      "schema_version": 1,
+      "created_at": "2026-11-20T19:01:18.814518+00:00",
+      "renderer": "Blender 5.1.2",
+      "engine": "BLENDER_WORKBENCH",
+      "script": "tools/render_generated_previews.py",
+      "script_sha256_lf": "0d7a86154a5cf8143512eaead6085ff5f6c4635bb511362b543fc665a730e058",
+      "colour_mode": "embedded_material_base_colour",
+      "transparent_background": true,
+      "resolution": [
+        640,
+        640
+      ],
+      "view_transform": "Standard",
+      "look": "None",
+      "studio_light": "paint.sl",
+      "studio_light_intensity": 1.0,
+      "notes": "Preview-only derivation from the unchanged GLBs. Studio shading of assigned material colours; not photographic textures or a full PBR render.",
+      "batch_id": "y2k-megastructure-kit-v020",
+      "asset_ids": [
+        "gen-ac-unit-wall-stack-1",
+        "gen-antenna-cluster-roof-1",
+        "gen-pipe-bundle-vertical-1",
+        "gen-satellite-dish-1",
+        "gen-scaffold-bay-1"
+      ]
+    },
+    {
+      "schema_version": 1,
+      "created_at": "2026-11-20T19:01:28.349229+00:00",
+      "renderer": "Blender 5.1.2",
+      "engine": "BLENDER_WORKBENCH",
+      "script": "tools/render_generated_previews.py",
+      "script_sha256_lf": "0d7a86154a5cf8143512eaead6085ff5f6c4635bb511362b543fc665a730e058",
+      "colour_mode": "embedded_material_base_colour",
+      "transparent_background": true,
+      "resolution": [
+        640,
+        640
+      ],
+      "view_transform": "Standard",
+      "look": "None",
+      "studio_light": "paint.sl",
+      "studio_light_intensity": 1.0,
+      "notes": "Preview-only derivation from the unchanged GLBs. Studio shading of assigned material colours; not photographic textures or a full PBR render.",
+      "batch_id": "y2k-world-kit-v040",
+      "asset_ids": [
+        "gen-commuter-railcar-lead-1",
+        "gen-commuter-railcar-mid-1",
+        "gen-shrine-lantern-1",
+        "gen-utility-pole-1",
+        "gen-vending-row-1",
+        "gen-wall-ac-rig-1"
       ]
     }
   ]

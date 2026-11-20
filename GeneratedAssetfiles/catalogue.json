@@ -2994,6 +2994,2049 @@
       "placement_priority": "accessory",
       "lod": "high",
       "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-fishing-boat-coastal-a-1",
+      "category": "vehicle",
+      "product": "Fishing boat",
+      "variant": "Taiwanese coastal fishing boat, 14 m, white wooden hull with black sheer stripe and red bow cap; generated watercraft; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 14000,
+        "depth": 4388,
+        "height": 4366
+      },
+      "render_material_id": "plaster-white",
+      "prompt": "Photorealistic isolated product shot of ONE complete Taiwanese coastal fishing boat (Daxi harbour, Yilan), about 14 m long, shown whole from bow to stern in a three-quarter front view from slightly above, the bow pointing toward the right of the frame, the entire hull visible out of the water down to the keel, on a plain flat light grey studio background, soft even overcast lighting. Match the boat in the reference crop: old weathered off-white painted wooden hull with a black sheer stripe below the gunwale, a dark red painted triangular bow cap on top of the stem, grey-blue lower hull, white bulwarks with a flat white foredeck, a white wheelhouse aft, deck clutter like a winch drum and coiled lines left out. Real chipped paint, rust bleeding from bolts, waterline grime, fine scratches. IMPORTANT: no mast, no rigging, no hanging ropes, no floats, no buoys, no tyres, no flags, no people, no water. Exactly one boat.",
+      "tags": [
+        "boat",
+        "fishing boat",
+        "watercraft",
+        "harbour",
+        "taiwan",
+        "waterfront",
+        "detailed",
+        "tripo",
+        "ginkgo-daxi-2026-11"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "movable",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-fishing-boat-coastal-b-1",
+      "category": "vehicle",
+      "product": "Fishing boat",
+      "variant": "Taiwanese coastal fishing boat, 16 m, white wooden hull with navy gunwale and maroon stem stripe; generated watercraft; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 16000,
+        "depth": 5497,
+        "height": 4988
+      },
+      "render_material_id": "plaster-white",
+      "prompt": "Photorealistic isolated product shot of ONE complete Taiwanese coastal fishing boat (Daxi harbour, Yilan), about 16 m long, shown whole from bow to stern in a three-quarter front view from slightly above, the bow pointing toward the left of the frame, the entire hull visible out of the water down to the keel, on a plain flat light grey studio background, soft even overcast lighting, no shadows on background. Match the boat in the reference crop: weathered white painted wooden hull with a dark navy blue gunwale cap and a thin navy sheer stripe, a narrow maroon-red painted stem stripe running down the bow, a small red painted curl motif on the bow flank, pale blue antifouling below the waterline, white bulwarks, a low white wheelhouse aft with small square windows, deck winch and a round orange-red lamp on the foredeck. Real paint wear, rust streaks from scuppers, scuffs, grime along the waterline. IMPORTANT: no mast, no rigging, no ropes, no floats, no buoys, no tyres, no flags, no people, no water. Exactly one boat.",
+      "tags": [
+        "boat",
+        "fishing boat",
+        "watercraft",
+        "harbour",
+        "taiwan",
+        "waterfront",
+        "detailed",
+        "tripo",
+        "ginkgo-daxi-2026-11"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "movable",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-work-boat-tarp-1",
+      "category": "vehicle",
+      "product": "Work boat",
+      "variant": "Small old harbour work boat, 11 m, weathered wooden hull, blue tarp deckhouse and tyre fenders; generated watercraft; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 11000,
+        "depth": 4308,
+        "height": 5329
+      },
+      "render_material_id": "wood-walnut",
+      "prompt": "Photorealistic isolated product shot of a SINGLE small old Taiwanese harbour work boat (about 11 m), centred in frame with generous empty space around it: dark weathered grey-brown wooden hull streaked with rust and grime, a low deckhouse roofed with a faded bright blue plastic tarp tied down, a row of old black car tyres hung along the side as fenders, a short wooden mast. Three-quarter view from slightly above, hull fully out of the water, plain flat light grey studio background, soft overcast light. Only one boat in the image, no second boat, no reflection, no people, no water.",
+      "tags": [
+        "boat",
+        "work boat",
+        "watercraft",
+        "harbour",
+        "taiwan",
+        "waterfront",
+        "detailed",
+        "meshy",
+        "ginkgo-daxi-2026-11"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "movable",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-fishing-boat-wheelhouse-1",
+      "category": "vehicle",
+      "product": "Fishing boat",
+      "variant": "Coastal fishing boat, 15 m, two-level wheelhouse with radar mast; generated watercraft; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 15000,
+        "depth": 4824,
+        "height": 8143
+      },
+      "render_material_id": "plaster-white",
+      "prompt": "Photorealistic isolated product shot of ONE Taiwanese coastal fishing boat (about 15 m), white painted wooden hull with a pale green-grey sheer stripe, a two-level white wheelhouse with dark windows amidships, railings, antennae and a short white mast with a radar on the wheelhouse roof, worn and rust-streaked. Whole boat visible bow to stern in three-quarter view from slightly above, hull fully out of the water, plain flat light grey studio background, soft overcast light. No people, no water, no flags, exactly one boat.",
+      "tags": [
+        "boat",
+        "fishing boat",
+        "watercraft",
+        "harbour",
+        "taiwan",
+        "waterfront",
+        "detailed",
+        "meshy",
+        "ginkgo-daxi-2026-11"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "movable",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-fishing-trawler-offshore-1",
+      "category": "vehicle",
+      "product": "Fishing trawler",
+      "variant": "Offshore fishing trawler, 22 m, steel hull with derrick mast and net drum; generated watercraft; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 22000,
+        "depth": 4336,
+        "height": 9266
+      },
+      "render_material_id": "plaster-white",
+      "prompt": "Photorealistic isolated product shot of ONE larger Taiwanese offshore fishing trawler (about 22 m), steel hull painted white with a dark red boot topping, a tall white superstructure with a bridge deck, railings, a tall forward mast with a red boom derrick and lamps, net drum at the stern, weathered with rust streaks. Whole boat visible bow to stern in three-quarter view from slightly above, hull fully out of the water, plain flat light grey studio background, soft overcast light. No people, no water, no flags, exactly one boat.",
+      "tags": [
+        "boat",
+        "trawler",
+        "fishing boat",
+        "watercraft",
+        "harbour",
+        "taiwan",
+        "waterfront",
+        "detailed",
+        "meshy",
+        "ginkgo-daxi-2026-11"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "movable",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-refuse-bag-heap-1",
+      "category": "household",
+      "product": "Refuse bag heap",
+      "variant": "Heap of tied black and grey bin bags with crushed cans and paper scraps; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 1516,
+        "depth": 1443,
+        "height": 720
+      },
+      "render_material_id": "rubber-black",
+      "prompt": "A heap of black and grey plastic garbage bags piled on a street kerb, tied bin bags slumped against each other, a few loose crushed drink cans and paper scraps around the base, realistic urban litter pile, game-ready prop",
+      "tags": [
+        "refuse",
+        "bin bags",
+        "litter",
+        "clutter",
+        "alley",
+        "streetscape",
+        "detailed",
+        "meshy",
+        "y2k-props-v038"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "accessory",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-cardboard-box-stack-1",
+      "category": "household",
+      "product": "Cardboard box stack",
+      "variant": "Stack of worn, crushed corrugated boxes with an open flap on top; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 483,
+        "depth": 526,
+        "height": 1300
+      },
+      "render_material_id": "wood-oak",
+      "prompt": "A messy stack of worn corrugated cardboard boxes, some crushed and sagging, one open flap box on top, plain unbranded brown cardboard with packing tape, realistic street market prop, game-ready",
+      "tags": [
+        "cardboard",
+        "boxes",
+        "clutter",
+        "alley",
+        "market",
+        "streetscape",
+        "detailed",
+        "meshy",
+        "y2k-props-v038"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "accessory",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-ivy-clump-1",
+      "category": "vegetation",
+      "product": "Ivy clump",
+      "variant": "Ivy and vines draped over a low wall block, stones at the base; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 1633,
+        "depth": 1508,
+        "height": 1600
+      },
+      "render_material_id": "foliage-pine",
+      "prompt": "A dense clump of overgrown climbing ivy and leafy vines spilling over a low wall edge, lush green leaves, tangled woody stems hanging down, industrial ruin overgrowth, realistic foliage prop, game-ready",
+      "tags": [
+        "ivy",
+        "vines",
+        "climber",
+        "overgrowth",
+        "planting",
+        "ruin",
+        "detailed",
+        "meshy",
+        "y2k-props-v038"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "accessory",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-rubble-pile-1",
+      "category": "landscape",
+      "product": "Rubble pile",
+      "variant": "Low heap of broken brick, tile shards, concrete chunks and a pallet plank; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 1837,
+        "depth": 1821,
+        "height": 282
+      },
+      "render_material_id": "brick-red",
+      "prompt": "A low pile of construction rubble: broken red bricks, cracked pink ceramic tile shards, concrete chunks, a snapped wooden pallet plank and dust, spread in a loose heap on the ground, realistic urban debris prop, game-ready",
+      "tags": [
+        "rubble",
+        "debris",
+        "brick",
+        "construction",
+        "ruin",
+        "streetscape",
+        "detailed",
+        "meshy",
+        "y2k-props-v038"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "accessory",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-tree-maple-red-1",
+      "category": "vegetation",
+      "product": "Japanese maple tree",
+      "variant": "Red-leaf Japanese maple with a curving trunk and layered airy crown; generated tree; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 5593,
+        "depth": 4816,
+        "height": 6500
+      },
+      "render_material_id": "foliage-pine",
+      "prompt": "A single stylised Japanese red maple tree, full view from trunk base to crown top, three-quarter view, centred, isolated on a plain light grey background. Slender curving dark grey-brown trunk splitting into several organic branches, an irregular airy crown of layered deep crimson and scarlet leaf clusters with gaps showing the branches through, natural asymmetric silhouette (not round or ball-shaped). Clean game-asset concept render, soft even lighting, no shadow on the ground, no text.",
+      "tags": [
+        "tree",
+        "maple",
+        "japanese maple",
+        "red foliage",
+        "deciduous",
+        "planting",
+        "detailed",
+        "meshy",
+        "y2k-trees-refset-0923b"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "accessory",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-tree-broadleaf-green-1",
+      "category": "vegetation",
+      "product": "Broadleaf tree",
+      "variant": "Mature green broadleaf (zelkova or elm type) with flared roots and a vase-shaped crown; generated tree; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 7158,
+        "depth": 4060,
+        "height": 7000
+      },
+      "render_material_id": "foliage-pine",
+      "prompt": "A single mature green broadleaf tree like a zelkova or elm, full view from trunk base to crown top, three-quarter view, centred, isolated on a plain light grey background. Thick gnarled trunk with visible roots flaring at the base, branching into several twisting limbs, a wide irregular vase-shaped crown of layered fresh green leaf clusters with open gaps and drooping edges, natural asymmetric silhouette (not round or ball-shaped). Clean game-asset concept render, soft even lighting, no ground shadow, no text.",
+      "tags": [
+        "tree",
+        "broadleaf",
+        "deciduous",
+        "street tree",
+        "planting",
+        "landscape",
+        "detailed",
+        "meshy",
+        "y2k-trees-refset-0923b"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "accessory",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-planter-pod-capsule-1",
+      "category": "site_furniture",
+      "product": "Planter pod",
+      "variant": "Y2K glossy bowl planter on a chrome ring base with a stylised round-leaf plant; generated Y2K prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 703,
+        "depth": 773,
+        "height": 1100
+      },
+      "render_material_id": "polycarbonate-opal",
+      "prompt": "Y2K futurist planter pod, a glossy white bowl-shaped capsule planter on a chrome ring base with a translucent cyan glass rim, holding a stylised round-leafed plant with glossy pale green leaves and small magenta glowing berries, rounded soft forms, clean single street prop, no text",
+      "tags": [
+        "planter",
+        "plant",
+        "street furniture",
+        "y2k",
+        "retro-futurist",
+        "sci-fi",
+        "detailed",
+        "meshy",
+        "y2k-twofronts-2026-09"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "movable",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-vending-machine-capsule-1",
+      "category": "site_furniture",
+      "product": "Vending machine",
+      "variant": "Y2K rounded capsule vending machine with a bubble window of drink capsules, unbranded; generated Y2K prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 972,
+        "depth": 973,
+        "height": 2400
+      },
+      "render_material_id": "polycarbonate-opal",
+      "prompt": "Y2K futurist vending machine, a tall rounded glossy white capsule-shaped vending machine with a large translucent cyan bubble window showing rows of small colorful pill-shaped drink capsules inside, chrome seam rings, a magenta glowing dispensing slot, chrome feet, rounded soft forms, clean single street prop, no text, no letters",
+      "tags": [
+        "vending",
+        "capsule",
+        "street furniture",
+        "y2k",
+        "retro-futurist",
+        "sci-fi",
+        "detailed",
+        "meshy",
+        "y2k-twofronts-2026-09"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-kiosk-pod-1",
+      "category": "site_furniture",
+      "product": "Kiosk pod",
+      "variant": "Y2K egg-shaped street kiosk with a porthole serving window on a pedestal base; generated Y2K prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 1376,
+        "depth": 1467,
+        "height": 2600
+      },
+      "render_material_id": "polycarbonate-opal",
+      "prompt": "Y2K futurist street vending pod kiosk: a glossy white egg-shaped capsule kiosk with a chrome seam ring around its equator, a large magenta translucent glass porthole serving window on the front, a chrome bubble pedestal base, a small cyan glass sphere holo-sign on a thin chrome stalk on top, rounded edges everywhere, clean single object, no people, no text",
+      "tags": [
+        "kiosk",
+        "vending",
+        "pod",
+        "y2k",
+        "retro-futurist",
+        "sci-fi",
+        "detailed",
+        "meshy",
+        "y2k-twofronts-2026-09"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-holo-sign-pod-1",
+      "category": "site_furniture",
+      "product": "Holo sign pod",
+      "variant": "Y2K sphere sign on a slim stalk with a ring, its disc face bearing raised 'Y2K' lettering; generated Y2K prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 1680,
+        "depth": 1412,
+        "height": 3400
+      },
+      "render_material_id": "aluminium-anodized",
+      "prompt": "Y2K futurist holographic sign pod, a chrome sphere on a slim chrome stalk with a flat translucent magenta glass disc floating above it like a screen, small cyan glowing ring at the base, glossy white accent panels, rounded soft forms, clean single street prop, no text, no letters",
+      "tags": [
+        "sign",
+        "signage",
+        "y2k",
+        "retro-futurist",
+        "sci-fi",
+        "lettering",
+        "detailed",
+        "meshy",
+        "y2k-twofronts-2026-09"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-hover-scooter-1",
+      "category": "vehicle",
+      "product": "Hover scooter",
+      "variant": "Speculative Y2K bubble scooter with a ball front wheel and a small rear wheel; generated Y2K prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 1281,
+        "depth": 969,
+        "height": 1200
+      },
+      "render_material_id": "polycarbonate-opal",
+      "prompt": "Y2K futurist hover scooter, a glossy white bubble-shaped body with chrome trim, translucent cyan windshield bubble, chrome handlebars, no wheels but a rounded chrome hover skirt underneath, magenta glowing tail light, small chrome star charms hanging from the handlebar, rounded soft forms, clean single vehicle prop, no rider, no text",
+      "tags": [
+        "scooter",
+        "vehicle",
+        "y2k",
+        "retro-futurist",
+        "sci-fi",
+        "detailed",
+        "meshy",
+        "y2k-twofronts-2026-09"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "movable",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-hover-car-bubble-1",
+      "category": "vehicle",
+      "product": "Hover car",
+      "variant": "Speculative Y2K egg-shaped two-seat bubble car on a hover skirt, no wheels; generated Y2K prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 2826,
+        "depth": 2111,
+        "height": 1600
+      },
+      "render_material_id": "polycarbonate-opal",
+      "prompt": "Y2K futurist bubble hover car, a glossy pearlescent white egg-shaped two-seat car with a large translucent cyan bubble canopy, chrome bumpers and chrome seam rings, no wheels, a rounded chrome hover skirt, magenta glowing light strips, rounded soft forms everywhere, clean single vehicle prop, no people, no text",
+      "tags": [
+        "car",
+        "hover car",
+        "bubble car",
+        "vehicle",
+        "y2k",
+        "retro-futurist",
+        "sci-fi",
+        "detailed",
+        "meshy",
+        "y2k-twofronts-2026-09"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "movable",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-lounge-chair-inflatable-cushion-1",
+      "category": "seating",
+      "product": "Lounge chair",
+      "variant": "Low lounge chair with quilted inflatable seat and round back cushions strapped to a bolted perforated-angle, aluminium-extrusion and timber-block frame; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 679,
+        "depth": 922,
+        "height": 900
+      },
+      "render_material_id": "fabric-linen",
+      "prompt": "Product-style 3D render of a single original chair, three-quarter view, whole object in frame with margin. A puffy quilted fluorescent yellow-green nylon inflatable cushion seat and round backrest with drawstring gathered edges and yellow elastic cords, strapped onto a low frame made of fluorescent yellow perforated steel angle legs, grey aluminium extrusion rails and pale timber blocks bolted together, a short white corrugated hose and a black carabiner. No text, no logos, no letters, no printing on the fabric. Plain flat light grey studio background, soft even lighting.",
+      "tags": [
+        "lounge chair",
+        "inflatable",
+        "cushion",
+        "seating",
+        "kit furniture",
+        "outdoor",
+        "detailed",
+        "meshy",
+        "ginkgo-refset-1003"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "floor",
+      "placement_priority": "primary",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-water-bladder-strapped-1",
+      "category": "household",
+      "product": "Water bladder",
+      "variant": "Upright quilted collapsible water container with screw cap, carry handle, two webbing straps with buckles and a bottom spout; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 402,
+        "depth": 254,
+        "height": 450
+      },
+      "render_material_id": "polycarbonate-opal",
+      "prompt": "Product-style 3D render of a single original soft storage tank, front three-quarter view, whole object in frame with margin. A tall upright translucent frosted white inflatable bladder in the shape of a big jug, crinkled quilted plastic skin, a rigid white screw cap and bail handle on top, wrapped by two wide lime green webbing straps with orange side-release buckles, a small blank dark label plate on the front, a short orange hose tail at the base. No text, no logos, no letters. Plain flat light grey studio background, soft even lighting.",
+      "tags": [
+        "water container",
+        "bladder",
+        "jerrycan",
+        "storage",
+        "utility",
+        "camping",
+        "detailed",
+        "meshy",
+        "ginkgo-refset-1003"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "floor",
+      "placement_priority": "accessory",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-pressure-canister-1",
+      "category": "building_services",
+      "product": "Pressure canister",
+      "variant": "Upright painted-steel pressure canister with top valve lever, hose and nozzle, two shackles at the valve guard and a blank instruction panel; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 451,
+        "depth": 245,
+        "height": 650
+      },
+      "render_material_id": "steel-galvanized",
+      "prompt": "Product-style 3D render of a single original industrial pressure canister, three-quarter view, upright, whole object in frame with margin. A weathered light grey painted steel cylinder with a rounded dark base, bolted seams, a top valve assembly with a cast grey lever handle, a curved black rubber hose with a ribbed nozzle, and two chunky safety orange forged shackles clipped through the handle guard. A blank white instruction panel area with only simple abstract pictogram squares, scuffed paint. No text, no letters, no logos. Plain flat medium grey studio background, soft even lighting.",
+      "tags": [
+        "canister",
+        "extinguisher",
+        "pressure vessel",
+        "fire safety",
+        "industrial",
+        "services",
+        "detailed",
+        "meshy",
+        "ginkgo-refset-1003"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "floor",
+      "placement_priority": "accessory",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-statue-plaster-togate-1",
+      "category": "ornament",
+      "product": "Plaster statue",
+      "variant": "Classical white plaster statue of a standing robed figure holding a scroll, on a chipped square plinth; generated ornament; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 640,
+        "depth": 582,
+        "height": 2000
+      },
+      "render_material_id": "plaster-white",
+      "prompt": "Product photo of a white plaster classical sculpture of a standing robed Greek figure holding a scroll, on a square white plinth, slightly chipped, full body three-quarter view, centred, plain light grey studio background, even soft lighting, no text.",
+      "tags": [
+        "statue",
+        "sculpture",
+        "classical",
+        "plaster cast",
+        "plinth",
+        "ornament",
+        "detailed",
+        "meshy",
+        "ginkgo-refset-0924"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-dress-form-mannequin-1",
+      "category": "household",
+      "product": "Dress form",
+      "variant": "Shop dress form on a wooden tripod stand, wearing a summer sundress; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 540,
+        "depth": 481,
+        "height": 1720
+      },
+      "render_material_id": "fabric-linen",
+      "prompt": "Shop display dress form mannequin on a wooden tripod stand, wearing a light blue summer sundress, second-hand clothing boutique, realistic",
+      "tags": [
+        "dress form",
+        "mannequin",
+        "shop fixture",
+        "boutique",
+        "retail",
+        "clothing",
+        "detailed",
+        "meshy",
+        "ginkgo-lausanne-market"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "floor",
+      "placement_priority": "accessory",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-water-tanks-rooftop-pair-1",
+      "category": "building_services",
+      "product": "Rooftop water tanks",
+      "variant": "Pair of vertical stainless water tanks with conical tops on a braced galvanised stand, with ladder and valved pipework; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 1283,
+        "depth": 2879,
+        "height": 3000
+      },
+      "render_material_id": "steel-galvanized",
+      "prompt": "Clean 3D model reference of ONLY a pair of stainless steel rooftop water tanks like in the reference image: two vertical cylindrical brushed-steel tanks with conical tops and ribbed bands, standing on a galvanised steel frame platform with cross bracing, a small ladder and pipes with valves underneath. Three-quarter view from slightly above, entire object in frame with margin, isolated on a plain neutral grey studio backdrop, soft even studio lighting, slightly weathered, no text, no logos.",
+      "tags": [
+        "water tank",
+        "rooftop",
+        "services",
+        "stainless steel",
+        "tokyo",
+        "roofscape",
+        "detailed",
+        "tripo",
+        "ginkgo-refset-1007"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-rover-six-wheel-1",
+      "category": "vehicle",
+      "product": "Exploration rover",
+      "variant": "Six-wheeled armoured exploration rover with wraparound cab windows, roof sensor mast, antennas and dish, big knobbly tyres; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 5400,
+        "depth": 2946,
+        "height": 4084
+      },
+      "render_material_id": "plaster-white",
+      "prompt": "Clean 3D model reference of ONLY the six-wheeled exploration rover from the reference image, same design: blue-and-white rounded armoured hull panels, wraparound cab windows, roof antennas and a small dish, orange hazard panels, six big knobbly tyres with orange hubs. Three-quarter front view from slightly above, entire vehicle in frame with margin, isolated on a plain neutral grey studio backdrop, soft even studio lighting, clean undamaged, no text, no logos, no numbers.",
+      "tags": [
+        "rover",
+        "vehicle",
+        "sci-fi",
+        "six-wheeled",
+        "expedition",
+        "concept vehicle",
+        "detailed",
+        "tripo",
+        "ginkgo-refset-1007"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "movable",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-capsule-tram-overgrown-1",
+      "category": "vehicle",
+      "product": "Capsule tram car",
+      "variant": "Abandoned rounded capsule tram car with windscreen, porthole, sliding side door, open roof hatch, vines and moss, on a low bogie frame; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 5263,
+        "depth": 9000,
+        "height": 4160
+      },
+      "render_material_id": "plaster-white",
+      "prompt": "Clean 3D model reference of ONLY the abandoned capsule tram car from the reference image, same design: long rounded white capsule body with a faded yellow band, big front windscreen, round porthole, tall side doorway, rust streaks, moss patches and a few vines, short bogie underframe. Side three-quarter view from slightly above, entire car in frame with margin, isolated on a plain neutral grey studio backdrop, soft even studio lighting, no flowers around it, no text, no logos, no numbers.",
+      "tags": [
+        "tram",
+        "capsule",
+        "vehicle",
+        "abandoned",
+        "overgrown",
+        "sci-fi",
+        "ruin",
+        "detailed",
+        "tripo",
+        "ginkgo-refset-1007"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-drone-quadcopter-1",
+      "category": "vehicle",
+      "product": "Quadcopter drone",
+      "variant": "Toy-like rounded quadcopter with camera eye, four propeller arms and short landing legs; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 1308,
+        "depth": 1400,
+        "height": 454
+      },
+      "render_material_id": "ceramic-teal",
+      "prompt": "Clean 3D model reference of ONLY one small quadcopter drone from the reference image, same design: rounded teal body with a camera eye, four arms with lime-green propeller rings, short landing legs. Three-quarter view from slightly above, entire object in frame with margin, isolated on a plain neutral grey studio backdrop, soft even studio lighting, no landing pad, no text, no logos, no numbers.",
+      "tags": [
+        "drone",
+        "quadcopter",
+        "uav",
+        "delivery",
+        "vehicle",
+        "sci-fi",
+        "detailed",
+        "tripo",
+        "ginkgo-refset-1007"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "movable",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-drone-launcher-vehicle-1",
+      "category": "vehicle",
+      "product": "Drone launcher vehicle",
+      "variant": "Chunky rounded wheeled service vehicle with a folding crane boom on top and two fold-out ramp wings; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 1861,
+        "depth": 3200,
+        "height": 2205
+      },
+      "render_material_id": "ceramic-teal",
+      "prompt": "Clean 3D model reference of ONLY the teal drone launcher vehicle from the reference image, same design: chunky rounded teal cab body with lime-green trim, square side hatch, two fold-out ramp wings deployed on the sides, short wheeled chassis, tall lime boom arm folded upright on top (no landing canopy, no drones). Three-quarter view from slightly above, entire object in frame with margin, isolated on a plain neutral grey studio backdrop, soft even studio lighting, no ground clutter, no text, no logos, no numbers.",
+      "tags": [
+        "service vehicle",
+        "drone launcher",
+        "crane",
+        "ramp",
+        "vehicle",
+        "sci-fi",
+        "detailed",
+        "tripo",
+        "ginkgo-refset-1007"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "movable",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-shuttle-craft-1",
+      "category": "vehicle",
+      "product": "Shuttle craft",
+      "variant": "Compact wedge-hulled sci-fi shuttle with swept wings, twin rear engine pods and a small canopy; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 12000,
+        "depth": 11991,
+        "height": 3171
+      },
+      "render_material_id": "steel-painted-charcoal",
+      "prompt": "Clean 3D model reference of ONLY one small sci-fi shuttle craft like the dark ships docking at the ring in the reference image: compact wedge-shaped gunmetal hull with chunky panel lines, short swept wings, twin rear engine pods, small canopy, a coral-red stripe accent. Three-quarter view from slightly above, entire craft in frame with margin, isolated on a plain neutral grey studio backdrop, soft even studio lighting, no text, no logos, no numbers.",
+      "tags": [
+        "spacecraft",
+        "shuttle",
+        "sci-fi",
+        "vehicle",
+        "aircraft",
+        "detailed",
+        "tripo",
+        "ginkgo-refset-1007"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "movable",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-planter-box-galvanised-1",
+      "category": "vegetation",
+      "product": "Planter box",
+      "variant": "Long galvanised corrugated-metal planter trough overflowing with leafy plants, herbs, tomatoes and trailing vines; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 1900,
+        "depth": 614,
+        "height": 782
+      },
+      "render_material_id": "steel-galvanized",
+      "prompt": "Clean 3D model reference of ONLY one long rectangular galvanised metal balcony planter box overflowing with lush leafy green plants, trailing vines spilling over the front edge, a few small tomato-like red fruits and herbs, like the vertical farm balconies in the reference image. Three-quarter view from slightly above, entire object in frame with margin, isolated on a plain neutral grey studio backdrop, soft even studio lighting, no text, no logos.",
+      "tags": [
+        "planter",
+        "trough",
+        "herbs",
+        "balcony",
+        "vertical farm",
+        "planting",
+        "detailed",
+        "meshy",
+        "ginkgo-refset-1007"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "accessory",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-flower-clump-magenta-1",
+      "category": "vegetation",
+      "product": "Flower clump",
+      "variant": "Dense clump of magenta flower spikes and pink daisy-like blooms on leafy stems, on a small soil base; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 733,
+        "depth": 705,
+        "height": 600
+      },
+      "render_material_id": "foliage-pine",
+      "prompt": "Clean 3D model reference of ONLY one dense clump of magenta and pink flowers like the meadow in the reference image: a mound of leafy green stems with tall magenta flower spikes and pink daisy-like blooms, about knee high, roots hidden in a small soil base. Three-quarter view from slightly above, entire clump in frame with margin, isolated on a plain neutral grey studio backdrop, soft even studio lighting, no text.",
+      "tags": [
+        "flowers",
+        "perennial",
+        "meadow",
+        "planting",
+        "clump",
+        "garden",
+        "detailed",
+        "meshy",
+        "ginkgo-refset-1007"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "accessory",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-bench-street-slab-1",
+      "category": "site_furniture",
+      "product": "Street bench",
+      "variant": "Rounded slab seat on two block supports, 2.4 m; procedural kit piece; low-poly edition",
+      "dimensions_mm": {
+        "width": 2400,
+        "depth": 700,
+        "height": 660
+      },
+      "render_material_id": "concrete-smooth",
+      "prompt": null,
+      "tags": [
+        "bench",
+        "seating",
+        "street furniture",
+        "y2k",
+        "streetscape",
+        "urban",
+        "procedural",
+        "low-poly",
+        "y2k-street-kit-v004"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "lod": "low",
+      "recipe_override": "procedural_script"
+    },
+    {
+      "asset_id": "gen-street-lamp-wayfinding-1",
+      "category": "site_furniture",
+      "product": "Street lamp",
+      "variant": "5 m lamp with an arched arm and a blank wayfinding panel; procedural kit piece; low-poly edition",
+      "dimensions_mm": {
+        "width": 1600,
+        "depth": 650,
+        "height": 5010
+      },
+      "render_material_id": "aluminium-anodized",
+      "prompt": null,
+      "tags": [
+        "lamp",
+        "street light",
+        "wayfinding",
+        "pole",
+        "y2k",
+        "streetscape",
+        "procedural",
+        "low-poly",
+        "y2k-street-kit-v004"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "lod": "low",
+      "recipe_override": "procedural_script"
+    },
+    {
+      "asset_id": "gen-info-kiosk-capsule-1",
+      "category": "site_furniture",
+      "product": "Information kiosk",
+      "variant": "Rounded capsule totem with a blank screen, 2.7 m; procedural kit piece; low-poly edition",
+      "dimensions_mm": {
+        "width": 1350,
+        "depth": 965,
+        "height": 2700
+      },
+      "render_material_id": "plaster-white",
+      "prompt": null,
+      "tags": [
+        "kiosk",
+        "information",
+        "totem",
+        "wayfinding",
+        "y2k",
+        "streetscape",
+        "procedural",
+        "low-poly",
+        "y2k-street-kit-v004"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "lod": "low",
+      "recipe_override": "procedural_script"
+    },
+    {
+      "asset_id": "gen-planter-sculpted-shrubs-1",
+      "category": "site_furniture",
+      "product": "Street planter",
+      "variant": "Rounded planter with three sculpted shrub forms, 2.6 m; procedural kit piece; low-poly edition",
+      "dimensions_mm": {
+        "width": 2600,
+        "depth": 1120,
+        "height": 1770
+      },
+      "render_material_id": "concrete-smooth",
+      "prompt": null,
+      "tags": [
+        "planter",
+        "shrubs",
+        "street furniture",
+        "y2k",
+        "streetscape",
+        "landscape",
+        "procedural",
+        "low-poly",
+        "y2k-street-kit-v004"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "lod": "low",
+      "recipe_override": "procedural_script"
+    },
+    {
+      "asset_id": "gen-gateway-arch-street-1",
+      "category": "site_furniture",
+      "product": "Street gateway arch",
+      "variant": "10.7 m arch on two piers with a blank sign band; procedural kit piece; low-poly edition",
+      "dimensions_mm": {
+        "width": 10700,
+        "depth": 858,
+        "height": 6360
+      },
+      "render_material_id": "concrete-smooth",
+      "prompt": null,
+      "tags": [
+        "gateway",
+        "arch",
+        "entrance",
+        "portal",
+        "y2k",
+        "streetscape",
+        "procedural",
+        "low-poly",
+        "y2k-street-kit-v004"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "lod": "low",
+      "recipe_override": "procedural_script"
+    },
+    {
+      "asset_id": "gen-market-stall-counter-1",
+      "category": "site_furniture",
+      "product": "Market stall counter",
+      "variant": "Painted counter with a metal top, front panels and legs, 2.4 m; procedural kit piece; low-poly edition",
+      "dimensions_mm": {
+        "width": 2600,
+        "depth": 1050,
+        "height": 1070
+      },
+      "render_material_id": "steel-painted-sage",
+      "prompt": null,
+      "tags": [
+        "market",
+        "stall",
+        "counter",
+        "street food",
+        "y2k",
+        "streetscape",
+        "procedural",
+        "low-poly",
+        "y2k-district-kit-v016"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "movable",
+      "lod": "low",
+      "recipe_override": "procedural_script"
+    },
+    {
+      "asset_id": "gen-market-stall-awning-1",
+      "category": "site_furniture",
+      "product": "Market stall awning",
+      "variant": "Sloped canopy on two posts with a valance and a bulb string, 3.2 m; procedural kit piece; low-poly edition",
+      "dimensions_mm": {
+        "width": 3200,
+        "depth": 1898,
+        "height": 2600
+      },
+      "render_material_id": "fabric-linen",
+      "prompt": null,
+      "tags": [
+        "market",
+        "stall",
+        "awning",
+        "canopy",
+        "y2k",
+        "streetscape",
+        "procedural",
+        "low-poly",
+        "y2k-district-kit-v016"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "movable",
+      "lod": "low",
+      "recipe_override": "procedural_script"
+    },
+    {
+      "asset_id": "gen-crate-stack-banded-1",
+      "category": "household",
+      "product": "Crate stack",
+      "variant": "Three stacked crates with metal bands, 1.8 m; procedural kit piece; low-poly edition",
+      "dimensions_mm": {
+        "width": 916,
+        "depth": 887,
+        "height": 1780
+      },
+      "render_material_id": "wood-oak",
+      "prompt": null,
+      "tags": [
+        "crates",
+        "boxes",
+        "clutter",
+        "market",
+        "yard",
+        "streetscape",
+        "procedural",
+        "low-poly",
+        "y2k-district-kit-v016"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "movable",
+      "lod": "low",
+      "recipe_override": "procedural_script"
+    },
+    {
+      "asset_id": "gen-produce-bin-1",
+      "category": "site_furniture",
+      "product": "Produce bin",
+      "variant": "Low metal market bin with a filled top and side handles, 1.1 m; procedural kit piece; low-poly edition",
+      "dimensions_mm": {
+        "width": 1200,
+        "depth": 700,
+        "height": 590
+      },
+      "render_material_id": "steel-galvanized",
+      "prompt": null,
+      "tags": [
+        "market",
+        "produce",
+        "bin",
+        "display",
+        "y2k",
+        "streetscape",
+        "procedural",
+        "low-poly",
+        "y2k-district-kit-v016"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "movable",
+      "lod": "low",
+      "recipe_override": "procedural_script"
+    },
+    {
+      "asset_id": "gen-barrel-steel-1",
+      "category": "household",
+      "product": "Steel barrel",
+      "variant": "Ribbed drum, 0.6 m diameter, 0.9 m; procedural kit piece; low-poly edition",
+      "dimensions_mm": {
+        "width": 610,
+        "depth": 610,
+        "height": 930
+      },
+      "render_material_id": "steel-painted-vermilion",
+      "prompt": null,
+      "tags": [
+        "barrel",
+        "drum",
+        "clutter",
+        "yard",
+        "industrial",
+        "streetscape",
+        "procedural",
+        "low-poly",
+        "y2k-district-kit-v016"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "movable",
+      "lod": "low",
+      "recipe_override": "procedural_script"
+    },
+    {
+      "asset_id": "gen-shipping-container-1",
+      "category": "site_furniture",
+      "product": "Shipping container",
+      "variant": "6 m (20 ft class) container, doors closed; procedural kit piece; low-poly edition",
+      "dimensions_mm": {
+        "width": 6200,
+        "depth": 2460,
+        "height": 2610
+      },
+      "render_material_id": "metal-corrugated",
+      "prompt": null,
+      "tags": [
+        "container",
+        "shipping",
+        "freight",
+        "yard",
+        "industrial",
+        "harbour",
+        "procedural",
+        "low-poly",
+        "y2k-district-kit-v016"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "lod": "low",
+      "recipe_override": "procedural_script"
+    },
+    {
+      "asset_id": "gen-shipping-container-open-1",
+      "category": "site_furniture",
+      "product": "Shipping container, doors open",
+      "variant": "6 m (20 ft class) container with both doors swung open; procedural kit piece; low-poly edition",
+      "dimensions_mm": {
+        "width": 6786,
+        "depth": 3610,
+        "height": 2610
+      },
+      "render_material_id": "metal-corrugated",
+      "prompt": null,
+      "tags": [
+        "container",
+        "shipping",
+        "freight",
+        "yard",
+        "industrial",
+        "harbour",
+        "procedural",
+        "low-poly",
+        "y2k-district-kit-v016"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "lod": "low",
+      "recipe_override": "procedural_script"
+    },
+    {
+      "asset_id": "gen-bollard-banded-1",
+      "category": "site_furniture",
+      "product": "Banded bollard",
+      "variant": "Steel bollard with reflective bands, 1.0 m; procedural kit piece; low-poly edition",
+      "dimensions_mm": {
+        "width": 340,
+        "depth": 340,
+        "height": 1040
+      },
+      "render_material_id": "steel-painted-charcoal",
+      "prompt": null,
+      "tags": [
+        "bollard",
+        "traffic",
+        "street furniture",
+        "site",
+        "urban",
+        "yard",
+        "procedural",
+        "low-poly",
+        "y2k-district-kit-v016"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "lod": "low",
+      "recipe_override": "procedural_script"
+    },
+    {
+      "asset_id": "gen-fence-panel-mesh-1",
+      "category": "site_furniture",
+      "product": "Mesh fence panel",
+      "variant": "3 m panel between two posts with top and bottom rails, 2.4 m; procedural kit piece; low-poly edition",
+      "dimensions_mm": {
+        "width": 3114,
+        "depth": 120,
+        "height": 2400
+      },
+      "render_material_id": "steel-mesh",
+      "prompt": null,
+      "tags": [
+        "fence",
+        "mesh",
+        "panel",
+        "site boundary",
+        "yard",
+        "industrial",
+        "procedural",
+        "low-poly",
+        "y2k-district-kit-v016"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "lod": "low",
+      "recipe_override": "procedural_script"
+    },
+    {
+      "asset_id": "gen-floodlight-mast-1",
+      "category": "site_furniture",
+      "product": "Floodlight mast",
+      "variant": "6 m mast with three floodlight heads; procedural kit piece; low-poly edition",
+      "dimensions_mm": {
+        "width": 1300,
+        "depth": 867,
+        "height": 6310
+      },
+      "render_material_id": "steel-galvanized",
+      "prompt": null,
+      "tags": [
+        "floodlight",
+        "mast",
+        "lighting",
+        "yard",
+        "industrial",
+        "site",
+        "procedural",
+        "low-poly",
+        "y2k-district-kit-v016"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "lod": "low",
+      "recipe_override": "procedural_script"
+    },
+    {
+      "asset_id": "gen-antenna-mast-beacon-1",
+      "category": "building_services",
+      "product": "Antenna mast",
+      "variant": "5 m guyed-look antenna mast with a beacon; procedural kit piece; low-poly edition",
+      "dimensions_mm": {
+        "width": 1014,
+        "depth": 900,
+        "height": 5320
+      },
+      "render_material_id": "steel-galvanized",
+      "prompt": null,
+      "tags": [
+        "antenna",
+        "mast",
+        "telecom",
+        "beacon",
+        "rooftop",
+        "industrial",
+        "procedural",
+        "low-poly",
+        "y2k-district-kit-v016"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "lod": "low",
+      "recipe_override": "procedural_script"
+    },
+    {
+      "asset_id": "gen-sign-mast-lit-1",
+      "category": "site_furniture",
+      "product": "Sign mast",
+      "variant": "3.4 m mast with an arm and a blank lit panel; procedural kit piece; low-poly edition",
+      "dimensions_mm": {
+        "width": 1870,
+        "depth": 155,
+        "height": 3400
+      },
+      "render_material_id": "steel-painted-charcoal",
+      "prompt": null,
+      "tags": [
+        "sign",
+        "signage",
+        "mast",
+        "blank panel",
+        "market",
+        "streetscape",
+        "procedural",
+        "low-poly",
+        "y2k-district-kit-v016"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "lod": "low",
+      "recipe_override": "procedural_script"
+    },
+    {
+      "asset_id": "gen-air-handler-1",
+      "category": "building_services",
+      "product": "Air handler",
+      "variant": "Packaged air-handling unit on a base, 2.0 m; procedural kit piece; low-poly edition",
+      "dimensions_mm": {
+        "width": 2006,
+        "depth": 1500,
+        "height": 1380
+      },
+      "render_material_id": "steel-galvanized",
+      "prompt": null,
+      "tags": [
+        "air handler",
+        "hvac",
+        "services",
+        "rooftop",
+        "plant",
+        "industrial",
+        "procedural",
+        "low-poly",
+        "y2k-district-kit-v016"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "lod": "low",
+      "recipe_override": "procedural_script"
+    },
+    {
+      "asset_id": "gen-pipe-run-stands-1",
+      "category": "building_services",
+      "product": "Pipe run on stands",
+      "variant": "4 m run of parallel pipes on support stands; procedural kit piece; low-poly edition",
+      "dimensions_mm": {
+        "width": 4000,
+        "depth": 1200,
+        "height": 1800
+      },
+      "render_material_id": "steel-galvanized",
+      "prompt": null,
+      "tags": [
+        "pipes",
+        "pipe rack",
+        "services",
+        "industrial",
+        "plant",
+        "yard",
+        "procedural",
+        "low-poly",
+        "y2k-district-kit-v016"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "lod": "low",
+      "recipe_override": "procedural_script"
+    },
+    {
+      "asset_id": "gen-satellite-dish-1",
+      "category": "building_services",
+      "product": "Satellite dish",
+      "variant": "3 m dish on a braced stand; procedural kit piece; low-poly edition",
+      "dimensions_mm": {
+        "width": 3000,
+        "depth": 1906,
+        "height": 3991
+      },
+      "render_material_id": "aluminium-anodized",
+      "prompt": null,
+      "tags": [
+        "satellite dish",
+        "antenna",
+        "telecom",
+        "rooftop",
+        "services",
+        "roofscape",
+        "procedural",
+        "low-poly",
+        "y2k-megastructure-kit-v020"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "lod": "low",
+      "recipe_override": "procedural_script"
+    },
+    {
+      "asset_id": "gen-ac-unit-wall-stack-1",
+      "category": "building_services",
+      "product": "Wall AC unit stack",
+      "variant": "Two rows of three outdoor AC units on wall brackets; procedural kit piece; low-poly edition",
+      "dimensions_mm": {
+        "width": 3251,
+        "depth": 540,
+        "height": 1900
+      },
+      "render_material_id": "steel-galvanized",
+      "prompt": null,
+      "tags": [
+        "air-conditioning",
+        "condenser",
+        "facade",
+        "services",
+        "wall-mounted",
+        "dense city",
+        "procedural",
+        "low-poly",
+        "y2k-megastructure-kit-v020"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "wall",
+      "placement_priority": "fixed",
+      "lod": "low",
+      "recipe_override": "procedural_script",
+      "mount_height_mm": 2500
+    },
+    {
+      "asset_id": "gen-pipe-bundle-vertical-1",
+      "category": "building_services",
+      "product": "Vertical pipe bundle",
+      "variant": "12 m facade riser of pipes with clamps and conduit; procedural kit piece; low-poly edition",
+      "dimensions_mm": {
+        "width": 1450,
+        "depth": 520,
+        "height": 12000
+      },
+      "render_material_id": "steel-galvanized",
+      "prompt": null,
+      "tags": [
+        "pipes",
+        "riser",
+        "facade",
+        "services",
+        "wall-mounted",
+        "dense city",
+        "procedural",
+        "low-poly",
+        "y2k-megastructure-kit-v020"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "wall",
+      "placement_priority": "fixed",
+      "lod": "low",
+      "recipe_override": "procedural_script",
+      "mount_height_mm": 0
+    },
+    {
+      "asset_id": "gen-scaffold-bay-1",
+      "category": "building_services",
+      "product": "Scaffold bay",
+      "variant": "Tube-and-fitting scaffold bay with plank decks, 4 m wide, 9.2 m high; procedural kit piece; low-poly edition",
+      "dimensions_mm": {
+        "width": 4052,
+        "depth": 1260,
+        "height": 9196
+      },
+      "render_material_id": "steel-galvanized",
+      "prompt": null,
+      "tags": [
+        "scaffold",
+        "construction",
+        "facade",
+        "temporary works",
+        "site",
+        "procedural",
+        "low-poly",
+        "y2k-megastructure-kit-v020"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "lod": "low",
+      "recipe_override": "procedural_script"
+    },
+    {
+      "asset_id": "gen-antenna-cluster-roof-1",
+      "category": "building_services",
+      "product": "Rooftop antenna cluster",
+      "variant": "Lattice mast with whip and panel antennas and dishes on a roof pad; procedural kit piece; low-poly edition",
+      "dimensions_mm": {
+        "width": 8000,
+        "depth": 8000,
+        "height": 15800
+      },
+      "render_material_id": "aluminium-anodized",
+      "prompt": null,
+      "tags": [
+        "antenna",
+        "mast",
+        "telecom",
+        "rooftop",
+        "services",
+        "roofscape",
+        "procedural",
+        "low-poly",
+        "y2k-megastructure-kit-v020"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "lod": "low",
+      "recipe_override": "procedural_script"
+    },
+    {
+      "asset_id": "gen-utility-pole-1",
+      "category": "site_furniture",
+      "product": "Utility pole",
+      "variant": "10.5 m concrete pole with crossarms, insulators, a transformer and a lamp arm; procedural kit piece; low-poly edition",
+      "dimensions_mm": {
+        "width": 3525,
+        "depth": 600,
+        "height": 10500
+      },
+      "render_material_id": "concrete-smooth",
+      "prompt": null,
+      "tags": [
+        "utility pole",
+        "power",
+        "street light",
+        "tokyo",
+        "streetscape",
+        "urban",
+        "procedural",
+        "low-poly",
+        "y2k-world-kit-v040"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "lod": "low",
+      "recipe_override": "procedural_script"
+    },
+    {
+      "asset_id": "gen-vending-row-1",
+      "category": "site_furniture",
+      "product": "Vending machine row",
+      "variant": "Three street vending machines with lit fronts and a can bin; procedural kit piece; low-poly edition",
+      "dimensions_mm": {
+        "width": 3920,
+        "depth": 860,
+        "height": 1990
+      },
+      "render_material_id": "steel-painted-vermilion",
+      "prompt": null,
+      "tags": [
+        "vending",
+        "drinks",
+        "kiosk",
+        "japan",
+        "streetscape",
+        "urban",
+        "procedural",
+        "low-poly",
+        "y2k-world-kit-v040"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "lod": "low",
+      "recipe_override": "procedural_script"
+    },
+    {
+      "asset_id": "gen-wall-ac-rig-1",
+      "category": "building_services",
+      "product": "Wall AC rig",
+      "variant": "Two split AC units on wall brackets with pipe runs and a drain line; procedural kit piece; low-poly edition",
+      "dimensions_mm": {
+        "width": 2525,
+        "depth": 450,
+        "height": 4130
+      },
+      "render_material_id": "steel-galvanized",
+      "prompt": null,
+      "tags": [
+        "air-conditioning",
+        "split unit",
+        "facade",
+        "services",
+        "wall-mounted",
+        "tokyo",
+        "procedural",
+        "low-poly",
+        "y2k-world-kit-v040"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "wall",
+      "placement_priority": "fixed",
+      "lod": "low",
+      "recipe_override": "procedural_script",
+      "mount_height_mm": 0
+    },
+    {
+      "asset_id": "gen-shrine-lantern-1",
+      "category": "ornament",
+      "product": "Lantern shrine",
+      "variant": "Plinth with a red gate frame, a hanging paper-lantern form and two offering boxes, 4 m; procedural kit piece; low-poly edition",
+      "dimensions_mm": {
+        "width": 4000,
+        "depth": 4000,
+        "height": 4020
+      },
+      "render_material_id": "steel-painted-vermilion",
+      "prompt": null,
+      "tags": [
+        "shrine",
+        "gate",
+        "lantern",
+        "japan",
+        "streetscape",
+        "landmark",
+        "procedural",
+        "low-poly",
+        "y2k-world-kit-v040"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "lod": "low",
+      "recipe_override": "procedural_script"
+    },
+    {
+      "asset_id": "gen-commuter-railcar-lead-1",
+      "category": "vehicle",
+      "product": "Commuter railcar, lead",
+      "variant": "20 m car with a raked nose, window band, doors, roof units and a pantograph; procedural kit piece; low-poly edition",
+      "dimensions_mm": {
+        "width": 19750,
+        "depth": 3060,
+        "height": 5420
+      },
+      "render_material_id": "plaster-white",
+      "prompt": null,
+      "tags": [
+        "train",
+        "railcar",
+        "commuter",
+        "rail",
+        "transit",
+        "vehicle",
+        "procedural",
+        "low-poly",
+        "y2k-world-kit-v040"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "lod": "low",
+      "recipe_override": "procedural_script"
+    },
+    {
+      "asset_id": "gen-commuter-railcar-mid-1",
+      "category": "vehicle",
+      "product": "Commuter railcar, middle",
+      "variant": "20 m middle car with a window band, doors, roof units and a pantograph; procedural kit piece; low-poly edition",
+      "dimensions_mm": {
+        "width": 19700,
+        "depth": 3060,
+        "height": 5420
+      },
+      "render_material_id": "plaster-white",
+      "prompt": null,
+      "tags": [
+        "train",
+        "railcar",
+        "commuter",
+        "rail",
+        "transit",
+        "vehicle",
+        "procedural",
+        "low-poly",
+        "y2k-world-kit-v040"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "lod": "low",
+      "recipe_override": "procedural_script"
     }
   ],
   "retired": [

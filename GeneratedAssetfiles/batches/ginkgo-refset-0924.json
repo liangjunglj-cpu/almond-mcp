@@ -1,0 +1,78 @@
+{
+  "batch_id": "ginkgo-refset-0924",
+  "purpose": "A classical plaster statue generated for the Ginkgo world pass refset_0924 (W038-W041, 2026-09-24) and reused in the owner's Project Y2K game (content v061, Mirai Ward hub), re-derived as Almond library geometry.",
+  "origin": {
+    "project": "Ginkgo, the owner's own world-generation repository (private); reused in Project Y2K, the owner's game project (private)",
+    "pass": "runs/refset_0924",
+    "pass_date": "2026-09-24",
+    "pass_records": [
+      "runs/refset_0924/pass.json",
+      "ProjectY2K: twofronts/meshy/ginkgo_props_v061/out/conditioning.json"
+    ],
+    "records": [
+      "runs/refset_0924/pass.json (owner reference set described; AI-assisted content statement)",
+      "ProjectY2K: twofronts/meshy/ginkgo_props_v061/condition_ginkgo_props.py and out/conditioning.json (content v061 conditioned these props for the Mirai Ward hub as SM_GK61_<Name>.fbx)",
+      "ProjectY2K: twofronts/infrastructure/scripts/world_fill_v061.py (places the conditioned props in the hub)",
+      "Claude Code session transcript 91b8746a-d9e0-43fb-9702-e16a1209fd34 (the tool calls that submitted the image and Meshy jobs, the curl download of the image and the GLB download)"
+    ],
+    "used_in_project_y2k": "Confirmed 2026-11-20: ginkgo_props_v061 SPEC conditions PlasterStatue from runs/refset_0924/meshy/plaster_statue.glb (this download) and world_fill_v061.py places it in the hub's statue set.",
+    "excluded": {
+      "inflatable_bear": "Cartoon-character inflatable art piece (character-likeness question); not in the owner's chosen group",
+      "refset_1003 plaster_statue.glb and Project Y2K SM_GK61_PlasterStatue.fbx": "Byte-identical copy and game derivative of this download"
+    }
+  },
+  "image_provider": "higgsfield",
+  "image_settings": {
+    "model": "gpt_image_2_5",
+    "aspect_ratio": "1:1",
+    "image_reference": "none (text prompt only)"
+  },
+  "mesh_settings": {
+    "ai_model": "meshy-7",
+    "enable_pbr": true,
+    "target_polycount": 30000,
+    "target_formats": [
+      "glb"
+    ],
+    "note": "target_polycount was sent without should_remesh; the download has about 0.9M triangles"
+  },
+  "strip_source_materials": true,
+  "external_reference_ids": [],
+  "external_reference_status": "Text prompt only: no image was given to the image model or to Meshy. The pass designed its scenes from an owner reference set of 8 images (described in runs/refset_0924/pass.json; a red container plaza with a giant inflatable, among others); none shows this statue and none was uploaded to a generator. The prompt asks for a generic classical robed figure, a public-domain sculptural genre; the generated figure was not identified as a reproduction of any specific known sculpture.",
+  "variant_suffix": "generated ornament; detailed geometry edition",
+  "dimension_basis": "2.0 m overall: a life-size figure (about 1.75 m) on a plinth of about 0.25 m, chosen for this import as a real-world size. The Ginkgo scene and Project Y2K v061 placed it at 2.4 m. Scaled uniformly to that height; width and depth measured after scaling. Not a physical survey.",
+  "rights": "Reference image generated on the owner's Higgsfield account (gpt_image_2_5, text prompt only); mesh with Meshy-7 image-to-3D on the owner's Meshy account (the same account, by the account ID in the result URLs, as the library's other Meshy batches). Owner approved release in the Almond library under CC BY 4.0 on 2026-11-20 (\"increase the range of models, from the ones i used for my project y2k games, (except for the operatives and bosses)\") and chose this group, Ginkgo props reused in Project Y2K, the same day. Generator account entitlements not independently audited. Provider textures are not distributed.",
+  "estimated_credits": "0 for this import (generation already paid in Ginkgo: 30 Meshy credits, Higgsfield image credits)",
+  "repair_nonmanifold": true,
+  "assets": [
+    {
+      "asset_id": "gen-statue-plaster-togate-1",
+      "ginkgo_name": "plaster_statue",
+      "product": "Plaster statue",
+      "variant": "Classical white plaster statue of a standing robed figure holding a scroll, on a chipped square plinth",
+      "category": "ornament",
+      "material": "plaster-white",
+      "height_mm": 2000,
+      "width_hint_mm": 640,
+      "depth_hint_mm": 582,
+      "target_triangles": 80000,
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "tags": [
+        "statue",
+        "sculpture",
+        "classical",
+        "plaster cast",
+        "plinth",
+        "ornament"
+      ],
+      "prompt": "Product photo of a white plaster classical sculpture of a standing robed Greek figure holding a scroll, on a square white plinth, slightly chipped, full body three-quarter view, centred, plain light grey studio background, even soft lighting, no text.",
+      "image_job_id": "8ab89e75-2a96-4b29-8137-0f3f5fdaba4a",
+      "mesh_task_id": "01a0d2db-0281-75e1-9f35-7fe0890f8b7a",
+      "reference_review": "Reference image reviewed on 2026-11-20 at full resolution (1024 px): no inscription, lettering, logos or marks. A generic classical togate figure with a scroll, in the manner of Greco-Roman portrait statues (a public-domain genre); not identified as a copy of a specific known sculpture, and the idealised face is not a recognisable likeness of a real person. A sculpture, not a character."
+    }
+  ],
+  "release_assets": [
+    "gen-statue-plaster-togate-1"
+  ]
+}

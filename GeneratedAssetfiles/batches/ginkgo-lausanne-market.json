@@ -1,0 +1,78 @@
+{
+  "batch_id": "ginkgo-lausanne-market",
+  "route": "meshy_text_to_3d",
+  "purpose": "A shop dress form generated with Meshy text-to-3D for the Ginkgo Lausanne market scene (2026-10-20) and reused in the owner's Project Y2K game (content v061, Mirai Ward hub), re-derived as Almond library geometry.",
+  "origin": {
+    "project": "Ginkgo, the owner's own world-generation repository (private); reused in Project Y2K, the owner's game project (private)",
+    "pass": "runs/lausanne_market",
+    "pass_date": "2026-10-20",
+    "pass_records": [
+      "ProjectY2K: twofronts/meshy/ginkgo_props_v061/out/conditioning.json"
+    ],
+    "records": [
+      "ProjectY2K: twofronts/meshy/ginkgo_props_v061/condition_ginkgo_props.py and out/conditioning.json (content v061 conditioned these props for the Mirai Ward hub as SM_GK61_<Name>.fbx)",
+      "ProjectY2K: twofronts/infrastructure/scripts/world_fill_v061.py (places the conditioned props in the hub)",
+      "Claude Code session transcript e4edd362-e50f-46af-9ed5-ee8428fc6b4e (the tool calls that submitted the preview and refine and downloaded the GLB)"
+    ],
+    "used_in_project_y2k": "Confirmed 2026-11-20: ginkgo_props_v061 SPEC conditions Mannequin from runs/lausanne_market/gen/mannequin_meshy.glb (this download) and world_fill_v061.py places two in the hub's market set.",
+    "excluded": {
+      "bike_meshy.glb": "Near-duplicate of the library's gen-bicycle-city-basket-1",
+      "pigeon_meshy.glb": "Creature; not in the owner's chosen group",
+      "walker_meshy.glb, sitter_meshy.glb": "Human figures (owner rule)",
+      "gen/ph/*_2k.gltf": "Poly Haven downloads (third-party)"
+    }
+  },
+  "text_to_3d_settings": {
+    "preview": {
+      "ai_model": "meshy-6",
+      "target_formats": [
+        "glb"
+      ]
+    },
+    "refine": {
+      "enable_pbr": true,
+      "texture_prompt": "in the request",
+      "ai_model": "not named in the refine request (provider default; not recorded)"
+    }
+  },
+  "strip_source_materials": true,
+  "external_reference_ids": [],
+  "external_reference_status": "Text prompts only: no image was given to any stage, and the prompt asks for a generic shop dress form.",
+  "variant_suffix": "generated prop; detailed geometry edition",
+  "dimension_basis": "1.72 m overall, the height Project Y2K v061 gave it and a real size for a dress form on a tripod stand. Scaled uniformly to that height; width and depth measured after scaling. Not a physical survey.",
+  "rights": "Meshy-6 text-to-3D preview and refine on the owner's Meshy account on 2026-10-20 (the same account, by the account ID in the result URLs, as the library's other Meshy batches); the plan on that date was not independently audited. Text prompts only. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-20 (\"increase the range of models, from the ones i used for my project y2k games, (except for the operatives and bosses)\") and chose this group, Ginkgo props reused in Project Y2K, the same day. Provider textures are not distributed.",
+  "estimated_credits": "0 for this import (generation already paid in Ginkgo: 20 Meshy credits for the preview, 10 for the refine)",
+  "repair_nonmanifold": true,
+  "assets": [
+    {
+      "asset_id": "gen-dress-form-mannequin-1",
+      "ginkgo_name": "mannequin",
+      "product": "Dress form",
+      "variant": "Shop dress form on a wooden tripod stand, wearing a summer sundress",
+      "category": "household",
+      "material": "fabric-linen",
+      "height_mm": 1720,
+      "width_hint_mm": 540,
+      "depth_hint_mm": 481,
+      "target_triangles": 60000,
+      "support_plane": "floor",
+      "placement_priority": "accessory",
+      "tags": [
+        "dress form",
+        "mannequin",
+        "shop fixture",
+        "boutique",
+        "retail",
+        "clothing"
+      ],
+      "prompt": "Shop display dress form mannequin on a wooden tripod stand, wearing a light blue summer sundress, second-hand clothing boutique, realistic",
+      "preview_task_id": "01a15a10-4973-74e6-ab6d-f72d458d29b6",
+      "mesh_task_id": "01a15a14-5059-76af-9594-a2735b85a87d",
+      "refine_texture_prompt": "light sky blue cotton summer dress with subtle fabric weave, cream linen dress form mannequin torso, dark walnut wooden neck knob and tripod stand",
+      "reference_review": "Reviewed on 2026-11-20: text-to-3D has no input image. The library geometry was checked in its archive preview: a headless dress form, not a human figure or character; no lettering, logos or brand marks in the geometry."
+    }
+  ],
+  "release_assets": [
+    "gen-dress-form-mannequin-1"
+  ]
+}

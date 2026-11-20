@@ -1,0 +1,360 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-fishing-boat-coastal-b-1",
+  "library_id": "generated_assets",
+  "name": "Fishing boat (Taiwanese coastal fishing boat, 16 m, white wooden hull with navy gunwale and maroon stem stripe; generated watercraft; detailed geometry edition)",
+  "source_app": "tripo",
+  "source_units": "m",
+  "file": "gen-fishing-boat-coastal-b-1.glb",
+  "dimensions_mm": {
+    "width": 15996.5,
+    "depth": 5496.7,
+    "height": 4988.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "ground",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -7998.25,
+        -2748.35,
+        0.0
+      ],
+      "max": [
+        7998.25,
+        2748.35,
+        4988.0
+      ]
+    },
+    "footprint": [
+      [
+        -7998.25,
+        -2748.35
+      ],
+      [
+        7998.25,
+        -2748.35
+      ],
+      [
+        7998.25,
+        2748.35
+      ],
+      [
+        -7998.25,
+        2748.35
+      ]
+    ],
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "movable"
+  },
+  "materials": [
+    {
+      "material_id": "plaster-white",
+      "objects": [
+        "gen-fishing-boat-coastal-b-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-fishing-boat-coastal-b-1",
+    "library_id": "generated_assets",
+    "name": "Fishing boat (Taiwanese coastal fishing boat, 16 m, white wooden hull with navy gunwale and maroon stem stripe; generated watercraft; detailed geometry edition)",
+    "category": "vehicle",
+    "tags": [
+      "boat",
+      "fishing boat",
+      "watercraft",
+      "harbour",
+      "taiwan",
+      "waterfront",
+      "detailed",
+      "tripo",
+      "ginkgo-daxi-2026-11"
+    ],
+    "dimensions_mm": {
+      "width": 15996.5,
+      "depth": 5496.7,
+      "height": 4988.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 16000.0,
+      "depth": 5497.0,
+      "height": 4988.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "ground",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -7998.25,
+          -2748.35,
+          0.0
+        ],
+        "max": [
+          7998.25,
+          2748.35,
+          4988.0
+        ]
+      },
+      "footprint": [
+        [
+          -7998.25,
+          -2748.35
+        ],
+        [
+          7998.25,
+          -2748.35
+        ],
+        [
+          7998.25,
+          2748.35
+        ],
+        [
+          -7998.25,
+          2748.35
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "movable"
+    },
+    "materials": [
+      {
+        "material_id": "plaster-white",
+        "objects": [
+          "gen-fishing-boat-coastal-b-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "tripo",
+      "parameters": {
+        "prompt": "Photorealistic isolated product shot of ONE complete Taiwanese coastal fishing boat (Daxi harbour, Yilan), about 16 m long, shown whole from bow to stern in a three-quarter front view from slightly above, the bow pointing toward the left of the frame, the entire hull visible out of the water down to the keel, on a plain flat light grey studio background, soft even overcast lighting, no shadows on background. Match the boat in the reference crop: weathered white painted wooden hull with a dark navy blue gunwale cap and a thin navy sheer stripe, a narrow maroon-red painted stem stripe running down the bow, a small red painted curl motif on the bow flank, pale blue antifouling below the waterline, white bulwarks, a low white wheelhouse aft with small square windows, deck winch and a round orange-red lamp on the foredeck. Real paint wear, rust streaks from scuppers, scuffs, grime along the waterline. IMPORTANT: no mast, no rigging, no ropes, no floats, no buoys, no tyres, no flags, no people, no water. Exactly one boat.",
+        "image_task_id": null,
+        "image_model": "nano_banana_pro",
+        "mesh_task_id": "ff019bd6-0048-49ab-8525-ebe7b1a07769",
+        "mesh_model": "tripo_h3_1_image_to_3d",
+        "generated_at": "2026-10-15",
+        "orientation_correction": null,
+        "scale_applied": 16225.83053,
+        "captured_generation": {
+          "batch_id": "ginkgo-daxi-2026-11",
+          "image": {
+            "asset_id": "gen-fishing-boat-coastal-b-1",
+            "provider": "higgsfield",
+            "tool": "generate_image",
+            "submitted_at": "2026-10-15T03:02:02.956Z",
+            "request": {
+              "model": "nano_banana_pro",
+              "resolution": "2k",
+              "aspect_ratio": "16:9",
+              "medias": [
+                {
+                  "value": "9f4997c6-c555-4f3f-978c-55143e90b91e",
+                  "role": "image_references"
+                },
+                {
+                  "value": "7541720a-3002-4785-b6b9-6b1bd975abaa",
+                  "role": "image_references"
+                }
+              ],
+              "prompt": "Photorealistic isolated product shot of ONE complete Taiwanese coastal fishing boat (Daxi harbour, Yilan), about 16 m long, shown whole from bow to stern in a three-quarter front view from slightly above, the bow pointing toward the left of the frame, the entire hull visible out of the water down to the keel, on a plain flat light grey studio background, soft even overcast lighting, no shadows on background. Match the boat in the reference crop: weathered white painted wooden hull with a dark navy blue gunwale cap and a thin navy sheer stripe, a narrow maroon-red painted stem stripe running down the bow, a small red painted curl motif on the bow flank, pale blue antifouling below the waterline, white bulwarks, a low white wheelhouse aft with small square windows, deck winch and a round orange-red lamp on the foredeck. Real paint wear, rust streaks from scuppers, scuffs, grime along the waterline. IMPORTANT: no mast, no rigging, no ropes, no floats, no buoys, no tyres, no flags, no people, no water. Exactly one boat."
+            },
+            "task_id": "a0f1074e-a58f-40a4-a9c9-4a008aff4798",
+            "status": "COMPLETED",
+            "provider_model": "nano_banana_pro",
+            "provider_reported_model": "nano_banana_2",
+            "completed_observed_at": "2026-10-15T03:04:08.314Z",
+            "provider_output_name": "hf_20261015_030209_a0f1074e-a58f-40a4-a9c9-4a008aff4798.png",
+            "reference_inputs": [
+              {
+                "name": "right_bow.png",
+                "role": "owner photograph (right_bow)",
+                "sha256": "79d792329c821fdbf608cf233885afb14fe88915e55137faa919ae47f1d688f1",
+                "retained": false,
+                "note": "Owner photograph uploaded to the image stage; not distributed"
+              },
+              {
+                "name": "daxi_ref.jpg",
+                "role": "owner photograph (daxi_ref)",
+                "sha256": "c61e641ee44b18b5ca441f344ba8d75ac4fdf3e0452f3e536e5ef42a1305ee9f",
+                "retained": false,
+                "note": "Owner photograph uploaded to the image stage; not distributed"
+              }
+            ],
+            "output_file": "gen-fishing-boat-coastal-b-1.image-output.png",
+            "output_sha256": "4243bef93f3a4c9a8708c942b25c1abe60e9638d2cbb668bf33a91e47425dd6c",
+            "output_file_modified_at": "2026-10-15T03:04:13+00:00",
+            "seed": null,
+            "evidence_source": {
+              "pass_records": [
+                "runs/daxi_harbour/blender/layout.json",
+                "runs/daxi_harbour/blender/build_scene.py"
+              ],
+              "session_records": "Tool calls of Ginkgo Claude Code session(s) 32f853ff-f053-42f0-973f-1c12ffd01fac (submissions, results and downloads)",
+              "extracted_at": "2026-11-20T16:57:59+00:00"
+            },
+            "status_basis": "Provider reported completed; curl of the job's result URL in the Ginkgo session (Bash)"
+          },
+          "mesh": {
+            "asset_id": "gen-fishing-boat-coastal-b-1",
+            "provider": "higgsfield",
+            "tool": "generate_3d",
+            "submitted_at": "2026-10-15T03:05:00.802Z",
+            "request": {
+              "model": "tripo_h3_1_image_to_3d",
+              "medias": [
+                {
+                  "value": "c206d00e-4b6e-4368-a849-f09089474d49",
+                  "role": "image_references"
+                }
+              ],
+              "geometry_quality": "detailed",
+              "texture_quality": "detailed",
+              "pbr": true
+            },
+            "task_id": "ff019bd6-0048-49ab-8525-ebe7b1a07769",
+            "status": "COMPLETED",
+            "status_basis": "Higgsfield jobs_wait reported completed; GLB downloaded with curl from the job's result URL in the Ginkgo session",
+            "provider_model": "tripo_h3_1_image_to_3d",
+            "completed_observed_at": "2026-10-15T03:08:15.373Z",
+            "provider_output_name": "hf_20261015_030505_ff019bd6-0048-49ab-8525-ebe7b1a07769.glb",
+            "consumed_credits": "18 Higgsfield credits (cost quote returned in the Ginkgo session)",
+            "input_link": "uploaded_derivative",
+            "input_image_sha256": "68a6bc8ad371be4ad61bc5a01fd29784502c53c6c8d730ef4bea4363c16c080e",
+            "output_file": "gen-fishing-boat-coastal-b-1.glb",
+            "output_sha256": "d46929626e3fc6ffe9300e858d3e25531d348ef95ee7e3febff3226d8808726a",
+            "seed": null,
+            "evidence_source": {
+              "pass_records": [
+                "runs/daxi_harbour/blender/layout.json",
+                "runs/daxi_harbour/blender/build_scene.py"
+              ],
+              "session_records": "Tool calls of Ginkgo Claude Code session(s) 32f853ff-f053-42f0-973f-1c12ffd01fac (submissions, results and downloads)",
+              "extracted_at": "2026-11-20T16:57:59+00:00"
+            },
+            "uploaded_input": {
+              "file": "gen-fishing-boat-coastal-b-1.png",
+              "sha256": "68a6bc8ad371be4ad61bc5a01fd29784502c53c6c8d730ef4bea4363c16c080e",
+              "derived_from_sha256": "4243bef93f3a4c9a8708c942b25c1abe60e9638d2cbb668bf33a91e47425dd6c",
+              "media_id": "c206d00e-4b6e-4368-a849-f09089474d49",
+              "uploaded_at": "2026-10-15T03:04:46Z",
+              "operation": "Ginkgo session cropped the generated image to (110, 290, 2640, 1380) to remove a faded duplicate boat at the top, then padded it with the image's background colour (100 px left/right, 200 px top/bottom) with Pillow; uploaded as Higgsfield media c206d00e at 2026-10-15T03:04:33Z, before the Tripo request."
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-fishing-boat-coastal-b-1",
+            "source_sha256": "d46929626e3fc6ffe9300e858d3e25531d348ef95ee7e3febff3226d8808726a",
+            "source_triangles": 1952348,
+            "target_triangles": 80000,
+            "prepared_sha256": "defd258082f19d4ddd67c31680da9f0cd6c3eab147659105897e6c014947238d",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Remove wire edges, split edges shared by more than two faces and remove zero-area faces (counts in quality.topology_repairs). Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 9.857887029647826e-08,
+            "quality": {
+              "vertices": 39974,
+              "triangles": 80000,
+              "boundary_edges": 0,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 1,
+              "largest_component_vertices": 39974,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "topology_repairs": {
+                "wire_edges_removed": 0,
+                "nonmanifold_edges_split": 1,
+                "zero_area_faces_removed": 0,
+                "loose_vertices_removed": 0
+              },
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                7.594267778960855e-05,
+                0.00010188384818989882,
+                0.00041646016617672305
+              ]
+            }
+          },
+          "input_image_file": "batches/ginkgo-daxi-2026-11/gen-fishing-boat-coastal-b-1.png",
+          "external_reference_status": "Photo-derived: each image request took crops of the owner's own photograph of Daxi fishing harbour (Yilan, Taiwan) as Higgsfield media references. The two hero boats (14 m and 16 m) were prompted to match specific boats in that photograph; the three smaller boats follow the photograph's general harbour craft. The photograph and crops are named and hashed in each image record, not distributed. The Higgsfield job results report model nano_banana_2 for requests that named nano_banana_pro; both are recorded.",
+          "external_reference_ids": [],
+          "dimension_basis": "Lengths are the sizes written into each image prompt in the Ginkgo session (14, 16, 11, 15 and 22 m); each mesh was scaled uniformly so its overall length matches, and height and beam were measured after scaling. The Daxi scene itself placed the hero boats at 18 and 19 m. Not a physical survey.",
+          "reference_review": "Reference image reviewed on 2026-11-20 (downscaled to 900 px wide): no hull numbers, boat names, lettering, logos or brand marks visible.",
+          "rights": "Reference images generated on the owner's Higgsfield account (nano_banana_pro) from crops of the owner's own photograph; meshes with Tripo H3.1 through the owner's Higgsfield account (the two hero boats) or on the owner's paid Meshy account (three harbour boats). The hero boats are modelled on specific working boats in the owner's photograph; no hull numbers, names, lettering or marks appear in the reference images. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-20. Generator account entitlements and the Tripo terms not independently audited.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private)",
+            "pass": "runs/daxi_harbour",
+            "source_name": "boatR",
+            "records": [
+              "runs/daxi_harbour/blender/layout.json",
+              "Claude Code session transcript 32f853ff-f053-42f0-973f-1c12ffd01fac (the tool calls that uploaded the photo crops and submitted the image, Tripo and Meshy jobs, and the crop of the boatR image)"
+            ]
+          }
+        }
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "streetscape"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.0,
+      "triangle_count": 80000,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "929FDBB154C56F48FF6FAB0DFD076CA2227C7C961FC0B656D1B427228DEB5CAC"
+}

@@ -85,7 +85,7 @@ function evidence(a) {
   const origin = external(a.source_url);
   const dl = (label, value) => value ? `<dt>${esc(label)}</dt><dd>${esc(value)}</dd>` : '';
   return `<details open><summary>Source & attribution</summary><p>${esc(a.publisher)}<br>${esc(a.license)}</p>${origin ? `<p><a href="${esc(origin)}" target="_blank" rel="noopener noreferrer">${a.kind === 'model' ? 'Generation provider' : 'Original source'} ↗</a></p>` : '<p>No external source link recorded.</p>'}${p ? `<dl>${dl('Generated', g.generated_at)}${dl('Mesh model',g.mesh_model)}${dl('Mesh task ID', g.mesh_task_id)}${dl('Image provider',p.image_generation?.provider)}${dl('Image task / job ID',p.image_generation?.id)}</dl><p>${esc(p.rights_evidence)}</p>` : '<p>Representation-only element. Check the original source terms for project use. Downloaded community files are local to this installation and are excluded from the distributable plugin.</p>'}</details>
-    ${p ? `<details><summary>Generation prompt & evidence gaps</summary><p>${esc(g.prompt || 'Prompt not recorded.')}</p><ul>${p.evidence_gaps.map(gap => `<li>${esc(gap)}</li>`).join('')}</ul><p>Reference directories are research leads; they are not evidence of inputs used for this model.</p></details>` : ''}
+    ${p ? `<details><summary>Generation prompt & evidence gaps</summary><p>${esc(g.generation_route === 'procedural_script' ? `Built by a script, not a generator: ${g.generator_script || 'script not recorded'}.` : (g.prompt || 'Prompt not recorded.'))}</p><ul>${p.evidence_gaps.map(gap => `<li>${esc(gap)}</li>`).join('')}</ul><p>Reference directories are research leads; they are not evidence of inputs used for this model.</p></details>` : ''}
     ${a.drawing ? `<details><summary>Drawing method & limitations</summary><p>Plan, front and right silhouettes at 1:50 and 1:100. SVGs and A3 sheets carry paper scale; DXF geometry uses real-world millimetres. On-screen previews are fitted to the viewer.</p><ul>${a.drawing.source.limitations.map(s => `<li>${esc(s)}</li>`).join('')}</ul><p>Geometry fingerprint: ${esc(a.drawing.source.geometry_sha256)}</p>${link(a.drawing.record,'Drawing record')}</details>` : '<details><summary>Drawing availability</summary><p>No derived drawing package is attached to this object. For a supported GLB, the Almond MCP drawing tool can generate a new projection package.</p></details>'}
     <details><summary>Object record</summary><dl>${dl('Object ID',a.id)}${dl('MCP resource',a.uri)}${dl('Drawing roles',a.roles.map(human).join(', '))}${dl('Model SHA-256',a.metadata.sha256)}</dl><p>The record connects this object’s files, dimensions and source history.</p>${link(a.record_url,'Complete record JSON')}${link(a.contract,'Spatial contract')}</details>`;
 }
@@ -126,9 +126,9 @@ function renderViewer() {
     model.setAttribute('scale','0.001 0.001 0.001'); model.setAttribute('interaction-prompt','none');
     model.setAttribute('camera-orbit','35deg 70deg auto');
     if(a.preview) model.setAttribute('poster',a.preview);
-    $('viewer-caption').textContent = 'Loading model…';
+    $('viewer-caption').textContent = a.local === false ? 'Downloading model (first view)…' : 'Loading model…';
     model.addEventListener('load',() => { if(currentView === '3d') $('viewer-caption').textContent='DRAG TO ORBIT · SCROLL TO ZOOM'; },{once:true});
-    model.addEventListener('error',() => { if(currentView === '3d') { const notice=document.createElement('p');notice.className='viewer-notice';notice.textContent='3D preview unavailable. You can still download the GLB.';viewer.append(notice);$('viewer-caption').textContent='Preview unavailable'; } },{once:true});
+    model.addEventListener('error',() => { if(currentView === '3d') { const notice=document.createElement('p');notice.className='viewer-notice';notice.textContent=a.local === false ? '3D preview unavailable: the model could not be downloaded. Check the connection, or run almond-mcp fetch-assets --generated.' : '3D preview unavailable. You can still download the GLB.';viewer.append(notice);$('viewer-caption').textContent='Preview unavailable'; } },{once:true});
     viewer.append(model);
     window.almondPreviewModel(model);
   } else {
@@ -138,7 +138,7 @@ function renderViewer() {
     $('viewer-caption').textContent = isDrawing ? `${currentView.toUpperCase()} / 1:${scale} · FITTED PREVIEW${rep?.method === 'raster_projection' ? ' · APPROXIMATED' : ''}` : a.preview ? 'DRAWING ELEMENT · FITTED PREVIEW' : 'No browser preview for this file.';
   }
   const drawingLinks = isDrawing ? (currentView === 'sheet' ? link(sheet?.svg,`A3 sheet 1:${scale}`,'primary') : link(rep?.svg,`${human(currentView)} SVG`,'primary')+link(rep?.dxf,`${human(currentView)} DXF`)) : '';
-  $('downloads').innerHTML = placementButton(a) + drawingLinks + link(a.model,`Download ${a.format.toUpperCase()}`,isDrawing ? '' : 'primary') + link(a.record_url,'Record JSON') + (!a.available ? '<p class="small-note">Model file is not installed. See the original source below.</p>' : '');
+  $('downloads').innerHTML = placementButton(a) + drawingLinks + link(a.model,`Download ${a.format.toUpperCase()}`,isDrawing ? '' : 'primary') + link(a.record_url,'Record JSON') + (!a.available ? '<p class="small-note">Model file is not installed. See the original source below.</p>' : a.local === false ? '<p class="small-note">The model file downloads from the Almond release on first view or placement.</p>' : '');
 }
 
 function renderSources() {

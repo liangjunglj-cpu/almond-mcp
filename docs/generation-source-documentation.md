@@ -140,3 +140,137 @@ Known gaps, in addition to the refset_1024 ones:
   evidence is the job result and the download command, not a provider checksum.
 - Fountain and ornament sizes were measured from photographs in Ginkgo's reconstruction, not
   surveyed. Wall mount heights are the heights at which those scenes placed them.
+
+## Project Y2K batches and the Meshy text-to-3D route (2026-11-20)
+
+Three batches import props from the owner's Project Y2K game, all generated in Ginkgo sessions:
+`y2k-props-v038` and `y2k-twofronts-2026-09` (Meshy text-to-3D) and `y2k-trees-refset-0923b`
+(Higgsfield image, uploaded to Meshy-7, the existing `upload` link).
+
+Text-to-3D has no image stage. Meshy takes the prompt in a **preview** task and textures it in a
+**refine** task that names the preview by `preview_task_id`. A batch declares `"route":
+"meshy_text_to_3d"`, and each asset carries `preview_task_id` instead of `image_job_id`. For that
+route:
+
+- `stage_ginkgo_chains.py` writes `<asset_id>.preview.json` and `<asset_id>.mesh.json` (the refine,
+  `input_link: preview_task_id`), checks the refine names the recorded preview, refuses a download
+  modified after the session saved it or whose size differs from what `meshy_download_model`
+  reported, and copies the refine download. No image is retained, because none existed.
+- `import_organic_batch.py` records `generation_route`, `preview_task_id` and `preview_model` in the
+  manifest and provenance in place of `image_task_id` / `image_model`, and sets
+  `captured_generation.input_image_file` to null.
+- The source checker applies the text-to-3D requirements only when the recorded
+  `generation_route` says so: it then requires the preview task and model, the prompt in the preview
+  request, the refine-to-preview link and no input image, and rejects a record that names both a
+  route and an image stage. Image-stage assets keep every earlier requirement.
+
+The round 1/2 props were downloaded from Meshy as OBJ (Y-up, arbitrary units) with separate texture
+maps. The OBJ is the hashed provider output (`output_format: obj`). `prepare_organic_meshes.py`
+imports its geometry directly (Blender OBJ importer, Y-up to Z-up, -Z forward: the same axis change
+as the glTF importer), drops the texture maps, decimates to the batch target and exports the library
+GLB, so the derivation record links the OBJ hash to the prepared GLB hash in one step
+(`source_format: obj`).
+
+Known gaps, in addition to the earlier ones:
+
+- Two v038 previews (box stack, ivy) were never queried in the session. Their success is inferred
+  from the refine tasks that name them, and their credits are the price-table figure; both are
+  labelled in `status_basis` / `consumed_credits`.
+- The session that made the round 1/2 props records the Meshy balance but not the plan, so whether
+  the account was on a paid plan on 2026-09-06 is unknown (see `docs/licensing-audit.md`).
+- Sizes are the game's own placement or conditioning heights, not surveys.
+
+## Ginkgo props reused in Project Y2K (four batches, 2026-11-20)
+
+Thirteen Ginkgo props that Project Y2K content v061 conditioned for its Mirai Ward hub
+(`twofronts/meshy/ginkgo_props_v061`), one batch per Ginkgo pass and route:
+
+- `ginkgo-refset-1003` and `ginkgo-refset-0924`: Higgsfield `gpt_image_2_5` images from text
+  prompts, curl-downloaded in the session and uploaded to Meshy-7 image-to-3D (`upload` link).
+- `ginkgo-refset-1007`: a two-step image stage. Concept images were made from text prompts; each
+  single-object reference image then took one concept image as its only media reference. The image
+  record names that concept in `concept_reference` (job ID, file name, SHA-256, its own prompt;
+  `retained: false`). The meshes are Tripo H3.1 through Higgsfield `generate_3d` (`media_job_id`
+  link) or Meshy-7.1 image-to-3D (`upload` link).
+- `ginkgo-lausanne-market`: Meshy-6 text-to-3D (the existing route). Its refine request named no
+  `ai_model`; the chain records that in `provider_model` ("unspecified ... provider default"), and
+  `import_organic_batch.py` now takes `mesh_model` from that field when the request has none,
+  instead of failing or guessing a model.
+
+Each batch's `origin.used_in_project_y2k` states where Y2K used the prop (v061 conditioned most of
+them from Ginkgo's `*_near.glb` LODs of these downloads; the provider downloads are the hashed
+sources here). Design proximity: the refset_1003 and refset_1007 prompts were written from owner
+reference sets of third-party photographs that were pasted into the sessions and never uploaded to
+a generator. Each generated image was compared with those photographs on 2026-11-20 and the
+comparison is recorded in `reference_review`; three refset_1003 props (pack unit, cube rover,
+lander) were excluded as close to specific third-party designs.
+
+Known gaps:
+
+- Three refset_1003 Meshy tasks were never status-queried in the session; their success rests on
+  `meshy_download_model` returning the GLB, and their credits are not recorded.
+- `runs/refset_1003/meshy/jobs.json` names the failed first rover task; the file on disk is the
+  re-run's download. The rover is excluded anyway (design proximity).
+- Vehicle sizes are Project Y2K's conditioning lengths; the other sizes are real-world choices made
+  for this import (each batch's `dimension_basis`).
+
+## Project Y2K procedural kit pieces and the procedural route (2026-11-20)
+
+Four batches (`y2k-street-kit-v004`, `y2k-district-kit-v016`, `y2k-megastructure-kit-v020`,
+`y2k-world-kit-v040`) import thirty pieces that Blender scripts in the owner's Project Y2K game
+repository built and exported as FBX. No generation provider, prompt, image or task exists for them,
+so they use a new route, keyed like text-to-3D: the batch declares `"route": "procedural_script"`
+and the manifest and provenance record `generation_route: procedural_script`. For that route:
+
+- The batch's `generator.scripts` holds, per script, the project-relative path, the SHA-256 and
+  size of the project file, the retained copy's name and SHA-256, any redaction, helper
+  dependencies (with their current hashes) and an `authoring` record: the Claude Code session(s)
+  that wrote and edited the script and ran the export, from the session transcripts, or
+  `"tool": "not found"` with the reason. `generator.kit_records` does the same for the kit record
+  each script wrote beside its FBX files. Each asset names its `source_file` (FBX) and
+  `source_sha256`, its `generator_script`, its `kit_record` entry (local paths dropped) and any
+  recorded `edits`.
+- `stage_ginkgo_chains.py` needs no chain file for this route. It checks every script, kit record
+  and FBX against the batch hashes, refuses an FBX older than a later edit of its script unless the
+  batch records that edit (`post_export_edit`, with the variants it touched) and the piece is not
+  among them, refuses a likely credential, and retains the scripts and kit records as text under
+  `raw/<batch>/evidence/`. Absolute local paths are redacted: the path up to the project folder is
+  replaced (`redact_local_paths`, `redaction_anchor`), so the retained copy's hash differs from the
+  project file's, and both are recorded.
+- `prepare_organic_meshes.py` imports the FBX with Blender's FBX importer (file axes and
+  `FBX_SCALE_UNITS` honoured, so pieces arrive at their authored metre size; custom normals not
+  imported), removes engine collision hulls (`UCX_*`), applies the recorded edits and records each
+  with the triangles it removed in `source_edits`. Edits are removals of cleanly separable parts
+  only: `remove_thin_loose_parts` (loose parts no thicker than a stated size along an axis, used
+  for tessellated lettering) and `remove_faces_by_material` (used for a decal quad). The target is
+  the source triangle count, so nothing is decimated or subdivided; hard edges above 30 degrees are
+  kept for the low-poly geometry.
+- `import_organic_batch.py` copies the retained scripts and kit records to `batches/<batch>/`,
+  writes `generation_route`, `generator_script`, `generator_script_sha256`, `source_file` and
+  `source_sha256` in place of the provider keys (the prompt is null; there are no image or mesh
+  task or model keys), sets the generator to `procedural_script` and the contract's `source_app`
+  to `blender`.
+- The source checker applies these requirements only when the recorded route says so: it requires
+  the script and source hashes, checks that the retained script and kit record still hash to the
+  recorded values, that the FBX hash links the mesh record, the derivation and the manifest, and
+  rejects a procedural record that also names a prompt, an image stage or a provider task. A record
+  without the route keeps every provider requirement (and a captured record with no image stage and
+  no route is an error). `tools/verify_release.py` checks the retained files in the release
+  evidence.
+
+Known gaps:
+
+- `build_street_kit.py` (street kit v004, 2026-09-11) predates every retained Project Y2K and
+  Ginkgo transcript; who wrote it is recorded as not found.
+- `kit_v040.py` and `kinetic_v046.py` import the owner's Ginkgo world-pack library (`gwlib.py`),
+  which changed after these exports; its current hash is recorded, the version the export used is
+  not retained. The export command for `MW_Shrine.fbx` was not pinned to a tool call (the session
+  edits and the file times bracket it).
+- `kinetic_v046.py` was edited a minute after the railcar export (two replacements inside the
+  blimp builder, recorded in `post_export_edit`); the retained script is the edited file.
+- The megastructure kit was designed with six owner-supplied third-party reference images in
+  view; they are named and hashed (`external_reference_files`), not retained.
+- The weld and degenerate cleanup drops a few triangles from four street and district pieces
+  (24 to 64); the counts are the difference between `source_triangles`, the recorded removals and
+  `quality.triangles`.
+- Sizes are the authored kit sizes; wall mount heights are assumptions.

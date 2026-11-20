@@ -2,8 +2,8 @@
 
 Open, redistributable 3D architectural assets for [Almond MCP](../README.md):
 entourage, site furniture, fixtures and unbranded
-furniture placeholders. **84 assets**, generated with
-[Meshy](https://www.meshy.ai) (three with Tripo, see the Ginkgo batches) from prompts written for this project and
+furniture placeholders. **144 assets**, generated with
+[Meshy](https://www.meshy.ai) (eleven with Tripo; thirty Project Y2K kit pieces built by Blender scripts; see the batches) from prompts written for this project and
 normalised to real-world millimetres with an authored Almond spatial
 contract. Unlike the IKEA / drawing libraries (3D Warehouse content that
 each user downloads), these files ship with the repository.
@@ -44,7 +44,8 @@ get_generated_asset(asset_id="gen-street-lamp-1")
 place_generated_asset(asset_id="gen-street-lamp-1", x_mm=0, y_mm=0)
 ```
 
-The wheel bundles all 84 models, contracts and previews.
+The wheel ships the manifest, catalogue and previews; each model GLB and its contract download from the
+GitHub release of the matching version on first use (`almond-mcp fetch-assets --generated` prefetches all 144).
 Run `almond-mcp audit-assets` to check checksums and agreement between embedded,
 sidecar and manifest passports. Wheel installs use a versioned user-data pack;
 explicit library directory overrides continue to take precedence.
@@ -226,6 +227,159 @@ length; the vending machine's front faces +X.
 Not included: the Freiburg scenes' people, bicycles and lamp (scene-baked copies of older
 meshes; the mesh-bank originals are above), procedural buildings and code-grown palms, and the
 assembled GRANDWHIS scenes. See `docs/licensing-audit.md`.
+
+## Project Y2K props (three batches, 2026-11-20)
+
+Twelve meshes the owner used in the Project Y2K game, released under CC BY 4.0 with the owner's
+approval on 2026-11-20 (operatives, bosses, weapons and buildings excluded). All were generated
+in the owner's Ginkgo sessions, staged by `tools/stage_ginkgo_chains.py` from those sessions' tool
+calls and imported with `tools/import_organic_batch.py`. Provider textures are removed and Almond
+materials assigned. Heights are the sizes the game used. Two of the batches are Meshy
+**text-to-3D** (preview + refine): they have no reference image, so their evidence keeps the
+preview and refine requests and no image (see `docs/generation-source-documentation.md`).
+
+**`y2k-props-v038`**: street clutter Ginkgo generated for pass refset_0923 (Meshy-6 text-to-3D,
+remeshed by Meshy to 14k to 23k triangles, kept at that density) and Y2K reused unchanged.
+
+| Preview | asset_id | Product | Category | W x D x H (mm) | Material | Triangles |
+| --- | --- | --- | --- | --- | --- | --- |
+| <img src="previews/gen-refuse-bag-heap-1.png" width="96" alt=""> | `gen-refuse-bag-heap-1` | Refuse bag heap (tied black and grey bin bags with crushed cans and paper scraps) | household | 1516 x 1443 x 720 | `rubber-black` | 20,630 |
+| <img src="previews/gen-cardboard-box-stack-1.png" width="96" alt=""> | `gen-cardboard-box-stack-1` | Cardboard box stack (worn, crushed corrugated boxes with an open flap on top) | household | 482 x 526 x 1300 | `wood-oak` | 13,928 |
+| <img src="previews/gen-ivy-clump-1.png" width="96" alt=""> | `gen-ivy-clump-1` | Ivy clump (ivy and vines draped over a low wall block, stones at the base) | vegetation | 1634 x 1508 x 1600 | `foliage-pine` | 23,170 |
+| <img src="previews/gen-rubble-pile-1.png" width="96" alt=""> | `gen-rubble-pile-1` | Rubble pile (low heap of broken brick, tile shards, concrete chunks and a pallet plank) | landscape | 1837 x 1820 x 282 | `brick-red` | 20,457 |
+
+**`y2k-trees-refset-0923b`**: Higgsfield `gpt_image_2_5` images from text prompts, uploaded to
+Meshy-7 image-to-3D (remeshed by Meshy to about 24k triangles, kept at that density).
+
+| Preview | asset_id | Product | Category | W x D x H (mm) | Material | Triangles |
+| --- | --- | --- | --- | --- | --- | --- |
+| <img src="previews/gen-tree-maple-red-1.png" width="96" alt=""> | `gen-tree-maple-red-1` | Japanese maple tree (red-leaf, curving trunk, layered airy crown) | vegetation | 5593 x 4816 x 6500 | `foliage-pine` | 23,312 |
+| <img src="previews/gen-tree-broadleaf-green-1.png" width="96" alt=""> | `gen-tree-broadleaf-green-1` | Broadleaf tree (mature zelkova or elm type with flared roots and a vase-shaped crown) | vegetation | 7158 x 4060 x 7000 | `foliage-pine` | 24,546 |
+
+**`y2k-twofronts-2026-09`**: Y2K retro-futurist props and speculative vehicles from the game's
+first Meshy rounds (Meshy-6 text-to-3D, downloaded as OBJ). Blender imported the OBJ geometry
+(250k to 860k triangles) and decimated it to 40k to 60k. Fronts face -Y; the scooter and car
+run along X. The holo sign's disc carries raised "Y2K" lettering that Meshy added despite the
+prompt; the scooter has small wheels the prompt did not ask for.
+
+| Preview | asset_id | Product | Category | W x D x H (mm) | Material | Triangles |
+| --- | --- | --- | --- | --- | --- | --- |
+| <img src="previews/gen-planter-pod-capsule-1.png" width="96" alt=""> | `gen-planter-pod-capsule-1` | Planter pod (glossy bowl planter on a ring base with a stylised round-leaf plant) | site_furniture | 703 x 773 x 1100 | `polycarbonate-opal` | 49,994 |
+| <img src="previews/gen-vending-machine-capsule-1.png" width="96" alt=""> | `gen-vending-machine-capsule-1` | Vending machine (rounded capsule with a bubble window of drink capsules, unbranded) | site_furniture | 972 x 973 x 2400 | `polycarbonate-opal` | 49,997 |
+| <img src="previews/gen-kiosk-pod-1.png" width="96" alt=""> | `gen-kiosk-pod-1` | Kiosk pod (egg-shaped street kiosk with a porthole serving window on a pedestal) | site_furniture | 1376 x 1467 x 2600 | `polycarbonate-opal` | 39,999 |
+| <img src="previews/gen-holo-sign-pod-1.png" width="96" alt=""> | `gen-holo-sign-pod-1` | Holo sign pod (sphere sign on a slim stalk, raised "Y2K" lettering) | site_furniture | 1680 x 1412 x 3400 | `aluminium-anodized` | 39,999 |
+| <img src="previews/gen-hover-scooter-1.png" width="96" alt=""> | `gen-hover-scooter-1` | Hover scooter (bubble scooter with a ball front wheel and a small rear wheel) | vehicle | 1282 x 970 x 1200 | `polycarbonate-opal` | 50,000 |
+| <img src="previews/gen-hover-car-bubble-1.png" width="96" alt=""> | `gen-hover-car-bubble-1` | Hover car (egg-shaped two-seat bubble car on a hover skirt, no wheels) | vehicle | 2826 x 2111 x 1600 | `polycarbonate-opal` | 59,999 |
+
+Not included: Y2K's operatives, their drones and the bosses, the needle pistol, the pod building,
+Ginkgo's unused `tree_green_wild`, and every remeshed, merged or conditioned derivative. See
+`docs/licensing-audit.md`.
+
+## Ginkgo props reused in Project Y2K (four batches, 2026-11-20)
+
+Thirteen Ginkgo props that Project Y2K content v061 conditioned and placed in its Mirai Ward hub
+(`twofronts/meshy/ginkgo_props_v061`), released under CC BY 4.0 with the owner's approval on
+2026-11-20 (the owner chose this group the same day). One batch per Ginkgo pass and route; all
+were staged by `tools/stage_ginkgo_chains.py` from the Ginkgo sessions' tool calls and imported
+with `tools/import_organic_batch.py`. Provider textures are removed and Almond materials
+assigned; Blender re-derived 50k to 80k-triangle editions (125k for the flower clump, whose
+separate petals stop collapse decimation near 120k) and split edges shared by more than two
+faces (counts in `topology_repairs`). Vehicles carry Project Y2K's lengths; the other props have
+real-world sizes chosen for this import rather than the stylised scene sizes (each batch's
+`dimension_basis`). The refset_1003 and refset_1007 prompts were written from owner reference
+sets of third-party photographs; every generated image was compared with them and the comparison
+is in each asset's `reference_review` (see `docs/licensing-audit.md`).
+
+**`ginkgo-refset-1003`**: Higgsfield `gpt_image_2_5` images from text prompts, uploaded to Meshy-7 image-to-3D (remeshed by Meshy to about 100k triangles). Sizes are real-world choices (Y2K used 1.35 m for the bladder and 1.25 m for the canister).
+
+| Preview | asset_id | Product | Category | W x D x H (mm) | Material | Triangles |
+| --- | --- | --- | --- | --- | --- | --- |
+| <img src="previews/gen-lounge-chair-inflatable-cushion-1.png" width="96" alt=""> | `gen-lounge-chair-inflatable-cushion-1` | Lounge chair (low lounge chair with quilted inflatable seat and round back cushions strapped to a bolted perforated-angle, aluminium-extrusion and timber-block frame) | seating | 679 x 923 x 900 | `fabric-linen` | 59,998 |
+| <img src="previews/gen-water-bladder-strapped-1.png" width="96" alt=""> | `gen-water-bladder-strapped-1` | Water bladder (upright quilted collapsible water container with screw cap, carry handle, two webbing straps with buckles and a bottom spout) | household | 402 x 254 x 450 | `polycarbonate-opal` | 49,977 |
+| <img src="previews/gen-pressure-canister-1.png" width="96" alt=""> | `gen-pressure-canister-1` | Pressure canister (upright painted-steel pressure canister with top valve lever, hose and nozzle, two shackles at the valve guard and a blank instruction panel) | building_services | 451 x 245 x 650 | `steel-galvanized` | 59,995 |
+
+**`ginkgo-refset-1007`**: Higgsfield `gpt_image_2_5` reference images, each conditioned on one of the pass's text-only concept images (named and hashed in `concept_reference`), then Tripo H3.1 through Higgsfield (about 1.9M triangles; water tanks, rover, tram, drone, launcher, shuttle) or Meshy-7.1 (7.6M to 7.8M triangles; planter box, flower clump). Vehicles are scaled by Project Y2K's lengths. The launcher is a drone launch and service vehicle (crane boom and ramps), not a weapon; the shuttle has no landing gear.
+
+| Preview | asset_id | Product | Category | W x D x H (mm) | Material | Triangles |
+| --- | --- | --- | --- | --- | --- | --- |
+| <img src="previews/gen-water-tanks-rooftop-pair-1.png" width="96" alt=""> | `gen-water-tanks-rooftop-pair-1` | Rooftop water tanks (pair of vertical stainless water tanks with conical tops on a braced galvanised stand, with ladder and valved pipework) | building_services | 1283 x 2878 x 3000 | `steel-galvanized` | 79,999 |
+| <img src="previews/gen-rover-six-wheel-1.png" width="96" alt=""> | `gen-rover-six-wheel-1` | Exploration rover (six-wheeled armoured exploration rover with wraparound cab windows, roof sensor mast, antennas and dish, big knobbly tyres) | vehicle | 5398 x 2944 x 4084 | `plaster-white` | 79,998 |
+| <img src="previews/gen-capsule-tram-overgrown-1.png" width="96" alt=""> | `gen-capsule-tram-overgrown-1` | Capsule tram car (abandoned rounded capsule tram car with windscreen, porthole, sliding side door, open roof hatch, vines and moss, on a low bogie frame) | vehicle | 5269 x 9003 x 4160 | `plaster-white` | 79,999 |
+| <img src="previews/gen-drone-quadcopter-1.png" width="96" alt=""> | `gen-drone-quadcopter-1` | Quadcopter drone (toy-like rounded quadcopter with camera eye, four propeller arms and short landing legs) | vehicle | 1309 x 1401 x 454 | `ceramic-teal` | 59,999 |
+| <img src="previews/gen-drone-launcher-vehicle-1.png" width="96" alt=""> | `gen-drone-launcher-vehicle-1` | Drone launcher vehicle (chunky rounded wheeled service vehicle with a folding crane boom on top and two fold-out ramp wings) | vehicle | 1861 x 3201 x 2205 | `ceramic-teal` | 79,999 |
+| <img src="previews/gen-shuttle-craft-1.png" width="96" alt=""> | `gen-shuttle-craft-1` | Shuttle craft (compact wedge-hulled sci-fi shuttle with swept wings, twin rear engine pods and a small canopy) | vehicle | 11997 x 11991 x 3171 | `steel-painted-charcoal` | 80,000 |
+| <img src="previews/gen-planter-box-galvanised-1.png" width="96" alt=""> | `gen-planter-box-galvanised-1` | Planter box (long galvanised corrugated-metal planter trough overflowing with leafy plants, herbs, tomatoes and trailing vines) | vegetation | 1899 x 613 x 782 | `steel-galvanized` | 80,000 |
+| <img src="previews/gen-flower-clump-magenta-1.png" width="96" alt=""> | `gen-flower-clump-magenta-1` | Flower clump (dense clump of magenta flower spikes and pink daisy-like blooms on leafy stems, on a small soil base) | vegetation | 718 x 690 x 600 | `foliage-pine` | 124,998 |
+
+**`ginkgo-refset-0924`**: a generic classical plaster statue (Higgsfield image from a text prompt, Meshy-7), life-size on its plinth (the Ginkgo and Y2K scenes used 2.4 m).
+
+| Preview | asset_id | Product | Category | W x D x H (mm) | Material | Triangles |
+| --- | --- | --- | --- | --- | --- | --- |
+| <img src="previews/gen-statue-plaster-togate-1.png" width="96" alt=""> | `gen-statue-plaster-togate-1` | Plaster statue (classical white plaster statue of a standing robed figure holding a scroll, on a chipped square plinth) | ornament | 640 x 582 x 2000 | `plaster-white` | 80,000 |
+
+**`ginkgo-lausanne-market`**: a shop dress form, Meshy-6 text-to-3D (no image stage; the refine request named no model, recorded as unspecified).
+
+| Preview | asset_id | Product | Category | W x D x H (mm) | Material | Triangles |
+| --- | --- | --- | --- | --- | --- | --- |
+| <img src="previews/gen-dress-form-mannequin-1.png" width="96" alt=""> | `gen-dress-form-mannequin-1` | Dress form (shop dress form on a wooden tripod stand, wearing a summer sundress) | household | 540 x 481 x 1720 | `fabric-linen` | 60,000 |
+
+Not included: the refset_1003 pack unit and cube rover (close to specific third-party designs in the owner's references) and lander (replica of a reference artwork), the refset_1007 AC unit and habitat module, the Lausanne bike, pigeon and figures, the inflatable bear, and every LOD or Y2K `SM_GK61` derivative. See `docs/licensing-audit.md`.
+
+## Project Y2K procedural kit pieces (four batches, 2026-11-20)
+
+Thirty low-poly pieces (176 to 2,084 triangles) that Blender scripts in the owner's Project Y2K game repository built and exported as FBX: route `procedural_script`, the library's first geometry with no generation provider, prompt or image. Released under CC BY 4.0 with the owner's approval on 2026-11-20 (the owner chose this group the same day). `tools/stage_ginkgo_chains.py` checked each script, kit record and FBX against the hashes in the batch and retained the scripts and kit records as text in `batches/<batch>/` (local absolute paths redacted); `tools/prepare_organic_meshes.py` imported the FBX at its authored metre size, removed collision hulls and the recorded edits, and kept the triangle count (no decimation, no subdivision, hard edges kept); `tools/import_organic_batch.py` imported them. Sizes are the authored kit sizes. Kit colours and textures are not shipped; each piece carries one Almond material. Each script's authoring session (or that none was found) is in its batch record (see `docs/generation-source-documentation.md`).
+
+**`y2k-street-kit-v004`**: street furniture from `build_street_kit.py` (street kit v004, 2026-09-11). No session that wrote this script was found (the retained transcripts start a day later), so its authorship is recorded as not found. The lamp, kiosk and arch carried tessellated lettering ("01", "RELAY" / "ACCESS", "NEON GATEWAY"); it is removed as a recorded edit and the panels are blank.
+
+| Preview | asset_id | Product | Category | W x D x H (mm) | Material | Triangles |
+| --- | --- | --- | --- | --- | --- | --- |
+| <img src="previews/gen-bench-street-slab-1.png" width="96" alt=""> | `gen-bench-street-slab-1` | Street bench (rounded slab seat on two block supports, 2.4 m) | site_furniture | 2400 x 700 x 660 | `concrete-smooth` | 564 |
+| <img src="previews/gen-street-lamp-wayfinding-1.png" width="96" alt=""> | `gen-street-lamp-wayfinding-1` | Street lamp (5 m lamp with an arched arm and a blank wayfinding panel) | site_furniture | 1600 x 650 x 5010 | `aluminium-anodized` | 908 |
+| <img src="previews/gen-info-kiosk-capsule-1.png" width="96" alt=""> | `gen-info-kiosk-capsule-1` | Information kiosk (rounded capsule totem with a blank screen, 2.7 m) | site_furniture | 1350 x 965 x 2700 | `plaster-white` | 532 |
+| <img src="previews/gen-planter-sculpted-shrubs-1.png" width="96" alt=""> | `gen-planter-sculpted-shrubs-1` | Street planter (rounded planter with three sculpted shrub forms, 2.6 m) | site_furniture | 2600 x 1120 x 1770 | `concrete-smooth` | 2,084 |
+| <img src="previews/gen-gateway-arch-street-1.png" width="96" alt=""> | `gen-gateway-arch-street-1` | Street gateway arch (10.7 m arch on two piers with a blank sign band) | site_furniture | 10700 x 835 x 6360 | `concrete-smooth` | 720 |
+
+**`y2k-district-kit-v016`**: market and yard props from `build_district_kit_v016.py` (Y2K session d8e0ca86, 2026-09-18).
+
+| Preview | asset_id | Product | Category | W x D x H (mm) | Material | Triangles |
+| --- | --- | --- | --- | --- | --- | --- |
+| <img src="previews/gen-market-stall-counter-1.png" width="96" alt=""> | `gen-market-stall-counter-1` | Market stall counter (painted counter with a metal top, front panels and legs, 2.4 m) | site_furniture | 2600 x 1050 x 1070 | `steel-painted-sage` | 276 |
+| <img src="previews/gen-market-stall-awning-1.png" width="96" alt=""> | `gen-market-stall-awning-1` | Market stall awning (sloped canopy on two posts with a valance and a bulb string, 3.2 m) | site_furniture | 3200 x 1898 x 2600 | `fabric-linen` | 264 |
+| <img src="previews/gen-crate-stack-banded-1.png" width="96" alt=""> | `gen-crate-stack-banded-1` | Crate stack (three stacked crates with metal bands, 1.8 m) | household | 916 x 887 x 1780 | `wood-oak` | 396 |
+| <img src="previews/gen-produce-bin-1.png" width="96" alt=""> | `gen-produce-bin-1` | Produce bin (low metal market bin with a filled top and side handles, 1.1 m) | site_furniture | 1200 x 700 x 590 | `steel-galvanized` | 272 |
+| <img src="previews/gen-barrel-steel-1.png" width="96" alt=""> | `gen-barrel-steel-1` | Steel barrel (ribbed drum, 0.6 m diameter, 0.9 m) | household | 610 x 610 x 930 | `steel-painted-vermilion` | 416 |
+| <img src="previews/gen-shipping-container-1.png" width="96" alt=""> | `gen-shipping-container-1` | Shipping container (6 m (20 ft class) container, doors closed) | site_furniture | 6200 x 2460 x 2610 | `metal-corrugated` | 1,292 |
+| <img src="previews/gen-shipping-container-open-1.png" width="96" alt=""> | `gen-shipping-container-open-1` | Shipping container, doors open (6 m (20 ft class) container with both doors swung open) | site_furniture | 6786 x 3610 x 2610 | `metal-corrugated` | 1,248 |
+| <img src="previews/gen-bollard-banded-1.png" width="96" alt=""> | `gen-bollard-banded-1` | Banded bollard (steel bollard with reflective bands, 1.0 m) | site_furniture | 340 x 340 x 1040 | `steel-painted-charcoal` | 348 |
+| <img src="previews/gen-fence-panel-mesh-1.png" width="96" alt=""> | `gen-fence-panel-mesh-1` | Mesh fence panel (3 m panel between two posts with top and bottom rails, 2.4 m) | site_furniture | 3114 x 120 x 2400 | `steel-mesh` | 228 |
+| <img src="previews/gen-floodlight-mast-1.png" width="96" alt=""> | `gen-floodlight-mast-1` | Floodlight mast (6 m mast with three floodlight heads) | site_furniture | 1300 x 867 x 6310 | `steel-galvanized` | 568 |
+| <img src="previews/gen-antenna-mast-beacon-1.png" width="96" alt=""> | `gen-antenna-mast-beacon-1` | Antenna mast (5 m guyed-look antenna mast with a beacon) | building_services | 1014 x 900 x 5320 | `steel-galvanized` | 468 |
+| <img src="previews/gen-sign-mast-lit-1.png" width="96" alt=""> | `gen-sign-mast-lit-1` | Sign mast (3.4 m mast with an arm and a blank lit panel) | site_furniture | 1870 x 155 x 3400 | `steel-painted-charcoal` | 212 |
+| <img src="previews/gen-air-handler-1.png" width="96" alt=""> | `gen-air-handler-1` | Air handler (packaged air-handling unit on a base, 2.0 m) | building_services | 2006 x 1500 x 1380 | `steel-galvanized` | 352 |
+| <img src="previews/gen-pipe-run-stands-1.png" width="96" alt=""> | `gen-pipe-run-stands-1` | Pipe run on stands (4 m run of parallel pipes on support stands) | building_services | 4000 x 1200 x 1800 | `steel-galvanized` | 288 |
+
+**`y2k-megastructure-kit-v020`**: facade and rooftop services from `build_megastructure_kit_v020.py` (Y2K session 46dbb3db, 2026-09-19). The kit was designed with six third-party reference images the owner supplied in view (hashed, not retained); these pieces are generic box-and-tube assemblies. The AC stack and pipe riser are wall-mounted (assumed mount heights 2.5 m and 0).
+
+| Preview | asset_id | Product | Category | W x D x H (mm) | Material | Triangles |
+| --- | --- | --- | --- | --- | --- | --- |
+| <img src="previews/gen-satellite-dish-1.png" width="96" alt=""> | `gen-satellite-dish-1` | Satellite dish (3 m dish on a braced stand) | building_services | 3000 x 1906 x 3991 | `aluminium-anodized` | 176 |
+| <img src="previews/gen-ac-unit-wall-stack-1.png" width="96" alt=""> | `gen-ac-unit-wall-stack-1` | Wall AC unit stack (two rows of three outdoor AC units on wall brackets) | building_services | 3251 x 540 x 1900 | `steel-galvanized` | 1,136 |
+| <img src="previews/gen-pipe-bundle-vertical-1.png" width="96" alt=""> | `gen-pipe-bundle-vertical-1` | Vertical pipe bundle (12 m facade riser of pipes with clamps and conduit) | building_services | 1450 x 520 x 12000 | `steel-galvanized` | 236 |
+| <img src="previews/gen-scaffold-bay-1.png" width="96" alt=""> | `gen-scaffold-bay-1` | Scaffold bay (tube-and-fitting scaffold bay with plank decks, 4 m wide, 9.2 m high) | building_services | 4052 x 1260 x 9196 | `steel-galvanized` | 312 |
+| <img src="previews/gen-antenna-cluster-roof-1.png" width="96" alt=""> | `gen-antenna-cluster-roof-1` | Rooftop antenna cluster (lattice mast with whip and panel antennas and dishes on a roof pad) | building_services | 8000 x 8000 x 15800 | `aluminium-anodized` | 1,176 |
+
+**`y2k-world-kit-v040`**: Mirai Ward street details (`kit_v060_details.py`, Y2K session f2628003, 2026-10-10), the lantern shrine (`kit_v040.py`, Y2K sessions 09c7fb46 and 5772745b, 2026-09-26/27) and two commuter railcars (`kinetic_v046.py`, Y2K session 6e4feafa, 2026-10-01). Engine collision hulls are removed; the lead car's destination-board decal quad (a lettered texture) is removed as a recorded edit. Railcars run along X.
+
+| Preview | asset_id | Product | Category | W x D x H (mm) | Material | Triangles |
+| --- | --- | --- | --- | --- | --- | --- |
+| <img src="previews/gen-utility-pole-1.png" width="96" alt=""> | `gen-utility-pole-1` | Utility pole (10.5 m concrete pole with crossarms, insulators, a transformer and a lamp arm) | site_furniture | 3525 x 600 x 10500 | `concrete-smooth` | 852 |
+| <img src="previews/gen-vending-row-1.png" width="96" alt=""> | `gen-vending-row-1` | Vending machine row (three street vending machines with lit fronts and a can bin) | site_furniture | 3920 x 860 x 1990 | `steel-painted-vermilion` | 252 |
+| <img src="previews/gen-wall-ac-rig-1.png" width="96" alt=""> | `gen-wall-ac-rig-1` | Wall AC rig (two split AC units on wall brackets with pipe runs and a drain line) | building_services | 2525 x 450 x 4130 | `steel-galvanized` | 354 |
+| <img src="previews/gen-shrine-lantern-1.png" width="96" alt=""> | `gen-shrine-lantern-1` | Lantern shrine (plinth with a red gate frame, a hanging paper-lantern form and two offering boxes, 4 m) | ornament | 4000 x 4000 x 4020 | `steel-painted-vermilion` | 1,072 |
+| <img src="previews/gen-commuter-railcar-lead-1.png" width="96" alt=""> | `gen-commuter-railcar-lead-1` | Commuter railcar, lead (20 m car with a raked nose, window band, doors, roof units and a pantograph) | vehicle | 19750 x 3060 x 5420 | `plaster-white` | 768 |
+| <img src="previews/gen-commuter-railcar-mid-1.png" width="96" alt=""> | `gen-commuter-railcar-mid-1` | Commuter railcar, middle (20 m middle car with a window band, doors, roof units and a pantograph) | vehicle | 19700 x 3060 x 5420 | `plaster-white` | 680 |
+
+Not included: the drain grate, square pillar (duplicate of `gen-column-square-1`), catwalk and stair (retired stair/railing family), overhead cable, the blank 48-triangle neon sign, the blimp, cargo airship, ad balloon and sign drone (billboard textures may show operatives), the sky gondola and cable, the ten Chinese neon signs (lettering from system fonts), game pickups, jump pad, parkour and FX meshes, and every building-scale, wall, ground or road module. See `docs/licensing-audit.md`.
 
 ## Batch 2: design-idiom furniture and lighting
 

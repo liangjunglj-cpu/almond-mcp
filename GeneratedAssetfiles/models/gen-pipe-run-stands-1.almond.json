@@ -1,0 +1,349 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-pipe-run-stands-1",
+  "library_id": "generated_assets",
+  "name": "Pipe run on stands (4 m run of parallel pipes on support stands; procedural kit piece; low-poly edition)",
+  "source_app": "blender",
+  "source_units": "m",
+  "file": "gen-pipe-run-stands-1.glb",
+  "dimensions_mm": {
+    "width": 4000.0,
+    "depth": 1200.0,
+    "height": 1800.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "ground",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -2000.0,
+        -600.0,
+        0.0
+      ],
+      "max": [
+        2000.0,
+        600.0,
+        1800.0
+      ]
+    },
+    "footprint": [
+      [
+        -2000.0,
+        -600.0
+      ],
+      [
+        2000.0,
+        -600.0
+      ],
+      [
+        2000.0,
+        600.0
+      ],
+      [
+        -2000.0,
+        600.0
+      ]
+    ],
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "fixed"
+  },
+  "materials": [
+    {
+      "material_id": "steel-galvanized",
+      "objects": [
+        "gen-pipe-run-stands-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-pipe-run-stands-1",
+    "library_id": "generated_assets",
+    "name": "Pipe run on stands (4 m run of parallel pipes on support stands; procedural kit piece; low-poly edition)",
+    "category": "building_services",
+    "tags": [
+      "pipes",
+      "pipe rack",
+      "services",
+      "industrial",
+      "plant",
+      "yard",
+      "procedural",
+      "low-poly",
+      "y2k-district-kit-v016"
+    ],
+    "dimensions_mm": {
+      "width": 4000.0,
+      "depth": 1200.0,
+      "height": 1800.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 4000.0,
+      "depth": 1200.0,
+      "height": 1800.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "ground",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -2000.0,
+          -600.0,
+          0.0
+        ],
+        "max": [
+          2000.0,
+          600.0,
+          1800.0
+        ]
+      },
+      "footprint": [
+        [
+          -2000.0,
+          -600.0
+        ],
+        [
+          2000.0,
+          -600.0
+        ],
+        [
+          2000.0,
+          600.0
+        ],
+        [
+          -2000.0,
+          600.0
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "fixed"
+    },
+    "materials": [
+      {
+        "material_id": "steel-galvanized",
+        "objects": [
+          "gen-pipe-run-stands-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "procedural_script",
+      "parameters": {
+        "prompt": null,
+        "generated_at": "2026-09-18",
+        "orientation_correction": null,
+        "scale_applied": 1000.000026,
+        "generation_route": "procedural_script",
+        "generator_script": "twofronts/infrastructure/scripts/build_district_kit_v016.py",
+        "generator_script_sha256": "400bd506a30e777d9dc23d83c4b9d67bb977c00a0b5717b24b7e5a3da024cc73",
+        "source_file": "twofronts/world/district_v016/SM_KitPipeRun.fbx",
+        "source_sha256": "d6a539e1f22afa128404f28b6d22e323292b84e3a9341257eaaf58060c6b3bd1",
+        "captured_generation": {
+          "batch_id": "y2k-district-kit-v016",
+          "route": "procedural_script",
+          "generator": {
+            "script": {
+              "path": "twofronts/infrastructure/scripts/build_district_kit_v016.py",
+              "sha256": "400bd506a30e777d9dc23d83c4b9d67bb977c00a0b5717b24b7e5a3da024cc73",
+              "size_bytes": 25137,
+              "last_modified_at": "2026-09-18T00:39:36+00:00",
+              "retained_as": "build_district_kit_v016.py.txt",
+              "retained_sha256": "2b98ae1d5212749512443a8fc903fd8b2f060571d136771a80e6f96279363da7",
+              "role": "generator",
+              "dependencies": [],
+              "authoring": {
+                "tool": "Claude Code",
+                "project": "Project Y2K",
+                "sessions": [
+                  {
+                    "session": "d8e0ca86-70c8-4df5-8b15-26f854a71153",
+                    "actions": "Write of the script (2026-09-18T00:39:06Z); one scripted edit to finish() that bakes a joined part's transform (2026-09-18T00:39:34Z), run in the same command as the kit build that wrote the FBX files and kit.json (2026-09-18T00:39:38Z)"
+                  }
+                ],
+                "basis": "Tool calls in the session transcript; the FBX files are newer than the last script edit."
+              },
+              "modified_at": "2026-09-18T00:39:36+00:00",
+              "redacted_lines": [],
+              "retained_file": "batches/y2k-district-kit-v016/build_district_kit_v016.py.txt"
+            },
+            "kit_record": {
+              "path": "twofronts/world/district_v016/kit.json",
+              "sha256": "0d3625ce2e4015bed0c4566d5c13c8fb0395a150cab8806dd8e1a51944b8e3b4",
+              "size_bytes": 6657,
+              "last_modified_at": "2026-09-18T00:39:38+00:00",
+              "retained_as": "district_v016.kit.json",
+              "retained_sha256": "1e7ad0273bed8c728ea0a6231a67740b40770c6706ccf44d69657bd0bdf6d2bf",
+              "modified_at": "2026-09-18T00:39:38+00:00",
+              "redacted_lines": [],
+              "retained_file": "batches/y2k-district-kit-v016/district_v016.kit.json"
+            }
+          },
+          "mesh": {
+            "asset_id": "gen-pipe-run-stands-1",
+            "tool": "blender_procedural_script",
+            "source_name": "SM_KitPipeRun",
+            "source_file": "twofronts/world/district_v016/SM_KitPipeRun.fbx",
+            "generator_script": "twofronts/infrastructure/scripts/build_district_kit_v016.py",
+            "generator_script_sha256": "400bd506a30e777d9dc23d83c4b9d67bb977c00a0b5717b24b7e5a3da024cc73",
+            "kit_record": "twofronts/world/district_v016/kit.json",
+            "kit_entry": {
+              "asset": "SM_KitPipeRun",
+              "file": "SM_KitPipeRun.fbx",
+              "note": "4 m pipe run on stands",
+              "triangles": 288,
+              "dimensions_m": [
+                4.0,
+                1.2,
+                1.8
+              ],
+              "materials": [
+                "TFKitMetal"
+              ]
+            },
+            "output_file": "gen-pipe-run-stands-1.fbx",
+            "output_format": "fbx",
+            "output_sha256": "d6a539e1f22afa128404f28b6d22e323292b84e3a9341257eaaf58060c6b3bd1",
+            "output_file_modified_at": "2026-09-18T00:39:38+00:00",
+            "evidence_source": {
+              "project_files": [
+                "twofronts/infrastructure/scripts/build_district_kit_v016.py",
+                "twofronts/world/district_v016/kit.json",
+                "twofronts/world/district_v016/SM_KitPipeRun.fbx"
+              ],
+              "authoring": {
+                "tool": "Claude Code",
+                "project": "Project Y2K",
+                "sessions": [
+                  {
+                    "session": "d8e0ca86-70c8-4df5-8b15-26f854a71153",
+                    "actions": "Write of the script (2026-09-18T00:39:06Z); one scripted edit to finish() that bakes a joined part's transform (2026-09-18T00:39:34Z), run in the same command as the kit build that wrote the FBX files and kit.json (2026-09-18T00:39:38Z)"
+                  }
+                ],
+                "basis": "Tool calls in the session transcript; the FBX files are newer than the last script edit."
+              },
+              "extracted_at": "2026-11-20T18:55:01+00:00"
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-pipe-run-stands-1",
+            "source_sha256": "d6a539e1f22afa128404f28b6d22e323292b84e3a9341257eaaf58060c6b3bd1",
+            "source_triangles": 288,
+            "target_triangles": 288,
+            "prepared_sha256": "b239e6fb4815867f9e4e6b9009b641b7f51cf99bfbca845c56fe4cc3d888a646",
+            "software": "Blender 5.1.2",
+            "source_format": "fbx",
+            "source_file": "gen-pipe-run-stands-1.fbx",
+            "source_edits": [],
+            "method": "Import the kit FBX with Blender (file axes and FBX_SCALE_UNITS honoured: metres, Z-up); remove engine collision hulls (UCX_*) and apply the recorded edits (source_edits); remove the kit material slots (Almond materials are assigned; kit textures are not shipped); Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Remove wire edges, split edges shared by more than two faces and remove zero-area faces (counts in quality.topology_repairs). Mark edges sharper than 30 degrees as sharp (flat-shaded hard edges; shading only). Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 4e-07,
+            "quality": {
+              "vertices": 160,
+              "triangles": 288,
+              "boundary_edges": 0,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 8,
+              "largest_component_vertices": 32,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "topology_repairs": {
+                "wire_edges_removed": 0,
+                "nonmanifold_edges_split": 0,
+                "zero_area_faces_removed": 0,
+                "loose_vertices_removed": 0
+              },
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            }
+          },
+          "edits": [],
+          "input_image_file": null,
+          "external_reference_status": "No external reference recorded: the script names none and the owner supplied no image in the authoring session (d8e0ca86, text instructions only).",
+          "external_reference_ids": [],
+          "dimension_basis": "Authored kit sizes in metres from the script (kit record dimensions_m); the library keeps them (height = authored height, width and depth measured). Not a physical survey.",
+          "reference_review": "Reviewed on 2026-11-20: procedural geometry, so there is no input image. The prepared library mesh was rendered untextured from the front three-quarter view (500 px, viewed in a 300 px contact sheet) and the script code that models it was read: no lettering, logos, brand marks or characters in the geometry.",
+          "rights": "Procedural geometry built by a Blender script in the owner's Project Y2K game repository (private); see each script's authoring record for the Claude Code session that wrote it, or that none was found. The owner's own project geometry: no generation provider, account or credits are involved, and the scripts build every piece from Blender primitives (no imported or third-party geometry in these pieces). Owner approved release in the Almond library under CC BY 4.0 on 2026-11-20 (\"increase the range of models, from the ones i used for my project y2k games, (except for the operatives and bosses)\") and chose the procedural kit pieces on 2026-11-20. Kit material colours and textures are not distributed; Almond materials are assigned.",
+          "origin": {
+            "project": "Project Y2K, the owner's game project (private repository)",
+            "pass": "twofronts/world/district_v016",
+            "source_name": "SM_KitPipeRun",
+            "records": [
+              "twofronts/infrastructure/scripts/build_district_kit_v016.py (the generator, retained as build_district_kit_v016.py.txt)",
+              "twofronts/world/district_v016/kit.json (kit record; retained)",
+              "twofronts/world/district_v016/SM_Kit*.fbx (the exported pieces, SHA-256 checked)",
+              "Claude Code session transcript d8e0ca86-70c8-4df5-8b15-26f854a71153 (Write, edit and build)"
+            ]
+          }
+        }
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "architecture",
+        "streetscape"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.0,
+      "triangle_count": 288,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "574DD84628691D1190205FC8ECF7FA41C032F44281B039ECA9DB8A05057B3716"
+}

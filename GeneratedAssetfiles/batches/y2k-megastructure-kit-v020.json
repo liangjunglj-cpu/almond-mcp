@@ -1,0 +1,349 @@
+{
+  "batch_id": "y2k-megastructure-kit-v020",
+  "route": "procedural_script",
+  "purpose": "Facade and rooftop services pieces of Project Y2K's megastructure kit v020 (Blender script), re-derived as Almond library geometry. Library derivation (tools/prepare_organic_meshes.py, procedural route): Blender FBX import at the authored metre size, engine collision hulls (UCX_*) removed, recorded edits applied, kit material slots removed, weld/degenerate cleanup, triangulation, normals recalculated, hard edges kept; no decimation (the target is the source triangle count) and no subdivision. tools/build_generated_assets.py then scales the GLB to millimetres (height = the authored height) and puts the bottom centre on the origin.",
+  "origin": {
+    "project": "Project Y2K, the owner's game project (private repository)",
+    "pass": "twofronts/world/megastructure_v020",
+    "pass_date": "2026-09-19",
+    "pass_records": [
+      "twofronts/infrastructure/scripts/build_megastructure_kit_v020.py",
+      "twofronts/world/megastructure_v020/kit.json"
+    ],
+    "records": [
+      "twofronts/infrastructure/scripts/build_megastructure_kit_v020.py (the generator, retained as build_megastructure_kit_v020.py.txt)",
+      "twofronts/world/megastructure_v020/kit.json (kit record; retained)",
+      "twofronts/world/megastructure_v020/SM_Mega*.fbx (the exported pieces, SHA-256 checked)",
+      "Claude Code session transcript 46dbb3db-4ae0-456f-b4c3-0760f56623e6 (Write, edit and build)"
+    ],
+    "excluded": {
+      "SM_MegaNeonSign": "Owner-chosen exclusion: 48-triangle blank neon sign, too little detail",
+      "SM_MegaCore, SM_MegaBase, SM_MegaCap, SM_MegaSlotWall, SM_MegaAccretion": "Building-scale or wall modules",
+      "world/neon_signs_v021 (ten Chinese neon signs)": "Lettering tessellated from Windows system fonts (font licences)",
+      "combat_v016/pickups": "Game items (the ammo cell is weapon-adjacent)",
+      "art/effects_v072 FX meshes": "Game effects, not objects"
+    }
+  },
+  "generator": {
+    "scripts": {
+      "twofronts/infrastructure/scripts/build_megastructure_kit_v020.py": {
+        "sha256": "fba9ec6023bce2ff590dbf4a07375bed49c03a0b0486f9d7cae910c0145edfea",
+        "size_bytes": 14753,
+        "last_modified_at": "2026-09-19T13:03:03+00:00",
+        "retained_as": "build_megastructure_kit_v020.py.txt",
+        "retained_sha256": "6bbc811d015dff2bb790b6de9801ac7a710db6139cff7ae0df3d1a3e101302fd",
+        "role": "generator",
+        "dependencies": [
+          {
+            "path": "twofronts/infrastructure/scripts/build_district_kit_v016.py",
+            "sha256": "400bd506a30e777d9dc23d83c4b9d67bb977c00a0b5717b24b7e5a3da024cc73",
+            "retained": "in batch y2k-district-kit-v016 (build_district_kit_v016.py.txt)",
+            "use": "box(), tube(), finish() and the metre UV helper, loaded by path; its main() does not run"
+          }
+        ],
+        "authoring": {
+          "tool": "Claude Code",
+          "project": "Project Y2K",
+          "sessions": [
+            {
+              "session": "46dbb3db-4ae0-456f-b4c3-0760f56623e6",
+              "actions": "Write of the script (2026-09-19T13:01:33Z); one scripted edit adding a louvre shelf to a tower module (2026-09-19T13:03:01Z), run in the same command as the kit build (FBX files and kit.json written 2026-09-19T13:03:12Z)"
+            }
+          ],
+          "basis": "Tool calls in the session transcript; the FBX files are newer than the last script edit."
+        }
+      }
+    },
+    "kit_records": {
+      "twofronts/world/megastructure_v020/kit.json": {
+        "sha256": "4b9feaf792f3a4b00918de8491e19b0aebd174b3fcb1394cec802a920cb8ab0d",
+        "size_bytes": 3047,
+        "last_modified_at": "2026-09-19T13:03:13+00:00",
+        "retained_as": "megastructure_v020.kit.json",
+        "retained_sha256": "f0bba680a08cf4fc906f67c7689d81655e667021bc93e54f3147597f7da86f45"
+      }
+    }
+  },
+  "strip_source_materials": true,
+  "external_reference_ids": [],
+  "external_reference_status": "Owner-supplied reference images informed the kit design: the script's docstring says it was \"modelled in Blender from the owner's 2026-09-19 reference images\", six images the owner pasted into session 46dbb3db (kept in the project as docs/references/infrastructure_v020/1.jpg to 6.jpg; SHA-256 recorded in external_reference_files). They are third-party renders and photographs of dense city towers, rooftop antennas, AC units, pipes and scaffolding; they are not retained or distributed. No image was an input to any geometry: the script builds generic services pieces from boxes and tubes.",
+  "variant_suffix": "procedural kit piece; low-poly edition",
+  "recipe_override": "procedural_script",
+  "dimension_basis": "Authored kit sizes in metres from the script (kit record dimensions_m); the library keeps them (height = authored height, width and depth measured). Wall-mounted pieces carry an assumed mount height (AC stack 2.5 m to its underside, pipe riser from ground level); the game placed them by script. Not a physical survey.",
+  "rights": "Procedural geometry built by a Blender script in the owner's Project Y2K game repository (private); see each script's authoring record for the Claude Code session that wrote it, or that none was found. The owner's own project geometry: no generation provider, account or credits are involved, and the scripts build every piece from Blender primitives (no imported or third-party geometry in these pieces). Owner approved release in the Almond library under CC BY 4.0 on 2026-11-20 (\"increase the range of models, from the ones i used for my project y2k games, (except for the operatives and bosses)\") and chose the procedural kit pieces on 2026-11-20. Kit material colours and textures are not distributed; Almond materials are assigned.",
+  "estimated_credits": 0,
+  "repair_nonmanifold": true,
+  "assets": [
+    {
+      "asset_id": "gen-satellite-dish-1",
+      "source_name": "SM_MegaDish",
+      "source_file": "twofronts/world/megastructure_v020/SM_MegaDish.fbx",
+      "source_sha256": "c7d6fc2f4a8858304be961f36886433d06f4323922662685dbaa8afc7bd74f42",
+      "source_exported_at": "2026-09-19T13:03:12+00:00",
+      "generator_script": "twofronts/infrastructure/scripts/build_megastructure_kit_v020.py",
+      "kit_record": "twofronts/world/megastructure_v020/kit.json",
+      "kit_entry": {
+        "asset": "SM_MegaDish",
+        "note": "3 m satellite dish on a stand",
+        "triangles": 176,
+        "dimensions_m": [
+          3.0,
+          1.91,
+          3.99
+        ],
+        "materials": [
+          "MegaMetal",
+          "MegaWhite"
+        ]
+      },
+      "product": "Satellite dish",
+      "variant": "3 m dish on a braced stand",
+      "category": "building_services",
+      "material": "aluminium-anodized",
+      "height_mm": 3991,
+      "width_hint_mm": 3000,
+      "depth_hint_mm": 1906,
+      "target_triangles": 176,
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "tags": [
+        "satellite dish",
+        "antenna",
+        "telecom",
+        "rooftop",
+        "services",
+        "roofscape"
+      ],
+      "prompt": null,
+      "edits": [],
+      "reference_review": "Reviewed on 2026-11-20: procedural geometry, so there is no input image. The prepared library mesh was rendered untextured from the front three-quarter view (500 px, viewed in a 300 px contact sheet) and the script code that models it was read: no lettering, logos, brand marks or characters in the geometry. The kit was designed with third-party reference images in view (external_reference_status); this piece is a generic assembly of boxes and tubes and copies no distinctive design from them."
+    },
+    {
+      "asset_id": "gen-ac-unit-wall-stack-1",
+      "source_name": "SM_MegaACStack",
+      "source_file": "twofronts/world/megastructure_v020/SM_MegaACStack.fbx",
+      "source_sha256": "9aaec79d7779370fecfeef12c98716d374e47c061d60332632fac3d351984255",
+      "source_exported_at": "2026-09-19T13:03:12+00:00",
+      "generator_script": "twofronts/infrastructure/scripts/build_megastructure_kit_v020.py",
+      "kit_record": "twofronts/world/megastructure_v020/kit.json",
+      "kit_entry": {
+        "asset": "SM_MegaACStack",
+        "note": "2 x 3 wall AC units on brackets",
+        "triangles": 1136,
+        "dimensions_m": [
+          3.25,
+          0.54,
+          1.9
+        ],
+        "materials": [
+          "MegaWhite",
+          "MegaConcreteDark",
+          "MegaMetal",
+          "MegaRust"
+        ]
+      },
+      "product": "Wall AC unit stack",
+      "variant": "Two rows of three outdoor AC units on wall brackets",
+      "category": "building_services",
+      "material": "steel-galvanized",
+      "height_mm": 1900,
+      "width_hint_mm": 3251,
+      "depth_hint_mm": 540,
+      "target_triangles": 1136,
+      "support_plane": "wall",
+      "placement_priority": "fixed",
+      "tags": [
+        "air-conditioning",
+        "condenser",
+        "facade",
+        "services",
+        "wall-mounted",
+        "dense city"
+      ],
+      "prompt": null,
+      "edits": [],
+      "reference_review": "Reviewed on 2026-11-20: procedural geometry, so there is no input image. The prepared library mesh was rendered untextured from the front three-quarter view (500 px, viewed in a 300 px contact sheet) and the script code that models it was read: no lettering, logos, brand marks or characters in the geometry. The kit was designed with third-party reference images in view (external_reference_status); this piece is a generic assembly of boxes and tubes and copies no distinctive design from them.",
+      "mount_height_mm": 2500
+    },
+    {
+      "asset_id": "gen-pipe-bundle-vertical-1",
+      "source_name": "SM_MegaPipeBundle",
+      "source_file": "twofronts/world/megastructure_v020/SM_MegaPipeBundle.fbx",
+      "source_sha256": "8ce24cb6a2aa796975b93414e6e9d4aedd946b42524494a9e2f9359c0a82bf8e",
+      "source_exported_at": "2026-09-19T13:03:12+00:00",
+      "generator_script": "twofronts/infrastructure/scripts/build_megastructure_kit_v020.py",
+      "kit_record": "twofronts/world/megastructure_v020/kit.json",
+      "kit_entry": {
+        "asset": "SM_MegaPipeBundle",
+        "note": "12 m vertical pipe bundle with clamps and conduit",
+        "triangles": 236,
+        "dimensions_m": [
+          1.45,
+          0.52,
+          12.0
+        ],
+        "materials": [
+          "MegaMetal",
+          "MegaRust",
+          "MegaConcreteDark",
+          "MegaWhite"
+        ]
+      },
+      "product": "Vertical pipe bundle",
+      "variant": "12 m facade riser of pipes with clamps and conduit",
+      "category": "building_services",
+      "material": "steel-galvanized",
+      "height_mm": 12000,
+      "width_hint_mm": 1450,
+      "depth_hint_mm": 520,
+      "target_triangles": 236,
+      "support_plane": "wall",
+      "placement_priority": "fixed",
+      "tags": [
+        "pipes",
+        "riser",
+        "facade",
+        "services",
+        "wall-mounted",
+        "dense city"
+      ],
+      "prompt": null,
+      "edits": [],
+      "reference_review": "Reviewed on 2026-11-20: procedural geometry, so there is no input image. The prepared library mesh was rendered untextured from the front three-quarter view (500 px, viewed in a 300 px contact sheet) and the script code that models it was read: no lettering, logos, brand marks or characters in the geometry. The kit was designed with third-party reference images in view (external_reference_status); this piece is a generic assembly of boxes and tubes and copies no distinctive design from them.",
+      "mount_height_mm": 0
+    },
+    {
+      "asset_id": "gen-scaffold-bay-1",
+      "source_name": "SM_MegaScaffold",
+      "source_file": "twofronts/world/megastructure_v020/SM_MegaScaffold.fbx",
+      "source_sha256": "73577920f736193de5ab64a1bfe892e344a692f183a3aa38678466c030e2ca61",
+      "source_exported_at": "2026-09-19T13:03:12+00:00",
+      "generator_script": "twofronts/infrastructure/scripts/build_megastructure_kit_v020.py",
+      "kit_record": "twofronts/world/megastructure_v020/kit.json",
+      "kit_entry": {
+        "asset": "SM_MegaScaffold",
+        "note": "4 x 8 m tube scaffold bay with planks",
+        "triangles": 312,
+        "dimensions_m": [
+          4.05,
+          1.26,
+          9.2
+        ],
+        "materials": [
+          "MegaRust",
+          "MegaConcreteDark"
+        ]
+      },
+      "product": "Scaffold bay",
+      "variant": "Tube-and-fitting scaffold bay with plank decks, 4 m wide, 9.2 m high",
+      "category": "building_services",
+      "material": "steel-galvanized",
+      "height_mm": 9196,
+      "width_hint_mm": 4052,
+      "depth_hint_mm": 1260,
+      "target_triangles": 312,
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "tags": [
+        "scaffold",
+        "construction",
+        "facade",
+        "temporary works",
+        "site"
+      ],
+      "prompt": null,
+      "edits": [],
+      "reference_review": "Reviewed on 2026-11-20: procedural geometry, so there is no input image. The prepared library mesh was rendered untextured from the front three-quarter view (500 px, viewed in a 300 px contact sheet) and the script code that models it was read: no lettering, logos, brand marks or characters in the geometry. The kit was designed with third-party reference images in view (external_reference_status); this piece is a generic assembly of boxes and tubes and copies no distinctive design from them."
+    },
+    {
+      "asset_id": "gen-antenna-cluster-roof-1",
+      "source_name": "SM_MegaAntennaCluster",
+      "source_file": "twofronts/world/megastructure_v020/SM_MegaAntennaCluster.fbx",
+      "source_sha256": "8c415432b8cf1b542fcd7d1a8662cc3c5763d225e37c06ccbebd2fb5a5025ade",
+      "source_exported_at": "2026-09-19T13:03:12+00:00",
+      "generator_script": "twofronts/infrastructure/scripts/build_megastructure_kit_v020.py",
+      "kit_record": "twofronts/world/megastructure_v020/kit.json",
+      "kit_entry": {
+        "asset": "SM_MegaAntennaCluster",
+        "note": "rooftop lattice mast, whips, panels, dishes",
+        "triangles": 1176,
+        "dimensions_m": [
+          8.0,
+          8.0,
+          15.8
+        ],
+        "materials": [
+          "MegaConcrete",
+          "MegaWhite",
+          "MegaMetal"
+        ]
+      },
+      "product": "Rooftop antenna cluster",
+      "variant": "Lattice mast with whip and panel antennas and dishes on a roof pad",
+      "category": "building_services",
+      "material": "aluminium-anodized",
+      "height_mm": 15800,
+      "width_hint_mm": 8000,
+      "depth_hint_mm": 8000,
+      "target_triangles": 1176,
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "tags": [
+        "antenna",
+        "mast",
+        "telecom",
+        "rooftop",
+        "services",
+        "roofscape"
+      ],
+      "prompt": null,
+      "edits": [],
+      "reference_review": "Reviewed on 2026-11-20: procedural geometry, so there is no input image. The prepared library mesh was rendered untextured from the front three-quarter view (500 px, viewed in a 300 px contact sheet) and the script code that models it was read: no lettering, logos, brand marks or characters in the geometry. The kit was designed with third-party reference images in view (external_reference_status); this piece is a generic assembly of boxes and tubes and copies no distinctive design from them."
+    }
+  ],
+  "release_assets": [
+    "gen-satellite-dish-1",
+    "gen-ac-unit-wall-stack-1",
+    "gen-pipe-bundle-vertical-1",
+    "gen-scaffold-bay-1",
+    "gen-antenna-cluster-roof-1"
+  ],
+  "external_reference_files": [
+    {
+      "name": "1.jpg",
+      "project_path": "docs/references/infrastructure_v020/1.jpg",
+      "sha256": "be1ddd033c989da33c5370cabefde04d1ebdb9e5c81413f4f627390698f79571",
+      "retained": false
+    },
+    {
+      "name": "2.jpg",
+      "project_path": "docs/references/infrastructure_v020/2.jpg",
+      "sha256": "4e4850e262c0a71bf0637a5d4b3e5de376e2aaf48935348405feaf8fa0be5171",
+      "retained": false
+    },
+    {
+      "name": "3.jpg",
+      "project_path": "docs/references/infrastructure_v020/3.jpg",
+      "sha256": "a90c900b781f6d909cff2b6b287603c12b92b9440168c3c3172327ec7da0e6b8",
+      "retained": false
+    },
+    {
+      "name": "4.jpg",
+      "project_path": "docs/references/infrastructure_v020/4.jpg",
+      "sha256": "b39ec6db597c1f99cc1262fdfcb47e4212fe0bb9df5676a65df43f5302b13315",
+      "retained": false
+    },
+    {
+      "name": "5.jpg",
+      "project_path": "docs/references/infrastructure_v020/5.jpg",
+      "sha256": "38e75e9bf9027838d8ba37ed76519e5f86431ded085388e33d94df494b766cee",
+      "retained": false
+    },
+    {
+      "name": "6.jpg",
+      "project_path": "docs/references/infrastructure_v020/6.jpg",
+      "sha256": "679420524a1c8203e7fddcc7c022cd69bb5e4e08b62da49212677e0156484298",
+      "retained": false
+    }
+  ]
+}

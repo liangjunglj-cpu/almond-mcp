@@ -1,0 +1,336 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-fishing-boat-wheelhouse-1",
+  "library_id": "generated_assets",
+  "name": "Fishing boat (Coastal fishing boat, 15 m, two-level wheelhouse with radar mast; generated watercraft; detailed geometry edition)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-fishing-boat-wheelhouse-1.glb",
+  "dimensions_mm": {
+    "width": 15002.6,
+    "depth": 4824.7,
+    "height": 8143.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "ground",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -7501.3,
+        -2412.35,
+        0.0
+      ],
+      "max": [
+        7501.3,
+        2412.35,
+        8143.0
+      ]
+    },
+    "footprint": [
+      [
+        -7501.3,
+        -2412.35
+      ],
+      [
+        7501.3,
+        -2412.35
+      ],
+      [
+        7501.3,
+        2412.35
+      ],
+      [
+        -7501.3,
+        2412.35
+      ]
+    ],
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "movable"
+  },
+  "materials": [
+    {
+      "material_id": "plaster-white",
+      "objects": [
+        "gen-fishing-boat-wheelhouse-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-fishing-boat-wheelhouse-1",
+    "library_id": "generated_assets",
+    "name": "Fishing boat (Coastal fishing boat, 15 m, two-level wheelhouse with radar mast; generated watercraft; detailed geometry edition)",
+    "category": "vehicle",
+    "tags": [
+      "boat",
+      "fishing boat",
+      "watercraft",
+      "harbour",
+      "taiwan",
+      "waterfront",
+      "detailed",
+      "meshy",
+      "ginkgo-daxi-2026-11"
+    ],
+    "dimensions_mm": {
+      "width": 15002.6,
+      "depth": 4824.7,
+      "height": 8143.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 15000.0,
+      "depth": 4824.0,
+      "height": 8143.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "ground",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -7501.3,
+          -2412.35,
+          0.0
+        ],
+        "max": [
+          7501.3,
+          2412.35,
+          8143.0
+        ]
+      },
+      "footprint": [
+        [
+          -7501.3,
+          -2412.35
+        ],
+        [
+          7501.3,
+          -2412.35
+        ],
+        [
+          7501.3,
+          2412.35
+        ],
+        [
+          -7501.3,
+          2412.35
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "movable"
+    },
+    "materials": [
+      {
+        "material_id": "plaster-white",
+        "objects": [
+          "gen-fishing-boat-wheelhouse-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "Photorealistic isolated product shot of ONE Taiwanese coastal fishing boat (about 15 m), white painted wooden hull with a pale green-grey sheer stripe, a two-level white wheelhouse with dark windows amidships, railings, antennae and a short white mast with a radar on the wheelhouse roof, worn and rust-streaked. Whole boat visible bow to stern in three-quarter view from slightly above, hull fully out of the water, plain flat light grey studio background, soft overcast light. No people, no water, no flags, exactly one boat.",
+        "image_task_id": null,
+        "image_model": "nano_banana_pro",
+        "mesh_task_id": "01a13d87-81ee-7709-841d-4af69dd823ef",
+        "mesh_model": "latest",
+        "generated_at": "2026-10-15",
+        "orientation_correction": null,
+        "scale_applied": 7885.4394,
+        "captured_generation": {
+          "batch_id": "ginkgo-daxi-2026-11",
+          "image": {
+            "asset_id": "gen-fishing-boat-wheelhouse-1",
+            "provider": "higgsfield",
+            "tool": "generate_image_batch",
+            "submitted_at": "2026-10-15T03:05:20.988Z",
+            "request": {
+              "model": "nano_banana_pro",
+              "resolution": "2k",
+              "aspect_ratio": "16:9",
+              "medias": [
+                {
+                  "value": "7541720a-3002-4785-b6b9-6b1bd975abaa",
+                  "role": "image_references"
+                }
+              ],
+              "prompt": "Photorealistic isolated product shot of ONE Taiwanese coastal fishing boat (about 15 m), white painted wooden hull with a pale green-grey sheer stripe, a two-level white wheelhouse with dark windows amidships, railings, antennae and a short white mast with a radar on the wheelhouse roof, worn and rust-streaked. Whole boat visible bow to stern in three-quarter view from slightly above, hull fully out of the water, plain flat light grey studio background, soft overcast light. No people, no water, no flags, exactly one boat."
+            },
+            "task_id": "10bd8c8d-cf0e-44ee-81fc-c6c658e7b303",
+            "status": "COMPLETED",
+            "provider_model": "nano_banana_pro",
+            "provider_reported_model": "nano_banana_2",
+            "completed_observed_at": "2026-10-15T03:07:06.122Z",
+            "provider_output_name": "hf_20261015_030523_10bd8c8d-cf0e-44ee-81fc-c6c658e7b303.png",
+            "reference_inputs": [
+              {
+                "name": "daxi_ref.jpg",
+                "role": "owner photograph (daxi_ref)",
+                "sha256": "c61e641ee44b18b5ca441f344ba8d75ac4fdf3e0452f3e536e5ef42a1305ee9f",
+                "retained": false,
+                "note": "Owner photograph uploaded to the image stage; not distributed"
+              }
+            ],
+            "output_file": "gen-fishing-boat-wheelhouse-1.png",
+            "output_sha256": "141c0f9b2b1ddc01b3c3eacc49a8a6089c072766574c0c56770ff694a397fa43",
+            "output_file_modified_at": "2026-10-15T03:07:14+00:00",
+            "seed": null,
+            "evidence_source": {
+              "pass_records": [
+                "runs/daxi_harbour/blender/layout.json",
+                "runs/daxi_harbour/blender/build_scene.py"
+              ],
+              "session_records": "Tool calls of Ginkgo Claude Code session(s) 32f853ff-f053-42f0-973f-1c12ffd01fac (submissions, results and downloads)",
+              "extracted_at": "2026-11-20T16:57:59+00:00"
+            },
+            "status_basis": "Provider reported completed; curl of the job's result URL in the Ginkgo session (Bash)"
+          },
+          "mesh": {
+            "asset_id": "gen-fishing-boat-wheelhouse-1",
+            "provider": "meshy",
+            "tool": "meshy_image_to_3d",
+            "submitted_at": "2026-10-15T03:07:27.274Z",
+            "request": {
+              "ai_model": "latest",
+              "enable_pbr": true,
+              "should_remesh": true,
+              "target_polycount": 150000,
+              "target_formats": [
+                "glb"
+              ],
+              "image": "local upload of mid1_ref.png"
+            },
+            "task_id": "01a13d87-81ee-7709-841d-4af69dd823ef",
+            "status": "SUCCEEDED",
+            "provider_model": "latest",
+            "consumed_credits": 30,
+            "input_link": "upload",
+            "input_image_sha256": "141c0f9b2b1ddc01b3c3eacc49a8a6089c072766574c0c56770ff694a397fa43",
+            "output_file": "gen-fishing-boat-wheelhouse-1.glb",
+            "output_sha256": "fe093e9043a3ad0fdac76c34414d3e39ac0c9a28d20c0e46db765637179757a2",
+            "seed": null,
+            "evidence_source": {
+              "pass_records": [
+                "runs/daxi_harbour/blender/layout.json",
+                "runs/daxi_harbour/blender/build_scene.py"
+              ],
+              "session_records": "Tool calls of Ginkgo Claude Code session(s) 32f853ff-f053-42f0-973f-1c12ffd01fac (submissions, results and downloads)",
+              "extracted_at": "2026-11-20T16:57:59+00:00"
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-fishing-boat-wheelhouse-1",
+            "source_sha256": "fe093e9043a3ad0fdac76c34414d3e39ac0c9a28d20c0e46db765637179757a2",
+            "source_triangles": 145619,
+            "target_triangles": 60000,
+            "prepared_sha256": "68b947981bfb595f092489479aa245e09f981b35130de8870b1454730bd8e1da",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Remove wire edges, split edges shared by more than two faces and remove zero-area faces (counts in quality.topology_repairs). Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.902419924736023e-07,
+            "quality": {
+              "vertices": 30179,
+              "triangles": 59996,
+              "boundary_edges": 492,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 142,
+              "largest_component_vertices": 29711,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 1,
+              "topology_repairs": {
+                "wire_edges_removed": 0,
+                "nonmanifold_edges_split": 144,
+                "zero_area_faces_removed": 0,
+                "loose_vertices_removed": 0
+              },
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                8.064589403054331e-05,
+                0.00011321197373482209,
+                8.241645983675077e-05
+              ]
+            }
+          },
+          "input_image_file": "batches/ginkgo-daxi-2026-11/gen-fishing-boat-wheelhouse-1.png",
+          "external_reference_status": "Photo-derived: each image request took crops of the owner's own photograph of Daxi fishing harbour (Yilan, Taiwan) as Higgsfield media references. The two hero boats (14 m and 16 m) were prompted to match specific boats in that photograph; the three smaller boats follow the photograph's general harbour craft. The photograph and crops are named and hashed in each image record, not distributed. The Higgsfield job results report model nano_banana_2 for requests that named nano_banana_pro; both are recorded.",
+          "external_reference_ids": [],
+          "dimension_basis": "Lengths are the sizes written into each image prompt in the Ginkgo session (14, 16, 11, 15 and 22 m); each mesh was scaled uniformly so its overall length matches, and height and beam were measured after scaling. The Daxi scene itself placed the hero boats at 18 and 19 m. Not a physical survey.",
+          "reference_review": "Reference image reviewed on 2026-11-20 (downscaled to 900 px wide): no hull numbers, boat names, lettering, logos or brand marks visible.",
+          "rights": "Reference images generated on the owner's Higgsfield account (nano_banana_pro) from crops of the owner's own photograph; meshes with Tripo H3.1 through the owner's Higgsfield account (the two hero boats) or on the owner's paid Meshy account (three harbour boats). The hero boats are modelled on specific working boats in the owner's photograph; no hull numbers, names, lettering or marks appear in the reference images. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-20. Generator account entitlements and the Tripo terms not independently audited.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private)",
+            "pass": "runs/daxi_harbour",
+            "source_name": "mid1",
+            "records": [
+              "runs/daxi_harbour/blender/layout.json",
+              "Claude Code session transcript 32f853ff-f053-42f0-973f-1c12ffd01fac (the tool calls that uploaded the photo crops and submitted the image, Tripo and Meshy jobs, and the crop of the boatR image)"
+            ]
+          }
+        }
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "streetscape"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.0,
+      "triangle_count": 59996,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "40EF07A1A76C372CC012B573DA7C6EADFEB171B0DA3F2C077E6DACD8BF4FAF41"
+}

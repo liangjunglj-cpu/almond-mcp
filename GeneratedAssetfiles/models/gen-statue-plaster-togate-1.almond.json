@@ -1,0 +1,327 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-statue-plaster-togate-1",
+  "library_id": "generated_assets",
+  "name": "Plaster statue (Classical white plaster statue of a standing robed figure holding a scroll, on a chipped square plinth; generated ornament; detailed geometry edition)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-statue-plaster-togate-1.glb",
+  "dimensions_mm": {
+    "width": 640.5,
+    "depth": 581.9,
+    "height": 2000.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "ground",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -320.25,
+        -290.95,
+        0.0
+      ],
+      "max": [
+        320.25,
+        290.95,
+        2000.0
+      ]
+    },
+    "footprint": [
+      [
+        -320.25,
+        -290.95
+      ],
+      [
+        320.25,
+        -290.95
+      ],
+      [
+        320.25,
+        290.95
+      ],
+      [
+        -320.25,
+        290.95
+      ]
+    ],
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "fixed"
+  },
+  "materials": [
+    {
+      "material_id": "plaster-white",
+      "objects": [
+        "gen-statue-plaster-togate-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-statue-plaster-togate-1",
+    "library_id": "generated_assets",
+    "name": "Plaster statue (Classical white plaster statue of a standing robed figure holding a scroll, on a chipped square plinth; generated ornament; detailed geometry edition)",
+    "category": "ornament",
+    "tags": [
+      "statue",
+      "sculpture",
+      "classical",
+      "plaster cast",
+      "plinth",
+      "ornament",
+      "detailed",
+      "meshy",
+      "ginkgo-refset-0924"
+    ],
+    "dimensions_mm": {
+      "width": 640.5,
+      "depth": 581.9,
+      "height": 2000.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 640.0,
+      "depth": 582.0,
+      "height": 2000.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "ground",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -320.25,
+          -290.95,
+          0.0
+        ],
+        "max": [
+          320.25,
+          290.95,
+          2000.0
+        ]
+      },
+      "footprint": [
+        [
+          -320.25,
+          -290.95
+        ],
+        [
+          320.25,
+          -290.95
+        ],
+        [
+          320.25,
+          290.95
+        ],
+        [
+          -320.25,
+          290.95
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "fixed"
+    },
+    "materials": [
+      {
+        "material_id": "plaster-white",
+        "objects": [
+          "gen-statue-plaster-togate-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "Product photo of a white plaster classical sculpture of a standing robed Greek figure holding a scroll, on a square white plinth, slightly chipped, full body three-quarter view, centred, plain light grey studio background, even soft lighting, no text.",
+        "image_task_id": null,
+        "image_model": "gpt_image_2_5",
+        "mesh_task_id": "01a0d2db-0281-75e1-9f35-7fe0890f8b7a",
+        "mesh_model": "meshy-7",
+        "generated_at": "2026-09-24",
+        "orientation_correction": null,
+        "scale_applied": 1050.708939,
+        "captured_generation": {
+          "batch_id": "ginkgo-refset-0924",
+          "image": {
+            "asset_id": "gen-statue-plaster-togate-1",
+            "provider": "higgsfield",
+            "tool": "generate_image_batch",
+            "submitted_at": "2026-09-24T09:58:13.815Z",
+            "request": {
+              "model": "gpt_image_2_5",
+              "aspect_ratio": "1:1",
+              "prompt": "Product photo of a white plaster classical sculpture of a standing robed Greek figure holding a scroll, on a square white plinth, slightly chipped, full body three-quarter view, centred, plain light grey studio background, even soft lighting, no text."
+            },
+            "batch_context": null,
+            "task_id": "8ab89e75-2a96-4b29-8137-0f3f5fdaba4a",
+            "status": "COMPLETED",
+            "provider_model": "gpt_image_2_5",
+            "provider_reported_model": "gpt_image_2_5",
+            "completed_observed_at": "2026-09-24T09:58:53.034Z",
+            "provider_output_name": "hf_20260924_095816_8ab89e75-2a96-4b29-8137-0f3f5fdaba4a.png",
+            "consumed_credits": "not returned in the session",
+            "reference_inputs": [],
+            "output_file": "gen-statue-plaster-togate-1.png",
+            "output_sha256": "342e5ca095b84b52e133afa7f2ef73477216b8881f22ef2ee9b1a856854f7d9f",
+            "output_file_modified_at": "2026-09-24T09:59:04+00:00",
+            "seed": null,
+            "evidence_source": {
+              "pass_records": [
+                "runs/refset_0924/pass.json",
+                "ProjectY2K: twofronts/meshy/ginkgo_props_v061/out/conditioning.json"
+              ],
+              "session_records": "Tool calls of Ginkgo Claude Code session(s) 91b8746a-d9e0-43fb-9702-e16a1209fd34 (submissions, results and downloads)",
+              "extracted_at": "2026-11-20T17:58:59+00:00"
+            },
+            "status_basis": "Provider reported completed; curl of the job's result URL in the Ginkgo session (Bash, 2026-09-24T09:59:00.513Z)"
+          },
+          "mesh": {
+            "asset_id": "gen-statue-plaster-togate-1",
+            "provider": "meshy",
+            "tool": "meshy_image_to_3d",
+            "submitted_at": "2026-09-24T09:59:20.190Z",
+            "request": {
+              "ai_model": "meshy-7",
+              "enable_pbr": true,
+              "target_formats": [
+                "glb"
+              ],
+              "target_polycount": 30000,
+              "response_format": "json",
+              "image": "local upload of ref_plaster_statue.png"
+            },
+            "task_id": "01a0d2db-0281-75e1-9f35-7fe0890f8b7a",
+            "status": "SUCCEEDED",
+            "status_basis": "meshy_get_task_status reported SUCCEEDED at 2026-09-24T10:01:23.383Z",
+            "consumed_credits": 30,
+            "provider_model": "meshy-7",
+            "input_link": "upload",
+            "input_image_sha256": "342e5ca095b84b52e133afa7f2ef73477216b8881f22ef2ee9b1a856854f7d9f",
+            "output_file": "gen-statue-plaster-togate-1.glb",
+            "output_sha256": "2f453be3a69659eb506d4d3d1c11329ede7b9a49e9120dbf0a05afdddadbe90c",
+            "seed": null,
+            "evidence_source": {
+              "pass_records": [
+                "runs/refset_0924/pass.json",
+                "ProjectY2K: twofronts/meshy/ginkgo_props_v061/out/conditioning.json"
+              ],
+              "session_records": "Tool calls of Ginkgo Claude Code session(s) 91b8746a-d9e0-43fb-9702-e16a1209fd34 (submissions, results and downloads)",
+              "extracted_at": "2026-11-20T17:58:59+00:00"
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-statue-plaster-togate-1",
+            "source_sha256": "2f453be3a69659eb506d4d3d1c11329ede7b9a49e9120dbf0a05afdddadbe90c",
+            "source_triangles": 900624,
+            "target_triangles": 80000,
+            "prepared_sha256": "4ad29fb9b0f47e1ef92a6afd08adb97a31ad9c2c5e6a7cd8c90b5bf6857e6f3e",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Remove wire edges, split edges shared by more than two faces and remove zero-area faces (counts in quality.topology_repairs). Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.9034979343414306e-07,
+            "quality": {
+              "vertices": 39980,
+              "triangles": 80000,
+              "boundary_edges": 0,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 1,
+              "largest_component_vertices": 39980,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "topology_repairs": {
+                "wire_edges_removed": 0,
+                "nonmanifold_edges_split": 0,
+                "zero_area_faces_removed": 0,
+                "loose_vertices_removed": 0
+              },
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                0.0002910711575086187,
+                0.0004614004348470283,
+                1.1147505420004812e-05
+              ]
+            }
+          },
+          "input_image_file": "batches/ginkgo-refset-0924/gen-statue-plaster-togate-1.png",
+          "external_reference_status": "Text prompt only: no image was given to the image model or to Meshy. The pass designed its scenes from an owner reference set of 8 images (described in runs/refset_0924/pass.json; a red container plaza with a giant inflatable, among others); none shows this statue and none was uploaded to a generator. The prompt asks for a generic classical robed figure, a public-domain sculptural genre; the generated figure was not identified as a reproduction of any specific known sculpture.",
+          "external_reference_ids": [],
+          "dimension_basis": "2.0 m overall: a life-size figure (about 1.75 m) on a plinth of about 0.25 m, chosen for this import as a real-world size. The Ginkgo scene and Project Y2K v061 placed it at 2.4 m. Scaled uniformly to that height; width and depth measured after scaling. Not a physical survey.",
+          "reference_review": "Reference image reviewed on 2026-11-20 at full resolution (1024 px): no inscription, lettering, logos or marks. A generic classical togate figure with a scroll, in the manner of Greco-Roman portrait statues (a public-domain genre); not identified as a copy of a specific known sculpture, and the idealised face is not a recognisable likeness of a real person. A sculpture, not a character.",
+          "rights": "Reference image generated on the owner's Higgsfield account (gpt_image_2_5, text prompt only); mesh with Meshy-7 image-to-3D on the owner's Meshy account (the same account, by the account ID in the result URLs, as the library's other Meshy batches). Owner approved release in the Almond library under CC BY 4.0 on 2026-11-20 (\"increase the range of models, from the ones i used for my project y2k games, (except for the operatives and bosses)\") and chose this group, Ginkgo props reused in Project Y2K, the same day. Generator account entitlements not independently audited. Provider textures are not distributed.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private); reused in Project Y2K, the owner's game project (private)",
+            "pass": "runs/refset_0924",
+            "source_name": "plaster_statue",
+            "records": [
+              "runs/refset_0924/pass.json (owner reference set described; AI-assisted content statement)",
+              "ProjectY2K: twofronts/meshy/ginkgo_props_v061/condition_ginkgo_props.py and out/conditioning.json (content v061 conditioned these props for the Mirai Ward hub as SM_GK61_<Name>.fbx)",
+              "ProjectY2K: twofronts/infrastructure/scripts/world_fill_v061.py (places the conditioned props in the hub)",
+              "Claude Code session transcript 91b8746a-d9e0-43fb-9702-e16a1209fd34 (the tool calls that submitted the image and Meshy jobs, the curl download of the image and the GLB download)"
+            ]
+          }
+        }
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "architecture",
+        "streetscape"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.001,
+      "triangle_count": 80000,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "DEE270D18E397DE1D25650C77FFE8B58D2964A265FE803B6A76A2831F018F508"
+}

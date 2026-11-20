@@ -1,0 +1,1863 @@
+"""Mirai Ward building kit v040 (Project Y2K open-world hub), generated in Blender in the style of the owner's
+Ginkgo refset_0924 world run (W038 Idol Tower, W039 Container Stack, W040 Smash Counter, W041 Coral Terminal).
+
+    blender -b --factory-startup --python kit_v040.py -- --variant PopTower_A [--render] [--samples 16]
+    blender -b --factory-startup --python kit_v040.py -- --validate
+
+The Ginkgo worldpack library (gwlib / gwrender) is imported by path and only read: decals come from
+runs/refset_0924/decals_lite, tiles from publishing/worldpack/textures_lite, Meshy lite maps from
+runs/refset_0924/meshy_lite. Nothing is written under the Ginkgo tree (gwlib._lite_image is patched).
+
+Conventions: metres, Z-up, +X east, +Y north, street (front) face is -Y, origin at the footprint centre with
+Z=0 at street level (bridges: deck top at Z=0). FBX export matches the W038 delivery (FBX_SCALE_UNITS), so
+Unreal imports centimetres at uniform scale 1 with Convert Scene Unit on.
+
+Every variant exports one FBX (twofronts/world_v040/kit/MW_<Variant>.fbx) holding up to four meshes:
+  SM_MW_<Variant>_Structure  solid shell, floors, stairs, parapets, rooftop plant (give it collision)
+  SM_MW_<Variant>_Glass      glazing only (faces routed by material)
+  SM_MW_<Variant>_Signs      decals, lightboxes, neon, cable lights (no collision)
+  SM_MW_<Variant>_Props      small clutter (vending, planters, shelves, fans, lamps)
+Textures are shared in kit/Textures; materials.json per variant in kit/materials/, merged by the runner.
+"""
+from __future__ import annotations
+
+import json
+import math
+import random
+import shutil
+import sys
+import time
+from contextlib import contextmanager
+from pathlib import Path
+
+import bmesh
+import bpy
+import numpy as np
+from mathutils import Matrix, Vector
+
+GINKGO = Path(r"<owner's Ginkgo repository>")
+WP = GINKGO / "publishing" / "worldpack"
+PASS = GINKGO / "runs" / "refset_0924"
+sys.path.insert(0, str(WP))
+import gwlib as L  # noqa: E402
+
+L.configure(PASS)
+import gwrender as R  # noqa: E402
+
+HERE = Path(__file__).resolve().parent
+KIT = HERE / "kit"
+TEXDIR = KIT / "Textures"
+META = KIT / "_meta"
+V = Vector
+
+# lite delivery profile (same as the harness): small POT maps, decimated props
+L.LITE = True
+L.MESHY_TRIS = 3000
+L.ALMOND_TRIS = 5000
+
+FLAT_EXTRA = {
+    "GlassBlue": ((0.07, 0.2, 0.36), 0.05, 0.4, 0.0),
+    "GlassTeal": ((0.25, 0.62, 0.66), 0.08, 0.1, 0.0),
+    "ShopLit": ((0.86, 0.74, 0.58), 0.5, 0.0, 0.45),
+    "LampTeal": ((0.4, 1.0, 0.9), 0.4, 0.0, 5.0),
+    "LanternRed": ((1.0, 0.1, 0.05), 0.45, 0.0, 1.6),
+    "LanternWhite": ((1.0, 0.92, 0.8), 0.45, 0.0, 1.2),
+    "ToriiGlow": ((1.0, 0.16, 0.07), 0.4, 0.0, 1.8),
+    "SignBlank": ((0.95, 0.95, 0.9), 0.4, 0.0, 2.5),
+    "MW_PadGlow": ((0.1, 0.85, 1.0), 0.3, 0.0, 8.0),
+}
+L.FLAT.update(FLAT_EXTRA)
+GLASS = {"Glass", "GlassLit", "GlassBlue", "GlassTeal"}
+SHOPS = ["Shop_Hoshido", "Shop_Kamome", "Shop_PixelLand", "Shop_Denki", "Shop_Mochi", "Shop_CardRyu"]
+BLADES = ["Blade_Anime", "Blade_Hobby", "Blade_Karaoke", "Blade_Denki", "Blade_Books"]
+NEONS = ["Neon_NoSleep", "Neon_StackCity", "Neon_OpenLate", "Neon_Skate", "Neon_Bolt"]
+MARKS = ["Mark_7", "Mark_Code", "Mark_Star", "Mark_Gross", "Mark_Arrow", "Mark_Wheel"]
+STICKERS = ["Stk_Smiley", "Stk_Boom", "Stk_S", "Stk_Sunset", "Stk_Pixel", "Stk_Star", "Stk_Weird", "Stk_24H"]
+CUBES = ["Cube_Izakaya", "Cube_Floors", "Cube_Crane", "Cube_Phone", "Cube_Arrow", "Cube_Taxi", "Cube_Ramen",
+         "Cube_Gyoza"]
+DKIT = L.Y2K / "district_v016"
+REMAP = {"TFKitConcrete": "ConcreteDark", "TFKitMetal": "Galvanized", "TFKitPaint": "PaintRed",
+         "TFKitGlass": "Glass", "TFKitEmissive": "LampWarm"}
+_VARIANT = "x"
+
+
+# ------------------------------------------------------------------ gwlib patch: never write into Ginkgo
+def _lite_image(node, sock):
+    """Lite Meshy map: reuse the refset_0924 lite JPG if it exists (read only), else save a resized copy into
+    this kit's cache."""
+    im = node.image
+    pre = PASS / "meshy_lite" / f"{im.name}.jpg"
+    if pre.exists():
+        path = pre
+    else:
+        size = 512 if "Base" in sock else (64 if "Emission" in sock else 256)
+        if max(im.size) > size:
+            im.scale(size, size)
+        out = KIT / "_cache" / _VARIANT
+        out.mkdir(parents=True, exist_ok=True)
+        path = out / f"{im.name}.jpg"
+        im.file_format = "JPEG"
+        im.save(filepath=str(path), quality=82)
+    new = bpy.data.images.load(str(path), check_existing=True)
+    new.colorspace_settings.name = im.colorspace_settings.name
+    node.image = new
+
+
+L._lite_image = _lite_image
+
+
+# ------------------------------------------------------------------ records (roofs, wall-run faces, climbs)
+REC: dict = {}
+
+
+def rec_reset():
+    REC.clear()
+    REC.update(roofs=[], wallrun=[], climb=[], notes=[])
+
+
+def r2(v):
+    return [round(float(a), 3) for a in v]
+
+
+def roof(z, x0, y0, x1, y1, note=""):
+    REC["roofs"].append({"z": round(z, 3), "rect": r2((x0, y0, x1, y1)), "note": note})
+
+
+NORM = {"S": (0, -1, 0), "N": (0, 1, 0), "E": (1, 0, 0), "W": (-1, 0, 0)}
+
+
+def wallrun(face, p0, p1, z0, z1, note=""):
+    REC["wallrun"].append({"start": r2(p0), "end": r2(p1), "z0": round(z0, 3), "z1": round(z1, 3),
+                           "length": round((V((*p1, 0)) - V((*p0, 0))).length, 2), "normal": list(NORM[face]),
+                           "note": note})
+
+
+@contextmanager
+def grp(name):
+    prev = L._current
+    L.group(name)
+    try:
+        yield
+    finally:
+        L.group(prev)
+
+
+# ------------------------------------------------------------------ face helpers (axis-aligned facades)
+def fquad(face, c, u0, u1, v0, v1, off, m):
+    """Flat quad on the facade plane (S/N: y=c, u=x; E/W: x=c, u=y), `off` metres proud, normal outward."""
+    if face == "S":
+        pts = [(u0, c - off, v0), (u1, c - off, v0), (u1, c - off, v1), (u0, c - off, v1)]
+    elif face == "N":
+        pts = [(u1, c + off, v0), (u0, c + off, v0), (u0, c + off, v1), (u1, c + off, v1)]
+    elif face == "E":
+        pts = [(c + off, u0, v0), (c + off, u1, v0), (c + off, u1, v1), (c + off, u0, v1)]
+    else:
+        pts = [(c - off, u1, v0), (c - off, u0, v0), (c - off, u0, v1), (c - off, u1, v1)]
+    L.G().add(pts, [(0, 1, 2, 3)], Matrix.Identity(4), m)
+
+
+def fbox(face, c, u0, u1, v0, v1, d0, d1, m):
+    """Box standing proud of a facade between outward offsets d0..d1."""
+    if face == "S":
+        L.boxz(u0, c - d1, v0, u1, c - d0, v1, m)
+    elif face == "N":
+        L.boxz(u0, c + d0, v0, u1, c + d1, v1, m)
+    elif face == "E":
+        L.boxz(c + d0, u0, v0, c + d1, u1, v1, m)
+    else:
+        L.boxz(c - d1, u0, v0, c - d0, u1, v1, m)
+
+
+def fpoint(face, c, u, v, off):
+    return {"S": (u, c - off, v), "N": (u, c + off, v), "E": (c + off, u, v), "W": (c - off, u, v)}[face]
+
+
+def lightbox(dname, face, c, u, v, w, h, depth=0.14, emission=None):
+    with grp("Signs"):
+        fbox(face, c, u - w / 2, u + w / 2, v - h / 2, v + h / 2, 0.0, depth, "SignBack")
+        L.decal(dname, fpoint(face, c, u, v, depth), w - 0.1, NORM[face], offset=0.012, height=h - 0.1,
+                emission=emission)
+
+
+def blade(dname, face, c, u, z0, w=1.2):
+    """Vertical blade sign projecting `w` out of a facade (attached along its back edge), decals both sides."""
+    a = L.DECALS[dname]["aspect"]
+    h = w / a
+    t = 0.3
+    with grp("Signs"):
+        fbox(face, c, u - t / 2, u + t / 2, z0, z0 + h, 0.0, w, "SignBack")
+        for s in (-1, 1):
+            n = (s, 0, 0) if face in "SN" else (0, s, 0)
+            L.decal(dname, fpoint(face, c, u + s * t / 2, z0 + h / 2, w / 2), w - 0.1, n, offset=0.012,
+                    height=h - 0.12)
+    return h
+
+
+# ------------------------------------------------------------------ polygons (from W038)
+def rounded_rect(x0, y0, x1, y1, r, seg=6):
+    """CCW polygon with the two front (-Y) corners rounded."""
+    pts = []
+
+    def arc(cx, cy, a0):
+        for k in range(seg + 1):
+            a = math.radians(a0 + 90 * k / seg)
+            pts.append((cx + r * math.cos(a), cy + r * math.sin(a)))
+    arc(x0 + r, y0 + r, 180)
+    arc(x1 - r, y0 + r, 270)
+    pts += [(x1, y1), (x0, y1)]
+    return pts
+
+
+def offset_poly(poly, d):
+    """Inset a convex CCW polygon by d (negative d grows it)."""
+    n = len(poly)
+    out = []
+    for i in range(n):
+        p0, p1, p2 = V((*poly[i - 1], 0)), V((*poly[i], 0)), V((*poly[(i + 1) % n], 0))
+        e1 = (p1 - p0).normalized(); e2 = (p2 - p1).normalized()
+        n1 = V((e1.y, -e1.x, 0)); n2 = V((e2.y, -e2.x, 0))
+        b = (n1 + n2).normalized()
+        s = d / max(0.3, b.dot(n1))
+        q = p1 - b * s
+        out.append((q.x, q.y))
+    return out
+
+
+def poly_skin(poly, z0, z1, m):
+    """Side faces only (outward) of a CCW polygon extrusion: glass skins."""
+    n = len(poly)
+    v = [(x, y, z0) for x, y in poly] + [(x, y, z1) for x, y in poly]
+    f = [(k, (k + 1) % n, n + (k + 1) % n, n + k) for k in range(n)]
+    L.G().add(v, f, Matrix.Identity(4), m)
+
+
+def mullions(poly, z0, z1, step, m="SteelDark", r=0.05):
+    P = [V((*p, 0)) for p in poly]
+    for a, b in zip(P, P[1:] + P[:1]):
+        k = max(1, int((b - a).length / step))
+        for i in range(k):
+            p = a.lerp(b, i / k)
+            L.box((r * 2, r * 2, z1 - z0), (p.x, p.y, z0), m, base=True)
+
+
+def rect_poly(x0, y0, x1, y1):
+    return [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
+
+
+def rect_path(x0, y0, x1, y1, skip):
+    """Open CCW path round a rectangle leaving out one edge ('S', 'E', 'N', 'W')."""
+    c = [(x0, y0), (x1, y0), (x1, y1), (x0, y1)]
+    start = {"S": 1, "E": 2, "N": 3, "W": 0}[skip]
+    return [c[(start + k) % 4] for k in range(4)]
+
+
+def prism_y(poly_xz, y0, y1, m):
+    """Extrude a CCW polygon in the (x, z) plane (seen from -Y) along +Y."""
+    n = len(poly_xz)
+    v = [(x, y0, z) for x, z in poly_xz] + [(x, y1, z) for x, z in poly_xz]
+    f = [tuple(range(n)), tuple(range(2 * n - 1, n - 1, -1))]
+    f += [(n + k, n + (k + 1) % n, (k + 1) % n, k) for k in range(n)]
+    L.G().add(v, f, Matrix.Identity(4), m)
+
+
+# ------------------------------------------------------------------ parapets and railings with gaps
+def path_pieces(points, closed, gaps, width=2.6):
+    """Straight pieces of a polyline with gap intervals removed. gaps = [(x, y)] points on the path, each
+    opening `width` metres centred on the nearest path position."""
+    P = [V((p[0], p[1], 0)) for p in points]
+    edges = list(zip(P, P[1:] + ([P[0]] if closed else [])))
+    lens = [(b - a).length for a, b in edges]
+    cum = [0.0]
+    for l_ in lens:
+        cum.append(cum[-1] + l_)
+    total = cum[-1]
+    gi = []
+    for g in gaps:
+        w = width
+        if len(g) == 3:
+            g, w = (g[0], g[1]), g[2]
+        q = V((g[0], g[1], 0))
+        best = None
+        for i, (a, b) in enumerate(edges):
+            d = b - a
+            t = max(0.0, min(1.0, (q - a).dot(d) / max(d.length_squared, 1e-9)))
+            dist = (a + d * t - q).length
+            if best is None or dist < best[0]:
+                best = (dist, cum[i] + t * lens[i])
+        s = best[1]
+        gi.append((s - w / 2, s + w / 2))
+        if closed:
+            gi += [(s - w / 2 + total, s + w / 2 + total), (s - w / 2 - total, s + w / 2 - total)]
+    out = []
+    for i, (a, b) in enumerate(edges):
+        s0, s1 = cum[i], cum[i + 1]
+        iv = [(s0, s1)]
+        for g0, g1 in gi:
+            nxt = []
+            for u0, u1 in iv:
+                if g1 <= u0 or g0 >= u1:
+                    nxt.append((u0, u1)); continue
+                if g0 > u0:
+                    nxt.append((u0, g0))
+                if g1 < u1:
+                    nxt.append((g1, u1))
+            iv = nxt
+        for u0, u1 in iv:
+            if u1 - u0 < 0.08 or lens[i] < 1e-6:
+                continue
+            out.append((a.lerp(b, (u0 - s0) / lens[i]), a.lerp(b, (u1 - s0) / lens[i])))
+    return out
+
+
+def parapet(points, z, closed=True, gaps=(), h=1.05, t=0.3, m="ConcreteWeathered", cap="SteelDark", width=2.6,
+            teeth=None):
+    """Parapet wall standing on the inside of a CCW outline (outer face flush with the facade), with gaps.
+    teeth=(tooth_h, step, tooth_w) makes the top a row of crenellation teeth (Coral)."""
+    for pa, pb in path_pieces(points, closed, gaps, width):
+        e = pb - pa
+        ln = e.length
+        ang = math.atan2(e.y, e.x)
+        n_in = V((-e.y, e.x, 0)).normalized()
+        c = (pa + pb) / 2 + n_in * t / 2
+        solid = h - (teeth[0] if teeth else 0.0)
+        L.box((ln, t, solid - 0.08), (c.x, c.y, z), m, rot=(0, 0, ang), base=True)
+        L.box((ln, t, 0.08), (c.x, c.y, z + solid - 0.08), cap if not teeth else m, rot=(0, 0, ang), base=True)
+        if teeth:
+            th, step, tw = teeth
+            k = max(1, int(ln / step))
+            for i in range(k):
+                p = pa + e * ((i + 0.5) / k) + n_in * t / 2
+                L.box((tw, t, th), (p.x, p.y, z + solid), m, rot=(0, 0, ang), base=True)
+
+
+def rail(points, z, closed=False, gaps=(), h=1.05, m="Galvanized", width=2.6):
+    for pa, pb in path_pieces(points, closed, gaps, width):
+        L.railing([(pa.x, pa.y, z), (pb.x, pb.y, z)], h=h, post=1.6, m=m, r=0.03)
+
+
+# ------------------------------------------------------------------ rooftop clutter (spaced for movement)
+def roof_ac(x, y, z, rot):
+    with grp("Structure"):
+        L.box((1.45, 0.95, 0.12), (x, y, z), "SteelDark", rot=(0, 0, rot), base=True)
+        L.box((1.3, 0.85, 0.95), (x, y, z + 0.12), "PlasticWhite", rot=(0, 0, rot), base=True)
+    with grp("Props"):
+        L.cyl(0.32, 0.03, (x, y, z + 1.07), "Black", n=16)
+        L.box((0.72, 0.05, 0.04), (x, y, z + 1.1), "SteelDark", rot=(0, 0, rot))
+        L.box((0.05, 0.72, 0.04), (x, y, z + 1.1), "SteelDark", rot=(0, 0, rot))
+
+
+def roof_tank(x, y, z, m="Galvanized"):
+    with grp("Structure"):
+        L.boxz(x - 1.1, y - 1.1, z, x + 1.1, y + 1.1, z + 0.4, "ConcreteDark")
+        L.cyl(0.95, 2.1, (x, y, z + 0.4), m, n=20)
+        L.cyl(0.95, 0.35, (x, y, z + 2.5), m, n=20, r2=0.25)
+    with grp("Props"):
+        L.sweep([(x + 0.9, y, z + 0.9), (x + 1.35, y, z + 0.9), (x + 1.35, y, z + 0.4)], 0.06, "SteelDark", n=8)
+        L.cyl(0.26, 0.08, (x, y, z + 2.83), "SteelDark", n=12)
+
+
+def roof_vent(x, y, z):
+    with grp("Structure"):
+        L.boxz(x - 0.55, y - 0.55, z, x + 0.55, y + 0.55, z + 0.85, "RenderGrey")
+    with grp("Props"):
+        L.cyl(0.34, 0.18, (x, y, z + 0.85), "SteelDark", n=16)
+        L.cyl(0.26, 0.02, (x, y, z + 1.03), "Black", n=16)
+
+
+RADIUS = {"ac": 0.9, "tank": 1.6, "vent": 0.8}
+
+
+def clutter(rect, z, rng, kinds, avoid=(), clear=2.1):
+    """Scatter rooftop plant inside rect keeping >= `clear` metres of free floor between items and around
+    the avoid rects (x0, y0, x1, y1)."""
+    x0, y0, x1, y1 = rect
+    placed = []
+    for kind in kinds:
+        r = RADIUS[kind]
+        for _ in range(80):
+            if x1 - x0 < 2 * r or y1 - y0 < 2 * r:
+                break
+            x = rng.uniform(x0 + r, x1 - r); y = rng.uniform(y0 + r, y1 - r)
+            if any(a[0] - r - clear / 2 < x < a[2] + r + clear / 2 and a[1] - r - clear / 2 < y < a[3] + r + clear / 2
+                   for a in avoid):
+                continue
+            if any(math.hypot(x - px, y - py) < r + pr + clear for px, py, pr in placed):
+                continue
+            placed.append((x, y, r))
+            if kind == "ac":
+                roof_ac(x, y, z, rng.choice((0.0, math.pi / 2)))
+            elif kind == "tank":
+                roof_tank(x, y, z, rng.choice(("Galvanized", "PaintWhite")))
+            else:
+                roof_vent(x, y, z)
+            break
+    return placed
+
+
+def landings(face, c, ucen, z_from, n, step=2.4, w=2.8, d=2.0, off=1.6, m="ConcreteWeathered", edge="PaintWhite",
+             note=""):
+    """Climb route: cantilevered concrete landings alternating left/right of ucen, each `step` higher than the
+    last (double-jump reachable, never directly above the previous one)."""
+    tops = []
+    with grp("Structure"):
+        for k in range(1, n + 1):
+            z = z_from + step * k
+            u = ucen + (off if k % 2 else -off)
+            fbox(face, c, u - w / 2, u + w / 2, z - 0.3, z, 0.0, d, m)
+            fbox(face, c, u - w / 2, u + w / 2, z, z + 0.1, d - 0.12, d, edge)
+            tops.append((u, z))
+    REC["climb"].append({"type": "landings", "face": face, "plane": round(c, 3), "width": w, "depth": d,
+                         "landings_u_z": [r2(t) for t in tops], "from_z": round(z_from, 3), "note": note})
+    return tops
+
+
+def ext_stair(xa, y_wall, z_top, direction=-1, width=1.3, riser=0.18, going=0.28, solid=False, max_run=None):
+    """Straight external stair along X against the wall plane y=y_wall (stair on the +Y side of it), rising
+    from (xa, z=0) in `direction`. solid=True builds a concrete stepped mass, else a steel stair on stringers
+    and posts. Returns (x of the top landing centre, top landing x-range)."""
+    n = math.ceil(z_top / riser)
+    r = z_top / n
+    g = going if not max_run else min(going, max_run / n)
+    ya, yb = y_wall, y_wall + width
+    xe = xa + direction * g * n
+    lx = sorted((xe, xe + direction * 1.3))
+    with grp("Structure"):
+        for i in range(n):
+            xs = sorted((xa + direction * g * i, xa + direction * g * (i + 1)))
+            if solid:
+                L.boxz(xs[0], ya, 0.0, xs[1], yb, r * (i + 1), "ConcreteDark")
+            else:
+                L.boxz(xs[0], ya + 0.06, r * (i + 1) - 0.05, xs[1], yb - 0.06, r * (i + 1), "Galvanized")
+        if solid:
+            L.boxz(lx[0], ya, 0.0, lx[1], yb, z_top, "ConcreteDark")
+        else:
+            L.boxz(lx[0], ya, z_top - 0.1, lx[1], yb, z_top, "Galvanized")
+            for yy in (ya + 0.04, yb - 0.04):
+                L.strut((xa, yy, 0.0), (xe, yy, z_top - 0.05), 0.09, "SteelDark", n=4)
+                L.strut((xe, yy, z_top - 0.12), (lx[1] if direction < 0 else lx[0], yy, z_top - 0.12), 0.07,
+                        "SteelDark", n=4)
+            k = max(1, int(abs(xe - xa) / 3.2))
+            for yp in (ya + 0.02, yb - 0.1):
+                for i in range(1, k + 1):
+                    x = xa + (xe - xa) * i / k
+                    L.boxz(x - 0.06, yp, 0.0, x + 0.06, yp + 0.12, r * n * i / k, "SteelDark")
+                for x in lx:
+                    L.boxz(x - 0.06, yp, 0.0, x + 0.06, yp + 0.12, z_top - 0.1, "SteelDark")
+        L.railing([(xa, yb - 0.03, r), (xe, yb - 0.03, z_top), ((lx[0] if direction < 0 else lx[1]), yb - 0.03, z_top)],
+                  h=1.0, post=1.8, m="Galvanized", r=0.028)
+    REC["climb"].append({"type": "stair", "from": r2((xa, (ya + yb) / 2, 0.0)), "to": r2(((lx[0] + lx[1]) / 2, (ya + yb) / 2, z_top)),
+                         "width": width, "riser": round(r, 3), "going": round(g, 3)})
+    return (lx[0] + lx[1]) / 2, lx
+
+
+# ------------------------------------------------------------------ props
+def meshy_planter(x, y, z, s=1.0):
+    with grp("Props"):
+        L.import_glb(L.MESHY / "planter_pod.glb", (x, y, z), 0.0, target=s, mat_prefix="MeshyPlanter")
+
+
+def meshy_tree(x, y, z, h=6.5, rot=0.0):
+    with grp("Props"):
+        L.import_glb(L.MESHY / "tree_green_broadleaf.glb", (x, y, z), rot, target=h,
+                     mat_prefix="MeshyTreeBroadleaf", decimate=3000)
+
+
+def almond(name, x, y, z, rot, target, axis="z"):
+    with grp("Props"):
+        L.import_glb(L.ALMOND / f"{name}.glb", (x, y, z), rot, target=target, axis=axis)
+
+
+# ================================================================== 1 / 10  Pop towers (W038 family)
+PALS = [
+    dict(main="PaintRed", left="PaintYellow", band="PaintYellow", stripe="PaintBlue", fascia="PaintWhite", glass="GlassBlue"),
+    dict(main="PaintYellow", left="PaintBlue", band="PaintRed", stripe="PaintWhite", fascia="PaintWhite", glass="GlassBlue"),
+    dict(main="PaintBlue", left="PaintWhite", band="PaintYellow", stripe="PaintRed", fascia="PaintYellow", glass="GlassTeal"),
+    dict(main="PaintWhite", left="PaintRed", band="PaintBlue", stripe="PaintYellow", fascia="PaintWhite", glass="GlassBlue"),
+]
+
+
+def podium(x0, y0, x1, y1, PZ, rng, P, stair_gap):
+    r = 4.0
+    fas = rounded_rect(x0, y0, x1, y1, r + 1.35)
+    outer = rounded_rect(x0 + 1.35, y0 + 1.35, x1 - 1.35, y1, r)
+    ff0, ff1 = 5.9, PZ - 0.6
+    with grp("Structure"):
+        L.prism(offset_poly(outer, 2.4), 0.0, 4.2, "ShopLit")
+        L.prism(offset_poly(fas, 0.02), 0.0, 0.14, "TileGrey")
+        mullions(offset_poly(outer, 0.75), 0.14, 3.3, 2.2, r=0.07)
+        L.prism(offset_poly(outer, 0.74), 3.3, 4.2, "SteelDark")
+        L.prism(fas, 4.2, 4.55, "RenderWhite")
+        L.prism(fas, 4.55, ff0, P["fascia"])
+        L.prism(offset_poly(outer, 1.0), ff0, ff1, "ConcreteDark")
+        mullions(offset_poly(outer, 0.78), ff0, ff1, 1.6, r=0.05)
+        L.prism(outer, ff1, PZ, "ConcreteWeathered")
+        poly_skin(offset_poly(outer, 0.75), 0.14, 3.3, "Glass")
+        poly_skin(offset_poly(outer, 0.8), ff0, ff1, P["glass"])
+        # canopy ledge railing (front and sides, with gaps), podium roof parapet (gaps on four sides)
+        rp = offset_poly(fas, 0.15)
+        rail([rp[-1]] + rp[:-1], ff0, closed=False,
+             gaps=[(0.0, y0), (x0, (y0 + y1) / 2), (x1, (y0 + y1) / 2)])
+        parapet(outer, PZ, gaps=[(0.0, y0 + 1.35), (x0 + 1.35, (y0 + y1) / 2 + 2.0), (x1 - 1.35, (y0 + y1) / 2 - 2.0),
+                                 stair_gap])
+    roof(ff0, x0, y0, x1, y1, "canopy ledge ring 2.15 m deep round front and sides (railing with gaps)")
+    roof(PZ, x0 + 1.35, y0 + 1.35, x1 - 1.35, y1, "podium roof terrace (tower stands on it)")
+    # shelves behind the shop glass (front straight run)
+    xa, xb = x0 + 1.35 + r, x1 - 1.35 - r
+    yf = y0 + 1.35 + 2.4
+    stock = ("PaintRed", "PaintYellow", "PaintBlue", "PaintWhite", "PaintPink", "PaintTeal", "PaintPurple")
+    with grp("Props"):
+        nb = int((xb - xa) / 2.1)
+        for k in range(nb):
+            sx0 = xa + (xb - xa - nb * 2.1) / 2 + k * 2.1
+            for sx in (sx0, sx0 + 1.9):
+                L.boxz(sx, yf - 0.5, 0.14, sx + 0.05, yf - 0.02, 2.6, "SteelDark")
+            for zz in (0.5, 1.1, 1.7, 2.3):
+                L.boxz(sx0, yf - 0.5, zz, sx0 + 1.95, yf - 0.02, zz + 0.03, "SteelDark")
+                xx = sx0 + 0.08
+                while xx < sx0 + 1.75:
+                    dw = rng.uniform(0.12, 0.3)
+                    L.boxz(xx, yf - 0.45, zz + 0.03, xx + dw, yf - 0.1, zz + rng.uniform(0.18, 0.42), rng.choice(stock))
+                    xx += dw + 0.04
+        for (vx, body, acc) in ((xa + 0.8, "PaintWhite", "PaintBlue"), (xa + 1.9, "PaintRed", "PaintWhite")):
+            L.vending((vx, y0 + 1.55, 0.14), 0.0, body=body, accent=acc, seed=int(vx * 10) % 97)
+    meshy_planter(xb - 0.8, y0 + 1.2, 0.14, 1.0)
+    meshy_planter(xb - 2.2, y0 + 1.2, 0.14, 1.0)
+    # signage: lightbox band on the fascia, soffit light strips, blade signs on the front corners
+    names = SHOPS[:]
+    rng.shuffle(names)
+    run = x1 - x0 - 2 * (r + 1.35)
+    n = max(2, int(run / 4.0))
+    for i in range(n):
+        u = x0 + r + 1.35 + run * (i + 0.5) / n
+        lightbox(names[i % len(names)], "S", y0, u, 5.22, 3.0, 1.15)
+    side_mid = (y0 + r + 1.35 + y1) / 2
+    lightbox(names[-1], "W", x0, side_mid, 5.22, 3.0, 1.15)
+    lightbox(names[-2], "E", x1, side_mid, 5.22, 3.0, 1.15)
+    with grp("Signs"):
+        for k in range(3):
+            L.boxz(x0 + r + 1.0, y0 + 0.35 + k * 0.5, 4.16, x1 - r - 1.0, y0 + 0.45 + k * 0.5, 4.2, "LampWarm")
+    bl = BLADES[:]
+    rng.shuffle(bl)
+    blade(bl[0], "S", y0, x0 + r + 2.2, 4.3)
+    blade(bl[1], "S", y0, x1 - r - 2.2, 4.3)
+    return outer, fas, bl
+
+
+def main_block(xL, tx1, ty0, ty1, z0, z1, P, glass_x0):
+    """Colour-blocked solid tower block: flush boxes (no protrusions) so every face stays wall-runnable."""
+    xc = [xL, max(xL + 1.0, glass_x0 - 0.5), tx1]
+    zc = [z0, z1 - 4.2, z1 - 1.0, z1]
+    with grp("Structure"):
+        for i in range(2):
+            for j in range(3):
+                m = P["band"] if j == 1 else (P["main"] if i == 0 else P["stripe"])
+                L.boxz(xc[i], ty0, zc[j], xc[i + 1], ty1, zc[j + 1], m)
+
+
+def windows(face, c, u0, u1, z0, z1, rng, floor_h=3.4, lit=0.15, frame="PaintWhite"):
+    """Flush window strips per floor (glass 2 cm proud, spandrel 6 cm)."""
+    with grp("Structure"):
+        f = 0
+        while True:
+            v0 = z0 + 1.0 + f * floor_h
+            v1 = v0 + 1.6
+            if v1 > z1 - 0.5:
+                break
+            fquad(face, c, u0, u1, v0, v1, 0.02, "GlassLit" if rng.random() < lit else "Glass")
+            fbox(face, c, u0 - 0.1, u1 + 0.1, v0 - 0.14, v0, 0.0, 0.06, frame)
+            f += 1
+
+
+def glass_bay(gx0, gx1, y_face, depth, z0, z1, P, balconies=True):
+    ya = y_face - depth
+    with grp("Structure"):
+        L.boxz(gx0 + 0.06, ya + 0.06, z0, gx1 - 0.06, y_face, z1, "ConcreteDark")
+        fquad("S", ya, gx0, gx1, z0, z1, 0.0, P["glass"])
+        fquad("W", gx0, ya, y_face, z0, z1, 0.0, P["glass"])
+        fquad("E", gx1, ya, y_face, z0, z1, 0.0, P["glass"])
+        for x in (gx0, gx1):
+            L.boxz(x - 0.08, ya - 0.08, z0, x + 0.08, ya + 0.08, z1, "PaintWhite")
+        k = max(1, int((gx1 - gx0) / 1.15))
+        for i in range(1, k):
+            x = gx0 + (gx1 - gx0) * i / k
+            L.boxz(x - 0.04, ya - 0.05, z0, x + 0.04, ya, z1, "SteelDark")
+        z = z0 + 3.4
+        while z < z1 - 0.3:
+            L.boxz(gx0 - 0.04, ya - 0.06, z - 0.12, gx1 + 0.04, y_face, z, "PaintWhite")
+            z += 3.4
+        L.boxz(gx0 - 0.1, ya - 0.1, z1, gx1 + 0.1, y_face, z1 + 0.4, P["stripe"])
+        if balconies:
+            z = z0 + 3.4
+            k = 0
+            while z < z1 - 1.5:
+                out = 0.9 + 0.1 * (k % 3)
+                L.boxz(gx1, ya + 0.25, z - 0.25, gx1 + out, y_face - 0.25, z, "ConcreteWeathered")
+                L.boxz(gx1 + out - 0.05, ya + 0.25, z, gx1 + out, y_face - 0.25, z + 1.05, "GlassTeal")
+                for yy in (ya + 0.25, y_face - 0.3):
+                    L.boxz(gx1, yy, z, gx1 + out, yy + 0.05, z + 1.05, "GlassTeal")
+                L.boxz(gx1 + out - 0.08, ya + 0.25, z + 1.05, gx1 + out + 0.02, y_face - 0.25, z + 1.1, "Galvanized")
+                z += 3.4
+                k += 1
+
+
+def billboard_face(dname, cx, y_face, zlo, zhi, wmax, emission=0.7):
+    """Deep white frame 1 m proud of an S facade carrying a billboard decal, fitted into (wmax, zhi-zlo)."""
+    a = L.DECALS[dname]["aspect"]
+    Wb = min(wmax, (zhi - zlo) * a)
+    Hb = Wb / a
+    zb0 = zhi - Hb
+    with grp("Structure"):
+        L.boxz(cx - Wb / 2 - 0.3, y_face - 1.0, zb0 - 0.3, cx + Wb / 2 + 0.3, y_face, zb0 + Hb + 0.3, "PaintWhite")
+    with grp("Signs"):
+        L.decal(dname, (cx, y_face - 1.0, zb0 + Hb / 2), Wb, (0, -1, 0), offset=0.02, height=Hb, emission=emission)
+    return Wb, Hb
+
+
+def crown_billboard(dname, cx, y_front, z, wmax, hmax=6.4):
+    """Solid roof billboard frame (flat both sides -> wall-run surface), decal on the street side, spot arms."""
+    a = L.DECALS[dname]["aspect"]
+    Wc = min(wmax, hmax * a)
+    Hc = Wc / a
+    top = z + 0.9 + Hc + 0.3
+    with grp("Structure"):
+        L.boxz(cx - Wc / 2 - 0.3, y_front, z, cx + Wc / 2 + 0.3, y_front + 0.6, top, "PaintWhite")
+    with grp("Signs"):
+        L.decal(dname, (cx, y_front, z + 0.9 + Hc / 2), Wc, (0, -1, 0), offset=0.02, height=Hc, emission=0.7)
+    with grp("Props"):
+        k = max(2, int(Wc / 3.2))
+        for i in range(k):
+            x = cx - Wc / 2 + Wc * (i + 0.5) / k
+            L.strut((x, y_front + 0.3, top), (x, y_front - 1.2, top + 0.9), 0.05, "SteelDark", n=6)
+            L.cyl(0.16, 0.4, (x, y_front - 1.2, top + 0.7), "SteelDark", rot=(math.radians(-120), 0, 0), n=10)
+    wallrun("N", (cx + Wc / 2 + 0.3, y_front + 0.6), (cx - Wc / 2 - 0.3, y_front + 0.6), z, top,
+            "back of the roof billboard frame")
+    return Wc, top
+
+
+def pop_tower(variant, W, D, H, seed, pal, big="Billboard_Idols", hero=False):
+    rng = random.Random(seed)
+    P = PALS[pal]
+    x0, x1, y0, y1 = -W / 2, W / 2, -D / 2, D / 2
+    PZ = 10.0 if hero else 9.0
+    # back stair to the podium roof (steel, outside the north face)
+    xa = x1 - 1.0
+    n_st = math.ceil(PZ / 0.18)
+    top_x = xa - 0.28 * n_st - 0.65
+    podium(x0, y0, x1, y1, PZ, rng, P, (top_x, y1))
+    ext_stair(xa, y1, PZ, direction=-1)
+    # tower massing
+    tx0, tx1 = x0 + 2.5, x1 - 2.5
+    ty1 = y1 - 2.5
+    ty0 = -8.0 if hero else ty1 - max(13.0, 0.55 * D)
+    TZ = 62.0 if hero else H - 7.5
+    TW = tx1 - tx0
+    xL = tx0 + max(7.0, 0.36 * TW)
+    nL = max(2, round(0.55 * (TZ - PZ) / 2.4))
+    TZL = PZ + 2.4 * nL + 1.2
+    nM = int((TZ - 0.5 - TZL) / 2.4)
+    gx1 = tx1 - 1.2
+    gx0 = gx1 - 4.6
+    # left block (framed bays, lower roof)
+    with grp("Structure"):
+        L.boxz(tx0, ty0, PZ, xL, ty1, TZL, P["left"])
+        f = 0
+        while PZ + 0.9 + f * 3.6 + 2.1 < TZL - 0.6:
+            v0 = PZ + 0.9 + f * 3.6
+            v1 = v0 + 2.1
+            fquad("S", ty0, tx0 + 0.9, xL - 0.9, v0, v1, 0.02, "GlassLit" if rng.random() < 0.2 else "Glass")
+            fbox("S", ty0, tx0 + 0.7, xL - 0.7, v0 - 0.2, v0, 0.0, 0.14, P["left"])
+            fbox("S", ty0, tx0 + 0.7, xL - 0.7, v1, v1 + 0.2, 0.0, 0.14, P["left"])
+            for u in (tx0 + 0.7, xL - 0.9):
+                fbox("S", ty0, u, u + 0.2, v0, v1, 0.0, 0.14, P["left"])
+            fbox("S", ty0, tx0 + 0.5, xL - 0.5, v1 + 0.35, v1 + 0.75, 0.0, 0.1, P["main"])
+            f += 1
+        parapet(rect_path(tx0, ty0, xL, ty1, "E"), TZL, closed=False, width=3.0,
+                gaps=[((tx0 + xL) / 2 + (1.6 if nL % 2 else -1.6), ty0), ((tx0 + xL) / 2, ty1)])
+    windows("N", ty1, tx0 + 1.0, xL - 1.0, PZ, TZL, rng)
+    lt = landings("S", ty0, (tx0 + xL) / 2, PZ, nL, note="podium roof -> left block roof")
+    roof(TZL, tx0, ty0, xL, ty1, "left block roof")
+    wallrun("W", (tx0, ty0), (tx0, ty1), PZ, TZL + 1.05, "left block west face (plain)")
+    # main block, glass bay, billboard
+    main_block(xL, tx1, ty0, ty1, PZ, TZ, P, gx0)
+    windows("N", ty1, xL + 1.0, tx1 - 1.0, PZ, TZ, rng)
+    windows("W", xL, ty0 + 1.0, ty1 - 1.0, TZL + 0.2, TZ, rng)
+    glass_bay(gx0, gx1, ty0, 1.8, PZ, TZ - 4.6, P)
+    wallrun("E", (tx1, ty0), (tx1, ty1), PZ, TZ + 1.05, "main block east face (flush colour blocks only)")
+    facade_bb = big
+    Wb, Hb = billboard_face(facade_bb, (xL + gx0 - 0.8) / 2, ty0, PZ + 1.5, TZ - 4.8, gx0 - 0.8 - xL - 1.2)
+    if gx0 - 0.8 - (xL + gx0 - 0.8) / 2 - Wb / 2 > 0.6 and TZ - PZ > 10:
+        blade(bl_pick(rng), "S", ty0, gx0 - 0.45, PZ + 1.6, w=1.0)
+    ml = landings("W", xL, (ty0 + ty1) / 2, TZL, nM, note="left block roof -> main roof")
+    last_main_y = ml[-1][0] if ml else (ty0 + ty1) / 2
+    with grp("Structure"):
+        if hero:
+            parapet(rect_poly(xL, ty0, tx1, ty1), TZ, gaps=[(xL, last_main_y, 3.0), ((xL + tx1) / 2, ty1),
+                                                           (tx1, (ty0 + ty1) / 2), ((xL + tx1) / 2 - 4.0, ty0)])
+        else:
+            parapet(rect_poly(xL, ty0, tx1, ty1), TZ, gaps=[(xL, last_main_y, 3.0), ((xL + tx1) / 2, ty1),
+                                                           (tx1, (ty0 + ty1) / 2)])
+    roof(TZ, xL, ty0, tx1, ty1, "main roof" + (" (setback terrace)" if hero else ""))
+    with grp("Props"):
+        for k in range(max(1, int((TZ - PZ) / 9))):
+            L.ac_unit((xL + 2.0 + 4.0 * (k % 3), ty1 + 0.02, PZ + 3.0 + k * 6.8), math.pi)
+    crown = "Billboard_Crown" if big == "Billboard_Idols" else "Billboard_Idols"
+    if not hero:
+        Wc, top = crown_billboard(crown, (xL + tx1) / 2, ty0 + 0.9, TZ, tx1 - xL - 2.2)
+        clutter((xL + 1.2, ty0 + 2.9, tx1 - 1.2, ty1 - 1.2), TZ, rng, ["tank", "ac", "ac", "vent", "ac"][:2 + int(TW / 8)],
+                avoid=[(xL - 2.0, last_main_y - 2.0, xL + 1.5, last_main_y + 2.0)])
+    else:
+        # upper tower section + crown frame on the hero landmark
+        ux0, ux1, uy0, uy1 = xL + 2.0, tx1 - 2.5, ty0 + 6.0, ty1 - 3.0
+        UZ = 90.0
+        with grp("Structure"):
+            L.boxz(ux0, uy0, TZ, ux1, uy1, UZ - 4.0, P["stripe"])
+            L.boxz(ux0, uy0, UZ - 4.0, ux1, uy1, UZ - 1.0, P["band"])
+            L.boxz(ux0, uy0, UZ - 1.0, ux1, uy1, UZ, P["main"])
+            fquad("S", uy0, ux0 + 1.0, ux1 - 1.0, TZ + 0.6, UZ - 4.6, 0.02, P["glass"])
+            k = int((ux1 - ux0 - 2.0) / 1.3)
+            for i in range(k + 1):
+                x = ux0 + 1.0 + (ux1 - ux0 - 2.0) * i / k
+                fbox("S", uy0, x - 0.05, x + 0.05, TZ + 0.6, UZ - 4.6, 0.0, 0.12, "SteelDark")
+            z = TZ + 3.4
+            while z < UZ - 4.6:
+                fbox("S", uy0, ux0 + 1.0, ux1 - 1.0, z - 0.1, z + 0.05, 0.0, 0.1, "PaintWhite")
+                z += 3.4
+        windows("N", uy1, ux0 + 1.0, ux1 - 1.0, TZ, UZ - 4.2, rng)
+        nU = int((UZ - 0.5 - TZ) / 2.4)
+        ul = landings("W", ux0, (uy0 + uy1) / 2, TZ, nU, note="main roof -> upper roof")
+        with grp("Structure"):
+            parapet(rect_poly(ux0, uy0, ux1, uy1), UZ, gaps=[(ux0, ul[-1][0], 3.0), ((ux0 + ux1) / 2, uy1),
+                                                            (ux1, (uy0 + uy1) / 2)])
+        roof(UZ, ux0, uy0, ux1, uy1, "upper roof (crown)")
+        wallrun("E", (ux1, uy0), (ux1, uy1), TZ, UZ + 1.05, "upper section east face")
+        clutter((xL + 1.2, ty0 + 1.4, tx1 - 1.2, ty1 - 1.2), TZ, rng, ["tank", "ac", "ac", "vent", "ac", "vent"],
+                avoid=[(ux0 - 2.2, uy0 - 0.6, ux1 + 0.2, uy1 + 0.2), (xL - 2.0, last_main_y - 2.0, xL + 1.5, last_main_y + 2.0)])
+        Wc, top = crown_billboard("Billboard_Crown", (ux0 + ux1) / 2, uy0 + 0.9, UZ, ux1 - ux0 - 4.2)
+        clutter((ux0 + 1.3, uy0 + 2.8, ux1 - 1.3, uy1 - 1.3), UZ, rng, ["ac", "vent"],
+                avoid=[(ux0 - 2.0, ul[-1][0] - 2.0, ux0 + 1.5, ul[-1][0] + 2.0)])
+        with grp("Structure"):
+            cz = UZ + 10.0
+            pts = [(ux0 + 1.2, uy0 + 1.2), (ux1 - 1.2, uy0 + 1.2), (ux1 - 1.2, uy1 - 1.2), (ux0 + 1.2, uy1 - 1.2)]
+            for (px, py) in pts:
+                L.lattice_mast((px, py, UZ), cz - UZ - 0.4, w=1.0, m="PaintWhite", r=0.05, bay=1.25)
+            for a, b in zip(pts, pts[1:] + pts[:1]):
+                L.boxz(min(a[0], b[0]) - 0.25, min(a[1], b[1]) - 0.25, cz - 0.4, max(a[0], b[0]) + 0.25,
+                       max(a[1], b[1]) + 0.25, cz, "PaintWhite")
+        with grp("Signs"):
+            for a, b in zip(pts, pts[1:] + pts[:1]):
+                L.boxz(min(a[0], b[0]) - 0.1, min(a[1], b[1]) - 0.1, cz - 0.47, max(a[0], b[0]) + 0.1,
+                       max(a[1], b[1]) + 0.1, cz - 0.4, "LampCool")
+        roof(cz, ux0 + 0.95, uy0 + 0.95, ux1 - 0.95, uy1 - 0.95, "crown frame ring beams (0.5 m wide, balance route)")
+    # podium roof clutter in front of and beside the tower
+    pl = [(x0 + 3.2, y0 + 3.4), (x1 - 3.2, y0 + 3.4)]
+    with grp("Props"):
+        for (px, py) in pl:
+            L.import_glb(L.MESHY / "planter_pod.glb", (px, py, PZ), 0.0, target=1.0, mat_prefix="MeshyPlanter")
+    clutter((x0 + 2.6, y0 + 2.6, x1 - 2.6, ty0 - 2.4), PZ, rng, ["ac", "vent", "ac"],
+            avoid=[(tx0 - 0.5, ty0 - 2.5, xL + 0.5, ty0), (gx0 - 1.0, ty0 - 2.9, tx1 + 0.3, ty0)]
+            + [(px - 0.7, py - 0.7, px + 0.7, py + 0.7) for px, py in pl])
+    REC["notes"].append("Street -> podium roof by the steel stair on the north side; landings climb the left "
+                        "block front, then the main block west face" + (", then the upper section west face" if hero else "") + ".")
+
+
+def bl_pick(rng):
+    return rng.choice(BLADES)
+
+
+# ================================================================== 2  Container stacks (W039 family)
+CH, CW = 2.59, 2.44
+PITCH = 2.6
+FT40, FT20 = 12.19, 6.06
+CCOL = ["PaintRed", "PaintYellow", "PaintBlue", "PaintGreen", "PaintWhite", "PaintPink", "PaintPurple", "Rust",
+        "PaintOrange", "PaintTeal"]
+
+
+def container(cx, cy, z, length, m, ribs_e=False, ribs_w=False, doors=True):
+    """ISO container, length along Y, doors on the south (street) end. The body is one closed solid box (clean
+    collision); flanks without ribs are perfectly flat (wall-run risers)."""
+    h, w, l2 = CH, CW / 2, length / 2
+    with grp("Structure"):
+        L.boxz(cx - w + 0.02, cy - l2 + 0.02, z, cx + w - 0.02, cy + l2 - 0.02, z + h, m)
+        L.boxz(cx - w, cy - l2, z, cx + w, cy + l2, z + 0.12, "SteelDark")
+        for xx in (cx - w, cx + w - 0.18):
+            for yy in (cy - l2, cy + l2 - 0.18):
+                L.boxz(xx, yy, z, xx + 0.18, yy + 0.18, z + h, "SteelDark")
+        for s, on in ((1, ribs_e), (-1, ribs_w)):
+            if not on:
+                continue
+            xf0 = cx + s * w
+            k = int((length - 0.4) / 0.28)
+            for i in range(k):
+                y = cy - l2 + 0.2 + (i + 0.5) * (length - 0.4) / k
+                L.boxz(min(xf0, xf0 + s * 0.035), y - 0.06, z + 0.2, max(xf0, xf0 + s * 0.035), y + 0.06, z + h - 0.14, m)
+            L.boxz(min(xf0, xf0 + s * 0.06), cy - l2, z + h - 0.16, max(xf0, xf0 + s * 0.06), cy + l2, z + h, m)
+        if doors:
+            ys = cy - l2
+            L.boxz(cx - 0.02, ys - 0.03, z + 0.2, cx + 0.02, ys, z + h - 0.2, "SteelDark")
+            for xx in (-0.85, -0.35, 0.35, 0.85):
+                L.boxz(cx + xx - 0.025, ys - 0.07, z + 0.15, cx + xx + 0.025, ys - 0.02, z + h - 0.15, "Galvanized")
+                L.boxz(cx + xx - 0.07, ys - 0.09, z + 1.1, cx + xx + 0.07, ys - 0.02, z + 1.25, "Galvanized")
+
+
+def container_stack(variant, W, D, nlev, seed):
+    rng = random.Random(seed)
+    x0 = -W / 2
+    ncol = int((W - 2.5) / 2.5)
+    ys0 = -D / 2 + (0.6 if D <= 14 else 1.4)
+    cyf = ys0 + FT40 / 2
+    colx = [x0 + 1.22 + 2.5 * i for i in range(ncol)]
+    east = colx[-1] + CW / 2
+    top_front = nlev % 2 == 0  # the scaffold's top landing is on the south side when nlev is even
+    colours = {}
+    for L_ in range(nlev):
+        z = L_ * PITCH
+        top = L_ == nlev - 1
+        for i in range(L_, ncol):
+            m = rng.choice(CCOL)
+            colours[(L_, i)] = m
+            if top:
+                length = FT20
+                cy = ys0 + FT20 / 2 if top_front else ys0 + FT40 - FT20 / 2
+            else:
+                length, cy = FT40, cyf
+            container(colx[i], cy, z, length, m, ribs_e=(i == ncol - 1), ribs_w=False,
+                      doors=(top and top_front) or not top or rng.random() < 0.5)
+        # the riser (west flank of the westmost column) is flat: wall-run face and neon canvas
+        cxw = colx[L_] - CW / 2
+        ylo = cyf - FT40 / 2 if not top else (ys0 if top_front else ys0 + FT40 - FT20)
+        yhi = ylo + (FT40 if not top else FT20)
+        wallrun("W", (cxw, yhi), (cxw, ylo), z, z + CH, f"level {L_} riser (west flank)")
+        roof(z + PITCH, colx[L_] - CW / 2, ylo, east, yhi, f"level {L_} container roofs (terrace step {PITCH} m)")
+        with grp("Signs"):
+            nm = NEONS[(L_ + seed) % len(NEONS)]
+            ww = min(4.4, (yhi - ylo) - 3.0) if nm != "Neon_Bolt" else 1.2
+            L.decal(nm, (cxw, (ylo + yhi) / 2, z + 1.35), ww, (-1, 0, 0), offset=0.03)
+            L.decal(rng.choice(MARKS), (cxw, ylo + 1.3, z + 1.3), 1.0, (-1, 0, 0), offset=0.03)
+            L.decal(rng.choice(STICKERS), (cxw, yhi - 1.0, z + 0.9), 0.9, (-1, 0, 0), offset=0.035)
+    # stickers and livery on the street ends
+    with grp("Signs"):
+        for i in range(ncol):
+            if rng.random() < 0.55:
+                L.decal(rng.choice(MARKS + STICKERS), (colx[i] + 0.55 * rng.choice((-1, 1)), ys0, 1.5), 0.8, (0, -1, 0),
+                        offset=0.1)
+    # scaffold stair tower on the east side
+    xs = east + 0.16
+    sy0 = ys0
+    land_s = (sy0, sy0 + 1.3)
+    run = 14 * 0.28
+    fl = (land_s[1], land_s[1] + run)
+    land_n = (fl[1], fl[1] + 2.4)
+    rz = PITCH / 14
+    lanes = ((xs + 0.1, xs + 1.15), (xs + 1.25, xs + 2.3))
+    with grp("Structure"):
+        for j in range(nlev):
+            la = lanes[j % 2]
+            z0 = j * PITCH
+            for i in range(1, 15):
+                if j % 2 == 0:
+                    ya, yb = fl[0] + (i - 1) * 0.28, fl[0] + i * 0.28
+                else:
+                    ya, yb = fl[1] - i * 0.28, fl[1] - (i - 1) * 0.28
+                L.boxz(la[0], ya, z0 + i * rz - 0.05, la[1], yb, z0 + i * rz, "Galvanized")
+            for xx in la:
+                p0 = (xx, fl[0] if j % 2 == 0 else fl[1], z0)
+                p1 = (xx, fl[1] if j % 2 == 0 else fl[0], z0 + PITCH)
+                L.strut(p0, p1, 0.07, "PaintRed", n=4)
+        for j in range(1, nlev + 1):
+            z = j * PITCH
+            ly = land_s if j % 2 == 0 else land_n
+            L.boxz(xs, ly[0], z - 0.08, xs + 2.4, ly[1], z, "Galvanized")
+        topz = nlev * PITCH
+        for (px, py) in ((xs + 0.05, sy0 + 0.05), (xs + 2.35, sy0 + 0.05), (xs + 0.05, land_n[1] - 0.05),
+                         (xs + 2.35, land_n[1] - 0.05), (xs + 0.05, fl[0]), (xs + 2.35, fl[0]), (xs + 0.05, fl[1]),
+                         (xs + 2.35, fl[1])):
+            L.boxz(px - 0.06, py - 0.06, 0.0, px + 0.06, py + 0.06, topz + 1.05, "PaintRed")
+        for j in range(nlev + 1):
+            z = j * PITCH + 1.05
+            L.strut((xs + 2.35, sy0 + 0.05 if j else fl[0], z), (xs + 2.35, land_n[1] - 0.05, z), 0.03, "PaintRed", n=6)
+            if j:  # ground level stays open on the south side (entry)
+                L.strut((xs + 0.05, sy0 + 0.05, z), (xs + 2.35, sy0 + 0.05, z), 0.03, "PaintRed", n=6)
+            L.strut((xs + 0.05, land_n[1] - 0.05, z), (xs + 2.35, land_n[1] - 0.05, z), 0.03, "PaintRed", n=6)
+        for j in range(nlev):
+            z0, z1 = j * PITCH + 0.1, (j + 1) * PITCH - 0.1
+            L.strut((xs + 2.35, sy0 + 0.05, z0), (xs + 2.35, land_n[1] - 0.05, z1), 0.035, "PaintRed", n=6)
+        # top-level railing on the street edge and back edge of the top containers (gaps left open)
+        ztop = nlev * PITCH
+        xw = colx[nlev - 1] - CW / 2
+        yt0 = ys0 if top_front else ys0 + FT40 - FT20
+        rail([(east, yt0 + 0.05), (xw + 0.05, yt0 + 0.05), (xw + 0.05, yt0 + FT20 - 0.05)], ztop, closed=False,
+             gaps=[((east + xw) / 2, yt0), (xw, yt0 + FT20 / 2)], m="PaintRed")
+    REC["climb"].append({"type": "scaffold_stair", "x": r2((xs, xs + 2.4)), "levels": nlev,
+                         "landings_z": [round(j * PITCH, 2) for j in range(nlev + 1)]})
+    REC["notes"].append("Every container level is a terrace one container (2.6 m) above the last: double-jump up "
+                        "the west risers or take the red scaffold stair on the east side.")
+    # top-level plant, props at the base
+    zt = nlev * PITCH
+    yt0 = ys0 if top_front else ys0 + FT40 - FT20
+    if ncol - (nlev - 1) >= 3:
+        clutter((colx[nlev - 1] - 1.0, yt0 + 1.0, east - 0.6, yt0 + FT20 - 1.0), zt, rng, ["ac"], clear=1.8)
+    with grp("Props"):
+        for (px, py, rr) in ((x0 + 0.8, ys0 - 0.2, 0.3), (x0 + 1.6, ys0 - 0.5, 1.2)):
+            L.import_fbx(DKIT / "SM_KitBarrel.fbx", (px, py - 0.4, 0.0), rr, remap=REMAP, retile=True)
+        L.import_fbx(DKIT / "SM_KitCrateStack.fbx", (colx[2], ys0 - 1.0, 0.0), 0.1, remap=REMAP, retile=True)
+        L.vending((colx[min(4, ncol - 1)], ys0 - 0.6, 0.0), 0.0, body="PaintBlue", accent="PaintWhite", seed=seed)
+    meshy_planter(colx[min(5, ncol - 1)] + 0.4, ys0 - 0.7, 0.0, 1.0)
+    if W > 22:
+        # sticker-bombed pylon at the back-west corner (W039)
+        px0, py0 = x0 + 0.2, ys0 + FT40 + 0.25
+        with grp("Structure"):
+            L.boxz(px0, py0, 0.0, px0 + 2.0, py0 + 2.0, 17.0, "PaintWhite")
+            L.boxz(px0 - 0.1, py0 - 0.1, 17.0, px0 + 2.1, py0 + 2.1, 20.0, "PaintRed")
+            L.boxz(px0 + 0.2, py0 + 0.2, 20.0, px0 + 1.8, py0 + 1.8, 22.0, "GlassBlue")
+            L.boxz(px0 - 0.15, py0 - 0.15, 22.0, px0 + 2.15, py0 + 2.15, 22.2, "SteelDark")
+        with grp("Signs"):
+            for fi, (n, P_) in enumerate((((0, -1, 0), lambda u, z: (px0 + u, py0, z)),
+                                          ((-1, 0, 0), lambda u, z: (px0, py0 + 2.0 - u, z)))):
+                z = 6.0
+                k = fi
+                while z < 16.4:
+                    u = 0.2
+                    rowh = 0
+                    while u < 1.6:
+                        nm = STICKERS[(k * 3 + fi) % len(STICKERS)]
+                        w_ = rng.uniform(0.7, 0.95)
+                        h_ = w_ / L.DECALS[nm]["aspect"]
+                        if u + w_ > 1.9:
+                            break
+                        L.decal(nm, P_(u + w_ / 2, z + h_ / 2), w_, n, offset=0.02 + 0.002 * (k % 4), height=h_)
+                        u += w_ + 0.05
+                        rowh = max(rowh, h_)
+                        k += 1
+                    z += rowh + 0.08
+            L.decal("Neon_StackCity", (px0 + 1.0, py0, 18.5), 1.8, (0, -1, 0), offset=0.03)
+
+
+# ================================================================== 3  Arcades (W040 family)
+APAL = [
+    dict(clad="RenderGrey", accent="PaintOrange", roofbb="Menu_Board"),
+    dict(clad="Blockwork", accent="PaintRed", roofbb="Billboard_Crown"),
+    dict(clad="RenderWhite", accent="PaintYellow", roofbb="Mural_Flowers"),
+]
+
+
+def arcade(variant, W, D, Cd, seed, pal):
+    rng = random.Random(seed)
+    P = APAL[pal]
+    x0, x1, y0, y1 = -W / 2, W / 2, -D / 2, D / 2
+    H = 7.5
+    yb = y0 + Cd
+    nb = max(2, int(W // 5.2))
+    bw = W / nb
+    ops_s = [(i * bw + 0.5, 0.0, (i + 1) * bw - 0.5, 3.2) for i in range(nb)]
+    ops_s += [(i * bw + 0.7, 4.9, (i + 1) * bw - 0.7, 6.7) for i in range(nb)]
+    DB = D - Cd
+    ops_e = L.grid_openings(DB, H, max(2, int(DB / 4.5)), 2, 1.8, 1.6, margin_u=1.0, floor_h=3.75, sill_h=1.1)
+    ops_n = []  # the back stair runs along the north wall
+    with grp("Structure"):
+        L.block(x0, yb, x1, y1, 0.0, H, {"S": ops_s, "E": ops_e, "N": [], "W": []},
+                depth={"S": 0.35, "E": 0.3, "N": 0.3, "W": 0.0}, m=P["clad"], lit=0.55, mullions=1)
+        fbox("S", yb, x0, x1, 3.45, 4.5, 0.0, 0.25, P["accent"])
+        fbox("S", yb, x0, x1, H - 0.35, H, 0.0, 0.12, P["accent"])
+    for i in range(nb):
+        lightbox(SHOPS[(i + seed) % len(SHOPS)], "S", yb - 0.25, x0 + (i + 0.5) * bw, 3.97, min(bw - 1.0, 3.0), 0.95)
+    wallrun("W", (x0, y1), (x0, yb), 0.0, H + 1.05, "west party wall (plain)")
+    # steel canopy grid over the street court
+    ncols = max(2, math.ceil(W / 5.0) + 1)
+    cxs = [x0 + 0.25 + (W - 0.5) * i / (ncols - 1) for i in range(ncols)]
+    rows = []
+    y = y0 + 0.2
+    while y < yb - 0.3:
+        rows.append(y)
+        y += 2.5
+    with grp("Structure"):
+        for x in cxs:
+            L.boxz(x - 0.15, y0 + 0.05, 0.0, x + 0.15, y0 + 0.35, 5.4, "SteelDark")
+            L.boxz(x - 0.09, y0 + 0.05, 4.95, x + 0.09, yb, 5.25, "SteelDark")
+        for yy in rows:
+            L.boxz(x0 + 0.1, yy - 0.08, 5.25, x1 - 0.1, yy + 0.08, 5.4, "SteelDark")
+        L.boxz(x0 + 0.1, yb - 0.16, 5.25, x1 - 0.1, yb, 5.4, "SteelDark")
+    with grp("Signs"):
+        L.boxz(x0 + 0.4, y0 + 0.2, 4.9, x1 - 0.4, y0 + 0.3, 4.95, "LampCool")
+    roof(5.4, x0, y0, x1, yb, "canopy grid beams (narrow, balance route to the roof)")
+    # hanging lightbox cubes on rods from the cross beams
+    with grp("Signs"):
+        n = 0
+        for yy in [r_ for r_ in rows[1:] if r_ < yb - 1.3]:
+            x = x0 + rng.uniform(1.0, 2.0)
+            while x < x1 - 1.0:
+                s = rng.uniform(0.9, 1.25)
+                w = s * rng.choice((1.0, 1.0, 1.5))
+                if x + w / 2 > x1 - 0.5:
+                    break
+                z = rng.uniform(2.8, 3.4)
+                rot = math.radians(rng.choice((0, 8, -8, 15, -12)))
+                L.box((w, s, s), (x, yy, z), "SignBack", rot=(0, 0, rot), base=True)
+                Rm = L.Euler((0, 0, rot)).to_matrix()
+                for i, (nv, hw) in enumerate((((0, -1, 0), w), ((1, 0, 0), s), ((0, 1, 0), w), ((-1, 0, 0), s))):
+                    nn = Rm @ V(nv)
+                    c = V((x, yy, z + s / 2)) + nn * ((s if i % 2 == 0 else w) / 2)
+                    L.decal(CUBES[(n * 3 + i) % len(CUBES)], tuple(c), hw - 0.06, tuple(nn), offset=0.01, height=s - 0.06)
+                for dx in (-0.25, 0.25):
+                    L.strut((x + dx, yy, z + s), (x + dx, yy, 5.25), 0.012, "SteelDark", n=4)
+                n += 1
+                x += w + rng.uniform(1.6, 2.8)
+    # roof: parapet with gaps, back stair, plant, roof billboard frame
+    xa = x1 - 0.4
+    n_st = math.ceil(H / 0.19)
+    g = min(0.28, (W - 2.2) / n_st)
+    top_x = xa - g * n_st - 0.65
+    with grp("Structure"):
+        parapet(rect_poly(x0, yb, x1, y1), H, gaps=[(0.0, yb), (top_x, y1), (x1, (yb + y1) / 2), (x0, yb + 3.0)])
+    ext_stair(xa, y1, H, direction=-1, solid=True, riser=0.19, max_run=W - 2.2)
+    roof(H, x0, yb, x1, y1, "flat roof")
+    Wf = min(9.0, W - 5.0)
+    cxf = x1 - Wf / 2 - 1.6
+    wf0 = y1 - 2.4
+    a = L.DECALS[P["roofbb"]]["aspect"]
+    hf = Wf / a
+    with grp("Structure"):
+        L.boxz(cxf - Wf / 2 - 0.25, wf0, H, cxf + Wf / 2 + 0.25, wf0 + 0.5, H + 1.0 + hf + 0.3, "PaintWhite")
+    with grp("Signs"):
+        L.decal(P["roofbb"], (cxf, wf0, H + 1.0 + hf / 2), Wf, (0, -1, 0), offset=0.02, height=hf, emission=0.7)
+    wallrun("N", (cxf + Wf / 2 + 0.25, wf0 + 0.5), (cxf - Wf / 2 - 0.25, wf0 + 0.5), H, H + 1.3 + hf,
+            "back of the roof billboard frame")
+    clutter((x0 + 1.3, yb + 1.3, x1 - 1.3, wf0 - 0.6), H, rng, ["ac", "vent", "ac", "tank"][:2 + (W * DB > 250)],
+            avoid=[(-0.8 - 1.3, yb, 0.8 + 1.3, yb + 2.0)], clear=2.0)
+    # east wall plant and pipes, props under the canopy
+    with grp("Props"):
+        for k in range(max(1, int(DB / 7))):
+            L.ac_unit((x1 + 0.02, yb + 3.0 + k * 6.0, 4.3), math.pi / 2)
+        L.vending((x0 + 1.2, yb - 0.6, 0.0), 0.0, body="PaintWhite", accent=P["accent"], seed=seed)
+        L.vending((x0 + 2.3, yb - 0.6, 0.0), 0.0, body=P["accent"], accent="PaintWhite", seed=seed + 1)
+    with grp("Structure"):
+        L.sweep([(x1 + 0.25, y1 - 1.0, 0.0), (x1 + 0.25, y1 - 1.0, H - 0.6), (x1 + 0.25, yb + 1.2, H - 0.6)], 0.09,
+                "Galvanized", n=10, bend=0.4)
+    almond("gen-bench-slatted-platform-1", 0.0, y0 + 2.2, 0.0, 0.0, 1.8, axis="max")
+    almond("gen-litter-bin-1", x1 - 1.0, yb - 0.6, 0.0, 0.0, 0.9)
+    meshy_planter(cxs[0] + 0.9, y0 + 0.9, 0.0, 1.0)
+    meshy_planter(cxs[-1] - 0.9, y0 + 0.9, 0.0, 1.0)
+    REC["notes"].append("Street -> canopy beams (5.4 m) by double jump off vending / planters, canopy -> roof "
+                        "through the front parapet gap; concrete stair at the back reaches the roof.")
+
+
+# ================================================================== 4  Coral halls (W041 family)
+PK = "ConcretePink"
+
+
+def wall_lamp(x, y, z):
+    with grp("Props"):
+        L.G().add([(x - 0.18, y - 0.08, z + 0.3), (x + 0.18, y - 0.08, z + 0.3), (x, y - 0.08, z - 0.2)],
+                  [(0, 1, 2)], Matrix.Identity(4), "SteelDark")
+        L.G().add([(x - 0.1, y - 0.1, z + 0.22), (x + 0.1, y - 0.1, z + 0.22), (x, y - 0.1, z - 0.06)],
+                  [(0, 1, 2)], Matrix.Identity(4), "LampWarm")
+        L.boxz(x - 0.05, y - 0.08, z - 0.05, x + 0.05, y, z + 0.25, "SteelDark")
+
+
+def coral(variant, W, D, h, seed, mode):
+    rng = random.Random(seed)
+    x0, x1, y0, y1 = -W / 2, W / 2, -D / 2, D / 2
+    slope = math.radians(38.66)
+    if mode == "A":
+        run = h / math.tan(slope)
+        hx0, hy0, hx1, hy1 = x0, y0, x1 - run, y1
+    else:
+        hx0, hy0, hx1, hy1 = x0, y0, x1 - 6.0, y1
+    with grp("Structure"):
+        L.boxz(hx0, hy0, 0.0, hx1, hy1, h, PK)
+        # battered ramp wall (<= 40 deg, walkable) from the street to the roof
+        if mode == "A":
+            prism_y([(hx1, 0.0), (x1, 0.0), (hx1, h)], hy0, hy1, PK)
+            nrm = V((h, 0, run)).normalized()
+            y = hy0 + 1.5
+            while y < hy1 - 1.0:
+                p0, p1 = V((x1 - 0.3, y, 0.3 * h / run)), V((hx1 + 0.1, y, h - 0.1 * h / run))
+                L.strut(p0 + nrm * 0.05, p1 + nrm * 0.05, 0.08, PK, n=4)
+                y += 2.0
+            ramp_note = f"battered east wall, {math.degrees(slope):.1f} deg, x {hx1:.1f}->{x1:.1f}"
+        else:
+            yt = hy1 - 1.5
+            L.prism_x([(hy0, 0.0), (hy1, 0.0), (hy1, h), (yt, h)], hx1, x1, PK)
+            nrm = V((0, -h, yt - hy0)).normalized()
+            for x in (hx1 + 1.2, hx1 + 3.0, hx1 + 4.8):
+                p0, p1 = V((x, hy0 + 0.4, 0.4 * h / (yt - hy0))), V((x, yt - 0.1, h - 0.1 * h / (yt - hy0)))
+                L.strut(p0 + nrm * 0.05, p1 + nrm * 0.05, 0.08, PK, n=4)
+            ramp_note = f"battered ramp along the east flank, {math.degrees(slope):.1f} deg, y {hy0:.1f}->{yt:.1f}"
+        # cornice on the street front with drip band
+        L.boxz(hx0, hy0 - 1.0, h - 1.6, hx1, hy0, h, PK)
+        L.boxz(hx0, hy0 - 1.05, h - 1.45, hx1, hy0 - 1.0, h - 1.25, PK)
+    REC["climb"].append({"type": "ramp", "note": ramp_note, "slope_deg": round(math.degrees(slope), 2)})
+    # teeth parapet (0.7 solid + 0.35 teeth = 1.05), gaps on at least two sides, ramp edge open
+    with grp("Structure"):
+        if mode == "A":
+            parapet(rect_path(hx0, hy0 - 1.0, hx1, hy1, "E"), h, closed=False, t=0.45, teeth=(0.35, 0.6, 0.3), m=PK,
+                    gaps=[(hx0 + 6.0, hy0 - 1.0), (hx0, 0.0), (hx0 + 8.0, hy1)])
+        else:
+            parapet(rect_poly(hx0, hy0 - 1.0, hx1, hy1), h, t=0.45, teeth=(0.35, 0.6, 0.3), m=PK,
+                    gaps=[(hx1, hy1 - 1.4, 2.8), (hx0 + 5.0, hy0 - 1.0), (-2.0, hy1), (hx0, hy0 + 6.0)])
+    roof(h, hx0, hy0 - 1.0, hx1, hy1, "hall roof")
+    if mode == "A":
+        wallrun("N", (hx1, hy1), (hx0, hy1), 0.0, h + 1.05, "north face (plain)")
+        roof(h, hx1, hy0, x1, hy1, "ramp top edge meets roof (sloped surface below)")
+    else:
+        wallrun("W", (hx0, hy1), (hx0, hy0), 0.0, h + 1.05, "west face (plain)")
+        roof(h, hx1, hy1 - 1.5, x1, hy1, "flat top of the ramp")
+    # big sliding door (teal ribbed leaf on a top track, slid a third open), keypad column, glazed band
+    dw, dh = (7.0, 8.0) if mode == "A" else (8.0, 10.0)
+    xd = hx0 + (13.0 if mode == "A" else 12.5)
+    with grp("Structure"):
+        for sx in (-1, 1):
+            xa = xd + sx * dw / 2
+            L.boxz(min(xa, xa + sx * 0.8), hy0 - 0.6, 0.0, max(xa, xa + sx * 0.8), hy0, dh + 0.8, PK)
+        L.boxz(xd - dw / 2 - 0.8, hy0 - 0.6, dh, xd + dw / 2 + 0.8, hy0, dh + 0.8, PK)
+        fquad("S", hy0, xd - dw / 2, xd + dw / 2, 0.0, dh, 0.005, "Black")
+        lx0 = xd - dw / 2 + dw * 0.35
+        L.boxz(lx0, hy0 - 0.78, 0.05, lx0 + dw, hy0 - 0.64, dh, "PaintTeal")
+        k = int(dw / 0.45)
+        for i in range(k):
+            x = lx0 + 0.2 + i * (dw - 0.4) / (k - 1)
+            L.boxz(x - 0.05, hy0 - 0.84, 0.1, x + 0.05, hy0 - 0.78, dh - 0.1, "PaintTeal")
+        L.boxz(xd - dw / 2 - 0.8, hy0 - 0.95, dh, lx0 + dw + 0.4, hy0 - 0.6, dh + 0.3, "SteelDark")
+        for x in (xd + dw / 2 + 1.2, lx0 + dw + 0.2):
+            L.boxz(x - 0.1, hy0 - 0.6, dh, x + 0.1, hy0, dh + 0.3, "SteelDark")
+        L.boxz(xd - dw / 2 - 2.4, hy0 - 0.7, 0.0, xd - dw / 2 - 1.5, hy0, 3.0, "RenderGrey")
+        gx0, gx1 = hx0 + 1.5, xd - dw / 2 - 3.2
+        fquad("S", hy0, gx0, gx1, 0.0, 6.0, 0.02, "Glass")
+        x = gx0
+        while x <= gx1 + 1e-3:
+            fbox("S", hy0, x - 0.05, x + 0.05, 0.0, 6.0, 0.0, 0.12, "SteelDark")
+            x += 1.0
+        fbox("S", hy0, gx0, gx1, 2.95, 3.05, 0.0, 0.12, "SteelDark")
+        L.sweep([(hx0 + 0.6, hy0 - 0.33, 5.2), (hx1 - 0.6, hy0 - 0.33, 5.2)], 0.05, "SteelDark", n=8)
+        L.boxz(hx0 + 0.5, hy0 - 0.3, 5.1, hx0 + 0.6, hy0, 5.3, "SteelDark")
+        L.boxz(hx1 - 0.6, hy0 - 0.3, 5.1, hx1 - 0.5, hy0, 5.3, "SteelDark")
+        xt = lx0 + dw + 1.4
+        L.boxz(xt - 0.4, hy0 - 0.5, 0.0, xt + 0.4, hy0, 2.4, "PaintTeal")
+    with grp("Props"):
+        for kk in range(3):
+            L.cyl(0.26, 0.04, (xd - dw / 2 - 1.95, hy0 - 0.7, 2.3 - kk * 0.5), "PaintWhite", rot=(math.pi / 2, 0, 0), n=16)
+        for x in (gx0 - 0.6, xd - dw / 2 - 1.15, hx1 - 0.8):
+            wall_lamp(x, hy0, 4.0)
+        for x in (xd - dw / 2 - 3.0, hx1 - 1.0):
+            L.boxz(x - 0.04, hy0 - 0.25, 5.6, x + 0.04, hy0, 5.65, "SteelDark")
+            L.box((0.14, 0.32, 0.14), (x, hy0 - 0.35, 5.58), "PlasticWhite", rot=(math.radians(-15), 0, 0))
+        # capsule tanks on low cradles along the front (W041 rail tanks)
+        for x in ((6.0, 9.2) if mode == "A" else (-14.4, -11.6)):
+            L.boxz(x - 0.1, hy0 - 1.4, 0.0, x + 0.1, hy0 - 0.8, 0.35, PK)
+            L.boxz(x + 2.1, hy0 - 1.4, 0.0, x + 2.3, hy0 - 0.8, 0.35, PK)
+            L.cyl(0.3, 2.4, (x - 0.1, hy0 - 1.1, 0.62), "RenderGrey", rot=(0, math.pi / 2, 0), n=16)
+            for dx in (0.15, 1.95):
+                L.cyl(0.315, 0.14, (x + dx, hy0 - 1.1, 0.62), "PaintTeal", rot=(0, math.pi / 2, 0), n=16)
+    meshy_planter(xt + 1.3, hy0 - 1.0, 0.0, 0.9)
+    meshy_planter(xd - dw / 2 - 3.2, hy0 - 1.0, 0.0, 0.9)
+    with grp("Signs"):
+        L.decal("Term_Gate", (xd, hy0 - 0.6, dh + 0.4 + 0.15), 1.8, (0, -1, 0), offset=0.03, emission=2.0, height=0.62)
+        L.decal("Term_Emblem", (hx0 + 4.5, hy0 - 1.0, h - 0.8), 1.2, (0, -1, 0), offset=0.03, emission=1.2)
+        L.decal("Term_Hazard", (xd, hy0 - 0.85, 0.4), 2.2, (0, -1, 0), offset=0.03, height=0.5)
+        L.decal("Term_Pass", (xd - dw / 2 - 1.95, hy0 - 0.7, 1.1), 0.45, (0, -1, 0), offset=0.02, emission=2.0)
+        L.decal("Term_Totem", (xt, hy0 - 0.5, 1.35), 0.7, (0, -1, 0), offset=0.02, emission=1.5)
+        L.decal("Term_Line2", (hx1 - 1.2, hy0, 2.6), 1.1, (0, -1, 0), offset=0.03)
+        if mode == "A":
+            L.decal("Term_Map", (hx1 + 5.0, hy0, 3.2), 2.4, (0, -1, 0), offset=0.03, emission=1.6)
+        else:
+            L.decal("Term_Map", (x1, -2.0, 3.2), 2.4, (1, 0, 0), offset=0.03, emission=1.6)
+    # mint pipes: up a flank (never the wall-run face), over the parapet into rooftop plant boxes
+    boxes = []
+    with grp("Structure"):
+        for k in range(3):
+            r = 0.28 - 0.05 * k
+            if mode == "A":
+                y = hy0 + 4.0 + k * 4.5
+                zt = h + 1.6 + 0.35 * k
+                pts = [(hx0 - 0.7, y, 0.0), (hx0 - 0.7, y, zt), (hx0 + 3.2, y, zt), (hx0 + 3.2, y, h + 1.2)]
+                L.boxz(hx0 - 1.2, y - 0.5, 0.0, hx0, y + 0.5, 0.3, PK)
+                for zz in range(3, int(h), 3):
+                    L.boxz(hx0 - 0.7, y - 0.12, zz, hx0, y + 0.12, zz + 0.2, "SteelDark")
+                bx = (hx0 + 3.2, y)
+            else:
+                x = hx0 + 6.0 + k * 4.5
+                zt = h + 1.6 + 0.35 * k
+                pts = [(x, hy1 + 0.7, 0.0), (x, hy1 + 0.7, zt), (x, hy1 - 3.2, zt), (x, hy1 - 3.2, h + 1.2)]
+                L.boxz(x - 0.5, hy1, 0.0, x + 0.5, hy1 + 1.2, 0.3, PK)
+                for zz in range(3, int(h), 3):
+                    L.boxz(x - 0.12, hy1, zz, x + 0.12, hy1 + 0.7, zz + 0.2, "SteelDark")
+                bx = (x, hy1 - 3.2)
+            L.sweep(pts, r, "PaintMint", n=14, bend=1.4, flanges=0.1)
+            L.boxz(bx[0] - 1.0, bx[1] - 1.0, h, bx[0] + 1.0, bx[1] + 1.0, h + 1.2, "RenderGrey")
+            boxes.append((bx[0] - 1.0, bx[1] - 1.0, bx[0] + 1.0, bx[1] + 1.0))
+        # looping overhead pipe arch between two roof plant boxes (clear headroom > 3.4 m)
+        if mode == "A":
+            a, b = (hx0 + 3.2, hy0 + 4.0), (hx1 - 4.0, hy1 - 4.0)
+        else:
+            a, b = (hx0 + 6.0, hy1 - 3.2), (hx0 + 6.0, hy0 + 4.0)
+        L.boxz(b[0] - 1.0, b[1] - 1.0, h, b[0] + 1.0, b[1] + 1.0, h + 1.2, "RenderGrey")
+        boxes.append((b[0] - 1.0, b[1] - 1.0, b[0] + 1.0, b[1] + 1.0))
+        L.sweep([(a[0] + 0.4, a[1], h + 1.2), (a[0] + 0.4, a[1], h + 4.2), (b[0], b[1], h + 4.2), (b[0], b[1], h + 1.2)],
+                0.2, "PaintMint", n=12, bend=1.2, flanges=0.08)
+    clutter((hx0 + 1.4, hy0 + 0.4, hx1 - 1.4, hy1 - 1.4), h, rng, ["vent", "ac", "vent", "ac"], avoid=boxes, clear=2.2)
+    REC["notes"].append("Walk up the battered ramp wall to the roof; the ramp edge of the roof has no parapet.")
+
+
+# ================================================================== 5  Truss skybridges
+def bridge(variant, Lb):
+    x0, x1 = -Lb / 2, Lb / 2
+    with grp("Structure"):
+        L.boxz(x0, -2.0, -0.1, x1, 2.0, 0.0, "Galvanized")
+        for s in (-1, 1):
+            yo = s * 2.0
+            L.boxz(x0, min(yo, yo - s * 0.25), -0.45, x1, max(yo, yo - s * 0.25), 0.15, "PaintRed")
+            L.boxz(x0, min(yo, yo - s * 0.25), 1.45, x1, max(yo, yo - s * 0.25), 1.7, "PaintRed")
+            yc = yo - s * 0.125
+            k = int(round(Lb / 2.5))
+            for i in range(k + 1):
+                x = x0 + Lb * i / k
+                xa = min(max(x - 0.1, x0), x1 - 0.2)
+                L.boxz(xa, yc - 0.1, 0.15, xa + 0.2, yc + 0.1, 1.45, "PaintRed")
+            for i in range(k):
+                xa, xb = x0 + Lb * i / k, x0 + Lb * (i + 1) / k
+                p, q = ((xa, yc, 0.15), (xb, yc, 1.45)) if i % 2 == 0 else ((xa, yc, 1.45), (xb, yc, 0.15))
+                L.strut(p, q, 0.07, "PaintRed", n=4)
+            yi = yo - s * 0.33
+            L.strut((x0 + 0.05, yi, 1.05), (x1 - 0.05, yi, 1.05), 0.03, "Galvanized", n=8)
+            for i in range(k + 1):
+                x = min(max(x0 + Lb * i / k, x0 + 0.05), x1 - 0.05)
+                L.strut((x, yc, 1.05), (x, yi, 1.05), 0.025, "Galvanized", n=6)
+        k = int(round(Lb / 2.5))
+        for i in range(k + 1):
+            x = min(max(x0 + Lb * i / k, x0 + 0.1), x1 - 0.1)
+            L.boxz(x - 0.1, -1.75, -0.4, x + 0.1, 1.75, -0.1, "SteelDark")
+        for y in (-0.8, 0.8):
+            L.boxz(x0, y - 0.08, -0.35, x1, y + 0.08, -0.1, "SteelDark")
+    with grp("Signs"):
+        for s in (-1, 1):
+            yy = s * (2.0 - 0.25)
+            L.boxz(x0 + 0.4, min(yy, yy - s * 0.03), 1.4, x1 - 0.4, max(yy, yy - s * 0.03), 1.45, "LampCool")
+    roof(0.0, x0, -1.75, x1, 1.75, "deck (walk surface, top at Z=0)")
+    REC["notes"].append(f"Span along X, {Lb:.0f} m x 4 m, deck top at Z=0; place at roof height, ends open.")
+
+
+# ================================================================== 6  Street kit
+def road(variant, cross=False):
+    with grp("Structure"):
+        L.boxz(-10, -10, -0.2, 10, 10, 0.0, "Asphalt")
+    with grp("Signs"):
+        z0, z1 = 0.0, 0.006
+        if not cross:
+            for yy in (-0.1, 0.1):
+                L.boxz(-10, yy - 0.06, z0, 10, yy + 0.06, z1, "PaintYellow")
+            for yl in (-4.6, 4.6):
+                for xs in (-10.0, -5.0, 0.0, 5.0):
+                    L.boxz(xs, yl - 0.075, z0, xs + 2.5, yl + 0.075, z1, "PaintWhite")
+            for ye in (-9.3, 9.3):
+                L.boxz(-10, ye - 0.075, z0, 10, ye + 0.075, z1, "PaintWhite")
+        else:
+            # zebra crossings on all four approaches + stop lines
+            for sgn in (-1, 1):
+                for i in range(18):
+                    t = -8.3 + i * 0.95
+                    xa, xb = sorted((sgn * 6.4, sgn * 9.4))
+                    L.boxz(xa, t, z0, xb, t + 0.45, z1, "PaintWhite")
+                    ya, yb = sorted((sgn * 6.4, sgn * 9.4))
+                    L.boxz(t, ya, z0, t + 0.45, yb, z1, "PaintWhite")
+                xa = sgn * 6.0
+                L.boxz(min(xa, xa - sgn * 0.3), -9.3 if sgn > 0 else 0.2, z0, max(xa, xa - sgn * 0.3),
+                       -0.2 if sgn > 0 else 9.3, z1, "PaintWhite")
+                ya = sgn * 6.0
+                L.boxz(0.2 if sgn > 0 else -9.3, min(ya, ya - sgn * 0.3), z0, 9.3 if sgn > 0 else -0.2,
+                       max(ya, ya - sgn * 0.3), z1, "PaintWhite")
+    roof(0.0, -10, -10, 10, 10, "asphalt top at Z=0 (slab to -0.2)")
+    REC["notes"].append("Road along X (lanes E-W); tiles every 20 m." if not cross else "Crossroads, zebra crossings on all four approaches.")
+
+
+def sidewalk(variant):
+    with grp("Structure"):
+        L.boxz(-10, -2.5, -0.2, 10, 2.5, 0.0, "ConcreteDark")
+        L.boxz(-10, -2.5, 0.0, 10, -2.2, 0.15, "ConcreteWeathered")
+        L.boxz(-10, -2.2, 0.0, 10, 2.5, 0.15, "TileGrey")
+        L.tactile(-10, -1.9, 10, -1.6, 0.15)
+    roof(0.15, -10, -2.5, 10, 2.5, "paving top (kerb 0.15 on the -Y road side)")
+    REC["notes"].append("Kerb faces -Y (road side); paving top 0.15 m above road level.")
+
+
+def plaza(variant):
+    with grp("Structure"):
+        L.boxz(-10, -10, -0.2, 10, 10, 0.0, "ConcreteDark")
+        for i in range(10):
+            for j in range(10):
+                x, y = -10 + 2 * i, -10 + 2 * j
+                grey = (i % 5 == 2) or (j % 5 == 2) or ((i + j) % 2 == 0 and 3 <= i <= 6 and 3 <= j <= 6)
+                L.boxz(x, y, 0.0, x + 2, y + 2, 0.15, "TileGrey" if grey else "TilePink")
+    roof(0.15, -10, -10, 10, 10, "tile top (flush with Sidewalk_20)")
+
+
+# ================================================================== 7  Lantern shrine checkpoint
+def shrine(variant):
+    with grp("Structure"):
+        L.boxz(-2.0, -2.0, 0.0, 2.0, 2.0, 0.2, "ConcreteDark")
+        L.boxz(-1.75, -1.75, 0.2, 1.75, 1.75, 0.55, "ConcreteWeathered")
+        for x in (-1.2, 1.2):
+            L.boxz(x - 0.16, -0.16, 0.55, x + 0.16, 0.16, 0.85, "Black")
+            L.boxz(x - 0.11, -0.11, 0.85, x + 0.11, 0.11, 3.65, "ToriiGlow")
+        L.boxz(-1.45, -0.09, 3.0, 1.45, 0.09, 3.15, "ToriiGlow")
+        L.boxz(-1.7, -0.14, 3.65, 1.7, 0.14, 3.85, "ToriiGlow")
+        L.boxz(-1.85, -0.16, 3.85, 1.85, 0.16, 3.93, "Black")
+        for s in (-1, 1):
+            L.boxz(min(s * 1.62, s * 1.9), -0.16, 3.85, max(s * 1.62, s * 1.9), 0.16, 4.02, "Black")
+        L.boxz(-0.1, -0.1, 3.15, 0.1, 0.1, 3.65, "Black")
+    with grp("Signs"):
+        z0, z1 = 1.35, 2.85
+        nb = 10
+        pattern = "WRRWRRWRRW"
+        for i in range(nb):
+            t0, t1 = i / nb, (i + 1) / nb
+            rr = lambda t: 0.3 + 0.36 * math.sin(math.pi * t)
+            L.cyl(rr(t0), (z1 - z0) / nb, (0, 0, z0 + t0 * (z1 - z0)), "LanternWhite" if pattern[i] == "W" else "LanternRed",
+                  r2=rr(t1), n=24, caps=False)
+        L.cyl(0.34, 0.14, (0, 0, z0 - 0.14), "Black", n=24)
+        L.cyl(0.34, 0.14, (0, 0, z1), "Black", n=24)
+        L.cyl(0.02, 3.0 - z1 - 0.14, (0, 0, z1 + 0.14), "SteelDark", n=6)
+        L.cyl(0.05, 0.12, (0, 0, z0 - 0.26), "LanternRed", n=8)
+    with grp("Props"):
+        for (x, y) in ((-1.25, 1.15), (1.25, 1.15)):
+            L.boxz(x - 0.3, y - 0.22, 0.55, x + 0.3, y + 0.22, 0.95, "WoodWeathered")
+            L.boxz(x - 0.31, y - 0.23, 0.9, x + 0.31, y + 0.23, 0.93, "SteelDark")
+            L.boxz(x - 0.31, y - 0.23, 0.6, x + 0.31, y + 0.23, 0.63, "SteelDark")
+            for dx in (-0.12, 0.12):
+                L.cyl(0.07, 0.14, (x + dx, y, 0.95), "PaintWhite", n=10)
+    roof(0.55, -1.75, -1.75, 1.75, 1.75, "plinth top")
+    REC["notes"].append("Checkpoint: lantern hangs under the nuki (1.21-2.99 m), trigger volume suggested 3x3x3 m.")
+
+
+# ================================================================== 8  District gate
+def gate(variant):
+    with grp("Structure"):
+        for sx in (-1, 1):
+            cx = sx * 7.0
+            L.boxz(cx - 1.2, -1.2, 0.0, cx + 1.2, 1.2, 0.6, "ConcreteDark")
+            cs = [(cx - 0.8, -0.8), (cx + 0.8, -0.8), (cx + 0.8, 0.8), (cx - 0.8, 0.8)]
+            for (px, py) in cs:
+                L.boxz(px - 0.1, py - 0.1, 0.6, px + 0.1, py + 0.1, 10.6, "PaintRed")
+            z = 0.6
+            k = 0
+            while z < 10.4:
+                zn = min(z + 1.4, 10.6)
+                for i in range(4):
+                    a, b = cs[i], cs[(i + 1) % 4]
+                    L.strut((a[0], a[1], zn), (b[0], b[1], zn), 0.05, "PaintRed", n=4)
+                    if k % 2:
+                        L.strut((a[0], a[1], z), (b[0], b[1], zn), 0.04, "SteelDark", n=4)
+                    else:
+                        L.strut((b[0], b[1], z), (a[0], a[1], zn), 0.04, "SteelDark", n=4)
+                z = zn
+                k += 1
+        for (zb, zt, xh) in ((8.2, 9.2, 8.0), (10.6, 11.6, 8.0)):
+            for y in (-0.5, 0.5):
+                for zz in (zb, zt):
+                    L.boxz(-xh, y - 0.09, zz - 0.09, xh, y + 0.09, zz + 0.09, "PaintRed")
+                n = 16
+                for i in range(n):
+                    xa, xb = -xh + 2 * xh * i / n, -xh + 2 * xh * (i + 1) / n
+                    L.strut((xa, y, zb), (xa, y, zt), 0.04, "PaintRed", n=4)
+                    L.strut((xa, y, zb) if i % 2 else (xa, y, zt), (xb, y, zt) if i % 2 else (xb, y, zb), 0.035,
+                            "SteelDark", n=4)
+                L.strut((xh, y, zb), (xh, y, zt), 0.04, "PaintRed", n=4)
+            for i in range(5):
+                x = -xh + 2 * xh * i / 4
+                L.boxz(x - 0.06, -0.5, zb - 0.06, x + 0.06, 0.5, zb + 0.06, "SteelDark")
+                L.boxz(x - 0.06, -0.5, zt - 0.06, x + 0.06, 0.5, zt + 0.06, "SteelDark")
+        L.boxz(-8.4, -1.0, 11.68, 8.4, 1.0, 12.0, "PaintRed")
+        for s in (-1, 1):
+            L.boxz(min(s * 7.9, s * 8.4), -1.0, 12.0, max(s * 7.9, s * 8.4), 1.0, 12.25, "PaintRed")
+        L.boxz(-0.5, -0.35, 9.27, 0.5, 0.35, 10.52, "PaintRed")
+    with grp("Signs"):
+        L.boxz(-4.6, -0.25, 6.1, 4.6, 0.25, 8.11, "SignBack")
+        L.boxz(-4.45, -0.27, 6.25, 4.45, -0.25, 7.96, "SignBlank")
+        L.boxz(-4.45, 0.25, 6.25, 4.45, 0.27, 7.96, "SignBlank")
+        for x in (-3.8, 3.8):
+            L.boxz(x - 0.05, -0.05, 8.1, x + 0.05, 0.05, 8.15, "SteelDark")
+        for y in (-0.95, 0.95):
+            p0, p1, sag = V((-6.12, y, 7.4)), V((6.12, y, 7.4)), 1.2
+            L.sag_cable(tuple(p0), tuple(p1), sag, r=0.015)
+            nbulb = 15
+            for i in range(1, nbulb):
+                u = i / nbulb
+                p = p0.lerp(p1, u)
+                p.z -= sag * 4 * u * (1 - u) + 0.08
+                L.sphere(0.07, tuple(p), "LampWarm", seg=8, ring=5)
+    roof(12.0, -8.4, -1.0, 8.4, 1.0, "kasagi top beam (16.8 x 2 m)")
+    roof(9.29, -8.0, -0.6, 8.0, 0.6, "nuki truss top chords (narrow)")
+    REC["notes"].append("Clear walk-through span 12.2 m between leg trusses (x = +/-6.1), sign underside at 6.1 m. "
+                        "Sign faces use the plain emissive M_SignBlank: add the district name in Unreal.")
+
+
+# ================================================================== 9  Jump pad
+def ring_slab(r0, r1, z0, z1, m, seg=48):
+    v, f = [], []
+    for k in range(seg):
+        a = 2 * math.pi * k / seg
+        c, s = math.cos(a), math.sin(a)
+        v += [(r0 * c, r0 * s, z0), (r1 * c, r1 * s, z0), (r1 * c, r1 * s, z1), (r0 * c, r0 * s, z1)]
+    for k in range(seg):
+        a, b = 4 * k, 4 * ((k + 1) % seg)
+        f += [(a, b, b + 1, a + 1), (a + 1, b + 1, b + 2, a + 2), (a + 2, b + 2, b + 3, a + 3), (a + 3, b + 3, b, a)]
+    L.G().add(v, f, Matrix.Identity(4), m)
+
+
+def jumppad(variant):
+    with grp("Structure"):
+        L.cyl(1.5, 0.19, (0, 0, 0), "SteelDark", n=48)
+        L.cyl(1.5, 0.06, (0, 0, 0.19), "PaintWhite", r2=1.4, n=48)
+    with grp("Signs"):
+        ring_slab(1.12, 1.3, 0.25, 0.256, "MW_PadGlow")
+        ring_slab(1.495, 1.505, 0.06, 0.13, "MW_PadGlow")
+        for yc in (-0.55, 0.0, 0.55):
+            for s in (-1, 1):
+                a = math.atan2(0.3, -s * 0.42)
+                L.box((0.52, 0.13, 0.006), (s * 0.19, yc + 0.02, 0.25), "MW_PadGlow", rot=(0, 0, a), base=True)
+    roof(0.25, -1.5, -1.5, 1.5, 1.5, "pad top (launch trigger)")
+    REC["notes"].append("M_MW_PadGlow is exported as material slot 'MW_PadGlow' for a dynamic material.")
+
+
+# ================================================================== variant table
+VARIANTS = {
+    "PopTower_A": (lambda v: pop_tower(v, 24, 24, 28, 381, 0, "Billboard_Idols"), 381, "PopTower", (24, 24)),
+    "PopTower_B": (lambda v: pop_tower(v, 26, 28, 40, 382, 1, "Billboard_Idols"), 382, "PopTower", (26, 28)),
+    "PopTower_C": (lambda v: pop_tower(v, 28, 32, 55, 383, 2, "Billboard_Idols"), 383, "PopTower", (28, 32)),
+    "PopTower_D": (lambda v: pop_tower(v, 30, 36, 72, 384, 3, "Billboard_Idols"), 384, "PopTower", (30, 36)),
+    "ContainerStack_A": (lambda v: container_stack(v, 20, 14, 4, 391), 391, "ContainerStack", (20, 14)),
+    "ContainerStack_B": (lambda v: container_stack(v, 26, 16, 5, 392), 392, "ContainerStack", (26, 16)),
+    "Arcade_A": (lambda v: arcade(v, 16, 30, 8.0, 401, 0), 401, "Arcade", (16, 30)),
+    "Arcade_B": (lambda v: arcade(v, 12, 24, 6.0, 402, 1), 402, "Arcade", (12, 24)),
+    "Arcade_C": (lambda v: arcade(v, 20, 20, 7.0, 403, 2), 403, "Arcade", (20, 20)),
+    "Coral_A": (lambda v: coral(v, 40, 20, 14, 411, "A"), 411, "Coral", (40, 20)),
+    "Coral_B": (lambda v: coral(v, 30, 24, 18, 412, "B"), 412, "Coral", (30, 24)),
+    "Bridge_20": (lambda v: bridge(v, 20.0), 420, "Bridge", (20, 4)),
+    "Bridge_30": (lambda v: bridge(v, 30.0), 430, "Bridge", (30, 4)),
+    "Road_20": (lambda v: road(v, False), 440, "Street", (20, 20)),
+    "Road_Cross": (lambda v: road(v, True), 441, "Street", (20, 20)),
+    "Sidewalk_20": (lambda v: sidewalk(v), 442, "Street", (20, 5)),
+    "Plaza_20": (lambda v: plaza(v), 443, "Street", (20, 20)),
+    "Shrine": (lambda v: shrine(v), 450, "Shrine", (4, 4)),
+    "Gate": (lambda v: gate(v), 460, "Gate", (16, 2.4)),
+    "JumpPad": (lambda v: jumppad(v), 470, "JumpPad", (3, 3)),
+    "IdolTower_Hero": (lambda v: pop_tower(v, 40, 40, 100, 380, 0, "Billboard_Idols", hero=True), 380, "IdolTower", (40, 40)),
+}
+
+
+# ================================================================== pipeline
+def route_faces():
+    """Move glass faces into Glass and decal faces into Signs, whatever group they were authored in."""
+    moves = {}
+    for name, g in list(L._groups.items()):
+        if name in ("Glass", "Signs"):
+            continue
+        for f in g.bm.faces:
+            mname = g.mats[f.material_index]
+            tgt = "Glass" if mname in GLASS else ("Signs" if mname.startswith("D_") else None)
+            if tgt:
+                moves.setdefault((name, tgt), []).append(f)
+    for (src, tgt), faces in moves.items():
+        gs = L._groups[src]
+        gt = L.group(tgt)
+        for f in faces:
+            mname = gs.mats[f.material_index]
+            vs = [gt.bm.verts.new(v.co) for v in f.verts]
+            nf = gt.bm.faces.new(vs)
+            nf.material_index = gt.mi(mname)
+            nf.smooth = f.smooth
+            if f.tag:
+                for ls, ld in zip(f.loops, nf.loops):
+                    ld[gt.uv].uv = ls[gs.uv].uv
+                nf.tag = True
+        bmesh.ops.delete(gs.bm, geom=faces, context="FACES")
+        # drop material slots no face uses any more (an unused slot loses its material on engine import)
+        used = sorted({f.material_index for f in gs.bm.faces})
+        remap = {old: k for k, old in enumerate(used)}
+        for f in gs.bm.faces:
+            f.material_index = remap[f.material_index]
+        gs.mats = [gs.mats[i] for i in used]
+
+
+def part_boxes(objs):
+    """Bounding boxes of every loose part (connected face island)."""
+    out = []
+    for o in objs:
+        bm = bmesh.new()
+        bm.from_mesh(o.data)
+        bm.faces.ensure_lookup_table()
+        seen = np.zeros(len(bm.faces), bool)
+        for f in bm.faces:
+            if seen[f.index]:
+                continue
+            stack = [f]
+            seen[f.index] = True
+            vs = set()
+            while stack:
+                gf = stack.pop()
+                for v in gf.verts:
+                    vs.add(v.index)
+                for e in gf.edges:
+                    for h in e.link_faces:
+                        if not seen[h.index]:
+                            seen[h.index] = True
+                            stack.append(h)
+            bm.verts.ensure_lookup_table()
+            co = np.array([bm.verts[i].co[:] for i in vs])
+            out.append((o.name, co.min(0), co.max(0)))
+        bm.free()
+    return out
+
+
+def floating_check(objs, tol=0.06):
+    """Support graph: parts touching the lowest level are grounded; a part is supported if its bbox (grown by
+    tol) touches a supported part. Returns unsupported parts."""
+    parts = part_boxes(objs)
+    if not parts:
+        return 0, []
+    lo = np.array([p[1] for p in parts]); hi = np.array([p[2] for p in parts])
+    zmin = lo[:, 2].min()
+    sup = lo[:, 2] <= max(zmin, 0.0) + 0.05  # street level (kit props may dip a few cm below it)
+    front = sup.copy()
+    while front.any():
+        F_lo = lo[front] - tol; F_hi = hi[front] + tol
+        idx = np.where(~sup)[0]
+        if len(idx) == 0:
+            break
+        new = np.zeros(len(parts), bool)
+        for c0 in range(0, len(F_lo), 256):
+            fl, fh = F_lo[c0:c0 + 256], F_hi[c0:c0 + 256]
+            ov = ((lo[idx, None, :] <= fh[None]) & (hi[idx, None, :] >= fl[None])).all(2).any(1)
+            new[idx[ov]] = True
+        sup |= new
+        front = new
+    bad = [i for i in range(len(parts)) if not sup[i]]
+    return len(bad), [{"mesh": parts[i][0], "centre": r2((lo[i] + hi[i]) / 2), "size": r2(hi[i] - lo[i])} for i in bad[:12]]
+
+
+COPLANAR_PUSH = 0.015   # m a losing face moves back behind the face it overlapped (v044, playtest v032 flicker)
+
+
+def _islands(bm):
+    """Connected face islands of a bmesh: face index -> island id, plus per-island bbox volume."""
+    comp = [-1] * len(bm.faces)
+    vols = []
+    for f in bm.faces:
+        if comp[f.index] >= 0:
+            continue
+        cid = len(vols)
+        stack = [f]
+        comp[f.index] = cid
+        lo = [1e9] * 3; hi = [-1e9] * 3
+        while stack:
+            g = stack.pop()
+            for v in g.verts:
+                for k in range(3):
+                    lo[k] = min(lo[k], v.co[k]); hi[k] = max(hi[k], v.co[k])
+            for e in g.edges:
+                for h in e.link_faces:
+                    if comp[h.index] < 0:
+                        comp[h.index] = cid
+                        stack.append(h)
+        vols.append((max(hi[0] - lo[0], 0.01) * max(hi[1] - lo[1], 0.01) * max(hi[2] - lo[2], 0.01), lo, hi))
+    return comp, vols
+
+
+def _clip(poly, a, b):
+    out = []
+    for i in range(len(poly)):
+        p, q = poly[i], poly[(i + 1) % len(poly)]
+        sp = (b[0] - a[0]) * (p[1] - a[1]) - (b[1] - a[1]) * (p[0] - a[0])
+        sq = (b[0] - a[0]) * (q[1] - a[1]) - (b[1] - a[1]) * (q[0] - a[0])
+        if sp >= 0:
+            out.append(p)
+        if (sp >= 0) != (sq >= 0):
+            t = sp / (sp - sq)
+            out.append((p[0] + t * (q[0] - p[0]), p[1] + t * (q[1] - p[1])))
+    return out
+
+
+def _area2(poly):
+    return sum(poly[i][0] * poly[(i + 1) % len(poly)][1] - poly[(i + 1) % len(poly)][0] * poly[i][1]
+               for i in range(len(poly))) / 2
+
+
+def _tri_overlap(t1, t2):
+    p = t1 if _area2(t1) >= 0 else [t1[0], t1[2], t1[1]]
+    c = t2 if _area2(t2) >= 0 else [t2[0], t2[2], t2[1]]
+    for i in range(3):
+        p = _clip(p, c[i], c[(i + 1) % 3])
+        if len(p) < 3:
+            return 0.0
+    return abs(_area2(p))
+
+
+def resolve_coplanar(objs, push=COPLANAR_PUSH, tol=0.002):
+    """No two same-facing faces may overlap on one plane (they z-fight: the flicker in playtest v032).
+
+    Faces of every exported mesh are bucketed by plane; for each overlapping same-facing pair from different
+    loose parts, the face of the BIGGER part (the mass: walls, slabs, frames) steps back `push` metres along its
+    own normal, so the smaller part (trim, lightbox, container, stair) reads in front. Two faces of one part are
+    left alone. Back-to-back (opposite-facing) faces are never both visible and are ignored. Returns counts."""
+    from collections import defaultdict
+    faces = []   # (obj index, face index, part key, part volume, normal, d, tris2d, axes, thickness)
+    bms = []
+    for oi, o in enumerate(objs):
+        bm = bmesh.new()
+        bm.from_mesh(o.data)
+        bm.faces.ensure_lookup_table(); bm.verts.ensure_lookup_table()
+        comp, vols = _islands(bm)
+        bms.append(bm)
+        for f in bm.faces:
+            n = f.normal.copy()
+            if n.length < 0.5 or f.calc_area() < 1e-5:
+                continue
+            ax = [k for k in range(3) if k != max(range(3), key=lambda k: abs(n[k]))]
+            pts = [v.co for v in f.verts]
+            tris = [[(pts[0][ax[0]], pts[0][ax[1]]), (pts[i][ax[0]], pts[i][ax[1]]), (pts[i + 1][ax[0]], pts[i + 1][ax[1]])]
+                    for i in range(1, len(pts) - 1)]   # kit faces are convex (boxes, quads, prisms)
+            vol, lo, hi = vols[comp[f.index]]
+            thick = sum(abs(n[k]) * (hi[k] - lo[k]) for k in range(3))
+            faces.append((oi, f.index, (oi, comp[f.index]), vol, n, n.dot(pts[0]), tris, thick,
+                          frozenset(v.index for v in f.verts)))
+    buckets = defaultdict(list)
+    for i, fc in enumerate(faces):
+        n = fc[4]
+        buckets[(round(n.x * 200), round(n.y * 200), round(n.z * 200), round(fc[5] / 0.01))].append(i)
+    losers = {}
+    pairs = 0
+    for key, idx in buckets.items():
+        cand = idx + buckets.get(key[:3] + (key[3] + 1,), [])
+        own = set(idx)
+        for a in idx:
+            A = faces[a]
+            xa = [p for t in A[6] for p in t]
+            ba = (min(p[0] for p in xa), min(p[1] for p in xa), max(p[0] for p in xa), max(p[1] for p in xa))
+            for b in cand:
+                if b in own and b <= a:
+                    continue
+                B = faces[b]
+                if A[4].dot(B[4]) < 0.9995 or abs(A[5] - B[5]) > tol:
+                    continue
+                same = B[2] == A[2]
+                if same and A[8] & B[8]:
+                    continue   # neighbours in one welded part never overlap by construction
+                xb = [p for t in B[6] for p in t]
+                if max(p[0] for p in xb) <= ba[0] or min(p[0] for p in xb) >= ba[2] or \
+                   max(p[1] for p in xb) <= ba[1] or min(p[1] for p in xb) >= ba[3]:
+                    continue
+                if sum(_tri_overlap(ta, tb) for ta in A[6] for tb in B[6]) <= 1e-4:
+                    continue
+                pairs += 1
+                if same:
+                    # two loose faces of one welded part (crosswalk stripes, stacked decals): the later face steps
+                    # 3 mm FORWARD, so neither sinks into whatever lies behind the part
+                    win = A if a > b else B
+                    losers[(win[0], win[1])] = (win[4], -0.003)
+                    continue
+                lose = A if (A[3], -a) > (B[3], -b) else B   # bigger part loses; on a tie the earlier face
+                if lose[7] < 2 * push:
+                    # a part thinner than the push (road paint, flat decals) would fold through itself: the other face
+                    # steps 3 mm forward instead
+                    win = B if lose is A else A
+                    losers[(win[0], win[1])] = (win[4], -0.003)
+                    continue
+                losers[(lose[0], lose[1])] = (lose[4], min(push, 0.25 * lose[7]))
+    moved = defaultdict(lambda: Vector((0, 0, 0)))
+    for (oi, fi), (n, d) in losers.items():
+        for v in bms[oi].faces[fi].verts:
+            key = (oi, v.index)
+            # a corner shared by two moved faces moves along both normals; never twice along one
+            if abs(moved[key].dot(n)) < abs(d) * 0.5:
+                moved[key] -= n * d
+    for (oi, vi), off in moved.items():
+        bms[oi].verts[vi].co += off
+    for o, bm in zip(objs, bms):
+        bm.to_mesh(o.data)
+        o.data.update()
+        bm.free()
+    return {"pairs": pairs, "faces_pushed": len(losers), "verts_moved": len(moved)}
+
+
+def copy_texture(src, dst):
+    for _ in range(20):
+        try:
+            if dst.exists() and dst.stat().st_size == src.stat().st_size:
+                return
+            shutil.copy2(src, dst)
+            return
+        except OSError:
+            time.sleep(0.3)
+    if not dst.exists():
+        raise RuntimeError(f"texture copy failed: {src}")
+
+
+def export(objs, fbx_path, manifest_path):
+    """gwlib.export, adapted: shared Textures/ folder next to every kit FBX, manifest per variant, no GLB."""
+    TEXDIR.mkdir(parents=True, exist_ok=True)
+    used = set()
+    for o in objs:
+        for s in o.material_slots:
+            if s.material and s.material.use_nodes:
+                for n in s.material.node_tree.nodes:
+                    if n.type == "TEX_IMAGE" and n.image:
+                        used.add(n.image)
+    for im in used:
+        src = Path(bpy.path.abspath(im.filepath)) if im.filepath else None
+        name = L._tex_name(Path(im.name).stem if not src else src.stem)
+        dst = TEXDIR / (name + (src.suffix if src else ".png"))
+        if src and src.exists():
+            if src.resolve() != dst.resolve():
+                copy_texture(src, dst)
+        else:
+            im.filepath_raw = str(dst); im.file_format = "PNG"; im.save()
+        im.filepath = str(dst)
+    manifest = L.material_manifest(objs)
+    manifest_path.parent.mkdir(parents=True, exist_ok=True)
+    manifest_path.write_text(json.dumps(manifest, indent=1))
+    bpy.ops.object.select_all(action="DESELECT")
+    for o in objs:
+        o.select_set(True)
+    bpy.context.view_layer.objects.active = objs[0]
+    removed = []
+    for m in {s.material for o in objs for s in o.material_slots if s.material and s.material.use_nodes}:
+        b = next((n for n in m.node_tree.nodes if n.type == "BSDF_PRINCIPLED"), None)
+        if b is None:
+            continue
+        for sock in ("Roughness", "Metallic"):
+            for ln in list(b.inputs[sock].links):
+                removed.append((m.node_tree, ln.from_socket, ln.to_socket))
+                m.node_tree.links.remove(ln)
+    bpy.ops.export_scene.fbx(filepath=str(fbx_path), use_selection=True, apply_scale_options="FBX_SCALE_UNITS",
+                             axis_forward="-Y", axis_up="Z", path_mode="RELATIVE", embed_textures=False,
+                             mesh_smooth_type="FACE", use_triangles=False, use_mesh_modifiers=True,
+                             bake_space_transform=False, object_types={"MESH"})
+    for tree, a, b in removed:
+        tree.links.new(a, b)
+    return manifest
+
+
+def build_variant(variant, render=False, samples=16):
+    global _VARIANT
+    _VARIANT = variant
+    fn, seed, family, fp = VARIANTS[variant]
+    L.reset(seed)
+    rec_reset()
+    L.group("Structure")
+    fn(variant)
+    route_faces()
+    objs, shift = L.finalize("MW_" + variant)
+    for o in objs:  # keep the authored origin (footprint centre, street level) instead of bbox centring
+        o.data.transform(Matrix.Translation(-shift))
+        o.data.update()
+    for m in bpy.data.materials:
+        if m.name == "M_MW_PadGlow":
+            m.name = "MW_PadGlow"
+    coplanar = []
+    for _ in range(6):   # a pushed face could land on a third layer; repeat until clean
+        res = resolve_coplanar(objs)
+        coplanar.append(res)
+        if not res["pairs"]:
+            break
+    print("KITCOPLANAR", json.dumps({"variant": variant, "passes": coplanar}), flush=True)
+    lo, hi = L._bounds(objs)
+    groups = {}
+    for o in objs:
+        o.data.calc_loop_triangles()
+        groups[o.name] = len(o.data.loop_triangles)
+    nfloat, floating = floating_check(objs)
+    KIT.mkdir(parents=True, exist_ok=True)
+    fbx = KIT / f"MW_{variant}.fbx"
+    man = KIT / "materials" / f"{variant}.json"
+    manifest = export(objs, fbx, man)
+    meta = {
+        "variant": variant, "family": family, "seed": seed,
+        "fbx": str(fbx), "fbx_rel": fbx.name,
+        "footprint_m": list(fp),
+        "height_m": round(hi.z, 2),
+        "bounds_m": {"min": r2(lo), "max": r2(hi), "size": r2(hi - lo)},
+        "roof_heights": REC["roofs"], "wallrun_faces": REC["wallrun"], "climb_routes": REC["climb"],
+        "notes": REC["notes"],
+        "groups": groups, "tris": sum(groups.values()),
+        "materials": sorted(manifest.keys()),
+        "materials_json": str(KIT / "materials.json"), "materials_json_variant": str(man),
+        "floating_parts": nfloat, "floating_samples": floating,
+        "coplanar_passes": coplanar,
+    }
+    META.mkdir(parents=True, exist_ok=True)
+    (META / f"{variant}.json").write_text(json.dumps(meta, indent=1))
+    print("KITSTATS", json.dumps({"variant": variant, "tris": meta["tris"], "size": meta["bounds_m"]["size"],
+                                  "floating": nfloat}), flush=True)
+    if render:
+        render_variant(objs, variant, samples, lo, hi, family)
+    return meta
+
+
+def render_variant(objs, variant, samples, lo, hi, family):
+    lift = max(0.0, -lo.z)
+    if lift:
+        for o in objs:
+            o.data.transform(Matrix.Translation((0, 0, lift)))
+    cam = R.setup("day", samples=samples, res=(800, 600), ground_mat="ConcreteDark",
+                  over={"look": "AgX - Punchy", "exposure": -0.1, "sun": 7.0, "sky": 0.28, "elev": 38, "azim": 205,
+                        "freestyle": 0.9, "haze": (0.74, 0.7, 0.86)})
+    c = (lo + hi) / 2
+    c.z += lift
+    size = hi - lo
+    diag = size.length
+    elev = 52 if family in ("Street", "JumpPad") else (30 if family != "Bridge" else 34)
+    dist = max(diag * (1.45 if size.z > 60 else 1.3), 6.0)
+    azim = -125 if family == "ContainerStack" else -58  # show the stepped west risers
+    shot = {"target": tuple(c), "dist": dist, "azim": azim, "elev": elev, "lens": 35}
+    R.render_shots(cam, [shot], KIT / "renders" / "tiles", variant)
+
+
+def validate_all():
+    """Round-trip every kit FBX in a clean scene (validate_fbx.py pattern) against its build meta."""
+    res_all = {}
+    for mf in sorted(META.glob("*.json")):
+        m = json.loads(mf.read_text())
+        bpy.ops.wm.read_factory_settings(use_empty=True)
+        bpy.ops.import_scene.fbx(filepath=m["fbx"])
+        objs = [o for o in bpy.data.objects if o.type == "MESH"]
+        tris = 0
+        lo, hi = np.full(3, 1e9), np.full(3, -1e9)
+        mats, unused = set(), []
+        for o in objs:
+            me = o.data
+            me.calc_loop_triangles()
+            tris += len(me.loop_triangles)
+            co = np.empty(len(me.vertices) * 3)
+            me.vertices.foreach_get("co", co)
+            M = np.array(o.matrix_world)
+            w = co.reshape(-1, 3) @ M[:3, :3].T + M[:3, 3]
+            lo, hi = np.minimum(lo, w.min(0)), np.maximum(hi, w.max(0))
+            mats |= {s.material.name for s in o.material_slots if s.material}
+            used = {p.material_index for p in me.polygons}
+            unused += [f"{o.name}:{s.material.name if s.material else i}" for i, s in enumerate(o.material_slots)
+                       if i not in used]
+        missing = []
+        for im in bpy.data.images:
+            if im.source == "FILE" and not Path(bpy.path.abspath(im.filepath)).exists():
+                missing.append(im.filepath)
+        exp_lo, exp_hi = np.array(m["bounds_m"]["min"]), np.array(m["bounds_m"]["max"])
+        err = float(max(np.abs(lo - exp_lo).max(), np.abs(hi - exp_hi).max()))
+        names = sorted(o.name for o in objs)
+        r = {"meshes": names, "triangles": tris, "triangles_expected": m["tris"],
+             "materials": len(mats), "materials_expected": len(m["materials"]),
+             "materials_mismatch": sorted(mats ^ set(m["materials"])),
+             "bounds_min": r2(lo), "bounds_max": r2(hi), "max_bounds_error_m": round(err, 4),
+             "textures_missing": missing, "unused_material_slots": unused}
+        r["passed"] = bool(tris == m["tris"] and not r["materials_mismatch"] and err < 0.02 and not missing
+                           and not unused and set(names) == set(m["groups"]))
+        res_all[m["variant"]] = r
+        print("VALIDATION", m["variant"], r["passed"], tris, m["tris"], round(err, 4), flush=True)
+    (KIT / "validation.json").write_text(json.dumps(res_all, indent=1))
+
+
+if __name__ == "__main__":
+    a = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+    if "--validate" in a:
+        validate_all()
+    else:
+        var = a[a.index("--variant") + 1]
+        smp = int(a[a.index("--samples") + 1]) if "--samples" in a else 16
+        build_variant(var, render="--render" in a, samples=smp)

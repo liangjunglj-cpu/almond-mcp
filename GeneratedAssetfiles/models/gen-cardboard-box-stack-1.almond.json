@@ -1,0 +1,332 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-cardboard-box-stack-1",
+  "library_id": "generated_assets",
+  "name": "Cardboard box stack (Stack of worn, crushed corrugated boxes with an open flap on top; generated prop; detailed geometry edition)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-cardboard-box-stack-1.glb",
+  "dimensions_mm": {
+    "width": 482.5,
+    "depth": 526.4,
+    "height": 1300.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "ground",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -241.25,
+        -263.2,
+        0.0
+      ],
+      "max": [
+        241.25,
+        263.2,
+        1300.0
+      ]
+    },
+    "footprint": [
+      [
+        -241.25,
+        -263.2
+      ],
+      [
+        241.25,
+        -263.2
+      ],
+      [
+        241.25,
+        263.2
+      ],
+      [
+        -241.25,
+        263.2
+      ]
+    ],
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "accessory"
+  },
+  "materials": [
+    {
+      "material_id": "wood-oak",
+      "objects": [
+        "gen-cardboard-box-stack-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-cardboard-box-stack-1",
+    "library_id": "generated_assets",
+    "name": "Cardboard box stack (Stack of worn, crushed corrugated boxes with an open flap on top; generated prop; detailed geometry edition)",
+    "category": "household",
+    "tags": [
+      "cardboard",
+      "boxes",
+      "clutter",
+      "alley",
+      "market",
+      "streetscape",
+      "detailed",
+      "meshy",
+      "y2k-props-v038"
+    ],
+    "dimensions_mm": {
+      "width": 482.5,
+      "depth": 526.4,
+      "height": 1300.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 483.0,
+      "depth": 526.0,
+      "height": 1300.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "ground",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -241.25,
+          -263.2,
+          0.0
+        ],
+        "max": [
+          241.25,
+          263.2,
+          1300.0
+        ]
+      },
+      "footprint": [
+        [
+          -241.25,
+          -263.2
+        ],
+        [
+          241.25,
+          -263.2
+        ],
+        [
+          241.25,
+          263.2
+        ],
+        [
+          -241.25,
+          263.2
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "accessory"
+    },
+    "materials": [
+      {
+        "material_id": "wood-oak",
+        "objects": [
+          "gen-cardboard-box-stack-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "A messy stack of worn corrugated cardboard boxes, some crushed and sagging, one open flap box on top, plain unbranded brown cardboard with packing tape, realistic street market prop, game-ready",
+        "mesh_task_id": "01a0cdff-1d3b-722e-914f-6d87883fc234",
+        "mesh_model": "meshy-6",
+        "generated_at": "2026-09-23",
+        "orientation_correction": null,
+        "scale_applied": 685.25428,
+        "generation_route": "meshy_text_to_3d",
+        "preview_task_id": "01a0cdfa-ab08-75b3-970d-201a3d2212d1",
+        "preview_model": "meshy-6",
+        "captured_generation": {
+          "batch_id": "y2k-props-v038",
+          "route": "meshy_text_to_3d",
+          "preview": {
+            "asset_id": "gen-cardboard-box-stack-1",
+            "provider": "meshy",
+            "tool": "meshy_text_to_3d",
+            "submitted_at": "2026-09-23T11:15:48.278Z",
+            "request": {
+              "prompt": "A messy stack of worn corrugated cardboard boxes, some crushed and sagging, one open flap box on top, plain unbranded brown cardboard with packing tape, realistic street market prop, game-ready",
+              "ai_model": "meshy-6",
+              "should_remesh": true,
+              "target_polycount": 15000,
+              "topology": "triangle",
+              "target_formats": [
+                "glb"
+              ],
+              "response_format": "json"
+            },
+            "task_id": "01a0cdfa-ab08-75b3-970d-201a3d2212d1",
+            "status": "SUCCEEDED",
+            "status_basis": "Inferred: the session did not query this task; Meshy accepted and completed the refine task that names it as preview_task_id",
+            "consumed_credits": "20 (Meshy price table for a meshy-6 preview; not returned in the session)",
+            "provider_model": "meshy-6",
+            "seed": null,
+            "evidence_source": {
+              "pass_records": [
+                "runs/refset_0923/pass.json",
+                "ProjectY2K: twofronts/meshy/props_v038/out/conditioning.json"
+              ],
+              "session_records": "Tool calls of Ginkgo Claude Code session c4b3b37a-2d74-4b83-bdf3-8455978b8e74 (submissions, results and downloads)",
+              "extracted_at": "2026-11-20T17:30:13+00:00"
+            }
+          },
+          "mesh": {
+            "asset_id": "gen-cardboard-box-stack-1",
+            "provider": "meshy",
+            "tool": "meshy_text_to_3d_refine",
+            "submitted_at": "2026-09-23T11:20:40.395Z",
+            "request": {
+              "preview_task_id": "01a0cdfa-ab08-75b3-970d-201a3d2212d1",
+              "ai_model": "meshy-6",
+              "enable_pbr": true,
+              "texture_prompt": "plain brown corrugated cardboard, water stained and scuffed, beige packing tape, no printing, no logos",
+              "target_formats": [
+                "glb"
+              ],
+              "response_format": "json"
+            },
+            "task_id": "01a0cdff-1d3b-722e-914f-6d87883fc234",
+            "status": "SUCCEEDED",
+            "status_basis": "meshy_get_task_status reported SUCCEEDED at 2026-09-23T11:25:34.927Z",
+            "consumed_credits": 10,
+            "provider_model": "meshy-6",
+            "input_link": "preview_task_id",
+            "output_file": "gen-cardboard-box-stack-1.glb",
+            "output_format": "glb",
+            "output_sha256": "97286512bae331aca16f924ec4174daae13518828ef836c55fb47a353ffccc68",
+            "output_file_modified_at": "2026-09-23T11:25:41+00:00",
+            "seed": null,
+            "evidence_source": {
+              "pass_records": [
+                "runs/refset_0923/pass.json",
+                "ProjectY2K: twofronts/meshy/props_v038/out/conditioning.json"
+              ],
+              "session_records": "Tool calls of Ginkgo Claude Code session c4b3b37a-2d74-4b83-bdf3-8455978b8e74 (submissions, results and downloads)",
+              "extracted_at": "2026-11-20T17:30:13+00:00"
+            },
+            "download": {
+              "tool": "meshy_download_model",
+              "format": "glb",
+              "reported_file_size_bytes": 5012656
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-cardboard-box-stack-1",
+            "source_sha256": "97286512bae331aca16f924ec4174daae13518828ef836c55fb47a353ffccc68",
+            "source_triangles": 13928,
+            "target_triangles": 15000,
+            "prepared_sha256": "426d9f0ea151b1b080978b02b10f62ec82cf6077ab2d4e8c8f001ea51a0041b1",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Remove wire edges, split edges shared by more than two faces and remove zero-area faces (counts in quality.topology_repairs). Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.8971059322357176e-07,
+            "quality": {
+              "vertices": 7370,
+              "triangles": 13928,
+              "boundary_edges": 768,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 167,
+              "largest_component_vertices": 6011,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "topology_repairs": {
+                "wire_edges_removed": 0,
+                "nonmanifold_edges_split": 259,
+                "zero_area_faces_removed": 0,
+                "loose_vertices_removed": 0
+              },
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            }
+          },
+          "input_image_file": null,
+          "external_reference_status": "Text prompts only: no image was given to any stage. The Ginkgo pass refset_0923 designed its scenes from an owner reference set of 8 images; none of them was submitted to Meshy for these props, and the prompts ask for plain, unbranded objects.",
+          "external_reference_ids": [],
+          "dimension_basis": "Heights are the sizes Project Y2K's props_v038 conditioning gave each prop (out/conditioning.json: bag heap 0.72 m, box stack 1.30 m, ivy clump 1.60 m, rubble pile 0.28 m); each mesh was scaled uniformly to that height and its width and depth measured after scaling. Y2K's later ginkgo_props_v061 pass used 0.9 m for the bag heap and 1.0 m for the box stack. Not a physical survey.",
+          "reference_review": "Reviewed on 2026-11-20: text-to-3D has no input image. The library geometry was checked in its archive preview (640 px) and in untextured front, side, back and three-quarter views (rendered 900 px, viewed at 450 px) and in Project Y2K's textured props_v038 review sheet (1024 px): no lettering, logos or brand marks in the geometry. The provider base-colour texture (2048 px, viewed at 1024 px) has a few small red-and-blue printed patches on box faces with no legible text; textures are not distributed.",
+          "rights": "Meshy-6 text-to-3D preview and refine on the owner's Meshy account on 2026-09-23 (the same account, by the account ID in the result URLs, as the library's other Meshy batches). The session records the balance (1,023 credits) but not the subscription plan; the plan on that date was not independently audited. Text prompts only. The same props appear in the owner's Ginkgo world packs (GRANDWHIS) and in Project Y2K. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-20 (\"increase the range of models, from the ones i used for my project y2k games, (except for the operatives and bosses)\"). Provider textures are not distributed.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private); reused in Project Y2K, the owner's game project (private)",
+            "pass": "runs/refset_0923",
+            "source_name": "boxes",
+            "records": [
+              "runs/refset_0923/pass.json (AI-assisted content statement)",
+              "ProjectY2K: twofronts/meshy/props_v038/raw/{garbage,boxes,ivy,rubble}.glb (byte-identical to the Ginkgo downloads, SHA-256 checked 2026-11-20)",
+              "ProjectY2K: twofronts/meshy/props_v038/out/conditioning.json (game sizes)",
+              "Claude Code session transcript c4b3b37a-2d74-4b83-bdf3-8455978b8e74 (the tool calls that submitted the previews and refines and downloaded the GLBs)"
+            ]
+          }
+        }
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "interior"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.001,
+      "triangle_count": 13928,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "DD992CBDACE3EEE02A5E4A1562626023FBFB6EAF07D41FECDDFEC586922AB43E"
+}

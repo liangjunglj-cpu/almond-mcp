@@ -8,9 +8,11 @@ Resolution order for every library directory:
 3. the per-user data directory (``%LOCALAPPDATA%\\Almond`` on Windows),
    scaffolded on first use from the manifests bundled inside the wheel.
 
-Third-party downloaded geometry is never bundled. The generated library
-is bundled in full, and scaffolded into a versioned directory so upgrades
-cannot reuse an old manifest or overwrite a user's previous asset pack.
+Third-party downloaded geometry is never bundled. The generated library's
+manifest, catalogue and previews are bundled and scaffolded into a versioned
+directory so upgrades cannot reuse an old manifest or overwrite a user's
+previous asset pack; its model files download into that same directory on
+first use (almond_mcp/model_store.py).
 """
 from __future__ import annotations
 

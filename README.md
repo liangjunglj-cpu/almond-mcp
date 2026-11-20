@@ -36,9 +36,10 @@ one searchable catalogue. The same index is exposed through the MCP tool
 `search_asset_repository` and `almond://repository/{asset_id}` resources.
 See the [Object Archive guide](docs/object-archive-0.6-rc3.md).
 
-All 84 generated
-models now carry embedded asset passports and ship with the Python package,
-including their sidecar contracts and previews. New MCP tools recommend assets
+All 144 generated
+models now carry embedded asset passports. The Python package ships their
+catalogue and previews; each model file (GLB + sidecar contract) downloads from
+the matching GitHub release the first time it is used. New MCP tools recommend assets
 with reasons and check rotated clearance envelopes before placement. See
 [the release guide](docs/semantic-assets-0.6.md) for the workflow, packaging,
 verification and remaining Rhino integration checks. The
@@ -165,19 +166,25 @@ and a Claude that supports MCP (Claude Desktop or Claude Code).
 
    Save each download into the library's `models/` folder under the exact
    file name shown; the command verifies every checksum.
+
+   The generated (CC BY 4.0) library needs none of this: the first placement
+   of a generated model downloads it from the GitHub release and checks its
+   sha256. To fetch all of them now, e.g. before working offline, run
+   `uvx almond-mcp fetch-assets --generated`.
 7. **Optional extras:** Karamba3D 3.1 enables `validate_structure` (found at
    runtime — never bundled); point `RHINO_MCP_LIBRARY_DIR` at your own
    Grasshopper definition library to expose it via `list_library`.
 
 You never need the large `almond_mcp-<version>.tar.gz` on the GitHub release page:
 the steps above install from the Rhino Package Manager and PyPI. It is the source
-archive, and its size (about 130 MB) is expected; the release notes say why.
+archive, and its size (well over 100 MB) is expected; the release notes say why.
 
 ## CLI
 
 ```text
 almond-mcp               start the MCP server (also: almond-mcp serve)
-almond-mcp fetch-assets  report missing/invalid model files and their sources
+almond-mcp fetch-assets  download generated models; report missing/invalid model files and their sources
+                         (--generated: only the generated models, to prefetch for offline use)
 almond-mcp doctor        check directories, manifests, state DB, bridge port
 almond-mcp paths         print every resolved directory
 ```
@@ -280,7 +287,8 @@ The optional drawing library describes community models that each user
 must download themselves. `GeneratedAssetfiles/` is different: 47 (and
 growing) architectural models generated with Meshy from Almond's own
 prompts, owned by the project and released under **CC BY 4.0**, so they ship
-with the repository and the 0.6 wheel for offline use. Categories:
+with the repository, the Rhino plugin and the GitHub release (the PyPI package
+downloads each model from that release on first use). Categories:
 
 | Group | Assets |
 | --- | --- |

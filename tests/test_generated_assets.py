@@ -46,10 +46,17 @@ def test_manifest_covers_every_catalogue_entry_with_present_files():
         assert glb.is_file(), asset["asset_id"]
         assert sha256(glb) == asset["sha256"], asset["asset_id"]
         assert asset["license"] == "CC-BY-4.0"
-        # Meshy throughout, except Tripo meshes (Ginkgo refset_1118) whose recorded model says so.
-        tripo = asset["geometry_source"]["parameters"]["mesh_model"].startswith("tripo")
-        assert asset["geometry_source"]["generator"] == ("tripo" if tripo else "meshy")
-        assert asset["geometry_source"]["parameters"]["mesh_task_id"]
+        parameters = asset["geometry_source"]["parameters"]
+        if parameters.get("generation_route") == "procedural_script":
+            # Blender-script kit pieces (Project Y2K): no provider task; the script and source FBX are hashed.
+            assert asset["geometry_source"]["generator"] == "procedural_script"
+            assert "mesh_task_id" not in parameters and len(parameters["generator_script_sha256"]) == 64
+            assert len(parameters["source_sha256"]) == 64
+        else:
+            # Meshy throughout, except Tripo meshes (Ginkgo refset_1118) whose recorded model says so.
+            tripo = parameters["mesh_model"].startswith("tripo")
+            assert asset["geometry_source"]["generator"] == ("tripo" if tripo else "meshy")
+            assert parameters["mesh_task_id"]
         assert asset["download_url"].endswith(asset["file"].split("/")[-1])
 
 

@@ -1,0 +1,376 @@
+{
+  "version": 4,
+  "units": "metres",
+  "materials": {
+    "Pearl": {
+      "base_color": [
+        0.71,
+        0.77,
+        0.78
+      ],
+      "metallic": 0.25,
+      "roughness": 0.3
+    },
+    "Ink": {
+      "base_color": [
+        0.023,
+        0.04,
+        0.065
+      ],
+      "metallic": 0.25,
+      "roughness": 0.48
+    },
+    "Chrome": {
+      "base_color": [
+        0.43,
+        0.55,
+        0.59
+      ],
+      "metallic": 0.85,
+      "roughness": 0.22
+    },
+    "Glass": {
+      "base_color": [
+        0.026,
+        0.17,
+        0.21
+      ],
+      "metallic": 0.55,
+      "roughness": 0.2
+    },
+    "Cyan": {
+      "base_color": [
+        0.02,
+        0.8,
+        0.91
+      ],
+      "metallic": 0.2,
+      "roughness": 0.3
+    },
+    "Coral": {
+      "base_color": [
+        1,
+        0.075,
+        0.21
+      ],
+      "metallic": 0.15,
+      "roughness": 0.4
+    },
+    "Lime": {
+      "base_color": [
+        0.64,
+        0.89,
+        0.1
+      ],
+      "metallic": 0.15,
+      "roughness": 0.4
+    },
+    "Paving": {
+      "base_color": [
+        0.21,
+        0.27,
+        0.31
+      ],
+      "metallic": 0.05,
+      "roughness": 0.82
+    },
+    "Road": {
+      "base_color": [
+        0.035,
+        0.055,
+        0.085
+      ],
+      "metallic": 0.05,
+      "roughness": 0.92
+    }
+  },
+  "modules": {
+    "Store_Cyan": {
+      "file": "SM_Store_Cyan.fbx",
+      "triangles": 4812,
+      "vertices": 3372,
+      "dimensions_m": [
+        8.199999809265137,
+        9.405000686645508,
+        5.039999961853027
+      ],
+      "collision_boxes": [
+        {
+          "center": [
+            0,
+            0,
+            2.5
+          ],
+          "size": [
+            8,
+            8,
+            5
+          ]
+        }
+      ],
+      "sha256": "98b7e54ddfdbcf1aa624cf66869e67677cd4c23d61673f90f7295bbd6b362763"
+    },
+    "Store_Coral": {
+      "file": "SM_Store_Coral.fbx",
+      "triangles": 4660,
+      "vertices": 3200,
+      "dimensions_m": [
+        8.199999809265137,
+        9.405000686645508,
+        5.039999961853027
+      ],
+      "collision_boxes": [
+        {
+          "center": [
+            0,
+            0,
+            2.5
+          ],
+          "size": [
+            8,
+            8,
+            5
+          ]
+        }
+      ],
+      "sha256": "223ede30595dd5f23ab6a3f7f14a505f27adb87110f32e417e92a96b76bc03bb"
+    },
+    "Store_Lime": {
+      "file": "SM_Store_Lime.fbx",
+      "triangles": 5664,
+      "vertices": 4224,
+      "dimensions_m": [
+        8.199999809265137,
+        9.405000686645508,
+        5.039999961853027
+      ],
+      "collision_boxes": [
+        {
+          "center": [
+            0,
+            0,
+            2.5
+          ],
+          "size": [
+            8,
+            8,
+            5
+          ]
+        }
+      ],
+      "sha256": "004f0e78eb33caeb52ce068583a82e5f7de4492c80e8df96fdc38c17b7e174ed"
+    },
+    "UpperPod": {
+      "file": "SM_UpperPod.fbx",
+      "triangles": 3536,
+      "vertices": 1802,
+      "dimensions_m": [
+        7.699999809265137,
+        7.675000190734863,
+        8.699999809265137
+      ],
+      "collision_boxes": [],
+      "sha256": "eee6df1d7848fc14f41db28e1fd5cc2450ffaccbe3b9fe45f64af02eb85c259f"
+    },
+    "Paving4m": {
+      "file": "SM_Paving4m.fbx",
+      "triangles": 260,
+      "vertices": 144,
+      "dimensions_m": [
+        4.0,
+        4.0,
+        0.2639999985694885
+      ],
+      "collision_boxes": [
+        {
+          "center": [
+            0,
+            0,
+            -0.15
+          ],
+          "size": [
+            4,
+            4,
+            0.3
+          ]
+        }
+      ],
+      "sha256": "fa04c5c670a318e6ed1b66e750904b99842f47dd1f6bbe5a2079ec4393a6ddfc"
+    },
+    "Road8m": {
+      "file": "SM_Road8m.fbx",
+      "triangles": 236,
+      "vertices": 128,
+      "dimensions_m": [
+        8.0,
+        8.0,
+        0.31450000405311584
+      ],
+      "collision_boxes": [
+        {
+          "center": [
+            0,
+            0,
+            -0.16
+          ],
+          "size": [
+            8,
+            8,
+            0.3
+          ]
+        }
+      ],
+      "sha256": "648d87f613daa1a26db122a523430b2a66e8f5da404b193c732efe2be0550265"
+    },
+    "PlanterCover": {
+      "file": "SM_PlanterCover.fbx",
+      "triangles": 2148,
+      "vertices": 1086,
+      "dimensions_m": [
+        2.5999999046325684,
+        1.1200000047683716,
+        1.7699999809265137
+      ],
+      "collision_boxes": [
+        {
+          "center": [
+            0,
+            0,
+            0.58
+          ],
+          "size": [
+            2.6,
+            1.1,
+            1.16
+          ]
+        }
+      ],
+      "sha256": "d97859eca7560e623741081190462b3028b509f0cce48f4b3b97c7d6d79dcf95"
+    },
+    "StreetLamp": {
+      "file": "SM_StreetLamp.fbx",
+      "triangles": 1336,
+      "vertices": 880,
+      "dimensions_m": [
+        1.5999999046325684,
+        0.6499999761581421,
+        5.010000228881836
+      ],
+      "collision_boxes": [
+        {
+          "center": [
+            0,
+            0,
+            2.5
+          ],
+          "size": [
+            0.3,
+            0.3,
+            5
+          ]
+        }
+      ],
+      "sha256": "0ea0df3933b8937a9af1819ec72ea6227b5e450ba27ac35cc9603daa6d7e6f78"
+    },
+    "InfoKiosk": {
+      "file": "SM_InfoKiosk.fbx",
+      "triangles": 2912,
+      "vertices": 2668,
+      "dimensions_m": [
+        1.350000023841858,
+        0.9649999737739563,
+        2.700000047683716
+      ],
+      "collision_boxes": [
+        {
+          "center": [
+            0,
+            0,
+            1.35
+          ],
+          "size": [
+            1.35,
+            0.85,
+            2.7
+          ]
+        }
+      ],
+      "sha256": "68ad43fd3c997b576b7ac5dd311f0d8a9f1fc4df06c803bc42793209432460f9"
+    },
+    "GatewayArch": {
+      "file": "SM_GatewayArch.fbx",
+      "triangles": 1896,
+      "vertices": 1560,
+      "dimensions_m": [
+        10.699999809265137,
+        0.8579999804496765,
+        6.360000133514404
+      ],
+      "collision_boxes": [
+        {
+          "center": [
+            -5.1,
+            0,
+            3
+          ],
+          "size": [
+            0.45,
+            0.6,
+            6
+          ]
+        },
+        {
+          "center": [
+            5.1,
+            0,
+            3
+          ],
+          "size": [
+            0.45,
+            0.6,
+            6
+          ]
+        }
+      ],
+      "sha256": "693578947cc74014b320de84dd47a330b8ea6b669d18273aa4d8cccd36fc30e7"
+    },
+    "Bench": {
+      "file": "SM_Bench.fbx",
+      "triangles": 564,
+      "vertices": 288,
+      "dimensions_m": [
+        2.4000000953674316,
+        0.699999988079071,
+        0.6600000262260437
+      ],
+      "collision_boxes": [
+        {
+          "center": [
+            0,
+            0,
+            0.35
+          ],
+          "size": [
+            2.4,
+            0.7,
+            0.7
+          ]
+        }
+      ],
+      "sha256": "55ff946329a33e015261f65d9f57988a768655b9e727ad9677fd00c5b26f1113"
+    },
+    "Drain": {
+      "file": "SM_Drain.fbx",
+      "triangles": 248,
+      "vertices": 136,
+      "dimensions_m": [
+        1.2000000476837158,
+        1.2000000476837158,
+        0.03449999913573265
+      ],
+      "collision_boxes": [],
+      "sha256": "f3afa0c692297436293e9c6e19f1580b02b2a1e89967158f7f210e036311a175"
+    }
+  },
+  "scope": "Original procedural exterior street kit; no interiors or third-party geometry"
+}

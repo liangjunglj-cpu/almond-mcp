@@ -82,8 +82,8 @@ Record pass/fail, the Yak SHA-256, Windows version and Rhino service release her
 ### From the next release: PyPI gets the wheel only
 
 With the Ginkgo props the library holds 84 models, and the distributions outgrew PyPI's 100 MB
-file limit. The wheel leaves out the generation evidence (`GeneratedAssetfiles/batches/`) and is about
-85 MB; `prepare_release.ps1` stops if it reaches 100 MiB. The sdist keeps the evidence (about 134 MB), so
+file limit. The wheel leaves out the generation evidence (`GeneratedAssetfiles/batches/`) and, since the
+next section, the model files; `prepare_release.ps1` stops if it reaches 100 MiB. The sdist keeps the evidence (well over 100 MB), so
 it is **not uploaded to PyPI**: it goes to the GitHub release with the Yak and `SHA256SUMS.txt`.
 `verify_release.py --sdist` checks every captured input image in it. Step 1 above becomes:
 
@@ -94,16 +94,60 @@ uv publish dist/release-<version>/almond_mcp-<version>-py3-none-any.whl
 Never `uv publish dist/release-<version>/*`: that also sends the sdist, which PyPI refuses. Nobody needs
 the sdist from PyPI: the wheel is pure Python, so `uvx almond-mcp` and the panel engine install from it.
 
+### Model files are GitHub release assets (the wheel has none)
+
+The library keeps growing (144 models), so the wheel no longer carries the
+generated model files either: it ships the manifest, catalogue, provenance, source register and preview
+renders, and each model's GLB + `.almond.json` contract downloads on first use (placement, drawing
+views, the archive's 3D view, the repository resource) from the GitHub release of the **same version**:
+
+```text
+https://github.com/liangjunglj-cpu/almond-mcp/releases/download/v<version>/<file name>
+```
+
+`almond_mcp/model_store.py` verifies every download against the manifest's SHA-256 and only then moves
+it into `%LOCALAPPDATA%\Almond\GeneratedAssetfiles\releases\<version>\models\`; a mismatching file is
+deleted. If that URL fails it falls back to the manifest's recorded raw-`master` URL, which is safe
+because of the same check (a changed file on `master` is simply refused). `ALMOND_MODEL_BASE_URL`
+replaces both (a mirror, a shared folder as `file:///…`, or the release check below). Users prefetch
+everything with `almond-mcp fetch-assets --generated`, e.g. before going offline. The Rhino plugin is
+unchanged: its archive still bundles the models.
+
+`prepare_release.ps1` stages every verified model file flat in `dist/release-<version>/models/` (from the
+sdist, through `verify_release.py --stage-models`), lists them in `SHA256SUMS.txt` as `models/<name>`, and
+runs the clean-install check with `ALMOND_MODEL_BASE_URL` pointing at that folder. `verify_release.py`
+refuses a wheel that contains any GLB or contract, and checks that every manifest model file is in the
+sdist with the manifest's SHA-256.
+
+**Publication order changes:** installs download from the GitHub release, so it must exist with the
+model files **before** the wheel reaches PyPI.
+
+1. Create the GitHub release `v<version>` (pre-release for an rc) with the Yak, sdist and
+   `SHA256SUMS.txt`, and attach the model files (several hundred assets; GitHub allows 1000 per release):
+
+   ```powershell
+   gh release upload v<version> (Get-ChildItem -LiteralPath dist/release-<version>/models -File).FullName
+   ```
+
+2. Check a download from it on a machine without the checkout: install the wheel into a scratch
+   environment and run `almond-mcp fetch-assets --generated` (no `ALMOND_MODEL_BASE_URL`); it must end with
+   *All manifest assets are present with matching hashes.*
+3. Then publish the wheel to PyPI as above, then the Yak.
+
+Never delete or replace a model file on a published release: installs of that version fetch it by name
+and check its hash.
+
 Put this note in the GitHub release notes, next to the asset list (the README's setup section points
 readers to it; fill in the sizes from the build):
 
-> **About the large source archive.** `almond_mcp-<version>.tar.gz` (about 130 MB) is the source
+> **About the large source archive.** `almond_mcp-<version>.tar.gz` (about <size> MB) is the source
 > archive, not an installer. It is large because it carries the whole generated model library
-> (84 models with their preview renders) and the generation records behind each model: the request
+> (144 models with their preview renders) and the generation records behind each model: the request
 > logs and the concept images the generators received, kept as evidence for the CC BY 4.0 release.
 > PyPI limits files to 100 MB, so this archive is published here only. To install, use the Rhino
-> Package Manager (`almondbridge`) and `uvx almond-mcp` from PyPI; the PyPI wheel has the same
-> models, without the generation records.
+> Package Manager (`almondbridge`) and `uvx almond-mcp` from PyPI. The PyPI package has the catalogue
+> and previews; each model file (`*.glb`, `*.almond.json`, attached below) downloads from this release
+> the first time it is used. Do not remove them.
 
 ## Known limits (documented to users)
 
