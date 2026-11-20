@@ -80,9 +80,13 @@ def build_register(library: Path) -> dict:
             image, mesh = captured["image"], captured["mesh"]
             if image["request"].get("prompt") != brief.get("prompt"):
                 errors.append(f"{aid}: submitted image prompt differs from catalogue")
-            # Meshy-generated images are linked by task ID; uploaded external images by their checksum.
+            # Meshy-generated images are linked by task ID; uploaded external images by their checksum;
+            # Higgsfield 3D jobs (Tripo) by naming the image job as their only media reference.
+            medias = [m.get("value") for m in mesh["request"].get("medias", [])]
             linked = (mesh["request"].get("input_task_id") == image_id
-                      or ("input_task_id" not in mesh["request"] and mesh.get("input_image_sha256") == image["output_sha256"]))
+                      or (medias == [image_id] and mesh.get("input_image_sha256") == image["output_sha256"])
+                      or ("input_task_id" not in mesh["request"] and not medias
+                          and mesh.get("input_image_sha256") == image["output_sha256"]))
             if image["task_id"] != image_id or mesh["task_id"] != generation["mesh_task_id"] or not linked:
                 errors.append(f"{aid}: captured task chain differs")
             image_path = (library / captured["input_image_file"]).resolve()

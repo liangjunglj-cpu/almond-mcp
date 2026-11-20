@@ -46,7 +46,9 @@ def test_manifest_covers_every_catalogue_entry_with_present_files():
         assert glb.is_file(), asset["asset_id"]
         assert sha256(glb) == asset["sha256"], asset["asset_id"]
         assert asset["license"] == "CC-BY-4.0"
-        assert asset["geometry_source"]["generator"] == "meshy"
+        # Meshy throughout, except Tripo meshes (Ginkgo refset_1118) whose recorded model says so.
+        tripo = asset["geometry_source"]["parameters"]["mesh_model"].startswith("tripo")
+        assert asset["geometry_source"]["generator"] == ("tripo" if tripo else "meshy")
         assert asset["geometry_source"]["parameters"]["mesh_task_id"]
         assert asset["download_url"].endswith(asset["file"].split("/")[-1])
 

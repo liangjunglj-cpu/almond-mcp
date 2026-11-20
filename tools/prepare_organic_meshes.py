@@ -75,6 +75,29 @@ for asset in batch['assets']:
     mesh.to_mesh(obj.data)
     mesh.free()
     validation_repairs += int(obj.data.validate(verbose=True, clean_customdata=True))
+    topology_repairs = {}
+    if batch.get('repair_nonmanifold'):
+        # Opt-in per batch: loose wire edges are removed, edges shared by more than two faces are split
+        # (each face keeps its own edge, so they become open boundaries) and zero-area faces are removed.
+        mesh = bmesh.new()
+        mesh.from_mesh(obj.data)
+        wires = [e for e in mesh.edges if e.is_wire]
+        if wires:
+            bmesh.ops.delete(mesh, geom=wires, context='EDGES')
+        crowded = [e for e in mesh.edges if len(e.link_faces) > 2]
+        if crowded:
+            bmesh.ops.split_edges(mesh, edges=crowded)
+        flat = [f for f in mesh.faces if f.calc_area() <= 0]
+        if flat:
+            bmesh.ops.delete(mesh, geom=flat, context='FACES_ONLY')
+        loose = [v for v in mesh.verts if not v.link_faces]
+        if loose:
+            bmesh.ops.delete(mesh, geom=loose, context='VERTS')
+        mesh.to_mesh(obj.data)
+        mesh.free()
+        validation_repairs += int(obj.data.validate(verbose=True, clean_customdata=True))
+        topology_repairs = {'wire_edges_removed': len(wires), 'nonmanifold_edges_split': len(crowded),
+                            'zero_area_faces_removed': len(flat), 'loose_vertices_removed': len(loose)}
     mesh = bmesh.new()
     mesh.from_mesh(obj.data)
     mesh.verts.ensure_lookup_table()
@@ -105,10 +128,11 @@ for asset in batch['assets']:
         'nonfinite_coordinates': sum(not math.isfinite(c) for v in mesh.verts for c in v.co),
         'self_intersections': 'not_tested',
         'mesh_validation_repair_passes': validation_repairs,
+        **({'topology_repairs': topology_repairs} if topology_repairs else {}),
         'use': 'Visual entourage; not certified for fabrication or structural analysis'
     }
     if quality['zero_area_faces'] or quality['nonfinite_coordinates'] or quality['triangles'] > asset['target_triangles'] + 100:
-        raise ValueError('Invalid output: ' + aid)
+        raise ValueError('Invalid output: ' + aid + ' ' + json.dumps({k: quality[k] for k in ('zero_area_faces', 'nonfinite_coordinates', 'triangles')}))
     mesh.to_mesh(obj.data)
     mesh.free()
     for p in obj.data.polygons:
@@ -124,7 +148,8 @@ for asset in batch['assets']:
                     'source_triangles':source_triangles,'target_triangles':asset['target_triangles'],
                     'prepared_sha256':hashlib.sha256(target.read_bytes()).hexdigest(),
                     'software':'Blender '+bpy.app.version_string,
-                    'method':('Remove provider PBR materials and textures; ' if batch.get('strip_source_materials') else '')+'Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Never subdivide to inflate counts.',
+                    'method':('Remove provider PBR materials and textures; ' if batch.get('strip_source_materials') else '')+'Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring.'
+                    +(' Remove wire edges, split edges shared by more than two faces and remove zero-area faces (counts in quality.topology_repairs).' if topology_repairs else '')+' Never subdivide to inflate counts.',
                     'weld_tolerance_source_units':weld_tolerance,'quality':quality})
     print('PREPARED', aid, source_triangles, '->', quality['triangles'], quality, flush=True)
 

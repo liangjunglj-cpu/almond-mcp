@@ -16,18 +16,18 @@ def write(path, value):
 
 
 def main():
-    batch_file=Path(sys.argv[1]);batch=json.loads(batch_file.read_text())
+    batch_file=Path(sys.argv[1]);batch=json.loads(batch_file.read_text(encoding='utf-8'))
     library=REPO/'GeneratedAssetfiles';raw=library/'raw'/batch['batch_id']
     evidence_dir=library/'batches'/batch['batch_id'];evidence_dir.mkdir(exist_ok=True)
-    manifest=json.loads((library/'manifest.json').read_text())
-    catalogue=json.loads((library/'catalogue.json').read_text())
-    provenance=json.loads((library/'provenance.json').read_text())
-    quality={r['asset_id']:r for r in json.loads((raw/'prepared/quality.json').read_text())}
+    manifest=json.loads((library/'manifest.json').read_text(encoding='utf-8'))
+    catalogue=json.loads((library/'catalogue.json').read_text(encoding='utf-8'))
+    provenance=json.loads((library/'provenance.json').read_text(encoding='utf-8'))
+    quality={r['asset_id']:r for r in json.loads((raw/'prepared/quality.json').read_text(encoding='utf-8'))}
     selected = [a for a in batch['assets'] if a['asset_id'] in batch['release_assets']]
     if {a['asset_id'] for a in selected} & {a['asset_id'] for a in manifest['assets']}:
         raise ValueError('Batch already imported; refusing replacement')
     for asset in selected:
-        aid=asset['asset_id'];image=json.loads((raw/(aid+'.image.json')).read_text());mesh=json.loads((raw/(aid+'.mesh.json')).read_text())
+        aid=asset['asset_id'];image=json.loads((raw/(aid+'.image.json')).read_text(encoding='utf-8'));mesh=json.loads((raw/(aid+'.mesh.json')).read_text(encoding='utf-8'))
         q=quality[aid];prepared=raw/'prepared'/(aid+'.glb')
         assert hashlib.sha256(prepared.read_bytes()).hexdigest()==q['prepared_sha256']
         assert hashlib.sha256((raw/(aid+'.glb')).read_bytes()).hexdigest()==mesh['output_sha256']==q['source_sha256']
@@ -46,7 +46,11 @@ def main():
                                 'source_name':asset.get('ginkgo_name'),'records':batch['origin']['records']}
         write(evidence_dir/(aid+'.json'),evidence)
         variant=asset['variant']+'; '+batch['variant_suffix'] if 'variant_suffix' in batch else 'Organic form; detailed geometry edition'
-        tags=(asset['tags']+['detailed','meshy',batch['batch_id']]) if 'tags' in asset else ['organic','detailed','meshy',batch['batch_id'],asset['product'].lower()]
+        # Mesh stage: Meshy, or Tripo run through Higgsfield generate_3d (request carries 'model', not 'ai_model').
+        tripo=mesh.get('provider','meshy')!='meshy'
+        mesh_model=mesh['request']['model'] if tripo else mesh['request']['ai_model']
+        mesh_tag='tripo' if tripo else 'meshy'
+        tags=(asset['tags']+['detailed',mesh_tag,batch['batch_id']]) if 'tags' in asset else ['organic','detailed','meshy',batch['batch_id'],asset['product'].lower()]
         brief={'asset_id':aid,'category':asset['category'],'product':asset['product'],
                'variant':variant,
                'dimensions_mm':{'width':asset['width_hint_mm'],'depth':asset['depth_hint_mm'],'height':asset['height_mm']},
@@ -65,12 +69,15 @@ def main():
             if mesh.get('input_image_sha256')!=image['output_sha256']:
                 raise ValueError('Mesh input image differs from the retained reference image: '+aid)
             history={'image_provider':batch['image_provider'],'image_job_id':image['task_id'],'image_model':image['request']['model']}
-        history.update({'mesh_provider':'meshy','mesh_task_id':mesh['task_id'],'mesh_model':mesh['request']['ai_model'],
+        history.update({'mesh_provider':'higgsfield (Tripo)' if tripo else 'meshy','mesh_task_id':mesh['task_id'],'mesh_model':mesh_model,
                         'generated_at':mesh['submitted_at'][:10],'captured_generation':evidence})
         record=normalise(brief,prepared,library/'models',load_material_colours(),{aid:history})
         record['geometry_source']['parameters']['captured_generation']=evidence
         record['license_note']=evidence['rights']
-        contract_path=library/record['contract_file'];contract=json.loads(contract_path.read_text())
+        contract_path=library/record['contract_file'];contract=json.loads(contract_path.read_text(encoding='utf-8'))
+        if tripo:
+            record['geometry_source']['generator']='tripo'
+            contract['source_app']='tripo'
         enrich_asset(record,contract,library/record['file'],contract_path)
         manifest['assets'].append(record);catalogue['assets'].append(brief);provenance['assets'][aid]=history
         print(aid,record['triangle_count'],record['dimensions_mm'])

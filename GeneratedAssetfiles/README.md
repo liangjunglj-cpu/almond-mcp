@@ -2,8 +2,8 @@
 
 Open, redistributable 3D architectural assets for [Almond MCP](../README.md):
 entourage, site furniture, fixtures and unbranded
-furniture placeholders. **66 assets**, all generated with
-[Meshy](https://www.meshy.ai) from prompts written for this project and
+furniture placeholders. **84 assets**, generated with
+[Meshy](https://www.meshy.ai) (three with Tripo, see the Ginkgo batches) from prompts written for this project and
 normalised to real-world millimetres with an authored Almond spatial
 contract. Unlike the IKEA / drawing libraries (3D Warehouse content that
 each user downloads), these files ship with the repository.
@@ -44,7 +44,7 @@ get_generated_asset(asset_id="gen-street-lamp-1")
 place_generated_asset(asset_id="gen-street-lamp-1", x_mm=0, y_mm=0)
 ```
 
-The wheel bundles all 66 models, contracts and previews.
+The wheel bundles all 84 models, contracts and previews.
 Run `almond-mcp audit-assets` to check checksums and agreement between embedded,
 sidecar and manifest passports. Wheel installs use a versioned user-data pack;
 explicit library directory overrides continue to take precedence.
@@ -170,6 +170,63 @@ GRANDWHIS products), and meshes Ginkgo discarded. See `docs/licensing-audit.md`.
 | <img src="previews/gen-table-lamp-pleated-1.png" width="96" alt=""> | `gen-table-lamp-pleated-1` | Table lamp (pleated paper shade on a brass stem) | lighting | 282 x 283 x 460 | `fabric-linen` | 80,000 |
 | <img src="previews/gen-washing-machine-front-1.png" width="96" alt=""> | `gen-washing-machine-front-1` | Washing machine (compact front-loading) | appliance | 609 x 524 x 850 | `plaster-white` | 80,000 |
 
+## Ginkgo batches of 2026-11-18 (mesh bank, Freiburg, refset_1118)
+
+Eighteen more meshes from the owner's Ginkgo project, released under CC BY 4.0 with the
+owner's approval on 2026-11-18. They were staged by `tools/stage_ginkgo_chains.py` from the
+Ginkgo sessions' own tool calls and imported with `tools/import_organic_batch.py`. As with
+refset_1024, Blender re-derived untextured library editions (40k to 80k triangles; 140k for
+the shrub clump, whose thousands of separate leaves stop collapse decimation there). Provider
+textures are removed and Almond materials assigned. The Freiburg ornaments and the three Tripo
+meshes had edges shared by more than two faces; those edges were split, and the counts are in
+each asset's `topology_repairs`.
+
+**`ginkgo-meshbank-2026-11`**: cafe and street props Ginkgo generated for its shared mesh bank
+(Meshy text-to-image, then Meshy 7.1). Heights are the real-world sizes stored with each prop.
+
+| Preview | asset_id | Product | Category | W x D x H (mm) | Material | Triangles |
+| --- | --- | --- | --- | --- | --- | --- |
+| <img src="previews/gen-bistro-chair-rattan-1.png" width="96" alt=""> | `gen-bistro-chair-rattan-1` | Bistro chair (French cafe chair, bent rattan frame, woven two-tone seat and back) | seating | 524 x 588 x 880 | `wood-oak` | 40,000 |
+| <img src="previews/gen-bistro-table-marble-1.png" width="96" alt=""> | `gen-bistro-table-marble-1` | Bistro table (Round marble top on a cast-iron pedestal) | table | 688 x 686 x 730 | `plaster-white` | 40,000 |
+| <img src="previews/gen-cafe-parasol-1.png" width="96" alt=""> | `gen-cafe-parasol-1` | Cafe parasol (Open square canvas parasol, wooden pole, concrete base) | site_furniture | 2584 x 2590 x 2700 | `fabric-linen` | 40,000 |
+| <img src="previews/gen-olive-tree-potted-1.png" width="96" alt=""> | `gen-olive-tree-potted-1` | Potted olive tree (Small olive tree in a terracotta pot) | vegetation | 884 x 819 x 1800 | `foliage-pine` | 80,000 |
+| <img src="previews/gen-street-lamp-cast-iron-1.png" width="96" alt=""> | `gen-street-lamp-cast-iron-1` | Street lamp (Traditional cast-iron post with a four-sided glass lantern) | site_furniture | 864 x 850 x 4000 | `steel-painted-charcoal` | 40,000 |
+| <img src="previews/gen-bicycle-city-basket-1.png" width="96" alt=""> | `gen-bicycle-city-basket-1` | Bicycle (Step-through city bicycle with wicker basket and rear rack) | vehicle | 610 x 1678 x 1100 | `steel-painted-charcoal` | 60,000 |
+| <img src="previews/gen-person-standing-coat-1.png" width="96" alt=""> | `gen-person-standing-coat-1` | Person standing (Adult pedestrian in a camel coat and scarf) | human_figure | 603 x 375 x 1800 | `plaster-white` | 60,000 |
+
+**`ginkgo-freiburg-2026-11`**: stone ornament and fountain sculpture from Ginkgo's Freiburg
+photo reconstructions. Meshy image-to-image received crops of the owner's own photographs; the
+photographs are hashed in the evidence and not distributed. Sizes are as measured from those
+photographs; the console and cartouche carry the wall heights at which the scene placed them.
+These six use the new `ornament` category.
+
+| Preview | asset_id | Product | Category | W x D x H (mm) | Material | Triangles |
+| --- | --- | --- | --- | --- | --- | --- |
+| <img src="previews/gen-statue-knight-gothic-1.png" width="96" alt=""> | `gen-statue-knight-gothic-1` | Statue (Gothic fountain figure: knight in plate armour on a corbel pedestal) | ornament | 368 x 328 x 1200 | `plaster-white` | 60,000 |
+| <img src="previews/gen-statue-saint-staff-gothic-1.png" width="96" alt=""> | `gen-statue-saint-staff-gothic-1` | Statue (Gothic fountain figure: robed saint holding a staff) | ornament | 207 x 187 x 740 | `stone-granite-paving` | 60,000 |
+| <img src="previews/gen-statue-bishop-gothic-1.png" width="96" alt=""> | `gen-statue-bishop-gothic-1` | Statue (Gothic fountain figure: bishop saint with mitre and book) | ornament | 212 x 173 x 720 | `stone-granite-paving` | 60,000 |
+| <img src="previews/gen-gothic-tabernacle-canopy-1.png" width="96" alt=""> | `gen-gothic-tabernacle-canopy-1` | Tabernacle canopy (Gothic fountain-column canopy with pinnacles, spire and finial cross) | ornament | 656 x 668 x 1710 | `brick-red` | 80,000 |
+| <img src="previews/gen-scroll-console-corbel-1.png" width="96" alt=""> | `gen-scroll-console-corbel-1` | Console (S-scroll balcony corbel with acanthus leaf) | ornament | 696 x 496 x 850 | `plaster-white` | 79,063 |
+| <img src="previews/gen-cartouche-shell-scroll-1.png" width="96" alt=""> | `gen-cartouche-shell-scroll-1` | Cartouche (Baroque shell-and-scroll relief on a backing plate) | ornament | 841 x 98 x 700 | `plaster-white` | 78,569 |
+
+**`ginkgo-refset-1118`**: hero props of the refset_1118 world pass. Higgsfield `gpt_image_2_5`
+reference images (each conditioned on one of the owner's own concept images), then Meshy 7.1
+(palm, shrub clump) or Tripo H3.1 through Higgsfield (taxi, refuse truck, vending machine). The
+Tripo meshes are linked to their image by the job ID they were given. Vehicles are scaled by
+length; the vending machine's front faces +X.
+
+| Preview | asset_id | Product | Category | W x D x H (mm) | Material | Triangles |
+| --- | --- | --- | --- | --- | --- | --- |
+| <img src="previews/gen-taxi-sedan-1.png" width="96" alt=""> | `gen-taxi-sedan-1` | Taxi (Sedan taxi with blank roof sign) | vehicle | 2194 x 4698 x 1790 | `steel-painted-vermilion` | 59,991 |
+| <img src="previews/gen-refuse-truck-rear-loader-1.png" width="96" alt=""> | `gen-refuse-truck-rear-loader-1` | Refuse truck (Cab-over rear-loader compactor, plain white) | vehicle | 2994 x 8594 x 3540 | `plaster-white` | 59,997 |
+| <img src="previews/gen-vending-machine-drinks-1.png" width="96" alt=""> | `gen-vending-machine-drinks-1` | Vending machine (Street drink vending machine, unbranded) | site_furniture | 823 x 981 x 1830 | `ceramic-teal` | 39,999 |
+| <img src="previews/gen-palm-tree-1.png" width="96" alt=""> | `gen-palm-tree-1` | Palm tree (Young fan palm with a curved ringed trunk) | vegetation | 5552 x 5229 x 6400 | `foliage-pine` | 80,000 |
+| <img src="previews/gen-shrub-clump-tropical-1.png" width="96" alt=""> | `gen-shrub-clump-tropical-1` | Shrub clump (Dense tropical shrubs and ferns on a soil patch) | vegetation | 1549 x 1366 x 1000 | `foliage-pine` | 140,000 |
+
+Not included: the Freiburg scenes' people, bicycles and lamp (scene-baked copies of older
+meshes; the mesh-bank originals are above), procedural buildings and code-grown palms, and the
+assembled GRANDWHIS scenes. See `docs/licensing-audit.md`.
+
 ## Batch 2: design-idiom furniture and lighting
 
 The second batch (ids with `batch: 2` in the catalogue) describes design language
@@ -213,7 +270,7 @@ contact sheets are legacy renders.
 Regenerate with `blender --factory-startup -b --python tools/render_generated_previews.py -- GeneratedAssetfiles/models GeneratedAssetfiles/previews --archive`.
 `--clay` is an optional neutral study; `--asset <asset_id>` renders a single
 inspection sample into a separate output folder. The full archive needs all
-66 records. `previews/render-record.json` records Blender/version/settings,
+84 records. `previews/render-record.json` records Blender/version/settings,
 script checksum (LF-normalized), and each source GLB and rendered PNG checksum.
 This is a post-generation preview derivation, not a change to Meshy history.
 

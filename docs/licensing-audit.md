@@ -55,9 +55,11 @@ into the distributable set.
 ## Generated (Meshy) asset library
 
 `GeneratedAssetfiles/` is the one library whose model files *are*
-distributed. Every asset was produced from a self-authored prompt: a
+distributed. Almost every asset was produced from a self-authored prompt: a
 reference image (Meshy's own image models, or Higgsfield for batch 2 and the
-Ginkgo batch) followed by Meshy image-to-3D on a paid plan. Meshy's terms grant
+Ginkgo batches) followed by Meshy image-to-3D on a paid plan. The exceptions
+are listed under the Ginkgo batches below: six photo-derived Freiburg pieces and
+three Tripo meshes. Meshy's terms grant
 paid accounts ownership of generated output, and Higgsfield claims no
 ownership of its outputs, so the files are ours to license. They are released under CC BY 4.0 (attribution: "Almond generated
 asset library"), and the manifest, contracts and build tooling are MIT like
@@ -91,6 +93,36 @@ products, and scenes rather than placeable objects), and discarded or
 earlier-pass meshes. The library editions carry Almond materials only; the
 provider's PBR textures are not distributed. The retained reference images
 ship in `batches/ginkgo-refset-1024/` as generation evidence.
+
+### Ginkgo mesh bank, Freiburg and refset_1118 (three batches, added 2026-11-18)
+
+Eighteen further Ginkgo meshes, approved by the owner for the CC BY 4.0 library
+on 2026-11-18, came by three rights routes:
+
+- `ginkgo-meshbank-2026-11` (7 cafe and street props): original text prompts,
+  Meshy `nano-banana` text-to-image, then Meshy 7.1 image-to-3D, all on the
+  owner's paid Meshy account. No external images.
+- `ginkgo-freiburg-2026-11` (2 facade ornaments, 3 fountain statues, 1 Gothic
+  canopy): Meshy image-to-image received crops of the **owner's own
+  photographs** of a Freiburg facade (1890s) and of the Fischbrunnen fountain
+  (15th century). The clean generated image then went to Meshy 7.1. The designs
+  reproduced are long out of copyright. The photographs are hashed in the
+  evidence but never distributed. The current monument's restoration history
+  (later copies of the figures) was not audited.
+- `ginkgo-refset-1118` (taxi, refuse truck, vending machine, palm, shrub clump):
+  Higgsfield `gpt_image_2_5` reference images, each conditioned on one of the
+  owner's own approved concept images. Then either Meshy 7.1 (palm, shrub) or
+  **Tripo H3.1 through the owner's Higgsfield account** (taxi, truck, vending
+  machine). The refset_1024 batch left Tripo output out because that route was
+  unreviewed. For these three, the owner confirmed the rights in the Ginkgo pass
+  and approved their CC BY 4.0 release. Tripo's terms were not independently
+  audited.
+
+As before, only the re-derived untextured geometry with Almond materials ships,
+plus the reference images as evidence. No provider textures, photographs or
+assembled GRANDWHIS scenes. The Freiburg scene copies of people, bicycles and
+the lamp were left out: they are scene-baked copies of older mesh-bank meshes,
+and the originals are in the mesh-bank batch.
 
 ## Capsules vs. example files
 

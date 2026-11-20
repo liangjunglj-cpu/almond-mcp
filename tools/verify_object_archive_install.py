@@ -24,8 +24,8 @@ from fastmcp.client.transports import StdioTransport
 assert Path(almond_mcp.__file__).is_relative_to(Path(sys.prefix)), "Must use an installed wheel"
 repository = AssetRepository()
 catalogue = repository.catalogue()
-assert catalogue["counts"]["assets"] == 73
-assert sum(a["available"] for a in catalogue["assets"]) == 66
+assert catalogue["counts"]["assets"] == 91
+assert sum(a["available"] for a in catalogue["assets"]) == 84
 server = create_server(0, repository)
 thread = threading.Thread(target=server.serve_forever, daemon=True)
 thread.start()
@@ -62,7 +62,7 @@ async def main():
             assert detail["metadata"]["triangle_count"] >= 70000
             assert all(Path(p).is_file() for p in detail["local_files"].values())
         return {"version":almond_mcp.__version__, "mcp_tools":len(tools),
-                "object_archive":catalogue["counts"], "fresh_install_available":66,
+                "object_archive":catalogue["counts"], "fresh_install_available":84,
                 "optional_elements_uninstalled":7, "installed_http":"passed",
                 "installed_mcp_search_resource":"passed", "installed_path":almond_mcp.__file__}
 

@@ -112,3 +112,31 @@ The import keeps known gaps visible:
 - Image credits are Ginkgo's estimate.
 - Heights are the sizes authored in the Ginkgo scene scripts, not surveys.
 
+
+## Ginkgo batches with other generation routes (2026-11-18)
+
+Three more batches import Ginkgo meshes with `tools/stage_ginkgo_chains.py`. It generalises
+`stage_ginkgo_batch.py` to every route Ginkgo has used. The chain file holds, per prop, the
+requests the Ginkgo session submitted, the IDs its results returned and where the downloads were
+saved. The tool checks the IDs against the batch and the link between the two stages, then copies
+the untouched files:
+
+| Batch | Image stage | Mesh stage | Link between stages |
+| --- | --- | --- | --- |
+| `ginkgo-meshbank-2026-11` | Meshy text-to-image `nano-banana` | Meshy 7.1 | `input_task_id` |
+| `ginkgo-freiburg-2026-11` | Meshy image-to-image from the owner's photograph crops | Meshy 7.1 | `input_task_id` (ornaments), uploaded file checksum (fountain) |
+| `ginkgo-refset-1118` | Higgsfield `gpt_image_2_5` with a concept image as reference | Meshy 7.1, or Tripo H3.1 via Higgsfield `generate_3d` | uploaded file checksum (Meshy), image job ID as the only media reference (Tripo) |
+
+The source checker accepts the Tripo link only when the request names the recorded image job as
+its sole media reference and the retained image's checksum matches. Owner photographs given to
+image-to-image appear in `reference_inputs` by name, role and SHA-256. They are not retained or
+distributed. Every mesh record carries `input_link`, saying how the mesh stage received its image.
+
+Known gaps, in addition to the refset_1024 ones:
+
+- Where Meshy's status response was not recorded in the session, credits are the price-table
+  figure and are labelled as such. The same applies to every image task.
+- Tripo and Higgsfield images were downloaded with `curl` from the job's result URL. The
+  evidence is the job result and the download command, not a provider checksum.
+- Fountain and ornament sizes were measured from photographs in Ginkgo's reconstruction, not
+  surveyed. Wall mount heights are the heights at which those scenes placed them.

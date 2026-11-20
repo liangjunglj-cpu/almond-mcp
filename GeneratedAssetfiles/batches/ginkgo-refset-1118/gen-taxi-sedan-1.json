@@ -1,0 +1,143 @@
+{
+  "batch_id": "ginkgo-refset-1118",
+  "image": {
+    "asset_id": "gen-taxi-sedan-1",
+    "provider": "higgsfield",
+    "tool": "generate_image_batch",
+    "submitted_at": "2026-11-18T04:29:09.013Z",
+    "request": {
+      "model": "gpt_image_2_5",
+      "aspect_ratio": "1:1",
+      "use_unlim": false,
+      "medias": [
+        {
+          "value": "9cfa420a-b3a0-4378-9347-6470a4544063",
+          "role": "image"
+        }
+      ],
+      "prompt": "Product reference of a single modern yellow taxi sedan like the taxis in the reference image, three-quarter front view, whole car in frame, plain light grey studio backdrop, soft even light, realistic paint and glass, black roof sign box blank with no text, no logos, no readable words, no numbers on doors, no people."
+    },
+    "batch_context": "Clean single-object reference images for owner-approved 3D hero generation (5 x 0.25 credits).",
+    "provider_adjustments": {
+      "medias[0].role": {
+        "requested": "image",
+        "used": "image_references",
+        "reason": "GPT Image 2.5 backend expects schema-key media roles"
+      }
+    },
+    "task_id": "eb36ba97-f8a4-47a8-89ba-b4f4615bd54f",
+    "status": "COMPLETED",
+    "provider_model": "gpt_image_2_5",
+    "completed_observed_at": "2026-11-18T04:30:13.009Z",
+    "provider_output_name": "hf_20261118_042913_eb36ba97-f8a4-47a8-89ba-b4f4615bd54f.png",
+    "consumed_credits": "0.25 (Ginkgo session estimate for gpt_image_2_5)",
+    "reference_inputs": [],
+    "output_file": "gen-taxi-sedan-1.png",
+    "output_sha256": "ccc0bac76bf3701a458dc2f2ec35706bf985ca053f304a67972d6dd74e68064f",
+    "output_file_modified_at": "2026-11-18T04:30:21+00:00",
+    "seed": null,
+    "evidence_source": {
+      "pass_records": [
+        "runs/refset_1118/OWNER_DECISIONS.md",
+        "runs/refset_1118/pass.json",
+        "runs/refset_1118/concept/jobs.json",
+        "runs/refset_1118/lab/W069/layout/life.json",
+        "runs/refset_1118/lab/W070/layout/life.json"
+      ],
+      "session_records": "Tool calls of Ginkgo Claude Code session(s) 5708e728-4dea-4745-a8f6-09778117e497 (submissions, results and downloads)",
+      "extracted_at": "2026-11-18T19:10:38+00:00"
+    },
+    "status_basis": "Provider reported completed; curl of the job's result URL in the Ginkgo session (Bash)"
+  },
+  "mesh": {
+    "asset_id": "gen-taxi-sedan-1",
+    "provider": "higgsfield",
+    "tool": "generate_3d",
+    "submitted_at": "2026-11-18T04:30:41.958Z",
+    "request": {
+      "model": "tripo_h3_1_image_to_3d",
+      "geometry_quality": "detailed",
+      "texture_quality": "detailed",
+      "pbr": true,
+      "medias": [
+        {
+          "value": "eb36ba97-f8a4-47a8-89ba-b4f4615bd54f",
+          "role": "image_references"
+        }
+      ]
+    },
+    "task_id": "0eb0fe9f-6662-4126-afbb-ad37d73e40de",
+    "status": "COMPLETED",
+    "status_basis": "Higgsfield jobs_wait reported completed; GLB downloaded with curl from the job's result URL in the Ginkgo session",
+    "provider_model": "tripo_h3_1_image_to_3d",
+    "completed_observed_at": "2026-11-18T04:40:09.122Z",
+    "provider_output_name": "hf_20261118_043048_0eb0fe9f-6662-4126-afbb-ad37d73e40de.glb",
+    "consumed_credits": "18 Higgsfield credits (cost quote returned in the Ginkgo session)",
+    "input_link": "media_job_id",
+    "input_image_sha256": "ccc0bac76bf3701a458dc2f2ec35706bf985ca053f304a67972d6dd74e68064f",
+    "output_file": "gen-taxi-sedan-1.glb",
+    "output_sha256": "7834177269c51b419fa3bc770abab2494b30f814a2c09331e36eaf011e461155",
+    "seed": null,
+    "evidence_source": {
+      "pass_records": [
+        "runs/refset_1118/OWNER_DECISIONS.md",
+        "runs/refset_1118/pass.json",
+        "runs/refset_1118/concept/jobs.json",
+        "runs/refset_1118/lab/W069/layout/life.json",
+        "runs/refset_1118/lab/W070/layout/life.json"
+      ],
+      "session_records": "Tool calls of Ginkgo Claude Code session(s) 5708e728-4dea-4745-a8f6-09778117e497 (submissions, results and downloads)",
+      "extracted_at": "2026-11-18T19:10:38+00:00"
+    }
+  },
+  "derivation": {
+    "asset_id": "gen-taxi-sedan-1",
+    "source_sha256": "7834177269c51b419fa3bc770abab2494b30f814a2c09331e36eaf011e461155",
+    "source_triangles": 1978522,
+    "target_triangles": 60000,
+    "prepared_sha256": "4a96d622fcd4fbf9c92ff1de3aa5002524b262a8a174a3d7a0c70ad1b11c236c",
+    "software": "Blender 5.1.2",
+    "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Remove wire edges, split edges shared by more than two faces and remove zero-area faces (counts in quality.topology_repairs). Never subdivide to inflate counts.",
+    "weld_tolerance_source_units": 9.804818630218506e-08,
+    "quality": {
+      "vertices": 29831,
+      "triangles": 59991,
+      "boundary_edges": 129,
+      "nonmanifold_edges_excluding_boundary": 0,
+      "zero_area_faces": 0,
+      "connected_components": 45,
+      "largest_component_vertices": 23584,
+      "nonfinite_coordinates": 0,
+      "self_intersections": "not_tested",
+      "mesh_validation_repair_passes": 1,
+      "topology_repairs": {
+        "wire_edges_removed": 0,
+        "nonmanifold_edges_split": 54,
+        "zero_area_faces_removed": 0,
+        "loose_vertices_removed": 0
+      },
+      "use": "Visual entourage; not certified for fabrication or structural analysis",
+      "bounds_relative_change": [
+        7.720479258172584e-05,
+        4.685738272231632e-05,
+        0.0001796826478903087
+      ]
+    }
+  },
+  "input_image_file": "batches/ginkgo-refset-1118/gen-taxi-sedan-1.png",
+  "external_reference_status": "Each reference image took one owner-approved refset_1118 concept image (the owner's own generated design, Higgsfield job ID recorded in the request) as an image reference. The owner's style photographs (runs/refset_1118/ref) were not given to any generator.",
+  "external_reference_ids": [],
+  "dimension_basis": "Sizes authored in the Ginkgo pass (taxi: 4.7 m, the default length in W069 cg_life.py, which the W069 layout enlarged to 5.1 m to match its concept image; W069 life.json truck length, W070 vending height, W069 palm variant height, the shrub prompt's 1 m height); vehicles scaled by length, others by height; remaining dimensions measured after uniform scaling. Not a physical survey.",
+  "reference_review": "Reference image reviewed on 2026-11-18 at full resolution for this import: no lettering, logos, badges or brand marks visible.",
+  "rights": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5); meshes on the owner's paid Meshy account (palm, shrub clump) or with Tripo H3.1 through the owner's Higgsfield account (taxi, refuse truck, vending machine). The Ginkgo pass records the owner's rights confirmation on 2026-11-18, and the owner approved release of all five, the Tripo models included, in the Almond library under CC BY 4.0 on 2026-11-18. These models also appear inside the owner's GRANDWHIS world packs. Generator account entitlements and the Tripo terms not independently audited.",
+  "origin": {
+    "project": "Ginkgo, the owner's own world-generation repository (private)",
+    "pass": "runs/refset_1118",
+    "source_name": "taxi",
+    "records": [
+      "runs/refset_1118/OWNER_DECISIONS.md",
+      "runs/refset_1118/pass.json",
+      "Claude Code session transcript 5708e728-4dea-4745-a8f6-09778117e497 (the tool calls that submitted the image, Meshy and Tripo jobs)"
+    ]
+  }
+}

@@ -1,0 +1,335 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-statue-knight-gothic-1",
+  "library_id": "generated_assets",
+  "name": "Statue (Gothic fountain figure: knight in plate armour on a corbel pedestal; generated ornament; detailed geometry edition)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-statue-knight-gothic-1.glb",
+  "dimensions_mm": {
+    "width": 368.2,
+    "depth": 327.7,
+    "height": 1200.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -184.1,
+        -163.85,
+        0.0
+      ],
+      "max": [
+        184.1,
+        163.85,
+        1200.0
+      ]
+    },
+    "footprint": [
+      [
+        -184.1,
+        -163.85
+      ],
+      [
+        184.1,
+        -163.85
+      ],
+      [
+        184.1,
+        163.85
+      ],
+      [
+        -184.1,
+        163.85
+      ]
+    ],
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "fixed"
+  },
+  "materials": [
+    {
+      "material_id": "plaster-white",
+      "objects": [
+        "gen-statue-knight-gothic-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-statue-knight-gothic-1",
+    "library_id": "generated_assets",
+    "name": "Statue (Gothic fountain figure: knight in plate armour on a corbel pedestal; generated ornament; detailed geometry edition)",
+    "category": "ornament",
+    "tags": [
+      "statue",
+      "sculpture",
+      "gothic",
+      "fountain",
+      "knight",
+      "detailed",
+      "meshy",
+      "ginkgo-freiburg-2026-11"
+    ],
+    "dimensions_mm": {
+      "width": 368.2,
+      "depth": 327.7,
+      "height": 1200.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 370.0,
+      "depth": 330.0,
+      "height": 1200.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -184.1,
+          -163.85,
+          0.0
+        ],
+        "max": [
+          184.1,
+          163.85,
+          1200.0
+        ]
+      },
+      "footprint": [
+        [
+          -184.1,
+          -163.85
+        ],
+        [
+          184.1,
+          -163.85
+        ],
+        [
+          184.1,
+          163.85
+        ],
+        [
+          -184.1,
+          163.85
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "fixed"
+    },
+    "materials": [
+      {
+        "material_id": "plaster-white",
+        "objects": [
+          "gen-statue-knight-gothic-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "Clean, sharp, high-resolution full-body front three-quarter view of this exact statue: a 15th-century painted sandstone sculpture of a medieval knight in white plate armour with a red-plumed helmet, from a Gothic town fountain, standing on a small carved corbel pedestal. Keep the same pose, proportions and weathered painted stone colours. Isolated on a plain light grey background, soft even daylight, no other objects, entire figure and pedestal visible.",
+        "image_task_id": "01a1d5e9-9989-74da-92d1-96d2732599f6",
+        "image_model": "nano-banana-pro",
+        "mesh_task_id": "01a1d5ea-4ce9-7741-ac52-b034b73bfdbc",
+        "mesh_model": "meshy-7.1",
+        "generated_at": "2026-11-13",
+        "orientation_correction": null,
+        "scale_applied": 630.773409,
+        "captured_generation": {
+          "batch_id": "ginkgo-freiburg-2026-11",
+          "image": {
+            "asset_id": "gen-statue-knight-gothic-1",
+            "provider": "meshy",
+            "tool": "meshy_image_to_image",
+            "submitted_at": "2026-11-13T17:16:50.080Z",
+            "request": {
+              "ai_model": "nano-banana-pro",
+              "prompt": "Clean, sharp, high-resolution full-body front three-quarter view of this exact statue: a 15th-century painted sandstone sculpture of a medieval knight in white plate armour with a red-plumed helmet, from a Gothic town fountain, standing on a small carved corbel pedestal. Keep the same pose, proportions and weathered painted stone colours. Isolated on a plain light grey background, soft even daylight, no other objects, entire figure and pedestal visible.",
+              "aspect_ratio": "3:4",
+              "reference_images": [
+                "local upload of knight_crop.jpg"
+              ]
+            },
+            "task_id": "01a1d5e9-9989-74da-92d1-96d2732599f6",
+            "status": "SUCCEEDED",
+            "status_basis": "Downloaded in the Ginkgo session with meshy_download_model; image file present",
+            "provider_model": "nano-banana-pro",
+            "completed_observed_at": "2026-11-13T17:17:26.895Z",
+            "consumed_credits": "9 (Meshy price table for nano-banana-pro; not returned in the session)",
+            "reference_inputs": [
+              {
+                "name": "knight_crop.jpg",
+                "role": "owner photograph, crop of the fountain",
+                "sha256": "4848dbd90d71b8e2cea49ae17c8c29b2ded936ad0890019da959f9fd9e8d46f7",
+                "retained": false,
+                "note": "Owner photograph uploaded to the image stage; not distributed"
+              }
+            ],
+            "output_file": "gen-statue-knight-gothic-1.png",
+            "output_sha256": "35256ba01c263588209064c1c6a36f8c23fb932bfc5489333d5efe9dd57a842a",
+            "output_file_modified_at": "2026-11-13T17:17:26+00:00",
+            "seed": null,
+            "evidence_source": {
+              "pass_records": [
+                "runs/freiburg_tram/AGENTS.md",
+                "runs/fischbrunnen/AGENTS.md",
+                "runs/fischbrunnen/layout/fountain.json",
+                "runs/freiburg_tram/layout/pink.json",
+                "runs/refset_1117/pass.json",
+                "runs/refset_1117/src/W067_placements.json",
+                "runs/refset_1117/src/W068_placements.json"
+              ],
+              "session_records": "Tool calls of Ginkgo Claude Code session(s) bc81df46-55a4-4f2b-b285-4743fcb41771 (submissions, results and downloads)",
+              "extracted_at": "2026-11-18T19:10:37+00:00"
+            }
+          },
+          "mesh": {
+            "asset_id": "gen-statue-knight-gothic-1",
+            "provider": "meshy",
+            "tool": "meshy_image_to_3d",
+            "submitted_at": "2026-11-13T17:17:40.057Z",
+            "request": {
+              "ai_model": "meshy-7.1",
+              "texture_model": "meshy-7",
+              "enable_pbr": true,
+              "target_formats": [
+                "glb"
+              ],
+              "image": "local upload of knight_clean.png"
+            },
+            "task_id": "01a1d5ea-4ce9-7741-ac52-b034b73bfdbc",
+            "status": "SUCCEEDED",
+            "status_basis": "downloaded with meshy_download_model {\"format\": \"glb\"}; GLB present",
+            "consumed_credits": "30 (Meshy price table: meshy-7.1 with texture; not returned in the session)",
+            "input_link": "upload",
+            "input_image_sha256": "35256ba01c263588209064c1c6a36f8c23fb932bfc5489333d5efe9dd57a842a",
+            "output_file": "gen-statue-knight-gothic-1.glb",
+            "output_sha256": "03e8909aebaa65ccf8632e7422d24c1bc6b2776841709eec6ca8bb1377d59239",
+            "seed": null,
+            "evidence_source": {
+              "pass_records": [
+                "runs/freiburg_tram/AGENTS.md",
+                "runs/fischbrunnen/AGENTS.md",
+                "runs/fischbrunnen/layout/fountain.json",
+                "runs/freiburg_tram/layout/pink.json",
+                "runs/refset_1117/pass.json",
+                "runs/refset_1117/src/W067_placements.json",
+                "runs/refset_1117/src/W068_placements.json"
+              ],
+              "session_records": "Tool calls of Ginkgo Claude Code session(s) bc81df46-55a4-4f2b-b285-4743fcb41771 (submissions, results and downloads)",
+              "extracted_at": "2026-11-18T19:10:37+00:00"
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-statue-knight-gothic-1",
+            "source_sha256": "03e8909aebaa65ccf8632e7422d24c1bc6b2776841709eec6ca8bb1377d59239",
+            "source_triangles": 921366,
+            "target_triangles": 60000,
+            "prepared_sha256": "4eaaefbb72d50ef4f039f85a4fa620d810f54927bea9111b75ad3b5d67d0e9e0",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.9029560089111326e-07,
+            "quality": {
+              "vertices": 29976,
+              "triangles": 60000,
+              "boundary_edges": 0,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 1,
+              "largest_component_vertices": 29976,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                0.000951135235964277,
+                0.00018153152016009658,
+                0.0002782658462438997
+              ]
+            }
+          },
+          "input_image_file": "batches/ginkgo-freiburg-2026-11/gen-statue-knight-gothic-1.png",
+          "external_reference_status": "Photo-derived: the image stage received crops of the owner's own photographs of a facade in Freiburg im Breisgau (ornaments) and of the Fischbrunnen, a Gothic fountain on the Muensterplatz (statues, canopy). The photographs are named and hashed in each image record, not distributed. The generated clean images were then uploaded to Meshy.",
+          "external_reference_ids": [],
+          "dimension_basis": "Sizes as placed in the Ginkgo photo reconstructions (fountain.json statue heights; pink.json console height; placement matrices for canopy and cartouche); height normalised exactly, width and depth measured after uniform scaling. Measured from photographs, not surveyed.",
+          "reference_review": "Reference image reviewed on 2026-11-18 at full resolution for this import: no lettering, logos, badges or brand marks visible.",
+          "rights": "Image and mesh stages ran on the owner's paid Meshy account; the inputs were the owner's own photographs. The fountain statues and canopy reproduce a 15th-century public monument and the ornaments an 1890s facade; their original designs are long out of copyright, and no photograph is distributed. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-18. These models also appear inside the owner's GRANDWHIS world packs. Generator account entitlements and the current monument's restoration history not independently audited.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private)",
+            "pass": "runs/freiburg_tram and runs/fischbrunnen (packaged in runs/refset_1117)",
+            "source_name": "knight",
+            "records": [
+              "runs/refset_1117/pass.json",
+              "runs/fischbrunnen/layout/fountain.json",
+              "Claude Code session transcripts 48627919-6d97-4c20-b07e-a5ea9fccb1ba (ornaments) and bc81df46-55a4-4f2b-b285-4743fcb41771 (fountain)"
+            ]
+          }
+        }
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "architecture",
+        "streetscape"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.007,
+      "triangle_count": 60000,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "6819CC9A105D3EE281B42E4EEEE4426DFD482FB23493129126C0B5F9D28FAC40"
+}

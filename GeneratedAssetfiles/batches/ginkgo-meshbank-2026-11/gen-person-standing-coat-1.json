@@ -1,0 +1,112 @@
+{
+  "batch_id": "ginkgo-meshbank-2026-11",
+  "image": {
+    "asset_id": "gen-person-standing-coat-1",
+    "provider": "meshy",
+    "tool": "meshy_text_to_image",
+    "submitted_at": "2026-11-13T12:38:53.501Z",
+    "request": {
+      "ai_model": "nano-banana",
+      "aspect_ratio": "3:4",
+      "prompt": "Full-body photorealistic adult pedestrian standing in a relaxed natural pose with arms at the sides and hands visible, wearing a camel wool autumn coat, grey scarf, dark trousers and brown leather shoes, generic non-identifiable face, neutral expression. Single figure, whole body from head to shoes, isolated on a plain white background, front three-quarter view at eye level, soft even studio lighting, no cast shadow, no text, no logo, realistic proportions."
+    },
+    "task_id": "01a1d4eb-0776-70fb-ac69-0471b163e927",
+    "status": "SUCCEEDED",
+    "status_basis": "Downloaded in the Ginkgo session with meshy_download_model; image file present",
+    "provider_model": "nano-banana",
+    "completed_observed_at": "2026-11-13T12:39:13.708Z",
+    "consumed_credits": "3 (Meshy price table for nano-banana; not returned in the session)",
+    "reference_inputs": [],
+    "output_file": "gen-person-standing-coat-1.png",
+    "output_sha256": "d851ad6e07b2a41c375057589e7ffd1f97c6b85d3d5e14f5afc06166a1f591ce",
+    "output_file_modified_at": "2026-11-13T12:39:13+00:00",
+    "seed": null,
+    "evidence_source": {
+      "pass_records": [
+        "publishing/library/meshbank/gen/meta.json",
+        "publishing/library/meshbank/gen/refs/tasks.json",
+        "publishing/library/meshbank/BANK.md"
+      ],
+      "session_records": "Tool calls of Ginkgo Claude Code session(s) 48627919-6d97-4c20-b07e-a5ea9fccb1ba (submissions, results and downloads)",
+      "extracted_at": "2026-11-18T19:10:36+00:00"
+    }
+  },
+  "mesh": {
+    "asset_id": "gen-person-standing-coat-1",
+    "provider": "meshy",
+    "tool": "meshy_image_to_3d",
+    "submitted_at": "2026-11-13T12:40:19.161Z",
+    "request": {
+      "input_task_id": "01a1d4eb-0776-70fb-ac69-0471b163e927",
+      "ai_model": "meshy-7.1",
+      "texture_model": "meshy-7",
+      "enable_pbr": true,
+      "texture_resolution": "2k",
+      "target_formats": [
+        "glb"
+      ]
+    },
+    "task_id": "01a1d4ec-6889-72de-ba08-142a57a9edfc",
+    "status": "SUCCEEDED",
+    "status_basis": "Meshy reported SUCCEEDED in the Ginkgo session; downloaded with meshy_download_model {\"format\": \"glb\", \"include_textures\": false}; GLB present",
+    "consumed_credits": 30,
+    "input_link": "input_task_id",
+    "input_image_sha256": "d851ad6e07b2a41c375057589e7ffd1f97c6b85d3d5e14f5afc06166a1f591ce",
+    "output_file": "gen-person-standing-coat-1.glb",
+    "output_sha256": "115e1fc2e37a652aced19343204a6e80ad4c96ab2eb69be4615659df04ba15da",
+    "seed": null,
+    "evidence_source": {
+      "pass_records": [
+        "publishing/library/meshbank/gen/meta.json",
+        "publishing/library/meshbank/gen/refs/tasks.json",
+        "publishing/library/meshbank/BANK.md"
+      ],
+      "session_records": "Tool calls of Ginkgo Claude Code session(s) 48627919-6d97-4c20-b07e-a5ea9fccb1ba (submissions, results and downloads)",
+      "extracted_at": "2026-11-18T19:10:36+00:00"
+    }
+  },
+  "derivation": {
+    "asset_id": "gen-person-standing-coat-1",
+    "source_sha256": "115e1fc2e37a652aced19343204a6e80ad4c96ab2eb69be4615659df04ba15da",
+    "source_triangles": 381882,
+    "target_triangles": 60000,
+    "prepared_sha256": "44a178de5591722cb52f5aaac3bc2648607f50897167f7e55652bc00795cb9b7",
+    "software": "Blender 5.1.2",
+    "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Never subdivide to inflate counts.",
+    "weld_tolerance_source_units": 1.9028449058532715e-07,
+    "quality": {
+      "vertices": 29986,
+      "triangles": 60000,
+      "boundary_edges": 0,
+      "nonmanifold_edges_excluding_boundary": 0,
+      "zero_area_faces": 0,
+      "connected_components": 1,
+      "largest_component_vertices": 29986,
+      "nonfinite_coordinates": 0,
+      "self_intersections": "not_tested",
+      "mesh_validation_repair_passes": 0,
+      "use": "Visual entourage; not certified for fabrication or structural analysis",
+      "bounds_relative_change": [
+        0.00019271260373139077,
+        0.00041152588218887565,
+        2.919393417707562e-05
+      ]
+    }
+  },
+  "input_image_file": "batches/ginkgo-meshbank-2026-11/gen-person-standing-coat-1.png",
+  "external_reference_status": "Original descriptive text-to-image prompts; no external images were given to either generator.",
+  "external_reference_ids": [],
+  "dimension_basis": "Real-world heights recorded with each prop in the Ginkgo mesh bank (gen/meta.json real_height_m); height normalised exactly, width and depth measured after uniform scaling. Not a physical survey.",
+  "reference_review": "Reference image reviewed on 2026-11-18 at full resolution for this import: no lettering, logos, badges or brand marks visible.",
+  "rights": "Generated on the owner's paid Meshy account in the owner's Ginkgo project; the account owns the output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-18. These models also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+  "origin": {
+    "project": "Ginkgo, the owner's own world-generation repository (private)",
+    "pass": "publishing/library/meshbank (gen set, 2026-11-13)",
+    "source_name": "pedestrian_coat",
+    "records": [
+      "publishing/library/meshbank/gen/meta.json",
+      "publishing/library/meshbank/BANK.md",
+      "Claude Code session transcript 48627919-6d97-4c20-b07e-a5ea9fccb1ba (the tool calls that submitted the image and mesh tasks)"
+    ]
+  }
+}

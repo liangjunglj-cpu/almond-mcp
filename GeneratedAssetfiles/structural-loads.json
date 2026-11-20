@@ -22,7 +22,8 @@
     "vehicle":        {"self_kg": 0,   "use_kg": 0,   "use": "", "ground_only": true},
     "column":         {"self_kg": 0,   "use_kg": 0,   "use": "", "structural_element": true},
     "building_services": {"self_kg": 20, "use_kg": 0,  "use": ""},
-    "household":      {"self_kg": 2,   "use_kg": 0,   "use": ""}
+    "household":      {"self_kg": 2,   "use_kg": 0,   "use": ""},
+    "ornament":       {"self_kg": 80,  "use_kg": 0,   "use": ""}
   },
   "assets": {
     "gen-kitchen-range-1":                 {"self_kg": 55,  "use_kg": 15,  "use": "cookware"},
@@ -90,6 +91,24 @@
     "gen-electric-kettle-1":               {"self_kg": 1.2, "use_kg": 1.7, "use": "water"},
     "gen-house-slippers-1":                {"self_kg": 0.4, "use_kg": 0,   "use": ""},
     "gen-table-lamp-pleated-1":            {"self_kg": 2,   "use_kg": 0,   "use": ""},
-    "gen-washing-machine-front-1":         {"self_kg": 60,  "use_kg": 30,  "use": "laundry and water during a cycle"}
+    "gen-washing-machine-front-1":         {"self_kg": 60,  "use_kg": 30,  "use": "laundry and water during a cycle"},
+    "gen-bistro-chair-rattan-1":           {"self_kg": 5,   "use_kg": 80,  "use": "one occupant"},
+    "gen-bistro-table-marble-1":           {"self_kg": 30,  "use_kg": 10,  "use": "items on the table", "note": "marble top on a cast-iron base"},
+    "gen-cafe-parasol-1":                  {"self_kg": 60,  "use_kg": 0,   "use": "", "ground_only": true, "note": "includes the concrete base"},
+    "gen-olive-tree-potted-1":             {"self_kg": 120, "use_kg": 10,  "use": "watering", "note": "large terracotta pot, soil and tree"},
+    "gen-street-lamp-cast-iron-1":         {"self_kg": 180, "use_kg": 0,   "use": "", "ground_only": true, "note": "cast-iron post on its own foundation"},
+    "gen-bicycle-city-basket-1":           {"self_kg": 18,  "use_kg": 0,   "use": ""},
+    "gen-person-standing-coat-1":          {"self_kg": 0,   "use_kg": 80,  "use": "one occupant"},
+    "gen-statue-knight-gothic-1":          {"self_kg": 250, "use_kg": 0,   "use": "", "note": "solid sandstone figure and pedestal; estimate"},
+    "gen-statue-saint-staff-gothic-1":     {"self_kg": 70,  "use_kg": 0,   "use": "", "note": "solid sandstone figure; estimate"},
+    "gen-statue-bishop-gothic-1":          {"self_kg": 70,  "use_kg": 0,   "use": "", "note": "solid sandstone figure; estimate"},
+    "gen-gothic-tabernacle-canopy-1":      {"self_kg": 600, "use_kg": 0,   "use": "", "note": "open sandstone tracery; estimate"},
+    "gen-scroll-console-corbel-1":         {"self_kg": 150, "use_kg": 0,   "use": "", "note": "wall mounted stone corbel; carries a balcony, not modelled here"},
+    "gen-cartouche-shell-scroll-1":        {"self_kg": 60,  "use_kg": 0,   "use": "", "note": "wall mounted relief"},
+    "gen-taxi-sedan-1":                    {"self_kg": 1450, "use_kg": 0,  "use": "", "ground_only": true},
+    "gen-refuse-truck-rear-loader-1":      {"self_kg": 12000, "use_kg": 6000, "use": "refuse", "ground_only": true},
+    "gen-vending-machine-drinks-1":        {"self_kg": 300, "use_kg": 60,  "use": "drinks", "ground_only": true},
+    "gen-palm-tree-1":                     {"self_kg": 0,   "use_kg": 0,   "use": "", "ground_only": true},
+    "gen-shrub-clump-tropical-1":          {"self_kg": 0,   "use_kg": 0,   "use": "", "ground_only": true}
   }
 }

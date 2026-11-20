@@ -2397,6 +2397,603 @@
       "placement_priority": "fixed",
       "lod": "high",
       "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-bistro-chair-rattan-1",
+      "category": "seating",
+      "product": "Bistro chair",
+      "variant": "French cafe chair, bent rattan frame, woven two-tone seat and back; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 520,
+        "depth": 590,
+        "height": 880
+      },
+      "render_material_id": "wood-oak",
+      "prompt": "A classic French bistro cafe chair with a bent rattan frame and a woven two-tone cream and dark green seat and back, slightly worn, photorealistic. Single object, isolated on a plain white background, three-quarter view from slightly above, soft even studio lighting, no cast shadow, no text, no logo, realistic real-world proportions.",
+      "tags": [
+        "bistro",
+        "cafe",
+        "chair",
+        "rattan",
+        "terrace",
+        "detailed",
+        "meshy",
+        "ginkgo-meshbank-2026-11"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "floor",
+      "placement_priority": "secondary",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-bistro-table-marble-1",
+      "category": "table",
+      "product": "Bistro table",
+      "variant": "Round marble top on a cast-iron pedestal; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 690,
+        "depth": 690,
+        "height": 730
+      },
+      "render_material_id": "plaster-white",
+      "prompt": "A small round outdoor bistro cafe table, 60 cm white marble top with a brass edge band on a black cast-iron pedestal base with three curved feet, slightly weathered, photorealistic. Single object, empty table top, isolated on a plain white background, three-quarter view from slightly above, soft even studio lighting, no cast shadow, no text, no logo, realistic real-world proportions.",
+      "tags": [
+        "bistro",
+        "cafe",
+        "table",
+        "marble",
+        "terrace",
+        "detailed",
+        "meshy",
+        "ginkgo-meshbank-2026-11"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "floor",
+      "placement_priority": "secondary",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-cafe-parasol-1",
+      "category": "site_furniture",
+      "product": "Cafe parasol",
+      "variant": "Open square canvas parasol, wooden pole, concrete base; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 2580,
+        "depth": 2590,
+        "height": 2700
+      },
+      "render_material_id": "fabric-linen",
+      "prompt": "An open square cafe terrace parasol, 3 m wide, plain cream canvas canopy with a short valance, wooden centre pole and ribs, heavy square concrete base, slightly sun-faded, photorealistic. Single object, whole parasol visible from base to top, isolated on a plain white background, three-quarter view from slightly below canopy height, soft even studio lighting, no cast shadow, no text, no logo, realistic real-world proportions.",
+      "tags": [
+        "parasol",
+        "umbrella",
+        "cafe",
+        "terrace",
+        "shade",
+        "detailed",
+        "meshy",
+        "ginkgo-meshbank-2026-11"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "movable",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-olive-tree-potted-1",
+      "category": "vegetation",
+      "product": "Potted olive tree",
+      "variant": "Small olive tree in a terracotta pot; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 880,
+        "depth": 820,
+        "height": 1800
+      },
+      "render_material_id": "foliage-pine",
+      "prompt": "A small olive tree about 1.8 m tall with a slender gnarled trunk and an airy crown of silvery green leaves, growing in a large weathered terracotta pot, photorealistic. Single object, whole tree and pot visible, isolated on a plain white background, eye-level three-quarter view, soft even studio lighting, no cast shadow, no text, realistic real-world proportions.",
+      "tags": [
+        "olive",
+        "tree",
+        "planter",
+        "terracotta",
+        "plant",
+        "detailed",
+        "meshy",
+        "ginkgo-meshbank-2026-11"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "floor",
+      "placement_priority": "accessory",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-street-lamp-cast-iron-1",
+      "category": "site_furniture",
+      "product": "Street lamp",
+      "variant": "Traditional cast-iron post with a four-sided glass lantern; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 860,
+        "depth": 850,
+        "height": 4000
+      },
+      "render_material_id": "steel-painted-charcoal",
+      "prompt": "A traditional European cast-iron street lamp post, 4 m tall, fluted dark green-black column with an ornate base, a single four-sided glass lantern on top with a small finial, slightly weathered paint, photorealistic. Single object, whole lamp visible from base to finial, isolated on a plain white background, eye-level three-quarter view, soft even studio lighting, no cast shadow, no text, realistic real-world proportions.",
+      "tags": [
+        "street-lamp",
+        "lantern",
+        "cast-iron",
+        "lighting",
+        "streetscape",
+        "detailed",
+        "meshy",
+        "ginkgo-meshbank-2026-11"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-bicycle-city-basket-1",
+      "category": "vehicle",
+      "product": "Bicycle",
+      "variant": "Step-through city bicycle with wicker basket and rear rack; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 610,
+        "depth": 1680,
+        "height": 1100
+      },
+      "render_material_id": "steel-painted-charcoal",
+      "prompt": "A used European city bicycle standing upright on its kickstand, dark blue step-through steel frame, wicker front basket, rear rack, mudguards, chain guard, dynamo headlight, a coiled cable lock around the seat post, slightly worn, photorealistic. Single object, isolated on a plain white background, three-quarter side view, soft even studio lighting, no cast shadow, no text, no logo, realistic real-world proportions.",
+      "tags": [
+        "bicycle",
+        "bike",
+        "city",
+        "basket",
+        "streetscape",
+        "detailed",
+        "meshy",
+        "ginkgo-meshbank-2026-11"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "accessory",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-person-standing-coat-1",
+      "category": "human_figure",
+      "product": "Person standing",
+      "variant": "Adult pedestrian in a camel coat and scarf; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 600,
+        "depth": 370,
+        "height": 1800
+      },
+      "render_material_id": "plaster-white",
+      "prompt": "Full-body photorealistic adult pedestrian standing in a relaxed natural pose with arms at the sides and hands visible, wearing a camel wool autumn coat, grey scarf, dark trousers and brown leather shoes, generic non-identifiable face, neutral expression. Single figure, whole body from head to shoes, isolated on a plain white background, front three-quarter view at eye level, soft even studio lighting, no cast shadow, no text, no logo, realistic proportions.",
+      "tags": [
+        "person",
+        "pedestrian",
+        "figure",
+        "scale",
+        "coat",
+        "detailed",
+        "meshy",
+        "ginkgo-meshbank-2026-11"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "floor",
+      "placement_priority": "accessory",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-statue-knight-gothic-1",
+      "category": "ornament",
+      "product": "Statue",
+      "variant": "Gothic fountain figure: knight in plate armour on a corbel pedestal; generated ornament; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 370,
+        "depth": 330,
+        "height": 1200
+      },
+      "render_material_id": "plaster-white",
+      "prompt": "Clean, sharp, high-resolution full-body front three-quarter view of this exact statue: a 15th-century painted sandstone sculpture of a medieval knight in white plate armour with a red-plumed helmet, from a Gothic town fountain, standing on a small carved corbel pedestal. Keep the same pose, proportions and weathered painted stone colours. Isolated on a plain light grey background, soft even daylight, no other objects, entire figure and pedestal visible.",
+      "tags": [
+        "statue",
+        "sculpture",
+        "gothic",
+        "fountain",
+        "knight",
+        "detailed",
+        "meshy",
+        "ginkgo-freiburg-2026-11"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "floor",
+      "placement_priority": "fixed",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-statue-saint-staff-gothic-1",
+      "category": "ornament",
+      "product": "Statue",
+      "variant": "Gothic fountain figure: robed saint holding a staff; generated ornament; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 210,
+        "depth": 190,
+        "height": 740
+      },
+      "render_material_id": "stone-granite-paving",
+      "prompt": "Clean, sharp, high-resolution full-body front view of this exact statue: a 15th-century weathered pale grey sandstone sculpture of a robed saint holding a tall staff, long folded robes to the feet, from a Gothic town fountain, standing on a small carved pedestal. Keep the same pose, proportions and weathered stone colour. Isolated on a plain light grey background, soft even daylight, no other objects, entire figure and pedestal visible.",
+      "tags": [
+        "statue",
+        "sculpture",
+        "gothic",
+        "fountain",
+        "saint",
+        "detailed",
+        "meshy",
+        "ginkgo-freiburg-2026-11"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "floor",
+      "placement_priority": "fixed",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-statue-bishop-gothic-1",
+      "category": "ornament",
+      "product": "Statue",
+      "variant": "Gothic fountain figure: bishop saint with mitre and book; generated ornament; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 210,
+        "depth": 170,
+        "height": 720
+      },
+      "render_material_id": "stone-granite-paving",
+      "prompt": "Clean, sharp, high-resolution full-body front view of this exact statue: a 15th-century weathered pale grey sandstone sculpture of a bishop saint wearing a mitre and long draped robes, holding a book, from a Gothic town fountain, standing on a small carved pedestal. Keep the same pose, proportions and weathered stone colour. Isolated on a plain light grey background, soft even daylight, no other objects, entire figure and pedestal visible.",
+      "tags": [
+        "statue",
+        "sculpture",
+        "gothic",
+        "fountain",
+        "bishop",
+        "detailed",
+        "meshy",
+        "ginkgo-freiburg-2026-11"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "floor",
+      "placement_priority": "fixed",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-gothic-tabernacle-canopy-1",
+      "category": "ornament",
+      "product": "Tabernacle canopy",
+      "variant": "Gothic fountain-column canopy with pinnacles, spire and finial cross; generated ornament; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 660,
+        "depth": 670,
+        "height": 1710
+      },
+      "render_material_id": "brick-red",
+      "prompt": "Clean, sharp, high-resolution front view of the upper part of this Gothic fountain column in weathered dark red sandstone: an open square tabernacle canopy with pointed tracery arches, crocketed pinnacles at the four corners, a tapering spire with a small finial cross on top, and below it a ring of pointed tracery arches. Remove the statues: the niche inside the tabernacle is empty. Same proportions and red sandstone colour as the reference. Isolated on a plain light grey background, soft even daylight, no buildings, no plants, whole canopy visible.",
+      "tags": [
+        "gothic",
+        "canopy",
+        "tabernacle",
+        "spire",
+        "fountain",
+        "sandstone",
+        "detailed",
+        "meshy",
+        "ginkgo-freiburg-2026-11"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "floor",
+      "placement_priority": "fixed",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-scroll-console-corbel-1",
+      "category": "ornament",
+      "product": "Console",
+      "variant": "S-scroll balcony corbel with acanthus leaf; generated ornament; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 700,
+        "depth": 500,
+        "height": 850
+      },
+      "render_material_id": "plaster-white",
+      "prompt": "From this photo of an ornate 1890s Gr\u00fcnderzeit building facade, extract ONE of the large stone scroll consoles (the S-curved corbel brackets that carry the curved balcony). Show that single console as an isolated object in three-quarter view from slightly below: a deep S-scroll volute corbel with carved acanthus leaf on the front, moulded top slab, cream-white painted sandstone with light weathering. Whole object visible, centred, plain light grey studio background, soft even lighting, no building, no railing, no text.",
+      "tags": [
+        "console",
+        "corbel",
+        "bracket",
+        "facade",
+        "ornament",
+        "balcony",
+        "detailed",
+        "meshy",
+        "ginkgo-freiburg-2026-11"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "wall",
+      "placement_priority": "fixed",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch",
+      "mount_height_mm": 7955
+    },
+    {
+      "asset_id": "gen-cartouche-shell-scroll-1",
+      "category": "ornament",
+      "product": "Cartouche",
+      "variant": "Baroque shell-and-scroll relief on a backing plate; generated ornament; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 840,
+        "depth": 100,
+        "height": 700
+      },
+      "render_material_id": "plaster-white",
+      "prompt": "From this photo of an ornate 1890s Gr\u00fcnderzeit building facade, extract the carved stone cartouche ornament seen on the underside of the curved corner balcony (top right of the photo): a baroque shell-and-scroll cartouche with acanthus leaves. Show that single ornament as an isolated relief object, front view, cream-white painted sandstone with light weathering, on a flat thin backing plate. Whole object visible, centred, plain light grey studio background, soft even lighting, no building, no text.",
+      "tags": [
+        "cartouche",
+        "relief",
+        "facade",
+        "ornament",
+        "baroque",
+        "detailed",
+        "meshy",
+        "ginkgo-freiburg-2026-11"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "wall",
+      "placement_priority": "fixed",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch",
+      "mount_height_mm": 8355
+    },
+    {
+      "asset_id": "gen-taxi-sedan-1",
+      "category": "vehicle",
+      "product": "Taxi",
+      "variant": "Sedan taxi with blank roof sign; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 2200,
+        "depth": 4700,
+        "height": 1790
+      },
+      "render_material_id": "steel-painted-vermilion",
+      "prompt": "Product reference of a single modern yellow taxi sedan like the taxis in the reference image, three-quarter front view, whole car in frame, plain light grey studio backdrop, soft even light, realistic paint and glass, black roof sign box blank with no text, no logos, no readable words, no numbers on doors, no people.",
+      "tags": [
+        "taxi",
+        "car",
+        "sedan",
+        "vehicle",
+        "streetscape",
+        "detailed",
+        "tripo",
+        "ginkgo-refset-1118"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "movable",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-refuse-truck-rear-loader-1",
+      "category": "vehicle",
+      "product": "Refuse truck",
+      "variant": "Cab-over rear-loader compactor, plain white; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 2990,
+        "depth": 8600,
+        "height": 3540
+      },
+      "render_material_id": "plaster-white",
+      "prompt": "Product reference of a single white rear-loader refuse collection truck like the one in the reference image, cab-over cab, boxy compactor body with rounded rear hopper, three-quarter front view, whole truck in frame, plain light grey studio backdrop, soft even light, realistic, plain white livery with a thin grey stripe, no text, no logos, no readable words.",
+      "tags": [
+        "truck",
+        "refuse",
+        "garbage",
+        "vehicle",
+        "streetscape",
+        "detailed",
+        "tripo",
+        "ginkgo-refset-1118"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "movable",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-vending-machine-drinks-1",
+      "category": "site_furniture",
+      "product": "Vending machine",
+      "variant": "Street drink vending machine, unbranded; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 820,
+        "depth": 980,
+        "height": 1830
+      },
+      "render_material_id": "ceramic-teal",
+      "prompt": "Product reference of a single Japanese street drink vending machine, mint green body, front window with three rows of small plain drink bottles and cans in pastel colours, row of selection buttons, coin slot panel, lower dispensing flap, three-quarter front view, whole machine in frame, plain light grey studio backdrop, soft even light, realistic, no text, no logos, no brands, no readable words.",
+      "tags": [
+        "vending",
+        "drinks",
+        "kiosk",
+        "japan",
+        "streetscape",
+        "detailed",
+        "tripo",
+        "ginkgo-refset-1118"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-palm-tree-1",
+      "category": "vegetation",
+      "product": "Palm tree",
+      "variant": "Young fan palm with a curved ringed trunk; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 5550,
+        "depth": 5240,
+        "height": 6400
+      },
+      "render_material_id": "foliage-pine",
+      "prompt": "Single young fan palm tree with a short slightly curved ringed trunk about 3 metres tall and a full crown of large glossy pinnate fronds, whole plant in frame from the base of the trunk, side view, plain light grey studio backdrop, soft even light, realistic, no pot, no ground clutter.",
+      "tags": [
+        "palm",
+        "tree",
+        "tropical",
+        "planting",
+        "detailed",
+        "meshy",
+        "ginkgo-refset-1118"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "accessory",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
+    },
+    {
+      "asset_id": "gen-shrub-clump-tropical-1",
+      "category": "vegetation",
+      "product": "Shrub clump",
+      "variant": "Dense tropical shrubs and ferns on a soil patch; generated prop; detailed geometry edition",
+      "dimensions_mm": {
+        "width": 1560,
+        "depth": 1390,
+        "height": 1000
+      },
+      "render_material_id": "foliage-pine",
+      "prompt": "Single dense clump of tropical shrubs and ferns about 1.5 metres wide and 1 metre tall, broad glossy leaves mixed with fern fronds and a few small spiky leaves, whole clump in frame sitting on a thin patch of soil, side view, plain light grey studio backdrop, soft even light, realistic, no pot.",
+      "tags": [
+        "shrub",
+        "fern",
+        "tropical",
+        "planting",
+        "bed",
+        "detailed",
+        "meshy",
+        "ginkgo-refset-1118"
+      ],
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "geometry_mode": "3d_entourage",
+      "support_plane": "ground",
+      "placement_priority": "accessory",
+      "lod": "high",
+      "recipe_override": "captured_organic_batch"
     }
   ],
   "retired": [

@@ -32,8 +32,8 @@ def verify(wheel: Path) -> dict:
         if prefix + "previews/render-record.json" not in names:
             raise ValueError("Preview derivation record missing")
         glbs = [n for n in names if n.endswith(".glb")]
-        if len(glbs) != 66 or any(not n.startswith(prefix + "models/") for n in glbs):
-            raise ValueError("Wheel must contain exactly the 66 generated GLBs")
+        if len(glbs) != 84 or any(not n.startswith(prefix + "models/") for n in glbs):
+            raise ValueError("Wheel must contain exactly the 84 generated GLBs")
         with tempfile.TemporaryDirectory(prefix="almond-release-audit-") as tmp:
             archive.extractall(tmp)
             result = audit_library(Path(tmp) / prefix)
@@ -66,7 +66,7 @@ def verify(wheel: Path) -> dict:
             archive_catalogue = AssetRepository({"generated": generated, "drafting": drafts,
                                                 "drawing": Path(tmp) / "almond_mcp/data/DrawingAssetfiles"})
             counts = archive_catalogue.catalogue()["counts"]
-            if counts != {"assets":73, "models":66, "elements":7, "drawing_packages":10, "views":60}:
+            if counts != {"assets":91, "models":84, "elements":7, "drawing_packages":10, "views":60}:
                 raise ValueError(f"Unified archive coverage changed: {counts}")
             for filename in ("index.html", "style.css", "app.js", "karamba.js", "karamba-help.js", "panel-theme.js", "panel.css", "analysis-view.mjs", "environment.js", "environment.css", "favicon.svg", "vendor/model-viewer.min.js", "vendor/LICENSE", "vendor/THIRD-PARTY-LICENSES.txt", "vendor/version.json"):
                 if "almond_mcp/library_ui/" + filename not in names:

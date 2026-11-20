@@ -51,6 +51,7 @@ def build_passport(asset: dict, contract: dict) -> dict:
         "column": ["architecture"], "railing": ["architecture"],
         "table": ["living_room", "dining_room"], "seating": ["living_room"],
         "building_services": ["architecture", "streetscape"], "household": ["interior"],
+        "ornament": ["architecture", "streetscape"],
     }.get(category, [])
     label = (asset["product"] + " " + asset.get("variant", "")).lower()
     if category == "seating" and any(t in label for t in ("task", "office")):

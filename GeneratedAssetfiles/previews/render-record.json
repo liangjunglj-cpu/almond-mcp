@@ -544,6 +544,150 @@
       "material_names": [
         "ALMOND::aluminium-anodized"
       ]
+    },
+    {
+      "asset_id": "gen-bicycle-city-basket-1",
+      "model_sha256": "87fc4de91fbb874426d13b56da9d6efa672772514d9e2e248d5bcdfc1d941874",
+      "preview_sha256": "74b7554bf1ebb7ea532c3029c8e42bebb7ed152017cdb8e378b9d82529e06b47",
+      "material_names": [
+        "ALMOND::steel-painted-charcoal"
+      ]
+    },
+    {
+      "asset_id": "gen-bistro-chair-rattan-1",
+      "model_sha256": "351f31c799de0fc515136fd0f1342c537edb5bdb47a201586dbf12e2d7c989da",
+      "preview_sha256": "9632bbbef3204489cbc69301fb38406f6867d33c5739b8ada6700f2b613377e3",
+      "material_names": [
+        "ALMOND::wood-oak"
+      ]
+    },
+    {
+      "asset_id": "gen-bistro-table-marble-1",
+      "model_sha256": "2910c0454049b03c3c8959510a836696db3987fb0ef1e9fc9ea2604052ffbe79",
+      "preview_sha256": "5a0574ae7dac88f2a618dc2b7bee7ecb0fd6cc2520359ec131616831ea741c40",
+      "material_names": [
+        "ALMOND::plaster-white"
+      ]
+    },
+    {
+      "asset_id": "gen-cafe-parasol-1",
+      "model_sha256": "583abe9451766d7fb2e1cdce4b8d8b8827c323d925ecc8cbef7ba873cbe1f63e",
+      "preview_sha256": "0490f7ffac51578c885657cb56374269915d1a19365ea30eca6a079693a1f0f4",
+      "material_names": [
+        "ALMOND::fabric-linen"
+      ]
+    },
+    {
+      "asset_id": "gen-cartouche-shell-scroll-1",
+      "model_sha256": "61ffb96cd700faba49aa7d07490477b293262d7cf3022bfcea075454eb71a9f8",
+      "preview_sha256": "890d3cce0a6521a1b60fe75031d0844de5e1e6ba9562264be986d04eed0d47a4",
+      "material_names": [
+        "ALMOND::plaster-white"
+      ]
+    },
+    {
+      "asset_id": "gen-gothic-tabernacle-canopy-1",
+      "model_sha256": "debe1e8df676617226942b7e8df359d86306adbd3a7dc4aa95ffa7df47316cac",
+      "preview_sha256": "dfe81c77780e87e37211defbf99e5881b56999fb8413733f38456ec8d59be3ee",
+      "material_names": [
+        "ALMOND::brick-red"
+      ]
+    },
+    {
+      "asset_id": "gen-olive-tree-potted-1",
+      "model_sha256": "b048591a6c68fef0c28386df40060f6e3169c67ee207384244c009510855c708",
+      "preview_sha256": "df39bbcbba60fa09ca4d38be60d4f69352d9758ac5dbe128789ab567cc736ddc",
+      "material_names": [
+        "ALMOND::foliage-pine"
+      ]
+    },
+    {
+      "asset_id": "gen-palm-tree-1",
+      "model_sha256": "123691df95c5155df2cb8528cb8adada5edc19543bcc405acd272e0a86a5bd3e",
+      "preview_sha256": "0077a093d894920393590acd51fe7ec4f4e59b85aa9da64757e19b143457f0e8",
+      "material_names": [
+        "ALMOND::foliage-pine"
+      ]
+    },
+    {
+      "asset_id": "gen-person-standing-coat-1",
+      "model_sha256": "0c0c966d6aafc7d1351e74b7aeb39a42a353d465c660794cf69ea324040226a1",
+      "preview_sha256": "4d20000563fcba4048217b0ac19e0114c3ddd85213f6a6125baa6e37b1e088bb",
+      "material_names": [
+        "ALMOND::plaster-white"
+      ]
+    },
+    {
+      "asset_id": "gen-refuse-truck-rear-loader-1",
+      "model_sha256": "caf6109b9d74bf574ba06622d7034e158fca28792003895e09588cf890d9f5a5",
+      "preview_sha256": "63e5fac9814f90b482bd18345fe479a25b9b3c9b1f8c7f9ae757f1ed3db44b67",
+      "material_names": [
+        "ALMOND::plaster-white"
+      ]
+    },
+    {
+      "asset_id": "gen-scroll-console-corbel-1",
+      "model_sha256": "7af5989d5a35bfa51eb04d75371958f57ceb25e04f90d3ba65b876d47069becb",
+      "preview_sha256": "9364d49576c3f48b43bc484966c4413b61d67469eba830b5974cbfe2f2d1c7ac",
+      "material_names": [
+        "ALMOND::plaster-white"
+      ]
+    },
+    {
+      "asset_id": "gen-shrub-clump-tropical-1",
+      "model_sha256": "e5bbd2d5dfcae7b18292386fa19cbf88dc3a35293c58fa61894521d1ee57d5a2",
+      "preview_sha256": "e75a3f7cfe39c28bfe2db3364e7ea1e32c4cd311162d46c053719b327cbc69dc",
+      "material_names": [
+        "ALMOND::foliage-pine"
+      ]
+    },
+    {
+      "asset_id": "gen-statue-bishop-gothic-1",
+      "model_sha256": "35f85a56bcc8016dc1c146990ed8680701a6983313cae780109d58f1f309218b",
+      "preview_sha256": "690b08ddd240d6f9ab906b6bd5839a14fc77421a4ebfe54d93453bdcc9fdc16d",
+      "material_names": [
+        "ALMOND::stone-granite-paving"
+      ]
+    },
+    {
+      "asset_id": "gen-statue-knight-gothic-1",
+      "model_sha256": "6819cc9a105d3ee281b42e4eeee4426dfd482fb23493129126c0b5f9d28fac40",
+      "preview_sha256": "c45a1ff319390b3af99be67161091fdf87422be1ca3c236aabebd08d43690c41",
+      "material_names": [
+        "ALMOND::plaster-white"
+      ]
+    },
+    {
+      "asset_id": "gen-statue-saint-staff-gothic-1",
+      "model_sha256": "ceefd5ae87c2c98a4f7bcca14ff5321c8e362565c29e302b5a941dc26cac291f",
+      "preview_sha256": "47f5c6a18ccb6d892e35b9da2fe20e5f831de5f7c14a42c06b403454e71667f7",
+      "material_names": [
+        "ALMOND::stone-granite-paving"
+      ]
+    },
+    {
+      "asset_id": "gen-street-lamp-cast-iron-1",
+      "model_sha256": "cc6d0d606954ee0eb0596f545b0937917a55a1ee8dac3276396e36a52710194b",
+      "preview_sha256": "da529103bbfb9e10acb427c74ca417a9ce7261fc5ce97ac505ea9f9ae12a2637",
+      "material_names": [
+        "ALMOND::steel-painted-charcoal"
+      ]
+    },
+    {
+      "asset_id": "gen-taxi-sedan-1",
+      "model_sha256": "1625e95609e8c9856b9914332875c1ddfee9cdb075752701a4e0d33d78a913d4",
+      "preview_sha256": "3cd045d4dc4f1abc8f845328b6d042ba0d8b3b90686e6aa56b540a507df92eab",
+      "material_names": [
+        "ALMOND::steel-painted-vermilion"
+      ]
+    },
+    {
+      "asset_id": "gen-vending-machine-drinks-1",
+      "model_sha256": "45cedee21a3ebec862acdcc48ea05dcaca350798b55ec6a4410e6e7733e2c685",
+      "preview_sha256": "c930d5186a462a8feb6f809e99729c60f23e059a4dcfaefaeb0b3cc5b7d60f7f",
+      "material_names": [
+        "ALMOND::ceramic-teal"
+      ]
     }
   ],
   "additional_batches": [

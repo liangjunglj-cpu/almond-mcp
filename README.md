@@ -36,7 +36,7 @@ one searchable catalogue. The same index is exposed through the MCP tool
 `search_asset_repository` and `almond://repository/{asset_id}` resources.
 See the [Object Archive guide](docs/object-archive-0.6-rc3.md).
 
-All 66 generated
+All 84 generated
 models now carry embedded asset passports and ship with the Python package,
 including their sidecar contracts and previews. New MCP tools recommend assets
 with reasons and check rotated clearance envelopes before placement. See
