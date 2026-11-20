@@ -68,7 +68,10 @@ packages = ["almond_mcp"]
 "GeneratedAssetfiles/provenance.json" = "almond_mcp/data/GeneratedAssetfiles/provenance.json"
 "GeneratedAssetfiles/structural-loads.json" = "almond_mcp/data/GeneratedAssetfiles/structural-loads.json"
 "GeneratedAssetfiles/source-register.json" = "almond_mcp/data/GeneratedAssetfiles/source-register.json"
-"GeneratedAssetfiles/batches" = "almond_mcp/data/GeneratedAssetfiles/batches"
+# GeneratedAssetfiles/batches (generation evidence: request records and input
+# images) is deliberately NOT in the wheel, to keep it under PyPI's 100 MB file
+# limit. It ships in the sdist, the Rhino plugin archive and the repository;
+# tools/verify_release.py checks the captured images against the sdist.
 "DrawingRecipes" = "almond_mcp/data/DrawingRecipes"
 "Draftingfiles" = "almond_mcp/data/Draftingfiles"
 "capsules" = "almond_mcp/data/capsules"

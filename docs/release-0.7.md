@@ -79,6 +79,32 @@ Record pass/fail, the Yak SHA-256, Windows version and Rhino service release her
 3. Tag `v0.7.0rc2` and create a GitHub pre-release with the checksums.
 4. Food4Rhino stays on 0.6.0 until a stable 0.7.0.
 
+### From the next release: PyPI gets the wheel only
+
+With the Ginkgo props the library holds 84 models, and the distributions outgrew PyPI's 100 MB
+file limit. The wheel leaves out the generation evidence (`GeneratedAssetfiles/batches/`) and is about
+85 MB; `prepare_release.ps1` stops if it reaches 100 MiB. The sdist keeps the evidence (about 134 MB), so
+it is **not uploaded to PyPI**: it goes to the GitHub release with the Yak and `SHA256SUMS.txt`.
+`verify_release.py --sdist` checks every captured input image in it. Step 1 above becomes:
+
+```powershell
+uv publish dist/release-<version>/almond_mcp-<version>-py3-none-any.whl
+```
+
+Never `uv publish dist/release-<version>/*`: that also sends the sdist, which PyPI refuses. Nobody needs
+the sdist from PyPI: the wheel is pure Python, so `uvx almond-mcp` and the panel engine install from it.
+
+Put this note in the GitHub release notes, next to the asset list (the README's setup section points
+readers to it; fill in the sizes from the build):
+
+> **About the large source archive.** `almond_mcp-<version>.tar.gz` (about 130 MB) is the source
+> archive, not an installer. It is large because it carries the whole generated model library
+> (84 models with their preview renders) and the generation records behind each model: the request
+> logs and the concept images the generators received, kept as evidence for the CC BY 4.0 release.
+> PyPI limits files to 100 MB, so this archive is published here only. To install, use the Rhino
+> Package Manager (`almondbridge`) and `uvx almond-mcp` from PyPI; the PyPI wheel has the same
+> models, without the generation records.
+
 ## Known limits (documented to users)
 
 - Steel member checks only; concrete (EN 1992), timber (EN 1995) and aluminium (EN 1999) are indicative.

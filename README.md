@@ -169,6 +169,10 @@ and a Claude that supports MCP (Claude Desktop or Claude Code).
    runtime — never bundled); point `RHINO_MCP_LIBRARY_DIR` at your own
    Grasshopper definition library to expose it via `list_library`.
 
+You never need the large `almond_mcp-<version>.tar.gz` on the GitHub release page:
+the steps above install from the Rhino Package Manager and PyPI. It is the source
+archive, and its size (about 130 MB) is expected; the release notes say why.
+
 ## CLI
 
 ```text

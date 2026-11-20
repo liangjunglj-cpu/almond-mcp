@@ -29,7 +29,10 @@ try {
     if ($LASTEXITCODE -ne 0) { throw "Python build failed." }
     $wheel = @(Get-ChildItem -LiteralPath $output -Filter *.whl)
     if ($wheel.Count -ne 1) { throw "Expected one wheel in release directory." }
-    & $python tools/verify_release.py $wheel[0].FullName
+    $sdist = @(Get-ChildItem -LiteralPath $output -Filter *.tar.gz)
+    if ($sdist.Count -ne 1) { throw "Expected one sdist in release directory." }
+    if ($wheel[0].Length -ge 100MB) { throw "Wheel is $([math]::Round($wheel[0].Length / 1MB, 1)) MiB; PyPI refuses files over 100 MB." }
+    & $python tools/verify_release.py $wheel[0].FullName --sdist $sdist[0].FullName
     if ($LASTEXITCODE -ne 0) { throw "Python package verification failed." }
     $install = Join-Path $scratch "install-env"
     & uv venv $install
@@ -59,6 +62,10 @@ try {
     $checksums | Set-Content -LiteralPath (Join-Path $output "SHA256SUMS.txt") -Encoding ascii
     Write-Host "Prepared release artifacts: $output"
     Write-Host "Pending: Rhino in-process smoke test and explicit publication. Nothing has been uploaded."
+    # PyPI gets the wheel only: the sdist carries the models plus the generation evidence and is over
+    # PyPI's 100 MB file limit. It goes to the GitHub release with the Yak and SHA256SUMS.txt.
+    Write-Host "PyPI (wheel only): uv publish `"$($wheel[0].FullName)`""
+    Write-Host ("GitHub release only: {0} ({1:N1} MiB)" -f $sdist[0].Name, ($sdist[0].Length / 1MB))
 } finally {
     Pop-Location
     $env:UV_PROJECT_ENVIRONMENT = $previousEnvironment

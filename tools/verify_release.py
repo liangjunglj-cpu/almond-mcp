@@ -3,6 +3,7 @@ import argparse
 import hashlib
 import json
 import sys
+import tarfile
 import tempfile
 import zipfile
 from pathlib import Path
@@ -14,7 +15,22 @@ from almond_mcp.drafting import audit_package
 from almond_mcp.asset_repository import AssetRepository
 
 
-def verify(wheel: Path) -> dict:
+def _evidence_root(sdist: Path | None, tmp: str) -> Path:
+    """GeneratedAssetfiles directory that holds batches/ (the evidence is not in the wheel)."""
+    if sdist is None:
+        return REPO / "GeneratedAssetfiles"
+    with tarfile.open(sdist) as tar:
+        members = [m for m in tar.getmembers()
+                   if "/GeneratedAssetfiles/batches/" in m.name and m.isfile()
+                   and not Path(m.name).is_absolute() and ".." not in Path(m.name).parts]
+        if not members:
+            raise ValueError("Source distribution has no GeneratedAssetfiles/batches evidence")
+        tar.extractall(tmp, members=members, filter="data")
+        top = members[0].name.split("/", 1)[0]
+    return Path(tmp) / top / "GeneratedAssetfiles"
+
+
+def verify(wheel: Path, sdist: Path | None = None) -> dict:
     with zipfile.ZipFile(wheel) as archive:
         names = archive.namelist()
         forbidden = []
@@ -23,6 +39,7 @@ def verify(wheel: Path) -> dict:
             if (path.is_absolute() or ".." in path.parts
                     or path.suffix.lower() in {".skp", ".3dm", ".gh", ".ghx", ".gha", ".dll", ".pdb", ".sqlite3"}
                     or "/IkeaFurniturefiles/" in name
+                    or "/GeneratedAssetfiles/batches/" in name
                     or "/raw/" in name or "/examples/" in name
                     or any(f"/{lib}/models/" in name for lib in ("IkeaFurniturefiles", "DrawingAssetfiles", "DiagramAssetfiles"))):
                 forbidden.append(name)
@@ -34,10 +51,13 @@ def verify(wheel: Path) -> dict:
         glbs = [n for n in names if n.endswith(".glb")]
         if len(glbs) != 84 or any(not n.startswith(prefix + "models/") for n in glbs):
             raise ValueError("Wheel must contain exactly the 84 generated GLBs")
-        with tempfile.TemporaryDirectory(prefix="almond-release-audit-") as tmp:
+        with tempfile.TemporaryDirectory(prefix="almond-release-audit-") as tmp, \
+                tempfile.TemporaryDirectory(prefix="almond-release-evidence-") as evidence_tmp:
             archive.extractall(tmp)
             result = audit_library(Path(tmp) / prefix)
             generated = Path(tmp) / prefix
+            evidence = _evidence_root(sdist, evidence_tmp)
+            images_checked = 0
             sources = json.loads((generated / "source-register.json").read_text())
             assets = {a["asset_id"]: a for a in json.loads((generated / "manifest.json").read_text())["assets"]}
             if sources["errors"] or len(sources["assets"]) != len(assets):
@@ -47,9 +67,13 @@ def verify(wheel: Path) -> dict:
                     raise ValueError("Source register does not match packaged models")
                 captured = record["recorded_generation"].get("captured_generation")
                 if captured:
-                    source_image = (generated / captured["input_image_file"]).resolve()
-                    if not source_image.is_relative_to(generated.resolve()) or hashlib.sha256(source_image.read_bytes()).hexdigest() != captured["image"]["output_sha256"]:
-                        raise ValueError("Captured generation image is missing or changed")
+                    source_image = (evidence / captured["input_image_file"]).resolve()
+                    if (not source_image.is_relative_to(evidence.resolve()) or not source_image.is_file()
+                            or hashlib.sha256(source_image.read_bytes()).hexdigest() != captured["image"]["output_sha256"]):
+                        raise ValueError(f"Captured generation image is missing or changed: {captured['input_image_file']}")
+                    images_checked += 1
+            result["captured_images_checked"] = images_checked
+            result["evidence_checked_in"] = sdist.name if sdist else "repository checkout"
             drafts = Path(tmp) / "almond_mcp/data/Draftingfiles"
             pilot = json.loads((drafts / "manifest.json").read_text())
             drawing_audits = []
@@ -95,7 +119,8 @@ def verify(wheel: Path) -> dict:
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("wheel", type=Path)
+    parser.add_argument("--sdist", type=Path, help="source distribution holding the generation evidence (default: this checkout)")
     args = parser.parse_args()
-    result = verify(args.wheel)
+    result = verify(args.wheel, args.sdist)
     print(json.dumps(result, indent=2))
     raise SystemExit(0 if result["status"] == "success" else 1)

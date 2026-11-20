@@ -73,6 +73,15 @@ The release verifier checks an explicit allowlist: no 3D Warehouse models,
 raw Meshy downloads, compiled bridge binaries or example projects. Earlier
 versions used repository download URLs. 3D Warehouse content stays manual.
 
+The generation evidence in `GeneratedAssetfiles/batches/` (per-asset request
+records and the input images the providers received) is not in the wheel,
+which keeps it under PyPI's 100 MB file limit. It ships in the sdist (attached to
+the GitHub release; too large for PyPI, which gets the wheel only), in the
+Rhino plugin archive (`evidence/batches/`) and in the repository. The manifest's
+`input_image_file` paths are relative to `GeneratedAssetfiles/` in those copies.
+The release verifier refuses a wheel that contains `batches/` and checks every
+captured input image's SHA-256 against the sdist.
+
 Raw Meshy downloads (`GeneratedAssetfiles/raw/`) are gitignored; the tracked
 normalised files are derived from them deterministically.
 
