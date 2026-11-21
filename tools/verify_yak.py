@@ -68,9 +68,23 @@ def verify(path):
             if hashlib.sha256(model).hexdigest().upper() != sources[record["id"]]["model_sha256"]:
                 raise ValueError("Source evidence does not match bundled model")
             captured = sources[record["id"]]["recorded_generation"].get("captured_generation")
-            if captured:
+            route = captured.get("route") if captured else None
+            if route in ("meshy_text_to_3d", "procedural_script"):
+                # No image stage on these routes: nothing may claim one. Procedural pieces ship their retained
+                # generator script and kit record as evidence, which must still hash to the recorded values.
+                if captured.get("input_image_file") is not None or "image" in captured or record.get("generation_image"):
+                    raise ValueError(f"{route} record claims an input image: {record['id']}")
+                if route == "procedural_script":
+                    for entry in (captured["generator"]["script"], captured["generator"]["kit_record"]):
+                        member = "archive/evidence/" + entry["retained_file"]
+                        if member not in names or hashlib.sha256(archive.read(member)).hexdigest() != entry["retained_sha256"]:
+                            raise ValueError(f"Procedural evidence is missing or changed: {entry['retained_file']}")
+            elif captured:
+                # The retained image is the one the mesh stage received (a locally edited upload differs from the
+                # generator's output and records that output's hash separately).
                 image_path = "archive/" + bundle["routes"][record["generation_image"]]["path"]
-                if hashlib.sha256(archive.read(image_path)).hexdigest() != captured["image"]["output_sha256"]:
+                expected = captured["mesh"].get("input_image_sha256", captured["image"]["output_sha256"])
+                if hashlib.sha256(archive.read(image_path)).hexdigest() != expected:
                     raise ValueError("Captured generation image is missing or changed")
             if record["drawing"]:
                 drawing_path = "archive/" + bundle["routes"][record["drawing"]["record"]]["path"]
