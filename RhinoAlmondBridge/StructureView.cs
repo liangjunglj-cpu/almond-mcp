@@ -469,8 +469,14 @@ namespace RhinoAlmondBridge
             e.Display.Draw2dText(byUtil ? "UTILIZATION" : "DISPLACEMENT", Color.White, new Point2d(tx, y0 + 50 * dpi), false, fs, "Consolas");
             var grey = Color.FromArgb(200, 200, 205);
             var warn = Color.FromArgb(255, 120, 100);
-            e.Display.Draw2dText(string.Format(member ? "max δ (member) {0:0.0} mm" : "max δ {0:0.0} mm", Data.CheckedDeflectionMM),
-                Color.White, new Point2d(tx, y0 + 76 * dpi), false, member ? Math.Max(12, (int)(24 * dpi)) : fb, "Arial Black");
+            // The verdict word is right-aligned on the title row band; the headline value keeps clear of it.
+            string verdictText = indicative ? Data.VerdictLabel : pass ? "PASS" : "FAIL";
+            int verdictSize = indicative ? Math.Max(10, (int)(20 * dpi)) : fb;
+            int right = x0 + w - (int)(18 * dpi);
+            int verdictX = right - (int)e.Display.Measure2dText(verdictText ?? "", new Point2d(0, 0), false, 0, verdictSize, "Arial Black").Width;
+            string headline = string.Format(member ? "max δ (member) {0:0.0} mm" : "max δ {0:0.0} mm", Data.CheckedDeflectionMM);
+            e.Display.Draw2dText(headline, Color.White, new Point2d(tx, y0 + 76 * dpi), false,
+                FitSize(e, headline, member ? Math.Max(12, (int)(24 * dpi)) : fb, right - tx, "Arial Black"), "Arial Black");
             e.Display.Draw2dText(string.Format("limit L/{0:0} = {1:0.0} mm", Data.LimitRatio, Data.LimitMM),
                 Data.CheckedDeflectionMM > Data.LimitMM ? warn : grey, new Point2d(tx, y0 + 122 * dpi), false, fs, "Consolas");
             double y = 146;
@@ -491,13 +497,12 @@ namespace RhinoAlmondBridge
             if (!double.IsNaN(maxU))
                 e.Display.Draw2dText(maxU > 10 ? "utilization > 10  (unstable)" : string.Format("utilization {0:0.00}", maxU), maxU > 1 ? warn : grey,
                     new Point2d(tx, y0 + y * dpi), false, fs, "Consolas");
-            e.Display.Draw2dText(Data.LoadLabel ?? string.Format("load {0:0} kN{1}  ·  {2}", Data.LoadKN, Data.SelfWeight ? " + self weight" : "", Data.Material),
-                grey, new Point2d(tx, y0 + (y + 24) * dpi), false, fs, "Consolas");
-            if (indicative)
-                e.Display.Draw2dText(Data.VerdictLabel, amber, new Point2d(tx + 190 * dpi, y0 + 54 * dpi), false, Math.Max(10, (int)(20 * dpi)), "Arial Black");
-            else
-                e.Display.Draw2dText(pass ? "PASS" : "FAIL", pass ? Color.FromArgb(40, 220, 90) : Color.FromArgb(240, 40, 30),
-                    new Point2d(tx + 220 * dpi, y0 + 50 * dpi), false, fb, "Arial Black");
+            string loadText = Data.LoadLabel ?? string.Format("load {0:0} kN{1}  ·  {2}", Data.LoadKN, Data.SelfWeight ? " + self weight" : "", Data.Material);
+            e.Display.Draw2dText(loadText, grey, new Point2d(tx, y0 + (y + 24) * dpi), false,
+                FitSize(e, loadText, fs, right - tx, "Consolas"), "Consolas");
+            if (!string.IsNullOrEmpty(verdictText))
+                e.Display.Draw2dText(verdictText, indicative ? amber : pass ? Color.FromArgb(40, 220, 90) : Color.FromArgb(240, 40, 30),
+                    new Point2d(verdictX, y0 + 44 * dpi), false, verdictSize, "Arial Black");
             // gradient bar
             int bx = tx, by = (int)(y0 + (206 + extra) * dpi), bw = w - (int)(48 * dpi), bh = (int)(16 * dpi);
             for (int i = 0; i < bw; i++)
@@ -508,6 +513,14 @@ namespace RhinoAlmondBridge
             e.Display.Draw2dText(hi, Color.White, new Point2d(bx + bw - hiBox.Width, by + bh + 16 * dpi), false, fs, "Consolas");
             e.Display.Draw2dText(string.Format("deformation shown x{0:0}", Data.Scale), Color.FromArgb(160, 160, 168),
                 new Point2d(tx, by + bh + 44 * dpi), false, fs, "Consolas");
+        }
+
+        /// <summary>The largest text height (down to 8 px) at which text fits the given width.</summary>
+        private static int FitSize(DrawEventArgs e, string text, int size, int width, string font)
+        {
+            while (size > 8 && e.Display.Measure2dText(text, new Point2d(0, 0), false, 0, size, font).Width > width)
+                size--;
+            return size;
         }
 
         /// <summary>Legend for a buckling mode: alpha_cr and its EN 1993-1-1 5.2.1 classification.</summary>

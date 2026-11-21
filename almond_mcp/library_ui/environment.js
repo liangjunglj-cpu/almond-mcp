@@ -214,11 +214,13 @@ function resultRows(res){
     rows:res.windows.map(w=>[w.window,w.sun_hours+' h',w.level].concat(res.range?[`${res.range.best_day_hours[w.window]} h`]:[]))};
   if(res.study==='rooms_daylight')return {head:['Room','sDA','ASE','DF'],
     rows:res.rooms.map(r=>[r.room,r.sda_pct!=null?r.sda_pct+' %':'—',r.ase_pct!=null?r.ase_pct+' %':'—',r.average_df_pct!=null?r.average_df_pct+' %':'—'])};
-  return {head:['Room','Method','Heating','Cooling','Lighting','h > 26 °C','Adaptive II','Comfort'],rows:(res.rooms||[]).map(r=>{
+  // Cooled rooms sit at their cooling set-point, so hours above 26 °C would count the set-point itself.
+  const cooled=(res.rooms||[]).some(r=>r.thermal&&r.thermal.cooling_kwh_m2>0), lim=cooled?28:26;
+  return {head:['Room','Method','Heating','Cooling','Lighting',`h > ${lim} °C`,'Adaptive II','Comfort'],rows:(res.rooms||[]).map(r=>{
     if(r.method==='semi_outdoor')return [r.room,'Open · semi-outdoor','—','—','—','—','—',`SET* ${r.comfort.set_c.mean_occupied} °C · ${r.comfort.hours_set_above[Object.keys(r.comfort.hours_set_above)[0]]} h hot`];
     const th=r.thermal,ad=th.adaptive_en16798_hours?.II,lc=th.lighting_control;
     return [r.room,r.method,th.heating_kwh_m2+' kWh/m²',th.cooling_kwh_m2+' kWh/m²',
-      th.lighting_kwh_m2!=null?th.lighting_kwh_m2+' kWh/m²'+(lc?` · −${lc.saving_pct} %`:''):'—',String(th.hours_above_26c_occupied),
+      th.lighting_kwh_m2!=null?th.lighting_kwh_m2+' kWh/m²'+(lc?` · −${lc.saving_pct} %`:''):'—',String(th[`hours_above_${lim}c_occupied`] ?? '—'),
       ad?`${ad.too_warm_h} h warm · ${ad.too_cool_h} h cool`:'—',
       th.tm52?(th.tm52.pass?'TM52 pass':'TM52 fail'):(th.adaptive_ashrae55?th.adaptive_ashrae55.comfortable_80_pct+' % comfortable':'')];
   })};
