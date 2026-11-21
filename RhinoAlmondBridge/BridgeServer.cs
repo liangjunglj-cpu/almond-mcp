@@ -324,6 +324,12 @@ namespace RhinoAlmondBridge
                     case "asset_placements":
                         return AssetPlacementExport.Handle(jobj);
 
+                    case "scene_inventory":
+                        return SceneMetadata.Inventory(jobj);
+
+                    case "scene_audit_overlay":
+                        return SceneMetadata.Overlay(jobj);
+
                     case "structure_view":
                         RhinoApp.WriteLine("RhinoAlmondBridge: Structure view (Karamba live)...");
                         return StructureView.Handle(jobj);

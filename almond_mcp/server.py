@@ -24,7 +24,7 @@ from fastmcp import FastMCP
 from fastmcp.resources import ResourceContent, ResourceResult
 from almond_mcp.ghx_parser import GHParser, validate_capsule_manifest
 from almond_mcp.retrieval_store import AlmondStore
-from almond_mcp import asset_passport, asset_loads, bridge_client, conditioning, exchange, paths, drafting, native_structure, structure_study, design_codes, model_store, structural_references, parametric_library
+from almond_mcp import asset_passport, asset_loads, bridge_client, conditioning, exchange, paths, drafting, native_structure, structure_study, design_codes, model_store, structural_references, parametric_library, scene_audit
 
 # ── Constants ────────────────────────────────────────────────────────────────
 
@@ -1580,6 +1580,83 @@ def validate_scene_layout(scene_id: str, detail_limit: int = 50) -> str:
         })
     except Exception as exc:
         return json.dumps({"status": "error", "message": str(exc)})
+
+
+def _scene_inventory(guids: list[str]) -> dict:
+    ids = scene_audit.object_ids(guids)
+    reply = json.loads(_send_and_receive(json.dumps({'type':'scene_inventory','guids':ids}).encode('utf-8')))
+    if not isinstance(reply, dict) or reply.get('status') != 'ok':
+        message = reply.get('message', 'Unexpected scene inventory reply') if isinstance(reply, dict) else 'Unexpected reply'
+        raise ValueError(message + ' (Scene auditing needs a matching development almondbridge.)')
+    scene_audit.validate_inventory(reply)
+    if set(reply['requested_ids']) != set(ids):
+        raise ValueError('Bridge inventory did not match the requested object IDs')
+    return reply
+
+
+@mcp.tool(annotations={"readOnlyHint": False, "destructiveHint": False, "openWorldHint": False})
+def capture_scene_metadata_snapshot(name: str, guids: list[str]) -> dict:
+    """Explicitly record 1-500 Rhino objects as an immutable local baseline.
+
+    Reads hidden/locked objects too. Stores bounds and quantities in mm, Almond
+    user text, block transforms and geometry CRCs. Writes only a new local DB
+    record; geometry and existing snapshots are unchanged. Keep snapshot_id for
+    audit_scene_metadata. Requires the matching development bridge.
+    """
+    try:
+        inventory = _scene_inventory(guids)
+        return {'status':'success','snapshot':retrieval_store.capture_metadata_snapshot(name,inventory),
+                'scope':'Explicit objects only. Capture records current state, not verified metadata truth.'}
+    except (ValueError, OSError, KeyError) as exc:
+        return {'status':'error','message':str(exc)}
+
+
+@mcp.tool(annotations={"readOnlyHint": True, "openWorldHint": False})
+def audit_scene_metadata(snapshot_id: str, absolute_mm: float = 0.1,
+                         relative: float = 1e-6, detail_limit: int = 100) -> dict:
+    """Read-only comparison of the current Rhino document with a recorded snapshot.
+
+    Reports deleted/moved/resized objects, block transforms/definition changes,
+    changed Almond user text and geometric quantities. Never refreshes the
+    baseline, repairs metadata, selects objects or changes their appearance.
+    A unit conversion is compared physically in mm; native CRC/linear transform
+    checks are skipped across different unit systems and reported as limited
+    coverage. A different document is an error, not a deletion verdict.
+    """
+    try:
+        snapshot = retrieval_store.get_metadata_snapshot(snapshot_id)
+        if snapshot is None:
+            raise ValueError('Unknown metadata snapshot_id')
+        baseline = snapshot['inventory']
+        inventory = _scene_inventory(baseline['requested_ids'])
+        report = scene_audit.compare(baseline,inventory,absolute_mm,relative,detail_limit)
+        return {**report,'snapshot_id':snapshot_id,'baseline_created_at':snapshot['created_at'],
+                'document_key':inventory['document_key']}
+    except (ValueError, OSError, KeyError) as exc:
+        return {'status':'error','message':str(exc)}
+
+
+@mcp.tool(annotations={"readOnlyHint": False, "destructiveHint": False, "openWorldHint": False})
+def show_scene_metadata_issues(snapshot_id: str = "", clear: bool = False) -> dict:
+    """Show temporary warning boxes/labels for a fresh audit, or clear them.
+
+    Does not bake geometry, change attributes, alter selection or repair data.
+    Missing objects get a box at their recorded position. Requires the matching
+    development bridge; call with clear=True when finished reviewing.
+    """
+    try:
+        request = {'type':'scene_audit_overlay','clear':clear}
+        if not clear:
+            report = audit_scene_metadata(snapshot_id,detail_limit=scene_audit.MAX_OBJECTS)
+            if report['status'] != 'success':
+                return report
+            request.update(document_key=report['document_key'],issues=report['issues'])
+        reply = json.loads(_send_and_receive(json.dumps(request).encode('utf-8')))
+        if not isinstance(reply, dict):
+            raise ValueError('Unexpected overlay reply')
+        return reply
+    except (ValueError, OSError, KeyError) as exc:
+        return {'status':'error','message':str(exc)}
 
 
 @mcp.tool()
