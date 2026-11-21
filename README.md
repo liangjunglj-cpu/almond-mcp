@@ -1,11 +1,119 @@
 # Almond MCP for Rhino
 
+<p align="center"><img src="assets/almond-icon.svg" width="120" alt="Almond"></p>
+
+Almond lets an AI assistant such as Claude work in Rhino 8 with you: it places
+furniture and other 3D models at their real sizes, checks whether a structure
+will stand up, and studies sunlight and climate on your design.
+
+## What Almond is
+
+Most Rhino MCP servers give the model a single power: *run a script*. That
+demos well, but generation is blind — the model has no memory of what is
+already in the scene, no real-world dimensions, no constraints, and no way
+to check its own work. The result is geometry that looks plausible and
+measures wrong.
+
+Almond is a **semantic layer around Rhino**, built so a language model can
+design with spatial awareness and produce high-detail, high-fidelity output:
+
+- **A persistent scene ledger** (SQLite) — scenes, rooms, placed instances,
+  delta-based revisions. The model *queries* the current state instead of
+  guessing it.
+- **Curated asset libraries with spatial contracts** — every furniture and
+  drawing asset carries its real catalogue dimensions plus an authored
+  contract: anchor point, floor footprint, functional clearances (e.g.
+  900 mm in front of a bookcase), collision shape, placement priority.
+  Placement respects ergonomics, not just bounding boxes.
+- **Structured retrieval** — FTS5 natural-language search and R-tree spatial
+  indexes, isolated per library, returning compact asset cards sized for a
+  model's context window.
+- **Layout validation** — an R-tree broad-phase overlap and room-containment
+  check the model can run *before* committing a layout.
+- **Audited Karamba capsules** — typed input/output contracts
+  (`ALMOND_IN_*`/`ALMOND_OUT_*`) over structural Grasshopper definitions, so
+  generated structures get real displacement/utilization feedback.
+- **Drawing recipes** — layer hierarchies, plot weights, and linetype
+  standards applied as one command, so output reads as an architectural
+  drawing rather than raw curves.
+- **Script execution and GLB publishing** — the raw `execute_rhino_script`
+  power is still there, plus one-call publishing of selected geometry into
+  Chestnut with physics metadata.
+
+The design goal: the model composes from **verified parts and validated
+layouts** instead of hallucinating geometry.
+
+Two pieces work together:
+
+- **`almond-mcp`** (this Python package, on PyPI) — the MCP server Claude
+  talks to. Holds the semantic layer; needs no Rhino SDK.
+- **`almondbridge`** (a Rhino 8 plugin, on the Rhino Package Manager) —
+  listens on `127.0.0.1:5000` (local only) inside Rhino and executes what
+  the server sends. Starts automatically with Rhino.
+
+## What's new
+
+### 0.8.0 (in preparation)
+
 > **Structural Validation (native engine) is stable from 0.8.0; Climate, Rooms & Comfort
 > (environmental analysis) and the Karamba route are in beta (BETA).** The beta tools, panel workspace and
 > viewport legends are labelled (BETA). Treat every result as a design-stage check, not certification or
 > code compliance. **Place tutorial model** in either workspace (or the `place_simulation_tutorial` tool) puts
-> an annotated example in Rhino that shows what each analysis needs. Stable-release status per feature:
+> an annotated example in Rhino that shows what each analysis needs. Status per feature:
 > [docs/simulation-stable-readiness.md](docs/simulation-stable-readiness.md).
+
+- **Structural checks.** EN 1993-1-1 shear (6.2.6, 6.2.8), lateral-torsional buckling of
+  I-sections (6.3.2), local bow imperfections (5.3.2(6)) and Table B.3 C_m read from each
+  member's own moment diagram. Deflection is measured relative to what holds each member (a
+  column floor to floor, sway checked as storey drift, h/300) and judged against the member's
+  own span, the governing member named; `visualize_structure` and the panel overlay give the
+  same verdict as `validate_structure`. Curved members are analysed as chords, and oversize
+  models are coarsened or refused instead of running out of memory.
+- **Generated asset library: 144 models** (Ginkgo props, Daxi harbour boats, Project Y2K kits),
+  each labelled by how it was made. The wheel carries no model files: they download from the
+  GitHub release on first use (`almond-mcp fetch-assets --generated` prefetches them).
+- **Structural reference library.** Twelve benchmarked building typologies (moment
+  frame, braced tower, Pratt truss, portal, warehouse, space grid, arch, L-bracket,
+  canopy, diagrid, Vierendeel girder, a frame on six support types) as parametric
+  line models: `list_structural_references`, `get_structural_reference`,
+  `analyze_structural_reference` (solved with their benchmark loads, no Rhino needed,
+  compared with the textbook closed form where one exists) and
+  `place_structural_reference` (drawn in Rhino with section, release and support user
+  text, ready for `validate_structure`). See
+  [StructuralReferences/README.md](StructuralReferences/README.md).
+- **Native solver.** Support types per support point (fixed, pinned, rollers, springs
+  and the horizontal-only `lateral-x` / `lateral-y`), the release words `bar` and
+  `hinged`, and explicit G/Q loads carried in the model. Fixes from a typology stress
+  test (false mechanisms, dropped floor bays, tower deflection failures), with the
+  typologies checked against closed forms in CI and cross-checked against OpenSees.
+  The Rhino bridge reads `almond:support` user text on support points (and splits members
+  there; the Supports tab and `set_support_type` write it); it does not export G/Q loads
+  yet, so drawn geometry uses `load_kn`, floor loads and placed-model loads.
+- **Parametric teaching library (Grasshopper).** Ten openly licensed architectural
+  definitions by other authors (facades, a shell roof, towers, terrain, paving),
+  annotated to read left to right, with their upstream logic and licences unchanged:
+  `list_parametric_definitions`, `get_parametric_definition`,
+  `open_parametric_definition`. The shell roof also ships as a harnessed capsule,
+  not yet audited. See [ParametricLibrary/README.md](ParametricLibrary/README.md).
+- **Environmental analysis.** A native engine on EPW weather files: climate summary
+  and sun path, annual daylight (sDA, ASE, UDI, EN 17037), daylight factor, solar
+  radiation, ISO 13790 thermal zones and comfort, plus user-defined rooms, layered
+  constructions and envelope code packs. In Rhino it is the Almond panel's
+  **Environment** workspace (Site, Rooms, Constructions, Study, Results). See
+  [docs/environmental-analysis.md](docs/environmental-analysis.md).
+- **Scene metadata audit (pilot).** `capture_scene_metadata_snapshot` records chosen
+  Rhino objects as a local baseline; `audit_scene_metadata` reports what was deleted,
+  moved, resized or had its Almond user text changed since, and
+  `show_scene_metadata_issues` marks them temporarily in the viewport. Read-only on
+  the model. See [docs/scene-metadata-audit.md](docs/scene-metadata-audit.md).
+- **Bridge security.** The bridge accepts only requests that carry the current Rhino
+  session's token (`%LOCALAPPDATA%\Almond\bridge.token`), with explicit request types
+  and size and read limits. Update `almond-mcp` and `almondbridge` together: an older
+  server gets `unauthorized` from a newer bridge.
+- **Undo after a failed script.** A script that fails and is rolled back no longer
+  leaves Rhino's Undo stuck (issue #35).
+
+### Earlier releases
 
 **0.7.0-rc.2 — structural analysis pre-release.** The Structure workspace now runs
 Almond's own 3D frame solver: floor and placed-model loads, EN 1990 combinations,
@@ -52,58 +160,6 @@ with reasons and check rotated clearance envelopes before placement. See
 verification and remaining Rhino integration checks. The
 [drafting update](docs/drafting-0.6-rc2.md) adds a ten-model SVG/DXF pilot,
 custom GLB drawing generation, source discovery and drawing revision checks.
-
-<p align="center"><img src="assets/almond-icon.svg" width="120" alt="Almond"></p>
-
-Almond exposes Rhino 8 and a semantic design layer as MCP tools: curated
-furniture/drawing/diagram libraries with spatial contracts, audited Karamba
-capsules, structured retrieval (SQLite FTS5 + R-tree scene ledger), script
-execution over a TCP bridge, and publishing into Chestnut.
-
-## What Almond is
-
-Most Rhino MCP servers give the model a single power: *run a script*. That
-demos well, but generation is blind — the model has no memory of what is
-already in the scene, no real-world dimensions, no constraints, and no way
-to check its own work. The result is geometry that looks plausible and
-measures wrong.
-
-Almond is a **semantic layer around Rhino**, built so a language model can
-design with spatial awareness and produce high-detail, high-fidelity output:
-
-- **A persistent scene ledger** (SQLite) — scenes, rooms, placed instances,
-  delta-based revisions. The model *queries* the current state instead of
-  guessing it.
-- **Curated asset libraries with spatial contracts** — every furniture and
-  drawing asset carries its real catalogue dimensions plus an authored
-  contract: anchor point, floor footprint, functional clearances (e.g.
-  900 mm in front of a bookcase), collision shape, placement priority.
-  Placement respects ergonomics, not just bounding boxes.
-- **Structured retrieval** — FTS5 natural-language search and R-tree spatial
-  indexes, isolated per library, returning compact asset cards sized for a
-  model's context window.
-- **Layout validation** — an R-tree broad-phase overlap and room-containment
-  check the model can run *before* committing a layout.
-- **Audited Karamba capsules** — typed input/output contracts
-  (`ALMOND_IN_*`/`ALMOND_OUT_*`) over structural Grasshopper definitions, so
-  generated structures get real displacement/utilization feedback.
-- **Drawing recipes** — layer hierarchies, plot weights, and linetype
-  standards applied as one command, so output reads as an architectural
-  drawing rather than raw curves.
-- **Script execution and GLB publishing** — the raw `execute_rhino_script`
-  power is still there, plus one-call publishing of selected geometry into
-  Chestnut with physics metadata.
-
-The design goal: the model composes from **verified parts and validated
-layouts** instead of hallucinating geometry.
-
-Two pieces work together:
-
-- **`almond-mcp`** (this Python package, on PyPI) — the MCP server Claude
-  talks to. Holds the semantic layer; needs no Rhino SDK.
-- **`almondbridge`** (a Rhino 8 plugin, on the Rhino Package Manager) —
-  listens on `127.0.0.1:5000` (local only) inside Rhino and executes what
-  the server sends. Starts automatically with Rhino.
 
 ## Setting up with an AI assistant?
 
