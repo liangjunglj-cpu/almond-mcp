@@ -1,4 +1,4 @@
-import {finite, fmt, utilState, memberRows, filterRows, sortRows, counts, ends} from './results-view.mjs';
+import {finite, fmt, utilState, memberRows, filterRows, sortRows, counts, ends, shearCell, swayText, bowText, ltbCell, restraintText} from './results-view.mjs';
 import {engineLabel, stabilityState} from './analysis-view.mjs';
 
 const el = id => document.getElementById(id);
@@ -54,6 +54,10 @@ const MEMBER_COLS = [
   {key: 'n_tension_kn', label: 'N⁺', unit: 'kN'},
   {key: 'n_compression_kn', label: 'N⁻', unit: 'kN'},
   {key: 'v_max_kn', label: 'V', unit: 'kN'},
+  {key: 'shear_utilization', label: 'Shear', unit: 'V/Vpl,Rd'},
+  {key: 'ltb_utilization', label: 'LTB', unit: 'M/Mb,Rd'},
+  {key: 'm_cr_knm', label: 'M_cr', unit: 'kNm'},
+  {key: 'chi_lt', label: 'χ_LT', unit: '6.3.2'},
   {key: 'm_max_knm', label: 'M', unit: 'kNm'},
   {key: 't_max_knm', label: 'T', unit: 'kNm'},
   {key: 'max_stress_mpa', label: 'σ', unit: 'MPa'},
@@ -64,6 +68,13 @@ const MEMBER_COLS = [
   {key: 'max_displacement_mm', label: 'Moves', unit: 'mm SLS'},
   {key: 'pinned', label: 'Ends', left: true},
 ];
+function stateCell(s) {
+  const c = td(s.text, s.state === 'ok' || s.state === 'dim' ? '' : s.state);
+  c.title = s.title;
+  return c;
+}
+const shear = r => stateCell(shearCell(r));
+const ltb = r => stateCell(ltbCell(r));
 function renderMembers() {
   const table = el('members');
   head(table, MEMBER_COLS, true);
@@ -81,7 +92,7 @@ function renderMembers() {
     tr.append(name, td(r.role || '—', 'l'), td(r.section || '—', 'l'),
       td(r.section_class ? String(r.section_class) : '—', r.section_class === 4 ? 'fail' : ''), td(fmt(r.length_m, 2)), u,
       td(r.governing_check || '—', 'l'), td(r.governing_combination || '—', 'l'),
-      td(fmt(r.n_tension_kn, 1)), td(fmt(r.n_compression_kn, 1)), td(fmt(r.v_max_kn, 1)), td(fmt(r.m_max_knm, 2)),
+      td(fmt(r.n_tension_kn, 1)), td(fmt(r.n_compression_kn, 1)), td(fmt(r.v_max_kn, 1)), shear(r), ltb(r), td(fmt(r.m_cr_knm, 1)), td(fmt(r.chi_lt, 2)), td(fmt(r.m_max_knm, 2)),
       td(fmt(r.t_max_knm, 2)), td(fmt(r.max_stress_mpa, 1)), td(fmt(r.slenderness, 2)), td(fmt(r.chi, 2)),
       td(fmt(r.deflection_mm, 1)), td(finite(r.deflection_ratio) ? 'L/' + r.deflection_ratio : '—'),
       td(fmt(r.max_displacement_mm, 1)), td(ends(r.pinned_ends), 'l'));
@@ -151,8 +162,8 @@ function renderCombinations() {
   const alphas = st?.alpha_cr ? Object.entries(st.alpha_cr).map(([k, v]) => k + ': ' + (v ?? 'no compression')).join(' · ') : null;
   facts(el('stability'), st ? [
     ['Method', st.method], ['αcr', alphas], ['Lowest αcr', finite(st.min_alpha_cr) ? st.min_alpha_cr.toFixed(2) : null],
-    ['Sway imperfection φ', st.sway_imperfection ? st.sway_imperfection.phi.toFixed(5) + ' (h ' + st.sway_imperfection.h_m +
-      ' m, ' + st.sway_imperfection.columns + ' columns)' : null],
+    ['Sway imperfection φ', swayText(st.sway_imperfection)],
+    ['Bow imperfections', bowText(st.bow_imperfection)],
     ['Second-order combinations', st.second_order?.length ? st.second_order.join(', ') : 'none'],
     ['P-Δ iterations', st.iterations], ['Elements per compression member', st.elements_per_member],
     ['Buckling view', b ? 'αcr ' + b.alpha_cr + ' under ' + b.combination : null],
@@ -170,6 +181,7 @@ function renderLoads() {
     ['Placed models as loads', s.asset_loads ? 'yes' : 'no'], ['Self-weight', s.self_weight ? 'included' : 'excluded'],
     ['Supports', (s.fixed_rotations ? 'fixed' : 'pinned') + (s.explicit_supports ? ', selected points only' : '')],
     ['Connections', s.connections], ['Stability', s.stability],
+    ['Lateral restraint', restraintText(r.results?.lateral_restraint ?? s.lateral_restraint)],
     ['Section override', finite(s.diameter_mm) ? 'CHS ' + s.diameter_mm + ' × ' + s.wall_mm + ' mm' : 'inferred sections'],
     ['Deflection limit', finite(r.results?.deflection_limit_mm) ? fmt(r.results.deflection_limit_mm, 2) + ' mm over ' +
       r.results.span_m + ' m (' + r.results.span_basis + ')' : null],
@@ -177,14 +189,15 @@ function renderLoads() {
   const floor = r.floor_loads;
   el('floor-block').hidden = !floor;
   if (floor) {
-    head(el('floor'), [{label: 'Level', unit: 'z m'}, {label: 'Bays'}, {label: 'Area', unit: 'm²'}, {label: 'Bearing walls'}]);
+    head(el('floor'), [{label: 'Level', unit: 'z m'}, {label: 'Bays'}, {label: 'One-way', unit: 'over 2:1'}, {label: 'Area', unit: 'm²'},
+      {label: 'Bearing walls'}]);
     el('floor').tBodies[0].replaceChildren(...(floor.levels || []).map(l => {
       const tr = document.createElement('tr');
-      tr.append(td(fmt(l.z_m, 2)), td(String(l.bays)), td(fmt(l.area_m2, 1)), td(String(l.bearing_walls)));
+      tr.append(td(fmt(l.z_m, 2)), td(String(l.bays)), td(String(l.one_way_bays || 0)), td(fmt(l.area_m2, 1)), td(String(l.bearing_walls)));
       return tr;
     }));
     const tf = document.createElement('tr');
-    tf.append(td('Total'), td(''), td(fmt(floor.area_m2, 1)), td(fmt(floor.total_kn, 1) + ' kN (' + fmt(floor.imposed_kn, 1) + ' Q + ' + fmt(floor.dead_kn, 1) + ' G)'));
+    tf.append(td('Total'), td(''), td(''), td(fmt(floor.area_m2, 1)), td(fmt(floor.total_kn, 1) + ' kN (' + fmt(floor.imposed_kn, 1) + ' Q + ' + fmt(floor.dead_kn, 1) + ' G)'));
     el('floor').tBodies[0].append(tf);
   }
   const assets = r.asset_loads;
@@ -229,7 +242,7 @@ function renderSummary() {
   el('sum-alpha').textContent = st ? st.value.replace('αcr = ', '') : '—';
   el('sum-alpha-note').textContent = m.stability?.method || (st ? '' : 'not checked');
   el('sum-count').textContent = String(c.all);
-  el('sum-count-note').textContent = c.fail + ' over 100% · ' + c.warn + ' at 80–100%';
+  el('sum-count-note').textContent = c.fail + ' failing · ' + c.warn + ' at 80–100%';
   el('snapshot').textContent = 'Analysed ' + new Date(report.created_at).toLocaleString() + '. Results do not follow later edits in Rhino: run the analysis again after changing the model.';
 }
 
