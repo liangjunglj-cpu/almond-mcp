@@ -202,6 +202,16 @@ namespace RhinoAlmondBridge
                 if (_loadAttempted) return;
                 _loadAttempted = true;
 
+                // The adapter binds Karamba's Windows build (net48 assemblies, native FE core loaded through
+                // kernel32). On macOS the api path is not supported yet: report it as unavailable so analysis
+                // falls back to the native solver, the audited template or the rule-based estimate.
+                if (!AlmondPlatform.IsWindows)
+                {
+                    _loadFailure = "api_unavailable: the Karamba3D api path is Windows only in this Almond release; " +
+                        "use the native solver (Engine: native) on macOS.";
+                    return;
+                }
+
                 // 0. Karamba may already be loaded into the AppDomain because
                 //    the Karamba Grasshopper plugin loaded first. Prefer that.
                 foreach (var asm in AppDomain.CurrentDomain.GetAssemblies())

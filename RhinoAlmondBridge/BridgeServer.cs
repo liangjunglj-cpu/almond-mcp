@@ -81,7 +81,7 @@ namespace RhinoAlmondBridge
 
         // Resolve a library dir the same way the Python server does:
         // env var (handled by callers) -> dev checkout near the assembly ->
-        // per-user data dir (%LOCALAPPDATA%\Almond\<name>, scaffolded by
+        // per-user data dir (AlmondPlatform.UserDataDir\<name>, scaffolded by
         // `almond-mcp` on first run) -> legacy pre-0.2 location.
         private string FindDataDirectory(string name, string legacySubdir)
         {
@@ -93,11 +93,7 @@ namespace RhinoAlmondBridge
                 directory = Path.GetDirectoryName(directory);
             }
 
-            string userData = Path.Combine(
-                Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
-                "Almond",
-                name
-            );
+            string userData = Path.Combine(AlmondPlatform.UserDataDir, name);
             if (Directory.Exists(userData)) return userData;
 
             return Path.Combine(

@@ -2,7 +2,8 @@
 
 Framing: 4-byte big-endian length + UTF-8 JSON, one request per connection. The bridge executes C#
 for its clients, so every request carries this Rhino session's token: almondbridge writes a fresh one
-to ``%LOCALAPPDATA%\\Almond\\bridge.token`` each time Rhino starts (ALMOND_BRIDGE_TOKEN overrides it,
+to ``paths.user_data_dir() / "bridge.token"`` (``%LOCALAPPDATA%\\Almond`` on Windows,
+``~/Library/Application Support/Almond`` on macOS) each time Rhino starts (ALMOND_BRIDGE_TOKEN overrides it,
 e.g. for a bridge on another account). The token is read per request, so restarting Rhino needs no
 restart here. Bridges before protocol 2 ignore the field.
 """

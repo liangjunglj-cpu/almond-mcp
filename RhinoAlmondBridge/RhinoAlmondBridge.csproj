@@ -1,7 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
+    <!-- net48: the Windows package (unchanged). net7.0: the macOS package, Rhino 8 for Mac runs .NET 7+. -->
+    <TargetFrameworks>net48;net7.0</TargetFrameworks>
     <Title>RhinoAlmondBridge</Title>
     <Description>MCP Bridge plugin for Rhino - receives and executes C# RhinoCommon scripts from AI agents</Description>
     <Version>0.8.0</Version>
@@ -14,8 +15,30 @@
     <AssemblyName>RhinoAlmondBridge</AssemblyName>
   </PropertyGroup>
 
-  <ItemGroup>
+  <PropertyGroup>
+    <!-- The 8.0 GA RhinoCommon/Grasshopper packages ship net48 reference assemblies only; Rhino 8's .NET 7
+         runtime (the only one on macOS) loads plug-ins compiled against them, so net7.0 references them too. -->
+    <NoWarn>$(NoWarn);NU1701</NoWarn>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)' == 'net7.0'">
+    <!-- .NET 7 is out of support, but it is the runtime Rhino 8 for Mac loads plug-ins into. -->
+    <CheckEolTargetFramework>false</CheckEolTargetFramework>
+    <!-- Ship Roslyn and Newtonsoft.Json beside the plug-in, as the net48 build does (a .NET Core library
+         otherwise leaves its NuGet dependencies out of the output folder). -->
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <!-- System.Drawing is Windows-only in Microsoft's .NET 7 package; Rhino for Mac supplies its own
+         implementation (RhinoCommon's own API returns Bitmap and Icon there), so this analyzer does not apply. -->
+    <NoWarn>$(NoWarn);CA1416</NoWarn>
+  </PropertyGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net48'">
     <Reference Include="System.Drawing" />
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(TargetFramework)' == 'net7.0'">
+    <!-- System.Drawing (Icon for the panel tabs) comes from Rhino at runtime: reference only, never packaged. -->
+    <PackageReference Include="System.Drawing.Common" Version="7.0.0" ExcludeAssets="runtime" />
   </ItemGroup>
 
   <ItemGroup>

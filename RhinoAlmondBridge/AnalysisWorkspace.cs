@@ -95,7 +95,7 @@ namespace RhinoAlmondBridge
                         LoadKN=settings.LoadKN,RequireKaramba=true,IncludeSelfWeight=settings.SelfWeight,FixedRotations=settings.FixedRotations,
                         ExplicitSupports=settings.ExplicitSupports,BeamDiameterMM=settings.DiameterMM,BeamWallMM=settings.WallMM};
                     var snapshot=Snapshot(doc);
-                    var validator=new StructuralValidator(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),"Almond","Grasshopperfiles"));
+                    var validator=new StructuralValidator(Path.Combine(AlmondPlatform.UserDataDir,"Grasshopperfiles"));
                     var result=validator.Validate(request);
                     _report=new JObject {["schema_version"]=1,["kind"]="result",["created_at"]=DateTime.UtcNow.ToString("o"),
                         ["document_serial"]=_document,["geometry_fingerprint"]=_fingerprint,["object_ids"]=new JArray(_ids),

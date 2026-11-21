@@ -178,7 +178,8 @@ needlessly upgrading Rhino):
 ## Setup, step by step
 
 Fresh machine to working in about five minutes. You need Rhino 8 on Windows
-and a Claude that supports MCP (Claude Desktop or Claude Code).
+and a Claude that supports MCP (Claude Desktop or Claude Code). For Rhino 8
+for Mac, see [macOS](#macos-rhino-8-for-mac-experimental) below.
 
 1. **Install the bridge.** In Rhino 8 run `_PackageManager`, search
    `almondbridge`, install, restart Rhino. You should see
@@ -237,6 +238,31 @@ and a Claude that supports MCP (Claude Desktop or Claude Code).
 7. **Optional extras:** Karamba3D 3.1 enables `validate_structure` (found at
    runtime — never bundled); point `RHINO_MCP_LIBRARY_DIR` at your own
    Grasshopper definition library to expose it via `list_library`.
+
+### macOS (Rhino 8 for Mac, experimental)
+
+A macOS build of almondbridge (`almondbridge-<version>-rh8_0-mac.yak`) is
+built alongside the Windows one, but it has **not yet been tested on a Mac**
+and is not on the Package Manager until it passes
+[docs/macos-test-checklist.md](docs/macos-test-checklist.md). On macOS the
+Karamba3D path is Windows only (the native solver works), and dragging a
+thumbnail into a viewport becomes a click to pick the insertion point.
+
+1. **Install the bridge.** In Rhino 8 for Mac run `_PackageManager`, search
+   `almondbridge`, install, and restart Rhino. Before it is published, a
+   tester installs the `.yak` from CI instead (see the checklist).
+2. **Install uv:** `brew install uv` (or the standalone installer from
+   [docs.astral.sh/uv](https://docs.astral.sh/uv/)).
+3. **Register the server.** For Claude Desktop, add the same `"Almond"` entry
+   as above to `~/Library/Application Support/Claude/claude_desktop_config.json`.
+   If Claude reports `spawn uvx ENOENT`, use the full path from `which uvx`
+   as `"command"`. For Claude Code, run `claude mcp add Almond -- uvx almond-mcp`.
+4. **Quit Claude completely (⌘Q) and reopen it.** The data folder is
+   `~/Library/Application Support/Almond` (for example the session token
+   `bridge.token`, the scene database and the library manifests).
+5. **Check:** `uvx almond-mcp doctor` with Rhino open. If the bridge is not
+   listening, turn off *AirPlay Receiver* in *System Settings → General →
+   AirDrop & Handoff*: it uses port 5000 on macOS 12 and later.
 
 You never need the large `almond_mcp-<version>.tar.gz` on the GitHub release page:
 the steps above install from the Rhino Package Manager and PyPI. It is the source

@@ -33,6 +33,7 @@ import math
 import os
 import shutil
 import subprocess
+import sys
 import time
 from typing import Callable, Iterable, Sequence
 
@@ -305,7 +306,9 @@ def find_ffmpeg() -> str | None:
     on_path = shutil.which("ffmpeg")
     if on_path:
         return on_path
-    for cand in (os.path.join(os.path.expanduser("~"), "WanGP", "ffmpeg_bins", "ffmpeg.exe"),):
+    # An MCP client started from the macOS Dock passes launchd's minimal PATH, which omits Homebrew's bin folders.
+    for cand in (os.path.join(os.path.expanduser("~"), "WanGP", "ffmpeg_bins", "ffmpeg.exe"),
+                 *(("/opt/homebrew/bin/ffmpeg", "/usr/local/bin/ffmpeg") if sys.platform == "darwin" else ())):
         if os.path.isfile(cand):
             return cand
     return None

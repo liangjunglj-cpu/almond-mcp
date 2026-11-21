@@ -17,7 +17,12 @@ payload assembled by `tools/build_yak.ps1`.
 
 1. Open `RhinoAlmondBridge.csproj` in Visual Studio (File, Open, Project/Solution). Visual Studio generates a solution around it.
 2. Select the `Release` configuration.
-3. Build (Ctrl+Shift+B). Output lands in `RhinoAlmondBridge\bin\Release\net48\RhinoAlmondBridge.dll`.
+3. Build (Ctrl+Shift+B). The project targets `net48` (the Windows package) and `net7.0` (the macOS package),
+   so output lands in `RhinoAlmondBridge\bin\Release\net48\RhinoAlmondBridge.dll` and
+   `RhinoAlmondBridge\bin\Release\net7.0\RhinoAlmondBridge.dll`. `tools/build_yak.ps1` packages them as
+   `almondbridge-<version>-rh8_0-win.yak` and `almondbridge-<version>-rh8_0-mac.yak` (`-Platform win` or
+   `-Platform mac` builds one). Both compile against the 8.0 GA RhinoCommon, so both are tagged `rh8_0`. The
+   macOS package is untested until [docs/macos-test-checklist.md](../docs/macos-test-checklist.md) passes on a Mac.
 4. Rename or copy `RhinoAlmondBridge.dll` to `RhinoAlmondBridge.rhp` if your install flow loads `.rhp` files, or drag the DLL onto Rhino once; Rhino registers plugin assemblies either way through `PlugInManager`.
 
 The project intentionally has NO reference to any Karamba assembly. Do not add one. All Karamba access is late bound through reflection inside `KarambaAdapter.cs`, so the plugin compiles and runs on machines without Karamba and simply reports the api path as unavailable there.

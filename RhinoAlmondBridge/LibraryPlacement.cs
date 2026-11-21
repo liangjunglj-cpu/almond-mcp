@@ -21,6 +21,11 @@ namespace RhinoAlmondBridge
     {
         [DllImport("user32.dll")] private static extern bool ReleaseCapture();
         [DllImport("user32.dll")] private static extern short GetAsyncKeyState(int key);
+        // Windows: drag a thumbnail out of the panel and release it in a viewport. The pointer capture moves from
+        // the Edge WebView to Rhino's point getter (ReleaseCapture), and the button state is read directly.
+        // macOS has no capture to hand over: a WKWebView keeps the drag's mouse-up, so a viewport never sees the
+        // release. There a drag becomes an ordinary pick (drop the thumbnail, then click the insertion point).
+        private static bool DragSupported => AlmondPlatform.IsWindows;
         private static bool LeftDown => (GetAsyncKeyState(1) & 0x8000) != 0;
         internal static string PendingId;
         internal static bool PendingDrag;
@@ -36,6 +41,7 @@ namespace RhinoAlmondBridge
                 RhinoApp.WriteLine("Finish the current Rhino command before placing a library model.");
                 return;
             }
+            if (drag && !DragSupported) drag = false;
             Busy = true;
             Eto.Forms.Application.Instance.AsyncInvoke(() =>
             {
@@ -53,6 +59,7 @@ namespace RhinoAlmondBridge
 
         internal static Result Place(RhinoDoc doc, string id, bool drag, bool light)
         {
+            if (!DragSupported) drag = false;
             var catalogue = JObject.Parse(Encoding.UTF8.GetString(AlmondLibraryCommand.ReadArchive("/api/catalogue")));
             var record = catalogue["assets"].OfType<JObject>().SingleOrDefault(a => (string)a["id"] == id);
             if (record == null || (string)record["kind"] != "model" || (string)record["format"] != "glb" || (bool?)record["available"] != true)
