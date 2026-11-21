@@ -74,7 +74,9 @@ Nothing is uploaded.
 
 ## Required Rhino smoke test
 
-On the exact Yak, in Rhino 8 without `ALMOND_SOLVER_COMMAND`:
+On the exact Yak, in Rhino 8. Before almond-mcp 0.8.0 is on PyPI the panel engine needs the local wheel:
+set `ALMOND_SOLVER_COMMAND` (User) to `uvx --from "<dist>/almond_mcp-0.8.0-py3-none-any.whl" almond-mcp`, and
+remove it afterwards. After publication, repeat check 2 without it.
 
 1. `Almond` opens the panel; **Models** lists 144 models; search, rotate, Place and drag work; a Tripo, a
    Meshy and a Scripted model each place at catalogue size.
@@ -97,7 +99,10 @@ Record pass/fail, the Yak SHA-256, Windows version and Rhino service release her
 2. **PyPI:** upload the wheel only: `uv publish dist/release-0.8.0/almond_mcp-0.8.0-py3-none-any.whl`.
    Verify `uvx --from almond-mcp==0.8.0 almond-mcp --version` and `fetch-assets --generated` on a clean machine.
 3. **Yak:** `Yak.exe push dist/release-0.8.0/almondbridge-0.8.0-rh8_0-win.yak`, then confirm with
-   `curl https://yak.rhino3d.com/versions/almondbridge` (an earlier push silently failed).
+   `curl https://yak.rhino3d.com/versions/almondbridge` (an earlier push silently failed). The Yak is about
+   222 MB (rc.2 was 51 MB) because it bundles all 144 models. No size limit is documented, but large pushes have
+   timed out on slow connections; use a fast connection, and if the push still fails, ask McNeel support for
+   their alternative upload route rather than trimming the package.
 4. **Food4Rhino:** update the existing listing with [food4rhino-listing.md](food4rhino-listing.md).
 
 ## Known limits (documented to users)
@@ -107,3 +112,50 @@ Record pass/fail, the Yak SHA-256, Windows version and Rhino service release her
   a real-EPW check and a daylight reference comparison exist.
 - The Karamba route depends on Karamba 3.1 internals (issue #6).
 - One material colour per generated model; some models face +X rather than −Y (documented per asset).
+
+## Build record — 21 November 2026
+
+Built with `./tools/prepare_release.ps1` from `release/0.8.0` at `bd792ba` (tag this commit `v0.8.0`), with
+`UV_NATIVE_TLS=1` and `UV_SYSTEM_CERTS=1`.
+
+- Tests: 1187 collected, 0 failed, 1 skipped (numba-only), with the .NET archive host. Node panel tests 27/27.
+  Mutation check of the structural suite: 63/63 caught.
+- Clean wheel install: 92 MCP tools; archive HTTP and repository resources pass; all 144 models download on first
+  use from the staged release files (file://) and audit clean.
+- Yak audit: 151 assets (144 models, 7 elements), 10 drawing packages; bridge `0.8.0`, archive `0.8.0`.
+- Source register: 144 assets, 0 errors.
+
+| File | SHA-256 |
+|---|---|
+| `almondbridge-0.8.0-rh8_0-win.yak` | `4470b7be2a293092962be156ad7e55e1cb7bda2723d6a23f5668986a5910427c` |
+| `almond_mcp-0.8.0-py3-none-any.whl` | `a4d2febb53b0a7c8263befc56d01c2c777b7b0eaafdde06dd81010175b75a139` |
+| `almond_mcp-0.8.0.tar.gz` | `b1ded0ea6c8e16c68bf9dda1aac6ce3b94865f40e162254e9754c405f7b0cb69` |
+| `almondbridge-0.8.0-food4rhino.zip` | `ca249c16eb2e26cbcfdcb33480c97864a92c51e963a51a405210475e3dd69188` |
+
+The 288 model files in `dist/release-0.8.0/models/` are listed with their hashes in `SHA256SUMS.txt`.
+
+### Smoke test
+
+Windows 11 Home 25H2 (10.0.26200), Rhino 8 SR34 (8.34.26223.11001, .NET 8), dark theme. The exact Yak installed
+with `Yak.exe install`; installed `RhinoAlmondBridge.rhp` identical to the one in the Yak
+(`d8b96f02438066b79e3919bb29adca129a5836177b7dfa3fe21b3324e490ba7e`). Engine via the local wheel (above).
+
+| Check | Result |
+|---|---|
+| 1. Models | Pass. 144 models listed (103 Meshy, 11 Tripo, 30 Scripted); search; Place of a Meshy, a Tripo and a Scripted model at catalogue size (park bench 1331 × 565 × 850, taxi 2195 × 4699 × 1794, utility pole 3525 × 600 × 10500 mm). The docked panel hides the maker label on cards for space; the object view shows it. Drag and 3D rotate need a real mouse and were not exercised. |
+| 2. Structure | Pass. "Native engine ready · v0.8.0". Tutorial frame, floor 2.0 + 1.0 kN/m²: within configured checks, 9.24 mm vs 24.0 mm (L/250, 6 m), utilization 50.5 % (column, ULS 6.10 +y sway), α_cr 67.10, 654 ms. No (BETA) on the native engine; the Karamba option keeps it. Legend: verdict right-aligned, no overlap, load label fits (also checked in a FAIL state: 47.3 mm, 2.63). |
+| 3. Support types | Pass. Pinned and roller rows written as `almond:support`; per-type symbols drawn; rerun 17.2 mm, α_cr 14.05, storey drift 27.8 mm > h/300 governs (FAIL, as expected without fixed bases). |
+| 4. Environment | Pass, (BETA) shown. Tutorial rooms, synthetic tropical EPW: cooled Studio 103.9 kWh/m² cooling, 0 h > 28 °C, TM52 pass, table/tiles/plan read 28 °C; free-running 8760 h > 26 °C. Daylight factor Studio 3.4–3.5 %, Loggia 38.4–38.9 % (two runs). |
+| 5. MCP | Pass. `almond-mcp doctor` all checks passed against the 0.8.0 bridge; `place_generated_asset` on an empty user-data folder downloaded and placed a model (1.9 s) from the staged release files. |
+
+Findings fixed before this build (bd792ba): legend overlap and clipped load label; home footnote still called
+Structural Validation beta; thermal table column still read 26 °C for cooled rooms.
+
+Open, not blocking: panel cards hide the maker label; the structure legend stays on screen while only
+environment results are shown; storey drift is not among the Results summary cards when it governs; support table
+rows are not numbered like the support points; "mean daylight factor" is a plain average over rooms; panel cooling
+defaults to off; ViewCapture of a perspective view sometimes returns a black background.
+
+Note for testers: installing a Yak makes Rhino's Package Manager remove inactive versions at the next start, so a
+locally installed development build is deleted; rebuild it or reinstall a release to go back.
+
