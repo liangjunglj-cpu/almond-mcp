@@ -447,6 +447,24 @@ def segment_ltb(frame, result, seg: dict) -> dict:
     res.update({"cm_lt": equivalent_moment_factor(t[order], np.concatenate(m_all)[order]), "length": L,
                 "ends": seg["ends"], "zg": zg})
     return res
+def _member_moments(frame, idx: list, ers: list, A: np.ndarray, B: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """My, Mz at every station of a member's elements, in one set of axes. A member drawn as one straight
+    line has them already; the chords of a curved member each report moments in their own turned axes,
+    which would put false kinks into the moment diagram (and Cm = 1.0 from Table B.3): those are turned
+    into the axes of the member's chord A -> B."""
+    from .frame_solver import local_axes
+    e0 = frame.elements[idx[0]]
+    frames = [local_axes(frame.nodes[frame.elements[i].n1], frame.nodes[frame.elements[i].n2],
+                         frame.elements[i].ref)[0] for i in idx]
+    if all(np.allclose(R, frames[0], atol=1e-9) for R in frames[1:]):
+        return np.concatenate([er.My for er in ers]), np.concatenate([er.Mz for er in ers])
+    Rg = local_axes(A, B, e0.ref)[0]
+    out = []
+    for R, er in zip(frames, ers):
+        local = np.stack([np.full(len(er.My), float(er.T)), er.My, er.Mz], axis=1)
+        out.append(local @ R @ Rg.T)                    # local -> global -> member axes (row vectors)
+    M = np.vstack(out)
+    return M[:, 1], M[:, 2]
 
 
 def apply(frame, result, member_groups: dict | None = None, plastic: bool = False,
@@ -479,9 +497,9 @@ def apply(frame, result, member_groups: dict | None = None, plastic: bool = Fals
         t = np.clip((pts - A) @ chord / L ** 2, 0.0, 1.0)
         order = np.argsort(t, kind="stable")
         N = np.concatenate([er.N for er in ers])[order]
-        My = np.concatenate([er.My for er in ers])[order]
-        Mz = np.concatenate([er.Mz for er in ers])[order]
-        Vy = Vz = None
+        My, Mz = _member_moments(frame, idx, ers, A, B)     # a curved member's chords: in the member's axes
+        My, Mz = My[order], Mz[order]
+        Vy = Vz = None                                      # shear stays in each piece's own axes (the section's)
         if all(getattr(er, "Vy", None) is not None and getattr(er, "Vz", None) is not None for er in ers):
             Vy = np.concatenate([er.Vy for er in ers])[order]
             Vz = np.concatenate([er.Vz for er in ers])[order]
