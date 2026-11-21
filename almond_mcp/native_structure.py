@@ -208,6 +208,17 @@ def _release_ends(m: dict, connections: str) -> tuple[bool, bool, str, bool]:
     return False, False, "rigid", minor
 
 
+def _finite_parameter(value, label, *, positive=False, nonnegative=False):
+    try:
+        number = float(value)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ValueError(f"{label} must be a finite number.") from exc
+    if isinstance(value, bool) or not math.isfinite(number) or (positive and number <= 0) or (nonnegative and number < 0):
+        qualifier = "positive " if positive else "non-negative " if nonnegative else ""
+        raise ValueError(f"{label} must be a finite {qualifier}number.")
+    return number
+
+
 def build_frame(model: dict, load_kn: float, material: str = "Steel", fixed_supports: bool = True,
                 self_weight: bool = True, diameter_mm=None, wall_mm=None, asset_loads: dict | None = None,
                 floor_loads: dict | None = None, connections: str = "rigid"):
@@ -217,6 +228,14 @@ def build_frame(model: dict, load_kn: float, material: str = "Steel", fixed_supp
     floor bay (see floor_loads.apply); its report is info["floor_loads"].
     ``connections``: "rigid" or "simple" (see module notes); per-member ``release`` overrides.
     All coordinates in meters (the bridge's exported conditioned model)."""
+    load_kn = _finite_parameter(load_kn, "load_kn", nonnegative=True)
+    if diameter_mm is not None:
+        diameter_mm = _finite_parameter(diameter_mm, "diameter_mm", positive=True)
+    if wall_mm is not None:
+        wall_mm = _finite_parameter(wall_mm, "wall_mm", positive=True)
+    for key in ("tolerance_m", "max_span_m", "max_member_span_m"):
+        if model.get(key) is not None:
+            _finite_parameter(model[key], key, nonnegative=True)
     connections = (connections or "rigid").lower()
     if connections not in CONNECTIONS:
         raise ValueError("connections must be 'rigid' or 'simple'.")
@@ -1035,6 +1054,10 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
               "results": {"analysis_method": "native"}}
     t0 = time.perf_counter()
     try:
+        if span_m is not None:
+            span_m = _finite_parameter(span_m, "span_m", positive=True)
+        if limit_ratio is not None:
+            limit_ratio = _finite_parameter(limit_ratio, "limit_ratio", positive=True)
         frame, info, notes = build_frame(model, load_kn, material, fixed_supports, self_weight, diameter_mm, wall_mm,
                                          asset_loads, floor_loads, connections)
         result["warnings"] += notes

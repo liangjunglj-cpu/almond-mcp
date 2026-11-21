@@ -302,7 +302,14 @@ def _wall_reactions(pts, L):
 def apply(frame: fs.Frame, imposed_kn_m2: float = 0.0, dead_kn_m2: float = 0.0, levels_m: list | None = None) -> dict:
     """Load every enclosed bay with dead (case "G") + imposed (case "Q") kN/m2; mutates ``frame``.
     Load shapes are built at unit intensity and applied once per case. Returns a report."""
-    q = float(imposed_kn_m2) + float(dead_kn_m2)
+    try:
+        imposed, dead = float(imposed_kn_m2), float(dead_kn_m2)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ValueError("Floor load intensities must be finite non-negative numbers.") from exc
+    if not all(math.isfinite(v) and v >= 0 for v in (imposed, dead, imposed + dead)):
+        raise ValueError("Floor load intensities must be finite non-negative numbers.")
+    imposed_kn_m2, dead_kn_m2 = imposed, dead
+    q = imposed + dead
     report = {"imposed_kn_m2": imposed_kn_m2, "dead_kn_m2": dead_kn_m2, "levels": [], "area_m2": 0.0,
               "imposed_kn": 0.0, "dead_kn": 0.0, "total_kn": 0.0, "wall_kn": 0.0, "warnings": []}
     if q <= 0:
