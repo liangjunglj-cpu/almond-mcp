@@ -28,6 +28,9 @@ function placeModel(id, drag = false) {
 
 const esc = (value) => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const human = (value) => String(value || '').replaceAll('_', ' ');
+// How a library model was made: Meshy or Tripo generation, or a Blender script (procedural kit pieces).
+const MAKERS = {meshy: ['MESHY', 'MESHY MODEL'], tripo: ['TRIPO', 'TRIPO MODEL'], procedural_script: ['SCRIPTED', 'SCRIPTED MODEL']};
+const maker = (a) => MAKERS[a.metadata?.geometry_source?.generator] || ['GENERATED', 'GENERATED MODEL'];
 const external = (url) => { try { const u = new URL(url); return ['http:', 'https:'].includes(u.protocol) ? u.href : ''; } catch { return ''; } };
 const link = (url, title, cls = '') => url ? `<a class="download ${cls}" href="${esc(url)}?download=1" ${panelMode ? 'target="_blank" rel="noopener"' : 'download'}>${esc(title)} ↙</a>` : '';
 let data, selected, currentView = '3d', filter = 'all';
@@ -64,7 +67,7 @@ function render() {
     <button class="card-save" data-save="${esc(a.id)}" aria-label="${saved.has(a.id) ? 'Unsave' : 'Save'} ${esc(a.name)}" aria-pressed="${saved.has(a.id)}">${saved.has(a.id) ? '−' : '+'}</button>
     <button class="card-open" data-open="${esc(a.id)}" aria-label="Explore ${esc(a.name)}">
       <div class="card-stage" ${a.kind === 'model' ? `data-asset-id="${esc(a.id)}"` : ''} ${canPlace(a) ? `data-drag="${esc(a.id)}" title="Drag into a Rhino viewport; Esc cancels"` : ''}><span class="card-index">${String(data.assets.indexOf(a)+1).padStart(3,'0')}</span>${a.preview ? `<img src="${esc(a.preview)}" alt="${esc(a.name)}" loading="lazy" draggable="false">` : `<div class="placeholder">${esc(a.format.toUpperCase())}<small>${a.available ? 'LOCAL FILE' : 'FILE NOT INSTALLED'}</small></div>`}<span class="card-format">${esc(a.format.toUpperCase())}</span>${a.drawing ? '<span class="card-status">DRAWING-READY</span>' : ''}</div>
-      <div class="card-name"><span>${esc(a.name)}</span><span aria-hidden="true">↗</span></div><div class="card-sub"><span>${esc(human(a.category))}</span><span>${a.kind === 'model' ? 'MESHY / 3D' : 'DRAWING ELEMENT'}</span></div>
+      <div class="card-name"><span>${esc(a.name)}</span><span aria-hidden="true">↗</span></div><div class="card-sub"><span>${esc(human(a.category))}</span><span>${a.kind === 'model' ? maker(a)[0] + ' / 3D' : 'DRAWING ELEMENT'}</span></div>
     </button>${placementButton(a)}</article>`).join('');
   $('grid').querySelectorAll('img').forEach(img => img.addEventListener('error', () => {
     img.replaceWith(Object.assign(document.createElement('span'), {className:'placeholder', textContent:'No preview'}));
@@ -95,7 +98,7 @@ function openObject(id) {
   selected = a;
   currentView = a.format === 'glb' && a.available ? '3d' : 'preview';
   $('object-number').textContent = `OBJECT / ${String(data.assets.indexOf(a)+1).padStart(3,'0')}`;
-  $('object-kind').textContent = `${a.kind === 'model' ? 'MESHY MODEL' : 'DRAWING ELEMENT'} / ${human(a.category).toUpperCase()}`;
+  $('object-kind').textContent = `${a.kind === 'model' ? maker(a)[1] : 'DRAWING ELEMENT'} / ${human(a.category).toUpperCase()}`;
   $('object-title').textContent = a.name;
   $('object-variant').textContent = a.variant;
   $('object-tags').innerHTML = a.tags.map(t => `<span>${esc(t)}</span>`).join('');
