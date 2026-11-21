@@ -522,3 +522,112 @@ def test_cantilever_i_beam_is_rooted_and_free():
     m["members"][0]["section"] = sec
     row = ns.validate(m, "beam", 10.0, fixed_supports=True, self_weight=False, stability="off", detail=True)["members"][0]
     assert row["ltb_ends"] == ["root", "free"] and math.isfinite(row["m_cr_knm"]) and row["m_cr_knm"] > 0
+
+
+# ------------------------------------------------------------------ EN 1993-1-1 Table B.3 Cm, one case per row
+# Each frame is a single steel member (one or more analysis elements, one lineage) under axial compression;
+# Cm and eq. (6.61) are worked here from the closed-form moment diagram and the standard's text.
+STEEL = fs.Material("S235", E, 80.76e6, GAM, FY, "steel")
+PIN_A, ROLLER_B = (True, True, True, True, False, False), (False, True, True, False, False, False)
+
+
+def chi_c(lam):
+    """6.3.1.2, curve c (cold-formed hollow section), written out independently."""
+    phi = 0.5 * (1 + 0.49 * (lam - 0.2) + lam ** 2)
+    return 1.0 if lam <= 0.2 else min(1.0, 1 / (phi + math.sqrt(phi ** 2 - lam ** 2)))
+
+
+def eq_6_61(L, ned, med, cm):
+    """N/(chi N_Rk) + kyy M/M_Rk for a CHS, elastic moduli, Annex B Table B.1 (Class 3 column)."""
+    lam = math.sqrt(A * FY / (math.pi ** 2 * E * I / L ** 2))
+    n = ned / (chi_c(lam) * A * FY)
+    kyy = cm * min(1 + 0.6 * lam * n, 1 + 0.6 * n)
+    return n + kyy * med / (WEL * FY)
+
+
+def member_frame(points, supports, P):
+    """One member through ``points`` (x, 0, z), compressed by P along x at its last point."""
+    f = fs.Frame()
+    ns_ = [f.add_node(p) for p in points]
+    for a, b in zip(ns_, ns_[1:]):
+        f.add_element(a, b, S, STEEL, group=0)
+    for n, dofs in supports.items():
+        f.fix(ns_[n], dofs)
+    f.load(ns_[-1], fx=-P)
+    return f, ns_
+
+
+def checked(f):
+    r = fs.solve(f, combination={"Q": 1.0})
+    from almond_mcp import ec3
+    ec3.apply(f, r)
+    return r.elements[0].util_detail, r
+
+
+def test_table_b3_row1_linear_end_moments():
+    """End moments M and psi M, no transverse load: Cm = 0.6 + 0.4 psi (psi = 0.5 -> 0.8)."""
+    L, P, M = 4.0, 300.0, 20.0
+    f, n = member_frame([(0, 0, 0), (L, 0, 0)], {0: PIN_A, 1: ROLLER_B}, P)
+    f.load(n[0], my=M)
+    f.load(n[1], my=-0.5 * M)
+    d, _ = checked(f)
+    assert d["cm_y"] == pytest.approx(0.6 + 0.4 * 0.5) and d["cm_y_basis"].startswith("linear")
+    assert d["eq_6_61"] == pytest.approx(eq_6_61(L, P, M, 0.8), rel=1e-6)
+
+
+def test_table_b3_row2_udl_with_end_moments():
+    """Fixed-ended member, UDL q: Mh = -qL^2/12 at both ends (psi = 1), Ms = +qL^2/24, alpha_s = -1/2:
+    uniform load, psi >= 0: Cm = 0.1 - 0.8 alpha_s = 0.5 (the 2 % rule read 1.0)."""
+    L, P, q = 4.0, 300.0, 10.0
+    fixed, slide = (True,) * 6, (False, True, True, True, True, True)
+    f, n = member_frame([(0, 0, 0), (L / 2, 0, 0), (L, 0, 0)], {0: fixed, 2: slide}, P)
+    for ei in range(len(f.elements)):
+        f.udl(ei, (0, 0, -q))
+    d, _ = checked(f)
+    assert d["cm_y"] == pytest.approx(0.1 - 0.8 * (-0.5), rel=1e-6)
+    assert "uniform" in d["cm_y_basis"] and "alpha_s = -0.50" in d["cm_y_basis"]
+    assert d["eq_6_61"] == pytest.approx(eq_6_61(L, P, q * L ** 2 / 12, 0.5), rel=1e-6)
+
+
+def test_table_b3_row3_point_load_at_mid_span():
+    """Pin-ended member, point load F at mid-span (a joint between its two elements): Mh = 0,
+    Ms = FL/4, alpha_h = 0, concentrated load: Cm = 0.90 + 0.10 alpha_h = 0.90."""
+    L, P, F = 4.0, 300.0, 20.0
+    f, n = member_frame([(0, 0, 0), (L / 2, 0, 0), (L, 0, 0)], {0: PIN_A, 2: ROLLER_B}, P)
+    f.load(n[1], fz=-F)
+    d, _ = checked(f)
+    assert d["cm_y"] == pytest.approx(0.90) and d["cm_y_basis"].startswith("concentrated")
+    assert d["eq_6_61"] == pytest.approx(eq_6_61(L, P, F * L / 4, 0.90), rel=1e-6)
+
+
+def test_table_b3_cantilever_sways():
+    """Flagpole: fixed base, free top, axial P and a horizontal tip load H. The diagram is linear
+    (psi = 0, non-sway row 1 would give 0.6) but the member buckles in a sway mode: Cm = 0.9."""
+    L, P, H = 3.0, 200.0, 5.0
+    f = fs.Frame()
+    a, b = f.add_node((0, 0, 0)), f.add_node((0, 0, L))
+    f.add_element(a, b, S, STEEL)
+    f.fix(a)
+    f.load(b, fz=-P, fx=H)
+    d, _ = checked(f)
+    assert d["cm_y"] == pytest.approx(0.9) and "sway" in d["cm_y_basis"]
+    assert d["eq_6_61"] == pytest.approx(eq_6_61(L, P, H * L, 0.9), rel=1e-6)
+
+
+def test_table_b3_curved_member_like_vault_m56():
+    """A curved member as four chords (the diagrid vault's M56 shape): N = 32 kN along the chord,
+    rise e = 70 mm at mid-span, pinned ends. M = N z(x): zero at the ends, N e = 2.24 kNm at
+    mid-span, kinked at three chord joints -> distributed load (more than two kinks), row 3 with
+    alpha_h = 0: Cm = 0.95 instead of the old 1.0. The chords carry the thrust N along their own axes,
+    N cos(theta) (no vertical reaction), most in the two middle chords."""
+    L, N, e = 2.0, 32.0, 0.070
+    R = (L ** 2 / 4 + e ** 2) / (2 * e)                       # circle through the ends and the crown
+    xs = np.linspace(0, L, 5)
+    pts = [(x, 0, math.sqrt(R ** 2 - (x - L / 2) ** 2) - (R - e)) for x in xs]
+    f, n = member_frame(pts, {0: PIN_A, 4: ROLLER_B}, N)
+    d, r = checked(f)
+    my = max(float(np.max(np.abs(er.My))) for er in r.elements)
+    assert my == pytest.approx(N * e, rel=1e-6)
+    assert d["cm_y"] == pytest.approx(0.95) and d["cm_y_basis"].startswith("uniform")
+    theta = math.atan2(pts[2][2] - pts[1][2], xs[2] - xs[1])
+    assert d["eq_6_61"] == pytest.approx(eq_6_61(L, N * math.cos(theta), N * e, 0.95), rel=1e-6)

@@ -58,13 +58,92 @@ def test_rhs_class_compression_and_bending():
 
 
 # ------------------------------------------------------------------ Table B.3 Cm
-def test_equivalent_moment_factor():
+T21 = np.linspace(0, 1, 21)
+T_JOINT = np.concatenate([np.linspace(0, 0.5, 11), np.linspace(0.5, 1, 11)])     # two elements, joint at mid-span
+
+
+def udl(m0, m1, q):
+    """End moments m0, m1 plus a uniform load q (t units: mid-span moment q/8)."""
+    return T21, m0 + (m1 - m0) * T21 + q * T21 * (1 - T21) / 2
+
+
+def point(m0, m1, P):
+    """End moments m0, m1 plus a point load P at the mid-span joint (mid-span moment P/4)."""
+    return T_JOINT, m0 + (m1 - m0) * T_JOINT + P * np.minimum(T_JOINT, 1 - T_JOINT) / 2
+
+
+def test_equivalent_moment_factor_row_1_linear():
     t = np.linspace(0, 1, 11)
     assert ec3.equivalent_moment_factor(t, np.full(11, 50.0)) == pytest.approx(1.0)          # uniform, psi = 1
     assert ec3.equivalent_moment_factor(t, 50.0 * (1 - t)) == pytest.approx(0.6)             # psi = 0
     assert ec3.equivalent_moment_factor(t, 50.0 * (1 - 2 * t)) == pytest.approx(0.4)         # psi = -1 -> 0.2, floor 0.4
-    assert ec3.equivalent_moment_factor(t, 50.0 * t * (1 - t)) == pytest.approx(1.0)         # transverse load
     assert ec3.equivalent_moment_factor(t, np.zeros(11)) == 1.0
+
+
+# expected values worked by hand from Table B.3 with Ms = (m0 + m1)/2 + q/8 (uniform) or + P/4 (point)
+@pytest.mark.parametrize("diagram, cm", [
+    (udl(100, 60, 80), 0.2 + 0.8 * 0.9),                      # row 2, Ms = 90, alpha_s = 0.9
+    (udl(-100, -100, 1280), 0.1 - 0.8 * (-0.6)),              # row 2, Ms = 60, alpha_s = -0.6, psi = 1
+    (udl(-100, 50, 560), 0.1 * 1.5 - 0.8 * (-0.45)),          # row 2, psi = -0.5, Ms = 45, alpha_s = -0.45
+    (udl(-100, 50, 400), 0.4),                                # row 2, psi = -0.5, alpha_s = -0.25 -> 0.35, floor 0.4
+    (udl(40, 20, 800), 0.95 + 0.05 * 40 / 130),               # row 3, Ms = 130, alpha_h = 0.308
+    (udl(-40, -20, 1280), 0.95 - 0.05 * 40 / 130),            # row 3, alpha_h = -0.308, psi = 0.5
+    (udl(-40, 10, 1200), 0.95 + 0.05 * (-40 / 135) * 0.5),    # row 3, alpha_h = -0.296, psi = -0.25
+    (udl(0, 0, 80), 0.95),                                    # simply supported UDL, alpha_h = 0
+    (point(-100, -100, 720), -0.8 * (-0.8)),                  # row 2, Ms = 80, alpha_s = -0.8, psi = 1
+    (point(-100, 50, 400), -0.2 * (-0.5) - 0.8 * (-0.75)),    # row 2, psi = -0.5, Ms = 75, alpha_s = -0.75
+    (point(20, 10, 400), 0.90 + 0.10 * 20 / 115),             # row 3, Ms = 115, alpha_h = 0.174
+    (point(-20, 5, 480), 0.90 + 0.10 * (-20 / 112.5) * 0.5),  # row 3, alpha_h = -0.178, psi = -0.25
+    (point(0, 0, 40), 0.90),                                  # simply supported, point load at mid-span
+])
+def test_equivalent_moment_factor_rows_2_and_3(diagram, cm):
+    t, M = diagram
+    assert ec3.equivalent_moment_factor(t, M) == pytest.approx(cm, abs=1e-9)
+    assert ec3.equivalent_moment_factor(t, -M) == pytest.approx(cm, abs=1e-9)                  # sign-free
+
+
+def test_load_type_read_from_the_stations():
+    assert ec3.moment_diagram(*udl(10, 5, 0))["load"] == "none"
+    assert ec3.moment_diagram(*udl(10, 5, 40))["load"] == "uniform"
+    assert ec3.moment_diagram(*point(10, 5, 40))["load"] == "concentrated"
+    t, M = point(0, 0, 400)
+    assert ec3.moment_diagram(t, M + 8 * t * (1 - t) / 2)["load"] == "concentrated"        # + light self weight
+    assert ec3.moment_diagram(t, M + 400 * t * (1 - t) / 2)["load"] == "uniform"           # mixed: the higher column
+    thirds = np.concatenate([np.linspace(0, 1 / 3, 6), np.linspace(1 / 3, 2 / 3, 6), np.linspace(2 / 3, 1, 6)])
+    assert ec3.moment_diagram(thirds, 30 * np.minimum(np.minimum(thirds, 1 / 3), 1 - thirds))["load"] == "concentrated"
+    quarters = np.concatenate([np.linspace(k / 4, (k + 1) / 4, 6) for k in range(4)])     # chords of a curved member
+    assert ec3.moment_diagram(quarters, np.interp(quarters, [0, .25, .5, .75, 1], [0, 1.5, 2, 1.5, 0]))["load"] == "uniform"
+
+
+def test_no_cliff_as_transverse_load_grows():
+    """The old rule jumped from 0.6 + 0.4 psi to 1.0 once the diagram was 2 % off linear; Table B.3 rows
+    2/3 meet row 1 as the load goes to zero, so Cm now moves smoothly with the load."""
+    cms = [ec3.equivalent_moment_factor(*udl(100, 0, q)) for q in np.linspace(0, 80, 41)]
+    assert cms[0] == pytest.approx(0.6)
+    assert max(abs(b - a) for a, b in zip(cms, cms[1:])) < 0.01
+    assert cms[-1] == pytest.approx(0.2 + 0.8 * 0.6)                                       # Ms = 60, alpha_s = 0.6
+
+
+def test_outside_table_b3_takes_the_upper_bound():
+    t = T_JOINT
+    step = np.where(np.arange(len(t)) < 11, 50.0 * t, 50.0 * t - 20.0)                       # concentrated moment at the joint
+    assert ec3.moment_factor(t, step)[0] == 1.0
+    anti = 100 * np.sin(2 * np.pi * T21)                                                     # zero at the ends and mid-span
+    assert ec3.moment_factor(T21, anti)[0] == 1.0
+
+
+def test_sway_mode_and_free_ends():
+    t = np.linspace(0, 1, 11)
+    assert ec3.equivalent_moment_factor(t, 50.0 * (1 - t), sway=True) == pytest.approx(0.9)
+    assert ec3.equivalent_moment_factor(t, np.zeros(11), sway=True) == 1.0                  # no moment: nothing to factor
+    f = fs.Frame()
+    a, b, c = f.add_node((0, 0, 0)), f.add_node((0, 0, 3)), f.add_node((4, 0, 3))
+    col, beam = f.add_element(a, b, fs.chs(219.1, 8), S235), f.add_element(b, c, fs.chs(219.1, 8), S235)
+    f.fix(a)
+    assert not ec3.free_end(f, [col])                                                        # the beam holds its top
+    assert ec3.free_end(f, [beam])                                                           # cantilever tip
+    f.spring(c, kz=1e3)
+    assert not ec3.free_end(f, [beam])                                                       # sprung tip: held
 
 
 # ------------------------------------------------------------------ 6.3.3 with Annex B

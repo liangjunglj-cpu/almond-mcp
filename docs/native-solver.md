@@ -126,8 +126,9 @@ axes polygonized identically. `almond_mcp/native_structure.py` then applies:
   (`CURVE_SAGITTA_RATIO`, `MAX_CURVE_TURN`, `MAX_CURVE_SEGMENTS`; `curve_ratio=None` keeps
   every vertex). The chords of one run are one member for the EN 1993 checks, with their
   moments read in the member's chord axes (each chord's own turned axes would put false kinks
-  into the moment diagram). The real N·e bending of a curved member still makes its diagram
-  non-linear, which takes Cm = 1.0 (Table B.3's upper bound, conservative). A 336-piece
+  into the moment diagram). The real N·e bending of a curved member makes its diagram
+  non-linear; Table B.3 reads it as transverse load on the member (a pure N·e member takes
+  about 0.95 from the uniform-load row, see the C_m notes below). A 336-piece
   diagrid vault exported with 15,456 vertices solves at 1,197 nodes; on a smaller vault the
   results stay within 0.1 % of a 16-chords-per-piece reference.
 - **Size:** the dense solver works within a fixed 6 GB budget (`DENSE_BUDGET_GB`; measured
@@ -204,9 +205,19 @@ axes polygonized identically. `almond_mcp/native_structure.py` then applies:
     6.3.2.2(4) (a Nationally Determined Parameter of 6.3.2.3) is not used: the curve's own 0.2
     plateau applies.
   - **Compression + bending** 6.3.3 (6.61)/(6.62) with the **Annex B** interaction factors
-    (Class 3 form with elastic moduli, Class 1/2 form with plastic) and Table B.3 C_m:
-    0.6 + 0.4ψ ≥ 0.4 for linear moment diagrams, the table's upper bound 1.0 for members
-    with transverse load. Table B.1 for members not susceptible to torsional deformation;
+    (Class 3 form with elastic moduli, Class 1/2 form with plastic) and Table B.3 C_m read
+    from each member's own moment diagram: the end moments M_h and ψM_h, the mid-span moment
+    M_s, and the transverse load on the member taken from the change of slope between its
+    stations (none → row 1, 0.6 + 0.4ψ; spread evenly → the uniform-load column; one or two
+    point loads standing out → the concentrated-load column; anything mixed → the uniform
+    column, which is never lower). Rows 2 (α_s = M_s/M_h) and 3 (α_h = M_h/M_s) meet row 1 as
+    the load goes to zero, so C_m has no cliff. C_m ≥ 0.4. A member with a free end (a
+    cantilever) buckles in a sway mode: C_m = 0.9 (Table B.3 note); frame sway is in the
+    global second-order analysis, so other members take the non-sway rows. Diagrams the
+    table does not draw (a concentrated moment inside the member, a peak away from both the
+    ends and mid-span) take its upper bound 1.0. The member results report the case used
+    (`cm_y_basis`, `cm_z_basis`).
+    Table B.1 for members not susceptible to torsional deformation;
     **Table B.2** (k_zy with C_mLT, M_y,Rk × χ_LT) for unrestrained I-sections.
   - **Shear** 6.2.6: V_pl,Rd = A_v (f_y/√3)/γ_M0 along both local axes (CHS: the
     resultant), with the 6.2.6(3) shear areas: I/H (no root radii) A − 2bt_f + t_w t_f ≥
@@ -229,7 +240,9 @@ axes polygonized identically. `almond_mcp/native_structure.py` then applies:
 
 - `tests/test_hand_calculations.py` and `tests/test_ec3.py`: closed forms worked from first
   principles and from the standard's text (beam, cantilever, column buckling on curves a and
-  c, Table 5.2 classes by grade, Table B.3 C_m, an Annex B case where k = 1.3, shear areas and
+  c, Table 5.2 classes by grade, every Table B.3 C_m sub-case, one solved member per Table
+  B.3 row (end moments, UDL with fixed ends, mid-span point load, cantilever, curved member),
+  an Annex B case where k = 1.3, shear areas and
   V_pl,Rd per section type, ρ and eq. (6.30), the h_w/t_w flag, Table 5.1 bow amplitudes, the
   5.3.2(6) condition, a bowed propped column against the closed-form second-order solution, the
   5.3.2(3)b column count; M_cr exact for uniform moment, the 4.013 cantilever, C1 = 1.13 / 1.365
