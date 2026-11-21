@@ -98,6 +98,13 @@ class AlmondStore:
                     updated_at TEXT NOT NULL
                 );
 
+                CREATE TABLE IF NOT EXISTS metadata_snapshots (
+                    snapshot_id TEXT PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    inventory_json TEXT NOT NULL,
+                    created_at TEXT NOT NULL
+                );
+
                 CREATE TABLE IF NOT EXISTS rooms (
                     room_id TEXT PRIMARY KEY,
                     scene_id TEXT NOT NULL REFERENCES scenes(scene_id) ON DELETE CASCADE,
@@ -1056,6 +1063,34 @@ class AlmondStore:
             "orphaned_instances": orphaned,
             "revision": revision,
         }
+
+    def capture_metadata_snapshot(self, name: str, inventory: dict[str, Any]) -> dict[str, Any]:
+        """Append an immutable local baseline; never alter Rhino or an existing snapshot."""
+        from .scene_audit import validate_inventory
+        validate_inventory(inventory)
+        if inventory['missing_ids']:
+            raise ValueError('Cannot capture a baseline with missing Rhino objects')
+        if not isinstance(name, str) or not name.strip() or len(name) > 200:
+            raise ValueError('Snapshot name must contain 1 to 200 characters')
+        snapshot_id = 'metadata-' + uuid.uuid4().hex
+        created_at = _utc_now()
+        encoded = json.dumps(inventory, ensure_ascii=False, allow_nan=False)
+        with self._connect() as connection:
+            connection.execute(
+                'INSERT INTO metadata_snapshots(snapshot_id,name,inventory_json,created_at) VALUES(?,?,?,?)',
+                (snapshot_id, name.strip(), encoded, created_at),
+            )
+        return {'snapshot_id':snapshot_id,'name':name.strip(),'created_at':created_at,
+                'object_count':len(inventory['objects']),'document_key':inventory['document_key']}
+
+    def get_metadata_snapshot(self, snapshot_id: str) -> dict[str, Any] | None:
+        """Return a detached baseline. Audit callers cannot update the persisted record."""
+        with self._connect() as connection:
+            row = connection.execute('SELECT * FROM metadata_snapshots WHERE snapshot_id=?',(snapshot_id,)).fetchone()
+        if row is None:
+            return None
+        return {'snapshot_id':row['snapshot_id'],'name':row['name'],'created_at':row['created_at'],
+                'inventory':json.loads(row['inventory_json'])}
 
     def scene_instances(self, scene_id: str) -> list[dict[str, Any]]:
         """Every instance of a scene with its world bounding box (mm), for structural loads."""
