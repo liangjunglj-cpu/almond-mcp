@@ -21,7 +21,7 @@ namespace RhinoAlmondBridge
 
     /// <summary>
     /// <c>almond:support</c> user text on a support point: <c>"&lt;type&gt; [key=value ...]"</c> with type
-    /// fixed | pinned | pin | roller | roller-x | roller-y | spring and springs kx ky kz (kN/m),
+    /// fixed | pinned | pin | roller | roller-x | roller-y | lateral-x | lateral-y | spring and springs kx ky kz (kN/m),
     /// rx ry rz (kNm/rad) in global axes. The native engine (almond_mcp.native_structure.parse_support)
     /// is the reference reading; this C# copy only serves the Karamba route and the overlay symbols.
     /// </summary>
@@ -37,6 +37,8 @@ namespace RhinoAlmondBridge
             ["roller"] = new[] { false, false, true, false, false, false },
             ["roller-x"] = new[] { false, true, true, false, false, false },
             ["roller-y"] = new[] { true, false, true, false, false, false },
+            ["lateral-x"] = new[] { true, false, false, false, false, false },   // holds x only (bracing, a deck)
+            ["lateral-y"] = new[] { false, true, false, false, false, false },
             ["spring"] = new[] { false, false, false, false, false, false },
         };
 
@@ -108,7 +110,7 @@ namespace RhinoAlmondBridge
                 string error;
                 if (!TryParse(spec, out r, out k, out label, out error))
                     throw new InvalidOperationException($"Support '{spec}' not understood ({error}). Types: fixed, pinned, roller, " +
-                        "roller-x, roller-y, spring kz=...; springs kx ky kz (kN/m), rx ry rz (kNm/rad).");
+                        "roller-x, roller-y, lateral-x, lateral-y, spring kz=...; springs kx ky kz (kN/m), rx ry rz (kNm/rad).");
             }
             var attrs = obj.Attributes.Duplicate();
             foreach (var key in Keys) attrs.DeleteUserString(key);

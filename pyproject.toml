@@ -80,6 +80,7 @@ packages = ["almond_mcp"]
 "Materialfiles/manifest.json" = "almond_mcp/data/Materialfiles/manifest.json"
 "Constructionfiles/manifest.json" = "almond_mcp/data/Constructionfiles/manifest.json"
 "Historyfiles/manifest.json" = "almond_mcp/data/Historyfiles/manifest.json"
+"StructuralReferences" = "almond_mcp/data/StructuralReferences"
 
 [tool.hatch.build.targets.sdist]
 include = [
@@ -97,6 +98,7 @@ include = [
     "/tools/run_meshy_batch.py", "/tools/prepare_organic_meshes.py", "/tools/import_organic_batch.py", "/GeneratedAssetfiles/batches",
     "/tools/build_archive_bundle.py", "/tools/verify_object_archive_install.py",
     "/tools/render_generated_previews.py", "/tools/verify_release.py",
+    "/StructuralReferences",
     "/README.md", "/AGENTS.md", "/LICENSE", "/THIRD-PARTY-NOTICES.md",
     "/pyproject.toml", "/uv.lock", "/.gitattributes",
 ]

@@ -334,7 +334,10 @@ beam deflection, so `connections="simple"` models it:
   a rigid body.
 - **Per member:** a curve's user text `almond:release` = `pinned` | `pinned_start` |
   `pinned_end` | `rigid` overrides either mode (the bridge exports the curve's own start and
-  end so one-sided releases know the direction).
+  end so one-sided releases know the direction). Two more words ignore the orientation rule:
+  `bar` releases both bending axes at both ends (a pin-jointed truss bar, checked as a
+  compression member over its own length) and `hinged` releases major-axis bending only at
+  both ends (a planar truss member or simple beam that stays continuous in plan).
 
 **Sections per curve.** A curve's user text `almond:section` sets its section, in millimetres unless a
 unit follows (`rect 30x64 cm`):
@@ -359,6 +362,27 @@ Live, Atelier-07 mezzanine (2026-10-01), floor 2.0 Q + 1.0 G kN/m², EN 1990: wi
 joints CHS 219.1×8 passes (18.5 mm, u 0.86); with simple connections (14 pinned ends) it
 fails (25.9 mm > 24.8 mm, u 0.98); the next size tried, CHS 244.5×10, passes (15.7 mm,
 u 0.66).
+
+## Explicit loads in the model
+
+The conditioned model may carry its own loads in `model["loads"]`, each with a case G or Q:
+nodal forces and moments at a point (`{"point_m": [x, y, z], "force_kn": [fx, fy, fz], "case": "Q"}`,
+snapped to the nearest node within 50 mm) and line loads along a model member
+(`{"member": i, "w_start_kn_m": [...], "w_end_kn_m": [...], "case": "G"}`, uniform when `w_end` is
+omitted, otherwise varying linearly along the member and split exactly over its pieces). The
+structural reference library uses this to analyse its benchmark loads; the Rhino bridge does not
+export loads yet, so for drawn geometry the loads remain `load_kn`, the floor loads and the placed
+assets. Supports may be `lateral-x` / `lateral-y` as well as the types above: a horizontal restraint
+only, the out-of-plane bracing a planar truss or frame relies on.
+
+## Structural reference library
+
+`list_structural_references`, `get_structural_reference`, `analyze_structural_reference` and
+`place_structural_reference` expose twelve benchmarked typologies (the models of
+`benchmarks/` and `tests/test_structural_typologies.py`) as parametric line models:
+analysed here with their benchmark loads and compared with the textbook closed form, or
+drawn in Rhino with `almond:section`, `almond:release` and `almond:support` user text for
+`validate_structure`. See [StructuralReferences/README.md](../StructuralReferences/README.md).
 
 ## Load combinations (EN 1990)
 
