@@ -7,6 +7,7 @@ the real capsules/ directory).
 """
 import importlib.util
 import json
+import os
 import sys
 import uuid
 from pathlib import Path
@@ -69,6 +70,10 @@ UNAUDITED_MANIFEST = {
 def _load_server(monkeypatch, tmp_path, capsule_dir):
     monkeypatch.setenv("RHINO_MCP_STATE_DB", str(tmp_path / "state.sqlite3"))
     monkeypatch.setenv("RHINO_MCP_CAPSULE_DIR", str(capsule_dir))
+    if not os.environ.get("RHINO_MCP_PARAMETRIC_DIR"):
+        # The parametric teaching library registers capsules of its own; keep them out of
+        # tests that count the capsules in their scratch directory.
+        monkeypatch.setenv("RHINO_MCP_PARAMETRIC_DIR", str(tmp_path / "no-parametric-library"))
     spec = importlib.util.spec_from_file_location(
         f"almond_server_capsules_{uuid.uuid4().hex}", SERVER_PATH
     )
@@ -164,11 +169,17 @@ def test_list_capsules_filters(server):
 
 
 def test_real_capsule_library_syncs_cleanly(monkeypatch, tmp_path):
+    if (PROJECT_ROOT / "ParametricLibrary").is_dir():
+        monkeypatch.setenv("RHINO_MCP_PARAMETRIC_DIR", str(PROJECT_ROOT / "ParametricLibrary"))
     server = _load_server(monkeypatch, tmp_path, REAL_CAPSULE_DIR)
     assert server.capsule_sync_report["skipped"] == []
     payload = json.loads(_call(server.list_capsules))
-    assert payload["total"] == 8
-    assert all(card["capability"] == "analyze" for card in payload["capsules"])
+    karamba = [card for card in payload["capsules"] if card["capsule_id"].startswith("karamba_")]
+    assert len(karamba) == 8 and all(card["capability"] == "analyze" for card in karamba)
+    # The parametric teaching library adds register-verified "generate" capsules of its own.
+    others = [card for card in payload["capsules"] if card not in karamba]
+    assert all(card["capability"] == "generate" and card["capsule_id"].startswith("parametric_") for card in others)
+    assert payload["total"] == len(karamba) + len(others)
 
 
 # ── run_gh_definition rejections (bridge must never be reached) ─────────────

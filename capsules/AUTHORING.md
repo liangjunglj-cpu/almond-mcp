@@ -4,6 +4,14 @@ This guide explains how to turn a Karamba example GHX into an audited capsule th
 
 You need Rhino 8, Grasshopper, and Karamba3D 3.1 or newer installed.
 
+> **Library capsules are generated, not hand-harnessed.** The parametric
+> teaching library derives its capsules at XML level from a `harness` block in
+> each lesson (`tools/parametric_library/harness_ghx.py`), writes them to
+> `ParametricLibrary/capsules/`, and records the step in its source register.
+> Do not edit those files by hand; change the lesson and rebuild. The same
+> contract and the same `audited` rule below apply to them. See
+> `ParametricLibrary/README.md`, "Runnable capsules".
+
 ## The contract in one paragraph
 
 Each capsule is a GHX file plus a sidecar manifest named `<capsule_id>.capsule.json`. The manifest lists inputs named `ALMOND_IN_*` and outputs named `ALMOND_OUT_*`. Almond binds to params in the GHX by exact NickName match on those reserved names. If a required input has no matching param, the run fails loudly and nothing is solved. Units are whatever the manifest declares, so your harness must feed the definition values in those units. Only when the harness exists and you have verified a real run do you flip `audited` to `true`.

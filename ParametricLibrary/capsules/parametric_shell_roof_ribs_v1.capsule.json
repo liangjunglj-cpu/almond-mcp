@@ -1,0 +1,97 @@
+{
+  "capsule_id": "parametric_shell_roof_ribs_v1",
+  "version": 1,
+  "capability": "generate",
+  "structure_type": "gridshell",
+  "plugin_dependencies": [],
+  "definition_file": "structure-shell-roof-ribs.harnessed.ghx",
+  "title": "Ribbed shell roof with diagonal bracing",
+  "description_for_llm": "Generates a ribbed shell roof: a two-way grid of vertical rib plates following a surface's U and V isocurves, with a pair of crossing diagonal braces on top of every bay. Inputs are all in the Rhino document's units (the upstream file was authored in metres: 16 x 10 bays, rib depth 1.8, brace radius 0.08, a 54 x 30 sample surface about 10 high). Give ALMOND_IN_BASE_SRF one single-face brep (a surface); polysurfaces fail because Iso Curve and Isotrim need one face. Omit it to build the stored sample roof. The axis outputs (rib isocurves, moved brace lines) are what validate_structure needs as members once sections are assigned with almond:section user text; the solid outputs are the drawn ribs (extrusions) and braces (pipes). Every geometry output is baked into the active document. The 2026-10-20 stress test took this roof (34 ribs, 320 braces, 764 exported members) through validate_structure in about a minute. Derived from the Almond parametric teaching definition 'structure-shell-roof-ribs' (Lucas Becker (runxel), runxel/grasshopper-examples @ 0e57586bdc, BlueOak-1.0.0); the geometric logic is unchanged, only the harness params were added (see ParametricLibrary/source-register.json).",
+  "inputs": [
+    {
+      "name": "ALMOND_IN_BASE_SRF",
+      "type": "brep",
+      "units": "document",
+      "required": false,
+      "description": "Roof surface as one single-face brep, in document units. Omit to use the sample surface stored in the file (54 x 30, about 10 high, authored in metres)."
+    },
+    {
+      "name": "ALMOND_IN_RIBS_U",
+      "type": "number",
+      "units": "count",
+      "required": false,
+      "description": "Number of rib bays along the surface's U direction (whole number; also the U isocurve count minus one).",
+      "default": 16
+    },
+    {
+      "name": "ALMOND_IN_RIBS_V",
+      "type": "number",
+      "units": "count",
+      "required": false,
+      "description": "Number of rib bays along the surface's V direction (whole number).",
+      "default": 10
+    },
+    {
+      "name": "ALMOND_IN_RIB_DEPTH",
+      "type": "number",
+      "units": "document",
+      "required": false,
+      "description": "Rib height: each isocurve is extruded straight up by this distance, and the braces sit at the top of the ribs.",
+      "default": 1.8
+    },
+    {
+      "name": "ALMOND_IN_BRACE_RADIUS",
+      "type": "number",
+      "units": "document",
+      "required": false,
+      "description": "Radius of the round diagonal braces (Pipe).",
+      "default": 0.08
+    }
+  ],
+  "outputs": [
+    {
+      "name": "ALMOND_OUT_RIB_AXES",
+      "type": "curve[]",
+      "units": "document",
+      "semantics": "member_axis_curves",
+      "description": "Rib centrelines: the U and V isocurves on the base surface, before extrusion. Members for validate_structure."
+    },
+    {
+      "name": "ALMOND_OUT_BRACE_AXES",
+      "type": "curve[]",
+      "units": "document",
+      "semantics": "member_axis_curves",
+      "description": "Brace centrelines: the two bay diagonals per bay, already moved up by the rib depth. Members for validate_structure."
+    },
+    {
+      "name": "ALMOND_OUT_RIBS",
+      "type": "brep[]",
+      "units": "document",
+      "semantics": "solid_geometry",
+      "description": "The rib plates as extruded surfaces (U ribs, then V ribs)."
+    },
+    {
+      "name": "ALMOND_OUT_BRACES",
+      "type": "brep[]",
+      "units": "document",
+      "semantics": "solid_geometry",
+      "description": "The braces as capped pipes."
+    }
+  ],
+  "binding": "reserved_nicknames",
+  "audited": false,
+  "audit": {
+    "status": "not run live yet; run_gh_definition refuses it",
+    "note": "Harnessed at XML level on 2026-10-25 from the teaching file; not yet solved live. To audit: open capsules/structure-shell-roof-ribs.harnessed.ghx in Grasshopper (Rhino 8), confirm it solves with the sample and that every ALMOND_OUT_* param carries data, reference your own surface into ALMOND_IN_BASE_SRF and change the numbers, then set harness.audited to true in this lesson and rebuild."
+  },
+  "source": {
+    "parametric_definition": "structure-shell-roof-ribs",
+    "teaching_definition": "definitions/structure-shell-roof-ribs.ghx",
+    "author": "Lucas Becker (runxel)",
+    "repo": "runxel/grasshopper-examples",
+    "path": "gh/shell_roof.ghx",
+    "commit": "0e57586bdc00a4c3663983e67f36a0ce1f6c7ee6",
+    "licence": "BlueOak-1.0.0",
+    "licence_url": "https://blueoakcouncil.org/license/1.0.0"
+  }
+}

@@ -1,0 +1,94 @@
+{
+  "id": "facade-louvre-rotation",
+  "title": "Louvres rotated by length",
+  "category": "facade",
+  "level": "beginner",
+  "summary": "A row of blades of increasing length is rotated so each blade's angle follows its own length: short blades stay flat, long blades turn - the logic behind graded shading louvres.",
+  "how_to_use": [
+    "'Blade count' sets the number of blades; 'Base length', 'Growth step' and 'Growth power' shape how blade lengths grow along the row.",
+    "Edit the two small panels to set the angle range in multiples of pi - 0.5 means a quarter turn.",
+    "Bake 'Rotate' to get the rotated blades (the unrotated ones are shown in a second colour)."
+  ],
+  "concepts": [
+    "Series: evenly spaced numbers",
+    "Power: non-linear growth",
+    "Bounds + Remap Numbers: mapping one range (lengths) onto another (angles)",
+    "Pi multiplier: angles in radians"
+  ],
+  "source": {
+    "author": "Lucas Becker (runxel)",
+    "repo": "runxel/grasshopper-examples",
+    "path": "gh/rotate_by_length.ghx",
+    "commit": "0e57586bdc00a4c3663983e67f36a0ce1f6c7ee6",
+    "licence": "BlueOak-1.0.0",
+    "licence_url": "https://blueoakcouncil.org/license/1.0.0"
+  },
+  "readme_extra": [
+    "8f8b10c0",
+    "560dd66e",
+    "bfe297c8"
+  ],
+  "drop_notes": [
+    "8622d59e"
+  ],
+  "labels": {
+    "23c30952": "Blade count",
+    "41500bca": "Base length",
+    "61135c38": "Growth step",
+    "78910728": "Growth power",
+    "1f0dd7dc": "Angle at shortest (x pi)",
+    "50fb240b": "Angle at longest (x pi)"
+  },
+  "steps": [
+    {
+      "title": "1  INPUTS - change these",
+      "select": {
+        "inputs": true
+      },
+      "explain": "How many blades, how their length grows, and the angle range (in multiples of pi)."
+    },
+    {
+      "title": "2  Blades of growing length",
+      "select": {
+        "guids": [
+          "0994c079",
+          "db72193c",
+          "3ce6da9d",
+          "d2b50758",
+          "df7f13a5",
+          "06c24d16",
+          "fb811530",
+          "906ad441"
+        ]
+      },
+      "explain": "Series gives each blade a Y position. A second Series plus Base length, raised to Growth power, gives a non-linear length per blade. Construct Point and Line draw each blade from the Y axis out to its length."
+    },
+    {
+      "title": "3  Length to angle",
+      "select": {
+        "guids": [
+          "f5cd3ebd",
+          "93672566",
+          "28334486",
+          "474c8fb7"
+        ]
+      },
+      "explain": "Bounds finds the shortest and longest blade. Remap Numbers maps every length from that range onto the angle range set in the panels, and Pi turns it into radians."
+    },
+    {
+      "title": "4  RESULT - rotated louvres",
+      "select": {
+        "outputs": true,
+        "types": [
+          "Colour Swatch"
+        ],
+        "guids": [
+          "d26a0fd6",
+          "a3c1b05f",
+          "ecbee504"
+        ]
+      },
+      "explain": "Rotate turns each blade in the XZ plane by its own angle. Two Custom Previews show the original and the rotated blades in different colours."
+    }
+  ]
+}

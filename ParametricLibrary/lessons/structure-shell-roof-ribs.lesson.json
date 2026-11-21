@@ -1,0 +1,188 @@
+{
+  "id": "structure-shell-roof-ribs",
+  "title": "Ribbed shell roof with diagonal bracing",
+  "category": "structure",
+  "level": "beginner",
+  "summary": "Turns any freeform surface into a roof structure: a two-way grid of deep ribs follows the surface's U and V directions, and every bay between ribs gets a pair of crossing diagonal braces at the top of the ribs.",
+  "how_to_use": [
+    "Right-click 'Base Srf' and choose Set one Surface to pick your own roof surface (a sample surface is already stored in the file).",
+    "Change 'Ribs U' and 'Ribs V' to set how many bays the roof is divided into in each direction.",
+    "'Rib depth' sets how tall the ribs are, in model units; the braces sit on top of the ribs.",
+    "'Brace radius' sets the thickness of the diagonal rods.",
+    "Right-click the Pipe and the two Custom Preview components, then Bake, to get the geometry into Rhino."
+  ],
+  "concepts": [
+    "UV parameter space: Range + Construct Point make points in the surface's 0..1 domain, not in XYZ",
+    "Iso Curve: a curve that follows the surface at a constant U or V",
+    "Divide Domain2 + Isotrim: cutting a surface into a grid of sub-surfaces (bays)",
+    "List Item with several outputs: picking the corners 0,1,2,3 of each bay to draw diagonals",
+    "One vector (Unit Z x depth) reused for extrusion and for moving the braces up"
+  ],
+  "source": {
+    "author": "Lucas Becker (runxel)",
+    "repo": "runxel/grasshopper-examples",
+    "path": "gh/shell_roof.ghx",
+    "commit": "0e57586bdc00a4c3663983e67f36a0ce1f6c7ee6",
+    "licence": "BlueOak-1.0.0",
+    "licence_url": "https://blueoakcouncil.org/license/1.0.0"
+  },
+  "readme_extra": [
+    "bb0e5496",
+    "9335f2cf",
+    "93ff4082"
+  ],
+  "drop_notes": [
+    "15acf1e6"
+  ],
+  "labels": {
+    "fa156fd0": "Ribs U",
+    "be1f76a0": "Ribs V",
+    "151b36b9": "Rib depth",
+    "2c1c3d87": "Brace radius"
+  },
+  "steps": [
+    {
+      "title": "1  INPUTS - change these",
+      "select": {
+        "inputs": true
+      },
+      "explain": "The roof surface and four numbers. Everything to the right is rebuilt live from these."
+    },
+    {
+      "title": "2  Rib grid from isocurves",
+      "select": {
+        "guids": [
+          "bc1bf5fe",
+          "df3b1eea",
+          "5d0f6320",
+          "520784d2",
+          "c8c64380",
+          "ba500b49",
+          "17c3c4ec",
+          "0b7cc797",
+          "d94bfe50"
+        ]
+      },
+      "explain": "Two Range components split the surface domain 0..1 into equal steps. Construct Point combines them into UV points, and Iso Curve draws the U and V curves through each point. Each curve is extruded straight up by Unit Z x Rib depth, giving vertical rib plates that follow the roof."
+    },
+    {
+      "title": "3  Diagonal bracing in every bay",
+      "select": {
+        "guids": [
+          "666fd943",
+          "e7a83073",
+          "0d8c461c",
+          "fee96af7",
+          "ce96cd53",
+          "5db9c7cb",
+          "467a3eef",
+          "f1a76d4e",
+          "97347b13"
+        ]
+      },
+      "explain": "Divide Domain2 cuts the same domain into U x V cells and Isotrim turns each cell into a small sub-surface (a bay). Deconstruct Brep gives each bay's four corner points; List Item picks corners 0-2 and 1-3 so two Lines cross the bay. The lines are moved up by the rib depth and piped into round braces."
+    },
+    {
+      "title": "4  RESULT - preview and bake",
+      "select": {
+        "outputs": true,
+        "types": [
+          "Colour Swatch",
+          "Sketch"
+        ]
+      },
+      "explain": "Custom Preview shows the base surface and the ribs in the colours of the swatches. Bake these (and the Pipe in step 3) to keep the geometry."
+    }
+  ],
+  "harness": {
+    "capsule_id": "parametric_shell_roof_ribs_v1",
+    "capability": "generate",
+    "structure_type": "gridshell",
+    "audited": false,
+    "audit_note": "Harnessed at XML level on 2026-10-25 from the teaching file; not yet solved live. To audit: open capsules/structure-shell-roof-ribs.harnessed.ghx in Grasshopper (Rhino 8), confirm it solves with the sample and that every ALMOND_OUT_* param carries data, reference your own surface into ALMOND_IN_BASE_SRF and change the numbers, then set harness.audited to true in this lesson and rebuild.",
+    "description_for_llm": "Generates a ribbed shell roof: a two-way grid of vertical rib plates following a surface's U and V isocurves, with a pair of crossing diagonal braces on top of every bay. Inputs are all in the Rhino document's units (the upstream file was authored in metres: 16 x 10 bays, rib depth 1.8, brace radius 0.08, a 54 x 30 sample surface about 10 high). Give ALMOND_IN_BASE_SRF one single-face brep (a surface); polysurfaces fail because Iso Curve and Isotrim need one face. Omit it to build the stored sample roof. The axis outputs (rib isocurves, moved brace lines) are what validate_structure needs as members once sections are assigned with almond:section user text; the solid outputs are the drawn ribs (extrusions) and braces (pipes). Every geometry output is baked into the active document. The 2026-10-20 stress test took this roof (34 ribs, 320 braces, 764 exported members) through validate_structure in about a minute.",
+    "inputs": [
+      {
+        "name": "ALMOND_IN_BASE_SRF",
+        "replaces": "cce800f9",
+        "type": "brep",
+        "units": "document",
+        "required": false,
+        "default": "sample",
+        "description": "Roof surface as one single-face brep, in document units. Omit to use the sample surface stored in the file (54 x 30, about 10 high, authored in metres)."
+      },
+      {
+        "name": "ALMOND_IN_RIBS_U",
+        "replaces": "fa156fd0",
+        "type": "number",
+        "units": "count",
+        "description": "Number of rib bays along the surface's U direction (whole number; also the U isocurve count minus one)."
+      },
+      {
+        "name": "ALMOND_IN_RIBS_V",
+        "replaces": "be1f76a0",
+        "type": "number",
+        "units": "count",
+        "description": "Number of rib bays along the surface's V direction (whole number)."
+      },
+      {
+        "name": "ALMOND_IN_RIB_DEPTH",
+        "replaces": "151b36b9",
+        "type": "number",
+        "units": "document",
+        "description": "Rib height: each isocurve is extruded straight up by this distance, and the braces sit at the top of the ribs."
+      },
+      {
+        "name": "ALMOND_IN_BRACE_RADIUS",
+        "replaces": "2c1c3d87",
+        "type": "number",
+        "units": "document",
+        "description": "Radius of the round diagonal braces (Pipe)."
+      }
+    ],
+    "outputs": [
+      {
+        "name": "ALMOND_OUT_RIB_AXES",
+        "from": [
+          "f3b2a566",
+          "02ed2ea4"
+        ],
+        "type": "curve[]",
+        "units": "document",
+        "semantics": "member_axis_curves",
+        "description": "Rib centrelines: the U and V isocurves on the base surface, before extrusion. Members for validate_structure."
+      },
+      {
+        "name": "ALMOND_OUT_BRACE_AXES",
+        "from": [
+          "cb2212fe"
+        ],
+        "type": "curve[]",
+        "units": "document",
+        "semantics": "member_axis_curves",
+        "description": "Brace centrelines: the two bay diagonals per bay, already moved up by the rib depth. Members for validate_structure."
+      },
+      {
+        "name": "ALMOND_OUT_RIBS",
+        "from": [
+          "63b624d5",
+          "1c7ba500"
+        ],
+        "type": "brep[]",
+        "units": "document",
+        "semantics": "solid_geometry",
+        "description": "The rib plates as extruded surfaces (U ribs, then V ribs)."
+      },
+      {
+        "name": "ALMOND_OUT_BRACES",
+        "from": [
+          "9aa61bd2"
+        ],
+        "type": "brep[]",
+        "units": "document",
+        "semantics": "solid_geometry",
+        "description": "The braces as capped pipes."
+      }
+    ]
+  }
+}

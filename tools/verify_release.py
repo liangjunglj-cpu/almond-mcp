@@ -14,14 +14,58 @@ from almond_mcp.drafting import audit_package
 from almond_mcp.asset_repository import AssetRepository
 
 
+def _verify_parametric(library: Path, names: list[str], prefix: str) -> int:
+    """Every packaged teaching definition matches its register hash and carries its licence."""
+    catalogue = json.loads((library / "catalogue.json").read_text(encoding="utf-8"))["entries"]
+    register = {i["id"]: i for i in json.loads((library / "source-register.json").read_text(encoding="utf-8"))["items"]}
+    packaged = sorted(n for n in names if n.startswith(prefix + "definitions/"))
+    expected = sorted(prefix + e["definition"] for e in catalogue)
+    if packaged != expected or set(register) != {e["id"] for e in catalogue}:
+        raise ValueError("Parametric definitions do not match the catalogue and source register")
+    for entry in catalogue:
+        item = register[entry["id"]]
+        digest = hashlib.sha256((library / entry["definition"]).read_bytes()).hexdigest()
+        if digest != item["derivation"][-1]["output_sha256"]:
+            raise ValueError(f"Parametric definition changed after registration: {entry['id']}")
+        licence = library / item["rights"]["licence_file"]
+        if not licence.is_file() or not (library / entry["preview"]).is_file() or not (library / entry["lesson"]).is_file():
+            raise ValueError(f"Parametric licence, preview or lesson missing: {entry['id']}")
+        if item["rights"]["licence"] not in {"MIT", "BSD-2-Clause", "BSD-3-Clause", "Apache-2.0", "BlueOak-1.0.0",
+                                             "CC0-1.0", "CC-BY-4.0", "BSL-1.0"}:
+            raise ValueError(f"Parametric definition is not permissively licensed: {entry['id']}")
+    # Harnessed capsules: the teaching file plus ALMOND_* sockets, registered as their own derivation.
+    capsules = [e for e in catalogue if e.get("capsule")]
+    packaged_capsules = sorted(n for n in names if n.startswith(prefix + "capsules/") and n.endswith(".ghx"))
+    if packaged_capsules != sorted(prefix + e["capsule"]["definition"] for e in capsules):
+        raise ValueError("Harnessed capsule definitions do not match the catalogue")
+    for entry in capsules:
+        harnessed = register[entry["id"]].get("harnessed")
+        if not harnessed or harnessed["capsule_id"] != entry["capsule"]["capsule_id"]:
+            raise ValueError(f"Harnessed capsule is not in the source register: {entry['id']}")
+        for key, rel in (("output_sha256", entry["capsule"]["definition"]), ("manifest_sha256", entry["capsule"]["manifest"])):
+            if hashlib.sha256((library / rel).read_bytes()).hexdigest() != harnessed["derivation"][key]:
+                raise ValueError(f"Harnessed capsule changed after registration: {entry['id']}")
+        manifest = json.loads((library / entry["capsule"]["manifest"]).read_text(encoding="utf-8"))
+        if manifest["audited"] != harnessed["audited"] or not harnessed["derivation"]["logic_fingerprint_unchanged_after_mapping"]:
+            raise ValueError(f"Harnessed capsule audit state or logic check does not match the register: {entry['id']}")
+    return len(catalogue)
+
+
 def verify(wheel: Path) -> dict:
     with zipfile.ZipFile(wheel) as archive:
         names = archive.namelist()
         forbidden = []
+        parametric = "almond_mcp/data/ParametricLibrary/"
         for name in names:
             path = Path(name)
+            # Adapted, register-checked teaching definitions (and their harnessed capsules) are the only
+            # Grasshopper files allowed.
+            parametric_definition = (name.startswith((parametric + "definitions/", parametric + "capsules/"))
+                                     and path.suffix.lower() == ".ghx")
             if (path.is_absolute() or ".." in path.parts
-                    or path.suffix.lower() in {".skp", ".3dm", ".gh", ".ghx", ".gha", ".dll", ".pdb", ".sqlite3"}
+                    or (path.suffix.lower() in {".skp", ".3dm", ".gh", ".ghx", ".gha", ".dll", ".pdb", ".sqlite3"}
+                        and not parametric_definition)
+                    or name.startswith(parametric + "upstream/")
                     or "/IkeaFurniturefiles/" in name
                     or "/raw/" in name or "/examples/" in name
                     or any(f"/{lib}/models/" in name for lib in ("IkeaFurniturefiles", "DrawingAssetfiles", "DiagramAssetfiles"))):
@@ -74,6 +118,7 @@ def verify(wheel: Path) -> dict:
             if any(a["available"] for a in archive_catalogue.records.values() if a["kind"] == "element"):
                 raise ValueError("Downloaded drawing files must not enter the distribution")
             result["object_archive"] = counts
+            result["parametric_definitions_checked"] = _verify_parametric(Path(tmp) / parametric, names, parametric)
             result["object_archive_ui"] = "packaged, including offline viewer and licence"
         env = "almond_mcp/environment/data/"
         for filename in ("materials.json", "glazing.json", "assemblies.json", "sources.json", "LICENSES/EnergyPlus.txt",
@@ -88,7 +133,8 @@ def verify(wheel: Path) -> dict:
         raise ValueError(f"Licence scan failed: {licences['denied_or_unknown']}")
     result["licence_scan"] = {"components": len(licences["components"]), "review": [r["component"] for r in licences["review"]]}
     result.update(wheel=wheel.name, wheel_size_mb=round(wheel.stat().st_size / 1_000_000, 2),
-                  distribution_check="no third-party model binaries, raw downloads or example projects")
+                  distribution_check="no third-party model binaries, raw downloads or example projects; Grasshopper files only as "
+                                     "register-checked, permissively licensed teaching definitions and their harnessed capsules")
     return result
 
 

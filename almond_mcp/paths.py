@@ -36,7 +36,11 @@ LIBRARY_DIRS = {
     "RHINO_MCP_MATERIAL_DIR": "Materialfiles",
     "RHINO_MCP_CONSTRUCTION_DIR": "Constructionfiles",
     "RHINO_MCP_HISTORY_DIR": "Historyfiles",
+    "RHINO_MCP_PARAMETRIC_DIR": "ParametricLibrary",
 }
+
+# Bundled in full and scaffolded per release, so an upgrade never mixes versions.
+VERSIONED_LIBRARIES = {"GeneratedAssetfiles", "Draftingfiles", "ParametricLibrary"}
 
 STATE_DB_ENV = "RHINO_MCP_STATE_DB"
 STATE_DB_NAME = "almond_state.sqlite3"
@@ -88,7 +92,7 @@ def _scaffold(name: str, target: Path) -> None:
     bundled = _bundled_data(name)
     if bundled is None:
         return
-    if name in {"GeneratedAssetfiles", "Draftingfiles"}:
+    if name in VERSIONED_LIBRARIES:
         _copy_missing(bundled, target)
         return
     for entry in bundled.iterdir():
@@ -113,7 +117,7 @@ def resolve_dir(env_var: str) -> str:
     if repo is not None:
         return str(repo)
     target = user_data_dir() / name
-    if name in {"GeneratedAssetfiles", "Draftingfiles"}:
+    if name in VERSIONED_LIBRARIES:
         target = target / "releases" / __version__
     _scaffold(name, target)
     return str(target)

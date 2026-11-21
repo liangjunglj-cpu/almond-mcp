@@ -1,0 +1,95 @@
+{
+  "id": "site-terrain-from-levels",
+  "title": "Terrain from level curves",
+  "category": "site",
+  "level": "intermediate",
+  "summary": "Builds a site terrain from surveyed level curves (contours drawn at their reduced levels) and a site boundary: points on the curves and on the boundary are triangulated into a Delaunay mesh, re-sectioned across the site and lofted into a smooth terrain surface.",
+  "how_to_use": [
+    "Sample contours and a boundary are stored in the file, so it solves on open.",
+    "To use your site: right-click 'Level curves' and Set Multiple Curves (contours drawn at their real heights), then right-click 'Site boundary' and Set one Curve (a closed boundary in plan).",
+    "'Points per contour' and 'Section count' control density; 'Section degree' and 'Section points' control smoothing.",
+    "Bake 'Loft' for the terrain surface."
+  ],
+  "concepts": [
+    "Rebuild: making curves uniform before sampling",
+    "Dispatch + Closed: separating closed and open contours",
+    "Closest Point: giving boundary corners a height from the nearest contour",
+    "Delaunay Mesh: triangulating scattered points",
+    "Mesh | Plane sections lofted into a surface"
+  ],
+  "source": {
+    "author": "Nono Martínez Alonso (nonoesp)",
+    "repo": "nonoesp/GettingArchitectureDoneKit",
+    "path": "Inbox/More/GADHelper_TerrainFromRLs.gh",
+    "commit": "853a38ceeb6023a2b7a5c43cbfd25e059e45f016",
+    "licence": "MIT",
+    "licence_url": "https://github.com/nonoesp/GettingArchitectureDoneKit/blob/853a38ceeb6023a2b7a5c43cbfd25e059e45f016/LICENSE"
+  },
+  "labels": {
+    "7aeda7de": "Level curves",
+    "f5ed1fcd": "Site boundary",
+    "fcb6b042": "Points per contour",
+    "b840011e": "Section count",
+    "6b836fba": "Section degree",
+    "400daa53": "Section points",
+    "84267254": "Contour rebuild degree"
+  },
+  "steps": [
+    {
+      "title": "1  INPUTS - change these",
+      "select": {
+        "inputs": true
+      },
+      "explain": "Level curves and site boundary (samples stored; replace them from Rhino), plus density and smoothing settings."
+    },
+    {
+      "title": "2  Sample the contours",
+      "select": {
+        "guids": [
+          "2dd9fa10",
+          "6f2966a8",
+          "50f6eb65",
+          "7087e6a9",
+          "ab2e3c13",
+          "58651a5e"
+        ]
+      },
+      "explain": "The contours are rebuilt to a clean degree and divided into points. Dispatch separates open contours, whose end points are collected so the boundary can borrow their heights."
+    },
+    {
+      "title": "3  Lift the boundary corners",
+      "select": {
+        "guids": [
+          "05f84d3c",
+          "8446f04b",
+          "6f561fb0",
+          "364a3cd7",
+          "0c511d0c",
+          "913b9ffb"
+        ]
+      },
+      "explain": "The boundary is exploded into segments and corners. Each corner takes the height of the closest contour end point (Closest Point, Decompose Z) and is moved up to it, so the mesh reaches the site edge."
+    },
+    {
+      "title": "4  Triangulate and re-section",
+      "select": {
+        "guids": [
+          "8e7f7f0c",
+          "64ea0f60",
+          "e8e384d6",
+          "976d18ea",
+          "db1ef959",
+          "928cce3f"
+        ]
+      },
+      "explain": "All points go into a Delaunay Mesh. Perpendicular frames along one boundary edge cut regular sections through the mesh (Mesh | Plane), and Rebuild smooths each section curve."
+    },
+    {
+      "title": "5  RESULT - terrain surface",
+      "select": {
+        "outputs": true
+      },
+      "explain": "Loft skins the smoothed sections into the terrain surface. Bake it to use it as the site model."
+    }
+  ]
+}

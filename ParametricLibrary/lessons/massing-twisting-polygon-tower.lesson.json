@@ -1,0 +1,79 @@
+{
+  "id": "massing-twisting-polygon-tower",
+  "title": "Twisting polygon tower",
+  "category": "massing",
+  "level": "beginner",
+  "summary": "A regular polygon floor plate is repeated up a tower, each floor rotated a fixed share of a total twist, and the floors are lofted into a twisting mass - the simplest parametric tower.",
+  "how_to_use": [
+    "'Plate radius' and 'Plate sides' set the floor plate; 'Floors' the number of levels; 'Floor height' the spacing.",
+    "'Total twist' is the rotation in degrees from bottom to top.",
+    "Bake the final Geometry parameter to get the tower surface."
+  ],
+  "concepts": [
+    "Polygon on a plane",
+    "Division: spreading a total value over a count",
+    "Series for heights and angles",
+    "Radians: Rotate wants radians",
+    "Loft through stacked curves"
+  ],
+  "source": {
+    "author": "Owen Derby (oderby)",
+    "repo": "oderby/VVD",
+    "path": "examples/versionTower.ghx",
+    "commit": "548fa5333b0c4eeeccbf9be7438eff3874c31db9",
+    "licence": "MIT",
+    "licence_url": "https://github.com/oderby/VVD/blob/548fa5333b0c4eeeccbf9be7438eff3874c31db9/LICENSE"
+  },
+  "labels": {
+    "bfa02660": "Plate radius",
+    "b01626f4": "Plate sides",
+    "10da5b34": "Floors",
+    "0ff86a0f": "Total twist (deg)",
+    "451da16b": "Floor height"
+  },
+  "steps": [
+    {
+      "title": "1  INPUTS - change these",
+      "select": {
+        "inputs": true
+      },
+      "explain": "Floor plate size and number of sides, number of floors, floor height and total twist."
+    },
+    {
+      "title": "2  Floor plate at the base",
+      "select": {
+        "guids": [
+          "8d7c65a4",
+          "d9738265",
+          "52e3cad6"
+        ]
+      },
+      "explain": "A point at the origin is used as the base plane and Polygon draws the floor plate on it."
+    },
+    {
+      "title": "3  Height and twist per floor",
+      "select": {
+        "guids": [
+          "20f2b9cf",
+          "914d7d4b",
+          "d065111e",
+          "2073953b",
+          "8f03134b",
+          "8aca0a06",
+          "024dc205"
+        ]
+      },
+      "explain": "Total twist / Floors gives the rotation step and a Series turns it into one angle per floor (Radians converts it). A second Series gives each floor its height. Rotate turns the plate and Move lifts it to its level."
+    },
+    {
+      "title": "4  RESULT - loft the floors",
+      "select": {
+        "outputs": true,
+        "guids": [
+          "9e195083"
+        ]
+      },
+      "explain": "Loft skins the rotated floor plates into the tower surface; the Geometry parameter is the result to bake."
+    }
+  ]
+}
