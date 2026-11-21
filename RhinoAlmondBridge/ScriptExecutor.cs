@@ -88,10 +88,10 @@ namespace RhinoAlmondBridge
                 // Collect GUIDs
                 if (invokeResult is List<Guid> guids)
                 {
+                    // Return the GUIDs only. The bridge used to stamp a LinearDimension over
+                    // every script's output; that left annotations nobody asked for in the
+                    // user's document (two per asset placement, one with the wrong scale).
                     result.Guids = guids.Select(g => g.ToString()).ToList();
-
-                    if (guids.Count > 0)
-                        AddScaleDimensions(doc, guids);
                 }
             }
             catch (TargetInvocationException ex)
@@ -291,44 +291,6 @@ using Rhino.Commands;
                     var layer = new Layer { Name = kvp.Key, Color = kvp.Value };
                     doc.Layers.Add(layer);
                 }
-            }
-        }
-
-        /// <summary>
-        /// Adds an aligned dimension line spanning the bounding box of created geometry.
-        /// </summary>
-        private void AddScaleDimensions(RhinoDoc doc, List<Guid> guids)
-        {
-            var bbox = BoundingBox.Empty;
-
-            foreach (var guid in guids)
-            {
-                var obj = doc.Objects.FindId(guid);
-                if (obj?.Geometry != null)
-                    bbox.Union(obj.Geometry.GetBoundingBox(true));
-            }
-
-            if (!bbox.IsValid) return;
-
-            try
-            {
-                var pt0 = bbox.Min;
-                var pt1 = new Point3d(bbox.Max.X, bbox.Min.Y, bbox.Min.Z);
-                var plane = Plane.WorldXY;
-                plane.Origin = pt0;
-
-                var dim = LinearDimension.Create(
-                    AnnotationType.Aligned,
-                    doc.DimStyles.Current,
-                    plane, plane.XAxis, pt0, pt1, pt0, 0
-                );
-
-                if (dim != null)
-                    doc.Objects.AddLinearDimension(dim);
-            }
-            catch (Exception ex)
-            {
-                RhinoApp.WriteLine($"RhinoAlmondBridge: Dimension error: {ex.Message}");
             }
         }
     }
