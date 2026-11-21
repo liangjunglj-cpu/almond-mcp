@@ -75,8 +75,16 @@ def build_bundle(destination: Path):
     shutil.copyfile(ROOT/"THIRD-PARTY-NOTICES.md",destination/"THIRD-PARTY-NOTICES.md")
     shutil.copyfile(generated/"previews/render-record.json",destination/"evidence/preview-render-record.json")
     if (generated/"batches").exists():
-        shutil.copytree(generated/"batches", destination/"evidence/batches")
-    (destination/"ATTRIBUTION.txt").write_text("Generated 3D models and derived drawings: Almond generated asset library.\nDeclared licence: CC BY 4.0 — https://creativecommons.org/licenses/by/4.0/\nRetain attribution, link the licence, and indicate modifications.\nAlmond code: MIT. Viewer and dependencies: see ui/vendor/ licences.\nGeneration source records and documented gaps: evidence/source-register.json.\nCommunity drawing models are metadata-only here, with separate source terms.\n", encoding="utf-8")
+        # Generation input images are already bundled (hash-checked routes under files/generated/batches/, linked
+        # from each record): keep one copy. evidence/batches holds the request records and retained scripts.
+        served = destination/"files"/"generated"/"batches"
+
+        def already_served(directory, names):
+            rel = Path(directory).relative_to(generated/"batches")
+            return [n for n in names if (served/rel/n).is_file()]
+
+        shutil.copytree(generated/"batches", destination/"evidence/batches", ignore=already_served)
+    (destination/"ATTRIBUTION.txt").write_text("Generated 3D models and derived drawings: Almond generated asset library.\nDeclared licence: CC BY 4.0 — https://creativecommons.org/licenses/by/4.0/\nRetain attribution, link the licence, and indicate modifications.\nAlmond code: MIT. Viewer and dependencies: see ui/vendor/ licences.\nGeneration source records and documented gaps: evidence/source-register.json; request records in evidence/batches/, generation input images in files/generated/batches/.\nCommunity drawing models are metadata-only here, with separate source terms.\n", encoding="utf-8")
     manifest = {"schema_version":1, "version":__version__, "counts":catalogue["counts"], "routes":routes}
     (destination/"bundle.json").write_text(json.dumps(manifest,indent=2)+"\n",encoding="utf-8")
     return {"version":__version__, "routes":len(routes), "counts":catalogue["counts"], "directory":str(destination)}
