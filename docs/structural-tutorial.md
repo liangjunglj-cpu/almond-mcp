@@ -37,7 +37,7 @@ Almond analyses **centre lines**: one curve for each beam and each column, meeti
 | Key | Value | Example |
 |---|---|---|
 | `almond:section` | `rect W x D`, `box W x D x t` or `chs D x t`, in mm unless a unit follows | `rect 300x640`, `rect 30x64 cm`, `chs 219.1x8` |
-| `almond:release` | `pinned`, `pinned_start`, `pinned_end` or `rigid` | `pinned` for a simply supported beam |
+| `almond:release` | `pinned`, `pinned_start`, `pinned_end` or `rigid`; `bar` (a pin-jointed truss bar) or `hinged` (pinned in its vertical plane, continuous in plan) | `pinned` for a simply supported beam |
 
 The panel's **Override beam section** sets one tube size for every member and takes precedence over both.
 
@@ -162,6 +162,7 @@ With the MCP server registered (`uvx almond-mcp`), Claude can run the same engin
 
 - `validate_structure`: solve and check. Pass `detail=True` for the per-member and per-support tables. `design_code`, `fabrication`, `floor_load_kn_m2` and `asset_loads` match the panel settings.
 - `visualize_structure`: draw the deflected shape or a buckling mode (`view="buckling"`) in the viewport.
+- `list_structural_references`, `analyze_structural_reference`, `place_structural_reference`: twelve benchmarked typologies (Pratt truss, portal, arch, moment frame, braced tower, canopy, ...) solved here with their benchmark loads, or drawn in Rhino with the section, release and support user text already set, so a user's frame can be compared with a verified one.
 
 A typical request: *"Check the frame on layer Structure with 2 kN/m² imposed and 1 kN/m² build-up, simple joints. If it fails, find the lightest CHS that passes."*
 

@@ -14,7 +14,12 @@ so the two engines are comparable:
   drawn along one line form a continuous member); columns stay continuous; a curve's user text
   ``almond:release``
   ("pinned" | "pinned_start" | "pinned_end" | "rigid") overrides either mode for that member;
+  "bar" releases both bending axes at both ends whatever the orientation (a pin-jointed truss bar),
+  "hinged" releases major-axis bending only at both ends (a planar truss member or simple beam that
+  stays continuous in plan);
 - imposed load: ``load_kn`` split equally over the free (unsupported) nodes, acting -Z;
+- explicit loads: ``model["loads"]`` nodal forces/moments and member line loads with their own case
+  (G or Q), e.g. the structural reference library's benchmark loads (``_apply_model_loads``);
 - self weight: gamma x A along every member, -Z;
 - deflection limit: span / the design code's ratio (250 for the Eurocode profile), span = longest
   member for beam/frame, else overall extent, unless the caller names the structural span
@@ -98,6 +103,8 @@ SUPPORT_TYPES = {                                       # restrained DOFs (ux uy
     "roller": (_F, _F, _T, _F, _F, _F),                 # vertical only: slides in plan
     "roller-x": (_F, _T, _T, _F, _F, _F),               # slides along x
     "roller-y": (_T, _F, _T, _F, _F, _F),               # slides along y
+    "lateral-x": (_T, _F, _F, _F, _F, _F),              # lateral restraint: holds x only (bracing, a deck)
+    "lateral-y": (_F, _T, _F, _F, _F, _F),              # lateral restraint: holds y only
     "spring": (_F,) * 6,                                # only the listed springs
 }
 SPRING_KEYS = ("kx", "ky", "kz", "rx", "ry", "rz")       # kN/m (translations), kNm/rad (rotations)
@@ -108,7 +115,8 @@ def parse_support(text: str) -> tuple[tuple, tuple, str]:
 
     ``"<type> [key=value ...]"``: type is one of SUPPORT_TYPES; keys kx ky kz (kN/m) and rx ry rz
     (kNm/rad) add springs to ground in global axes, and a sprung DOF is no longer rigid. Examples:
-    ``fixed``, ``roller-x``, ``spring kz=50000``, ``fixed rx=8000 ry=8000`` (semi-rigid base).
+    ``fixed``, ``roller-x``, ``spring kz=50000``, ``fixed rx=8000 ry=8000`` (semi-rigid base); ``lateral-y``
+    holds one horizontal direction only (the out-of-plane restraint a planar truss gets from its deck or bracing).
     Raises ValueError for anything else."""
     words = str(text or "").replace(",", " ").lower().split()
     if not words or words[0] not in SUPPORT_TYPES:
@@ -131,7 +139,7 @@ def parse_support(text: str) -> tuple[tuple, tuple, str]:
 WELD_RATIO = 2e-4          # points closer than this x the model's diagonal extent are one node
 COLLINEAR_COS = 0.9995     # pieces meeting within ~1.8 degrees of a straight line are one member
 STEEP_SIN = 0.7            # members at least ~45 degrees from horizontal support what they meet
-RELEASES = ("rigid", "pinned", "pinned_start", "pinned_end")
+RELEASES = ("rigid", "pinned", "pinned_start", "pinned_end", "bar", "hinged")
 
 
 def _member_ends(model: dict, tol: float) -> list:
@@ -192,11 +200,94 @@ def _release_ends(m: dict, connections: str) -> tuple[bool, bool, str, bool]:
     kind = _orientation(m)
     minor = kind != "beam"
     user = (m.get("release") or "").strip().lower()
+    if user == "bar":                                   # pin-jointed bar: axial only (both axes released)
+        return True, True, "user", True
+    if user == "hinged":                                # in-plane hinges: major axis only, plan bending continuous
+        return True, True, "user", False
     if user in RELEASES:
         return user in ("pinned", "pinned_start"), user in ("pinned", "pinned_end"), "user", minor
     if connections == "simple" and kind != "column":
         return True, True, "simple", minor
     return False, False, "rigid", minor
+
+
+MODEL_LOAD_CASES = ("G", "Q")
+
+
+def _apply_model_loads(frame: fs.Frame, model: dict, member_elements: dict, tol: float) -> tuple[dict, list[str]]:
+    """Explicit loads carried by the model (``model["loads"]``): the structural reference library's
+    benchmark loads today, point loads declared in Rhino tomorrow. Each entry is one of
+
+    - ``{"point_m": [x, y, z], "force_kn": [fx, fy, fz], "moment_knm": [mx, my, mz], "case": "Q"}``:
+      a nodal load at the nearest node (within 50 mm, else ignored with a warning);
+    - ``{"member": i, "w_start_kn_m": [wx, wy, wz], "w_end_kn_m": [...], "case": "G"}``: a line load
+      (global kN/m) along model member ``i``, uniform when ``w_end`` is omitted, otherwise varying
+      linearly from the member's first drawn point to its last; applied to every piece of the member.
+
+    ``case`` is G (permanent) or Q (variable; the default). Returns ({"count", "nodal", "member",
+    "nodes"}, warnings)."""
+    out = {"count": 0, "nodal": 0, "member": 0, "nodes": []}
+    notes = []
+    loads = model.get("loads") or []
+    if not isinstance(loads, list):
+        raise ValueError("model['loads'] must be a list of load entries.")
+    X = np.asarray(frame.nodes, float) if frame.nodes else np.zeros((0, 3))
+    members = model.get("members") or []
+    for k, load in enumerate(loads):
+        if not isinstance(load, dict):
+            raise ValueError(f"Load {k} must be an object.")
+        case = str(load.get("case") or "Q").strip().upper()
+        if case not in MODEL_LOAD_CASES:
+            raise ValueError(f"Load {k}: case must be G (permanent) or Q (variable), not {load.get('case')!r}.")
+        if load.get("point_m") is not None:
+            p = np.asarray(load["point_m"], float)
+            if p.shape != (3,) or not np.all(np.isfinite(p)):
+                raise ValueError(f"Load {k}: point_m must be three finite coordinates in metres.")
+            d = np.linalg.norm(X - p, axis=1)
+            i = int(np.argmin(d))
+            if d[i] > max(tol, 0.05):
+                notes.append(f"Load {k} at {tuple(round(v, 3) for v in p)} is {d[i]:.3f} m from the nearest node "
+                             "and was ignored.")
+                continue
+            force = load.get("force_kn") or (0.0, 0.0, 0.0)
+            moment = load.get("moment_knm") or (0.0, 0.0, 0.0)
+            if len(force) != 3 or len(moment) != 3:
+                raise ValueError(f"Load {k}: force_kn and moment_knm must have three components.")
+            frame.load(i, *[float(v) for v in force], *[float(v) for v in moment], case=case)
+            out["nodes"].append(i)
+            out["nodal"] += 1
+        elif load.get("member") is not None:
+            try:
+                mi = int(load["member"])
+            except (TypeError, ValueError):
+                raise ValueError(f"Load {k}: member must be a model member index.") from None
+            if mi not in member_elements:
+                notes.append(f"Load {k}: member {mi} has no analysed piece; the load was ignored.")
+                continue
+            wa = load.get("w_start_kn_m", load.get("w_kn_m"))
+            if wa is None:
+                raise ValueError(f"Load {k}: a member load needs w_start_kn_m (or w_kn_m) in kN/m.")
+            wb = load.get("w_end_kn_m", wa)
+            wa, wb = np.asarray(wa, float), np.asarray(wb, float)
+            if wa.shape != (3,) or wb.shape != (3,) or not (np.all(np.isfinite(wa)) and np.all(np.isfinite(wb))):
+                raise ValueError(f"Load {k}: member loads are three finite components (global kN/m).")
+            pts = members[mi].get("points") or []
+            p0, p1 = np.asarray(pts[0], float), np.asarray(pts[-1], float)
+            chord = float(np.linalg.norm(p1 - p0))
+            for ei in member_elements[mi]:
+                e = frame.elements[ei]
+                if chord <= tol or np.allclose(wa, wb):
+                    frame.udl(ei, wa, case)
+                    continue
+                ta = float(np.dot(X[e.n1] - p0, p1 - p0) / chord ** 2)
+                tb = float(np.dot(X[e.n2] - p0, p1 - p0) / chord ** 2)
+                frame.linear_load(ei, wa + ta * (wb - wa), wa + tb * (wb - wa), case)
+            out["member"] += 1
+        else:
+            raise ValueError(f"Load {k}: give point_m (nodal load) or member (line load).")
+        out["count"] += 1
+    out["nodes"] = sorted(set(out["nodes"]))
+    return out, notes
 
 
 def build_frame(model: dict, load_kn: float, material: str = "Steel", fixed_supports: bool = True,
@@ -228,6 +319,7 @@ def build_frame(model: dict, load_kn: float, material: str = "Steel", fixed_supp
         return frame.add_node(p)
 
     lineage = []
+    member_elements: dict = {}                              # model member index -> its elements
     pinned_ends, user_members, unordered, welded = 0, 0, 0, 0
     cont = _continued(model, tol) if connections == "simple" else {}
     for mi, (m, (c0, c1, ordered)) in enumerate(zip(model.get("members", []), _member_ends(model, tol))):
@@ -258,6 +350,7 @@ def build_frame(model: dict, load_kn: float, material: str = "Steel", fixed_supp
                                    releases=fs.release_mask(ra, rb, minor))
             pinned_ends += int(ra) + int(rb)
             lineage.append(ei)
+            member_elements.setdefault(mi, []).append(ei)
     if welded:
         warnings.append(f"{welded} member piece(s) shorter than {weld * 1000:.1f} mm were collapsed into a single "
                         "joint (points this close are one node for the analysis).")
@@ -286,7 +379,8 @@ def build_frame(model: dict, load_kn: float, material: str = "Steel", fixed_supp
             sup = parse_support(spec or default)
         except ValueError as exc:
             warnings.append(f"Support '{spec}' at {tuple(round(v, 3) for v in p)} not understood ({exc}); the default "
-                            f"({default}) was used. Types: fixed, pinned, roller, roller-x, roller-y, spring kz=...")
+                            f"({default}) was used. Types: fixed, pinned, roller, roller-x, roller-y, lateral-x, lateral-y, "
+                            "spring kz=...")
             sup = parse_support(default)
         if i in chosen and chosen[i][2] != sup[2]:
             warnings.append(f"Two supports ({chosen[i][2]}, {sup[2]}) land on the node at "
@@ -310,11 +404,16 @@ def build_frame(model: dict, load_kn: float, material: str = "Steel", fixed_supp
     if load_kn > 0:
         for n in free:
             frame.load(n, fz=-load_kn / len(free), case="Q")
+    explicit, explicit_notes = _apply_model_loads(frame, model, member_elements, tol)
+    warnings += explicit_notes
     if self_weight:
         frame.gravity = (0.0, 0.0, -1.0)
+    loaded = sorted(set(free if load_kn > 0 else []) | set(explicit["nodes"]))
     info = {"support_nodes": support_nodes, "support_labels": {n: chosen[n][2] for n in support_nodes},
-            "loaded_nodes": free if load_kn > 0 else [], "material": mat,
+            "loaded_nodes": loaded, "material": mat,
             "connections": {"mode": connections, "pinned_ends": pinned_ends, "user_released_members": user_members}}
+    if explicit["count"]:
+        info["model_loads"] = {k: v for k, v in explicit.items() if k != "nodes"}
     if floor_loads and (floor_loads.get("imposed") or floor_loads.get("dead")):
         info["floor_loads"] = fl.apply(frame, floor_loads.get("imposed", 0.0), floor_loads.get("dead", 0.0),
                                        floor_loads.get("levels"))

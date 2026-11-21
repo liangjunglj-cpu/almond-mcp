@@ -190,6 +190,7 @@ locations:
 | `RHINO_MCP_DRAWING_RECIPE_DIR` | `DrawingRecipes` |
 | `RHINO_MCP_GENERATED_ASSET_DIR` | `GeneratedAssetfiles` |
 | `RHINO_MCP_CAPSULE_DIR` | `capsules` |
+| `RHINO_MCP_STRUCTURAL_REFERENCE_DIR` | `StructuralReferences` |
 | `RHINO_MCP_STATE_DB` | `%LOCALAPPDATA%\Almond\almond_state.sqlite3` |
 
 ## Rhino to Chestnut
@@ -320,6 +321,12 @@ Every run is recorded in the local state database;
 `export_structural_report()` renders the history to a Markdown report
 (inputs, pathway, span/deflection/utilization/reactions, warnings,
 PASS/FAIL). Details: `docs/structural-validation.md`.
+
+Start from a verified model: `list_structural_references`,
+`analyze_structural_reference` and `place_structural_reference` expose twelve
+benchmarked typologies as parametric line models, analysed with their benchmark
+loads (closed forms and OpenSees agree) or drawn in Rhino ready for
+`validate_structure`. See `StructuralReferences/README.md`.
 
 On top of the solver, a **construction knowledge layer**
 (`get_construction_guidance`, `Constructionfiles/manifest.json`) grounds

@@ -24,7 +24,7 @@ from fastmcp import FastMCP
 from fastmcp.resources import ResourceContent, ResourceResult
 from almond_mcp.ghx_parser import GHParser, validate_capsule_manifest
 from almond_mcp.retrieval_store import AlmondStore
-from almond_mcp import asset_passport, asset_loads, bridge_client, conditioning, exchange, paths, drafting, native_structure, structure_study, design_codes
+from almond_mcp import asset_passport, asset_loads, bridge_client, conditioning, exchange, paths, drafting, native_structure, structure_study, design_codes, structural_references
 
 # ── Constants ────────────────────────────────────────────────────────────────
 
@@ -38,6 +38,7 @@ DRAFTING_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_DRAFTING_DIR")
 CAPSULE_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_CAPSULE_DIR")
 MATERIAL_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_MATERIAL_DIR")
 CONSTRUCTION_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_CONSTRUCTION_DIR")
+STRUCTURAL_REFERENCE_DIR = paths.resolve_dir("RHINO_MCP_STRUCTURAL_REFERENCE_DIR")
 STATE_DB_PATH = paths.resolve_state_db()
 BRIDGE_HOST = '127.0.0.1'
 BRIDGE_PORT = 5000
@@ -59,12 +60,18 @@ mcp = FastMCP("Almond", instructions=(
     "Register placements in the scene ledger and validate_scene_layout. "
     "Use measured dimensions, not nominal prompt targets. Usage suggestions are "
     "heuristics and clearances are design allowances, not certified code compliance. "
+    "For structure, start from a benchmarked reference: list_structural_references, "
+    "analyze_structural_reference (no Rhino needed) to see a correct verdict for the typology, "
+    "place_structural_reference to draw it in Rhino, then validate_structure / visualize_structure "
+    "on the placed members, and compare. "
     "For climate and environment (EPW weather files): climate_summary and sun_path for the site, "
     "analyze_daylight (annual sDA/ASE/UDI, daylight factor, point-in-time, glare), "
     "analyze_solar_radiation, analyze_thermal (energy and comfort) and thermal_comfort; each accepts "
     "a shoebox room to study without Rhino. Check the returned material classification before "
     "trusting numbers, and show_environment_result to draw a saved run in Rhino."
 ))
+
+structural_index = structural_references.ReferenceLibrary(STRUCTURAL_REFERENCE_DIR)
 
 # ── Library Indexer ──────────────────────────────────────────────────────────
 
@@ -1093,6 +1100,198 @@ def get_generated_asset(asset_id: str) -> str:
             "message": f"Unknown generated asset_id: {asset_id}",
         })
     return json.dumps({"status": "success", "asset": asset})
+
+
+# ── Structural reference library ──────────────────────────────────────────────
+
+def _reference_error(message: str) -> dict:
+    return {"status": "error", "message": message}
+
+
+def _reference_guard():
+    if not structural_index.available:
+        return _reference_error(f"Structural reference library not found in {STRUCTURAL_REFERENCE_DIR}")
+    return None
+
+
+@mcp.tool(annotations={"readOnlyHint": True, "openWorldHint": False})
+def list_structural_references(query: str = "", family: str = "", limit: int = 20) -> dict:
+    """List Almond's structural reference library: twelve benchmarked building typologies
+    (moment frame, braced tower, Pratt truss, gable portal, portal-frame warehouse,
+    double-layer space grid, parabolic arch, L-shaped cantilever, cantilever canopy,
+    diagrid tower, Vierendeel girder, a frame on six support types) as parametric line
+    models with their benchmark loads. They are the models the native solver is verified
+    against (closed forms and OpenSees), so a reference run shows what a correct
+    validate_structure result looks like for that typology. query matches titles,
+    summaries, what each exercises and the teaching notes (e.g. "truss", "buckling",
+    "cantilever"); family is frame, tower, truss, hall, roof, arch or cantilever.
+    No Rhino needed."""
+    err = _reference_guard()
+    if err:
+        return err
+    return {"status": "success", "library_dir": STRUCTURAL_REFERENCE_DIR,
+            **structural_index.search(query, family, limit)}
+
+
+@mcp.tool(annotations={"readOnlyHint": True, "openWorldHint": False})
+def get_structural_reference(reference_id: str, parameters: dict | None = None) -> dict:
+    """One reference in full: what it models and exercises, its parameters with ranges and
+    defaults, sections, the default study (material, supports, self weight, connections,
+    deflection span), how it was verified (closed form, OpenSees), related Karamba
+    capsules and parametric definitions, teaching notes, and the model it builds at the
+    given parameters: member and node counts, support types, the loads it applies (G and
+    Q; wind is dropped) and the nearest validate_structure call for the placed geometry.
+    Then analyze_structural_reference to solve it, or place_structural_reference to draw it."""
+    err = _reference_guard()
+    if err:
+        return err
+    try:
+        entry, params, model, report = structural_references.reference_model(structural_index, reference_id, parameters)
+    except KeyError:
+        return _reference_error(f"Unknown structural reference id: {reference_id}. Use list_structural_references.")
+    except ValueError as exc:
+        return _reference_error(str(exc))
+    report.pop("built", None)
+    study = structural_references.study_settings(entry)
+    if study.get("span_m") is None and study.get("span_parameter"):
+        study["span_m"] = params[study["span_parameter"]]
+    return {"status": "success",
+            **{k: v for k, v in entry.items() if k != "builder"},
+            "parameters_used": params, "model": report, "study_resolved": study,
+            "rhino": structural_references.rhino_study(entry, report, study),
+            "model_uri": f"almond://structural/{entry['id']}/model",
+            "how_to_use": [
+                "analyze_structural_reference(reference_id, parameters) solves it here with the native engine and "
+                "compares with the textbook value where one exists.",
+                "place_structural_reference(reference_id, parameters, x_mm, y_mm) draws it in Rhino with almond:section, "
+                "almond:release and almond:support user text.",
+                "validate_structure / visualize_structure on the placed members with the suggested rhino.validate_structure "
+                "arguments, and compare with the reference run.",
+                "Change one parameter at a time (the teaching notes suggest which) and run again."]}
+
+
+@mcp.tool(annotations={"readOnlyHint": True, "openWorldHint": False})
+def analyze_structural_reference(
+    reference_id: str,
+    parameters: dict | None = None,
+    material: str | None = None,
+    fixed_supports: bool | None = None,
+    self_weight: bool | None = None,
+    connections: str | None = None,
+    stability: str | None = None,
+    span_m: float | None = None,
+    load_kn: float = 0.0,
+    floor_load_kn_m2: float = 0.0,
+    floor_dead_kn_m2: float = 0.0,
+    design_basis: str = "en1990",
+    uls_combination: str | None = None,
+    design_code: str = "eurocode",
+    detail: bool = False,
+    fabrication: str = "cold_formed",
+) -> dict:
+    """Solve a structural reference with Almond's native engine, exactly as validate_structure
+    does for Rhino geometry, but from the reference's own model: no Rhino session needed.
+    The result has validate_structure's shape (verdict, deflection against the limit,
+    utilization, stability with alpha_cr, combinations, warnings, assumptions; members and
+    supports with detail=True) plus "reference": the parameters used, counts, the loads
+    applied (the benchmark's G and Q loads; wind dropped), the support types, conversion
+    notes and "checks", which compare the run with the benchmark frame and, for the Pratt
+    truss, portal, arch and L-bracket, with the textbook closed form (method of joints,
+    virtual work, the force method, funicular statics). A reference may fail honestly (the
+    canopy and diagrid are sizing exercises; the arch goes unstable above about 12 kN/m).
+
+    parameters: a subset of the reference's parameters (see get_structural_reference), e.g.
+    {"storeys": 3, "bay": 7.5}. The other arguments override the reference's default study
+    and mean what they mean on validate_structure; None keeps the study value. load_kn adds
+    an extra variable load shared over the free nodes on top of the reference loads (default
+    0); floor loads apply to frames with floor bays. Typed supports (planar references,
+    mixed-supports) ignore fixed_supports."""
+    err = _reference_guard()
+    if err:
+        return err
+    try:
+        return structural_references.analyze(
+            structural_index, reference_id, parameters, material=material, fixed_supports=fixed_supports,
+            self_weight=self_weight, connections=connections, stability=stability, span_m=span_m,
+            load_kn=load_kn, floor_imposed_kn_m2=floor_load_kn_m2, floor_dead_kn_m2=floor_dead_kn_m2,
+            design_basis=design_basis, uls_combination=uls_combination, design_code=design_code, detail=detail,
+            fabrication=fabrication)
+    except KeyError:
+        return _reference_error(f"Unknown structural reference id: {reference_id}. Use list_structural_references.")
+    except (ValueError, TypeError) as exc:
+        return _reference_error(str(exc))
+
+
+@mcp.tool(annotations={"readOnlyHint": False, "destructiveHint": False, "openWorldHint": False})
+def place_structural_reference(
+    reference_id: str,
+    parameters: dict | None = None,
+    x_mm: float = 0.0,
+    y_mm: float = 0.0,
+    z_mm: float = 0.0,
+    layer: str = "",
+    lateral_restraints: bool = False,
+) -> dict:
+    """Draw a structural reference in Rhino (through the bridge): one line per member with
+    almond:section (and almond:release for bars and pinned ends) user text, one point per
+    support with almond:support user text, on its own layer, in the document's units, with
+    the reference origin at (x_mm, y_mm, z_mm). Returns the GUIDs (members first, in the
+    reference's member order, then supports) and rhino.validate_structure, the nearest
+    validate_structure arguments: the bridge exports geometry, sections, releases and
+    support points but not loads, so the reference's variable loads become one load_kn.
+    lateral_restraints=True also places the lateral-y restraint points of a planar
+    reference (Pratt truss, portal, arch, Vierendeel); leave it False for a bridge that
+    does not read almond:support yet, or every point would become a full support."""
+    err = _reference_guard()
+    if err:
+        return err
+    try:
+        entry, params, model, report = structural_references.reference_model(
+            structural_index, reference_id, parameters, lateral_restraints=bool(lateral_restraints))
+        built = report.pop("built")
+        script = structural_references.place_script(entry, model, built, x_mm, y_mm, z_mm, layer)
+    except KeyError:
+        return _reference_error(f"Unknown structural reference id: {reference_id}. Use list_structural_references.")
+    except ValueError as exc:
+        return _reference_error(str(exc))
+    raw = execute_rhino_script(script)
+    try:
+        result = json.loads(raw)
+    except (TypeError, ValueError):
+        result = {"status": "error", "message": str(raw)[:500]}
+    if result.get("status") != "success":
+        return {"status": "error", "message": "Rhino could not draw the reference", "bridge": result}
+    guids = list(result.get("guids") or [])
+    n_members = len(model["members"])
+    n_supports = len(model.get("supports") or model.get("anchor_points") or [])
+    study = structural_references.study_settings(entry)
+    if study.get("span_m") is None and study.get("span_parameter"):
+        study["span_m"] = params[study["span_parameter"]]
+    return {"status": "success", "reference_id": entry["id"], "title": entry["title"], "parameters_used": params,
+            "layer": (layer or f"Almond Reference {entry['id']}").strip(),
+            "guids": guids, "member_guids": guids[:n_members], "support_guids": guids[n_members:],
+            "members": n_members, "supports": n_supports, "objects_created": len(guids),
+            "support_types": report["supports"], "loads_not_drawn": report["loads"],
+            "rhino": structural_references.rhino_study(entry, report, study),
+            "next": "validate_structure(guids=member_guids + support_guids, **rhino.validate_structure), or "
+                    "visualize_structure on the same GUIDs; compare with analyze_structural_reference."}
+
+
+@mcp.resource("almond://structural/catalogue", mime_type="application/json")
+def structural_catalogue_resource() -> ResourceResult:
+    """Compact catalogue of the structural reference library."""
+    return ResourceResult([ResourceContent(list_structural_references(limit=1000), mime_type="application/json")])
+
+
+@mcp.resource("almond://structural/{reference_id}/model", mime_type="application/json")
+def structural_model_resource(reference_id: str) -> ResourceResult:
+    """The reference's conditioned line model at its default parameters: the JSON validate_structure analyses
+    (members with sections and releases, typed supports or anchor points, G/Q loads)."""
+    try:
+        _, _, model, _ = structural_references.reference_model(structural_index, reference_id)
+    except KeyError:
+        raise ValueError("Unknown structural reference id")
+    return ResourceResult([ResourceContent(model, mime_type="application/json")])
 
 
 @mcp.tool()

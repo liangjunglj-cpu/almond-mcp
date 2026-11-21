@@ -72,6 +72,7 @@ fixed, or pinned). A support point can carry its own type in the model's
 | `pinned` (`pin`) | three translations | simple base plate |
 | `roller` | vertical | sliding bearing |
 | `roller-x` / `roller-y` | vertical + y / x (slides along x / y) | expansion joint |
+| `lateral-x` / `lateral-y` | that horizontal direction only | out-of-plane bracing of a planar truss or frame, a deck |
 | `spring kz=50000` | only the listed springs | soil, elastic bearing |
 
 Spring keys: `kx ky kz` in kN/m, `rx ry rz` in kNm/rad; a sprung direction is
