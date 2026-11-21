@@ -37,11 +37,17 @@ SCHEMA = {
     "uls_expression": ("choice", ("either", "6.10", "6.10ab")),
     "uls_default": ("choice", ("6.10", "6.10ab")),
     "deflection_limit_ratio": ("number", 100.0, 1000.0),
+    "storey_drift_limit_ratio": ("number", 100.0, 1000.0),
     "gamma_M0": ("number", 1.0, 1.5),
     "gamma_M1": ("number", 1.0, 1.5),
     "imposed_floor_kn_m2": ("table", 0.0, 50.0),
 }
-REQUIRED = tuple(k for k in SCHEMA if k != "imposed_floor_kn_m2")
+OPTIONAL = ("imposed_floor_kn_m2", "storey_drift_limit_ratio")
+REQUIRED = tuple(k for k in SCHEMA if k not in OPTIONAL)
+# a value no code clause fixes: Almond's project default, used when a profile does not set its own
+DRIFT_DEFAULT = (300.0, "Almond project default (not a code value): EN 1993-1-1 7.2.2 and EN 1990 A1.4.3 leave "
+                        "horizontal displacement limits, including the storey drift u_i over the storey height H_i, "
+                        "to the project or the National Annex. Agree the limit for the project.")
 
 
 @dataclass(frozen=True)
@@ -53,6 +59,7 @@ class Profile:
     sources: dict = field(default_factory=dict)
     unverified: tuple = ()
     origin: str = "built-in"            # "built-in" | "user" | path of the file
+    project_defaults: tuple = ()        # values no code clause fixes (verified false by nature), e.g. drift
 
     def __getattr__(self, key):
         values = object.__getattribute__(self, "values")
@@ -75,21 +82,27 @@ class Profile:
 
     def summary(self) -> dict:
         return {"id": self.id, "name": self.name, "basis": self.basis, "origin": self.origin,
-                "values": dict(self.values), "unverified": list(self.unverified)}
+                "values": dict(self.values), "unverified": list(self.unverified),
+                "project_defaults": list(self.project_defaults)}
 
     def listing(self) -> dict:
         return {"id": self.id, "name": self.name, "basis": self.basis, "origin": self.origin,
                 "verified": not self.unverified, "unverified": list(self.unverified),
                 "uls_expression": self.values["uls_expression"], "uls_default": self.values["uls_default"],
                 "deflection_limit_ratio": self.values["deflection_limit_ratio"],
+                "storey_drift_limit_ratio": self.values["storey_drift_limit_ratio"],
+                "project_defaults": list(self.project_defaults),
                 "imposed_floor_kn_m2": self.values.get("imposed_floor_kn_m2") or {}}
 
 
 OFF_PROFILE = Profile(
     id=OFF, name="Off (unfactored mechanics)", basis="No design code: characteristic G + Q, no partial factors",
     values={"gamma_G": 1.0, "gamma_Q": 1.0, "psi_0": 1.0, "xi": 1.0, "uls_expression": "6.10", "uls_default": "6.10",
-            "deflection_limit_ratio": 250.0, "gamma_M0": 1.0, "gamma_M1": 1.0, "imposed_floor_kn_m2": {}},
-    sources={"deflection_limit_ratio": "Indicative span/250 screen, not a code limit"})
+            "deflection_limit_ratio": 250.0, "storey_drift_limit_ratio": DRIFT_DEFAULT[0], "gamma_M0": 1.0,
+            "gamma_M1": 1.0, "imposed_floor_kn_m2": {}},
+    sources={"deflection_limit_ratio": "Indicative span/250 screen, not a code limit",
+             "storey_drift_limit_ratio": DRIFT_DEFAULT[1]},
+    project_defaults=("storey_drift_limit_ratio",))
 
 
 def user_dir() -> Path:
@@ -113,7 +126,7 @@ def parse(data: dict, origin: str = "built-in") -> Profile:
     unknown = sorted(set(params) - set(SCHEMA))
     if unknown:
         raise ValueError(f"unknown parameter(s): {', '.join(unknown)}")
-    values, sources, unverified = {}, {}, []
+    values, sources, unverified, defaults = {}, {}, [], []
     for key in SCHEMA:
         entry = params.get(key)
         if entry is None:
@@ -128,10 +141,15 @@ def parse(data: dict, origin: str = "built-in") -> Profile:
         sources[key] = str(entry.get("source") or "")
         if not sources[key]:
             raise ValueError(f"{key} needs a source (document and clause)")
-        if entry.get("verified") is not True:
+        if entry.get("project_default") is True:
+            defaults.append(key)                # no published value to verify against: reported as such
+        elif entry.get("verified") is not True:
             unverified.append(key)
     values.setdefault("imposed_floor_kn_m2", {})
-    return Profile(pid, name, basis, values, sources, tuple(unverified), origin)
+    if "storey_drift_limit_ratio" not in values:
+        values["storey_drift_limit_ratio"], sources["storey_drift_limit_ratio"] = DRIFT_DEFAULT
+        defaults.append("storey_drift_limit_ratio")
+    return Profile(pid, name, basis, values, sources, tuple(unverified), origin, tuple(defaults))
 
 
 def _check(key, value):

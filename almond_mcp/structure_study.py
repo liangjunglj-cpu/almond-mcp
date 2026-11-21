@@ -82,9 +82,13 @@ def draw_message(request: dict, result: dict, span: float) -> tuple[dict, dict]:
     color_by, scale, ...); keys that only steer the analysis are not forwarded."""
     reports = {k: result.pop(k, None) for k in
                ("asset_loads", "floor_loads", "combinations", "connections", "stability", "buckling",
-                "design_code", "deflection_limit_ratio", "indicative")}
-    draw = {k: v for k, v in request.items() if k not in ("guids", "reanalyze", "clear")}
+                "design_code", "deflection_limit_ratio", "indicative", "verdict")}
+    draw = {k: v for k, v in request.items() if k not in ("guids", "reanalyze", "clear", "structure_type")}
     draw.update({"type": "structure_draw", "engine": "native", "span_m": span, "result": result})
+    if reports["verdict"]:
+        # the native checks' own verdict (validate's: member deflection, Class 4, utilization, storey drift);
+        # the bridge's legend shows it instead of judging the displacement field itself
+        draw["verdict_status"] = reports["verdict"]["status"]
     buckling, combos = reports["buckling"], reports["combinations"]
     if buckling:
         draw["buckling_alpha"] = buckling["alpha_cr"]
@@ -143,10 +147,12 @@ def run(request: dict) -> dict:
     if validation["status"] == "error":
         out["message"] = validation.get("verdict", "The native check could not run.")
         return out
-    span = (validation.get("results") or {}).get("span_m") or s["span_m"]
+    # only the user's span: the validated span_m is the governing member's own span, which as a fixed span
+    # would judge every other member against it (view_result finds the same governing span itself)
     try:
-        result, span = native_structure.view_result(model, s["load_kn"], s["material"], span_m=span,
-                                                    view=s["view"], **common)
+        result, span = native_structure.view_result(model, s["load_kn"], s["material"], span_m=s["span_m"],
+                                                    view=s["view"], structure_type=s["structure"],
+                                                    limit_ratio=limit_ratio, **common)
     except native_structure.InstabilityError as e:
         out["message"] = f"{e} Switch the view to Buckling mode to see the shape it buckles into."
         return out

@@ -15,7 +15,8 @@ ROOT = Path(__file__).resolve().parents[1]
 TESTS = ["tests/test_rigorous_validation.py", "tests/test_frame_solver.py", "tests/test_native_structure.py", "tests/test_load_combinations.py",
          "tests/test_end_releases.py", "tests/test_stability.py", "tests/test_floor_loads.py",
          "tests/test_asset_loads.py", "tests/test_design_codes.py", "tests/test_structure_study.py",
-         "tests/test_validate_engines.py", "tests/test_visualize_native.py", "tests/test_hand_calculations.py", "tests/test_ec3.py"]
+         "tests/test_validate_engines.py", "tests/test_visualize_native.py", "tests/test_hand_calculations.py", "tests/test_ec3.py",
+         "tests/test_deflection_verdicts.py", "tests/test_curved_members.py", "tests/test_deflection_combined.py"]
 
 MUTANTS = [
     ("load factor gamma_G 1.35 -> 1.30", "almond_mcp/code_profiles/eurocode.json", '"gamma_G": {"value": 1.35', '"gamma_G": {"value": 1.30'),
@@ -123,6 +124,25 @@ MUTANTS = [
      "if _supported(frame, n) or len(touching) != 2:", "if True:"),
     ("lateral restraint ignored (no LTB)", "almond_mcp/ec3.py",
      '    if lateral_restraint == "joints":\n        for seg in ltb_segments', '    if False:\n        for seg in ltb_segments'),
+    ("column sway counted as deflection (cantilever from the base)", "almond_mcp/native_structure.py",
+     'chord = first and g["steep"] and len(g["held"]) >= 2', "chord = False"),
+    ("storey drift left out of the verdict", "almond_mcp/native_structure.py",
+     'if worst and drift.get("checked") and worst["utilization"] > 1.0:', "if False:"),
+    ("storey drift limit h/300 -> h/200", "almond_mcp/code_profiles/eurocode.json",
+     '"storey_drift_limit_ratio": {"value": 300', '"storey_drift_limit_ratio": {"value": 200'),
+    ("overlay keeps the bridge's absolute-displacement verdict", "almond_mcp/server.py",
+     "_apply_verdict(parsed, verdict)                 # the native checks decide", "pass  # the native checks decide"),
+    # deflection span per member (PR #37) together with the member-relative measure
+    ("every member against its whole length (no span between supports)", "almond_mcp/native_structure.py",
+     'gaps = np.concatenate([[2 * (u[0] - g["t"][0])], np.diff(u), [2 * (g["t"][1] - u[-1])]])',
+     'gaps = np.full(len(u) + 1, g["t"][1] - g["t"][0])'),
+    ("cantilever span = its overhang, not twice", "almond_mcp/native_structure.py",
+     'gaps = np.concatenate([[2 * (u[0] - g["t"][0])], np.diff(u), [2 * (g["t"][1] - u[-1])]])',
+     'gaps = np.concatenate([[u[0] - g["t"][0]], np.diff(u), [g["t"][1] - u[-1]]])'),
+    ("panel overlay judges every member against the governing span", "almond_mcp/structure_study.py",
+     'native_structure.view_result(model, s["load_kn"], s["material"], span_m=s["span_m"],',
+     'native_structure.view_result(model, s["load_kn"], s["material"], '
+     'span_m=(validation.get("results") or {}).get("span_m") or s["span_m"],'),
 ]
 
 

@@ -12,6 +12,7 @@
     "uls_expression": {"value": "either", "source": "EN 1990 6.4.3.2(3): expression 6.10, or the less favourable of 6.10a and 6.10b, by National Annex choice", "verified": true},
     "uls_default": {"value": "6.10", "source": "Almond default where the code leaves the choice open", "verified": true},
     "deflection_limit_ratio": {"value": 250, "source": "Not fixed by EN 1990 (A1.4.2: limits agreed per project or National Annex); span/250 is an indicative screen", "verified": true},
+    "storey_drift_limit_ratio": {"value": 300, "source": "Almond project default, not a code value: EN 1993-1-1 7.2.2 and EN 1990 A1.4.3 (Figure A1.2, storey drift u_i over the storey height H_i) leave horizontal displacement limits to the project or the National Annex. h/300 per storey is a screening value; agree the limit for the project", "verified": false, "project_default": true},
     "gamma_M0": {"value": 1.0, "source": "EN 1993-1-1 6.1(1) Note 2B: resistance of cross-sections", "verified": true},
     "gamma_M1": {"value": 1.0, "source": "EN 1993-1-1 6.1(1) Note 2B: resistance of members to instability", "verified": true},
     "imposed_floor_kn_m2": {"value": {"A_residential": 2.0, "B_office": 3.0}, "source": "EN 1991-1-1 Table 6.2 recommended values: category A floors, category B", "verified": true}

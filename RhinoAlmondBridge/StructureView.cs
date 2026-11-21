@@ -45,6 +45,10 @@ namespace RhinoAlmondBridge
         [JsonProperty("load_label")] public string LoadLabel { get; set; }
         /// <summary>Replaces PASS when there is no capacity verdict (e.g. "INDICATIVE" for concrete).</summary>
         [JsonProperty("verdict_label")] public string VerdictLabel { get; set; }
+        /// <summary>The native checks' verdict ("pass" | "fail" | "indicative"), computed by the MCP server
+        /// exactly as validate_structure judges the model (member deflection, Class 4, utilization, storey
+        /// drift). When present the legend and the reply use it instead of judging the displacement field.</summary>
+        [JsonProperty("verdict_status")] public string VerdictStatus { get; set; }
         [JsonProperty("show_legend")] public bool ShowLegend { get; set; } = true;
         [JsonProperty("clear")] public bool Clear { get; set; }
     }
@@ -141,6 +145,9 @@ namespace RhinoAlmondBridge
                     ?? res.Elements.Max(x => x.SampleDispM.Max(d => Len(d))) * 1000.0;
                 res.Warnings = result["warnings"]?.ToObject<List<string>>() ?? new List<string>();
                 double spanM = Math.Max(1e-3, req.SpanM ?? 5.0);
+                // the checked deflection: each member's deflection relative to its supports (the absolute
+                // maximum above includes column shortening and sway, and only scales the drawing)
+                var drift = result["storey_drift"] as JObject;
                 _conduit.Data = new StructureData
                 {
                     Result = res, ToDoc = RhinoMath.UnitScale(UnitSystem.Meters, doc.ModelUnitSystem), SpanM = spanM,
@@ -150,10 +157,19 @@ namespace RhinoAlmondBridge
                     BucklingAlpha = jobj["buckling_alpha"] != null && jobj["buckling_alpha"].Type != JTokenType.Null
                         ? jobj["buckling_alpha"].Value<double>() : (double?)null,
                     VerdictLabel = string.IsNullOrWhiteSpace(req.VerdictLabel) ? null : req.VerdictLabel.Trim(),
+                    MaxDeflectionMM = Num(result["max_deflection_mm"]),
+                    DriftMM = Num(drift?["max_drift_mm"]),
+                    DriftLimitMM = Num(drift?["limit_mm"]),
+                    DriftUtilization = Num(drift?["utilization"]),
+                    DriftChecked = drift?["checked"]?.Type == JTokenType.Boolean && drift["checked"].Value<bool>(),
                 };
             }
             else if (_conduit.Data == null)
                 return Error("Nothing to display yet: send a result first.");
+            if (!string.IsNullOrWhiteSpace(req.VerdictStatus))
+                _conduit.Data.VerdictStatus = req.VerdictStatus.Trim().ToLowerInvariant();
+            else if (result != null)
+                _conduit.Data.VerdictStatus = null;
             return Present(doc, req);
         }
 
@@ -179,10 +195,10 @@ namespace RhinoAlmondBridge
             double maxUtil = r.Elements.Where(e => !double.IsNaN(e.Utilization)).Select(e => e.Utilization).DefaultIfEmpty(double.NaN).Max();
             return JsonConvert.SerializeObject(new
             {
-                status = r.MaxDisplacementMM > data.LimitMM ? "fail"
-                    : data.VerdictLabel != null ? "indicative"
-                    : (double.IsNaN(maxUtil) || maxUtil <= 1.0) ? "pass" : "fail",
+                status = data.Status(maxUtil),
                 analysis_method = data.Engine,
+                max_deflection_mm = Math.Round(data.CheckedDeflectionMM, 3),
+                deflection_measure = data.MaxDeflectionMM.HasValue ? "member, relative to its supports" : "absolute displacement",
                 max_displacement_mm = Math.Round(r.MaxDisplacementMM, 3),
                 deflection_limit_mm = Math.Round(data.LimitMM, 3),
                 span_m = Math.Round(data.SpanM, 3),
@@ -200,6 +216,9 @@ namespace RhinoAlmondBridge
         }
 
         private static double Len(double[] d) => Math.Sqrt(d[0] * d[0] + d[1] * d[1] + d[2] * d[2]);
+
+        private static double? Num(JToken t) =>
+            t != null && (t.Type == JTokenType.Float || t.Type == JTokenType.Integer) ? t.Value<double>() : (double?)null;
 
         private static string Error(string msg, List<string> warnings = null) =>
             JsonConvert.SerializeObject(new { status = "error", message = msg, warnings = warnings ?? new List<string>() });
@@ -219,6 +238,28 @@ namespace RhinoAlmondBridge
         public string Title, ColorBy = "displacement", Material;
         public string Engine = "api", DefaultTitle = "ALMOND  //  KARAMBA LIVE ANALYSIS";
         public bool ShowLegend = true;
+        /// <summary>Native solver: the largest member deflection relative to its supports (what the
+        /// span/limit check reads); null on the Karamba route, which only has the absolute maximum.</summary>
+        public double? MaxDeflectionMM;
+        /// <summary>Native solver: governing storey drift, its limit (h/ratio) and drift/limit.</summary>
+        public double? DriftMM, DriftLimitMM, DriftUtilization;
+        public bool DriftChecked;
+        /// <summary>The MCP server's verdict for this result (validate_structure's checks), when sent.</summary>
+        public string VerdictStatus;
+
+        /// <summary>The deflection judged against the limit: member-relative when the solver sent it.</summary>
+        public double CheckedDeflectionMM => MaxDeflectionMM ?? (Result?.MaxDisplacementMM ?? 0.0);
+
+        /// <summary>Serviceability fails: member deflection over span/limit, or storey drift over h/limit.</summary>
+        public bool Deflects => CheckedDeflectionMM > LimitMM || (DriftChecked && (DriftUtilization ?? 0.0) > 1.0);
+
+        public string Status(double maxUtil)
+        {
+            if (VerdictStatus == "pass" || VerdictStatus == "fail" || VerdictStatus == "indicative") return VerdictStatus;
+            if (Deflects) return "fail";
+            if (VerdictLabel != null) return "indicative";
+            return (double.IsNaN(maxUtil) || maxUtil <= 1.0) ? "pass" : "fail";
+        }
     }
 
     public class StructureConduit : DisplayConduit
@@ -346,12 +387,16 @@ namespace RhinoAlmondBridge
             if (Data.BucklingAlpha.HasValue) { DrawBucklingLegend(e, dpi); return; }
             var r = Data.Result;
             var vp = e.Viewport.Bounds;
-            int w = (int)(380 * dpi), h = (int)(300 * dpi);
+            bool member = Data.MaxDeflectionMM.HasValue;                   // native: member-relative deflection
+            bool drift = Data.DriftMM.HasValue && Data.DriftLimitMM.HasValue;
+            int extra = (member ? 24 : 0) + (drift ? 24 : 0);
+            int w = (int)(380 * dpi), h = (int)((300 + extra) * dpi);
             int x0 = vp.Width - w - (int)(30 * dpi), y0 = (int)(30 * dpi);
             double maxU = r.Elements.Where(x => !double.IsNaN(x.Utilization)).Select(x => x.Utilization).DefaultIfEmpty(double.NaN).Max();
-            bool deflects = r.MaxDisplacementMM > Data.LimitMM;
-            bool indicative = Data.VerdictLabel != null && !deflects;      // no capacity verdict: only deflection can fail
-            bool pass = !deflects && (double.IsNaN(maxU) || maxU <= 1.0);
+            // the server's verdict when sent (validate_structure's checks, Class 4 included), else judged here
+            string status = Data.Status(maxU);
+            bool indicative = status == "indicative";                       // no capacity verdict
+            bool pass = status == "pass";
             var amber = Color.FromArgb(255, 186, 60);
             var accent = indicative ? amber : pass ? Color.FromArgb(40, 220, 90) : Color.FromArgb(233, 68, 43);
             e.Display.Draw2dRectangle(new Rectangle(x0, y0, w, h), Color.FromArgb(0, 0, 0, 0), 0, Color.FromArgb(215, 10, 10, 12));
@@ -360,22 +405,39 @@ namespace RhinoAlmondBridge
             int fs = Math.Max(10, (int)(16 * dpi)), fb = Math.Max(14, (int)(30 * dpi));
             DrawTitle(e, accent, tx, y0 + 18 * dpi, w - (int)(40 * dpi), fs);
             e.Display.Draw2dText(byUtil ? "UTILIZATION" : "DISPLACEMENT", Color.White, new Point2d(tx, y0 + 50 * dpi), false, fs, "Consolas");
-            e.Display.Draw2dText(string.Format("max δ {0:0.0} mm", r.MaxDisplacementMM), Color.White,
-                new Point2d(tx, y0 + 76 * dpi), false, fb, "Arial Black");
-            e.Display.Draw2dText(string.Format("limit L/{0:0} = {1:0.0} mm", Data.LimitRatio, Data.LimitMM), Color.FromArgb(200, 200, 205),
-                new Point2d(tx, y0 + 122 * dpi), false, fs, "Consolas");
+            var grey = Color.FromArgb(200, 200, 205);
+            var warn = Color.FromArgb(255, 120, 100);
+            e.Display.Draw2dText(string.Format(member ? "max δ (member) {0:0.0} mm" : "max δ {0:0.0} mm", Data.CheckedDeflectionMM),
+                Color.White, new Point2d(tx, y0 + 76 * dpi), false, member ? Math.Max(12, (int)(24 * dpi)) : fb, "Arial Black");
+            e.Display.Draw2dText(string.Format("limit L/{0:0} = {1:0.0} mm", Data.LimitRatio, Data.LimitMM),
+                Data.CheckedDeflectionMM > Data.LimitMM ? warn : grey, new Point2d(tx, y0 + 122 * dpi), false, fs, "Consolas");
+            double y = 146;
+            if (member)
+            {
+                // the absolute maximum (column shortening and sway included) is not the checked value
+                e.Display.Draw2dText(string.Format("displacement {0:0.0} mm (absolute)", r.MaxDisplacementMM), grey,
+                    new Point2d(tx, y0 + y * dpi), false, fs, "Consolas");
+                y += 24;
+            }
+            if (drift)
+            {
+                bool over = Data.DriftChecked && (Data.DriftUtilization ?? 0) > 1.0;
+                e.Display.Draw2dText(string.Format("storey drift {0:0.0} mm / limit {1:0.0} mm{2}", Data.DriftMM, Data.DriftLimitMM,
+                    Data.DriftChecked ? "" : " (info)"), over ? warn : grey, new Point2d(tx, y0 + y * dpi), false, fs, "Consolas");
+                y += 24;
+            }
             if (!double.IsNaN(maxU))
-                e.Display.Draw2dText(maxU > 10 ? "utilization > 10  (unstable)" : string.Format("utilization {0:0.00}", maxU), maxU > 1 ? Color.FromArgb(255, 120, 100) : Color.FromArgb(200, 200, 205),
-                    new Point2d(tx, y0 + 146 * dpi), false, fs, "Consolas");
+                e.Display.Draw2dText(maxU > 10 ? "utilization > 10  (unstable)" : string.Format("utilization {0:0.00}", maxU), maxU > 1 ? warn : grey,
+                    new Point2d(tx, y0 + y * dpi), false, fs, "Consolas");
             e.Display.Draw2dText(Data.LoadLabel ?? string.Format("load {0:0} kN{1}  ·  {2}", Data.LoadKN, Data.SelfWeight ? " + self weight" : "", Data.Material),
-                Color.FromArgb(200, 200, 205), new Point2d(tx, y0 + 170 * dpi), false, fs, "Consolas");
+                grey, new Point2d(tx, y0 + (y + 24) * dpi), false, fs, "Consolas");
             if (indicative)
                 e.Display.Draw2dText(Data.VerdictLabel, amber, new Point2d(tx + 190 * dpi, y0 + 54 * dpi), false, Math.Max(10, (int)(20 * dpi)), "Arial Black");
             else
                 e.Display.Draw2dText(pass ? "PASS" : "FAIL", pass ? Color.FromArgb(40, 220, 90) : Color.FromArgb(240, 40, 30),
                     new Point2d(tx + 220 * dpi, y0 + 50 * dpi), false, fb, "Arial Black");
             // gradient bar
-            int bx = tx, by = (int)(y0 + 206 * dpi), bw = w - (int)(48 * dpi), bh = (int)(16 * dpi);
+            int bx = tx, by = (int)(y0 + (206 + extra) * dpi), bw = w - (int)(48 * dpi), bh = (int)(16 * dpi);
             for (int i = 0; i < bw; i++)
                 e.Display.Draw2dLine(new System.Drawing.Point(bx + i, by), new System.Drawing.Point(bx + i, by + bh), Ramp((double)i / bw), 1);
             string lo = byUtil ? "0" : "0 mm", hi = byUtil ? "1.0" : string.Format("{0:0.0} mm", r.MaxDisplacementMM);

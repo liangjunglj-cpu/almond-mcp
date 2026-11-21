@@ -78,11 +78,14 @@ ASSUMPTIONS = [
     "Curved members analysed as equal straight chords close to the curve (a warning gives the tolerance when "
     "a curve was simplified).",
     "Deflection checked per member relative to its supports (beam ends on columns, a cantilever's root, a truss "
-    "chord's end posts), not the absolute displacement: column shortening and rigid-body sway are excluded. "
+    "chord's end posts; a column or brace between the floors that hold it, from the chord through their "
+    "displaced positions), not the absolute displacement: column shortening and rigid-body sway are excluded. "
     "For beam/frame each member is checked against its own span between those supports (a cantilever: twice "
-    "its length); a frame working as a surface (vault, gridshell, arch, no columns) is checked globally (largest "
-    "displacement against the span between its supports) and locally (member sag between its joints). Storey "
-    "drift is not checked.",
+    "its length; a column between floors: the storey height); a frame working as a surface (vault, gridshell, "
+    "arch, no columns) is checked globally (largest displacement against the span between its supports) and "
+    "locally (member sag between its joints). Sway is checked as storey drift instead (the horizontal "
+    "displacement of each column line between consecutive floors over the storey height; not for "
+    "structure_type truss).",
     "Member checks per member (EN 1993-1-1): section class from Table 5.2 for the actual stresses "
     "(Class 4 flagged as not covered); cross-section 6.2.1(7) with elastic moduli (plastic only for "
     "Class 1/2 when plastic design is requested); flexural buckling about both axes (6.3.1, curves "
@@ -710,33 +713,13 @@ def _member_groups(frame) -> list[list[int]]:
     return list(groups.values())
 
 
-def member_deflections(frame, res) -> list[np.ndarray]:
-    """Deflection at every station of every element (m); see member_deflection_spans."""
-    return member_deflection_spans(frame, res)[0]
-
-
-def member_deflection_spans(frame, res) -> tuple[list[np.ndarray], list[np.ndarray]]:
-    """(deflections, spans): at every station of every element (m), the deflection and the span it is
-    checked against. The span is the member's own: the distance between the two points that support it
-    on either side of the station, along the member (one drawn curve or line and the pieces that carry
-    on in line from it, however it was split at joints); beyond its last support (a cantilever) twice
-    the overhang; a member supported nowhere: its length.
-
-    The deflection is the displacement across the member relative to
-    what supports it, which is what a span/limit check reads (not the absolute displacement, which in a
-    tall frame is mostly column shortening).
-
-    A member is supported where it meets a support or a steep member (about 45 degrees or more) that leads
-    down to one: a beam on columns, a truss chord at its end posts, a floor beam on a diagrid. Between
-    supporting points the reference displacement is interpolated, beyond the last one (a cantilever) it
-    is that point's translation, so root rotation counts as deflection. A member resting on other
-    members (a secondary beam on girders) is measured from their deflected positions, so their
-    deflection adds to its own. Movement along the member's axis is not deflection."""
+def _support_paths(frame):
+    """(steep, supported, reach): steep[node] = [(lower node, element)] along members at least ~45 degrees
+    from horizontal; the vertically supported nodes; and every node with a path down such members to one
+    of them (a column stack on its foundation, a diagrid node)."""
     X = np.asarray(frame.nodes, float)
-    U = res.displacements[:, :3]
-    els = frame.elements
-    down: dict = {}                                     # node -> [(lower node, element)] along steep members
-    for i, e in enumerate(els):
+    down: dict = {}
+    for i, e in enumerate(frame.elements):
         d = X[e.n2] - X[e.n1]
         L = float(np.linalg.norm(d))
         if L > 0 and abs(d[2]) / L >= STEEP_SIN:
@@ -747,8 +730,33 @@ def member_deflection_spans(frame, res) -> tuple[list[np.ndarray], list[np.ndarr
     for n in sorted(range(len(X)), key=lambda k: X[k, 2]):   # lower nodes first
         if any(lo in reach for lo, _ in down.get(n, [])):
             reach.add(n)
-    groups = _member_groups(frame)
-    info = []
+    return down, supported, reach
+
+
+def _group_geometry(frame, groups, down, reach):
+    """Per member group: its elements, nodes, end point a, unit axis a -> b, its extent along that axis
+    (``t``), whether it is steep, and the nodes where it is held in place by the rest of the structure: a
+    support; a steep member of another group leading down to a support (a brace, the column below); or a
+    joint whose floor (the network of non-steep members through it) reaches another member's support path
+    (a floor tying the columns together). A cantilever arm on a lone post does not hold the post."""
+    X = np.asarray(frame.nodes, float)
+    els = frame.elements
+    parent = list(range(len(X)))                        # components of the non-steep (floor) network
+
+    def find(k):
+        while parent[k] != k:
+            parent[k] = parent[parent[k]]
+            k = parent[k]
+        return k
+    for e in els:
+        d = X[e.n2] - X[e.n1]
+        L = float(np.linalg.norm(d))
+        if L > 0 and abs(d[2]) / L < STEEP_SIN:
+            parent[find(e.n1)] = find(e.n2)
+    anchored: dict = {}                                 # floor component -> its nodes on a support path
+    for n in reach:
+        anchored.setdefault(find(n), set()).add(n)
+    out = []
     for g in groups:
         members = set(g)
         nodes = sorted({n for i in g for n in (els[i].n1, els[i].n2)})
@@ -756,19 +764,63 @@ def member_deflection_spans(frame, res) -> tuple[list[np.ndarray], list[np.ndarr
         a = P[int(np.argmax(np.linalg.norm(P - P[0], axis=1)))]
         b = P[int(np.argmax(np.linalg.norm(P - a, axis=1)))]
         axis = (b - a) / (np.linalg.norm(b - a) or 1.0)
-        own = [n for n in nodes if n in supported or any(lo in reach and i not in members for lo, i in down.get(n, []))]
         tn = (P - a) @ axis
-        info.append({"els": g, "nodes": nodes, "a": a, "axis": axis, "own": own, "t": (float(tn.min()), float(tn.max()))})
+        mine = set(nodes)
+        held = [n for n in nodes if n in frame.supports
+                or any(lo in reach and i not in members for lo, i in down.get(n, []))
+                or anchored.get(find(n), set()) - mine]
+        out.append({"els": g, "members": members, "nodes": nodes, "a": a, "axis": axis, "held": held,
+                    "steep": abs(float(axis[2])) >= STEEP_SIN, "t": (float(tn.min()), float(tn.max()))})
+    return out
+
+
+def member_deflections(frame, res) -> list[np.ndarray]:
+    """Deflection at every station of every element (m); see member_deflection_spans."""
+    return member_deflection_spans(frame, res)[0]
+
+
+def member_deflection_spans(frame, res) -> tuple[list[np.ndarray], list[np.ndarray]]:
+    """(deflections, spans): at every station of every element (m), the deflection and the span it is
+    checked against.
+
+    The deflection is the displacement across the member relative to what supports it, which is what a
+    span/limit check reads (not the absolute displacement, which in a tall frame is mostly column
+    shortening and sway). A member is supported where it meets a support or a steep member (about 45
+    degrees or more) that leads down to one: a beam on columns, a truss chord at its end posts, a floor
+    beam on a diagrid. Between supporting points the reference displacement is interpolated, beyond the
+    last one (a cantilever) it is that point's translation, so root rotation counts as deflection. A
+    member resting on other members (a secondary beam on girders) is measured from their deflected
+    positions, so their deflection adds to its own. Movement along the member's axis is not deflection.
+    A steep member (column, brace, diagrid bar) held at two or more points (supports or joints with
+    other members, e.g. the floors along a column) bends between them: its deflection is measured from
+    the chord through those points' actual displacements, so the storey's sway (rigid-body translation
+    and rotation of the column) is not deflection; it is the storey drift (``storey_drift``). Only a
+    steep member held at one point (a free-standing post) is measured as a cantilever from its root.
+
+    The span is the member's own: the distance between the two points it is measured from on either side
+    of the station, along the member (one drawn curve or line and the pieces that carry on in line from
+    it, however it was split at joints; for a column between floors, the storey height); beyond its last
+    one (a cantilever) twice the overhang; a member supported nowhere: its length."""
+    X = np.asarray(frame.nodes, float)
+    U = res.displacements[:, :3]
+    els = frame.elements
+    down, supported, reach = _support_paths(frame)
+    groups = _member_groups(frame)
+    info = _group_geometry(frame, groups, down, reach)
+    for g in info:
+        g["own"] = [n for n in g["nodes"]
+                    if n in supported or any(lo in reach and i not in g["members"] for lo, i in down.get(n, []))]
     base = {n: U[n] for n in reach}                     # supported points move with their support path
     out = [np.zeros(len(res.elements[i].stations)) for i in range(len(els))]
     spans = [np.zeros(len(res.elements[i].stations)) for i in range(len(els))]
     done = [False] * len(groups)
 
-    def measure(gi, refs):
+    def measure(gi, refs, chord=False):
         g = info[gi]
         ts = np.array([(X[n] - g["a"]) @ g["axis"] for n in refs])
         order = np.argsort(ts)
-        ts, vs = ts[order], np.array([base[refs[k]] for k in order])
+        ts = ts[order]
+        vs = np.array([U[refs[k]] if chord else base[refs[k]] for k in order])
         u = np.unique(np.round(ts, 9))
         # span per interval: left overhang (x2), the gaps between supports, right overhang (x2)
         gaps = np.concatenate([[2 * (u[0] - g["t"][0])], np.diff(u), [2 * (g["t"][1] - u[-1])]])
@@ -778,7 +830,11 @@ def member_deflection_spans(frame, res) -> tuple[list[np.ndarray], list[np.ndarr
             t = (er.stations - g["a"]) @ g["axis"]
             ref = np.stack([np.interp(t, ts, vs[:, k]) for k in range(3)], axis=1)   # clamped beyond the ends
             rel = er.disp - ref
-            perp = rel - np.outer(rel @ g["axis"], g["axis"])
+            ax = g["axis"]
+            if chord:                                    # the piece's own axis: a gently curved column line
+                d = X[els[i].n2] - X[els[i].n1]
+                ax = d / (np.linalg.norm(d) or 1.0)
+            perp = rel - np.outer(rel @ ax, ax)
             out[i] = np.linalg.norm(perp, axis=1)
             k = np.searchsorted(u, t, side="right")     # a station on a support: the span after it, except
             k = np.where((k == len(u)) & (t <= u[-1] + 1e-9), len(u) - 1, k)    # on the last support
@@ -794,11 +850,12 @@ def member_deflection_spans(frame, res) -> tuple[list[np.ndarray], list[np.ndarr
         for gi, g in enumerate(info):
             if done[gi]:
                 continue
-            refs = g["own"] if first else [n for n in g["nodes"] if n in base]
+            chord = first and g["steep"] and len(g["held"]) >= 2
+            refs = g["held"] if chord else g["own"] if first else [n for n in g["nodes"] if n in base]
             if not refs:
                 continue
             done[gi] = True
-            for n, v in measure(gi, refs).items():
+            for n, v in measure(gi, refs, chord).items():
                 if n not in new or np.linalg.norm(U[n] - v) > np.linalg.norm(U[n] - new[n]):
                     new[n] = v                           # the larger deflection governs a shared point
         if not new and not first:
@@ -811,6 +868,44 @@ def member_deflection_spans(frame, res) -> tuple[list[np.ndarray], list[np.ndarr
                 out[i] = np.linalg.norm(res.elements[i].disp, axis=1)
                 spans[i] = np.full(len(out[i]), g["t"][1] - g["t"][0])
     return out, spans
+
+
+DRIFT_EXEMPT_TYPES = ("truss",)   # a spanning truss's posts turn with it: that is bending, not storey sway
+
+
+def storey_drift(frame, res, limit_ratio: float) -> dict:
+    """Storey drift (EN 1990 A1.4.3, Figure A1.2: u_i over the storey height H_i): the horizontal
+    displacement of the top of every steep member line (columns, braces, diagrid bars on a support path)
+    relative to its bottom, between consecutive points where the rest of the structure holds it (the
+    floors), against height / ``limit_ratio``. Reported per storey (pair of levels), governing first.
+    This is the sway that ``member_deflections`` leaves out of the column deflection."""
+    X = np.asarray(frame.nodes, float)
+    U = res.displacements[:, :3]
+    down, _, reach = _support_paths(frame)
+    storeys: dict = {}
+    for g in _group_geometry(frame, _member_groups(frame), down, reach):
+        if not g["steep"] or len(g["held"]) < 2:
+            continue
+        held = sorted(g["held"], key=lambda n: X[n, 2])
+        for lo, hi in zip(held, held[1:]):
+            h = float(X[hi, 2] - X[lo, 2])
+            if h < 1e-3 or lo not in reach:
+                continue
+            drift = float(np.linalg.norm((U[hi] - U[lo])[:2]))
+            key = (round(float(X[lo, 2]), 2), round(float(X[hi, 2]), 2))
+            entry = {"z_bottom_m": key[0], "z_top_m": key[1], "height_m": round(h, 3),
+                     "drift_mm": round(drift * 1000.0, 3), "limit_mm": round(h * 1000.0 / limit_ratio, 3),
+                     "utilization": round(drift * limit_ratio / h, 4),
+                     "drift_ratio": round(h / drift) if drift > 1e-9 else None,
+                     "at_m": [round(float(v), 4) for v in X[hi]],
+                     "source_guids": sorted({t for i in g["els"] for t in (frame.elements[i].tag or [])})}
+            if key not in storeys or entry["utilization"] > storeys[key]["utilization"]:
+                storeys[key] = entry
+    rows = sorted(storeys.values(), key=lambda s: (s["z_bottom_m"], s["z_top_m"]))
+    worst = max(rows, key=lambda s: s["utilization"]) if rows else None
+    return {"limit_ratio": float(limit_ratio), "storeys": rows, "governing": worst,
+            "max_drift_mm": worst["drift_mm"] if worst else 0.0,
+            "utilization": worst["utilization"] if worst else 0.0}
 
 
 def _drawn_members(model: dict, frame) -> dict:
@@ -1460,15 +1555,20 @@ def view_result(model: dict, load_kn: float = 10.0, material: str = "Steel", fix
                 floor_loads: dict | None = None, design_basis: str = "en1990",
                 uls: str | None = None, connections: str = "rigid", stability: str = "auto",
                 view: str = "deflection", design_code=None, fabrication: str = "cold_formed",
-                lateral_restraint: str = "joints", curve_ratio: float | None = CURVE_SAGITTA_RATIO,
+                lateral_restraint: str = "joints", structure_type: str | None = None,
+                limit_ratio: float | None = None, curve_ratio: float | None = CURVE_SAGITTA_RATIO,
                 max_curve_segments: int = MAX_CURVE_SEGMENTS) -> tuple[dict, float]:
     """Solve and package the result for the bridge's ``structure_draw`` overlay.
 
     Returns (result, span_m): per-element start/end points and sampled global displacements in
-    meters (SLS characteristic), ULS utilization envelope, supports, loaded nodes and the max
-    displacement; span_m is the caller's or the span of the member whose deflection / span is largest.
-    Raises frame_solver.MechanismError for unstable models, ModelTooLargeError (a ValueError) for a model
-    beyond the dense solver."""
+    meters (SLS characteristic), ULS utilization envelope, supports, loaded nodes, the absolute max
+    displacement (which scales the drawing) and, for the deflected shape, the checked deflection
+    (``max_deflection_mm``: the governing member's, as validate() measures it), the storey drift and
+    ``verdict``: the same checks and pass/fail as validate() with the same inputs (each member's
+    deflection against its own span / ``limit_ratio``, or the surface checks; Class 4 sections and
+    webs past the shear buckling limit, utilization, storey drift). span_m is the caller's or the span
+    of the governing deflection. Raises frame_solver.MechanismError for unstable models,
+    ModelTooLargeError (a ValueError) for a model beyond the dense solver."""
     args = {k: v for k, v in locals().items() if k != "model"}
     try:
         return _view_result(model, **args)
@@ -1479,7 +1579,7 @@ def view_result(model: dict, load_kn: float = 10.0, material: str = "Steel", fix
 
 def _view_result(model, load_kn, material, fixed_supports, self_weight, diameter_mm, wall_mm, span_m, stations,
                  asset_loads, floor_loads, design_basis, uls, connections, stability, view, design_code, fabrication,
-                 lateral_restraint, curve_ratio, max_curve_segments):
+                 lateral_restraint, structure_type, limit_ratio, curve_ratio, max_curve_segments):
     want_mode = (view or "deflection").lower() == "buckling"
     frame, info, warnings = build_within_budget(model, load_kn, material, fixed_supports, self_weight, diameter_mm,
                                                 wall_mm, asset_loads, floor_loads, connections,
@@ -1494,11 +1594,33 @@ def _view_result(model, load_kn, material, fixed_supports, self_weight, diameter
                                               lateral_restraint=_lateral_restraint(lateral_restraint))
     warnings += stab.pop("warnings", [])
     span = float(span_m or 0.0)
-    if not span and not want_mode:                          # the governing deflection's span
-        span = deflection_check(model, frame, res)["span"]
+    buckling = None
+    verdict = None
+    if not want_mode:
+        kind = (structure_type or "beam").lower()
+        ratio = float(limit_ratio or code.deflection_limit_ratio)
+        dc_ = deflection_check(model, frame, res, kind, span_m)
+        span = dc_["span"]                                  # the governing deflection's span
+        limit_mm = span * 1000.0 / ratio
+        dmax_mm = dc_["deflection"] * 1000.0
+        gov, where = _governing_deflection(model, frame, dc_, limit_mm)
+        drift = _storey_drift_check(frame, res, code, kind)
+        umax, governing = max(((u, n) for u, n, _ in envelope), key=lambda t: t[0])
+        slender, thin_webs = _uncovered_members(frame, envelope)
+        indicative = INDICATIVE_FAMILIES.get(info["material"].family)
+        failures, _ = check_failures(dmax_mm, limit_mm, ratio, umax, governing, len(slender), indicative, drift,
+                                     where, len(thin_webs))
+        status = "fail" if failures else "indicative" if indicative else "pass"
+        verdict = {"status": status, "passed": None if status == "indicative" else not failures,
+                   "failures": failures, "max_deflection_mm": round(dmax_mm, 3),
+                   "largest_deflection_mm": round(dc_["largest"] * 1000.0, 3),
+                   "deflection_measure": _deflection_measure(dc_["basis"]), "governing_deflection": gov,
+                   "deflection_limit_mm": round(limit_mm, 3), "deflection_limit_ratio": ratio,
+                   "span_m": round(span, 3), "span_basis": dc_["basis"],
+                   "max_utilization": round(float(umax), 4), "utilization_combination": governing,
+                   "class4_members": len(slender), "shear_buckling_members": len(thin_webs), "storey_drift": drift}
     if span <= SPAN_FLOOR:
         span = float(model.get("max_member_span_m") or model.get("max_span_m") or 5.0)
-    buckling = None
     if want_mode:
         asm = fs.prepare(frame)
         N = fs.axial_forces(asm, combinations(design_basis, uls, code)[1][0][1])
@@ -1538,7 +1660,101 @@ def _view_result(model, load_kn, material, fixed_supports, self_weight, diameter
             result[key] = info[key]
     if buckling:
         result["buckling"] = buckling
+    if verdict:
+        result["verdict"] = verdict
+        result["max_deflection_mm"] = verdict["max_deflection_mm"]          # the bridge's legend and verdict
+        result["deflection_limit_mm"] = verdict["deflection_limit_mm"]
+        worst = verdict["storey_drift"]["governing"]
+        result["storey_drift"] = {"checked": verdict["storey_drift"]["checked"],
+                                  "limit_ratio": verdict["storey_drift"]["limit_ratio"],
+                                  "max_drift_mm": worst["drift_mm"] if worst else 0.0,
+                                  "limit_mm": worst["limit_mm"] if worst else None,
+                                  "utilization": worst["utilization"] if worst else 0.0}
     return result, span
+
+
+def _deflection_measure(basis: str) -> str:
+    return ("surface: node displacement against the span between supports (global) and member sag between its "
+            "joints (local)" if basis == "surface" else "member, relative to its supports")
+
+
+def _governing_deflection(model: dict, frame, dc: dict, limit_mm: float) -> tuple[dict, str]:
+    """(governing_deflection report, where-text for the verdict) of a deflection_check result."""
+    gi, span, basis = dc["element"], dc["span"], dc["basis"]
+    drawn = _drawn_members(model, frame)
+    gtag = tuple(frame.elements[gi].tag or [])
+    gname = drawn.get(gtag, (None,))[0] or f"element {gi}"
+    if dc["kind"] == "global":
+        at = ", ".join(f"{v:.2f}" for v in frame.nodes[dc["node"]])
+        where = f" at ({at}) on member {gname} (global, span {span:.2f} m between the supports either side)"
+    elif dc["kind"] == "local":
+        where = f" in member {gname} (local sag over its {span:.2f} m between joints)"
+    else:
+        where = f" in member {gname}" + (f" (span {span:.2f} m)" if basis == "member" else "")
+    dmm = dc["deflection"] * 1000.0
+    report = {"member": gname, "source_guids": list(gtag), "kind": dc["kind"],
+              "node_m": [round(float(v), 4) for v in frame.nodes[dc["node"]]] if dc["node"] is not None else None,
+              "deflection_mm": round(dmm, 3), "span_m": round(span, 3), "limit_mm": round(limit_mm, 3),
+              "utilization": round(dmm / limit_mm, 4) if limit_mm > 0 else None}
+    return report, where
+
+
+def _storey_drift_check(frame, res, code, structure_type: str) -> dict:
+    drift = storey_drift(frame, res, code.storey_drift_limit_ratio)
+    drift["checked"] = (structure_type or "beam") not in DRIFT_EXEMPT_TYPES
+    drift["basis"] = ("project default" if "storey_drift_limit_ratio" in code.project_defaults
+                      else "design code profile")
+    return drift
+
+
+def _uncovered_members(frame, envelope) -> tuple[list, list]:
+    """(Class 4 members, members whose webs need the EN 1993-1-5 shear buckling check), by source GUIDs."""
+    slender = sorted({tuple(frame.elements[i].tag or [str(i)]) for i, (_, _, er) in enumerate(envelope)
+                      if er.util_detail.get("class") == 4})
+    thin_webs = sorted({tuple(frame.elements[i].tag or [str(i)]) for i, (_, _, er) in enumerate(envelope)
+                        if er.util_detail.get("shear_buckling")})
+    return slender, thin_webs
+
+
+def check_failures(dmax_mm, limit_mm, limit_ratio, umax, governing, slender: int, indicative, drift: dict | None,
+                   where: str = "", thin_webs: int = 0):
+    """(failures, suggestions) of the native checks: deflection (``where`` names the governing member),
+    Class 4 sections, webs past the shear buckling limit, utilization (not for indicative materials) and
+    storey drift (where checked). validate() and the overlay verdict (view_result) share it, so both
+    judge a model the same way."""
+    failures, sug = [], []
+    if dmax_mm > limit_mm:
+        failures.append(f"Deflection {dmax_mm:.1f}mm ({SLS[0]}){where} exceeds L/{limit_ratio:g} limit "
+                        f"({limit_mm:.1f}mm)")
+        sug += ["Increase member depth or use a stiffer cross-section", "Add intermediate supports to reduce effective span"]
+    if slender:
+        failures.append(f"{slender} member(s) have Class 4 (slender) sections, which these checks do not "
+                        "cover (EN 1993-1-5/-1-6 effective sections)")
+        sug.append("Use thicker walls: Class 4 starts at d/t = 90 x 235/fy for CHS (59.6 for S355)")
+    if thin_webs:
+        failures.append(f"{thin_webs} member(s) have webs with hw/tw > 72 epsilon / eta, which need the shear "
+                        "buckling check of EN 1993-1-5 (not covered)")
+        sug.append("Use thicker webs or walls (hw/tw <= 72 epsilon), or add web stiffeners and check to EN 1993-1-5")
+    if umax > 1.0 and not indicative:
+        failures.append(f"Utilization ratio {umax:.2f} ({governing}) exceeds 1.0")
+        sug.append("Use a larger cross-section or higher-grade material")
+    worst = (drift or {}).get("governing")
+    if worst and drift.get("checked") and worst["utilization"] > 1.0:
+        failures.append(f"Storey drift {worst['drift_mm']:.1f}mm over h = {worst['height_m']:g} m (z {worst['z_bottom_m']:g}"
+                        f"-{worst['z_top_m']:g} m, {SLS[0]}) exceeds h/{drift['limit_ratio']:g} ({worst['limit_mm']:.1f}mm, "
+                        f"{drift.get('basis', 'project default')})")
+        sug.append("Stiffen the lateral system: bracing, a core, rigid joints or stiffer columns (or agree a "
+                   "project-specific drift limit in the design code profile)")
+    return failures, sug
+
+
+def _drift_note(drift: dict, deflection_utilization: float) -> str:
+    """The storey drift, for a verdict, when it governs the serviceability checks."""
+    worst = drift.get("governing")
+    if not worst or not drift.get("checked") or worst["utilization"] <= deflection_utilization:
+        return ""
+    return (f", storey drift {worst['drift_mm']:.1f}mm (z {worst['z_bottom_m']:g}-{worst['z_top_m']:g} m, "
+            f"limit h/{drift['limit_ratio']:g} = {worst['limit_mm']:.1f}mm)")
 
 
 def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, material: str = "Steel",
@@ -1620,19 +1836,11 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
     if mat.family in INDICATIVE_FAMILIES:
         result["confidence"] = "low"
     dc = deflection_check(model, frame, res, structure_type, span_m)
-    deflections, spans, span, basis, gi = dc["deflections"], dc["spans"], dc["span"], dc["basis"], dc["element"]
+    deflections, spans, span, basis = dc["deflections"], dc["spans"], dc["span"], dc["basis"]
     dmax_mm, dcheck_mm = dc["largest"] * 1000.0, dc["deflection"] * 1000.0
     limit_mm = span * 1000.0 / limit_ratio
-    drawn = _drawn_members(model, frame)
-    gtag = tuple(frame.elements[gi].tag or [])
-    gname = drawn.get(gtag, (None,))[0] or f"element {gi}"
-    if dc["kind"] == "global":
-        at = ", ".join(f"{v:.2f}" for v in frame.nodes[dc["node"]])
-        where = f" at ({at}) on member {gname} (global, span {span:.2f} m between the supports either side)"
-    elif dc["kind"] == "local":
-        where = f" in member {gname} (local sag over its {span:.2f} m between joints)"
-    else:
-        where = f" in member {gname}" + (f" (span {span:.2f} m)" if basis == "member" else "")
+    gov, where = _governing_deflection(model, frame, dc, limit_mm)
+    drift = _storey_drift_check(frame, res, code, structure_type)
     umax = max(u for u, _, _ in envelope)
     governing = max(envelope, key=lambda t: t[0])[1]
     stress = max(er.util_detail.get("max_stress_mpa", 0.0) for _, _, er in envelope)
@@ -1645,15 +1853,7 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
     r = result["results"]
     r.update({
         "max_deflection_mm": round(dcheck_mm, 3), "largest_deflection_mm": round(dmax_mm, 3),
-        "deflection_measure": ("surface: node displacement against the span between supports (global) and member "
-                               "sag between its joints (local)" if basis == "surface" else
-                               "member, relative to its supports"),
-        "governing_deflection": {"member": gname, "source_guids": list(gtag), "kind": dc["kind"],
-                                 "node_m": [round(float(v), 4) for v in frame.nodes[dc["node"]]]
-                                 if dc["node"] is not None else None,
-                                 "deflection_mm": round(dcheck_mm, 3),
-                                 "span_m": round(span, 3), "limit_mm": round(limit_mm, 3),
-                                 "utilization": round(dcheck_mm / limit_mm, 4) if limit_mm > 0 else None},
+        "deflection_measure": _deflection_measure(basis), "governing_deflection": gov,
         "max_displacement_mm": round(res.max_displacement * 1000.0, 3),
         "displacement_available": True, "utilization_available": True,
         "deflection_limit_mm": round(limit_mm, 3), "utilization_ratio": round(umax, 4),
@@ -1673,6 +1873,7 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
         "loaded_points_m": [list(frame.nodes[n]) for n in info["loaded_nodes"]],
         "per_element_utilization": elem_util,
         "max_member_sag_mm": round(max(er.max_sag for er in res.elements) * 1000.0, 3),
+        "storey_drift": drift,
         "support_mode": _support_mode(info, fixed_supports),
         "support_types": [info["support_labels"][n] for n in info["support_nodes"]],
         "connections": info["connections"],
@@ -1693,7 +1894,9 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
          "I-section beams: compression flange held continuously (lateral_restraint='continuous'): no "
          "lateral-torsional buckling check."),
         f"Design code: {code.name} ({code.basis}); gamma_M0 = {code.gamma_M0:g}, gamma_M1 = {code.gamma_M1:g}; "
-        f"deflection limit span/{limit_ratio:g}"
+        f"deflection limit span/{limit_ratio:g}; storey drift limit h/{code.storey_drift_limit_ratio:g}"
+        + (" (project default: no Eurocode clause fixes it; agree it for the project)"
+           if "storey_drift_limit_ratio" in code.project_defaults else "")
         + (f"; unverified values: {', '.join(code.unverified)}." if code.unverified else "."),
         ("Connections: rigid joints." if info["connections"]["mode"] == "rigid" and not info["connections"]["pinned_ends"]
          else f"Connections: {info['connections']['mode']} ({info['connections']['pinned_ends']} pinned member ends; "
@@ -1722,27 +1925,10 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
             result["assumptions"] = result["assumptions"] + [
                 "Asset loads: estimated self weight + in-use load per placed asset (structural-loads.json), "
                 "carried by the nearest member or shared by the lever rule between two parallel members."]
-    failures, sug = [], []
-    if dcheck_mm > limit_mm:
-        failures.append(f"Deflection {dcheck_mm:.1f}mm ({SLS[0]}){where} exceeds L/{limit_ratio:g} limit "
-                        f"({limit_mm:.1f}mm)")
-        sug += ["Increase member depth or use a stiffer cross-section", "Add intermediate supports to reduce effective span"]
-    slender = sorted({tuple(frame.elements[i].tag or [str(i)]) for i, (_, _, er) in enumerate(envelope)
-                      if er.util_detail.get("class") == 4})
-    if slender:
-        failures.append(f"{len(slender)} member(s) have Class 4 (slender) sections, which these checks do not "
-                        "cover (EN 1993-1-5/-1-6 effective sections)")
-        sug.append("Use thicker walls: Class 4 starts at d/t = 90 x 235/fy for CHS (59.6 for S355)")
-    thin_webs = sorted({tuple(frame.elements[i].tag or [str(i)]) for i, (_, _, er) in enumerate(envelope)
-                        if er.util_detail.get("shear_buckling")})
-    if thin_webs:
-        failures.append(f"{len(thin_webs)} member(s) have webs with hw/tw > 72 epsilon / eta, which need the shear "
-                        "buckling check of EN 1993-1-5 (not covered)")
-        sug.append("Use thicker webs or walls (hw/tw <= 72 epsilon), or add web stiffeners and check to EN 1993-1-5")
+    slender, thin_webs = _uncovered_members(frame, envelope)
     indicative = INDICATIVE_FAMILIES.get(mat.family)
-    if umax > 1.0 and not indicative:
-        failures.append(f"Utilization ratio {umax:.2f} ({governing}) exceeds 1.0")
-        sug.append("Use a larger cross-section or higher-grade material")
+    failures, sug = check_failures(dcheck_mm, limit_mm, limit_ratio, umax, governing, len(slender), indicative, drift,
+                                   where, len(thin_webs))
     if indicative and not failures:
         # no capacity verdict without the material's own design code; deflection and stability still decide fail
         result["passed"] = None
@@ -1758,7 +1944,8 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
         result["status"] = "pass" if not failures else "fail"
         result["verdict"] = METHOD_PREFIX + (
             f"PASSED: Configured checks satisfied. Deflection {dcheck_mm:.1f}mm ({SLS[0]}, limit {limit_mm:.1f}mm){where}, "
-            f"Utilization {umax:.2f} ({governing})" if not failures else "FAILED: " + "; ".join(failures))
+            f"Utilization {umax:.2f} ({governing})" + _drift_note(drift, dcheck_mm / limit_mm)
+            if not failures else "FAILED: " + "; ".join(failures))
     result["suggestions"] = sug
     worst = sorted(elem_util, key=lambda e: -e["utilization"])
     seen = []
