@@ -67,8 +67,10 @@ mcp = FastMCP("Almond", instructions=(
     "studies: shadow_study (shadow plans at dates and times), compare_thermal_cases and "
     "compare_daylight_cases (design cases side by side, with CSVs and report charts), comfort_setpoints "
     "(set-points from PMV), en17037_view_out and en17037_sunlight. "
-    "All simulation tools (environment and structure, marked (BETA)) are still under test: present "
-    "their results to the user as beta, indicative design-stage results. place_simulation_tutorial "
+    "The environment tools and the Karamba structural route (engine='karamba'), marked (BETA), are "
+    "still under test: present their results to the user as beta, indicative design-stage results. "
+    "The native structural engine (the default for validate_structure / visualize_structure) is "
+    "stable; its verdicts are still design-stage checks, not code compliance. place_simulation_tutorial "
     "places an annotated example model that shows what each analysis needs."
 ))
 
@@ -2258,7 +2260,8 @@ def validate_structure(
     lateral_restraint: str = "joints",
 ) -> str:
     """
-    (BETA) Validates AI-generated geometry with a structural analysis.
+    Validates AI-generated geometry with a structural analysis. The native engine is stable; the
+    Karamba route (engine="karamba", or auto for shells) is (BETA).
     Call this AFTER execute_rhino_script to verify the generated structure is buildable.
 
     engine="auto" (default) analyses line models (beams, columns, trusses, frames) with
@@ -2619,7 +2622,7 @@ def _native_validation(guids, structure_type, load_kn, material, fixed_supports,
 @mcp.tool()
 def list_design_codes() -> str:
     """
-    (BETA) Lists the design code profiles validate_structure / visualize_structure accept as design_code.
+    Lists the design code profiles validate_structure / visualize_structure accept as design_code.
 
     A profile holds the numbers a design code or National Annex sets (load factors gamma_G,
     gamma_Q, psi_0, xi; the ULS expression; material factors gamma_M0, gamma_M1; the deflection
@@ -2670,7 +2673,7 @@ def visualize_structure(
     structure_type: str = "beam",
 ) -> str:
     """
-    (BETA) Run a live structural analysis on a line model and SHOW it in every Rhino viewport:
+    Run a live structural analysis on a line model and SHOW it in every Rhino viewport:
     the undeformed wireframe, the exaggerated deformed shape coloured blue -> red by
     displacement (or by utilization), supports, load arrows and a legend panel with
     max deflection, the L/limit check and PASS/FAIL. Nothing is baked into the document.
@@ -2730,7 +2733,7 @@ def visualize_structure(
     deflection_limit_mm, as in validate_structure), max_displacement_mm (absolute, incl. column
     shortening and sway; it scales the drawing), storey_drift, failures, class4_members, span_m,
     max_utilization, scale, per-element {source_guids, max_displacement_mm, utilization}, warnings.
-    The native engine reports analysis_method "native"; engine="karamba" needs
+    The native engine reports analysis_method "native"; engine="karamba" (BETA) needs
     Karamba3D 3.1 (the trial caps models at 20 beam elements).
     """
     if not clear and not guids:
@@ -3133,7 +3136,7 @@ def set_support_type(guids: list[str], support: str = "") -> str:
 @mcp.tool()
 def export_structural_report(path: str = "", limit: int = 50) -> str:
     """
-    (BETA) Renders the persisted validate_structure history to a Markdown report.
+    Renders the persisted validate_structure history to a Markdown report.
 
     Every validate_structure call that returns pass, fail or indicative is
     recorded in the local state database (inputs, loads and design settings,

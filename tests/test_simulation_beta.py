@@ -1,5 +1,6 @@
-"""Simulation features in beta: every simulation tool says (BETA), the panel says so too, the panel's
-hierarchy keeps every control its scripts use, and the tutorial model places what each analysis needs
+"""Simulation features in beta: every environment tool says (BETA), the panel says so too, and since 0.8.0
+the native structural engine is stable while its Karamba route keeps (BETA); the panel's hierarchy keeps
+every control its scripts use, and the tutorial model places what each analysis needs
 (checked by running the real engines on exactly what it places)."""
 from __future__ import annotations
 
@@ -39,16 +40,21 @@ def _descriptions(server) -> dict[str, str]:
     return {t.name: t.description or "" for t in asyncio.run(server.mcp.list_tools())}
 
 
-def test_every_simulation_tool_is_labelled_beta(server):
+def test_every_environment_tool_is_labelled_beta_and_the_native_structure_tools_are_not(server):
     tools = _descriptions(server)
-    simulation = _env_tool_names(server) | STRUCTURE_TOOLS
-    assert "place_simulation_tutorial" in simulation and len(simulation) >= 23
-    for name in simulation:
+    environment = _env_tool_names(server)
+    assert "place_simulation_tutorial" in environment and len(environment) >= 19
+    for name in environment:
         assert tools[name].lstrip().startswith("(BETA)"), name
-    # only simulation is in beta: the library and drawing tools are not labelled
+    # 0.8.0: the native structural engine is stable; only its Karamba route stays in beta
+    for name in STRUCTURE_TOOLS:
+        assert not tools[name].lstrip().startswith("(BETA)"), name
+    for name in ("validate_structure", "visualize_structure"):
+        assert "(BETA)" in tools[name] and "karamba" in tools[name].lower(), name
+    # the library and drawing tools are not labelled
     for name in ("list_library", "place_generated_asset", "get_asset_drawing"):
         assert "(BETA)" not in tools[name]
-    assert "(BETA)" in server.mcp.instructions
+    assert "(BETA)" in server.mcp.instructions and "native structural engine" in server.mcp.instructions
 
 
 def _env_tool_names(_server=None) -> set[str]:
@@ -58,14 +64,18 @@ def _env_tool_names(_server=None) -> set[str]:
 
 def test_panel_and_plugin_say_beta():
     html = (UI / "index.html").read_text(encoding="utf-8")
-    for heading in ("Structural <br>Validation", "Climate, Rooms <br>&amp; Comfort"):
-        assert re.search(re.escape(heading) + r'<span class="red">\.</span> <span class="beta-tag"[^>]*>\(BETA\)</span></h1>', html)
-    assert html.count('class="beta-tag"') >= 4                     # two headings and two home cards
-    assert "(BETA)" in (UI / "results.html").read_text(encoding="utf-8")
-    assert '"Almond Results (BETA)"' in (BRIDGE / "RhinoAlmondBridgePlugin.cs").read_text(encoding="utf-8")
+    assert re.search(re.escape("Climate, Rooms <br>&amp; Comfort") +
+                     r'<span class="red">\.</span> <span class="beta-tag"[^>]*>\(BETA\)</span></h1>', html)
+    assert re.search(re.escape("Structural <br>Validation") + r'<span class="red">\.</span></h1>', html)
+    assert html.count('class="beta-tag"') == 2                     # the environment heading and home card
+    assert "Karamba3D · separate licence (BETA)" in html           # the Karamba route stays in beta
+    assert "(BETA)" not in (UI / "results.html").read_text(encoding="utf-8")
+    assert '"Almond Results"' in (BRIDGE / "RhinoAlmondBridgePlugin.cs").read_text(encoding="utf-8")
     assert "(BETA)" in (BRIDGE / "EnvironmentWorkspace.cs").read_text(encoding="utf-8")
-    assert "Structural Validation (BETA)" in (BRIDGE / "LibraryCommands.cs").read_text(encoding="utf-8")
-    assert '"(BETA)  " + title' in (BRIDGE / "StructureView.cs").read_text(encoding="utf-8")
+    commands = (BRIDGE / "LibraryCommands.cs").read_text(encoding="utf-8")
+    assert "Structural Validation (BETA)" not in commands and "Karamba engine is (BETA)" in commands
+    view = (BRIDGE / "StructureView.cs").read_text(encoding="utf-8")
+    assert 'Data.Engine != "native"' in view and '"(BETA)  " + title' in view   # only the Karamba legend
 
 
 def _ids(html: str) -> set[str]:

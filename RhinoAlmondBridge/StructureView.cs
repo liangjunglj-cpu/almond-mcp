@@ -537,9 +537,10 @@ namespace RhinoAlmondBridge
         /// <summary>Legend title shrunk to fit the panel width (long stage/iteration titles).</summary>
         private void DrawTitle(DrawEventArgs e, Color c, int x, double y, int maxW, int fs)
         {
-            // The structural engines are in beta: every legend says so.
+            // The native engine is stable (0.8.0); the Karamba route is still in beta and its legend says so.
             string title = Data.Title ?? "";
-            if (title.IndexOf("BETA", StringComparison.OrdinalIgnoreCase) < 0) title = ("(BETA)  " + title).Trim();   // first: long titles are cut at the end
+            if (Data.Engine != "native" && title.IndexOf("BETA", StringComparison.OrdinalIgnoreCase) < 0)
+                title = ("(BETA)  " + title).Trim();   // first: long titles are cut at the end
             int size = fs;
             while (size > 8 && e.Display.Measure2dText(title, new Point2d(0, 0), false, 0, size, "Consolas").Width > maxW) size--;
             e.Display.Draw2dText(title, c, new Point2d(x, y), false, size, "Consolas");

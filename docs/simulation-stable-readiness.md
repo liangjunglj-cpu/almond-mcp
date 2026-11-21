@@ -1,4 +1,9 @@
-# Simulation features: stable-release readiness (BETA)
+# Simulation features: stable-release readiness
+
+> **0.8.0 (owner decision, 2026-11-21):** the native structural engine (frame solver, EN 1993-1-1 member
+> checks, `validate_structure` / `visualize_structure` / the Structure workspace and the Results panel)
+> is stable and no longer labelled. The Environment features and the Karamba route keep **(BETA)**.
+> The audit below is the 2026-11-18 record that led there.
 
 Audit of 2026-11-18, on `feat/simulation-beta-panel` (cut from master `d2de2db`). Every simulation
 feature below is labelled **(BETA)**: its MCP tool descriptions, the server instructions, the README and

@@ -88,7 +88,7 @@ namespace RhinoAlmondBridge
 
     public sealed class AlmondStructureCommand : Command
     {
-        internal const string BetaNotice = "Almond Structural Validation (BETA): still under test. Results are indicative design-stage checks, not code compliance. Use Place tutorial model to see what an analysis needs.";
+        internal const string BetaNotice = "Almond Structural Validation: design-stage checks, not code compliance. The Karamba engine is (BETA), still under test. Use Place tutorial model to see what an analysis needs.";
         public override string EnglishName => "AlmondStructure";
         protected override Result RunCommand(RhinoDoc doc,RunMode mode) {
             try { AlmondLibraryCommand.OpenPanel(doc,"karamba");RhinoApp.WriteLine(AlmondStructureCommand.BetaNotice);return Result.Success; }

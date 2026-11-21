@@ -1,9 +1,9 @@
 # Almond MCP for Rhino
 
-> **Simulation features are in beta (BETA).** Structural Validation and Climate, Rooms & Comfort
-> (environmental analysis) are still under test. Their tools, panel workspaces and viewport legends are
-> labelled (BETA); treat their results as indicative design-stage checks, not certification or code
-> compliance. **Place tutorial model** in either workspace (or the `place_simulation_tutorial` tool) puts
+> **Structural Validation (native engine) is stable from 0.8.0; Climate, Rooms & Comfort
+> (environmental analysis) and the Karamba route are in beta (BETA).** The beta tools, panel workspace and
+> viewport legends are labelled (BETA). Treat every result as a design-stage check, not certification or
+> code compliance. **Place tutorial model** in either workspace (or the `place_simulation_tutorial` tool) puts
 > an annotated example in Rhino that shows what each analysis needs. Stable-release status per feature:
 > [docs/simulation-stable-readiness.md](docs/simulation-stable-readiness.md).
 
@@ -328,7 +328,7 @@ meshy-t2 smart-topology mesh, untextured), save the GLB as
 `provenance.json`, and run the build script. Provenance and licensing are
 documented in `docs/licensing-audit.md`.
 
-## Structural validation with reports (BETA)
+## Structural validation with reports
 
 `validate_structure(guids, structure_type, load_kn, material)` checks
 generated geometry through three pathways in strict order of confidence —

@@ -1,8 +1,8 @@
-# Almond in Rhino: the Structure workspace (BETA)
+# Almond in Rhino: the Structure workspace
 
-> **(BETA)** This feature is still under test. Its tools, panel workspace and viewport legends are
-> labelled (BETA); results are indicative design-stage checks, not certification or code compliance.
-> Stable-release status: [simulation-stable-readiness.md](simulation-stable-readiness.md).
+> **Stable since 0.8.0** (the native engine). Its verdicts are design-stage checks, not certification or
+> code compliance. The Karamba route (`engine="karamba"`, shells) is still **(BETA)**, under test.
+> Status per feature: [simulation-stable-readiness.md](simulation-stable-readiness.md).
 
 This tutorial shows how to check a structure inside Rhino 8 with Almond. You draw the frame, set the loads, run the analysis, and read where it bends, how hard each member works and whether it could buckle. Change a size and check again in seconds.
 

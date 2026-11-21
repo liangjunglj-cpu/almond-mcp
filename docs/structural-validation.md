@@ -1,8 +1,8 @@
-# Structural validation: process, inputs, and verified behavior (BETA)
+# Structural validation: process, inputs, and verified behavior
 
-> **(BETA)** This feature is still under test. Its tools, panel workspace and viewport legends are
-> labelled (BETA); results are indicative design-stage checks, not certification or code compliance.
-> Stable-release status: [simulation-stable-readiness.md](simulation-stable-readiness.md).
+> **Stable since 0.8.0** (the native engine). Its verdicts are design-stage checks, not certification or
+> code compliance. The Karamba route (`engine="karamba"`, shells) is still **(BETA)**, under test.
+> Status per feature: [simulation-stable-readiness.md](simulation-stable-readiness.md).
 
 How Almond's `validate_structure` works, what goes in, what comes out, and
 the dimension matrix it has been verified against (live sessions,
