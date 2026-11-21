@@ -158,6 +158,20 @@ MUTANTS = [
 ]
 
 
+def mutate(original: bytes, old: str, new: str) -> tuple[int, bytes | None]:
+    """(times ``old`` occurs, the mutated bytes or None unless exactly once). Matching ignores line endings:
+    mutant targets are written with LF, a Windows checkout has CRLF (core.autocrlf), and a multi-line
+    target would otherwise never match there. The mutated file keeps the original line endings."""
+    text = original.decode("utf-8")
+    crlf = "\r\n" in text
+    lf, old, new = (s.replace("\r\n", "\n") for s in (text, old, new))
+    count = lf.count(old)
+    if count != 1:
+        return count, None
+    out = lf.replace(old, new)
+    return 1, (out.replace("\n", "\r\n") if crlf else out).encode("utf-8")
+
+
 def run_tests():
     p = subprocess.run([sys.executable, "-m", "pytest", "-q", "-x", "-p", "no:cacheprovider", *TESTS],
                        cwd=ROOT, capture_output=True, text=True, timeout=900)
@@ -177,14 +191,14 @@ def main():
             continue
         path = ROOT / rel
         original = path.read_bytes()
-        text = original.decode("utf-8")
-        if text.count(old) != 1:
-            print(f"SKIP {name}: target found {text.count(old)} times", flush=True)
+        count, mutated = mutate(original, old, new)
+        if mutated is None:
+            print(f"SKIP {name}: target found {count} times", flush=True)
             skipped.append(name)
             continue
         attempted += 1
         try:
-            path.write_bytes(text.replace(old, new).encode("utf-8"))
+            path.write_bytes(mutated)
             code, tail = run_tests()
         finally:
             path.write_bytes(original)
