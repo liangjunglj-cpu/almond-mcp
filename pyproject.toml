@@ -81,6 +81,14 @@ packages = ["almond_mcp"]
 "Constructionfiles/manifest.json" = "almond_mcp/data/Constructionfiles/manifest.json"
 "Historyfiles/manifest.json" = "almond_mcp/data/Historyfiles/manifest.json"
 "StructuralReferences" = "almond_mcp/data/StructuralReferences"
+"ParametricLibrary/catalogue.json" = "almond_mcp/data/ParametricLibrary/catalogue.json"
+"ParametricLibrary/source-register.json" = "almond_mcp/data/ParametricLibrary/source-register.json"
+"ParametricLibrary/README.md" = "almond_mcp/data/ParametricLibrary/README.md"
+"ParametricLibrary/definitions" = "almond_mcp/data/ParametricLibrary/definitions"
+"ParametricLibrary/lessons" = "almond_mcp/data/ParametricLibrary/lessons"
+"ParametricLibrary/previews" = "almond_mcp/data/ParametricLibrary/previews"
+"ParametricLibrary/LICENSES" = "almond_mcp/data/ParametricLibrary/LICENSES"
+"ParametricLibrary/capsules" = "almond_mcp/data/ParametricLibrary/capsules"
 
 [tool.hatch.build.targets.sdist]
 include = [
@@ -98,7 +106,7 @@ include = [
     "/tools/run_meshy_batch.py", "/tools/prepare_organic_meshes.py", "/tools/import_organic_batch.py", "/GeneratedAssetfiles/batches",
     "/tools/build_archive_bundle.py", "/tools/verify_object_archive_install.py",
     "/tools/render_generated_previews.py", "/tools/verify_release.py",
-    "/StructuralReferences",
+    "/StructuralReferences", "/ParametricLibrary", "/tools/parametric_library",
     "/README.md", "/AGENTS.md", "/LICENSE", "/THIRD-PARTY-NOTICES.md",
     "/pyproject.toml", "/uv.lock", "/.gitattributes",
 ]

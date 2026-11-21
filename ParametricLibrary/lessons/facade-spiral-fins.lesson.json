@@ -1,0 +1,103 @@
+{
+  "id": "facade-spiral-fins",
+  "title": "Rotating fin field (kinetic facade)",
+  "category": "facade",
+  "level": "intermediate",
+  "summary": "A field of identical curved fins sits on a square grid; every fin rotates by an amount set by its distance from a disturbance point, giving the look of a kinetic facade or shading screen that opens around a focus.",
+  "how_to_use": [
+    "'Field X' and 'Field Y' set the size of the field; 'Grid spacing' sets the distance between fins.",
+    "'Fin z1..z4' and 'Fin width' shape the curved fin profile; 'Fin depth' sets how far it is extruded.",
+    "Move the disturbance point with 'Disturbance X/Y/Z' - fins farther away rotate more.",
+    "Bake 'Rot3D' to get the rotated fins."
+  ],
+  "concepts": [
+    "Square grid of points as placement anchors",
+    "Building one module (the fin) and copying it with Move",
+    "Distance-driven rotation: Line length used as an angle in radians",
+    "Rotate 3D about a per-fin axis"
+  ],
+  "source": {
+    "author": "Lucas Becker (runxel)",
+    "repo": "runxel/grasshopper-examples",
+    "path": "gh/spiral_panels.ghx",
+    "commit": "0e57586bdc00a4c3663983e67f36a0ce1f6c7ee6",
+    "licence": "BlueOak-1.0.0",
+    "licence_url": "https://blueoakcouncil.org/license/1.0.0"
+  },
+  "readme_extra": [
+    "bd8986fa",
+    "a75d5197"
+  ],
+  "drop_notes": [
+    "f410b3b2"
+  ],
+  "labels": {
+    "0e3b23eb": "Field X",
+    "bdae4de2": "Field Y",
+    "46428dd5": "Grid spacing",
+    "596b4c51": "Fin z1",
+    "fb9e04b9": "Fin z2",
+    "e74f9fbf": "Fin z3",
+    "bfd0f4fa": "Fin z4",
+    "0fb1a1ec": "Fin width",
+    "aad21cc3": "Fin depth",
+    "27b48808": "Disturbance X",
+    "6c26e646": "Disturbance Y",
+    "536f1880": "Disturbance Z"
+  },
+  "steps": [
+    {
+      "title": "1  INPUTS - change these",
+      "select": {
+        "inputs": true
+      },
+      "explain": "Grid size and spacing, the four heights and width that shape a fin, its depth, and the position of the disturbance point."
+    },
+    {
+      "title": "2  One fin (the module)",
+      "select": {
+        "guids": [
+          "20d803b1",
+          "6f2618af",
+          "449f22a8",
+          "fc074ed2",
+          "100a6a63",
+          "1faac2cf",
+          "6cfa7d21",
+          "065159ce"
+        ]
+      },
+      "explain": "Four points (one on the axis, three offset by Fin width at heights z1..z4) are merged and joined by a curve. Extruding that curve along Y by Fin depth makes one curved fin."
+    },
+    {
+      "title": "3  Grid of anchor points",
+      "select": {
+        "guids": [
+          "3ecd6e14",
+          "751dd81d",
+          "1d4d9225",
+          "f8ead2d1",
+          "8419b715",
+          "b5823cf4"
+        ]
+      },
+      "explain": "A square grid of Field X x Field Y extent is built and shifted so it is centred on the origin. Each grid point will receive one fin."
+    },
+    {
+      "title": "4  RESULT - rotate fins by distance",
+      "select": {
+        "guids": [
+          "d38b5813",
+          "f5b58fad",
+          "abfa0e1f",
+          "6d2dd303",
+          "ed4ca5b8",
+          "1a8133b9",
+          "a6b14a04",
+          "9857b313"
+        ]
+      },
+      "explain": "Move copies the fin onto every grid point. A Line from each point to the disturbance point gives both the rotation axis and, through its Length, the rotation angle in radians - farther fins turn more. Rotate 3D applies it; Symbol Display marks the disturbance point."
+    }
+  ]
+}

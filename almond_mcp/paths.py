@@ -39,10 +39,11 @@ LIBRARY_DIRS = {
     "RHINO_MCP_CONSTRUCTION_DIR": "Constructionfiles",
     "RHINO_MCP_HISTORY_DIR": "Historyfiles",
     "RHINO_MCP_STRUCTURAL_REFERENCE_DIR": "StructuralReferences",
+    "RHINO_MCP_PARAMETRIC_DIR": "ParametricLibrary",
 }
 
 # Bundled in full and scaffolded per release, so an upgrade never mixes versions.
-VERSIONED_LIBRARIES = {"GeneratedAssetfiles", "Draftingfiles", "StructuralReferences"}
+VERSIONED_LIBRARIES = {"GeneratedAssetfiles", "Draftingfiles", "ParametricLibrary", "StructuralReferences"}
 
 STATE_DB_ENV = "RHINO_MCP_STATE_DB"
 STATE_DB_NAME = "almond_state.sqlite3"

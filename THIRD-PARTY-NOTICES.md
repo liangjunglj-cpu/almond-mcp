@@ -62,6 +62,27 @@ Kangaroo example definitions by Daniel Piker were used locally as a physics
 reference library. They carry no redistribution license and are excluded
 from every distribution artifact.
 
+## Parametric library: adapted third-party definitions — distributed with their licences
+
+`ParametricLibrary/definitions/` contains annotated teaching copies of
+Grasshopper definitions by other authors. The geometric logic is theirs and
+unchanged; Almond added layout, labels and explanatory notes. Each file
+carries its upstream licence text in an on-canvas LICENCE panel, and
+`ParametricLibrary/LICENSES/` holds the same texts.
+
+- Lucas Becker, runxel/grasshopper-examples: Blue Oak Model License 1.0.0
+  (https://blueoakcouncil.org/license/1.0.0)
+- Owen Derby, oderby/VVD: MIT, Copyright (c) 2015 Owen Derby
+- Nono Martínez Alonso, nonoesp/GettingArchitectureDoneKit: MIT,
+  Copyright (c) 2014 Nono Martínez Alonso
+- Brendan Harmon, baharmon/computational-design-library: MIT,
+  Copyright (c) 2023 Brendan Harmon
+
+Per-file commits, hashes and changes are recorded in
+`ParametricLibrary/source-register.json`. The wheel bundles the annotated
+definitions with their licence texts (`almond_mcp/data/ParametricLibrary/`);
+the sdist also carries the unmodified upstream files.
+
 ## Rhino / Grasshopper SDK
 
 RhinoCommon and the Grasshopper SDK are used under McNeel's developer terms;

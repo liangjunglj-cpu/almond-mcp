@@ -24,7 +24,7 @@ from fastmcp import FastMCP
 from fastmcp.resources import ResourceContent, ResourceResult
 from almond_mcp.ghx_parser import GHParser, validate_capsule_manifest
 from almond_mcp.retrieval_store import AlmondStore
-from almond_mcp import asset_passport, asset_loads, bridge_client, conditioning, exchange, paths, drafting, native_structure, structure_study, design_codes, model_store, structural_references
+from almond_mcp import asset_passport, asset_loads, bridge_client, conditioning, exchange, paths, drafting, native_structure, structure_study, design_codes, model_store, structural_references, parametric_library
 
 # ── Constants ────────────────────────────────────────────────────────────────
 
@@ -39,6 +39,7 @@ CAPSULE_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_CAPSULE_DIR")
 MATERIAL_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_MATERIAL_DIR")
 CONSTRUCTION_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_CONSTRUCTION_DIR")
 STRUCTURAL_REFERENCE_DIR = paths.resolve_dir("RHINO_MCP_STRUCTURAL_REFERENCE_DIR")
+PARAMETRIC_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_PARAMETRIC_DIR")
 STATE_DB_PATH = paths.resolve_state_db()
 BRIDGE_HOST = '127.0.0.1'
 BRIDGE_PORT = 5000
@@ -64,6 +65,8 @@ mcp = FastMCP("Almond", instructions=(
     "analyze_structural_reference (no Rhino needed) to see a correct verdict for the typology, "
     "place_structural_reference to draw it in Rhino, then validate_structure / visualize_structure "
     "on the placed members, and compare. "
+    "To teach Grasshopper: list_parametric_definitions, get_parametric_definition for the "
+    "lesson steps, then open_parametric_definition to open the annotated canvas. "
     "For climate and environment (EPW weather files): climate_summary and sun_path for the site, "
     "analyze_daylight (annual sDA/ASE/UDI, daylight factor, point-in-time, glare), "
     "analyze_solar_radiation, analyze_thermal (energy and comfort) and thermal_comfort; each accepts "
@@ -80,6 +83,7 @@ mcp = FastMCP("Almond", instructions=(
 ))
 
 structural_index = structural_references.ReferenceLibrary(STRUCTURAL_REFERENCE_DIR)
+parametric_index = parametric_library.ParametricLibrary(PARAMETRIC_LIBRARY_DIR)
 
 # ── Library Indexer ──────────────────────────────────────────────────────────
 
@@ -521,10 +525,12 @@ retrieval_store.sync_assets(
 )
 
 
-def _sync_capsule_library(store: AlmondStore, capsules_dir: str) -> dict:
+def _sync_capsule_library(store: AlmondStore, capsules_dir: str,
+                          library_manifests: list[dict] = (), library_skipped: list[dict] = ()) -> dict:
     """Scan <capsules_dir>/*.capsule.json sidecars, validate each manifest via
     ghx_parser.validate_capsule_manifest, and sync the valid ones into the
-    AlmondStore capsule registry.
+    AlmondStore capsule registry together with the parametric library's
+    register-verified capsules (ParametricLibrary.capsule_manifests()).
 
     Invalid manifests are skipped loudly (stderr) rather than aborting startup,
     so one bad sidecar cannot take down the whole capsule library. The absolute
@@ -532,24 +538,33 @@ def _sync_capsule_library(store: AlmondStore, capsules_dir: str) -> dict:
     can hand it to the bridge.
     """
     manifests: list[dict] = []
-    skipped: list[dict] = []
+    skipped: list[dict] = list(library_skipped)
     directory = Path(capsules_dir)
-    if not directory.is_dir():
+    if directory.is_dir():
+        for manifest_path in sorted(directory.glob("*.capsule.json")):
+            try:
+                manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            except (json.JSONDecodeError, OSError) as exc:
+                skipped.append({"file": manifest_path.name, "errors": [str(exc)]})
+                continue
+            errors = validate_capsule_manifest(manifest)
+            if errors:
+                skipped.append({"file": manifest_path.name, "errors": errors})
+                continue
+            manifest["_manifest_path"] = str(manifest_path.resolve())
+            manifests.append(manifest)
+    else:
         print(f"Capsule directory not found: {directory}", file=sys.stderr)
-        store.sync_capsules([])
-        return {"synced": 0, "skipped": skipped}
 
-    for manifest_path in sorted(directory.glob("*.capsule.json")):
-        try:
-            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-        except (json.JSONDecodeError, OSError) as exc:
-            skipped.append({"file": manifest_path.name, "errors": [str(exc)]})
-            continue
+    known = {m["capsule_id"] for m in manifests}
+    for manifest in library_manifests:
         errors = validate_capsule_manifest(manifest)
+        if manifest.get("capsule_id") in known:
+            errors = errors + [f"capsule_id {manifest['capsule_id']!r} already defined in {directory}"]
         if errors:
-            skipped.append({"file": manifest_path.name, "errors": errors})
+            skipped.append({"file": Path(manifest.get("_manifest_path", "?")).name, "errors": errors})
             continue
-        manifest["_manifest_path"] = str(manifest_path.resolve())
+        known.add(manifest["capsule_id"])
         manifests.append(manifest)
 
     for entry in skipped:
@@ -562,7 +577,7 @@ def _sync_capsule_library(store: AlmondStore, capsules_dir: str) -> dict:
     return {"synced": synced, "skipped": skipped}
 
 
-capsule_sync_report = _sync_capsule_library(retrieval_store, CAPSULE_LIBRARY_DIR)
+capsule_sync_report = _sync_capsule_library(retrieval_store, CAPSULE_LIBRARY_DIR, *parametric_index.capsule_manifests())
 
 # ── TCP Helpers ──────────────────────────────────────────────────────────────
 
@@ -1312,6 +1327,84 @@ def structural_model_resource(reference_id: str) -> ResourceResult:
     except KeyError:
         raise ValueError("Unknown structural reference id")
     return ResourceResult([ResourceContent(model, mime_type="application/json")])
+
+
+# ── Parametric (Grasshopper) teaching library ────────────────────────────────
+
+def _parametric_error(message: str) -> dict:
+    return {"status": "error", "message": message}
+
+
+@mcp.tool(annotations={"readOnlyHint": True, "openWorldHint": False})
+def list_parametric_definitions(query: str = "", category: str = "", level: str = "", limit: int = 20) -> dict:
+    """List the annotated parametric teaching library: openly licensed architectural
+    Grasshopper definitions (facades, structure, massing, site, landscape) reorganised
+    for learning. Each canvas reads left to right: README, green INPUTS with named
+    sliders, numbered explained steps, blue RESULT to bake. Upstream logic is unchanged.
+    query matches titles, summaries, steps and concepts (e.g. "attractor", "loft",
+    "Isotrim"); level is beginner, intermediate or advanced. No Rhino needed."""
+    if not parametric_index.available:
+        return _parametric_error(f"Parametric library not found in {PARAMETRIC_LIBRARY_DIR}")
+    return {"status": "success", "library_dir": PARAMETRIC_LIBRARY_DIR, **parametric_index.search(query, category, level, limit)}
+
+
+@mcp.tool(annotations={"readOnlyHint": True, "openWorldHint": False})
+def get_parametric_definition(definition_id: str) -> dict:
+    """Get one teaching definition: what it models, numbered how-to-use steps, the
+    concepts it teaches, each canvas step with its explanation, inputs, plugin and
+    script notes, the local .ghx path (integrity-checked against the source register),
+    the upstream author, commit and licence. Use the steps to walk a learner through
+    the canvas after open_parametric_definition."""
+    try:
+        return {"status": "success", **parametric_index.details(definition_id)}
+    except KeyError:
+        return _parametric_error(f"Unknown parametric definition id: {definition_id}")
+    except (OSError, ValueError) as exc:
+        return _parametric_error(str(exc))
+
+
+@mcp.tool(annotations={"readOnlyHint": False, "destructiveHint": False, "openWorldHint": False})
+def open_parametric_definition(definition_id: str) -> dict:
+    """Open a teaching definition in Rhino's Grasshopper editor through the bridge
+    (Rhino 8 with almondbridge running). Only library files that match the source
+    register can be opened. Opening solves the definition and adds its preview to
+    the viewport; nothing is baked. The Voronoi screen's script toggle is saved off."""
+    try:
+        path = parametric_index.verify(definition_id)
+    except KeyError:
+        return _parametric_error(f"Unknown parametric definition id: {definition_id}")
+    except (OSError, ValueError) as exc:
+        return _parametric_error(str(exc))
+    raw = execute_rhino_script(parametric_library.open_in_grasshopper_script(path))
+    try:
+        result = json.loads(raw)
+    except (TypeError, ValueError):
+        result = {"status": "error", "message": str(raw)[:500]}
+    if result.get("status") != "success":
+        return {"status": "error", "message": "Rhino could not open the definition", "bridge": result,
+                "definition_path": str(path)}
+    return {"status": "success", "definition_id": definition_id, "definition_path": str(path),
+            "next": "Read the README panel, then change the green INPUTS and follow the numbered steps."}
+
+
+@mcp.resource("almond://parametric/catalogue", mime_type="application/json")
+def parametric_catalogue_resource() -> ResourceResult:
+    """Compact catalogue of the parametric teaching library."""
+    return ResourceResult([ResourceContent(list_parametric_definitions(limit=1000), mime_type="application/json")])
+
+
+@mcp.resource("almond://parametric/{definition_id}/preview", mime_type="image/png")
+def parametric_preview_resource(definition_id: str) -> ResourceResult:
+    """Canvas layout preview rendered from the definition's XML (nothing solved)."""
+    try:
+        return ResourceResult([ResourceContent(parametric_index.preview(definition_id), mime_type="image/png")])
+    except KeyError:
+        raise ValueError("Unknown parametric definition id")
+
+
+@mcp.resource("almond://parametric/{definition_id}/lesson", mime_type="application/json")
+def parametric_lesson_resource(definition_id: str) -> ResourceResult:
+    return ResourceResult([ResourceContent(get_parametric_definition(definition_id), mime_type="application/json")])
 
 
 @mcp.tool()
@@ -4021,6 +4114,7 @@ def run_gh_definition(
         })
 
     if not manifest.get("audited"):
+        audit_note = (manifest.get("audit") or {}).get("note") or ""
         return json.dumps({
             "status": "error",
             "message": (
@@ -4028,6 +4122,7 @@ def run_gh_definition(
                 "ALMOND_IN_*/ALMOND_OUT_* harness params, so run_gh_definition refuses to "
                 "execute it. It remains available as retrieval context (get_logic_by_id). "
                 "See capsules/AUTHORING.md for how to harness and audit the definition."
+                + (f" Audit note: {audit_note}" if audit_note else "")
             ),
         })
 

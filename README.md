@@ -265,6 +265,7 @@ locations:
 | `RHINO_MCP_GENERATED_ASSET_DIR` | `GeneratedAssetfiles` |
 | `RHINO_MCP_CAPSULE_DIR` | `capsules` |
 | `RHINO_MCP_STRUCTURAL_REFERENCE_DIR` | `StructuralReferences` |
+| `RHINO_MCP_PARAMETRIC_DIR` | `ParametricLibrary` |
 | `RHINO_MCP_STATE_DB` | `%LOCALAPPDATA%\Almond\almond_state.sqlite3` |
 
 ## Rhino to Chestnut
@@ -344,6 +345,19 @@ create_generation_plan(
   scope="drawing"
 )
 ```
+
+## Parametric teaching library (Grasshopper)
+
+`ParametricLibrary/` holds ten openly licensed architectural Grasshopper
+definitions (facades, a shell roof, towers, terrain, paving) by other authors,
+annotated so a student can read the canvas left to right: README, named
+inputs, numbered explained steps, result. The upstream logic is unchanged and
+each file keeps its licence. Use `list_parametric_definitions`,
+`get_parametric_definition` and `open_parametric_definition` (opens it in
+Grasshopper). Definitions with a lesson `harness` block also ship as runnable
+capsules (`ALMOND_IN_*`/`ALMOND_OUT_*` sockets, `run_gh_definition`); the first
+is the shell roof, `parametric_shell_roof_ribs_v1`, not yet audited.
+See [ParametricLibrary/README.md](ParametricLibrary/README.md).
 
 ## Generated asset library (open, redistributable)
 

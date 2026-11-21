@@ -1,0 +1,87 @@
+{
+  "id": "facade-diagrid-on-surface",
+  "title": "Diagrid on a freeform surface",
+  "category": "facade",
+  "level": "beginner",
+  "summary": "Divides any surface into a grid of bays and draws the two diagonals of every bay along the surface, producing a diagrid structure or facade pattern that follows the curvature.",
+  "how_to_use": [
+    "Right-click 'Srf' and Set one Surface to use your own facade or roof surface (a sample is stored).",
+    "'Bays U' and 'Bays V' set how many diamonds you get in each direction.",
+    "Leave the four corner MD Sliders as they are for a classic diagrid; moving them bends the diagonals inside each bay.",
+    "Bake the two Curve On Surface components to get the diagonals."
+  ],
+  "concepts": [
+    "Divide Domain2 + Isotrim: splitting a surface into sub-surfaces",
+    "Deconstruct Brep: faces, edges and vertices of a bay",
+    "Curve On Surface: a curve defined by UV points that stays on the surface",
+    "MD Slider: a 2D (UV) input"
+  ],
+  "source": {
+    "author": "Lucas Becker (runxel)",
+    "repo": "runxel/grasshopper-examples",
+    "path": "gh/diagrid_on_surface.ghx",
+    "commit": "0e57586bdc00a4c3663983e67f36a0ce1f6c7ee6",
+    "licence": "BlueOak-1.0.0",
+    "licence_url": "https://blueoakcouncil.org/license/1.0.0"
+  },
+  "readme_extra": [
+    "506ee4ce",
+    "0908e16f",
+    "51e08675"
+  ],
+  "drop_notes": [
+    "64df48f1"
+  ],
+  "labels": {
+    "ffbe72b2": "Bays U",
+    "92b2e2f6": "Bays V",
+    "b974b4d3": "Diagonal A start",
+    "4637cd65": "Diagonal A end",
+    "6d743934": "Diagonal B start",
+    "eb1e066d": "Diagonal B end"
+  },
+  "steps": [
+    {
+      "title": "1  INPUTS - change these",
+      "select": {
+        "guids": [
+          "702d2fd1",
+          "ffbe72b2",
+          "92b2e2f6"
+        ]
+      },
+      "explain": "The surface to cover and the number of bays in U and V."
+    },
+    {
+      "title": "2  Split the surface into bays",
+      "select": {
+        "guids": [
+          "f2a02230",
+          "c9f1e819",
+          "357ed359"
+        ]
+      },
+      "explain": "Divide Domain2 splits the surface's UV domain into Bays U x Bays V cells, and Isotrim cuts out one sub-surface per cell. Deconstruct Brep passes each bay on as a face."
+    },
+    {
+      "title": "3  Diagonal pattern (UV corners)",
+      "select": {
+        "types": [
+          "MD Slider"
+        ]
+      },
+      "explain": "Each MD Slider is a point in the bay's own 0..1 UV space. (0,0)->(1,1) and (1,0)->(0,1) give the two diagonals; other values give other patterns."
+    },
+    {
+      "title": "4  RESULT - diagonals on every bay",
+      "select": {
+        "guids": [
+          "b8a6ce0a",
+          "f95c4932"
+        ],
+        "rest": true
+      },
+      "explain": "Curve On Surface draws a curve through the UV points on every bay face, so the diagonals follow the surface exactly. Bake these to keep the diagrid."
+    }
+  ]
+}

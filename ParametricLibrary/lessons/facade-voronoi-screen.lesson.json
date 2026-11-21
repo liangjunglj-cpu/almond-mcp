@@ -1,0 +1,144 @@
+{
+  "id": "facade-voronoi-screen",
+  "title": "Voronoi screen on a surface",
+  "category": "facade",
+  "level": "advanced",
+  "summary": "Scatters random points on a surface, builds 3D Voronoi cells around them and uses the cells to cut a perforated, thickened screen - a typical organic facade or pavilion skin.",
+  "how_to_use": [
+    "Right-click 'Srf' and Set one Surface for your own screen (a sample is stored).",
+    "'Number of Points' sets how many cells; 'Cell box X/Y/Z' must be large enough to contain the whole surface.",
+    "'Rib width' (0..1) insets the cell outlines on the surface for the flat version in step 3.",
+    "'Shell thickness' thickens the surface; 'Cutter offset' shrinks the cells before cutting.",
+    "'Run cutter script' is saved OFF in this copy (the original was saved on). Switch it to True only when you are ready: the Python script temporarily adds geometry to the Rhino document and runs the _OffsetSrf command, then cleans up. Switch it off again before changing inputs.",
+    "If the cut fails, check the Rhino document tolerance (see the original author's notes) - very small tolerances make the Breps fail."
+  ],
+  "concepts": [
+    "Populate Geometry: random points on a surface",
+    "Voronoi 3D: cells around each point inside a box",
+    "Brep | Brep intersection: cell outlines on the surface",
+    "Data Dam: holding back heavy downstream work",
+    "Solid Difference: cutting the cells out of a thickened surface",
+    "A GhPython script that drives a Rhino command (and why it must not run in parallel)"
+  ],
+  "source": {
+    "author": "Lucas Becker (runxel)",
+    "repo": "runxel/grasshopper-examples",
+    "path": "gh/voronoi_on_surface.ghx",
+    "commit": "0e57586bdc00a4c3663983e67f36a0ce1f6c7ee6",
+    "licence": "BlueOak-1.0.0",
+    "licence_url": "https://blueoakcouncil.org/license/1.0.0"
+  },
+  "readme_extra": [
+    "5e86c71d",
+    "6f4e4638"
+  ],
+  "drop_notes": [
+    "3fe456fd"
+  ],
+  "labels": {
+    "d03401d4": "Number of Points",
+    "5458c092": "Cell box X",
+    "098e88ee": "Cell box Y",
+    "28fef60f": "Cell box Z",
+    "65e03115": "Rib width",
+    "6fc40672": "Cap scale",
+    "f4ce85de": "Shell thickness",
+    "cef9e938": "Cutter offset",
+    "27ee5376": "Run cutter script"
+  },
+  "steps": [
+    {
+      "title": "1  INPUTS - change these",
+      "select": {
+        "inputs": true
+      },
+      "explain": "Surface, number of cells, the size of the box that holds the Voronoi cells, offsets, and the toggle that runs the cutting script."
+    },
+    {
+      "title": "2  Voronoi cells around random points",
+      "select": {
+        "guids": [
+          "a46fb5f1",
+          "6ad0bf3b",
+          "43251a1c",
+          "f0b334e8",
+          "cfc05cf8",
+          "dd96437f",
+          "0c27c594",
+          "4e722a8f",
+          "8b6e84d3"
+        ]
+      },
+      "explain": "Populate Geometry scatters points on the surface. A Center Box around the surface centroid limits space, and Voronoi 3D grows one cell around each point. Clean Tree removes empty results and a Data Dam holds them until the heavy steps below are needed."
+    },
+    {
+      "title": "3  Flat version: cell outlines on the surface",
+      "select": {
+        "guids": [
+          "0bf1b80b",
+          "2fd4cf45"
+        ]
+      },
+      "explain": "Intersecting the surface with the cells (Brep | Brep) gives the cell outlines lying on the surface. Offset on Srf insets them by 'Rib width' - useful for a laser-cut or flat panel version."
+    },
+    {
+      "title": "4  Thicken the surface into a closed shell",
+      "select": {
+        "guids": [
+          "d0436a7c",
+          "6807621d",
+          "ea012d86",
+          "9da7735e",
+          "88f64265",
+          "8dadac7f",
+          "231351a0",
+          "88e54e09",
+          "4d817242",
+          "21416088",
+          "e933e260",
+          "aa953766",
+          "05505442",
+          "f7a07327",
+          "88e16326",
+          "a2696503",
+          "a60b42c1",
+          "1f6190be",
+          "825f51fe",
+          "2808858f",
+          "8dbcfda5"
+        ]
+      },
+      "explain": "Offset Surface creates the second skin. The bounding-box faces at both ends are scaled up and intersected with the two skins to build end caps, and Brep Join closes everything into one solid shell."
+    },
+    {
+      "title": "5  Shrink the cells into cutters (script)",
+      "select": {
+        "guids": [
+          "39150ed1",
+          "818deed4",
+          "5817b3bc",
+          "54bafc92",
+          "81aac5a5"
+        ]
+      },
+      "explain": "Grasshopper's own offset cannot offset these solids, so a GhPython script hands each cell to Rhino's _OffsetSrf command (only while 'Run cutter script' is True). The shrunken cells become the cutters; their outline is previewed on the surface."
+    },
+    {
+      "title": "6  RESULT - perforated screen",
+      "select": {
+        "guids": [
+          "308e59e6",
+          "3c855372"
+        ],
+        "rest": true
+      },
+      "explain": "Solid Difference subtracts all cutters from the shell, leaving the perforated screen. Move places the result next to the input so both stay visible. Bake Move to keep it."
+    }
+  ],
+  "overrides": {
+    "27ee5376": {
+      "ToggleValue": "false",
+      "reason": "upstream saved the cutter-script toggle as on, so the GhPython script would add geometry to the Rhino document and run _OffsetSrf as soon as the file opens; the teaching copy opens with it off"
+    }
+  }
+}

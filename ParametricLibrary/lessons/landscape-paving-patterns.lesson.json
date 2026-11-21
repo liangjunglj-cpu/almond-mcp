@@ -1,0 +1,105 @@
+{
+  "id": "landscape-paving-patterns",
+  "title": "Paving patterns with attractor colouring",
+  "category": "landscape",
+  "level": "intermediate",
+  "summary": "Lays out rectangular pavers with joints, shifts every second course to make a running bond, and colours the pavers randomly or by distance to an attractor curve - a toolkit for hardscape and floor patterns.",
+  "how_to_use": [
+    "'Paver X' and 'Paver Y' set the paver size, 'Paver height' the thickness, 'Joint' the gap between pavers.",
+    "'Area X' and 'Area Y' set how many pavers in each direction.",
+    "'Bond shift ratio' (the panel, default 2) shifts alternate courses by Paver X / ratio for a running bond.",
+    "Right-click 'Attractor curve' and Set one Curve to colour by distance from a path; 'Sample distance' samples it, 'Contrast' scales the effect.",
+    "Change 'Colour seed' and 'Attractor seed' for different random colourings. Bake the Box parameters to keep the pavers."
+  ],
+  "concepts": [
+    "Rectangular grid as paver origins",
+    "Domain Box: a paver from a corner point and size domains",
+    "Dispatch: splitting a list into alternating items for running bond",
+    "Random + Gradient: random colours",
+    "Closest Point + Remap: attractor colouring along a curve"
+  ],
+  "source": {
+    "author": "Brendan Harmon (baharmon)",
+    "repo": "baharmon/computational-design-library",
+    "path": "05-random-paving/random-paving.gh",
+    "commit": "3b49802218466afb9dcdb0452cb0afe566b51382",
+    "licence": "MIT",
+    "licence_url": "https://github.com/baharmon/computational-design-library/blob/3b49802218466afb9dcdb0452cb0afe566b51382/LICENSE.txt"
+  },
+  "labels": {
+    "98dfcbfc": "Attractor curve",
+    "5ff045ef": "Attractor seed",
+    "3eaec5a7": "Contrast",
+    "26a3eca0": "Sample distance",
+    "e32e835d": "Paver X",
+    "be4597b2": "Paver Y",
+    "ce8c46d2": "Paver height",
+    "c78af4a9": "Area X",
+    "71d3dc0c": "Area Y",
+    "19b160c0": "Joint",
+    "7d77509b": "Colour seed",
+    "532e5995": "Bond shift ratio"
+  },
+  "steps": [
+    {
+      "title": "1  INPUTS - change these",
+      "select": {
+        "inputs": true
+      },
+      "explain": "Paver size and joint, area, bond shift, the attractor curve and the two random seeds."
+    },
+    {
+      "title": "2  Stacked bond: grid of pavers",
+      "select": {
+        "guids": [
+          "fc3e9c38",
+          "721575ac",
+          "7f2747f5",
+          "60063bb4",
+          "6b9e2c7e",
+          "15232bdc",
+          "5b4c6361",
+          "9df3d686",
+          "6d130a18",
+          "bdd97491",
+          "ef3a6c66",
+          "91452766",
+          "0cf9da1a",
+          "d4ddb768",
+          "fdb68400"
+        ]
+      },
+      "explain": "A Rectangular grid gives one corner point per paver. Domain Box builds each paver from its corner, with the joint subtracted from its length and width. This is a stacked bond: every course lines up."
+    },
+    {
+      "title": "3  Running bond: shift every second course",
+      "select": {
+        "guids": [
+          "9fbd4177",
+          "dc66937f",
+          "e744c0c9",
+          "26f7418e",
+          "f3670a20",
+          "79fb94db",
+          "d8a6833b",
+          "2508e28d"
+        ]
+      },
+      "explain": "Dispatch splits the pavers into alternating courses. One set is moved along X by Paver X / Bond shift ratio, then both sets are merged back - a running bond."
+    },
+    {
+      "title": "4  RESULT - random and attractor colours",
+      "select": {
+        "rest": true
+      },
+      "explain": "Random + Gradient gives every paver a random colour. Closest Point measures each paver's distance to the attractor curve; Remap, a random factor and Contrast turn that into a second Gradient. The two Custom Previews show both colourings."
+    }
+  ],
+  "drop_notes": [
+    "aba2f15e",
+    "fa2b7522",
+    "64a94093",
+    "2304eb63",
+    "f3a1a24e"
+  ]
+}

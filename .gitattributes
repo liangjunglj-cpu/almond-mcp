@@ -12,3 +12,8 @@ almond_mcp/library_ui/vendor/model-viewer.min.js -diff
 GeneratedAssetfiles/batches/**/*.txt text eol=lf
 GeneratedAssetfiles/batches/**/*.json text eol=lf
 GeneratedAssetfiles/batches/*.json text eol=lf
+# Parametric library: upstream files and built definitions are hashed in source-register.json.
+ParametricLibrary/upstream/** -text -diff
+ParametricLibrary/definitions/*.ghx -text linguist-generated=true
+ParametricLibrary/capsules/** -text linguist-generated=true
+ParametricLibrary/**/*.gh binary
