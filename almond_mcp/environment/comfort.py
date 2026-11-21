@@ -281,6 +281,44 @@ def adaptive_ashrae55(t_op: np.ndarray, t_pma_daily: np.ndarray, air_speed: floa
 
 
 EN16798_CATEGORIES = {"I": (2.0, 3.0), "II": (3.0, 4.0), "III": (4.0, 5.0)}
+# PMV range per EN 16798-1 / ISO 7730 category for mechanically conditioned spaces
+PMV_CATEGORIES = {"I": 0.2, "II": 0.5, "III": 0.7, "IV": 1.0}
+
+
+def temperature_for_pmv(target: float, met: float, clo: float, rh: float = 50.0, vel: float = 0.1,
+                        radiant_offset_k: float = 0.0) -> float:
+    """The operative temperature (air temperature with mean radiant = air + radiant_offset_k) at which
+    PMV equals ``target``, by bisection (PMV rises with temperature)."""
+    def f(t):
+        return float(pmv_ppd(t, t + radiant_offset_k, vel, rh, met, clo)["pmv"]) - target
+    lo, hi = 0.0, 45.0
+    if f(lo) > 0 or f(hi) < 0:
+        raise ValueError(f"No temperature in 0..45 degC gives PMV {target:+.1f} for {met} met and {clo} clo")
+    for _ in range(60):
+        mid = 0.5 * (lo + hi)
+        if f(mid) < 0:
+            lo = mid
+        else:
+            hi = mid
+    t = 0.5 * (lo + hi)
+    return float(operative_temperature(t, t + radiant_offset_k, vel))
+
+
+def pmv_setpoints(met: float, clo_heating: float = 1.0, clo_cooling: float = 0.5, rh: float = 50.0,
+                  vel: float = 0.1, category: str = "II", radiant_offset_k: float = 0.0) -> dict:
+    """Design set-points from PMV: the lowest operative temperature that keeps PMV at or above the
+    category's lower limit with winter clothing (heating) and the highest that keeps it at or below the
+    upper limit with summer clothing (cooling)."""
+    if category not in PMV_CATEGORIES:
+        raise ValueError("category must be I, II, III or IV")
+    lim = PMV_CATEGORIES[category]
+    heat = temperature_for_pmv(-lim, met, clo_heating, rh, vel, radiant_offset_k)
+    cool = temperature_for_pmv(lim, met, clo_cooling, rh, vel, radiant_offset_k)
+    return {"category": category, "pmv_range": [-lim, lim],
+            "heating_setpoint_c": round(heat, 1), "cooling_setpoint_c": round(cool, 1),
+            "inputs": {"met": met, "clo_heating": clo_heating, "clo_cooling": clo_cooling, "rh_pct": rh,
+                       "air_speed_m_s": vel, "mean_radiant_minus_air_k": radiant_offset_k},
+            "method": "PMV (ISO 7730) solved for the category limit; temperatures are operative."}
 
 
 def adaptive_en16798(t_op: np.ndarray, t_rm_daily: np.ndarray, category: str = "II") -> dict:
@@ -297,16 +335,36 @@ def adaptive_en16798(t_op: np.ndarray, t_rm_daily: np.ndarray, category: str = "
             "category": category}
 
 
-def tm52(t_op: np.ndarray, t_rm_daily: np.ndarray, occupied: np.ndarray, month: np.ndarray) -> dict:
-    """CIBSE TM52 overheating criteria for the non-heating season (May-September), occupied hours.
-    A room fails when it fails two or more of the three criteria."""
+TM52_SEASON_NORTH = [5, 6, 7, 8, 9]          # May-September, as in TM52 (written for the UK)
+TM52_SEASON_SOUTH = [11, 12, 1, 2, 3]         # the same months six months on
+
+
+def tm52_season(latitude: float, season_months=None) -> tuple[list[int], str]:
+    """(months, description) of TM52's non-heating season: ``season_months`` when given, else
+    May-September north of the equator and November-March south of it."""
+    if season_months is not None:
+        months = [int(m) for m in season_months]
+        if not months or any(not 1 <= m <= 12 for m in months):
+            raise ValueError("TM52 season months must be 1..12")
+        return months, "given months"
+    if latitude < 0:
+        return list(TM52_SEASON_SOUTH), "November-March (southern hemisphere)"
+    return list(TM52_SEASON_NORTH), "May-September (northern hemisphere)"
+
+
+def tm52(t_op: np.ndarray, t_rm_daily: np.ndarray, occupied: np.ndarray, month: np.ndarray,
+         latitude: float = 0.0, season_months=None) -> dict:
+    """CIBSE TM52 overheating criteria over the occupied hours of the non-heating season (see
+    tm52_season). A room fails when it fails two or more of the three criteria."""
+    months, label = tm52_season(latitude, season_months)
     t_rm = np.repeat(np.asarray(t_rm_daily, dtype=float), 24)
     t_max = 0.33 * t_rm + 21.8
     dT = np.round(np.asarray(t_op, dtype=float) - t_max)
-    season = (month >= 5) & (month <= 9) & np.asarray(occupied, dtype=bool)
+    season = np.isin(month, months) & np.asarray(occupied, dtype=bool)
     occ_hours = int(season.sum())
     if occ_hours == 0:
-        return {"applicable": False, "reason": "no occupied hours between May and September"}
+        return {"applicable": False, "reason": f"no occupied hours in the season ({label})",
+                "season": label, "season_months": months}
     exceed = int(((dT >= 1) & season).sum())
     c1_pct = 100.0 * exceed / occ_hours
     day = np.repeat(np.arange(365), 24)
@@ -314,7 +372,7 @@ def tm52(t_op: np.ndarray, t_rm_daily: np.ndarray, occupied: np.ndarray, month: 
     c2_max = float(we.max())
     c3_max = float(np.where(season, dT, -99).max())
     fails = [c1_pct > 3.0, c2_max > 6.0, c3_max > 4.0]
-    return {"applicable": True, "occupied_hours": occ_hours,
+    return {"applicable": True, "season": label, "season_months": months, "occupied_hours": occ_hours,
             "criterion_1": {"hours_exceeding": exceed, "pct": round(c1_pct, 2), "limit_pct": 3.0, "pass": not fails[0]},
             "criterion_2": {"max_daily_weighted_exceedance": round(c2_max, 1), "limit": 6.0,
                             "days_over": int((we > 6.0).sum()), "pass": not fails[1]},

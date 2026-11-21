@@ -100,3 +100,7 @@ table.data { border-collapse: collapse; width: 100%; font-variant-numeric: tabul
 ul { margin: 0; padding-left: 1.2em; display: grid; gap: 3px; }
 .snapshot { border-top: 1px solid var(--line); padding-top: 6px; margin-top: 16px; }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+/* Beta label, and inside Rhino no brand colour: the mark takes the ink, like a Rhino panel caption. */
+.beta-tag { display: inline-block; font-size: 10px; font-weight: 600; line-height: 16px; color: var(--muted); border: 1px solid var(--line); border-radius: 2px; padding: 0 4px; margin-left: 4px; vertical-align: middle; }
+.rhino-panel .mark { background: var(--ink); color: var(--paper); transform: none; border-radius: 3px; }
+.rhino-panel button:focus-visible, .rhino-panel input:focus-visible, .rhino-panel select:focus-visible, .rhino-panel tr:focus-visible { outline: 1px solid var(--accent); }

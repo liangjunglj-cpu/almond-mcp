@@ -1,4 +1,8 @@
-# Almond in Rhino: the Structure workspace
+# Almond in Rhino: the Structure workspace (BETA)
+
+> **(BETA)** This feature is still under test. Its tools, panel workspace and viewport legends are
+> labelled (BETA); results are indicative design-stage checks, not certification or code compliance.
+> Stable-release status: [simulation-stable-readiness.md](simulation-stable-readiness.md).
 
 This tutorial shows how to check a structure inside Rhino 8 with Almond. You draw the frame, set the loads, run the analysis, and read where it bends, how hard each member works and whether it could buckle. Change a size and check again in seconds.
 
@@ -11,6 +15,20 @@ It covers the Rhino panel. Every step can also be driven by Claude or another MC
 The screenshots show the A07 apartment mezzanine from the generated model library.
 
 ---
+
+## Tutorial model
+
+**Place tutorial model** at the top of the Structure workspace (or the `place_simulation_tutorial` MCP
+tool with `part="structure"`) draws a 6 x 4 m single-bay frame beside your model on
+`Almond Tutorial::Structure` layers: four columns and four beams as line axes, each with its section as
+`almond:section` user text (beams `box 100x200x6`, columns `box 150x150x8`), a point at each column base,
+numbered dots for members, supports, loads and how to run, and a notes block that explains each number.
+Select the members and the support points, then **Use Rhino selection** and **Run native analysis**. With
+the default 10 kN plus a 2.0 + 1.0 kN/m² floor load (Loads tab, **Floor loads and model loads**) it passes;
+delete the `almond:section` text and the default CHS 114.3 × 4 fails (72 mm, 303 %).
+
+Advanced options sit in collapsed sections on each tab (Section, Floor loads and model loads, Joints and
+support locations, Combinations, stability and deflection): the defaults suit a first check.
 
 ## 0. Install
 

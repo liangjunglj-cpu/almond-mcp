@@ -21,3 +21,24 @@
 .env-warnings li{font-size:11px;line-height:1.55;color:var(--red);margin:4px 0}
 .env-page .analysis-meta.need{color:var(--red)}
 .rhino-panel .env-strip svg text{font-family:var(--ui-font,"Segoe UI"),Arial,sans-serif}
+.env-date{display:grid;grid-template-columns:1fr 64px;gap:6px}
+.env-image{display:block;width:100%;height:auto;margin:12px 0;border:1px solid var(--line)}
+.env-plain li{color:var(--muted)}
+.env-seasons td{padding:4px}
+.env-seasons select{width:100%}
+.env-inner{margin-top:10px}
+#env-compare-bars{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:0 14px}
+/* Inside Rhino (Rhino default style): a neutral white drawing sheet instead of the archive paper, the UI font
+   for tables and lists, and state colours for warnings. */
+.rhino-panel .env-page{--sheet:#ffffff}
+.rhino-panel[data-rhino-theme=dark] .env-page{--sheet:#e6e6e6}
+.rhino-panel .env-diagram svg{border:1px solid var(--line);border-radius:2px}
+.rhino-panel .env-diagram{margin:8px 0}
+.rhino-panel .env-warnings li,.rhino-panel .env-page .env-warnings li{color:var(--warn)}
+.rhino-panel .env-table tr[data-state=semi_open] td:first-child,.rhino-panel .env-table tr[data-state=open] td:first-child{border-left-color:var(--warn)}
+.rhino-panel .env-facts{border-top-color:var(--line);margin:8px 0;padding-top:8px}
+.rhino-panel .env-facts dt,.rhino-panel .env-table th{font:600 11px var(--ui-font,"Segoe UI"),Arial,sans-serif;text-transform:none;color:var(--muted)}
+.rhino-panel .env-table th{border-bottom-color:var(--line);color:var(--ink)}
+.rhino-panel .env-list{font:12px/1.5 var(--ui-font,"Segoe UI"),Arial,sans-serif;background:var(--field);border-radius:2px}
+.rhino-panel .env-list option:checked{background:var(--accent);color:#fff}
+.rhino-panel .env-link{font:11px var(--ui-font,"Segoe UI"),Arial,sans-serif;color:var(--accent)}

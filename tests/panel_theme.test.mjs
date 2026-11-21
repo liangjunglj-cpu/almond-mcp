@@ -42,3 +42,14 @@ test('unreadable custom colours get a readable text/control fallback',()=>{
   assert.equal(p.properties.get('--field'),'#333333');
   assert.notEqual(p.properties.get('--preview'),p.properties.get('--paper'));
 });
+test('Rhino 8 dark theme: its blue is the accent, hover stays visible, no brand red',()=>{
+  // PaintColor values read from a live Rhino 8 dark theme (PressedEnd is the accent, HotStart = panel colour).
+  const rhino={paper:'#323232',ink:'#EAEAEA',control:'#444444',field:'#5B5B5B',line:'#848484',hover:'#323232',accent:'#4889FF',tab:'#444444',font:'Segoe UI'};
+  const p=page('?panel=1&palette='+encodeURIComponent(JSON.stringify(rhino)));
+  assert.equal(p.properties.get('--accent'),'#4889FF');
+  assert.equal(p.properties.get('--red'),'#4889FF');
+  assert.notEqual(p.properties.get('--hover').toLowerCase(),'#323232');
+  assert.equal(p.properties.get('--tab'),'#444444');
+  p.window.almondThemeReceive({...rhino,accent:'#191919'});          // an unreadable accent falls back
+  assert.equal(p.properties.get('--accent'),'#5c9ee0');
+});

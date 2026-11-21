@@ -37,6 +37,9 @@ DISPLAY = {   # metric -> (unit, vmin, vmax, ramp, title)
     "lux": ("lux", 0, None, "viridis", "Illuminance"),
     "kwh_m2": ("kWh/m2", None, None, "magma", "Incident solar irradiation"),
     "sun_hours": ("h", 0, None, "magma", "Direct sun hours"),
+    "view_level": ("level", 0, 3, "viridis", "EN 17037 view out level (0 none, 1 min, 2 medium, 3 high)"),
+    "sight_angle_deg": ("deg", 0, 90, "viridis", "EN 17037 horizontal sight angle"),
+    "outside_distance_m": ("m", 0, 60, "viridis", "EN 17037 outside distance"),
 }
 # CIE skies whose luminance pattern does not depend on the sun (gradation only)
 SUNLESS_SKIES = {"cie_overcast", "uniform", "cie_1", "cie_3", "cie_5"}
@@ -271,9 +274,42 @@ def drop_enclosed_sensors(scene: Scene, grid: SensorGrid, lid: float = 0.6, reac
                        spacing=grid.spacing, cells=grid.cells[keep], group=grid.group[keep]), int(enclosed.sum()))
 
 
-def zones_from_export(data: dict, scene: Scene, zone_guids: list[str]) -> list[thermal.Zone]:
+_NOT_BUILDING = ("ground", "context", "shading")
+
+
+def _floor_below(v: np.ndarray, scene: Scene, others: list[tuple[np.ndarray, np.ndarray]],
+                 inset: float = 0.3, storey: float = 0.5) -> float | None:
+    """The z of the lowest building floor under a zone, or None when there is none (the zone's lowest
+    floor is then on the ground). A floor below is a horizontal face of the building - any scene
+    object but ground, context, shading and ignored ones, or another zone - lying wholly ``storey``
+    m or more under the zone, within its plan extent inset by ``inset`` m (so perimeter walls and
+    foundations, and the zone's own slab, do not count)."""
+    lo, hi = v.min(axis=0), v.max(axis=0)
+    fx0, fy0, fx1, fy1 = lo[0] + inset, lo[1] + inset, hi[0] - inset, hi[1] - inset
+    if fx0 >= fx1 or fy0 >= fy1:
+        fx0, fy0, fx1, fy1 = lo[0], lo[1], hi[0], hi[1]
+    names = np.array([m.name for m in scene.materials] or [""])
+    kinds = np.array([m.kind for m in scene.materials] or [""])
+    keep = ~np.isin(names[scene.tri_material], _NOT_BUILDING) & (kinds[scene.tri_material] != "ignore")
+    tris = [scene.vertices[scene.triangles[keep]].reshape(-1, 3, 3)]
+    tris += [np.asarray(ov, dtype=float)[np.asarray(ot, dtype=np.int64)] for ov, ot in others]
+    t = np.concatenate(tris)
+    if not len(t):
+        return None
+    n = np.cross(t[:, 1] - t[:, 0], t[:, 2] - t[:, 0])
+    horiz = np.abs(n[:, 2]) > 0.7 * np.maximum(np.linalg.norm(n, axis=1), 1e-30)
+    tlo, thi = t.min(axis=1), t.max(axis=1)
+    below = (horiz & (thi[:, 2] < lo[2] - storey) & (tlo[:, 0] < fx1) & (thi[:, 0] > fx0)
+             & (tlo[:, 1] < fy1) & (thi[:, 1] > fy0))
+    return float(tlo[below, 2].min()) if below.any() else None
+
+
+def zones_from_export(data: dict, scene: Scene, zone_guids: list[str], ground_z: float | None = None) -> list[thermal.Zone]:
     """Zones from closed Rhino objects (one zone per GUID); glazing in the scene is attached to the
-    zone face it lies on; faces shared between the listed zones are adiabatic."""
+    zone face it lies on; faces shared between the listed zones are adiabatic. A zone's lowest floor
+    is on the ground unless building floors lie under it (see _floor_below) - then it is exposed, or
+    adiabatic where a listed zone is under it. ``ground_z`` (metres) fixes the ground level for
+    every zone instead."""
     scale = float(data.get("units_to_m", 1.0))
     by_guid: dict[str, list[dict]] = {}
     for o in data.get("objects", []):
@@ -306,8 +342,15 @@ def zones_from_export(data: dict, scene: Scene, zone_guids: list[str]) -> list[t
     zones = []
     for i, (g, name, v, t) in enumerate(meshes):
         others = [(mv, mt) for j, (_, _, mv, mt) in enumerate(meshes) if j != i]
-        z = thermal.zone_from_mesh(name, v, t, windows, others)
+        gz = ground_z if ground_z is not None else _floor_below(v, scene, others)
+        z = thermal.zone_from_mesh(name, v, t, windows, others, ground_z=gz)
         z.source["guid"] = g
+        exposed = z.areas().get("exposed_floor", 0.0)
+        if exposed > 0 and gz is not None:
+            where = "the given ground level" if ground_z is not None else "a building floor below it"
+            z.source["note"] = (f"{exposed:.1f} m2 of floor lies above {where} (z {gz:.2f} m) with no listed zone "
+                                "under it, so it is treated as exposed to outside air; list the zone below too "
+                                "to make that floor adiabatic, or pass ground_z_m.")
         zones.append(z)
     return zones
 
@@ -346,7 +389,7 @@ def run_daylight(scene: Scene, grid: SensorGrid, weather, study: str = "annual",
                  da_threshold: float = 300.0, en17037: bool = True,
                  point_time: dict | None = None, views: list[dict] | None = None,
                  ground_reflectance: float = 0.2, seed: int = 0, inputs: dict | None = None,
-                 dropped: int = 0) -> dict:
+                 dropped: int = 0, probes: list | None = None) -> dict:
     if study not in ("annual", "daylight_factor", "point_in_time"):
         raise ValueError("study must be annual, daylight_factor or point_in_time")
     if study == "annual" and weather is None:
@@ -500,6 +543,8 @@ def run_daylight(scene: Scene, grid: SensorGrid, weather, study: str = "annual",
         display = ["da", "ase_hours", "udi_useful", "mean_lux"]
     result["timing_s"] = round(time.time() - t0, 2)
     result["display_metrics"] = [k for k in display if k in arrays] + [k for k in arrays if k not in display]
+    if probes:
+        result["probes"] = probe_values(grid, arrays, probes)
     if dropped:
         warnings.append(f"{dropped} sensors were dropped: they sit inside fixed joinery or furniture "
                         "(every direction blocked within 0.6 m), so they are not occupiable floor.")
@@ -514,6 +559,26 @@ def run_daylight(scene: Scene, grid: SensorGrid, weather, study: str = "annual",
     (run_dir / "result.json").write_text(json.dumps(_jsonable(result), indent=1), encoding="utf-8")
     result["run_dir"] = str(run_dir)
     return result
+
+
+def probe_values(grid: SensorGrid, arrays: dict, probes: list) -> list[dict]:
+    """Every metric at the sensor nearest (in plan) to each probe point [x, y] or [x, y, z], in metres."""
+    out = []
+    for p in probes:
+        q = np.asarray(p, dtype=float).reshape(-1)
+        if q.size not in (2, 3):
+            raise ValueError("a probe is [x, y] or [x, y, z] in metres")
+        d = np.linalg.norm(grid.points[:, :2] - q[:2], axis=1)
+        if q.size == 3:
+            d = d + np.abs(grid.points[:, 2] - q[2])
+        k = int(np.argmin(d))
+        row = {"probe": q.round(3).tolist(), "sensor": grid.points[k].round(3).tolist(), "offset_m": round(float(d[k]), 3)}
+        for name, arr in arrays.items():
+            v = np.asarray(arr)
+            if v.ndim == 1 and len(v) == grid.n:
+                row[name] = round(float(v[k]) * (100.0 if name in PERCENT_METRICS else 1.0), 2)
+        out.append(row)
+    return out
 
 
 def skymod_up(weather) -> np.ndarray:
@@ -622,10 +687,51 @@ def run_radiation(scene: Scene, grid: SensorGrid, weather, quality: str = "draft
 
 # ── thermal ──────────────────────────────────────────────────────────────────
 
+def building_totals(summaries: list[dict]) -> dict:
+    """Whole-building figures over the simulated zones: each energy summed, divided by their total floor area."""
+    area = sum(s["floor_area_m2"] for s in summaries)
+    out = {"zones": len(summaries), "floor_area_m2": round(area, 1)}
+    if not area:
+        return out
+    for key in ("heating", "cooling", "lighting", "equipment"):
+        if all(f"{key}_kwh_m2" in s for s in summaries):
+            kwh = sum(s[f"{key}_kwh_m2"] * s["floor_area_m2"] for s in summaries)
+            out[f"{key}_kwh"] = round(kwh, 0)
+            out[f"{key}_kwh_m2"] = round(kwh / area, 1)
+    return out
+
+
+def prepare_lighting(zones: list[thermal.Zone], scene: Scene, weather, settings: thermal.Settings,
+                     quality: str = "draft") -> dict | None:
+    """For daylight-linked lighting: the daylight at every zone's control points, traced in one pass on
+    ``scene`` (the daylight scene of the zones). Returns what was done, or None when the lights follow
+    the schedule."""
+    if settings.lighting_control is None:
+        return None
+    from . import lighting
+    missing = [z.name for z in zones if z.daylight_points is None or not len(z.daylight_points)]
+    if missing:
+        raise ValueError(f"lighting_control needs control points on each zone's floor; none for {missing}. It works "
+                         "for shoeboxes and for rooms (analyze_rooms); for Rhino zone volumes use analyze_rooms")
+    t0 = time.time()
+    pts = np.vstack([z.daylight_points for z in zones])
+    lux = lighting.control_illuminance(scene, pts, weather, quality)
+    k = 0
+    for z in zones:
+        n = len(z.daylight_points)
+        z.daylight_lux = lux[k:k + n]
+        k += n
+    return {"control_points": int(len(pts)), "quality": quality, "timing_s": round(time.time() - t0, 1),
+            "method": "daylight at the work plane (0.8 m) on a 1 m grid per zone (at most "
+                      f"{lighting.MAX_POINTS} points), daylight coefficients with the Perez sky of every daylight "
+                      "hour, dynamic shades as in the daylight study; each point controls an equal share of the luminaires"}
+
+
 def run_thermal(zones: list[thermal.Zone], scene: Scene, weather, settings: thermal.Settings, label: str = "",
                 inputs: dict | None = None, notes: list[str] | None = None) -> dict:
     settings.validate()
     t0 = time.time()
+    lighting_info = prepare_lighting(zones, scene, weather, settings)
     solar_info = thermal.solar_on_surfaces(zones, scene, weather, scene.north_deg)
     run_id = new_run_id("thermal")
     summaries, arrays = [], {}
@@ -634,12 +740,22 @@ def run_thermal(zones: list[thermal.Zone], scene: Scene, weather, settings: ther
         all_notes += [f"{z.name}: {n}" for n in thermal.apply_construction(z, settings)]
         if z.source.get("warning"):
             all_notes.append(f"{z.name}: {z.source['warning']}")
+        if z.source.get("note"):
+            all_notes.append(f"{z.name}: {z.source['note']}")
         if z.source.get("windows_given") and not z.source.get("windows_assigned"):
-            all_notes.append(f"{z.name}: none of the glazing lies on this zone's faces (within 5 cm), so it has no windows")
+            tol = z.source.get("window_tolerance_m", 0.3)
+            all_notes.append(f"{z.name}: none of the glazing lies on this zone's faces (parallel and within "
+                             f"{100 * tol:.0f} cm), so it has no windows")
         res = thermal.simulate(z, weather, settings)
         summaries.append(thermal.summarize(z, res, weather, settings))
         for k in ("t_op", "t_air", "heating_w", "cooling_w", "solar_w"):
             arrays[f"z{i}_{k}"] = res[k]
+        if (inputs or {}).get("export_csv"):
+            from . import cases
+            d = runs_dir() / run_id
+            d.mkdir(parents=True, exist_ok=True)
+            safe = "".join(ch if ch.isalnum() or ch in "-_" else "_" for ch in z.name)[:40] or f"zone{i}"
+            summaries[-1]["hourly_csv"] = cases.write_csv(d / f"hourly-{i:02d}-{safe}.csv", cases.hourly_columns(weather, res))
         monthly = []
         for m in range(1, 13):
             sel = weather.month == m
@@ -648,6 +764,7 @@ def run_thermal(zones: list[thermal.Zone], scene: Scene, weather, settings: ther
                             "t_op_mean": round(float(res["t_op"][sel].mean()), 1), "t_op_max": round(float(res["t_op"][sel].max()), 1)})
         summaries[-1]["monthly"] = monthly
     free = settings.heating_setpoint is None and settings.cooling_setpoint is None
+    building = building_totals(summaries) if len(summaries) > 1 else None
     if settings.cooling_setpoint is not None:
         all_notes.append("Set-points control the air temperature; comfort uses operative temperature, which sunlit "
                          "glass and warm surfaces can lift above the cooling set-point.")
@@ -658,8 +775,10 @@ def run_thermal(zones: list[thermal.Zone], scene: Scene, weather, settings: ther
               "weather": {"location": weather.location.label(), "file": weather.source_path,
                           "data_quality_warnings": weather.report.get("warnings", [])},
               "engine": {"method": "ISO 13790 hourly 5R1C per zone; solar gains ray traced on each window and wall",
-                         "ray_backend": raytrace.backend(), "solar_sampling": solar_info},
-              "settings": settings.__dict__, "zones": summaries, "mode": "free-running" if free else "conditioned",
+                         "ray_backend": raytrace.backend(), "solar_sampling": solar_info,
+                         **({"lighting_control": lighting_info} if lighting_info else {})},
+              "settings": settings.__dict__, "zones": summaries, "building": building,
+              "mode": "free-running" if free else "conditioned",
               "inputs": inputs or {}, "notes": all_notes,
               "assumptions": ["Zone boundaries between zones are adiabatic; no moisture balance (indoor absolute humidity = outdoor).",
                               "Schedules, U-values and gains are presets unless overridden - see settings.",
@@ -680,6 +799,27 @@ def climate_report(weather, hdd_base: float = 18.0, cdd_base: float = 18.0, thre
     if include_psychrometric_bins:
         out["psychrometric_bins"] = climate.psychrometric_bins(weather)
     return out
+
+
+def climate_charts(weather) -> dict:
+    """Monthly diurnal averages as data, a chart (SVG + PNG) and a CSV, saved as a run folder."""
+    from . import charts
+    run_id = new_run_id("climate")
+    d = runs_dir() / run_id
+    d.mkdir(parents=True, exist_ok=True)
+    diurnal = climate.diurnal_averages(weather)
+    files = charts.save(climate.diurnal_chart(weather), d / "monthly-diurnal-averages")
+    rows = ["month,hour_ending," + ",".join(f"{k}_{u.replace('/', '_per_')}" for k, _, u in climate.DIURNAL_VARIABLES)]
+    for m in diurnal["months"]:
+        for h in range(24):
+            rows.append(f"{m['month']},{h + 1}," + ",".join(f"{m[k][h]:g}" for k, _, _ in climate.DIURNAL_VARIABLES))
+    csv = d / "monthly-diurnal-averages.csv"
+    csv.write_text("\n".join(rows) + "\n", encoding="utf-8")
+    files["csv"] = str(csv)
+    result = {"run_id": run_id, "study": "climate_charts", "label": weather.location.label(), "files": files,
+              "diurnal": diurnal}
+    save_run(run_id, result, None, {})
+    return result
 
 
 # ── rooms ────────────────────────────────────────────────────────────────────
@@ -741,21 +881,30 @@ def envelope_surfaces(zones: list[thermal.Zone]) -> list[dict]:
 
 def run_rooms_thermal(data: dict, weather, settings: thermal.Settings, label: str = "", inputs: dict | None = None,
                       overrides: dict | None = None, envelope_pack: str = "", pack_options: dict | None = None,
-                      cooling: bool = True) -> dict:
+                      cooling: bool = True, setpoints: dict | None = None) -> dict:
     """Thermal study of user-defined rooms: enclosed and semi-open rooms by coupled 5R1C zones with their
-    constructions, open rooms by semi-outdoor comfort."""
+    constructions, open rooms by semi-outdoor comfort. ``setpoints`` ({"heating_setpoint", "cooling_setpoint"})
+    replaces the room uses' defaults in every room that has no set-point of its own. inputs["export_csv"]
+    writes one hourly CSV per room (named columns, energy balance included)."""
     from . import codes, rooms as rm
     settings.validate()
     t0 = time.time()
     rooms, encs, scene, notes = prepare_rooms(data, overrides)
     zones = rm.zones_from_rooms(rooms, encs, scene, _windows(scene), problems=notes)
+    own = {r.name: r.setpoints for r in rooms}
     for z in zones:
+        if setpoints and z.source.get("enclosure") != "semi_open":
+            z.profile.update({k: v for k, v in setpoints.items() if k not in own.get(z.name, {})})
         z.source.pop("warning", None)                      # the room mesh is re-sampled, not a modelling error
         if not cooling:
             z.profile["cooling_setpoint"] = None
         if z.source.get("openings"):
             z.opening_ach = rm.opening_air_changes(z.source["openings"], z.volume, weather)
     solar_info = thermal.solar_on_surfaces(zones, scene, weather, scene.north_deg) if zones else {"surfaces": 0}
+    lighting_info = None
+    if settings.lighting_control is not None and zones:
+        shells, _ = _daylight_shells(data, rooms, encs, scene, overrides)
+        lighting_info = prepare_lighting(zones, shells, weather, settings)
     for z in zones:
         notes += [f"{z.name}: {n}" for n in thermal.apply_construction(z, settings)]
     results, balance = rm.couple(zones, weather, settings) if zones else ([], {"links": 0})
@@ -782,6 +931,14 @@ def run_rooms_thermal(data: dict, weather, settings: thermal.Settings, label: st
             entry.update(method="5R1C" + (" + openings" if enc.state == "semi_open" else ""), thermal=summ)
             for key in ("t_op", "t_air", "heating_w", "cooling_w"):
                 arrays[f"r{k}_{key}"] = res[key]
+            for key, v in res["balance_w"].items():
+                arrays[f"r{k}_bal_{key}"] = v
+            if (inputs or {}).get("export_csv"):
+                from . import cases
+                d = runs_dir() / run_id
+                d.mkdir(parents=True, exist_ok=True)
+                safe = "".join(ch if ch.isalnum() or ch in "-_" else "_" for ch in room.name)[:40] or f"room{k}"
+                summ["hourly_csv"] = cases.write_csv(d / f"hourly-{k:02d}-{safe}.csv", cases.hourly_columns(weather, res))
         out_rooms.append(entry)
     notes.append("Mechanical cooling to the room set-points." if cooling else "No mechanical cooling: rooms run free in warm weather.")
     result = {"run_id": run_id, "study": "rooms_thermal", "label": label or "rooms", "created": datetime.now().isoformat(timespec="seconds"),
@@ -789,7 +946,8 @@ def run_rooms_thermal(data: dict, weather, settings: thermal.Settings, label: st
               "engine": {"method": "rooms: enclosure check per room; enclosed / semi-open rooms as ISO 13790 5R1C zones with "
                                    "constructions, thermal mass from areal heat capacity and heat exchange through shared faces; "
                                    "open rooms as semi-outdoor comfort (SolarCal MRT, SET*)",
-                         "ray_backend": raytrace.backend(), "solar_sampling": solar_info, "interzone": balance},
+                         "ray_backend": raytrace.backend(), "solar_sampling": solar_info, "interzone": balance,
+                         **({"lighting_control": lighting_info} if lighting_info else {})},
               "settings": settings.__dict__, "rooms": out_rooms, "inputs": inputs or {}, "notes": notes,
               "assumptions": ["Room-use gains, schedules and set-points: Almond assumptions (rooms.ROOM_USES), overridable per room.",
                               "Faces with no construction use the preset U-values of the settings; mass falls back to the preset "
@@ -798,6 +956,7 @@ def run_rooms_thermal(data: dict, weather, settings: thermal.Settings, label: st
     if envelope_pack:
         result["envelope_check"] = codes.check_envelope(envelope_surfaces(zones), envelope_pack, weather,
                                                         **({"north_deg": scene.north_deg} | (pack_options or {})))
+    result["building"] = building_totals([e["thermal"] for e in out_rooms if e.get("thermal")])
     heads = []
     for e in out_rooms:
         if e["method"] == "semi_outdoor":
@@ -917,6 +1076,8 @@ def run_rooms_daylight(data: dict, weather, study: str = "annual", quality: str 
     res["rooms"] = per
     res["room_names"] = [r.name for r in rooms]
     res["notes"] = notes + res.get("notes", [])
+    # a per-room study: the panel and case comparison key it as rooms_daylight; the metric stays in daylight_study
+    res["daylight_study"], res["study"] = study, "rooms_daylight"
     def head(p: dict) -> str:
         if "sda_pct" in p:
             return f"sDA {p['sda_pct']} %"
@@ -927,7 +1088,60 @@ def run_rooms_daylight(data: dict, weather, study: str = "annual", quality: str 
     result_path = Path(res["run_dir"]) / "result.json"
     if result_path.is_file():
         saved = json.loads(result_path.read_text(encoding="utf-8"))
-        saved.update(rooms=per, room_names=res["room_names"], headline=res["headline"], notes=res["notes"])
+        saved.update(rooms=per, room_names=res["room_names"], headline=res["headline"], notes=res["notes"],
+                     study=res["study"], daylight_study=study)
         result_path.write_text(json.dumps(_jsonable(saved), indent=1), encoding="utf-8")
     np.save(Path(res["run_dir"]) / "room_owner.npy", owner)
     return res
+
+
+def run_rooms_view_out(data: dict, view_height_m: float = 1.2, spacing: float = 0.6, edge: float = 0.3,
+                       label: str = "", overrides: dict | None = None) -> dict:
+    """EN 17037 view out per room: viewpoints on a grid view_height_m above each room's floor, traced on the
+    room-study scene (en17037.view_out). Returns each room's share of floor at each level, and saves the
+    level, sight-angle and outside-distance maps as a run."""
+    from . import en17037 as en, rooms as rm
+    if not 0.2 <= spacing <= 5:
+        raise ValueError("grid spacing must be 0.2..5 m")
+    if not 0.3 <= view_height_m <= 3:
+        raise ValueError("view height must be 0.3..3 m")
+    t0 = time.time()
+    rooms, encs, scene, notes = prepare_rooms(data, overrides)
+    scene, shell_notes = _daylight_shells(data, rooms, encs, scene, overrides)
+    grids, owner = [], []
+    for k, r in enumerate(rooms):
+        g = rm.daylight_grid(r, spacing, view_height_m, edge)
+        if g.n:
+            grids.append(g)
+            owner.append(np.full(g.n, k))
+    if not grids:
+        raise ValueError("Could not place viewpoints on any room floor")
+    owner = np.concatenate(owner)
+    grid = SensorGrid(np.vstack([g.points for g in grids]), np.vstack([g.normals for g in grids]),
+                      np.concatenate([g.cell_area for g in grids]), spacing, np.vstack([g.cells for g in grids]), owner)
+    v = en.view_out(scene, grid.points)
+    per = []
+    for k, r in enumerate(rooms):
+        m = owner == k
+        if not m.any():
+            continue
+        s = en.view_summary({key: val[m] for key, val in v.items()}, grid.cell_area[m])
+        per.append({"room": r.name, "use": r.use, "viewpoints": int(m.sum()), **s["area_at_least_pct"],
+                    "sight_angle_mean_deg": s["sight_angle_deg"]["mean"], "outside_distance_m_median": s["outside_distance_m_median"],
+                    "layers_seen_pct": s["layers_seen_pct"], "level_of_most_points": s["level_of_most_points"]})
+    run_id = new_run_id("viewout")
+    arrays = {"view_level": v["level"].astype(float), "sight_angle_deg": v["sight_angle_deg"],
+              "outside_distance_m": np.minimum(v["outside_distance_m"], 999.0)}
+    whole = en.view_summary(v, grid.cell_area)
+    result = {"run_id": run_id, "study": "rooms_view_out", "label": label or "view out", "created": datetime.now().isoformat(timespec="seconds"),
+              "rooms": per, "metrics": whole, "display_metrics": list(arrays),
+              "inputs": {"view_height_m": view_height_m, "grid_spacing_m": spacing, "edge_offset_m": edge, "units_to_m": data.get("units_to_m")},
+              "grid": {"sensors": grid.n, "area_m2": round(grid.area, 2), "spacing_m": grid.spacing},
+              "headline": "; ".join(f"{p['room']}: medium on {p['medium']} %, high on {p['high']} %" for p in per),
+              "notes": notes + shell_notes + ["Indicative, by Almond's implementation of the EN 17037 Annex A view-out principles; "
+                                              "thresholds quoted by value. Glazing is treated as clear."],
+              "timing_s": round(time.time() - t0, 2)}
+    run_dir = save_run(run_id, result, grid, arrays)
+    np.save(run_dir / "room_owner.npy", owner)
+    result["run_dir"] = str(run_dir)
+    return result

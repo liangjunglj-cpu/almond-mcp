@@ -703,6 +703,8 @@ def zones_from_rooms(rooms: list[Room], encs: list[Enclosure], scene, windows: l
             prof["heating_setpoint"] = None
             prof["cooling_setpoint"] = None
         z.source.update(room=r.name, use=r.use, enclosure=e.state, guids=r.guids)
+        from .lighting import control_points
+        z.daylight_points = control_points(daylight_grid(r, 1.0, 0.8, 0.3))
         zones.append(z)
     return zones
 

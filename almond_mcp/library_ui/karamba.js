@@ -350,7 +350,7 @@ engineControls();codeControls();
 el('analysis-settings').addEventListener('input',advancedSummary);
 el('analysis-settings').addEventListener('change',advancedSummary);
 // an invalid value on another tab would stop Run with nothing in view: show its tab
-el('analysis-form').addEventListener('invalid',e=>{const pane=e.target.closest('[data-pane]');if(pane)showTab(pane.dataset.pane);},true);
+el('analysis-form').addEventListener('invalid',e=>{const pane=e.target.closest('[data-pane]');if(pane)showTab(pane.dataset.pane);const more=e.target.closest('details');if(more)more.open=true;},true);
 let savedTab='model';try{savedTab=localStorage.getItem('almond-structure-tab')||'model';}catch{}
 showTab(TABS.includes(savedTab)?savedTab:'model');
 el('analysis-native-note').hidden=native;
