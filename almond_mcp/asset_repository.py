@@ -2,6 +2,8 @@
 
 The catalogue joins existing libraries by stable asset ID. Files stay in their
 canonical libraries; HTTP serves only individual manifest-listed files.
+Generated model files that are not on disk yet (a PyPI install ships none) are
+listed with their checksums and downloaded on first request (model_store).
 """
 from __future__ import annotations
 
@@ -12,9 +14,11 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import quote, urlsplit
 
-from almond_mcp import __version__, paths
+from almond_mcp import __version__, model_store, paths
 
 UI_ROOT = Path(__file__).with_name("library_ui")
+# Link shown as the generated model's provider. Procedural pieces were built by scripts, so they get none.
+GENERATOR_URLS = {"meshy": "https://www.meshy.ai/", "tripo": "https://www.tripo3d.ai/", "procedural_script": ""}
 
 
 def read_json(path: Path, default=None):
@@ -32,22 +36,39 @@ class AssetRepository:
         }
         self.roots = {k: Path(v).resolve() for k, v in self.roots.items()}
         self.files: dict[str, tuple[Path, Path]] = {}
+        self.downloads: dict[str, dict] = {}  # route -> generated manifest asset fetched on demand
         self.records: dict[str, dict] = {}
         self.refresh()
 
-    def file(self, library: str, relative: str | None) -> str | None:
+    def file(self, library: str, relative: str | None, download: dict | None = None) -> str | None:
+        """Route for one manifest-listed file. A file that is not on disk gets a
+        route only when *download* is a generated asset with verifiable checksums."""
         if not relative:
             return None
         root = self.roots[library]
         candidate = (root / relative).resolve()
-        if not candidate.is_relative_to(root) or not candidate.is_file():
+        if not candidate.is_relative_to(root):
+            return None
+        if not candidate.is_file() and not (download and model_store.is_obtainable(download)):
             return None
         url = "/files/" + library + "/" + quote(candidate.relative_to(root).as_posix(), safe="/")
         self.files[url] = (root, candidate)
+        if download is not None:
+            self.downloads[url] = download
         return url
+
+    def ensure(self, route: str) -> Path:
+        """Local path for an indexed route, downloading a generated model + contract
+        on first use. Raises OSError (model_store.ModelUnavailable) when offline."""
+        root, path = self.files[route]
+        asset = self.downloads.get(route)
+        if asset is not None and not path.is_file():
+            model_store.ensure_generated_files(asset, root)
+        return path
 
     def refresh(self):
         self.files = {}
+        self.downloads = {}
         self.records = {}
         source_register = read_json(self.roots["generated"] / "source-register.json")
         sources = {a["asset_id"]: a for a in source_register.get("assets", [])}
@@ -56,7 +77,8 @@ class AssetRepository:
             manifest = read_json(self.roots[library] / "manifest.json")
             for asset in manifest.get("assets", []):
                 aid = asset["asset_id"]
-                model = self.file(library, asset.get("file"))
+                lazy = asset if library == "generated" else None
+                model = self.file(library, asset.get("file"), lazy)
                 fmt = Path(asset.get("file", "")).suffix.lstrip(".").lower()
                 record = {
                     "id": aid, "name": asset.get("product", aid),
@@ -67,10 +89,12 @@ class AssetRepository:
                     "dimensions_mm": asset.get("dimensions_mm", {}),
                     "dimension_basis": asset.get("spatial", {}).get("bounds_source", "unverified"),
                     "available": bool(model), "model": model,
+                    "local": bool(model) and self.files[model][1].is_file(),
                     "preview": self.file(library, f"previews/{aid}.png") if library == "generated" else model if fmt == "svg" else None,
-                    "contract": self.file(library, asset.get("contract_file")),
+                    "contract": self.file(library, asset.get("contract_file"), lazy),
                     "license": asset.get("license", "Source terms apply; not cleared for redistribution"),
-                    "source_url": (asset.get("warehouse_url") or "https://www.meshy.ai/") if library == "generated" else asset.get("warehouse_url", ""),
+                    "source_url": (asset.get("warehouse_url") or GENERATOR_URLS.get((asset.get("geometry_source") or {}).get("generator", "meshy"), ""))
+                                  if library == "generated" else asset.get("warehouse_url", ""),
                     "publisher": asset.get("warehouse_publisher") or ("Almond generated asset library" if library == "generated" else "Not recorded"),
                     "provenance": sources.get(aid), "metadata": asset,
                     "drawing": None, "uri": f"almond://repository/{aid}",
@@ -158,7 +182,20 @@ def create_server(port=8767, repository: AssetRepository | None = None):
                 path = static.get(route)
                 root = UI_ROOT.resolve()
                 if route in repo.files:
-                    root, path = repo.files[route]
+                    try:
+                        root, path = repo.files[route][0], repo.ensure(route)
+                    except OSError as exc:
+                        # Not downloaded and the download failed (offline, blocked): say so.
+                        body = json.dumps({"status": "model_unavailable", "message": str(exc)}).encode()
+                        self.send_response(503)
+                        self.send_header("Content-Type", "application/json")
+                        self.send_header("Content-Length", str(len(body)))
+                        self.send_header("X-Content-Type-Options", "nosniff")
+                        self.send_header("Cache-Control", "no-store")
+                        self.end_headers()
+                        if not head:
+                            self.wfile.write(body)
+                        return
                 if path and path.resolve().is_relative_to(root) and path.is_file():
                     content = path.read_bytes()
                     mime = {".js": "text/javascript", ".mjs": "text/javascript", ".glb": "model/gltf-binary", ".svg": "image/svg+xml", ".dxf": "application/dxf"}.get(path.suffix, mimetypes.guess_type(path.name)[0] or "application/octet-stream")

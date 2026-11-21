@@ -1,0 +1,112 @@
+{
+  "batch_id": "ginkgo-meshbank-2026-11",
+  "image": {
+    "asset_id": "gen-bistro-table-marble-1",
+    "provider": "meshy",
+    "tool": "meshy_text_to_image",
+    "submitted_at": "2026-11-13T12:38:40.822Z",
+    "request": {
+      "ai_model": "nano-banana",
+      "aspect_ratio": "1:1",
+      "prompt": "A small round outdoor bistro cafe table, 60 cm white marble top with a brass edge band on a black cast-iron pedestal base with three curved feet, slightly weathered, photorealistic. Single object, empty table top, isolated on a plain white background, three-quarter view from slightly above, soft even studio lighting, no cast shadow, no text, no logo, realistic real-world proportions."
+    },
+    "task_id": "01a1d4eb-0221-768d-9289-b8bc8982ed23",
+    "status": "SUCCEEDED",
+    "status_basis": "Downloaded in the Ginkgo session with meshy_download_model; image file present",
+    "provider_model": "nano-banana",
+    "completed_observed_at": "2026-11-13T12:39:10.005Z",
+    "consumed_credits": "3 (Meshy price table for nano-banana; not returned in the session)",
+    "reference_inputs": [],
+    "output_file": "gen-bistro-table-marble-1.png",
+    "output_sha256": "594f5cb04116af09a56a4e5c3b01cb9e7149d72e09891a2f03ba32dc98d59bb6",
+    "output_file_modified_at": "2026-11-13T12:39:09+00:00",
+    "seed": null,
+    "evidence_source": {
+      "pass_records": [
+        "publishing/library/meshbank/gen/meta.json",
+        "publishing/library/meshbank/gen/refs/tasks.json",
+        "publishing/library/meshbank/BANK.md"
+      ],
+      "session_records": "Tool calls of Ginkgo Claude Code session(s) 48627919-6d97-4c20-b07e-a5ea9fccb1ba (submissions, results and downloads)",
+      "extracted_at": "2026-11-18T19:10:36+00:00"
+    }
+  },
+  "mesh": {
+    "asset_id": "gen-bistro-table-marble-1",
+    "provider": "meshy",
+    "tool": "meshy_image_to_3d",
+    "submitted_at": "2026-11-13T12:40:10.905Z",
+    "request": {
+      "input_task_id": "01a1d4eb-0221-768d-9289-b8bc8982ed23",
+      "ai_model": "meshy-7.1",
+      "texture_model": "meshy-7",
+      "enable_pbr": true,
+      "texture_resolution": "2k",
+      "target_formats": [
+        "glb"
+      ]
+    },
+    "task_id": "01a1d4ec-55d0-77de-8b74-dd2455a35746",
+    "status": "SUCCEEDED",
+    "status_basis": "downloaded with meshy_download_model {\"format\": \"glb\", \"include_textures\": false}; GLB present",
+    "consumed_credits": "30 (Meshy price table: meshy-7.1 with texture; not returned in the session)",
+    "input_link": "input_task_id",
+    "input_image_sha256": "594f5cb04116af09a56a4e5c3b01cb9e7149d72e09891a2f03ba32dc98d59bb6",
+    "output_file": "gen-bistro-table-marble-1.glb",
+    "output_sha256": "fb9b748c4663c908f0e192887b419400799d2a83ddf0f48837c6cc10c54c90e5",
+    "seed": null,
+    "evidence_source": {
+      "pass_records": [
+        "publishing/library/meshbank/gen/meta.json",
+        "publishing/library/meshbank/gen/refs/tasks.json",
+        "publishing/library/meshbank/BANK.md"
+      ],
+      "session_records": "Tool calls of Ginkgo Claude Code session(s) 48627919-6d97-4c20-b07e-a5ea9fccb1ba (submissions, results and downloads)",
+      "extracted_at": "2026-11-18T19:10:36+00:00"
+    }
+  },
+  "derivation": {
+    "asset_id": "gen-bistro-table-marble-1",
+    "source_sha256": "fb9b748c4663c908f0e192887b419400799d2a83ddf0f48837c6cc10c54c90e5",
+    "source_triangles": 333074,
+    "target_triangles": 40000,
+    "prepared_sha256": "afe08d2563f60ceea6775f0bec6e0e9fb06b12ba326ba41d3af9c1ecf55a34e4",
+    "software": "Blender 5.1.2",
+    "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Never subdivide to inflate counts.",
+    "weld_tolerance_source_units": 1.9031059741973877e-07,
+    "quality": {
+      "vertices": 19806,
+      "triangles": 40000,
+      "boundary_edges": 0,
+      "nonmanifold_edges_excluding_boundary": 0,
+      "zero_area_faces": 0,
+      "connected_components": 1,
+      "largest_component_vertices": 19806,
+      "nonfinite_coordinates": 0,
+      "self_intersections": "not_tested",
+      "mesh_validation_repair_passes": 0,
+      "use": "Visual entourage; not certified for fabrication or structural analysis",
+      "bounds_relative_change": [
+        0.00023021684950536305,
+        1.732731959827809e-05,
+        0.00014381990941099608
+      ]
+    }
+  },
+  "input_image_file": "batches/ginkgo-meshbank-2026-11/gen-bistro-table-marble-1.png",
+  "external_reference_status": "Original descriptive text-to-image prompts; no external images were given to either generator.",
+  "external_reference_ids": [],
+  "dimension_basis": "Real-world heights recorded with each prop in the Ginkgo mesh bank (gen/meta.json real_height_m); height normalised exactly, width and depth measured after uniform scaling. Not a physical survey.",
+  "reference_review": "Reference image reviewed on 2026-11-18 at full resolution for this import: no lettering, logos, badges or brand marks visible.",
+  "rights": "Generated on the owner's paid Meshy account in the owner's Ginkgo project; the account owns the output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-18. These models also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+  "origin": {
+    "project": "Ginkgo, the owner's own world-generation repository (private)",
+    "pass": "publishing/library/meshbank (gen set, 2026-11-13)",
+    "source_name": "bistro_table",
+    "records": [
+      "publishing/library/meshbank/gen/meta.json",
+      "publishing/library/meshbank/BANK.md",
+      "Claude Code session transcript 48627919-6d97-4c20-b07e-a5ea9fccb1ba (the tool calls that submitted the image and mesh tasks)"
+    ]
+  }
+}

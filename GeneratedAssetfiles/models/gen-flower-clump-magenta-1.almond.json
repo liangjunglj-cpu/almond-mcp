@@ -1,0 +1,348 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-flower-clump-magenta-1",
+  "library_id": "generated_assets",
+  "name": "Flower clump (Dense clump of magenta flower spikes and pink daisy-like blooms on leafy stems, on a small soil base; generated prop; detailed geometry edition)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-flower-clump-magenta-1.glb",
+  "dimensions_mm": {
+    "width": 718.3,
+    "depth": 690.2,
+    "height": 600.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "ground",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -359.15,
+        -345.1,
+        0.0
+      ],
+      "max": [
+        359.15,
+        345.1,
+        600.0
+      ]
+    },
+    "footprint": [
+      [
+        -359.15,
+        -345.1
+      ],
+      [
+        359.15,
+        -345.1
+      ],
+      [
+        359.15,
+        345.1
+      ],
+      [
+        -359.15,
+        345.1
+      ]
+    ],
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "accessory"
+  },
+  "materials": [
+    {
+      "material_id": "foliage-pine",
+      "objects": [
+        "gen-flower-clump-magenta-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-flower-clump-magenta-1",
+    "library_id": "generated_assets",
+    "name": "Flower clump (Dense clump of magenta flower spikes and pink daisy-like blooms on leafy stems, on a small soil base; generated prop; detailed geometry edition)",
+    "category": "vegetation",
+    "tags": [
+      "flowers",
+      "perennial",
+      "meadow",
+      "planting",
+      "clump",
+      "garden",
+      "detailed",
+      "meshy",
+      "ginkgo-refset-1007"
+    ],
+    "dimensions_mm": {
+      "width": 718.3,
+      "depth": 690.2,
+      "height": 600.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 733.0,
+      "depth": 705.0,
+      "height": 600.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "ground",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -359.15,
+          -345.1,
+          0.0
+        ],
+        "max": [
+          359.15,
+          345.1,
+          600.0
+        ]
+      },
+      "footprint": [
+        [
+          -359.15,
+          -345.1
+        ],
+        [
+          359.15,
+          -345.1
+        ],
+        [
+          359.15,
+          345.1
+        ],
+        [
+          -359.15,
+          345.1
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "accessory"
+    },
+    "materials": [
+      {
+        "material_id": "foliage-pine",
+        "objects": [
+          "gen-flower-clump-magenta-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "Clean 3D model reference of ONLY one dense clump of magenta and pink flowers like the meadow in the reference image: a mound of leafy green stems with tall magenta flower spikes and pink daisy-like blooms, about knee high, roots hidden in a small soil base. Three-quarter view from slightly above, entire clump in frame with margin, isolated on a plain neutral grey studio backdrop, soft even studio lighting, no text.",
+        "image_task_id": null,
+        "image_model": "gpt_image_2_5",
+        "mesh_task_id": "01a11346-d1b8-765f-b4f1-ba4580a33edd",
+        "mesh_model": "meshy-7.1",
+        "generated_at": "2026-10-06",
+        "orientation_correction": null,
+        "scale_applied": 389.276868,
+        "captured_generation": {
+          "batch_id": "ginkgo-refset-1007",
+          "image": {
+            "asset_id": "gen-flower-clump-magenta-1",
+            "provider": "higgsfield",
+            "tool": "generate_image_batch",
+            "submitted_at": "2026-10-06T22:08:09.882Z",
+            "request": {
+              "model": "gpt_image_2_5",
+              "aspect_ratio": "1:1",
+              "medias": [
+                {
+                  "role": "image_references",
+                  "value": "a4679b5c-16bc-4492-ad08-948561fd6370"
+                }
+              ],
+              "prompt": "Clean 3D model reference of ONLY one dense clump of magenta and pink flowers like the meadow in the reference image: a mound of leafy green stems with tall magenta flower spikes and pink daisy-like blooms, about knee high, roots hidden in a small soil base. Three-quarter view from slightly above, entire clump in frame with margin, isolated on a plain neutral grey studio backdrop, soft even studio lighting, no text."
+            },
+            "batch_context": "Clean single-object reference images for 3D hero generation, using the approved concept art as design reference.",
+            "task_id": "688fb345-4f6a-4b62-aeb1-1325a122d791",
+            "status": "COMPLETED",
+            "provider_model": "gpt_image_2_5",
+            "provider_reported_model": "gpt_image_2_5",
+            "completed_observed_at": "2026-10-06T22:08:37.113Z",
+            "provider_output_name": "hf_20261006_220815_688fb345-4f6a-4b62-aeb1-1325a122d791.png",
+            "consumed_credits": "0.25 (Higgsfield cost quote for gpt_image_2_5 returned in the Ginkgo session)",
+            "concept_reference": {
+              "job_id": "a4679b5c-16bc-4492-ad08-948561fd6370",
+              "name": "W056_b.png",
+              "sha256": "aab145ef2086c89b66975e4f0fa1cedbe98b9034164d86a8d7ebd3d695f2fcb7",
+              "retained": false,
+              "submitted_at": "2026-10-06T22:03:47.913Z",
+              "model": "gpt_image_2_5",
+              "prompt": "Environment concept art, eye-level view inside a misty grove on a terrace of a giant red megastructure ring: an abandoned rounded white capsule tram car with a faded yellow band, rust streaks, moss, hanging cables spilling from an open hatch, a tall doorway glowing warm pink from inside, half sunk in a dense meadow of magenta and pink flowers. Thin tall trees fade into blue fog; behind them a towering curved wall of coral-red armour plates with dark machinery rises into the haze. Moody blue hour light, realistic high-detail 3D render, cinematic sci-fi concept art. No readable words, no logos, no brands; only abstract glyphs.",
+              "note": "Concept image generated in the same Ginkgo session from a text-only prompt (no image input); given to this image request as its only image reference by Higgsfield job ID. Not distributed."
+            },
+            "reference_inputs": [],
+            "output_file": "gen-flower-clump-magenta-1.png",
+            "output_sha256": "c9cc9dafb345110c1da3a36fc840dacf6d1d3318e12209a70575888ee1e60173",
+            "output_file_modified_at": "2026-10-06T22:10:14+00:00",
+            "seed": null,
+            "evidence_source": {
+              "pass_records": [
+                "runs/refset_1007/pass.json",
+                "runs/refset_1007/concept/jobs.json",
+                "runs/refset_1007/meshy/jobs.json",
+                "ProjectY2K: twofronts/meshy/ginkgo_props_v061/out/conditioning.json"
+              ],
+              "session_records": "Tool calls of Ginkgo Claude Code session(s) 7ee433c3-63f6-4781-b345-d2c4f70b8e73 (submissions, results and downloads)",
+              "extracted_at": "2026-11-20T17:58:55+00:00"
+            },
+            "status_basis": "Provider reported completed; curl of the job's result URL in the Ginkgo session (Bash, 2026-10-06T22:10:05.505Z)"
+          },
+          "mesh": {
+            "asset_id": "gen-flower-clump-magenta-1",
+            "provider": "meshy",
+            "tool": "meshy_image_to_3d",
+            "submitted_at": "2026-10-06T22:11:17.677Z",
+            "request": {
+              "ai_model": "meshy-7.1",
+              "enable_pbr": true,
+              "texture_resolution": "4k",
+              "target_formats": [
+                "glb"
+              ],
+              "response_format": "json",
+              "image": "local upload of ref_flower_clump.png"
+            },
+            "task_id": "01a11346-d1b8-765f-b4f1-ba4580a33edd",
+            "status": "SUCCEEDED",
+            "status_basis": "meshy_get_task_status reported SUCCEEDED at 2026-10-06T22:24:38.838Z",
+            "consumed_credits": 30,
+            "provider_model": "meshy-7.1",
+            "input_link": "upload",
+            "input_image_sha256": "c9cc9dafb345110c1da3a36fc840dacf6d1d3318e12209a70575888ee1e60173",
+            "output_file": "gen-flower-clump-magenta-1.glb",
+            "output_sha256": "fb59c670f612f8ca1d62d635291e13b3dd9afc8149d7697d03cea6d84008d02d",
+            "seed": null,
+            "evidence_source": {
+              "pass_records": [
+                "runs/refset_1007/pass.json",
+                "runs/refset_1007/concept/jobs.json",
+                "runs/refset_1007/meshy/jobs.json",
+                "ProjectY2K: twofronts/meshy/ginkgo_props_v061/out/conditioning.json"
+              ],
+              "session_records": "Tool calls of Ginkgo Claude Code session(s) 7ee433c3-63f6-4781-b345-d2c4f70b8e73 (submissions, results and downloads)",
+              "extracted_at": "2026-11-20T17:58:55+00:00"
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-flower-clump-magenta-1",
+            "source_sha256": "fb59c670f612f8ca1d62d635291e13b3dd9afc8149d7697d03cea6d84008d02d",
+            "source_triangles": 7604320,
+            "target_triangles": 125000,
+            "prepared_sha256": "08562a45c2db6611fce3978427a1d371d11a669bfecdbae5de8e878ea3058b51",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Remove wire edges, split edges shared by more than two faces and remove zero-area faces (counts in quality.topology_repairs). Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.8918659687042236e-07,
+            "quality": {
+              "vertices": 35971,
+              "triangles": 124998,
+              "boundary_edges": 0,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 4,
+              "largest_component_vertices": 35942,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "topology_repairs": {
+                "wire_edges_removed": 0,
+                "nonmanifold_edges_split": 0,
+                "zero_area_faces_removed": 0,
+                "loose_vertices_removed": 0
+              },
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                0.024603339533243663,
+                0.025840808614122503,
+                0.004734804019449106
+              ]
+            }
+          },
+          "input_image_file": "batches/ginkgo-refset-1007/gen-flower-clump-magenta-1.png",
+          "external_reference_status": "Two-step image stage. The concept images were generated in the Ginkgo session from text-only prompts that describe an owner reference set of 9 images pasted into the session on 2026-10-06 (third-party photographs and artworks: a toy-like drone hangar, habitat units, a red ring megastructure, an overgrown capsule car in a pink flower forest, a six-wheeled rover, a Tokyo vertical-farm building and a Tokyo rooftop; described in runs/refset_1007/pass.json). Each single-object reference image then took one concept image as its only image reference (named and hashed in the image record as concept_reference, not distributed). No owner reference photograph was uploaded to any generator. Design-proximity review 2026-11-20: the generated references were compared with the owner's reference photographs; the rover and capsule tram share subject and colourway with two of them but differ in form (see their reference_review); the others are generic types. Provider textures are not distributed; only geometry ships.",
+          "external_reference_ids": [],
+          "dimension_basis": "Sci-fi vehicles use the sizes Project Y2K content v061 gave them (twofronts/meshy/ginkgo_props_v061 condition_ginkgo_props.py SPEC, longest horizontal side): capsule tram 9.0 m, six-wheeled rover 5.4 m, drone launcher vehicle 3.2 m, shuttle 12.0 m, drone 1.4 m; each mesh was scaled uniformly so that side matches, and height, width and depth were measured after scaling. The planter box keeps Y2K's 1.9 m length, a real trough length. Real-world heights replace stylised ones for the rest: rooftop water tank pair 3.0 m overall (about 2 m stainless tanks on a 1 m stand; Y2K used 5.2 m), flower clump 0.60 m (the prompt's \"about knee high\"; Y2K used 0.85 m). Not a physical survey.",
+          "reference_review": "Reference image reviewed on 2026-11-20 at 1000 px (from 1024 px): plant only, no text. Image reference: concept W056_b.png (Higgsfield job a4679b5c). Generic plant type.",
+          "rights": "Concept and reference images generated on the owner's Higgsfield account (gpt_image_2_5); meshes with Tripo H3.1 through the owner's Higgsfield account (water tanks, rover, capsule tram, drone, launcher, shuttle) or with Meshy-7.1 image-to-3D on the owner's Meshy account (planter box, flower clump). Owner approved release in the Almond library under CC BY 4.0 on 2026-11-20 (\"increase the range of models, from the ones i used for my project y2k games, (except for the operatives and bosses)\") and chose this group, Ginkgo props reused in Project Y2K, the same day. The Ginkgo pass records an owner go-ahead on 2026-10-07 (\"go ahead with the plan\") that covered generation for the GRANDWHIS world packs, not this library. Generator account entitlements and the Tripo terms not independently audited. Provider textures are not distributed.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private); reused in Project Y2K, the owner's game project (private)",
+            "pass": "runs/refset_1007",
+            "source_name": "flower_clump",
+            "records": [
+              "runs/refset_1007/pass.json (owner reference set described; AI-assisted content statement)",
+              "runs/refset_1007/concept/jobs.json (concept image job IDs)",
+              "runs/refset_1007/meshy/jobs.json (reference image, Tripo and Meshy IDs)",
+              "ProjectY2K: twofronts/meshy/ginkgo_props_v061/condition_ginkgo_props.py and out/conditioning.json (content v061 conditioned these props for the Mirai Ward hub as SM_GK61_<Name>.fbx)",
+              "ProjectY2K: twofronts/infrastructure/scripts/world_fill_v061.py (places the conditioned props in the hub)",
+              "Claude Code session transcript 7ee433c3-63f6-4781-b345-d2c4f70b8e73 (the tool calls that submitted the concept, reference image, Tripo and Meshy jobs, the curl downloads and the Meshy downloads)"
+            ]
+          }
+        }
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "landscape"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.021,
+      "triangle_count": 124998,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "B98B1F45A6406942EB2827AFCE12B9388A90FFECDAE57948AC06DBB9685C324F"
+}

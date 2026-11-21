@@ -1,0 +1,307 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-ac-condenser-louvred-1",
+  "library_id": "generated_assets",
+  "name": "Air-conditioner outdoor unit (Older louvred-grille condenser, weathered; generated prop; detailed geometry edition)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-ac-condenser-louvred-1.glb",
+  "dimensions_mm": {
+    "width": 773.9,
+    "depth": 560.0,
+    "height": 720.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -386.95,
+        -280.0,
+        0.0
+      ],
+      "max": [
+        386.95,
+        280.0,
+        720.0
+      ]
+    },
+    "footprint": [
+      [
+        -386.95,
+        -280.0
+      ],
+      [
+        386.95,
+        -280.0
+      ],
+      [
+        386.95,
+        280.0
+      ],
+      [
+        -386.95,
+        280.0
+      ]
+    ],
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "fixed"
+  },
+  "materials": [
+    {
+      "material_id": "steel-galvanized",
+      "objects": [
+        "gen-ac-condenser-louvred-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-ac-condenser-louvred-1",
+    "library_id": "generated_assets",
+    "name": "Air-conditioner outdoor unit (Older louvred-grille condenser, weathered; generated prop; detailed geometry edition)",
+    "category": "building_services",
+    "tags": [
+      "air-conditioning",
+      "condenser",
+      "facade",
+      "services",
+      "detailed",
+      "meshy",
+      "ginkgo-refset-1024"
+    ],
+    "dimensions_mm": {
+      "width": 773.9,
+      "depth": 560.0,
+      "height": 720.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 770.0,
+      "depth": 560.0,
+      "height": 720.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -386.95,
+          -280.0,
+          0.0
+        ],
+        "max": [
+          386.95,
+          280.0,
+          720.0
+        ]
+      },
+      "footprint": [
+        [
+          -386.95,
+          -280.0
+        ],
+        [
+          386.95,
+          -280.0
+        ],
+        [
+          386.95,
+          280.0
+        ],
+        [
+          -386.95,
+          280.0
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "fixed"
+    },
+    "materials": [
+      {
+        "material_id": "steel-galvanized",
+        "objects": [
+          "gen-ac-condenser-louvred-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "Product photo of an older, larger air-conditioner outdoor condenser unit: grey-beige painted steel, square louvre grille across the front, rust at the corners and screws, dirt streaks, dented top. Single object centred, three-quarter view from slightly above, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos, no labels.",
+        "image_task_id": null,
+        "image_model": "gpt_image_2_5",
+        "mesh_task_id": "01a16f47-7cfd-7151-9f74-fc60a7fab22c",
+        "mesh_model": "meshy-7.1",
+        "generated_at": "2026-10-24",
+        "orientation_correction": null,
+        "scale_applied": 406.873959,
+        "captured_generation": {
+          "batch_id": "ginkgo-refset-1024",
+          "image": {
+            "asset_id": "gen-ac-condenser-louvred-1",
+            "provider": "higgsfield",
+            "tool": "generate_image_batch",
+            "submitted_at": "2026-10-24T18:53:16.129Z",
+            "request": {
+              "model": "gpt_image_2_5",
+              "aspect_ratio": "1:1",
+              "prompt": "Product photo of an older, larger air-conditioner outdoor condenser unit: grey-beige painted steel, square louvre grille across the front, rust at the corners and screws, dirt streaks, dented top. Single object centred, three-quarter view from slightly above, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos, no labels."
+            },
+            "batch_context": "Clean single-object reference images for Meshy image-to-3D props of a photoreal apartment-block world pack.",
+            "status": "COMPLETED",
+            "task_id": "b516a4c3-ecd2-4740-9b1d-0257719736fe",
+            "provider_model": "gpt_image_2_5",
+            "completed_observed_at": "2026-10-24T18:55:01.053Z",
+            "provider_output_name": "hf_20261024_185329_b516a4c3-ecd2-4740-9b1d-0257719736fe.png",
+            "output_file": "gen-ac-condenser-louvred-1.png",
+            "output_sha256": "217636e05fd4b9c03e1db2d86db78aa9f22d827ba49c4e1fac15275773990679",
+            "output_file_modified_at": "2026-10-24T18:55:45+00:00",
+            "seed": null,
+            "consumed_credits": "about 0.25 (Ginkgo MESH_SOURCES.md)",
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "mesh": {
+            "asset_id": "gen-ac-condenser-louvred-1",
+            "provider": "meshy",
+            "tool": "meshy_image_to_3d",
+            "submitted_at": "2026-10-24T18:58:01.159Z",
+            "request": {
+              "ai_model": "meshy-7.1",
+              "enable_pbr": true,
+              "texture_resolution": "4k",
+              "target_formats": [
+                "glb"
+              ],
+              "image": "local upload of ref_ac_outdoor_old.png"
+            },
+            "input_image_sha256": "217636e05fd4b9c03e1db2d86db78aa9f22d827ba49c4e1fac15275773990679",
+            "status": "SUCCEEDED",
+            "status_basis": "Downloaded in the Ginkgo session with meshy_download_model; GLB present",
+            "task_id": "01a16f47-7cfd-7151-9f74-fc60a7fab22c",
+            "output_file": "gen-ac-condenser-louvred-1.glb",
+            "output_sha256": "236b431febb8bbb5ef29a606f76849fb80942aa80a01c5396bca01921b999411",
+            "seed": null,
+            "consumed_credits": 30,
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-ac-condenser-louvred-1",
+            "source_sha256": "236b431febb8bbb5ef29a606f76849fb80942aa80a01c5396bca01921b999411",
+            "source_triangles": 891242,
+            "target_triangles": 80000,
+            "prepared_sha256": "053868c800aea07189b426d84e0abe75f662e4f2de11643f3a6fe259f57298d5",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.902113914489746e-07,
+            "quality": {
+              "vertices": 39194,
+              "triangles": 80000,
+              "boundary_edges": 0,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 2,
+              "largest_component_vertices": 39055,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                1.7046784901161236e-05,
+                4.936894791913782e-06,
+                4.5334922009114405e-05
+              ]
+            }
+          },
+          "input_image_file": "batches/ginkgo-refset-1024/gen-ac-condenser-louvred-1.png",
+          "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+          "external_reference_ids": [],
+          "dimension_basis": "Real-world sizes authored in the Ginkgo pass (runs/refset_1024/worlds/jp.py PROPS); height normalised exactly, width and depth measured after uniform scaling. Not a physical survey.",
+          "reference_review": "Ginkgo reference image reviewed in that session for a clean, unbranded single object; re-checked for this import: no lettering, logos or brand marks visible.",
+          "rights": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private)",
+            "pass": "runs/refset_1024",
+            "source_name": "ac_outdoor_old",
+            "records": [
+              "runs/refset_1024/MESH_SOURCES.md",
+              "runs/refset_1024/meshy/jobs.json",
+              "runs/refset_1024/pass.json",
+              "Claude Code session transcript c849f85f-3384-47ae-bf45-2e1a471d157c (the tool calls that submitted the image and mesh jobs)"
+            ]
+          }
+        }
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "architecture",
+        "streetscape"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.005,
+      "triangle_count": 80000,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "6FEEA12919F9E38051A230C4E8ECE9C838D88A39AD7A471EBEFA31A4185DDEFA"
+}

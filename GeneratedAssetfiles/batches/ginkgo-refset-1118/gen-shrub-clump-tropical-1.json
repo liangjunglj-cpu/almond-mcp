@@ -1,0 +1,135 @@
+{
+  "batch_id": "ginkgo-refset-1118",
+  "image": {
+    "asset_id": "gen-shrub-clump-tropical-1",
+    "provider": "higgsfield",
+    "tool": "generate_image_batch",
+    "submitted_at": "2026-11-18T04:29:09.013Z",
+    "request": {
+      "model": "gpt_image_2_5",
+      "aspect_ratio": "1:1",
+      "use_unlim": false,
+      "medias": [
+        {
+          "value": "49b533e3-0c7e-4329-9382-902864344414",
+          "role": "image"
+        }
+      ],
+      "prompt": "Single dense clump of tropical shrubs and ferns about 1.5 metres wide and 1 metre tall, broad glossy leaves mixed with fern fronds and a few small spiky leaves, whole clump in frame sitting on a thin patch of soil, side view, plain light grey studio backdrop, soft even light, realistic, no pot."
+    },
+    "batch_context": "Clean single-object reference images for owner-approved 3D hero generation (5 x 0.25 credits).",
+    "provider_adjustments": {
+      "medias[0].role": {
+        "requested": "image",
+        "used": "image_references",
+        "reason": "GPT Image 2.5 backend expects schema-key media roles"
+      }
+    },
+    "task_id": "258ccd73-4dc3-4d0f-98e6-75c5de618670",
+    "status": "COMPLETED",
+    "provider_model": "gpt_image_2_5",
+    "completed_observed_at": "2026-11-18T04:30:13.009Z",
+    "provider_output_name": "hf_20261118_042912_258ccd73-4dc3-4d0f-98e6-75c5de618670.png",
+    "consumed_credits": "0.25 (Ginkgo session estimate for gpt_image_2_5)",
+    "reference_inputs": [],
+    "output_file": "gen-shrub-clump-tropical-1.png",
+    "output_sha256": "e05699789caef44434d6ca03872c39a7d957dbf76f3395b023ed82f988fd8dd0",
+    "output_file_modified_at": "2026-11-18T04:30:22+00:00",
+    "seed": null,
+    "evidence_source": {
+      "pass_records": [
+        "runs/refset_1118/OWNER_DECISIONS.md",
+        "runs/refset_1118/pass.json",
+        "runs/refset_1118/concept/jobs.json",
+        "runs/refset_1118/lab/W069/layout/life.json",
+        "runs/refset_1118/lab/W070/layout/life.json"
+      ],
+      "session_records": "Tool calls of Ginkgo Claude Code session(s) 5708e728-4dea-4745-a8f6-09778117e497 (submissions, results and downloads)",
+      "extracted_at": "2026-11-18T19:10:38+00:00"
+    },
+    "status_basis": "Provider reported completed; curl of the job's result URL in the Ginkgo session (Bash)"
+  },
+  "mesh": {
+    "asset_id": "gen-shrub-clump-tropical-1",
+    "provider": "meshy",
+    "tool": "meshy_image_to_3d",
+    "submitted_at": "2026-11-18T04:30:46.429Z",
+    "request": {
+      "ai_model": "meshy-7.1",
+      "texture_model": "meshy-7",
+      "enable_pbr": true,
+      "texture_resolution": "4k",
+      "image": "local upload of ref_shrub_clump.png"
+    },
+    "task_id": "01a1ecec-0451-7768-8a8c-241d5ce8ebb8",
+    "status": "SUCCEEDED",
+    "status_basis": "downloaded with meshy_download_model {\"format\": \"glb\"}; GLB present",
+    "consumed_credits": "30 (Meshy price table: meshy-7.1 with texture; not returned in the session)",
+    "input_link": "upload",
+    "input_image_sha256": "e05699789caef44434d6ca03872c39a7d957dbf76f3395b023ed82f988fd8dd0",
+    "output_file": "gen-shrub-clump-tropical-1.glb",
+    "output_sha256": "8b3f1bf023eca26af32683882496898505e973df8293e04d30745d01b9d99ea5",
+    "seed": null,
+    "evidence_source": {
+      "pass_records": [
+        "runs/refset_1118/OWNER_DECISIONS.md",
+        "runs/refset_1118/pass.json",
+        "runs/refset_1118/concept/jobs.json",
+        "runs/refset_1118/lab/W069/layout/life.json",
+        "runs/refset_1118/lab/W070/layout/life.json"
+      ],
+      "session_records": "Tool calls of Ginkgo Claude Code session(s) 5708e728-4dea-4745-a8f6-09778117e497 (submissions, results and downloads)",
+      "extracted_at": "2026-11-18T19:10:38+00:00"
+    }
+  },
+  "derivation": {
+    "asset_id": "gen-shrub-clump-tropical-1",
+    "source_sha256": "8b3f1bf023eca26af32683882496898505e973df8293e04d30745d01b9d99ea5",
+    "source_triangles": 7573812,
+    "target_triangles": 140000,
+    "prepared_sha256": "528e40375f6d5ee9a41fb44e3d9e6d532ea9a0616971a4071afe5f05529a536d",
+    "software": "Blender 5.1.2",
+    "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Remove wire edges, split edges shared by more than two faces and remove zero-area faces (counts in quality.topology_repairs). Never subdivide to inflate counts.",
+    "weld_tolerance_source_units": 1.885815978050232e-07,
+    "quality": {
+      "vertices": 40898,
+      "triangles": 140000,
+      "boundary_edges": 0,
+      "nonmanifold_edges_excluding_boundary": 0,
+      "zero_area_faces": 0,
+      "connected_components": 5,
+      "largest_component_vertices": 40663,
+      "nonfinite_coordinates": 0,
+      "self_intersections": "not_tested",
+      "mesh_validation_repair_passes": 0,
+      "topology_repairs": {
+        "wire_edges_removed": 0,
+        "nonmanifold_edges_split": 0,
+        "zero_area_faces_removed": 0,
+        "loose_vertices_removed": 0
+      },
+      "use": "Visual entourage; not certified for fabrication or structural analysis",
+      "bounds_relative_change": [
+        0.02042489552839996,
+        0.030396114289815222,
+        0.012054042628433877
+      ]
+    }
+  },
+  "input_image_file": "batches/ginkgo-refset-1118/gen-shrub-clump-tropical-1.png",
+  "external_reference_status": "Each reference image took one owner-approved refset_1118 concept image (the owner's own generated design, Higgsfield job ID recorded in the request) as an image reference. The owner's style photographs (runs/refset_1118/ref) were not given to any generator.",
+  "external_reference_ids": [],
+  "dimension_basis": "Sizes authored in the Ginkgo pass (taxi: 4.7 m, the default length in W069 cg_life.py, which the W069 layout enlarged to 5.1 m to match its concept image; W069 life.json truck length, W070 vending height, W069 palm variant height, the shrub prompt's 1 m height); vehicles scaled by length, others by height; remaining dimensions measured after uniform scaling. Not a physical survey.",
+  "reference_review": "Reference image reviewed on 2026-11-18 at full resolution for this import: no lettering, logos, badges or brand marks visible.",
+  "rights": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5); meshes on the owner's paid Meshy account (palm, shrub clump) or with Tripo H3.1 through the owner's Higgsfield account (taxi, refuse truck, vending machine). The Ginkgo pass records the owner's rights confirmation on 2026-11-18, and the owner approved release of all five, the Tripo models included, in the Almond library under CC BY 4.0 on 2026-11-18. These models also appear inside the owner's GRANDWHIS world packs. Generator account entitlements and the Tripo terms not independently audited.",
+  "origin": {
+    "project": "Ginkgo, the owner's own world-generation repository (private)",
+    "pass": "runs/refset_1118",
+    "source_name": "shrub_clump",
+    "records": [
+      "runs/refset_1118/OWNER_DECISIONS.md",
+      "runs/refset_1118/pass.json",
+      "Claude Code session transcript 5708e728-4dea-4745-a8f6-09778117e497 (the tool calls that submitted the image, Meshy and Tripo jobs)"
+    ]
+  }
+}

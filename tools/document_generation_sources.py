@@ -25,18 +25,39 @@ def build_register(library: Path) -> dict:
         generation = asset.get("geometry_source", {}).get("parameters", {})
         history = provenance.get("assets", {}).get(aid, {})
         image_id = generation.get("image_task_id") or history.get("image_job_id")
-        missing = [key for key in (
-            "prompt", "image_model", "mesh_task_id",
-            "mesh_model", "generated_at") if not generation.get(key)]
-        if not image_id:
+        # Meshy text-to-3D has no image stage: the preview task (which received the prompt) takes its place.
+        # Only a recorded route value selects this; image-stage assets keep every image-stage requirement.
+        text_to_3d = generation.get("generation_route") == "meshy_text_to_3d"
+        # A Blender script in the owner's project built the geometry: no provider, prompt, image or task ID exists.
+        # Only this recorded route value selects it; it needs the script and source-file hashes instead.
+        procedural = generation.get("generation_route") == "procedural_script"
+        if procedural:
+            missing = [key for key in ("generator_script", "generator_script_sha256", "source_file",
+                                       "source_sha256", "generated_at") if not generation.get(key)]
+        else:
+            missing = [key for key in (
+                "prompt", "preview_model" if text_to_3d else "image_model", "mesh_task_id",
+                "mesh_model", "generated_at") if not generation.get(key)]
+        if text_to_3d and not generation.get("preview_task_id"):
+            missing.append("preview_task_id")
+        elif not text_to_3d and not procedural and not image_id:
             missing.append("image_generation_id")
         if missing:
             errors.append(f"{aid}: missing recorded fields: {', '.join(missing)}")
         if not brief or brief.get("prompt") != generation.get("prompt"):
             errors.append(f"{aid}: catalogue prompt missing or differs from manifest")
-        for key in ("image_task_id", "image_model", "mesh_task_id", "mesh_model", "generated_at"):
+        for key in ("image_task_id", "image_model", "mesh_task_id", "mesh_model", "generated_at",
+                    "generation_route", "preview_task_id", "preview_model",
+                    "generator_script", "generator_script_sha256", "source_file", "source_sha256"):
             if history.get(key) != generation.get(key):
                 errors.append(f"{aid}: provenance {key} differs from manifest")
+        if text_to_3d and (image_id or generation.get("image_model") or history.get("image_provider")):
+            errors.append(f"{aid}: text-to-3D record also names an image stage")
+        if procedural and (image_id or generation.get("prompt") or any(
+                generation.get(k) or history.get(k) for k in (
+                    "image_model", "image_provider", "mesh_provider", "mesh_task_id", "mesh_model",
+                    "preview_task_id", "preview_model"))):
+            errors.append(f"{aid}: procedural record also names a generation provider, prompt or task")
         if asset.get("passport", {}).get("provenance") != asset.get("geometry_source"):
             errors.append(f"{aid}: embedded-passport record differs from geometry source")
         records.append({
@@ -49,6 +70,8 @@ def build_register(library: Path) -> dict:
             "generator": asset.get("geometry_source", {}).get("generator"),
             "recorded_generation": generation,
             "recorded_task_history": {key: history[key] for key in (
+                "generation_route", "preview_task_id", "preview_model",
+                "generator_script", "generator_script_sha256", "source_file", "source_sha256",
                 "image_provider", "image_model", "image_task_id", "image_job_id",
                 "mesh_provider", "mesh_model", "mesh_task_id", "generated_at", "supersedes"
             ) if key in history},
@@ -74,16 +97,111 @@ def build_register(library: Path) -> dict:
             "missing_recorded_fields": missing,
         })
         captured = generation.get("captured_generation")
-        if captured:
+        if text_to_3d:
+            records[-1]["image_generation"] = {
+                "provider": "none", "provider_basis": "generation_route", "id": None, "id_type": "none",
+                "route": "meshy_text_to_3d",
+                "note": "Meshy text-to-3D: the prompt went to a preview task, refined by a second task; no image stage.",
+                "preview_task_id": generation.get("preview_task_id"), "preview_model": generation.get("preview_model"),
+            }
+        if procedural:
+            records[-1]["image_generation"] = {
+                "provider": "none", "provider_basis": "generation_route", "id": None, "id_type": "none",
+                "route": "procedural_script",
+                "note": "Blender script geometry from the owner's project: no generation provider, prompt, image or task.",
+                "generator_script": generation.get("generator_script"),
+                "generator_script_sha256": generation.get("generator_script_sha256"),
+            }
+            if not captured:
+                errors.append(f"{aid}: procedural record has no captured evidence")
+        if captured and procedural:
+            if captured != history.get("captured_generation"):
+                errors.append(f"{aid}: captured requests differ from provenance")
+            script, kit, mesh = captured["generator"]["script"], captured["generator"]["kit_record"], captured["mesh"]
+            if (captured.get("route") != "procedural_script" or "image" in captured or "preview" in captured
+                    or captured.get("input_image_file") is not None):
+                errors.append(f"{aid}: procedural record names an image or provider stage")
+            if (script["path"] != generation["generator_script"] or script["sha256"] != generation["generator_script_sha256"]
+                    or mesh["generator_script"] != script["path"] or mesh["generator_script_sha256"] != script["sha256"]
+                    or mesh["output_sha256"] != generation["source_sha256"] or mesh["source_file"] != generation["source_file"]
+                    or mesh["kit_record"] != kit["path"]):
+                errors.append(f"{aid}: captured script chain differs")
+            # The script and kit record are retained as evidence; each must still hash to what was recorded.
+            for entry, expected in ((script, script["retained_sha256"]), (kit, kit["retained_sha256"])):
+                path = (library / entry["retained_file"]).resolve()
+                if (not path.is_relative_to(library.resolve()) or not path.is_file()
+                        or hashlib.sha256(path.read_bytes()).hexdigest() != expected):
+                    errors.append(f"{aid}: retained {path.name} missing or changed")
+            derivation = captured["derivation"]
+            if (derivation["source_sha256"] != mesh["output_sha256"] or derivation.get("source_format") != "fbx"
+                    or derivation["quality"]["triangles"] != asset["triangle_count"]):
+                errors.append(f"{aid}: mesh derivation differs from recorded output")
+            records[-1].update(
+                recipe_evidence="Generator script retained as text (hash of the project file and of the retained copy), the kit record it wrote and the exported FBX checksum, in captured_generation; this route has no prompt, image or provider task.",
+                external_reference_status=captured["external_reference_status"],
+                external_reference_ids=captured["external_reference_ids"],
+                evidence_gaps=["Authoring session: see captured_generation.generator.script.authoring (recorded as found, or as not found).",
+                               "Helper libraries the script imports are recorded by their current hash where named; versions at export time are not retained.",
+                               "Dimensions are the authored kit sizes in metres, not verified physical measurements.",
+                               "Mesh self-intersections and fabrication suitability have not been certified."],
+                rights_evidence=captured["rights"],
+            )
+        elif captured and text_to_3d:
+            if captured != history.get("captured_generation"):
+                errors.append(f"{aid}: captured requests differ from provenance")
+            preview, mesh = captured.get("preview") or {}, captured["mesh"]
+            if preview.get("request", {}).get("prompt") != brief.get("prompt"):
+                errors.append(f"{aid}: submitted preview prompt differs from catalogue")
+            linked = (captured.get("route") == "meshy_text_to_3d" and "image" not in captured
+                      and preview.get("tool") == "meshy_text_to_3d" and mesh.get("tool") == "meshy_text_to_3d_refine"
+                      and mesh.get("input_link") == "preview_task_id"
+                      and mesh["request"].get("preview_task_id") == preview.get("task_id")
+                      and "image" not in mesh["request"] and "input_task_id" not in mesh["request"])
+            if (preview.get("task_id") != generation["preview_task_id"] or mesh["task_id"] != generation["mesh_task_id"]
+                    or not linked):
+                errors.append(f"{aid}: captured task chain differs")
+            if captured.get("input_image_file") is not None:
+                errors.append(f"{aid}: text-to-3D record names an input image")
+            derivation = captured["derivation"]
+            if derivation["source_sha256"] != mesh["output_sha256"] or derivation["quality"]["triangles"] != asset["triangle_count"]:
+                errors.append(f"{aid}: mesh derivation differs from recorded output")
+            records[-1].update(
+                recipe_evidence="Exact submitted preview and refine requests and the downloaded mesh checksum retained in captured_generation; text-to-3D has no input image.",
+                external_reference_status=captured["external_reference_status"],
+                evidence_gaps=["Provider seed was not returned where null.",
+                               "No input image exists for this route; the prompt is the only generation input recorded.",
+                               "Dimensions are authored study sizes, not verified physical measurements.",
+                               "Mesh self-intersections and fabrication suitability have not been certified."],
+                rights_evidence=captured["rights"],
+            )
+        elif captured and "image" not in captured:
+            # Only a recorded route (text-to-3D, procedural) may leave out the image stage.
+            errors.append(f"{aid}: captured record has no image stage and no recorded route without one")
+        elif captured:
             if captured != history.get("captured_generation"):
                 errors.append(f"{aid}: captured requests differ from provenance")
             image, mesh = captured["image"], captured["mesh"]
             if image["request"].get("prompt") != brief.get("prompt"):
                 errors.append(f"{aid}: submitted image prompt differs from catalogue")
-            if image["task_id"] != image_id or mesh["task_id"] != generation["mesh_task_id"] or mesh["request"].get("input_task_id") != image_id:
+            # Meshy-generated images are linked by task ID; uploaded external images by their checksum;
+            # Higgsfield 3D jobs (Tripo) by naming the image job as their only media reference.
+            # A locally edited copy of the generated image, uploaded as media, is linked through the derivative's
+            # hash, its recorded source hash and its media ID.
+            medias = [m.get("value") for m in mesh["request"].get("medias", [])]
+            upload = mesh.get("uploaded_input")
+            mesh_input_sha = upload["sha256"] if upload else image["output_sha256"]
+            linked = (mesh["request"].get("input_task_id") == image_id
+                      or (medias == [image_id] and mesh.get("input_image_sha256") == image["output_sha256"])
+                      or ("input_task_id" not in mesh["request"] and not medias
+                          and mesh.get("input_image_sha256") == image["output_sha256"])
+                      or (upload is not None and mesh.get("input_link") == "uploaded_derivative"
+                          and medias == [upload.get("media_id")] and bool(upload.get("operation"))
+                          and upload.get("derived_from_sha256") == image["output_sha256"]
+                          and mesh.get("input_image_sha256") == upload.get("sha256")))
+            if image["task_id"] != image_id or mesh["task_id"] != generation["mesh_task_id"] or not linked:
                 errors.append(f"{aid}: captured task chain differs")
             image_path = (library / captured["input_image_file"]).resolve()
-            if not image_path.is_relative_to(library.resolve()) or not image_path.is_file() or hashlib.sha256(image_path.read_bytes()).hexdigest() != image["output_sha256"]:
+            if not image_path.is_relative_to(library.resolve()) or not image_path.is_file() or hashlib.sha256(image_path.read_bytes()).hexdigest() != mesh_input_sha:
                 errors.append(f"{aid}: retained input image checksum mismatch")
             derivation = captured["derivation"]
             if derivation["source_sha256"] != mesh["output_sha256"] or derivation["quality"]["triangles"] != asset["triangle_count"]:
@@ -96,7 +214,10 @@ def build_register(library: Path) -> dict:
                                "Mesh self-intersections and fabrication suitability have not been certified."],
                 rights_evidence=captured["rights"],
             )
-            records[-1]["image_generation"].update(input_file=captured["input_image_file"], sha256=image["output_sha256"])
+            records[-1]["image_generation"].update(input_file=captured["input_image_file"], sha256=mesh_input_sha)
+            if upload:
+                records[-1]["image_generation"].update(generated_output_sha256=image["output_sha256"],
+                                                       edit_before_mesh_stage=upload["operation"])
     return {
         "schema_version": 1,
         "library_id": manifest["library_id"],

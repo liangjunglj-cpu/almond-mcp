@@ -1,0 +1,212 @@
+{
+  "batch_id": "ginkgo-freiburg-2026-11",
+  "purpose": "Stone ornament and fountain sculpture the owner's Ginkgo project generated for its Freiburg street reconstructions (runs/freiburg_tram, runs/fischbrunnen; packaged as refset_1117 W067/W068), re-derived as Almond library geometry.",
+  "origin": {
+    "project": "Ginkgo, the owner's own world-generation repository (private)",
+    "pass": "runs/freiburg_tram and runs/fischbrunnen (packaged in runs/refset_1117)",
+    "pass_date": "2026-11-12/13",
+    "pass_records": [
+      "runs/freiburg_tram/AGENTS.md",
+      "runs/fischbrunnen/AGENTS.md",
+      "runs/fischbrunnen/layout/fountain.json",
+      "runs/freiburg_tram/layout/pink.json",
+      "runs/refset_1117/pass.json",
+      "runs/refset_1117/src/W067_placements.json",
+      "runs/refset_1117/src/W068_placements.json"
+    ],
+    "records": [
+      "runs/refset_1117/pass.json",
+      "runs/fischbrunnen/layout/fountain.json",
+      "Claude Code session transcripts 48627919-6d97-4c20-b07e-a5ea9fccb1ba (ornaments) and bc81df46-55a4-4f2b-b285-4743fcb41771 (fountain)"
+    ],
+    "excluded": {
+      "fb_man, fb_woman, fb_woman_head, fb_lamp, fr_walker0-2, fr_sitter, fr_bike": "Scene-baked copies of older mesh-bank and lausanne_market meshes, not new generations; the mesh-bank originals are imported in ginkgo-meshbank-2026-11",
+      "W067/W068 scenes": "Paid GRANDWHIS products; assembled scenes, not placeable objects"
+    }
+  },
+  "image_provider": "meshy",
+  "image_settings": {
+    "tool": "meshy_image_to_image",
+    "ai_model": "nano-banana-2 (ornaments), nano-banana-pro (fountain)"
+  },
+  "mesh_settings": {
+    "ai_model": "meshy-7.1",
+    "texture_model": "meshy-7",
+    "enable_pbr": true,
+    "target_formats": [
+      "glb"
+    ]
+  },
+  "strip_source_materials": true,
+  "external_reference_ids": [],
+  "external_reference_status": "Photo-derived: the image stage received crops of the owner's own photographs of a facade in Freiburg im Breisgau (ornaments) and of the Fischbrunnen, a Gothic fountain on the Muensterplatz (statues, canopy). The photographs are named and hashed in each image record, not distributed. The generated clean images were then uploaded to Meshy.",
+  "variant_suffix": "generated ornament; detailed geometry edition",
+  "dimension_basis": "Sizes as placed in the Ginkgo photo reconstructions (fountain.json statue heights; pink.json console height; placement matrices for canopy and cartouche); height normalised exactly, width and depth measured after uniform scaling. Measured from photographs, not surveyed.",
+  "rights": "Image and mesh stages ran on the owner's paid Meshy account; the inputs were the owner's own photographs. The fountain statues and canopy reproduce a 15th-century public monument and the ornaments an 1890s facade; their original designs are long out of copyright, and no photograph is distributed. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-18. These models also appear inside the owner's GRANDWHIS world packs. Generator account entitlements and the current monument's restoration history not independently audited.",
+  "estimated_credits": "0 for this import (generation already paid in Ginkgo: 6-9 Meshy credits per image and 30 per mesh)",
+  "assets": [
+    {
+      "asset_id": "gen-statue-knight-gothic-1",
+      "ginkgo_name": "knight",
+      "product": "Statue",
+      "variant": "Gothic fountain figure: knight in plate armour on a corbel pedestal",
+      "category": "ornament",
+      "material": "plaster-white",
+      "height_mm": 1200,
+      "width_hint_mm": 370,
+      "depth_hint_mm": 330,
+      "target_triangles": 60000,
+      "support_plane": "floor",
+      "placement_priority": "fixed",
+      "tags": [
+        "statue",
+        "sculpture",
+        "gothic",
+        "fountain",
+        "knight"
+      ],
+      "prompt": "Clean, sharp, high-resolution full-body front three-quarter view of this exact statue: a 15th-century painted sandstone sculpture of a medieval knight in white plate armour with a red-plumed helmet, from a Gothic town fountain, standing on a small carved corbel pedestal. Keep the same pose, proportions and weathered painted stone colours. Isolated on a plain light grey background, soft even daylight, no other objects, entire figure and pedestal visible.",
+      "image_job_id": "01a1d5e9-9989-74da-92d1-96d2732599f6",
+      "mesh_task_id": "01a1d5ea-4ce9-7741-ac52-b034b73bfdbc",
+      "reference_review": "Reference image reviewed on 2026-11-18 at full resolution for this import: no lettering, logos, badges or brand marks visible."
+    },
+    {
+      "asset_id": "gen-statue-saint-staff-gothic-1",
+      "ginkgo_name": "saint",
+      "product": "Statue",
+      "variant": "Gothic fountain figure: robed saint holding a staff",
+      "category": "ornament",
+      "material": "stone-granite-paving",
+      "height_mm": 740,
+      "width_hint_mm": 210,
+      "depth_hint_mm": 190,
+      "target_triangles": 60000,
+      "support_plane": "floor",
+      "placement_priority": "fixed",
+      "tags": [
+        "statue",
+        "sculpture",
+        "gothic",
+        "fountain",
+        "saint"
+      ],
+      "prompt": "Clean, sharp, high-resolution full-body front view of this exact statue: a 15th-century weathered pale grey sandstone sculpture of a robed saint holding a tall staff, long folded robes to the feet, from a Gothic town fountain, standing on a small carved pedestal. Keep the same pose, proportions and weathered stone colour. Isolated on a plain light grey background, soft even daylight, no other objects, entire figure and pedestal visible.",
+      "image_job_id": "01a1d5e9-9c9b-7654-9c38-d80ed519ac96",
+      "mesh_task_id": "01a1d5ea-5919-7313-91b6-4e471478ef72",
+      "reference_review": "Reference image reviewed on 2026-11-18 at full resolution for this import: no lettering, logos, badges or brand marks visible."
+    },
+    {
+      "asset_id": "gen-statue-bishop-gothic-1",
+      "ginkgo_name": "bishop",
+      "product": "Statue",
+      "variant": "Gothic fountain figure: bishop saint with mitre and book",
+      "category": "ornament",
+      "material": "stone-granite-paving",
+      "height_mm": 720,
+      "width_hint_mm": 210,
+      "depth_hint_mm": 170,
+      "target_triangles": 60000,
+      "support_plane": "floor",
+      "placement_priority": "fixed",
+      "tags": [
+        "statue",
+        "sculpture",
+        "gothic",
+        "fountain",
+        "bishop"
+      ],
+      "prompt": "Clean, sharp, high-resolution full-body front view of this exact statue: a 15th-century weathered pale grey sandstone sculpture of a bishop saint wearing a mitre and long draped robes, holding a book, from a Gothic town fountain, standing on a small carved pedestal. Keep the same pose, proportions and weathered stone colour. Isolated on a plain light grey background, soft even daylight, no other objects, entire figure and pedestal visible.",
+      "image_job_id": "01a1d5e9-9b54-7368-baeb-399f31d0a5c8",
+      "mesh_task_id": "01a1d5ea-54bb-70af-a1f5-fbcdf99d2895",
+      "reference_review": "Reference image reviewed on 2026-11-18 at full resolution for this import: no lettering, logos, badges or brand marks visible."
+    },
+    {
+      "asset_id": "gen-gothic-tabernacle-canopy-1",
+      "ginkgo_name": "canopy",
+      "product": "Tabernacle canopy",
+      "variant": "Gothic fountain-column canopy with pinnacles, spire and finial cross",
+      "category": "ornament",
+      "material": "brick-red",
+      "height_mm": 1710,
+      "width_hint_mm": 660,
+      "depth_hint_mm": 670,
+      "target_triangles": 80000,
+      "support_plane": "floor",
+      "placement_priority": "fixed",
+      "tags": [
+        "gothic",
+        "canopy",
+        "tabernacle",
+        "spire",
+        "fountain",
+        "sandstone"
+      ],
+      "prompt": "Clean, sharp, high-resolution front view of the upper part of this Gothic fountain column in weathered dark red sandstone: an open square tabernacle canopy with pointed tracery arches, crocketed pinnacles at the four corners, a tapering spire with a small finial cross on top, and below it a ring of pointed tracery arches. Remove the statues: the niche inside the tabernacle is empty. Same proportions and red sandstone colour as the reference. Isolated on a plain light grey background, soft even daylight, no buildings, no plants, whole canopy visible.",
+      "image_job_id": "01a1d5e9-9e75-7555-a2b8-8da736f9be7f",
+      "mesh_task_id": "01a1d5ea-5e9a-711f-89f5-3096bbb26bfa",
+      "reference_review": "Reference image reviewed on 2026-11-18 at full resolution for this import: no lettering, logos, badges or brand marks visible."
+    },
+    {
+      "asset_id": "gen-scroll-console-corbel-1",
+      "ginkgo_name": "console",
+      "product": "Console",
+      "variant": "S-scroll balcony corbel with acanthus leaf",
+      "category": "ornament",
+      "material": "plaster-white",
+      "height_mm": 850,
+      "width_hint_mm": 700,
+      "depth_hint_mm": 500,
+      "target_triangles": 80000,
+      "support_plane": "wall",
+      "placement_priority": "fixed",
+      "tags": [
+        "console",
+        "corbel",
+        "bracket",
+        "facade",
+        "ornament",
+        "balcony"
+      ],
+      "prompt": "From this photo of an ornate 1890s Gründerzeit building facade, extract ONE of the large stone scroll consoles (the S-curved corbel brackets that carry the curved balcony). Show that single console as an isolated object in three-quarter view from slightly below: a deep S-scroll volute corbel with carved acanthus leaf on the front, moulded top slab, cream-white painted sandstone with light weathering. Whole object visible, centred, plain light grey studio background, soft even lighting, no building, no railing, no text.",
+      "image_job_id": "01a1cff5-7f13-723f-ae4b-21d845346432",
+      "mesh_task_id": "01a1cff6-2df8-7069-ac75-de9c3eb919cc",
+      "reference_review": "Reference image reviewed on 2026-11-18 at full resolution for this import: no lettering, logos, badges or brand marks visible.",
+      "mount_height_mm": 7955
+    },
+    {
+      "asset_id": "gen-cartouche-shell-scroll-1",
+      "ginkgo_name": "cartouche",
+      "product": "Cartouche",
+      "variant": "Baroque shell-and-scroll relief on a backing plate",
+      "category": "ornament",
+      "material": "plaster-white",
+      "height_mm": 700,
+      "width_hint_mm": 840,
+      "depth_hint_mm": 100,
+      "target_triangles": 80000,
+      "support_plane": "wall",
+      "placement_priority": "fixed",
+      "tags": [
+        "cartouche",
+        "relief",
+        "facade",
+        "ornament",
+        "baroque"
+      ],
+      "prompt": "From this photo of an ornate 1890s Gründerzeit building facade, extract the carved stone cartouche ornament seen on the underside of the curved corner balcony (top right of the photo): a baroque shell-and-scroll cartouche with acanthus leaves. Show that single ornament as an isolated relief object, front view, cream-white painted sandstone with light weathering, on a flat thin backing plate. Whole object visible, centred, plain light grey studio background, soft even lighting, no building, no text.",
+      "image_job_id": "01a1cff5-82d0-707a-aa9b-bd323ad9320b",
+      "mesh_task_id": "01a1cff6-3279-707e-b6bb-051d4ef55676",
+      "reference_review": "Reference image reviewed on 2026-11-18 at full resolution for this import: no lettering, logos, badges or brand marks visible.",
+      "mount_height_mm": 8355
+    }
+  ],
+  "repair_nonmanifold": true,
+  "release_assets": [
+    "gen-statue-knight-gothic-1",
+    "gen-statue-saint-staff-gothic-1",
+    "gen-statue-bishop-gothic-1",
+    "gen-gothic-tabernacle-canopy-1",
+    "gen-scroll-console-corbel-1",
+    "gen-cartouche-shell-scroll-1"
+  ]
+}

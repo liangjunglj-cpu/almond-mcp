@@ -1,0 +1,347 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-refuse-truck-rear-loader-1",
+  "library_id": "generated_assets",
+  "name": "Refuse truck (Cab-over rear-loader compactor, plain white; generated prop; detailed geometry edition)",
+  "source_app": "tripo",
+  "source_units": "m",
+  "file": "gen-refuse-truck-rear-loader-1.glb",
+  "dimensions_mm": {
+    "width": 2994.4,
+    "depth": 8594.3,
+    "height": 3540.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "ground",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -1497.2,
+        -4297.15,
+        0.0
+      ],
+      "max": [
+        1497.2,
+        4297.15,
+        3540.0
+      ]
+    },
+    "footprint": [
+      [
+        -1497.2,
+        -4297.15
+      ],
+      [
+        1497.2,
+        -4297.15
+      ],
+      [
+        1497.2,
+        4297.15
+      ],
+      [
+        -1497.2,
+        4297.15
+      ]
+    ],
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "movable"
+  },
+  "materials": [
+    {
+      "material_id": "plaster-white",
+      "objects": [
+        "gen-refuse-truck-rear-loader-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-refuse-truck-rear-loader-1",
+    "library_id": "generated_assets",
+    "name": "Refuse truck (Cab-over rear-loader compactor, plain white; generated prop; detailed geometry edition)",
+    "category": "vehicle",
+    "tags": [
+      "truck",
+      "refuse",
+      "garbage",
+      "vehicle",
+      "streetscape",
+      "detailed",
+      "tripo",
+      "ginkgo-refset-1118"
+    ],
+    "dimensions_mm": {
+      "width": 2994.4,
+      "depth": 8594.3,
+      "height": 3540.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 2990.0,
+      "depth": 8600.0,
+      "height": 3540.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "ground",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -1497.2,
+          -4297.15,
+          0.0
+        ],
+        "max": [
+          1497.2,
+          4297.15,
+          3540.0
+        ]
+      },
+      "footprint": [
+        [
+          -1497.2,
+          -4297.15
+        ],
+        [
+          1497.2,
+          -4297.15
+        ],
+        [
+          1497.2,
+          4297.15
+        ],
+        [
+          -1497.2,
+          4297.15
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "movable"
+    },
+    "materials": [
+      {
+        "material_id": "plaster-white",
+        "objects": [
+          "gen-refuse-truck-rear-loader-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "tripo",
+      "parameters": {
+        "prompt": "Product reference of a single white rear-loader refuse collection truck like the one in the reference image, cab-over cab, boxy compactor body with rounded rear hopper, three-quarter front view, whole truck in frame, plain light grey studio backdrop, soft even light, realistic, plain white livery with a thin grey stripe, no text, no logos, no readable words.",
+        "image_task_id": null,
+        "image_model": "gpt_image_2_5",
+        "mesh_task_id": "a274de55-6db1-46f5-b43c-2c3bcaf3762c",
+        "mesh_model": "tripo_h3_1_image_to_3d",
+        "generated_at": "2026-11-18",
+        "orientation_correction": "rotated_90_about_vertical",
+        "scale_applied": 8757.907497,
+        "captured_generation": {
+          "batch_id": "ginkgo-refset-1118",
+          "image": {
+            "asset_id": "gen-refuse-truck-rear-loader-1",
+            "provider": "higgsfield",
+            "tool": "generate_image_batch",
+            "submitted_at": "2026-11-18T04:29:09.013Z",
+            "request": {
+              "model": "gpt_image_2_5",
+              "aspect_ratio": "1:1",
+              "use_unlim": false,
+              "medias": [
+                {
+                  "value": "abcd7a45-13b7-4906-9dbb-ebb1c876dac4",
+                  "role": "image"
+                }
+              ],
+              "prompt": "Product reference of a single white rear-loader refuse collection truck like the one in the reference image, cab-over cab, boxy compactor body with rounded rear hopper, three-quarter front view, whole truck in frame, plain light grey studio backdrop, soft even light, realistic, plain white livery with a thin grey stripe, no text, no logos, no readable words."
+            },
+            "batch_context": "Clean single-object reference images for owner-approved 3D hero generation (5 x 0.25 credits).",
+            "provider_adjustments": {
+              "medias[0].role": {
+                "requested": "image",
+                "used": "image_references",
+                "reason": "GPT Image 2.5 backend expects schema-key media roles"
+              }
+            },
+            "task_id": "f1cc27b2-88c7-4085-abcf-ca4514e6fe7b",
+            "status": "COMPLETED",
+            "provider_model": "gpt_image_2_5",
+            "completed_observed_at": "2026-11-18T04:30:13.009Z",
+            "provider_output_name": "hf_20261118_042912_f1cc27b2-88c7-4085-abcf-ca4514e6fe7b.png",
+            "consumed_credits": "0.25 (Ginkgo session estimate for gpt_image_2_5)",
+            "reference_inputs": [],
+            "output_file": "gen-refuse-truck-rear-loader-1.png",
+            "output_sha256": "42e65505b0025a22c62d07b551aa32f0e69cc2b90b311c2896c443afc0f6c839",
+            "output_file_modified_at": "2026-11-18T04:30:22+00:00",
+            "seed": null,
+            "evidence_source": {
+              "pass_records": [
+                "runs/refset_1118/OWNER_DECISIONS.md",
+                "runs/refset_1118/pass.json",
+                "runs/refset_1118/concept/jobs.json",
+                "runs/refset_1118/lab/W069/layout/life.json",
+                "runs/refset_1118/lab/W070/layout/life.json"
+              ],
+              "session_records": "Tool calls of Ginkgo Claude Code session(s) 5708e728-4dea-4745-a8f6-09778117e497 (submissions, results and downloads)",
+              "extracted_at": "2026-11-18T19:10:38+00:00"
+            },
+            "status_basis": "Provider reported completed; curl of the job's result URL in the Ginkgo session (Bash)"
+          },
+          "mesh": {
+            "asset_id": "gen-refuse-truck-rear-loader-1",
+            "provider": "higgsfield",
+            "tool": "generate_3d",
+            "submitted_at": "2026-11-18T04:30:43.911Z",
+            "request": {
+              "model": "tripo_h3_1_image_to_3d",
+              "geometry_quality": "detailed",
+              "texture_quality": "detailed",
+              "pbr": true,
+              "medias": [
+                {
+                  "value": "f1cc27b2-88c7-4085-abcf-ca4514e6fe7b",
+                  "role": "image_references"
+                }
+              ]
+            },
+            "task_id": "a274de55-6db1-46f5-b43c-2c3bcaf3762c",
+            "status": "COMPLETED",
+            "status_basis": "Higgsfield jobs_wait reported completed; GLB downloaded with curl from the job's result URL in the Ginkgo session",
+            "provider_model": "tripo_h3_1_image_to_3d",
+            "completed_observed_at": "2026-11-18T04:40:09.122Z",
+            "provider_output_name": "hf_20261118_043050_a274de55-6db1-46f5-b43c-2c3bcaf3762c.glb",
+            "consumed_credits": "18 Higgsfield credits (cost quote returned in the Ginkgo session)",
+            "input_link": "media_job_id",
+            "input_image_sha256": "42e65505b0025a22c62d07b551aa32f0e69cc2b90b311c2896c443afc0f6c839",
+            "output_file": "gen-refuse-truck-rear-loader-1.glb",
+            "output_sha256": "67c604b5bb3260091f0727bc49f14c8af1770e619ef42c6ef3607c6ab7351e48",
+            "seed": null,
+            "evidence_source": {
+              "pass_records": [
+                "runs/refset_1118/OWNER_DECISIONS.md",
+                "runs/refset_1118/pass.json",
+                "runs/refset_1118/concept/jobs.json",
+                "runs/refset_1118/lab/W069/layout/life.json",
+                "runs/refset_1118/lab/W070/layout/life.json"
+              ],
+              "session_records": "Tool calls of Ginkgo Claude Code session(s) 5708e728-4dea-4745-a8f6-09778117e497 (submissions, results and downloads)",
+              "extracted_at": "2026-11-18T19:10:38+00:00"
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-refuse-truck-rear-loader-1",
+            "source_sha256": "67c604b5bb3260091f0727bc49f14c8af1770e619ef42c6ef3607c6ab7351e48",
+            "source_triangles": 1893380,
+            "target_triangles": 60000,
+            "prepared_sha256": "6e239f0c7a1cb563584a3f7605e8fea456de92d308f207c842950583b1e6e040",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Remove wire edges, split edges shared by more than two faces and remove zero-area faces (counts in quality.topology_repairs). Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 9.812666177749634e-08,
+            "quality": {
+              "vertices": 29705,
+              "triangles": 59997,
+              "boundary_edges": 63,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 23,
+              "largest_component_vertices": 29481,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 1,
+              "topology_repairs": {
+                "wire_edges_removed": 0,
+                "nonmanifold_edges_split": 29,
+                "zero_area_faces_removed": 0,
+                "loose_vertices_removed": 0
+              },
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                5.83128560045416e-05,
+                0.0011018352489722705,
+                0.00015913574101727413
+              ]
+            }
+          },
+          "input_image_file": "batches/ginkgo-refset-1118/gen-refuse-truck-rear-loader-1.png",
+          "external_reference_status": "Each reference image took one owner-approved refset_1118 concept image (the owner's own generated design, Higgsfield job ID recorded in the request) as an image reference. The owner's style photographs (runs/refset_1118/ref) were not given to any generator.",
+          "external_reference_ids": [],
+          "dimension_basis": "Sizes authored in the Ginkgo pass (taxi: 4.7 m, the default length in W069 cg_life.py, which the W069 layout enlarged to 5.1 m to match its concept image; W069 life.json truck length, W070 vending height, W069 palm variant height, the shrub prompt's 1 m height); vehicles scaled by length, others by height; remaining dimensions measured after uniform scaling. Not a physical survey.",
+          "reference_review": "Reference image reviewed on 2026-11-18 at full resolution for this import: no lettering, logos, badges or brand marks visible.",
+          "rights": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5); meshes on the owner's paid Meshy account (palm, shrub clump) or with Tripo H3.1 through the owner's Higgsfield account (taxi, refuse truck, vending machine). The Ginkgo pass records the owner's rights confirmation on 2026-11-18, and the owner approved release of all five, the Tripo models included, in the Almond library under CC BY 4.0 on 2026-11-18. These models also appear inside the owner's GRANDWHIS world packs. Generator account entitlements and the Tripo terms not independently audited.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private)",
+            "pass": "runs/refset_1118",
+            "source_name": "refuse_truck",
+            "records": [
+              "runs/refset_1118/OWNER_DECISIONS.md",
+              "runs/refset_1118/pass.json",
+              "Claude Code session transcript 5708e728-4dea-4745-a8f6-09778117e497 (the tool calls that submitted the image, Meshy and Tripo jobs)"
+            ]
+          }
+        }
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "streetscape"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.001,
+      "triangle_count": 59997,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "CAF6109B9D74BF574BA06622D7034E158FCA28792003895E09588CF890D9F5A5"
+}

@@ -1,0 +1,327 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-tree-maple-red-1",
+  "library_id": "generated_assets",
+  "name": "Japanese maple tree (Red-leaf Japanese maple with a curving trunk and layered airy crown; generated tree; detailed geometry edition)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-tree-maple-red-1.glb",
+  "dimensions_mm": {
+    "width": 5592.9,
+    "depth": 4816.2,
+    "height": 6500.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "ground",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -2796.45,
+        -2408.1,
+        0.0
+      ],
+      "max": [
+        2796.45,
+        2408.1,
+        6500.0
+      ]
+    },
+    "footprint": [
+      [
+        -2796.45,
+        -2408.1
+      ],
+      [
+        2796.45,
+        -2408.1
+      ],
+      [
+        2796.45,
+        2408.1
+      ],
+      [
+        -2796.45,
+        2408.1
+      ]
+    ],
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "accessory"
+  },
+  "materials": [
+    {
+      "material_id": "foliage-pine",
+      "objects": [
+        "gen-tree-maple-red-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-tree-maple-red-1",
+    "library_id": "generated_assets",
+    "name": "Japanese maple tree (Red-leaf Japanese maple with a curving trunk and layered airy crown; generated tree; detailed geometry edition)",
+    "category": "vegetation",
+    "tags": [
+      "tree",
+      "maple",
+      "japanese maple",
+      "red foliage",
+      "deciduous",
+      "planting",
+      "detailed",
+      "meshy",
+      "y2k-trees-refset-0923b"
+    ],
+    "dimensions_mm": {
+      "width": 5592.9,
+      "depth": 4816.2,
+      "height": 6500.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 5593.0,
+      "depth": 4816.0,
+      "height": 6500.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "ground",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -2796.45,
+          -2408.1,
+          0.0
+        ],
+        "max": [
+          2796.45,
+          2408.1,
+          6500.0
+        ]
+      },
+      "footprint": [
+        [
+          -2796.45,
+          -2408.1
+        ],
+        [
+          2796.45,
+          -2408.1
+        ],
+        [
+          2796.45,
+          2408.1
+        ],
+        [
+          -2796.45,
+          2408.1
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "accessory"
+    },
+    "materials": [
+      {
+        "material_id": "foliage-pine",
+        "objects": [
+          "gen-tree-maple-red-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "A single stylised Japanese red maple tree, full view from trunk base to crown top, three-quarter view, centred, isolated on a plain light grey background. Slender curving dark grey-brown trunk splitting into several organic branches, an irregular airy crown of layered deep crimson and scarlet leaf clusters with gaps showing the branches through, natural asymmetric silhouette (not round or ball-shaped). Clean game-asset concept render, soft even lighting, no shadow on the ground, no text.",
+        "image_task_id": null,
+        "image_model": "gpt_image_2_5",
+        "mesh_task_id": "01a0d28e-f131-7615-9755-ec136af48407",
+        "mesh_model": "meshy-7",
+        "generated_at": "2026-09-24",
+        "orientation_correction": null,
+        "scale_applied": 3493.677147,
+        "captured_generation": {
+          "batch_id": "y2k-trees-refset-0923b",
+          "image": {
+            "asset_id": "gen-tree-maple-red-1",
+            "provider": "higgsfield",
+            "tool": "generate_image_batch",
+            "submitted_at": "2026-09-24T08:34:56.926Z",
+            "request": {
+              "model": "gpt_image_2_5",
+              "aspect_ratio": "1:1",
+              "use_unlim": false,
+              "prompt": "A single stylised Japanese red maple tree, full view from trunk base to crown top, three-quarter view, centred, isolated on a plain light grey background. Slender curving dark grey-brown trunk splitting into several organic branches, an irregular airy crown of layered deep crimson and scarlet leaf clusters with gaps showing the branches through, natural asymmetric silhouette (not round or ball-shaped). Clean game-asset concept render, soft even lighting, no shadow on the ground, no text."
+            },
+            "task_id": "e78a291f-ef17-44ac-b1bf-dd733f9e2ebd",
+            "status": "COMPLETED",
+            "provider_model": "gpt_image_2_5",
+            "provider_reported_model": "gpt_image_2_5",
+            "completed_observed_at": "2026-09-24T08:35:37.590Z",
+            "provider_output_name": "hf_20260924_083502_e78a291f-ef17-44ac-b1bf-dd733f9e2ebd.png",
+            "consumed_credits": "not returned in the session",
+            "reference_inputs": [],
+            "output_file": "gen-tree-maple-red-1.png",
+            "output_sha256": "bb37758816208bd982b38cc8985f0d385e36c00543a4812b03dfa3b112875290",
+            "output_file_modified_at": "2026-09-24T08:35:56+00:00",
+            "seed": null,
+            "evidence_source": {
+              "pass_records": [
+                "runs/refset_0923b/pass.json",
+                "ProjectY2K: twofronts/meshy/ginkgo_props_v061/out/conditioning.json"
+              ],
+              "session_records": "Tool calls of Ginkgo Claude Code session(s) 61af4758-8f9a-4e2f-8a91-2da1d4920088 (submissions, results and downloads)",
+              "extracted_at": "2026-11-20T17:29:46+00:00"
+            },
+            "status_basis": "Provider reported completed; curl of the job's result URL in the Ginkgo session (Bash, 2026-09-24T08:35:52.887Z)"
+          },
+          "mesh": {
+            "asset_id": "gen-tree-maple-red-1",
+            "provider": "meshy",
+            "tool": "meshy_image_to_3d",
+            "submitted_at": "2026-09-24T08:36:16.115Z",
+            "request": {
+              "ai_model": "meshy-7",
+              "should_texture": true,
+              "enable_pbr": true,
+              "target_formats": [
+                "glb"
+              ],
+              "target_polycount": 30000,
+              "should_remesh": true,
+              "response_format": "json",
+              "image": "local upload of ref_tree_red_maple.png"
+            },
+            "task_id": "01a0d28e-f131-7615-9755-ec136af48407",
+            "status": "SUCCEEDED",
+            "status_basis": "meshy_get_task_status reported SUCCEEDED at 2026-09-24T08:41:46.117Z",
+            "consumed_credits": 30,
+            "provider_model": "meshy-7",
+            "input_link": "upload",
+            "input_image_sha256": "bb37758816208bd982b38cc8985f0d385e36c00543a4812b03dfa3b112875290",
+            "output_file": "gen-tree-maple-red-1.glb",
+            "output_sha256": "04e50dae62b8179b36d3ffa4a4bdfdb1918f150f389cca8cd2a3d956a3f86e32",
+            "seed": null,
+            "evidence_source": {
+              "pass_records": [
+                "runs/refset_0923b/pass.json",
+                "ProjectY2K: twofronts/meshy/ginkgo_props_v061/out/conditioning.json"
+              ],
+              "session_records": "Tool calls of Ginkgo Claude Code session(s) 61af4758-8f9a-4e2f-8a91-2da1d4920088 (submissions, results and downloads)",
+              "extracted_at": "2026-11-20T17:29:46+00:00"
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-tree-maple-red-1",
+            "source_sha256": "04e50dae62b8179b36d3ffa4a4bdfdb1918f150f389cca8cd2a3d956a3f86e32",
+            "source_triangles": 23312,
+            "target_triangles": 30000,
+            "prepared_sha256": "923927104b7d6a6e0b33ab79ffbf22cd11867012e91a4cc6ec1e6be4845a9260",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Remove wire edges, split edges shared by more than two faces and remove zero-area faces (counts in quality.topology_repairs). Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.860503911972046e-07,
+            "quality": {
+              "vertices": 22601,
+              "triangles": 23312,
+              "boundary_edges": 16088,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 3326,
+              "largest_component_vertices": 1361,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "topology_repairs": {
+                "wire_edges_removed": 0,
+                "nonmanifold_edges_split": 3796,
+                "zero_area_faces_removed": 0,
+                "loose_vertices_removed": 0
+              },
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            }
+          },
+          "input_image_file": "batches/y2k-trees-refset-0923b/gen-tree-maple-red-1.png",
+          "external_reference_status": "Reference images generated by Higgsfield gpt_image_2_5 from text prompts only (no media references in the request); Meshy received those images as uploads. The Ginkgo pass refset_0923b followed an owner reference set of 7 images; none was given to either generator.",
+          "external_reference_ids": [],
+          "dimension_basis": "Heights are the sizes Project Y2K's ginkgo_props_v061 conditioning gave the trees (maple 6.5 m, broadleaf 7.0 m); each mesh was scaled uniformly to that height and its spread measured after scaling. Not a survey of a real tree.",
+          "reference_review": "Reference image reviewed on 2026-11-20 at full resolution (1024 px): an isolated tree on a plain grey background; no lettering, logos or marks.",
+          "rights": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5, text prompts only); meshes with Meshy-7 image-to-3D on the owner's Meshy account on 2026-09-24 (the same account, by the account ID in the result URLs, as the library's other Meshy batches; balance 882 credits recorded, subscription plan not recorded or independently audited). The same trees appear in the owner's Ginkgo world packs (GRANDWHIS) and in Project Y2K. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-20 (\"increase the range of models, from the ones i used for my project y2k games, (except for the operatives and bosses)\"). Provider textures are not distributed.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private); reused in Project Y2K, the owner's game project (private)",
+            "pass": "runs/refset_0923b",
+            "source_name": "tree_red_maple",
+            "records": [
+              "runs/refset_0923b/pass.json (AI-assisted content statement)",
+              "ProjectY2K: twofronts/meshy/ginkgo_props_v061/out/conditioning.json (game sizes)",
+              "Claude Code session transcript 61af4758-8f9a-4e2f-8a91-2da1d4920088 (the image batch, the curl download of the images, the Meshy uploads and downloads)"
+            ]
+          }
+        }
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "landscape"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.0,
+      "triangle_count": 23312,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "0EEB52C05D739379406FB9636463082471318369F8F5FFFC12BE2B20DAB80FE8"
+}

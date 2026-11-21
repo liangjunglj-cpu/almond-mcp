@@ -1,0 +1,214 @@
+"""Mirai Ward street-detail kit v060 (owner 2026-10-10: "continue to add architectural details"): the small things that
+make a Tokyo street read as one, generated here so the hub's 20 m roads stop looking bare between the buildings.
+
+    MW60_UtilityPole   10.5 m concrete pole: two steel crossarms across the street with four insulators each, pole transformer, step bolts, a
+                       street-lamp arm (lit), a yellow address plate and a kerb collar. Cables hang from the crossarm
+                       ends (anchors in kit/kit_v060.json).
+    MW60_Cable10       four sagging wires 10 m long along +X (anchors at x=0 and x=10, y=+-0.35/+-0.95, z=0; 0.5 m
+                       sag); scaled along X in Unreal to span pole to pole.
+    MW60_VendingRow    three vending machines (red / white / blue) with lit fronts and product windows, a can bin;
+                       back against the frontage, facing -Y (the street, kit convention).
+    MW60_WallACRig     two split AC units on wall brackets with their pipe runs and a drain line; wall plane at y=0,
+                       units out along -Y.
+
+    blender -b --factory-startup --python kit_v060_details.py
+
+Metres, Z up, origin at the footprint's base. Material slots carry the Unreal material instance name they map to
+(/Game/TwoFronts/MiraiWard/Kit/Materials/MI_<slot>). FBX per mesh into kit/ plus kit/kit_v060.json.
+"""
+import json
+import math
+import sys
+from pathlib import Path
+
+import bmesh
+import bpy
+from mathutils import Matrix, Vector
+
+sys.dont_write_bytecode = True
+HERE = Path(__file__).resolve().parent
+OUT = HERE / "kit"
+META = {"kit": "v060_details", "meshes": {}}
+WIRES = (-0.95, -0.35, 0.35, 0.95)   # m: insulator positions on each crossarm = wire offsets across the cable mesh
+
+
+def reset():
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+
+
+def mat(name):
+    m = bpy.data.materials.get(name) or bpy.data.materials.new(name)
+    return m
+
+
+class Mesh:
+    def __init__(self, name):
+        self.name = name
+        self.bm = bmesh.new()
+        self.slots = []
+
+    def slot(self, m):
+        if m not in self.slots:
+            self.slots.append(m)
+        return self.slots.index(m)
+
+    def _tag(self, faces, m):
+        i = self.slot(m)
+        for f in faces:
+            f.material_index = i
+
+    def box(self, c, size, m, rot_z=0.0):
+        r = bmesh.ops.create_cube(self.bm, size=1.0)
+        verts = r["verts"]
+        M = Matrix.Translation(Vector(c)) @ Matrix.Rotation(rot_z, 4, "Z") @ Matrix.Diagonal(Vector((size[0], size[1], size[2], 1.0)))
+        bmesh.ops.transform(self.bm, matrix=M, verts=verts)
+        self._tag({f for v in verts for f in v.link_faces}, m)
+
+    def cyl(self, p0, p1, r0, m, r1=None, seg=10, cap=True):
+        r1 = r0 if r1 is None else r1
+        a, b = Vector(p0), Vector(p1)
+        d = b - a
+        L = d.length
+        r = bmesh.ops.create_cone(self.bm, cap_ends=cap, cap_tris=False, segments=seg, radius1=r0, radius2=r1, depth=L)
+        verts = r["verts"]
+        q = Vector((0, 0, 1)).rotation_difference(d.normalized())
+        M = Matrix.Translation((a + b) / 2) @ q.to_matrix().to_4x4()
+        bmesh.ops.transform(self.bm, matrix=M, verts=verts)
+        self._tag({f for v in verts for f in v.link_faces}, m)
+
+    def wire(self, pts, r, m, seg=6):
+        for p, q in zip(pts, pts[1:]):
+            self.cyl(p, q, r, m, seg=seg, cap=False)
+
+    def finish(self):
+        me = bpy.data.meshes.new(self.name)
+        self.bm.to_mesh(me)
+        self.bm.free()
+        ob = bpy.data.objects.new(self.name, me)
+        bpy.context.scene.collection.objects.link(ob)
+        for m in self.slots:
+            ob.data.materials.append(mat(m))
+        return ob
+
+
+def ucx(ob, boxes):
+    """Authored simple collision (UCX_<mesh>): auto-fitted shapes wrapped the pole's lamp arm and crossarms."""
+    out = []
+    for i, (c, size) in enumerate(boxes):
+        m = Mesh(f"UCX_{ob.name}_{i:02d}")
+        m.box(c, size, "Collision")
+        o = m.finish()
+        o.data.materials.clear()
+        out.append(o)
+    return out
+
+
+def export(ob, meta, collision=()):
+    bpy.ops.object.select_all(action="DESELECT")
+    ob.select_set(True)
+    for c in collision:
+        c.select_set(True)
+    bpy.context.view_layer.objects.active = ob
+    path = OUT / f"{ob.name}.fbx"
+    bpy.ops.export_scene.fbx(filepath=str(path), use_selection=True, apply_scale_options="FBX_SCALE_UNITS",
+                             axis_forward="-Y", axis_up="Z", mesh_smooth_type="FACE", use_triangles=False,
+                             bake_space_transform=False, object_types={"MESH"})
+    meta["ucx"] = [c.name for c in collision]
+    lo = [min(v.co[i] for v in ob.data.vertices) for i in range(3)]
+    hi = [max(v.co[i] for v in ob.data.vertices) for i in range(3)]
+    meta.update(fbx=path.name, materials=list(ob.data.materials.keys()), min=[round(x, 3) for x in lo],
+                max=[round(x, 3) for x in hi], tris=sum(len(p.vertices) - 2 for p in ob.data.polygons))
+    META["meshes"][ob.name] = meta
+
+
+def utility_pole():
+    m = Mesh("MW60_UtilityPole")
+    m.cyl((0, 0, 0), (0, 0, 10.5), 0.19, "ConcreteWeathered", r1=0.12, seg=12)
+    m.cyl((0, 0, 0), (0, 0, 0.35), 0.3, "ConcreteDark", seg=12)                    # kerb collar
+    anchors = []
+    # crossarms run across the street (local X, the lamp side), so the wires along the street hang off their ends
+    for z in (9.6, 8.8):
+        m.box((0, 0, z), (2.2, 0.14, 0.12), "SteelDark")
+        m.cyl((-0.65, 0, z - 0.05), (-0.05, 0, z - 0.6), 0.025, "SteelDark", seg=6)   # braces
+        m.cyl((0.65, 0, z - 0.05), (0.05, 0, z - 0.6), 0.025, "SteelDark", seg=6)
+        for x in WIRES:
+            m.cyl((x, 0, z + 0.06), (x, 0, z + 0.26), 0.05, "PlasticWhite", r1=0.035, seg=8)   # insulator
+        anchors.append({"z": z + 0.24, "x": list(WIRES)})
+    # pole transformer on its bracket
+    m.box((-0.32, 0, 7.4), (0.3, 0.12, 0.1), "SteelDark")
+    m.cyl((-0.55, 0, 6.9), (-0.55, 0, 7.75), 0.27, "Galvanized", seg=12)
+    m.cyl((-0.55, 0, 7.75), (-0.55, 0, 7.82), 0.29, "SteelDark", seg=12)
+    for dy in (-0.12, 0.12):
+        m.cyl((-0.55, dy, 7.82), (-0.55, dy, 8.1), 0.03, "PlasticWhite", seg=6)
+    # street lamp arm towards the road (+X here; the placer turns the pole so +X faces the carriageway)
+    m.wire([(0, 0, 6.1), (0.6, 0, 6.45), (1.6, 0, 6.6), (2.1, 0, 6.55)], 0.04, "SteelDark", seg=8)
+    m.box((2.15, 0, 6.48), (0.55, 0.24, 0.12), "SteelDark")
+    m.box((2.15, 0, 6.41), (0.48, 0.18, 0.03), "LampCool")
+    # step bolts and the address plate
+    for i in range(10):
+        z = 2.6 + i * 0.42
+        a = math.pi / 2 if i % 2 else -math.pi / 2
+        m.cyl((0, 0, z), (0.32 * math.cos(a) * 0 + 0.0, 0.3 * math.sin(a), z), 0.018, "Galvanized", seg=6)
+    m.box((0.2, 0, 2.3), (0.03, 0.34, 0.9), "PaintYellow")
+    m.box((0.215, 0, 2.3), (0.01, 0.28, 0.82), "SignBack")
+    ob = m.finish()
+    export(ob, {"anchors": anchors, "lamp": [2.15, 0, 6.41], "collision": "UCX column 0.44 x 0.44 x 10.5 m"},
+           ucx(ob, [((0, 0, 5.25), (0.44, 0.44, 10.5))]))
+
+
+def cable10():
+    m = Mesh("MW60_Cable10")
+    for y, sag in zip(WIRES, (0.42, 0.5, 0.5, 0.42)):
+        pts = []
+        for i in range(17):
+            t = i / 16
+            pts.append((10.0 * t, y, -4 * sag * t * (1 - t)))
+        m.wire(pts, 0.013, "Cable", seg=5)
+    ob = m.finish()
+    export(ob, {"span": 10.0, "sag": 0.5})
+
+
+def vending_row():
+    m = Mesh("MW60_VendingRow")
+    bodies = ["PaintRed", "PaintWhite", "PaintBlue"]
+    for i, body in enumerate(bodies):
+        x = (i - 1) * 1.05
+        m.box((x, -0.38, 0.95), (1.0, 0.76, 1.9), body)
+        m.box((x, -0.77, 1.32), (0.84, 0.02, 0.88), "GlassLit")         # product window
+        m.box((x, -0.775, 0.62), (0.84, 0.01, 0.28), "ShopLit")          # lit selection panel
+        m.box((x, -0.78, 0.2), (0.6, 0.03, 0.16), "Black")              # pick-up slot
+        m.box((x, -0.77, 1.86), (0.9, 0.03, 0.12), "ScreenCyan")        # top band
+        m.box((x + 0.3, -0.785, 0.85), (0.12, 0.02, 0.2), "SteelDark")  # coin unit
+    m.box((1.95, -0.3, 0.45), (0.5, 0.5, 0.9), "PaintBlue")              # can bin
+    m.box((1.95, -0.3, 0.92), (0.54, 0.54, 0.06), "SteelDark")
+    m.box((0.0, -0.4, 1.96), (3.4, 0.86, 0.06), "SteelDark")             # shared canopy
+    ob = m.finish()
+    export(ob, {"collision": "UCX box", "face": "-Y"}, ucx(ob, [((0.3, -0.4, 1.0), (3.75, 0.82, 2.0))]))
+
+
+def wall_ac_rig():
+    m = Mesh("MW60_WallACRig")
+    for x, z in ((-0.8, 0.0), (0.7, 0.9)):
+        m.box((x, -0.28, z + 0.32), (0.86, 0.32, 0.62), "PlasticWhite")
+        m.cyl((x, -0.45, z + 0.34), (x, -0.44, z + 0.34), 0.24, "Black", seg=16)   # fan grille
+        for dx in (-0.32, 0.32):
+            m.box((x + dx, -0.22, z - 0.02), (0.05, 0.44, 0.05), "SteelDark")
+            m.cyl((x + dx, -0.42, z - 0.02), (x + dx, -0.02, z + 0.3), 0.015, "SteelDark", seg=6)
+        # pipe run: out of the unit, along the wall and down
+        m.wire([(x + 0.43, -0.2, z + 0.4), (x + 0.55, -0.08, z + 0.4), (x + 0.55, -0.08, -2.2)], 0.03, "Cable", seg=6)
+        m.box((x + 0.55, -0.08, z - 0.9), (0.09, 0.07, 2.6), "PlasticWhite")   # pipe cover
+    m.wire([(-0.8, -0.3, -0.02), (-0.8, -0.3, -2.6)], 0.012, "Cable", seg=5)      # drain
+    ob = m.finish()
+    export(ob, {"face": "-Y", "wall_plane_y": 0.0})
+
+
+def main():
+    OUT.mkdir(parents=True, exist_ok=True)
+    for fn in (utility_pole, cable10, vending_row, wall_ac_rig):
+        reset()
+        fn()
+    (OUT / "kit_v060.json").write_text(json.dumps(META, indent=1), encoding="utf-8")
+    print("kit_v060 done", {k: v["tris"] for k, v in META["meshes"].items()})
+
+
+main()

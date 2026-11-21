@@ -1,0 +1,4262 @@
+{
+ "kit": "Mirai Ward building kit v040",
+ "generator": "<Project Y2K>\\twofronts\\world_v040\\kit_v040.py",
+ "runner": "<Project Y2K>\\twofronts\\world_v040\\build_kit_v040.py",
+ "style_source": "Ginkgo runs/refset_0924 (W038-W041), gwlib worldpack, lite textures",
+ "units": "metres in Blender; FBX exported like the W038 delivery (FBX_SCALE_UNITS) -> Unreal centimetres at import scale 1 with Convert Scene + Convert Scene Unit on",
+ "axes": "+X east, +Y north, Z up; street (front) face is -Y; origin = footprint centre at street level (bridges: deck top at Z=0; street tiles: road top at Z=0)",
+ "groups": {
+  "Structure": "solid, give it collision (complex-as-simple recommended for stairs/landings)",
+  "Glass": "glazing only (sits flush on a solid core; collision optional)",
+  "Signs": "decals, lightboxes, neon, cable lights: NO collision",
+  "Props": "small clutter"
+ },
+ "textures": "<Project Y2K>\\twofronts\\world_v040\\kit\\Textures",
+ "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+ "unreal_setup_script": "<Project Y2K>\\twofronts\\world_v040\\kit\\Unreal\\MW_Setup_Kit_v040.py",
+ "material_conflicts": [
+  "M_Decal_Billboard_Idols",
+  "M_Decal_Blade_Anime",
+  "M_Decal_Blade_Books",
+  "M_Decal_Blade_Denki",
+  "M_Decal_Blade_Hobby",
+  "M_Decal_Blade_Karaoke",
+  "M_Decal_Cube_Arrow",
+  "M_Decal_Cube_Crane",
+  "M_Decal_Cube_Floors",
+  "M_Decal_Cube_Gyoza",
+  "M_Decal_Cube_Izakaya",
+  "M_Decal_Cube_Phone",
+  "M_Decal_Cube_Ramen",
+  "M_Decal_Cube_Taxi",
+  "M_Decal_Mark_Arrow",
+  "M_Decal_Neon_NoSleep",
+  "M_Decal_Neon_StackCity",
+  "M_Decal_Term_Line2"
+ ],
+ "player": {
+  "capsule_radius_m": 0.35,
+  "capsule_height_m": 1.8,
+  "jump_apex_m": 1.8,
+  "double_jump_m": 3.5,
+  "air_dash_m": 4.0
+ },
+ "variants": {
+  "IdolTower_Hero": {
+   "family": "IdolTower",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_IdolTower_Hero.fbx",
+   "fbx_rel": "MW_IdolTower_Hero.fbx",
+   "footprint_m": [
+    40,
+    40
+   ],
+   "height_m": 100.0,
+   "bounds_m": {
+    "min": [
+     -20.152,
+     -21.2,
+     -0.076
+    ],
+    "max": [
+     20.152,
+     21.35,
+     100.0
+    ],
+    "size": [
+     40.304,
+     42.55,
+     100.076
+    ]
+   },
+   "roof_heights": [
+    {
+     "z": 5.9,
+     "rect": [
+      -20.0,
+      -20.0,
+      20.0,
+      20.0
+     ],
+     "note": "canopy ledge ring 2.15 m deep round front and sides (railing with gaps)"
+    },
+    {
+     "z": 10.0,
+     "rect": [
+      -18.65,
+      -18.65,
+      18.65,
+      20.0
+     ],
+     "note": "podium roof terrace (tower stands on it)"
+    },
+    {
+     "z": 40.0,
+     "rect": [
+      -17.5,
+      -8.0,
+      -4.9,
+      17.5
+     ],
+     "note": "left block roof"
+    },
+    {
+     "z": 62.0,
+     "rect": [
+      -4.9,
+      -8.0,
+      17.5,
+      17.5
+     ],
+     "note": "main roof (setback terrace)"
+    },
+    {
+     "z": 90.0,
+     "rect": [
+      -2.9,
+      -2.0,
+      15.0,
+      14.5
+     ],
+     "note": "upper roof (crown)"
+    },
+    {
+     "z": 100.0,
+     "rect": [
+      -1.95,
+      -1.05,
+      14.05,
+      13.55
+     ],
+     "note": "crown frame ring beams (0.5 m wide, balance route)"
+    }
+   ],
+   "wallrun_faces": [
+    {
+     "start": [
+      -17.5,
+      -8.0
+     ],
+     "end": [
+      -17.5,
+      17.5
+     ],
+     "z0": 10.0,
+     "z1": 41.05,
+     "length": 25.5,
+     "normal": [
+      -1,
+      0,
+      0
+     ],
+     "note": "left block west face (plain)"
+    },
+    {
+     "start": [
+      17.5,
+      -8.0
+     ],
+     "end": [
+      17.5,
+      17.5
+     ],
+     "z0": 10.0,
+     "z1": 63.05,
+     "length": 25.5,
+     "normal": [
+      1,
+      0,
+      0
+     ],
+     "note": "main block east face (flush colour blocks only)"
+    },
+    {
+     "start": [
+      15.0,
+      -2.0
+     ],
+     "end": [
+      15.0,
+      14.5
+     ],
+     "z0": 62.0,
+     "z1": 91.05,
+     "length": 16.5,
+     "normal": [
+      1,
+      0,
+      0
+     ],
+     "note": "upper section east face"
+    },
+    {
+     "start": [
+      12.069,
+      -0.5
+     ],
+     "end": [
+      0.031,
+      -0.5
+     ],
+     "z0": 90.0,
+     "z1": 97.6,
+     "length": 12.04,
+     "normal": [
+      0,
+      1,
+      0
+     ],
+     "note": "back of the roof billboard frame"
+    }
+   ],
+   "climb_routes": [
+    {
+     "type": "stair",
+     "from": [
+      19.0,
+      20.65,
+      0.0
+     ],
+     "to": [
+      2.67,
+      20.65,
+      10.0
+     ],
+     "width": 1.3,
+     "riser": 0.179,
+     "going": 0.28
+    },
+    {
+     "type": "landings",
+     "face": "S",
+     "plane": -8.0,
+     "width": 2.8,
+     "depth": 2.0,
+     "landings_u_z": [
+      [
+       -9.6,
+       12.4
+      ],
+      [
+       -12.8,
+       14.8
+      ],
+      [
+       -9.6,
+       17.2
+      ],
+      [
+       -12.8,
+       19.6
+      ],
+      [
+       -9.6,
+       22.0
+      ],
+      [
+       -12.8,
+       24.4
+      ],
+      [
+       -9.6,
+       26.8
+      ],
+      [
+       -12.8,
+       29.2
+      ],
+      [
+       -9.6,
+       31.6
+      ],
+      [
+       -12.8,
+       34.0
+      ],
+      [
+       -9.6,
+       36.4
+      ],
+      [
+       -12.8,
+       38.8
+      ]
+     ],
+     "from_z": 10.0,
+     "note": "podium roof -> left block roof"
+    },
+    {
+     "type": "landings",
+     "face": "W",
+     "plane": -4.9,
+     "width": 2.8,
+     "depth": 2.0,
+     "landings_u_z": [
+      [
+       6.35,
+       42.4
+      ],
+      [
+       3.15,
+       44.8
+      ],
+      [
+       6.35,
+       47.2
+      ],
+      [
+       3.15,
+       49.6
+      ],
+      [
+       6.35,
+       52.0
+      ],
+      [
+       3.15,
+       54.4
+      ],
+      [
+       6.35,
+       56.8
+      ],
+      [
+       3.15,
+       59.2
+      ]
+     ],
+     "from_z": 40.0,
+     "note": "left block roof -> main roof"
+    },
+    {
+     "type": "landings",
+     "face": "W",
+     "plane": -2.9,
+     "width": 2.8,
+     "depth": 2.0,
+     "landings_u_z": [
+      [
+       7.85,
+       64.4
+      ],
+      [
+       4.65,
+       66.8
+      ],
+      [
+       7.85,
+       69.2
+      ],
+      [
+       4.65,
+       71.6
+      ],
+      [
+       7.85,
+       74.0
+      ],
+      [
+       4.65,
+       76.4
+      ],
+      [
+       7.85,
+       78.8
+      ],
+      [
+       4.65,
+       81.2
+      ],
+      [
+       7.85,
+       83.6
+      ],
+      [
+       4.65,
+       86.0
+      ],
+      [
+       7.85,
+       88.4
+      ]
+     ],
+     "from_z": 62.0,
+     "note": "main roof -> upper roof"
+    }
+   ],
+   "notes": [
+    "Street -> podium roof by the steel stair on the north side; landings climb the left block front, then the main block west face, then the upper section west face."
+   ],
+   "groups": {
+    "SM_MW_IdolTower_Hero_Structure": 11512,
+    "SM_MW_IdolTower_Hero_Props": 19770,
+    "SM_MW_IdolTower_Hero_Signs": 246,
+    "SM_MW_IdolTower_Hero_Glass": 628
+   },
+   "tris": 32156,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\IdolTower_Hero.json",
+   "floating_parts": 0,
+   "validation": {
+    "passed": true,
+    "triangles": 32156,
+    "max_bounds_error_m": 0.0,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "PopTower_D": {
+   "family": "PopTower",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_PopTower_D.fbx",
+   "fbx_rel": "MW_PopTower_D.fbx",
+   "footprint_m": [
+    30,
+    36
+   ],
+   "height_m": 73.04,
+   "bounds_m": {
+    "min": [
+     -15.152,
+     -19.2,
+     -0.076
+    ],
+    "max": [
+     15.152,
+     19.35,
+     73.037
+    ],
+    "size": [
+     30.304,
+     38.55,
+     73.113
+    ]
+   },
+   "roof_heights": [
+    {
+     "z": 5.9,
+     "rect": [
+      -15.0,
+      -18.0,
+      15.0,
+      18.0
+     ],
+     "note": "canopy ledge ring 2.15 m deep round front and sides (railing with gaps)"
+    },
+    {
+     "z": 9.0,
+     "rect": [
+      -13.65,
+      -16.65,
+      13.65,
+      18.0
+     ],
+     "note": "podium roof terrace (tower stands on it)"
+    },
+    {
+     "z": 41.4,
+     "rect": [
+      -12.5,
+      -4.3,
+      -3.5,
+      15.5
+     ],
+     "note": "left block roof"
+    },
+    {
+     "z": 64.5,
+     "rect": [
+      -3.5,
+      -4.3,
+      12.5,
+      15.5
+     ],
+     "note": "main roof"
+    }
+   ],
+   "wallrun_faces": [
+    {
+     "start": [
+      -12.5,
+      -4.3
+     ],
+     "end": [
+      -12.5,
+      15.5
+     ],
+     "z0": 9.0,
+     "z1": 42.45,
+     "length": 19.8,
+     "normal": [
+      -1,
+      0,
+      0
+     ],
+     "note": "left block west face (plain)"
+    },
+    {
+     "start": [
+      12.5,
+      -4.3
+     ],
+     "end": [
+      12.5,
+      15.5
+     ],
+     "z0": 9.0,
+     "z1": 65.55,
+     "length": 19.8,
+     "normal": [
+      1,
+      0,
+      0
+     ],
+     "note": "main block east face (flush colour blocks only)"
+    },
+    {
+     "start": [
+      10.519,
+      -2.8
+     ],
+     "end": [
+      -1.519,
+      -2.8
+     ],
+     "z0": 64.5,
+     "z1": 72.1,
+     "length": 12.04,
+     "normal": [
+      0,
+      1,
+      0
+     ],
+     "note": "back of the roof billboard frame"
+    }
+   ],
+   "climb_routes": [
+    {
+     "type": "stair",
+     "from": [
+      14.0,
+      18.65,
+      0.0
+     ],
+     "to": [
+      -0.65,
+      18.65,
+      9.0
+     ],
+     "width": 1.3,
+     "riser": 0.18,
+     "going": 0.28
+    },
+    {
+     "type": "landings",
+     "face": "S",
+     "plane": -4.3,
+     "width": 2.8,
+     "depth": 2.0,
+     "landings_u_z": [
+      [
+       -6.4,
+       11.4
+      ],
+      [
+       -9.6,
+       13.8
+      ],
+      [
+       -6.4,
+       16.2
+      ],
+      [
+       -9.6,
+       18.6
+      ],
+      [
+       -6.4,
+       21.0
+      ],
+      [
+       -9.6,
+       23.4
+      ],
+      [
+       -6.4,
+       25.8
+      ],
+      [
+       -9.6,
+       28.2
+      ],
+      [
+       -6.4,
+       30.6
+      ],
+      [
+       -9.6,
+       33.0
+      ],
+      [
+       -6.4,
+       35.4
+      ],
+      [
+       -9.6,
+       37.8
+      ],
+      [
+       -6.4,
+       40.2
+      ]
+     ],
+     "from_z": 9.0,
+     "note": "podium roof -> left block roof"
+    },
+    {
+     "type": "landings",
+     "face": "W",
+     "plane": -3.5,
+     "width": 2.8,
+     "depth": 2.0,
+     "landings_u_z": [
+      [
+       7.2,
+       43.8
+      ],
+      [
+       4.0,
+       46.2
+      ],
+      [
+       7.2,
+       48.6
+      ],
+      [
+       4.0,
+       51.0
+      ],
+      [
+       7.2,
+       53.4
+      ],
+      [
+       4.0,
+       55.8
+      ],
+      [
+       7.2,
+       58.2
+      ],
+      [
+       4.0,
+       60.6
+      ],
+      [
+       7.2,
+       63.0
+      ]
+     ],
+     "from_z": 41.4,
+     "note": "left block roof -> main roof"
+    }
+   ],
+   "notes": [
+    "Street -> podium roof by the steel stair on the north side; landings climb the left block front, then the main block west face."
+   ],
+   "groups": {
+    "SM_MW_PopTower_D_Structure": 7428,
+    "SM_MW_PopTower_D_Props": 18308,
+    "SM_MW_PopTower_D_Signs": 156,
+    "SM_MW_PopTower_D_Glass": 652
+   },
+   "tris": 26544,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\PopTower_D.json",
+   "floating_parts": 0,
+   "validation": {
+    "passed": true,
+    "triangles": 26544,
+    "max_bounds_error_m": 0.0002,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "PopTower_C": {
+   "family": "PopTower",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_PopTower_C.fbx",
+   "fbx_rel": "MW_PopTower_C.fbx",
+   "footprint_m": [
+    28,
+    32
+   ],
+   "height_m": 56.04,
+   "bounds_m": {
+    "min": [
+     -14.152,
+     -17.2,
+     -0.076
+    ],
+    "max": [
+     14.152,
+     17.35,
+     56.037
+    ],
+    "size": [
+     28.304,
+     34.55,
+     56.113
+    ]
+   },
+   "roof_heights": [
+    {
+     "z": 5.9,
+     "rect": [
+      -14.0,
+      -16.0,
+      14.0,
+      16.0
+     ],
+     "note": "canopy ledge ring 2.15 m deep round front and sides (railing with gaps)"
+    },
+    {
+     "z": 9.0,
+     "rect": [
+      -12.65,
+      -14.65,
+      12.65,
+      16.0
+     ],
+     "note": "podium roof terrace (tower stands on it)"
+    },
+    {
+     "z": 31.8,
+     "rect": [
+      -11.5,
+      -4.1,
+      -3.22,
+      13.5
+     ],
+     "note": "left block roof"
+    },
+    {
+     "z": 47.5,
+     "rect": [
+      -3.22,
+      -4.1,
+      11.5,
+      13.5
+     ],
+     "note": "main roof"
+    }
+   ],
+   "wallrun_faces": [
+    {
+     "start": [
+      -11.5,
+      -4.1
+     ],
+     "end": [
+      -11.5,
+      13.5
+     ],
+     "z0": 9.0,
+     "z1": 32.85,
+     "length": 17.6,
+     "normal": [
+      -1,
+      0,
+      0
+     ],
+     "note": "left block west face (plain)"
+    },
+    {
+     "start": [
+      11.5,
+      -4.1
+     ],
+     "end": [
+      11.5,
+      13.5
+     ],
+     "z0": 9.0,
+     "z1": 48.55,
+     "length": 17.6,
+     "normal": [
+      1,
+      0,
+      0
+     ],
+     "note": "main block east face (flush colour blocks only)"
+    },
+    {
+     "start": [
+      10.159,
+      -2.6
+     ],
+     "end": [
+      -1.879,
+      -2.6
+     ],
+     "z0": 47.5,
+     "z1": 55.1,
+     "length": 12.04,
+     "normal": [
+      0,
+      1,
+      0
+     ],
+     "note": "back of the roof billboard frame"
+    }
+   ],
+   "climb_routes": [
+    {
+     "type": "stair",
+     "from": [
+      13.0,
+      16.65,
+      0.0
+     ],
+     "to": [
+      -1.65,
+      16.65,
+      9.0
+     ],
+     "width": 1.3,
+     "riser": 0.18,
+     "going": 0.28
+    },
+    {
+     "type": "landings",
+     "face": "S",
+     "plane": -4.1,
+     "width": 2.8,
+     "depth": 2.0,
+     "landings_u_z": [
+      [
+       -5.76,
+       11.4
+      ],
+      [
+       -8.96,
+       13.8
+      ],
+      [
+       -5.76,
+       16.2
+      ],
+      [
+       -8.96,
+       18.6
+      ],
+      [
+       -5.76,
+       21.0
+      ],
+      [
+       -8.96,
+       23.4
+      ],
+      [
+       -5.76,
+       25.8
+      ],
+      [
+       -8.96,
+       28.2
+      ],
+      [
+       -5.76,
+       30.6
+      ]
+     ],
+     "from_z": 9.0,
+     "note": "podium roof -> left block roof"
+    },
+    {
+     "type": "landings",
+     "face": "W",
+     "plane": -3.22,
+     "width": 2.8,
+     "depth": 2.0,
+     "landings_u_z": [
+      [
+       6.3,
+       34.2
+      ],
+      [
+       3.1,
+       36.6
+      ],
+      [
+       6.3,
+       39.0
+      ],
+      [
+       3.1,
+       41.4
+      ],
+      [
+       6.3,
+       43.8
+      ],
+      [
+       3.1,
+       46.2
+      ]
+     ],
+     "from_z": 31.8,
+     "note": "left block roof -> main roof"
+    }
+   ],
+   "notes": [
+    "Street -> podium roof by the steel stair on the north side; landings climb the left block front, then the main block west face."
+   ],
+   "groups": {
+    "SM_MW_PopTower_C_Structure": 6564,
+    "SM_MW_PopTower_C_Props": 17576,
+    "SM_MW_PopTower_C_Signs": 172,
+    "SM_MW_PopTower_C_Glass": 448
+   },
+   "tris": 24760,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\PopTower_C.json",
+   "floating_parts": 0,
+   "validation": {
+    "passed": true,
+    "triangles": 24760,
+    "max_bounds_error_m": 0.0002,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "PopTower_B": {
+   "family": "PopTower",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_PopTower_B.fbx",
+   "fbx_rel": "MW_PopTower_B.fbx",
+   "footprint_m": [
+    26,
+    28
+   ],
+   "height_m": 40.93,
+   "bounds_m": {
+    "min": [
+     -13.152,
+     -15.2,
+     -0.076
+    ],
+    "max": [
+     13.152,
+     15.35,
+     40.926
+    ],
+    "size": [
+     26.304,
+     30.55,
+     41.002
+    ]
+   },
+   "roof_heights": [
+    {
+     "z": 5.9,
+     "rect": [
+      -13.0,
+      -14.0,
+      13.0,
+      14.0
+     ],
+     "note": "canopy ledge ring 2.15 m deep round front and sides (railing with gaps)"
+    },
+    {
+     "z": 9.0,
+     "rect": [
+      -11.65,
+      -12.65,
+      11.65,
+      14.0
+     ],
+     "note": "podium roof terrace (tower stands on it)"
+    },
+    {
+     "z": 22.2,
+     "rect": [
+      -10.5,
+      -3.9,
+      -2.94,
+      11.5
+     ],
+     "note": "left block roof"
+    },
+    {
+     "z": 32.5,
+     "rect": [
+      -2.94,
+      -3.9,
+      10.5,
+      11.5
+     ],
+     "note": "main roof"
+    }
+   ],
+   "wallrun_faces": [
+    {
+     "start": [
+      -10.5,
+      -3.9
+     ],
+     "end": [
+      -10.5,
+      11.5
+     ],
+     "z0": 9.0,
+     "z1": 23.25,
+     "length": 15.4,
+     "normal": [
+      -1,
+      0,
+      0
+     ],
+     "note": "left block west face (plain)"
+    },
+    {
+     "start": [
+      10.5,
+      -3.9
+     ],
+     "end": [
+      10.5,
+      11.5
+     ],
+     "z0": 9.0,
+     "z1": 33.55,
+     "length": 15.4,
+     "normal": [
+      1,
+      0,
+      0
+     ],
+     "note": "main block east face (flush colour blocks only)"
+    },
+    {
+     "start": [
+      9.7,
+      -2.4
+     ],
+     "end": [
+      -2.14,
+      -2.4
+     ],
+     "z0": 32.5,
+     "z1": 39.989,
+     "length": 11.84,
+     "normal": [
+      0,
+      1,
+      0
+     ],
+     "note": "back of the roof billboard frame"
+    }
+   ],
+   "climb_routes": [
+    {
+     "type": "stair",
+     "from": [
+      12.0,
+      14.65,
+      0.0
+     ],
+     "to": [
+      -2.65,
+      14.65,
+      9.0
+     ],
+     "width": 1.3,
+     "riser": 0.18,
+     "going": 0.28
+    },
+    {
+     "type": "landings",
+     "face": "S",
+     "plane": -3.9,
+     "width": 2.8,
+     "depth": 2.0,
+     "landings_u_z": [
+      [
+       -5.12,
+       11.4
+      ],
+      [
+       -8.32,
+       13.8
+      ],
+      [
+       -5.12,
+       16.2
+      ],
+      [
+       -8.32,
+       18.6
+      ],
+      [
+       -5.12,
+       21.0
+      ]
+     ],
+     "from_z": 9.0,
+     "note": "podium roof -> left block roof"
+    },
+    {
+     "type": "landings",
+     "face": "W",
+     "plane": -2.94,
+     "width": 2.8,
+     "depth": 2.0,
+     "landings_u_z": [
+      [
+       5.4,
+       24.6
+      ],
+      [
+       2.2,
+       27.0
+      ],
+      [
+       5.4,
+       29.4
+      ],
+      [
+       2.2,
+       31.8
+      ]
+     ],
+     "from_z": 22.2,
+     "note": "left block roof -> main roof"
+    }
+   ],
+   "notes": [
+    "Street -> podium roof by the steel stair on the north side; landings climb the left block front, then the main block west face."
+   ],
+   "groups": {
+    "SM_MW_PopTower_B_Structure": 5736,
+    "SM_MW_PopTower_B_Props": 17048,
+    "SM_MW_PopTower_B_Signs": 158,
+    "SM_MW_PopTower_B_Glass": 282
+   },
+   "tris": 23224,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\PopTower_B.json",
+   "floating_parts": 0,
+   "validation": {
+    "passed": true,
+    "triangles": 23224,
+    "max_bounds_error_m": 0.0002,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "PopTower_A": {
+   "family": "PopTower",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_PopTower_A.fbx",
+   "fbx_rel": "MW_PopTower_A.fbx",
+   "footprint_m": [
+    24,
+    24
+   ],
+   "height_m": 28.12,
+   "bounds_m": {
+    "min": [
+     -12.152,
+     -13.2,
+     -0.076
+    ],
+    "max": [
+     12.152,
+     13.35,
+     28.12
+    ],
+    "size": [
+     24.304,
+     26.55,
+     28.196
+    ]
+   },
+   "roof_heights": [
+    {
+     "z": 5.9,
+     "rect": [
+      -12.0,
+      -12.0,
+      12.0,
+      12.0
+     ],
+     "note": "canopy ledge ring 2.15 m deep round front and sides (railing with gaps)"
+    },
+    {
+     "z": 9.0,
+     "rect": [
+      -10.65,
+      -10.65,
+      10.65,
+      12.0
+     ],
+     "note": "podium roof terrace (tower stands on it)"
+    },
+    {
+     "z": 17.4,
+     "rect": [
+      -9.5,
+      -3.7,
+      -2.5,
+      9.5
+     ],
+     "note": "left block roof"
+    },
+    {
+     "z": 20.5,
+     "rect": [
+      -2.5,
+      -3.7,
+      9.5,
+      9.5
+     ],
+     "note": "main roof"
+    }
+   ],
+   "wallrun_faces": [
+    {
+     "start": [
+      -9.5,
+      -3.7
+     ],
+     "end": [
+      -9.5,
+      9.5
+     ],
+     "z0": 9.0,
+     "z1": 18.45,
+     "length": 13.2,
+     "normal": [
+      -1,
+      0,
+      0
+     ],
+     "note": "left block west face (plain)"
+    },
+    {
+     "start": [
+      9.5,
+      -3.7
+     ],
+     "end": [
+      9.5,
+      9.5
+     ],
+     "z0": 9.0,
+     "z1": 21.55,
+     "length": 13.2,
+     "normal": [
+      1,
+      0,
+      0
+     ],
+     "note": "main block east face (flush colour blocks only)"
+    },
+    {
+     "start": [
+      8.7,
+      -2.2
+     ],
+     "end": [
+      -1.7,
+      -2.2
+     ],
+     "z0": 20.5,
+     "z1": 27.183,
+     "length": 10.4,
+     "normal": [
+      0,
+      1,
+      0
+     ],
+     "note": "back of the roof billboard frame"
+    }
+   ],
+   "climb_routes": [
+    {
+     "type": "stair",
+     "from": [
+      11.0,
+      12.65,
+      0.0
+     ],
+     "to": [
+      -3.65,
+      12.65,
+      9.0
+     ],
+     "width": 1.3,
+     "riser": 0.18,
+     "going": 0.28
+    },
+    {
+     "type": "landings",
+     "face": "S",
+     "plane": -3.7,
+     "width": 2.8,
+     "depth": 2.0,
+     "landings_u_z": [
+      [
+       -4.4,
+       11.4
+      ],
+      [
+       -7.6,
+       13.8
+      ],
+      [
+       -4.4,
+       16.2
+      ]
+     ],
+     "from_z": 9.0,
+     "note": "podium roof -> left block roof"
+    },
+    {
+     "type": "landings",
+     "face": "W",
+     "plane": -2.5,
+     "width": 2.8,
+     "depth": 2.0,
+     "landings_u_z": [
+      [
+       4.5,
+       19.8
+      ]
+     ],
+     "from_z": 17.4,
+     "note": "left block roof -> main roof"
+    }
+   ],
+   "notes": [
+    "Street -> podium roof by the steel stair on the north side; landings climb the left block front, then the main block west face."
+   ],
+   "groups": {
+    "SM_MW_PopTower_A_Structure": 5148,
+    "SM_MW_PopTower_A_Props": 16334,
+    "SM_MW_PopTower_A_Signs": 158,
+    "SM_MW_PopTower_A_Glass": 120
+   },
+   "tris": 21760,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\PopTower_A.json",
+   "floating_parts": 0,
+   "validation": {
+    "passed": true,
+    "triangles": 21760,
+    "max_bounds_error_m": 0.0005,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "ContainerStack_A": {
+   "family": "ContainerStack",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_ContainerStack_A.fbx",
+   "fbx_rel": "MW_ContainerStack_A.fbx",
+   "footprint_m": [
+    20,
+    14
+   ],
+   "height_m": 11.52,
+   "bounds_m": {
+    "min": [
+     -10.035,
+     -7.878,
+     -0.058
+    ],
+    "max": [
+     10.01,
+     5.79,
+     11.52
+    ],
+    "size": [
+     20.045,
+     13.668,
+     11.578
+    ]
+   },
+   "roof_heights": [
+    {
+     "z": 2.6,
+     "rect": [
+      -10.0,
+      -6.4,
+      7.44,
+      5.79
+     ],
+     "note": "level 0 container roofs (terrace step 2.6 m)"
+    },
+    {
+     "z": 5.2,
+     "rect": [
+      -7.5,
+      -6.4,
+      7.44,
+      5.79
+     ],
+     "note": "level 1 container roofs (terrace step 2.6 m)"
+    },
+    {
+     "z": 7.8,
+     "rect": [
+      -5.0,
+      -6.4,
+      7.44,
+      5.79
+     ],
+     "note": "level 2 container roofs (terrace step 2.6 m)"
+    },
+    {
+     "z": 10.4,
+     "rect": [
+      -2.5,
+      -6.4,
+      7.44,
+      -0.34
+     ],
+     "note": "level 3 container roofs (terrace step 2.6 m)"
+    }
+   ],
+   "wallrun_faces": [
+    {
+     "start": [
+      -10.0,
+      5.79
+     ],
+     "end": [
+      -10.0,
+      -6.4
+     ],
+     "z0": 0.0,
+     "z1": 2.59,
+     "length": 12.19,
+     "normal": [
+      -1,
+      0,
+      0
+     ],
+     "note": "level 0 riser (west flank)"
+    },
+    {
+     "start": [
+      -7.5,
+      5.79
+     ],
+     "end": [
+      -7.5,
+      -6.4
+     ],
+     "z0": 2.6,
+     "z1": 5.19,
+     "length": 12.19,
+     "normal": [
+      -1,
+      0,
+      0
+     ],
+     "note": "level 1 riser (west flank)"
+    },
+    {
+     "start": [
+      -5.0,
+      5.79
+     ],
+     "end": [
+      -5.0,
+      -6.4
+     ],
+     "z0": 5.2,
+     "z1": 7.79,
+     "length": 12.19,
+     "normal": [
+      -1,
+      0,
+      0
+     ],
+     "note": "level 2 riser (west flank)"
+    },
+    {
+     "start": [
+      -2.5,
+      -0.34
+     ],
+     "end": [
+      -2.5,
+      -6.4
+     ],
+     "z0": 7.8,
+     "z1": 10.39,
+     "length": 6.06,
+     "normal": [
+      -1,
+      0,
+      0
+     ],
+     "note": "level 3 riser (west flank)"
+    }
+   ],
+   "climb_routes": [
+    {
+     "type": "scaffold_stair",
+     "x": [
+      7.6,
+      10.0
+     ],
+     "levels": 4,
+     "landings_z": [
+      0.0,
+      2.6,
+      5.2,
+      7.8,
+      10.4
+     ]
+    }
+   ],
+   "notes": [
+    "Every container level is a terrace one container (2.6 m) above the last: double-jump up the west risers or take the red scaffold stair on the east side."
+   ],
+   "groups": {
+    "SM_MW_ContainerStack_A_Structure": 7096,
+    "SM_MW_ContainerStack_A_Signs": 30,
+    "SM_MW_ContainerStack_A_Props": 4828
+   },
+   "tris": 11954,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\ContainerStack_A.json",
+   "floating_parts": 0,
+   "validation": {
+    "passed": true,
+    "triangles": 11954,
+    "max_bounds_error_m": 0.0004,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "ContainerStack_B": {
+   "family": "ContainerStack",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_ContainerStack_B.fbx",
+   "fbx_rel": "MW_ContainerStack_B.fbx",
+   "footprint_m": [
+    26,
+    16
+   ],
+   "height_m": 22.2,
+   "bounds_m": {
+    "min": [
+     -13.035,
+     -8.078,
+     -0.058
+    ],
+    "max": [
+     12.01,
+     7.99,
+     22.2
+    ],
+    "size": [
+     25.045,
+     16.068,
+     22.258
+    ]
+   },
+   "roof_heights": [
+    {
+     "z": 2.6,
+     "rect": [
+      -13.0,
+      -6.6,
+      9.44,
+      5.59
+     ],
+     "note": "level 0 container roofs (terrace step 2.6 m)"
+    },
+    {
+     "z": 5.2,
+     "rect": [
+      -10.5,
+      -6.6,
+      9.44,
+      5.59
+     ],
+     "note": "level 1 container roofs (terrace step 2.6 m)"
+    },
+    {
+     "z": 7.8,
+     "rect": [
+      -8.0,
+      -6.6,
+      9.44,
+      5.59
+     ],
+     "note": "level 2 container roofs (terrace step 2.6 m)"
+    },
+    {
+     "z": 10.4,
+     "rect": [
+      -5.5,
+      -6.6,
+      9.44,
+      5.59
+     ],
+     "note": "level 3 container roofs (terrace step 2.6 m)"
+    },
+    {
+     "z": 13.0,
+     "rect": [
+      -3.0,
+      -0.47,
+      9.44,
+      5.59
+     ],
+     "note": "level 4 container roofs (terrace step 2.6 m)"
+    }
+   ],
+   "wallrun_faces": [
+    {
+     "start": [
+      -13.0,
+      5.59
+     ],
+     "end": [
+      -13.0,
+      -6.6
+     ],
+     "z0": 0.0,
+     "z1": 2.59,
+     "length": 12.19,
+     "normal": [
+      -1,
+      0,
+      0
+     ],
+     "note": "level 0 riser (west flank)"
+    },
+    {
+     "start": [
+      -10.5,
+      5.59
+     ],
+     "end": [
+      -10.5,
+      -6.6
+     ],
+     "z0": 2.6,
+     "z1": 5.19,
+     "length": 12.19,
+     "normal": [
+      -1,
+      0,
+      0
+     ],
+     "note": "level 1 riser (west flank)"
+    },
+    {
+     "start": [
+      -8.0,
+      5.59
+     ],
+     "end": [
+      -8.0,
+      -6.6
+     ],
+     "z0": 5.2,
+     "z1": 7.79,
+     "length": 12.19,
+     "normal": [
+      -1,
+      0,
+      0
+     ],
+     "note": "level 2 riser (west flank)"
+    },
+    {
+     "start": [
+      -5.5,
+      5.59
+     ],
+     "end": [
+      -5.5,
+      -6.6
+     ],
+     "z0": 7.8,
+     "z1": 10.39,
+     "length": 12.19,
+     "normal": [
+      -1,
+      0,
+      0
+     ],
+     "note": "level 3 riser (west flank)"
+    },
+    {
+     "start": [
+      -3.0,
+      5.59
+     ],
+     "end": [
+      -3.0,
+      -0.47
+     ],
+     "z0": 10.4,
+     "z1": 12.99,
+     "length": 6.06,
+     "normal": [
+      -1,
+      0,
+      0
+     ],
+     "note": "level 4 riser (west flank)"
+    }
+   ],
+   "climb_routes": [
+    {
+     "type": "scaffold_stair",
+     "x": [
+      9.6,
+      12.0
+     ],
+     "levels": 5,
+     "landings_z": [
+      0.0,
+      2.6,
+      5.2,
+      7.8,
+      10.4,
+      13.0
+     ]
+    }
+   ],
+   "notes": [
+    "Every container level is a terrace one container (2.6 m) above the last: double-jump up the west risers or take the red scaffold stair on the east side."
+   ],
+   "groups": {
+    "SM_MW_ContainerStack_B_Structure": 10040,
+    "SM_MW_ContainerStack_B_Signs": 116,
+    "SM_MW_ContainerStack_B_Props": 4828,
+    "SM_MW_ContainerStack_B_Glass": 12
+   },
+   "tris": 14996,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\ContainerStack_B.json",
+   "floating_parts": 0,
+   "validation": {
+    "passed": true,
+    "triangles": 14996,
+    "max_bounds_error_m": 0.0004,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "Arcade_A": {
+   "family": "Arcade",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_Arcade_A.fbx",
+   "fbx_rel": "MW_Arcade_A.fbx",
+   "footprint_m": [
+    16,
+    30
+   ],
+   "height_m": 13.84,
+   "bounds_m": {
+    "min": [
+     -8.0,
+     -14.95,
+     -0.008
+    ],
+    "max": [
+     8.42,
+     16.3,
+     13.836
+    ],
+    "size": [
+     16.42,
+     31.25,
+     13.844
+    ]
+   },
+   "roof_heights": [
+    {
+     "z": 5.4,
+     "rect": [
+      -8.0,
+      -15.0,
+      8.0,
+      -7.0
+     ],
+     "note": "canopy grid beams (narrow, balance route to the roof)"
+    },
+    {
+     "z": 7.5,
+     "rect": [
+      -8.0,
+      -7.0,
+      8.0,
+      15.0
+     ],
+     "note": "flat roof"
+    }
+   ],
+   "wallrun_faces": [
+    {
+     "start": [
+      -8.0,
+      15.0
+     ],
+     "end": [
+      -8.0,
+      -7.0
+     ],
+     "z0": 0.0,
+     "z1": 8.55,
+     "length": 22.0,
+     "normal": [
+      -1,
+      0,
+      0
+     ],
+     "note": "west party wall (plain)"
+    },
+    {
+     "start": [
+      6.65,
+      13.1
+     ],
+     "end": [
+      -2.85,
+      13.1
+     ],
+     "z0": 7.5,
+     "z1": 13.836,
+     "length": 9.5,
+     "normal": [
+      0,
+      1,
+      0
+     ],
+     "note": "back of the roof billboard frame"
+    }
+   ],
+   "climb_routes": [
+    {
+     "type": "stair",
+     "from": [
+      7.6,
+      15.65,
+      0.0
+     ],
+     "to": [
+      -4.25,
+      15.65,
+      7.5
+     ],
+     "width": 1.3,
+     "riser": 0.188,
+     "going": 0.28
+    }
+   ],
+   "notes": [
+    "Street -> canopy beams (5.4 m) by double jump off vending / planters, canopy -> roof through the front parapet gap; concrete stair at the back reaches the roof."
+   ],
+   "groups": {
+    "SM_MW_Arcade_A_Structure": 2528,
+    "SM_MW_Arcade_A_Signs": 344,
+    "SM_MW_Arcade_A_Props": 15439,
+    "SM_MW_Arcade_A_Glass": 28
+   },
+   "tris": 18339,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\Arcade_A.json",
+   "floating_parts": 0,
+   "validation": {
+    "passed": true,
+    "triangles": 18339,
+    "max_bounds_error_m": 0.0003,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "Arcade_B": {
+   "family": "Arcade",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_Arcade_B.fbx",
+   "fbx_rel": "MW_Arcade_B.fbx",
+   "footprint_m": [
+    12,
+    24
+   ],
+   "height_m": 12.72,
+   "bounds_m": {
+    "min": [
+     -6.0,
+     -11.95,
+     -0.008
+    ],
+    "max": [
+     6.42,
+     13.3,
+     12.717
+    ],
+    "size": [
+     12.42,
+     25.25,
+     12.725
+    ]
+   },
+   "roof_heights": [
+    {
+     "z": 5.4,
+     "rect": [
+      -6.0,
+      -12.0,
+      6.0,
+      -6.0
+     ],
+     "note": "canopy grid beams (narrow, balance route to the roof)"
+    },
+    {
+     "z": 7.5,
+     "rect": [
+      -6.0,
+      -6.0,
+      6.0,
+      12.0
+     ],
+     "note": "flat roof"
+    }
+   ],
+   "wallrun_faces": [
+    {
+     "start": [
+      -6.0,
+      12.0
+     ],
+     "end": [
+      -6.0,
+      -6.0
+     ],
+     "z0": 0.0,
+     "z1": 8.55,
+     "length": 18.0,
+     "normal": [
+      -1,
+      0,
+      0
+     ],
+     "note": "west party wall (plain)"
+    },
+    {
+     "start": [
+      4.65,
+      10.1
+     ],
+     "end": [
+      -2.85,
+      10.1
+     ],
+     "z0": 7.5,
+     "z1": 12.717,
+     "length": 7.5,
+     "normal": [
+      0,
+      1,
+      0
+     ],
+     "note": "back of the roof billboard frame"
+    }
+   ],
+   "climb_routes": [
+    {
+     "type": "stair",
+     "from": [
+      5.6,
+      12.65,
+      0.0
+     ],
+     "to": [
+      -4.85,
+      12.65,
+      7.5
+     ],
+     "width": 1.3,
+     "riser": 0.188,
+     "going": 0.245
+    }
+   ],
+   "notes": [
+    "Street -> canopy beams (5.4 m) by double jump off vending / planters, canopy -> roof through the front parapet gap; concrete stair at the back reaches the roof."
+   ],
+   "groups": {
+    "SM_MW_Arcade_B_Structure": 2260,
+    "SM_MW_Arcade_B_Signs": 150,
+    "SM_MW_Arcade_B_Props": 15265,
+    "SM_MW_Arcade_B_Glass": 24
+   },
+   "tris": 17699,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\Arcade_B.json",
+   "floating_parts": 0,
+   "validation": {
+    "passed": true,
+    "triangles": 17699,
+    "max_bounds_error_m": 0.0003,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "Arcade_C": {
+   "family": "Arcade",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_Arcade_C.fbx",
+   "fbx_rel": "MW_Arcade_C.fbx",
+   "footprint_m": [
+    20,
+    20
+   ],
+   "height_m": 13.84,
+   "bounds_m": {
+    "min": [
+     -10.0,
+     -9.95,
+     -0.008
+    ],
+    "max": [
+     10.42,
+     11.3,
+     13.836
+    ],
+    "size": [
+     20.42,
+     21.25,
+     13.844
+    ]
+   },
+   "roof_heights": [
+    {
+     "z": 5.4,
+     "rect": [
+      -10.0,
+      -10.0,
+      10.0,
+      -3.0
+     ],
+     "note": "canopy grid beams (narrow, balance route to the roof)"
+    },
+    {
+     "z": 7.5,
+     "rect": [
+      -10.0,
+      -3.0,
+      10.0,
+      10.0
+     ],
+     "note": "flat roof"
+    }
+   ],
+   "wallrun_faces": [
+    {
+     "start": [
+      -10.0,
+      10.0
+     ],
+     "end": [
+      -10.0,
+      -3.0
+     ],
+     "z0": 0.0,
+     "z1": 8.55,
+     "length": 13.0,
+     "normal": [
+      -1,
+      0,
+      0
+     ],
+     "note": "west party wall (plain)"
+    },
+    {
+     "start": [
+      8.65,
+      8.1
+     ],
+     "end": [
+      -0.85,
+      8.1
+     ],
+     "z0": 7.5,
+     "z1": 13.836,
+     "length": 9.5,
+     "normal": [
+      0,
+      1,
+      0
+     ],
+     "note": "back of the roof billboard frame"
+    }
+   ],
+   "climb_routes": [
+    {
+     "type": "stair",
+     "from": [
+      9.6,
+      10.65,
+      0.0
+     ],
+     "to": [
+      -2.25,
+      10.65,
+      7.5
+     ],
+     "width": 1.3,
+     "riser": 0.188,
+     "going": 0.28
+    }
+   ],
+   "notes": [
+    "Street -> canopy beams (5.4 m) by double jump off vending / planters, canopy -> roof through the front parapet gap; concrete stair at the back reaches the roof."
+   ],
+   "groups": {
+    "SM_MW_Arcade_C_Structure": 2164,
+    "SM_MW_Arcade_C_Signs": 416,
+    "SM_MW_Arcade_C_Props": 15259,
+    "SM_MW_Arcade_C_Glass": 20
+   },
+   "tris": 17859,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\Arcade_C.json",
+   "floating_parts": 0,
+   "validation": {
+    "passed": true,
+    "triangles": 17859,
+    "max_bounds_error_m": 0.0003,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "Coral_A": {
+   "family": "Coral",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_Coral_A.fbx",
+   "fbx_rel": "MW_Coral_A.fbx",
+   "footprint_m": [
+    40,
+    20
+   ],
+   "height_m": 18.4,
+   "bounds_m": {
+    "min": [
+     -21.2,
+     -11.415,
+     -0.1
+    ],
+    "max": [
+     20.0,
+     10.0,
+     18.397
+    ],
+    "size": [
+     41.2,
+     21.415,
+     18.497
+    ]
+   },
+   "roof_heights": [
+    {
+     "z": 14,
+     "rect": [
+      -20.0,
+      -11.0,
+      2.5,
+      10.0
+     ],
+     "note": "hall roof"
+    },
+    {
+     "z": 14,
+     "rect": [
+      2.5,
+      -10.0,
+      20.0,
+      10.0
+     ],
+     "note": "ramp top edge meets roof (sloped surface below)"
+    }
+   ],
+   "wallrun_faces": [
+    {
+     "start": [
+      2.5,
+      10.0
+     ],
+     "end": [
+      -20.0,
+      10.0
+     ],
+     "z0": 0.0,
+     "z1": 15.05,
+     "length": 22.5,
+     "normal": [
+      0,
+      1,
+      0
+     ],
+     "note": "north face (plain)"
+    }
+   ],
+   "climb_routes": [
+    {
+     "type": "ramp",
+     "note": "battered east wall, 38.7 deg, x 2.5->20.0",
+     "slope_deg": 38.66
+    }
+   ],
+   "notes": [
+    "Walk up the battered ramp wall to the roof; the ramp edge of the roof has no parapet."
+   ],
+   "groups": {
+    "SM_MW_Coral_A_Structure": 4474,
+    "SM_MW_Coral_A_Props": 7086,
+    "SM_MW_Coral_A_Signs": 14,
+    "SM_MW_Coral_A_Glass": 2
+   },
+   "tris": 11576,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\Coral_A.json",
+   "floating_parts": 0,
+   "validation": {
+    "passed": true,
+    "triangles": 11576,
+    "max_bounds_error_m": 0.0004,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "Coral_B": {
+   "family": "Coral",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_Coral_B.fbx",
+   "fbx_rel": "MW_Coral_B.fbx",
+   "footprint_m": [
+    30,
+    24
+   ],
+   "height_m": 22.4,
+   "bounds_m": {
+    "min": [
+     -15.0,
+     -13.415,
+     -0.1
+    ],
+    "max": [
+     15.03,
+     13.2,
+     22.4
+    ],
+    "size": [
+     30.03,
+     26.615,
+     22.5
+    ]
+   },
+   "roof_heights": [
+    {
+     "z": 18,
+     "rect": [
+      -15.0,
+      -13.0,
+      9.0,
+      12.0
+     ],
+     "note": "hall roof"
+    },
+    {
+     "z": 18,
+     "rect": [
+      9.0,
+      10.5,
+      15.0,
+      12.0
+     ],
+     "note": "flat top of the ramp"
+    }
+   ],
+   "wallrun_faces": [
+    {
+     "start": [
+      -15.0,
+      12.0
+     ],
+     "end": [
+      -15.0,
+      -12.0
+     ],
+     "z0": 0.0,
+     "z1": 19.05,
+     "length": 24.0,
+     "normal": [
+      -1,
+      0,
+      0
+     ],
+     "note": "west face (plain)"
+    }
+   ],
+   "climb_routes": [
+    {
+     "type": "ramp",
+     "note": "battered ramp along the east flank, 38.7 deg, y -12.0->10.5",
+     "slope_deg": 38.66
+    }
+   ],
+   "notes": [
+    "Walk up the battered ramp wall to the roof; the ramp edge of the roof has no parapet."
+   ],
+   "groups": {
+    "SM_MW_Coral_B_Structure": 5078,
+    "SM_MW_Coral_B_Props": 7086,
+    "SM_MW_Coral_B_Signs": 14,
+    "SM_MW_Coral_B_Glass": 2
+   },
+   "tris": 12180,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\Coral_B.json",
+   "floating_parts": 0,
+   "validation": {
+    "passed": true,
+    "triangles": 12180,
+    "max_bounds_error_m": 0.0003,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "Bridge_20": {
+   "family": "Bridge",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_Bridge_20.fbx",
+   "fbx_rel": "MW_Bridge_20.fbx",
+   "footprint_m": [
+    20,
+    4
+   ],
+   "height_m": 1.7,
+   "bounds_m": {
+    "min": [
+     -10.032,
+     -2.0,
+     -0.45
+    ],
+    "max": [
+     10.032,
+     2.0,
+     1.7
+    ],
+    "size": [
+     20.065,
+     4.0,
+     2.15
+    ]
+   },
+   "roof_heights": [
+    {
+     "z": 0.0,
+     "rect": [
+      -10.0,
+      -1.75,
+      10.0,
+      1.75
+     ],
+     "note": "deck (walk surface, top at Z=0)"
+    }
+   ],
+   "wallrun_faces": [],
+   "climb_routes": [],
+   "notes": [
+    "Span along X, 20 m x 4 m, deck top at Z=0; place at roof height, ends open."
+   ],
+   "groups": {
+    "SM_MW_Bridge_20_Structure": 784,
+    "SM_MW_Bridge_20_Signs": 24
+   },
+   "tris": 808,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\Bridge_20.json",
+   "floating_parts": 0,
+   "validation": {
+    "passed": true,
+    "triangles": 808,
+    "max_bounds_error_m": 0.0003,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "Bridge_30": {
+   "family": "Bridge",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_Bridge_30.fbx",
+   "fbx_rel": "MW_Bridge_30.fbx",
+   "footprint_m": [
+    30,
+    4
+   ],
+   "height_m": 1.7,
+   "bounds_m": {
+    "min": [
+     -15.032,
+     -2.0,
+     -0.45
+    ],
+    "max": [
+     15.032,
+     2.0,
+     1.7
+    ],
+    "size": [
+     30.065,
+     4.0,
+     2.15
+    ]
+   },
+   "roof_heights": [
+    {
+     "z": 0.0,
+     "rect": [
+      -15.0,
+      -1.75,
+      15.0,
+      1.75
+     ],
+     "note": "deck (walk surface, top at Z=0)"
+    }
+   ],
+   "wallrun_faces": [],
+   "climb_routes": [],
+   "notes": [
+    "Span along X, 30 m x 4 m, deck top at Z=0; place at roof height, ends open."
+   ],
+   "groups": {
+    "SM_MW_Bridge_30_Structure": 1088,
+    "SM_MW_Bridge_30_Signs": 24
+   },
+   "tris": 1112,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\Bridge_30.json",
+   "floating_parts": 0,
+   "validation": {
+    "passed": true,
+    "triangles": 1112,
+    "max_bounds_error_m": 0.0003,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "Road_20": {
+   "family": "Street",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_Road_20.fbx",
+   "fbx_rel": "MW_Road_20.fbx",
+   "footprint_m": [
+    20,
+    20
+   ],
+   "height_m": 0.01,
+   "bounds_m": {
+    "min": [
+     -10.0,
+     -10.0,
+     -0.2
+    ],
+    "max": [
+     10.0,
+     10.0,
+     0.006
+    ],
+    "size": [
+     20.0,
+     20.0,
+     0.206
+    ]
+   },
+   "roof_heights": [
+    {
+     "z": 0.0,
+     "rect": [
+      -10.0,
+      -10.0,
+      10.0,
+      10.0
+     ],
+     "note": "asphalt top at Z=0 (slab to -0.2)"
+    }
+   ],
+   "wallrun_faces": [],
+   "climb_routes": [],
+   "notes": [
+    "Road along X (lanes E-W); tiles every 20 m."
+   ],
+   "groups": {
+    "SM_MW_Road_20_Structure": 12,
+    "SM_MW_Road_20_Signs": 144
+   },
+   "tris": 156,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\Road_20.json",
+   "floating_parts": 0,
+   "validation": {
+    "passed": true,
+    "triangles": 156,
+    "max_bounds_error_m": 0.0,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "Road_Cross": {
+   "family": "Street",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_Road_Cross.fbx",
+   "fbx_rel": "MW_Road_Cross.fbx",
+   "footprint_m": [
+    20,
+    20
+   ],
+   "height_m": 0.01,
+   "bounds_m": {
+    "min": [
+     -10.0,
+     -10.0,
+     -0.2
+    ],
+    "max": [
+     10.0,
+     10.0,
+     0.015
+    ],
+    "size": [
+     20.0,
+     20.0,
+     0.215
+    ]
+   },
+   "roof_heights": [
+    {
+     "z": 0.0,
+     "rect": [
+      -10.0,
+      -10.0,
+      10.0,
+      10.0
+     ],
+     "note": "asphalt top at Z=0 (slab to -0.2)"
+    }
+   ],
+   "wallrun_faces": [],
+   "climb_routes": [],
+   "notes": [
+    "Crossroads, zebra crossings on all four approaches."
+   ],
+   "groups": {
+    "SM_MW_Road_Cross_Structure": 12,
+    "SM_MW_Road_Cross_Signs": 912
+   },
+   "tris": 924,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\Road_Cross.json",
+   "floating_parts": 0,
+   "validation": {
+    "passed": true,
+    "triangles": 924,
+    "max_bounds_error_m": 0.0,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "Sidewalk_20": {
+   "family": "Street",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_Sidewalk_20.fbx",
+   "fbx_rel": "MW_Sidewalk_20.fbx",
+   "footprint_m": [
+    20,
+    5
+   ],
+   "height_m": 0.18,
+   "bounds_m": {
+    "min": [
+     -10.0,
+     -2.5,
+     -0.2
+    ],
+    "max": [
+     10.0,
+     2.5,
+     0.182
+    ],
+    "size": [
+     20.0,
+     5.0,
+     0.382
+    ]
+   },
+   "roof_heights": [
+    {
+     "z": 0.15,
+     "rect": [
+      -10.0,
+      -2.5,
+      10.0,
+      2.5
+     ],
+     "note": "paving top (kerb 0.15 on the -Y road side)"
+    }
+   ],
+   "wallrun_faces": [],
+   "climb_routes": [],
+   "notes": [
+    "Kerb faces -Y (road side); paving top 0.15 m above road level."
+   ],
+   "groups": {
+    "SM_MW_Sidewalk_20_Structure": 84
+   },
+   "tris": 84,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\Sidewalk_20.json",
+   "floating_parts": 0,
+   "validation": {
+    "passed": true,
+    "triangles": 84,
+    "max_bounds_error_m": 0.0,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "Plaza_20": {
+   "family": "Street",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_Plaza_20.fbx",
+   "fbx_rel": "MW_Plaza_20.fbx",
+   "footprint_m": [
+    20,
+    20
+   ],
+   "height_m": 0.15,
+   "bounds_m": {
+    "min": [
+     -10.0,
+     -10.0,
+     -0.2
+    ],
+    "max": [
+     10.0,
+     10.0,
+     0.15
+    ],
+    "size": [
+     20.0,
+     20.0,
+     0.35
+    ]
+   },
+   "roof_heights": [
+    {
+     "z": 0.15,
+     "rect": [
+      -10.0,
+      -10.0,
+      10.0,
+      10.0
+     ],
+     "note": "tile top (flush with Sidewalk_20)"
+    }
+   ],
+   "wallrun_faces": [],
+   "climb_routes": [],
+   "notes": [],
+   "groups": {
+    "SM_MW_Plaza_20_Structure": 1212
+   },
+   "tris": 1212,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\Plaza_20.json",
+   "floating_parts": 0,
+   "validation": {
+    "passed": true,
+    "triangles": 1212,
+    "max_bounds_error_m": 0.0,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "Shrine": {
+   "family": "Shrine",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_Shrine.fbx",
+   "fbx_rel": "MW_Shrine.fbx",
+   "footprint_m": [
+    4,
+    4
+   ],
+   "height_m": 4.02,
+   "bounds_m": {
+    "min": [
+     -2.0,
+     -2.0,
+     0.0
+    ],
+    "max": [
+     2.0,
+     2.0,
+     4.02
+    ],
+    "size": [
+     4.0,
+     4.0,
+     4.02
+    ]
+   },
+   "roof_heights": [
+    {
+     "z": 0.55,
+     "rect": [
+      -1.75,
+      -1.75,
+      1.75,
+      1.75
+     ],
+     "note": "plinth top"
+    }
+   ],
+   "wallrun_faces": [],
+   "climb_routes": [],
+   "notes": [
+    "Checkpoint: lantern hangs under the nuki (1.21-2.99 m), trigger volume suggested 3x3x3 m."
+   ],
+   "groups": {
+    "SM_MW_Shrine_Structure": 144,
+    "SM_MW_Shrine_Signs": 712,
+    "SM_MW_Shrine_Props": 216
+   },
+   "tris": 1072,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\Shrine.json",
+   "floating_parts": 0,
+   "validation": {
+    "passed": true,
+    "triangles": 1072,
+    "max_bounds_error_m": 0.0,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "Gate": {
+   "family": "Gate",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_Gate.fbx",
+   "fbx_rel": "MW_Gate.fbx",
+   "footprint_m": [
+    16,
+    2.4
+   ],
+   "height_m": 12.25,
+   "bounds_m": {
+    "min": [
+     -8.4,
+     -1.2,
+     0.0
+    ],
+    "max": [
+     8.4,
+     1.2,
+     12.25
+    ],
+    "size": [
+     16.8,
+     2.4,
+     12.25
+    ]
+   },
+   "roof_heights": [
+    {
+     "z": 12.0,
+     "rect": [
+      -8.4,
+      -1.0,
+      8.4,
+      1.0
+     ],
+     "note": "kasagi top beam (16.8 x 2 m)"
+    },
+    {
+     "z": 9.29,
+     "rect": [
+      -8.0,
+      -0.6,
+      8.0,
+      0.6
+     ],
+     "note": "nuki truss top chords (narrow)"
+    }
+   ],
+   "wallrun_faces": [],
+   "climb_routes": [],
+   "notes": [
+    "Clear walk-through span 12.2 m between leg trusses (x = +/-6.1), sign underside at 6.1 m. Sign faces use the plain emissive M_SignBlank: add the district name in Unreal."
+   ],
+   "groups": {
+    "SM_MW_Gate_Structure": 2456,
+    "SM_MW_Gate_Signs": 2132
+   },
+   "tris": 4588,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\Gate.json",
+   "floating_parts": 0,
+   "validation": {
+    "passed": true,
+    "triangles": 4588,
+    "max_bounds_error_m": 0.0,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "JumpPad": {
+   "family": "JumpPad",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_JumpPad.fbx",
+   "fbx_rel": "MW_JumpPad.fbx",
+   "footprint_m": [
+    3,
+    3
+   ],
+   "height_m": 0.26,
+   "bounds_m": {
+    "min": [
+     -1.505,
+     -1.505,
+     0.0
+    ],
+    "max": [
+     1.505,
+     1.505,
+     0.259
+    ],
+    "size": [
+     3.01,
+     3.01,
+     0.259
+    ]
+   },
+   "roof_heights": [
+    {
+     "z": 0.25,
+     "rect": [
+      -1.5,
+      -1.5,
+      1.5,
+      1.5
+     ],
+     "note": "pad top (launch trigger)"
+    }
+   ],
+   "wallrun_faces": [],
+   "climb_routes": [],
+   "notes": [
+    "M_MW_PadGlow is exported as material slot 'MW_PadGlow' for a dynamic material."
+   ],
+   "groups": {
+    "SM_MW_JumpPad_Structure": 376,
+    "SM_MW_JumpPad_Signs": 840
+   },
+   "tris": 1216,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\JumpPad.json",
+   "floating_parts": 0,
+   "validation": {
+    "passed": true,
+    "triangles": 1216,
+    "max_bounds_error_m": 0.0,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "Mega_A": {
+   "family": "Mega",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_Mega_A.fbx",
+   "fbx_rel": "MW_Mega_A.fbx",
+   "footprint_m": [
+    68,
+    68
+   ],
+   "height_m": 417.64,
+   "bounds_m": {
+    "min": [
+     -43.994,
+     -41.464,
+     0.0
+    ],
+    "max": [
+     62.951,
+     62.248,
+     417.642
+    ],
+    "size": [
+     106.945,
+     103.712,
+     417.642
+    ]
+   },
+   "roof_heights": [
+    {
+     "z": 14.0,
+     "rect": [
+      -34.0,
+      -34.0,
+      34.0,
+      34.0
+     ],
+     "note": "podium roof"
+    },
+    {
+     "z": 112.1,
+     "rect": [
+      -39.143,
+      -35.606,
+      37.942,
+      62.048
+     ],
+     "note": "sky deck 0"
+    },
+    {
+     "z": 196.2,
+     "rect": [
+      -36.822,
+      -36.397,
+      62.651,
+      35.443
+     ],
+     "note": "sky deck 1"
+    }
+   ],
+   "wallrun_faces": [
+    {
+     "start": [
+      30.061,
+      -16.926
+     ],
+     "end": [
+      3.939,
+      -16.926
+     ],
+     "z0": 247.6,
+     "z1": 263.08,
+     "length": 26.12,
+     "normal": [
+      0,
+      1,
+      0
+     ],
+     "note": "back of the roof billboard frame"
+    }
+   ],
+   "climb_routes": [],
+   "notes": [
+    "v046 megastructure: 3 shafts, tops [319.6, 247.6, 403.6], 2 sky decks, 2 bridge levels"
+   ],
+   "groups": {
+    "SM_MW_Mega_A_Structure": 40428,
+    "SM_MW_Mega_A_Signs": 2670,
+    "SM_MW_Mega_A_Props": 336,
+    "SM_MW_Mega_A_Glass": 1010
+   },
+   "tris": 44444,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\Mega_A.json",
+   "floating_parts": 17,
+   "validation": {
+    "passed": true,
+    "triangles": 44444,
+    "max_bounds_error_m": 0.0005,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "Mega_B": {
+   "family": "Mega",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_Mega_B.fbx",
+   "fbx_rel": "MW_Mega_B.fbx",
+   "footprint_m": [
+    64,
+    60
+   ],
+   "height_m": 467.0,
+   "bounds_m": {
+    "min": [
+     -62.255,
+     -36.502,
+     0.0
+    ],
+    "max": [
+     61.052,
+     40.024,
+     467.003
+    ],
+    "size": [
+     123.307,
+     76.526,
+     467.003
+    ]
+   },
+   "roof_heights": [
+    {
+     "z": 12.0,
+     "rect": [
+      -32.0,
+      -30.0,
+      32.0,
+      30.0
+     ],
+     "note": "podium roof"
+    },
+    {
+     "z": 83.3,
+     "rect": [
+      -35.083,
+      -31.379,
+      60.752,
+      31.214
+     ],
+     "note": "sky deck 0"
+    },
+    {
+     "z": 154.5,
+     "rect": [
+      -61.955,
+      -32.789,
+      34.821,
+      34.268
+     ],
+     "note": "sky deck 1"
+    }
+   ],
+   "wallrun_faces": [
+    {
+     "start": [
+      -7.974,
+      -22.62
+     ],
+     "end": [
+      -16.143,
+      -22.62
+     ],
+     "z0": 453.6,
+     "z1": 466.066,
+     "length": 8.17,
+     "normal": [
+      0,
+      1,
+      0
+     ],
+     "note": "back of the roof billboard frame"
+    }
+   ],
+   "climb_routes": [],
+   "notes": [
+    "v046 megastructure: 2 shafts, tops [453.6, 215.6], 2 sky decks, 1 bridge levels"
+   ],
+   "groups": {
+    "SM_MW_Mega_B_Structure": 43008,
+    "SM_MW_Mega_B_Signs": 1966,
+    "SM_MW_Mega_B_Props": 96,
+    "SM_MW_Mega_B_Glass": 1082
+   },
+   "tris": 46152,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\Mega_B.json",
+   "floating_parts": 50,
+   "validation": {
+    "passed": true,
+    "triangles": 46152,
+    "max_bounds_error_m": 0.0002,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "Mega_C": {
+   "family": "Mega",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_Mega_C.fbx",
+   "fbx_rel": "MW_Mega_C.fbx",
+   "footprint_m": [
+    70,
+    66
+   ],
+   "height_m": 395.43,
+   "bounds_m": {
+    "min": [
+     -44.158,
+     -42.406,
+     0.0
+    ],
+    "max": [
+     63.989,
+     40.953,
+     395.434
+    ],
+    "size": [
+     108.147,
+     83.359,
+     395.434
+    ]
+   },
+   "roof_heights": [
+    {
+     "z": 12.0,
+     "rect": [
+      -35.0,
+      -33.0,
+      35.0,
+      33.0
+     ],
+     "note": "podium roof"
+    },
+    {
+     "z": 120.8,
+     "rect": [
+      -38.478,
+      -37.612,
+      63.689,
+      37.523
+     ],
+     "note": "sky deck 0"
+    }
+   ],
+   "wallrun_faces": [
+    {
+     "start": [
+      27.3,
+      -25.894
+     ],
+     "end": [
+      17.122,
+      -25.894
+     ],
+     "z0": 299.6,
+     "z1": 306.159,
+     "length": 10.18,
+     "normal": [
+      0,
+      1,
+      0
+     ],
+     "note": "back of the roof billboard frame"
+    },
+    {
+     "start": [
+      29.706,
+      8.054
+     ],
+     "end": [
+      17.831,
+      8.054
+     ],
+     "z0": 229.6,
+     "z1": 237.109,
+     "length": 11.87,
+     "normal": [
+      0,
+      1,
+      0
+     ],
+     "note": "back of the roof billboard frame"
+    }
+   ],
+   "climb_routes": [],
+   "notes": [
+    "v046 megastructure: 4 shafts, tops [263.6, 299.6, 337.6, 229.6], 1 sky decks, 2 bridge levels"
+   ],
+   "groups": {
+    "SM_MW_Mega_C_Structure": 37440,
+    "SM_MW_Mega_C_Signs": 2978,
+    "SM_MW_Mega_C_Props": 240,
+    "SM_MW_Mega_C_Glass": 1184
+   },
+   "tris": 41842,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\Mega_C.json",
+   "floating_parts": 57,
+   "validation": {
+    "passed": true,
+    "triangles": 41842,
+    "max_bounds_error_m": 0.0003,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "Mega_D": {
+   "family": "Mega",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_Mega_D.fbx",
+   "fbx_rel": "MW_Mega_D.fbx",
+   "footprint_m": [
+    60,
+    60
+   ],
+   "height_m": 405.74,
+   "bounds_m": {
+    "min": [
+     -35.093,
+     -47.254,
+     0.0
+    ],
+    "max": [
+     55.266,
+     30.324,
+     405.737
+    ],
+    "size": [
+     90.358,
+     77.578,
+     405.737
+    ]
+   },
+   "roof_heights": [
+    {
+     "z": 12.0,
+     "rect": [
+      -30.0,
+      -30.0,
+      30.0,
+      30.0
+     ],
+     "note": "podium roof"
+    },
+    {
+     "z": 124.7,
+     "rect": [
+      -27.473,
+      -46.954,
+      27.908,
+      26.977
+     ],
+     "note": "sky deck 0"
+    },
+    {
+     "z": 244.9,
+     "rect": [
+      -29.886,
+      -27.225,
+      54.966,
+      28.394
+     ],
+     "note": "sky deck 1"
+    }
+   ],
+   "wallrun_faces": [
+    {
+     "start": [
+      5.675,
+      -12.881
+     ],
+     "end": [
+      -5.675,
+      -12.881
+     ],
+     "z0": 387.6,
+     "z1": 404.8,
+     "length": 11.35,
+     "normal": [
+      0,
+      1,
+      0
+     ],
+     "note": "back of the roof billboard frame"
+    }
+   ],
+   "climb_routes": [],
+   "notes": [
+    "v046 megastructure: 1 shafts, tops [387.6], 2 sky decks, 0 bridge levels"
+   ],
+   "groups": {
+    "SM_MW_Mega_D_Structure": 23340,
+    "SM_MW_Mega_D_Signs": 1218,
+    "SM_MW_Mega_D_Props": 144,
+    "SM_MW_Mega_D_Glass": 440
+   },
+   "tris": 25142,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\Mega_D.json",
+   "floating_parts": 32,
+   "validation": {
+    "passed": true,
+    "triangles": 25142,
+    "max_bounds_error_m": 0.0005,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "Mega_E": {
+   "family": "Mega",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_Mega_E.fbx",
+   "fbx_rel": "MW_Mega_E.fbx",
+   "footprint_m": [
+    68,
+    56
+   ],
+   "height_m": 371.64,
+   "bounds_m": {
+    "min": [
+     -43.7,
+     -35.338,
+     0.0
+    ],
+    "max": [
+     58.705,
+     34.842,
+     371.642
+    ],
+    "size": [
+     102.406,
+     70.18,
+     371.642
+    ]
+   },
+   "roof_heights": [
+    {
+     "z": 14.0,
+     "rect": [
+      -34.0,
+      -28.0,
+      34.0,
+      28.0
+     ],
+     "note": "podium roof"
+    },
+    {
+     "z": 110.2,
+     "rect": [
+      -38.487,
+      -28.41,
+      58.405,
+      31.371
+     ],
+     "note": "sky deck 0"
+    },
+    {
+     "z": 203.0,
+     "rect": [
+      -38.381,
+      -27.819,
+      54.738,
+      31.209
+     ],
+     "note": "sky deck 1"
+    },
+    {
+     "z": 306.1,
+     "rect": [
+      -36.845,
+      -28.642,
+      56.781,
+      30.411
+     ],
+     "note": "sky deck 2"
+    }
+   ],
+   "wallrun_faces": [
+    {
+     "start": [
+      -17.718,
+      -16.296
+     ],
+     "end": [
+      -21.296,
+      -16.296
+     ],
+     "z0": 357.6,
+     "z1": 363.232,
+     "length": 3.58,
+     "normal": [
+      0,
+      1,
+      0
+     ],
+     "note": "back of the roof billboard frame"
+    }
+   ],
+   "climb_routes": [],
+   "notes": [
+    "v046 megastructure: 2 shafts, tops [357.6, 357.6], 3 sky decks, 1 bridge levels"
+   ],
+   "groups": {
+    "SM_MW_Mega_E_Structure": 47832,
+    "SM_MW_Mega_E_Signs": 1766,
+    "SM_MW_Mega_E_Props": 96,
+    "SM_MW_Mega_E_Glass": 900
+   },
+   "tris": 50594,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\Mega_E.json",
+   "floating_parts": 20,
+   "validation": {
+    "passed": true,
+    "triangles": 50594,
+    "max_bounds_error_m": 0.0005,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "Mega_F": {
+   "family": "Mega",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_Mega_F.fbx",
+   "fbx_rel": "MW_Mega_F.fbx",
+   "footprint_m": [
+    66,
+    66
+   ],
+   "height_m": 483.14,
+   "bounds_m": {
+    "min": [
+     -35.198,
+     -41.907,
+     0.0
+    ],
+    "max": [
+     41.007,
+     59.133,
+     483.144
+    ],
+    "size": [
+     76.205,
+     101.04,
+     483.144
+    ]
+   },
+   "roof_heights": [
+    {
+     "z": 14.0,
+     "rect": [
+      -33.0,
+      -33.0,
+      33.0,
+      33.0
+     ],
+     "note": "podium roof"
+    },
+    {
+     "z": 110.5,
+     "rect": [
+      -32.433,
+      -33.823,
+      33.345,
+      58.933
+     ],
+     "note": "sky deck 0"
+    }
+   ],
+   "wallrun_faces": [
+    {
+     "start": [
+      24.302,
+      2.797
+     ],
+     "end": [
+      3.315,
+      2.797
+     ],
+     "z0": 469.6,
+     "z1": 482.207,
+     "length": 20.99,
+     "normal": [
+      0,
+      1,
+      0
+     ],
+     "note": "back of the roof billboard frame"
+    }
+   ],
+   "climb_routes": [],
+   "notes": [
+    "v046 megastructure: 3 shafts, tops [215.6, 469.6, 169.6], 1 sky decks, 2 bridge levels"
+   ],
+   "groups": {
+    "SM_MW_Mega_F_Structure": 42252,
+    "SM_MW_Mega_F_Signs": 2450,
+    "SM_MW_Mega_F_Props": 288,
+    "SM_MW_Mega_F_Glass": 1112
+   },
+   "tris": 46102,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\Mega_F.json",
+   "floating_parts": 44,
+   "validation": {
+    "passed": true,
+    "triangles": 46102,
+    "max_bounds_error_m": 0.0004,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "Mega_G": {
+   "family": "Mega",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_Mega_G.fbx",
+   "fbx_rel": "MW_Mega_G.fbx",
+   "footprint_m": [
+    70,
+    50
+   ],
+   "height_m": 402.52,
+   "bounds_m": {
+    "min": [
+     -42.938,
+     -46.992,
+     0.0
+    ],
+    "max": [
+     44.827,
+     45.238,
+     402.518
+    ],
+    "size": [
+     87.765,
+     92.23,
+     402.518
+    ]
+   },
+   "roof_heights": [
+    {
+     "z": 16.0,
+     "rect": [
+      -35.0,
+      -25.0,
+      35.0,
+      25.0
+     ],
+     "note": "podium roof"
+    },
+    {
+     "z": 103.0,
+     "rect": [
+      -39.119,
+      -25.572,
+      39.718,
+      45.038
+     ],
+     "note": "sky deck 0"
+    },
+    {
+     "z": 190.1,
+     "rect": [
+      -38.149,
+      -46.692,
+      40.122,
+      27.832
+     ],
+     "note": "sky deck 1"
+    }
+   ],
+   "wallrun_faces": [
+    {
+     "start": [
+      -23.337,
+      -18.4
+     ],
+     "end": [
+      -28.948,
+      -18.4
+     ],
+     "z0": 277.6,
+     "z1": 286.258,
+     "length": 5.61,
+     "normal": [
+      0,
+      1,
+      0
+     ],
+     "note": "back of the roof billboard frame"
+    }
+   ],
+   "climb_routes": [],
+   "notes": [
+    "v046 megastructure: 3 shafts, tops [277.6, 345.6, 233.6], 2 sky decks, 2 bridge levels"
+   ],
+   "groups": {
+    "SM_MW_Mega_G_Structure": 48984,
+    "SM_MW_Mega_G_Signs": 2516,
+    "SM_MW_Mega_G_Props": 96,
+    "SM_MW_Mega_G_Glass": 1064
+   },
+   "tris": 52660,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\Mega_G.json",
+   "floating_parts": 30,
+   "validation": {
+    "passed": true,
+    "triangles": 52660,
+    "max_bounds_error_m": 0.0004,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "Mega_H": {
+   "family": "Mega",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_Mega_H.fbx",
+   "fbx_rel": "MW_Mega_H.fbx",
+   "footprint_m": [
+    58,
+    58
+   ],
+   "height_m": 495.93,
+   "bounds_m": {
+    "min": [
+     -52.02,
+     -35.533,
+     0.0
+    ],
+    "max": [
+     35.782,
+     51.649,
+     495.926
+    ],
+    "size": [
+     87.803,
+     87.182,
+     495.926
+    ]
+   },
+   "roof_heights": [
+    {
+     "z": 18.0,
+     "rect": [
+      -29.0,
+      -29.0,
+      29.0,
+      29.0
+     ],
+     "note": "podium roof"
+    },
+    {
+     "z": 130.8,
+     "rect": [
+      -31.488,
+      -30.589,
+      29.282,
+      51.449
+     ],
+     "note": "sky deck 0"
+    },
+    {
+     "z": 221.0,
+     "rect": [
+      -51.72,
+      -29.793,
+      29.312,
+      30.817
+     ],
+     "note": "sky deck 1"
+    }
+   ],
+   "wallrun_faces": [
+    {
+     "start": [
+      5.675,
+      -20.443
+     ],
+     "end": [
+      -5.675,
+      -20.443
+     ],
+     "z0": 243.6,
+     "z1": 260.8,
+     "length": 11.35,
+     "normal": [
+      0,
+      1,
+      0
+     ],
+     "note": "back of the roof billboard frame"
+    }
+   ],
+   "climb_routes": [],
+   "notes": [
+    "v046 megastructure: 2 shafts, tops [243.6, 425.6], 2 sky decks, 0 bridge levels"
+   ],
+   "groups": {
+    "SM_MW_Mega_H_Structure": 34788,
+    "SM_MW_Mega_H_Signs": 2004,
+    "SM_MW_Mega_H_Props": 144,
+    "SM_MW_Mega_H_Glass": 692
+   },
+   "tris": 37628,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\Mega_H.json",
+   "floating_parts": 35,
+   "validation": {
+    "passed": true,
+    "triangles": 37628,
+    "max_bounds_error_m": 0.0004,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "Mega_I": {
+   "family": "Mega",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_Mega_I.fbx",
+   "fbx_rel": "MW_Mega_I.fbx",
+   "footprint_m": [
+    68,
+    68
+   ],
+   "height_m": 524.76,
+   "bounds_m": {
+    "min": [
+     -61.195,
+     -42.617,
+     0.0
+    ],
+    "max": [
+     43.175,
+     61.544,
+     524.761
+    ],
+    "size": [
+     104.37,
+     104.16,
+     524.761
+    ]
+   },
+   "roof_heights": [
+    {
+     "z": 12.0,
+     "rect": [
+      -34.0,
+      -34.0,
+      34.0,
+      34.0
+     ],
+     "note": "podium roof"
+    },
+    {
+     "z": 77.7,
+     "rect": [
+      -60.895,
+      -37.988,
+      36.242,
+      35.394
+     ],
+     "note": "sky deck 0"
+    },
+    {
+     "z": 143.3,
+     "rect": [
+      -36.352,
+      -37.07,
+      35.455,
+      61.344
+     ],
+     "note": "sky deck 1"
+    }
+   ],
+   "wallrun_faces": [
+    {
+     "start": [
+      26.386,
+      6.802
+     ],
+     "end": [
+      9.658,
+      6.802
+     ],
+     "z0": 513.6,
+     "z1": 523.824,
+     "length": 16.73,
+     "normal": [
+      0,
+      1,
+      0
+     ],
+     "note": "back of the roof billboard frame"
+    }
+   ],
+   "climb_routes": [],
+   "notes": [
+    "v046 megastructure: 4 shafts, tops [199.6, 239.6, 283.6, 513.6], 2 sky decks, 1 bridge levels"
+   ],
+   "groups": {
+    "SM_MW_Mega_I_Structure": 55704,
+    "SM_MW_Mega_I_Signs": 2854,
+    "SM_MW_Mega_I_Props": 240,
+    "SM_MW_Mega_I_Glass": 1228
+   },
+   "tris": 60026,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\Mega_I.json",
+   "floating_parts": 35,
+   "validation": {
+    "passed": true,
+    "triangles": 60026,
+    "max_bounds_error_m": 0.0004,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "Mega_J": {
+   "family": "Mega",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_Mega_J.fbx",
+   "fbx_rel": "MW_Mega_J.fbx",
+   "footprint_m": [
+    62,
+    62
+   ],
+   "height_m": 345.64,
+   "bounds_m": {
+    "min": [
+     -60.223,
+     -33.2,
+     0.0
+    ],
+    "max": [
+     38.885,
+     31.592,
+     345.642
+    ],
+    "size": [
+     99.108,
+     64.792,
+     345.642
+    ]
+   },
+   "roof_heights": [
+    {
+     "z": 18.0,
+     "rect": [
+      -31.0,
+      -31.0,
+      31.0,
+      31.0
+     ],
+     "note": "podium roof"
+    },
+    {
+     "z": 113.8,
+     "rect": [
+      -59.923,
+      -24.985,
+      34.338,
+      25.597
+     ],
+     "note": "sky deck 0"
+    }
+   ],
+   "wallrun_faces": [
+    {
+     "start": [
+      5.675,
+      -17.0
+     ],
+     "end": [
+      -5.675,
+      -17.0
+     ],
+     "z0": 177.6,
+     "z1": 194.8,
+     "length": 11.35,
+     "normal": [
+      0,
+      1,
+      0
+     ],
+     "note": "back of the roof billboard frame"
+    }
+   ],
+   "climb_routes": [],
+   "notes": [
+    "v046 megastructure: 2 shafts, tops [177.6, 331.6], 1 sky decks, 0 bridge levels"
+   ],
+   "groups": {
+    "SM_MW_Mega_J_Structure": 33132,
+    "SM_MW_Mega_J_Signs": 1306,
+    "SM_MW_Mega_J_Props": 144,
+    "SM_MW_Mega_J_Glass": 606
+   },
+   "tris": 35188,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\Mega_J.json",
+   "floating_parts": 11,
+   "validation": {
+    "passed": true,
+    "triangles": 35188,
+    "max_bounds_error_m": 0.0005,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "Train_Lead": {
+   "family": "Kinetic",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_Train_Lead.fbx",
+   "fbx_rel": "MW_Train_Lead.fbx",
+   "footprint_m": [
+    20,
+    3
+   ],
+   "height_m": 5.45,
+   "bounds_m": {
+    "min": [
+     -9.9,
+     -1.53,
+     0.03
+    ],
+    "max": [
+     9.85,
+     1.53,
+     5.45
+    ],
+    "size": [
+     19.75,
+     3.06,
+     5.42
+    ]
+   },
+   "roof_heights": [],
+   "wallrun_faces": [],
+   "climb_routes": [],
+   "notes": [
+    "Train car: length along +X, origin at the car centre on the rail; Unreal: ATFTrainLine CarLength 2000."
+   ],
+   "groups": {
+    "SM_MW_Train_Lead_Structure": 652,
+    "SM_MW_Train_Lead_Signs": 62,
+    "SM_MW_Train_Lead_Glass": 56
+   },
+   "tris": 770,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\Train_Lead.json",
+   "floating_parts": 0,
+   "validation": {
+    "passed": true,
+    "triangles": 770,
+    "max_bounds_error_m": 0.0,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "Train_Mid": {
+   "family": "Kinetic",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_Train_Mid.fbx",
+   "fbx_rel": "MW_Train_Mid.fbx",
+   "footprint_m": [
+    20,
+    3
+   ],
+   "height_m": 5.45,
+   "bounds_m": {
+    "min": [
+     -9.85,
+     -1.53,
+     0.03
+    ],
+    "max": [
+     9.85,
+     1.53,
+     5.45
+    ],
+    "size": [
+     19.7,
+     3.06,
+     5.42
+    ]
+   },
+   "roof_heights": [],
+   "wallrun_faces": [],
+   "climb_routes": [],
+   "notes": [
+    "Train car: length along +X, origin at the car centre on the rail; Unreal: ATFTrainLine CarLength 2000."
+   ],
+   "groups": {
+    "SM_MW_Train_Mid_Structure": 604,
+    "SM_MW_Train_Mid_Signs": 24,
+    "SM_MW_Train_Mid_Glass": 52
+   },
+   "tris": 680,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\Train_Mid.json",
+   "floating_parts": 0,
+   "validation": {
+    "passed": true,
+    "triangles": 680,
+    "max_bounds_error_m": 0.0,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "Viaduct_20": {
+   "family": "Kinetic",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_Viaduct_20.fbx",
+   "fbx_rel": "MW_Viaduct_20.fbx",
+   "footprint_m": [
+    20,
+    5.6
+   ],
+   "height_m": 1.1,
+   "bounds_m": {
+    "min": [
+     -10.0,
+     -2.82,
+     -2.4
+    ],
+    "max": [
+     10.0,
+     2.82,
+     1.1
+    ],
+    "size": [
+     20.0,
+     5.64,
+     3.5
+    ]
+   },
+   "roof_heights": [],
+   "wallrun_faces": [],
+   "climb_routes": [],
+   "notes": [
+    "Viaduct deck 20 m along +X, rails on top at Z=0..0.16; tile end to end."
+   ],
+   "groups": {
+    "SM_MW_Viaduct_20_Structure": 204,
+    "SM_MW_Viaduct_20_Signs": 24
+   },
+   "tris": 228,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\Viaduct_20.json",
+   "floating_parts": 0,
+   "validation": {
+    "passed": true,
+    "triangles": 228,
+    "max_bounds_error_m": 0.0,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "Viaduct_Pillar": {
+   "family": "Kinetic",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_Viaduct_Pillar.fbx",
+   "fbx_rel": "MW_Viaduct_Pillar.fbx",
+   "footprint_m": [
+    4.4,
+    4.4
+   ],
+   "height_m": -1.6,
+   "bounds_m": {
+    "min": [
+     -2.2,
+     -2.2,
+     -40.0
+    ],
+    "max": [
+     2.2,
+     2.2,
+     -1.6
+    ],
+    "size": [
+     4.4,
+     4.4,
+     38.4
+    ]
+   },
+   "roof_heights": [],
+   "wallrun_faces": [],
+   "climb_routes": [],
+   "notes": [],
+   "groups": {
+    "SM_MW_Viaduct_Pillar_Structure": 36,
+    "SM_MW_Viaduct_Pillar_Signs": 28
+   },
+   "tris": 64,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\Viaduct_Pillar.json",
+   "floating_parts": 0,
+   "validation": {
+    "passed": true,
+    "triangles": 64,
+    "max_bounds_error_m": 0.0,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "Blimp": {
+   "family": "Kinetic",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_Blimp.fbx",
+   "fbx_rel": "MW_Blimp.fbx",
+   "footprint_m": [
+    40,
+    12
+   ],
+   "height_m": 6.3,
+   "bounds_m": {
+    "min": [
+     -19.545,
+     -6.43,
+     -7.6
+    ],
+    "max": [
+     20.475,
+     6.43,
+     6.298
+    ],
+    "size": [
+     40.02,
+     12.86,
+     13.898
+    ]
+   },
+   "roof_heights": [],
+   "wallrun_faces": [],
+   "climb_routes": [],
+   "notes": [
+    "Blimp: length along +X, origin at the envelope centre; ATFKineticMover Orbit, no collision."
+   ],
+   "groups": {
+    "SM_MW_Blimp_Structure": 3404,
+    "SM_MW_Blimp_Signs": 28,
+    "SM_MW_Blimp_Glass": 4
+   },
+   "tris": 3436,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\Blimp.json",
+   "floating_parts": 0,
+   "validation": {
+    "passed": true,
+    "triangles": 3436,
+    "max_bounds_error_m": 0.0005,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "Parkour_Platform": {
+   "family": "Parkour",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_Parkour_Platform.fbx",
+   "fbx_rel": "MW_Parkour_Platform.fbx",
+   "footprint_m": [
+    6,
+    6
+   ],
+   "height_m": 0.01,
+   "bounds_m": {
+    "min": [
+     -3.02,
+     -3.02,
+     -1.2
+    ],
+    "max": [
+     3.02,
+     3.02,
+     0.01
+    ],
+    "size": [
+     6.04,
+     6.04,
+     1.21
+    ]
+   },
+   "roof_heights": [
+    {
+     "z": 0.0,
+     "rect": [
+      -3.0,
+      -3.0,
+      3.0,
+      3.0
+     ],
+     "note": "floating platform top"
+    }
+   ],
+   "wallrun_faces": [],
+   "climb_routes": [],
+   "notes": [],
+   "groups": {
+    "SM_MW_Parkour_Platform_Structure": 24,
+    "SM_MW_Parkour_Platform_Signs": 50
+   },
+   "tris": 74,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\Parkour_Platform.json",
+   "floating_parts": 0,
+   "validation": {
+    "passed": true,
+    "triangles": 74,
+    "max_bounds_error_m": 0.0,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  },
+  "Parkour_WallRun": {
+   "family": "Parkour",
+   "fbx": "<Project Y2K>\\twofronts\\world_v040\\kit\\MW_Parkour_WallRun.fbx",
+   "fbx_rel": "MW_Parkour_WallRun.fbx",
+   "footprint_m": [
+    20,
+    1
+   ],
+   "height_m": 8.2,
+   "bounds_m": {
+    "min": [
+     -10.2,
+     -0.5,
+     0.0
+    ],
+    "max": [
+     10.2,
+     0.5,
+     8.2
+    ],
+    "size": [
+     20.4,
+     1.0,
+     8.2
+    ]
+   },
+   "roof_heights": [],
+   "wallrun_faces": [
+    {
+     "start": [
+      10.0,
+      -0.4
+     ],
+     "end": [
+      -10.0,
+      -0.4
+     ],
+     "z0": 0.4,
+     "z1": 7.6,
+     "length": 20.0,
+     "normal": [
+      0,
+      -1,
+      0
+     ],
+     "note": "wall-run panel south face"
+    },
+    {
+     "start": [
+      -10.0,
+      0.4
+     ],
+     "end": [
+      10.0,
+      0.4
+     ],
+     "z0": 0.4,
+     "z1": 7.6,
+     "length": 20.0,
+     "normal": [
+      0,
+      1,
+      0
+     ],
+     "note": "wall-run panel north face"
+    }
+   ],
+   "climb_routes": [],
+   "notes": [],
+   "groups": {
+    "SM_MW_Parkour_WallRun_Structure": 36,
+    "SM_MW_Parkour_WallRun_Signs": 20
+   },
+   "tris": 56,
+   "materials_json": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials.json",
+   "materials_json_variant": "<Project Y2K>\\twofronts\\world_v040\\kit\\materials\\Parkour_WallRun.json",
+   "floating_parts": 0,
+   "validation": {
+    "passed": true,
+    "triangles": 56,
+    "max_bounds_error_m": 0.0,
+    "textures_missing": [],
+    "unused_material_slots": []
+   }
+  }
+ }
+}

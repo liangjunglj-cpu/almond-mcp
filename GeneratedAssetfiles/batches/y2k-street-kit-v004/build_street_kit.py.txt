@@ -1,0 +1,125 @@
+"""Blender: original reusable Y2K street modules, metre units, with FBX delivery."""
+import bpy,json,math,hashlib
+from pathlib import Path
+from mathutils import Vector
+ROOT=Path(__file__).resolve().parents[1]
+OUT=ROOT/'world/street_v004';OUT.mkdir(parents=True,exist_ok=True)
+if (OUT/'NeonGateway_StreetKit.blend').exists():raise RuntimeError('Artist source exists; version it before regeneration')
+bpy.ops.wm.read_factory_settings(use_empty=True)
+bpy.context.scene.unit_settings.system='METRIC'
+PALETTE={'Pearl':((.71,.77,.78),.25,.3),'Ink':((.023,.04,.065),.25,.48),'Chrome':((.43,.55,.59),.85,.22),'Glass':((.026,.17,.21),.55,.2),'Cyan':((.02,.8,.91),.2,.3),'Coral':((1,.075,.21),.15,.4),'Lime':((.64,.89,.1),.15,.4),'Paving':((.21,.27,.31),.05,.82),'Road':((.035,.055,.085),.05,.92)}
+mats={}
+for n,(c,metal,rough) in PALETTE.items():
+    m=bpy.data.materials.new(n);m.diffuse_color=(*c,1);m.use_nodes=True
+    b=m.node_tree.nodes['Principled BSDF'];b.inputs['Base Color'].default_value=(*c,1);b.inputs['Metallic'].default_value=metal;b.inputs['Roughness'].default_value=rough
+    if n in ['Cyan','Coral','Lime']:b.inputs['Emission Color'].default_value=(*c,1);b.inputs['Emission Strength'].default_value=.6
+    mats[n]=m
+parts=[];modules={}
+def box(n,loc,size,mat='Pearl',bevel=.05):
+    bpy.ops.mesh.primitive_cube_add(size=1,location=loc);o=bpy.context.object;o.name=n;o.dimensions=size
+    bpy.ops.object.transform_apply(location=False,rotation=False,scale=True)
+    o.data.materials.append(mats[mat])
+    if bevel:
+        mod=o.modifiers.new('Soft manufactured edge','BEVEL');mod.width=bevel;mod.segments=3
+        bpy.context.view_layer.objects.active=o;bpy.ops.object.modifier_apply(modifier=mod.name)
+        for p in o.data.polygons:p.use_smooth=True
+        mod=o.modifiers.new('Weighted corner normals','WEIGHTED_NORMAL');bpy.ops.object.modifier_apply(modifier=mod.name)
+    parts.append(o);return o
+def orb(n,loc,size,mat):
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=24,ring_count=12,location=loc);o=bpy.context.object;o.name=n;o.scale=size
+    bpy.ops.object.transform_apply(location=False,rotation=False,scale=True);o.data.materials.append(mats[mat])
+    for p in o.data.polygons:p.use_smooth=True
+    parts.append(o);return o
+def label(text,loc,size=.4,mat='Pearl'):
+    bpy.ops.object.text_add(location=loc,rotation=(math.pi/2,0,0));o=bpy.context.object;o.data.body=text;o.data.align_x='CENTER';o.data.size=size;o.data.extrude=.003;o.data.materials.append(mats[mat]);bpy.ops.object.convert(target='MESH');parts.append(bpy.context.object)
+def finish(name,collision):
+    bpy.ops.object.select_all(action='DESELECT')
+    for o in parts:o.select_set(True)
+    bpy.context.view_layer.objects.active=parts[0];bpy.ops.object.join();o=bpy.context.object;o.name='SM_'+name
+    bpy.context.scene.cursor.location=(0,0,0);bpy.ops.object.origin_set(type='ORIGIN_CURSOR')
+    # All modules share the same nine slots, making engine material assignment deterministic.
+    old=list(o.data.materials)
+    mapped=[list(PALETTE).index(old[p.material_index].name) for p in o.data.polygons]
+    o.data.materials.clear()
+    for m in mats.values():o.data.materials.append(m)
+    for p,i in zip(o.data.polygons,mapped):p.material_index=i
+    bpy.ops.object.transform_apply(location=False,rotation=True,scale=True)
+    bpy.ops.object.mode_set(mode='EDIT');bpy.ops.mesh.select_all(action='SELECT')
+    bpy.ops.uv.smart_project(angle_limit=math.radians(66),island_margin=.02)
+    bpy.ops.object.mode_set(mode='OBJECT')
+    file=OUT/(o.name+'.fbx')
+    bpy.ops.export_scene.fbx(filepath=str(file),use_selection=True,object_types={'MESH'},axis_forward='-Y',axis_up='Z',apply_unit_scale=True,apply_scale_options='FBX_SCALE_UNITS',bake_anim=False,mesh_smooth_type='FACE',use_mesh_modifiers=True)
+    modules[name]={'file':file.name,'triangles':sum(len(p.vertices)-2 for p in o.data.polygons),'vertices':len(o.data.vertices),'dimensions_m':list(o.dimensions),'collision_boxes':collision,'sha256':hashlib.sha256(file.read_bytes()).hexdigest()}
+    o.hide_render=True;o.hide_set(True);parts.clear()
+
+# Front is -Y. The facade is a closed exterior shell with readable doors, display bays and service trim.
+for kind,accent,title in [('Store_Cyan','Cyan','NEON / SUPPLY'),('Store_Coral','Coral','ORBIT  /  24'),('Store_Lime','Lime','CIRCUIT CLUB')]:
+    box('Podium',(0,0,2.5),(8,8,5),'Ink',.32)
+    box('Roof rim',(0,0,4.85),(8.2,8.2,.38),'Pearl',.18)
+    box('Display glazing',(0,-4.04,2.1),(7.5,.08,3.5),'Glass',.16)
+    for x in [-3.8,-1.25,1.25,3.8]:box('Frame',(x,-4.14,2.1),(.12,.2,3.7),'Chrome',.045)
+    for x in [-2.5,2.5]:
+        box('Display base',(x,-4.18,.5),(2.25,.25,.45),'Pearl',.1)
+        box('Display glow',(x,-4.24,3.35),(1.9,.08,.08),accent,.03)
+    box('Door seam',(0,-4.16,1.7),(.05,.12,2.8),'Chrome',.01)
+    box('Door handle',(.2,-4.28,1.55),(.06,.08,.5),accent,.025)
+    box('Canopy',(0,-4.4,4.15),(8.1,1.8,.3),'Pearl',.14)
+    box('Canopy stripe',(0,-5.28,4.13),(7.45,.05,.12),accent,.025)
+    box('Sign panel',(0,-4.22,4.55),(5.8,.14,.65),'Ink',.13)
+    label(title,(0,-4.31,4.42),.36,accent)
+    finish(kind,[{'center':[0,0,2.5],'size':[8,8,5]}])
+
+box('Capsule tower',(0,0,4),(7.5,7.4,8),'Pearl',1.0)
+for z in [1.2,3.6,6.0]:
+    box('Ribbon',(0,0,z),(7.65,7.55,1.25),'Glass',.52)
+    box('Seam',(0,0,z-.68),(7.7,7.6,.09),'Chrome',.04)
+    for x in [-2.5,0,2.5]:box('Window fin',(x,-3.8,z),(.13,.15,1.25),'Pearl',.035)
+orb('Roof pod',(0,0,8),(2.3,2.3,.7),'Chrome')
+finish('UpperPod',[])  # Exterior collision is supplied by the building's authored proxy.
+
+box('Paver slab',(0,0,-.13),(4,4,.26),'Paving',.02)
+for x in [-1,0,1]:box('Paver seam',(x,0,.002),(.018,4,.004),'Ink',0)
+for y in [-1,0,1]:box('Paver seam',(0,y,.002),(4,.018,.004),'Ink',0)
+finish('Paving4m',[{'center':[0,0,-.15],'size':[4,4,.3]}])
+box('Road slab',(0,0,-.16),(8,8,.3),'Road',.01)
+for y in [-2,2]:box('Lane dash',(0,y,.002),(.09,1.8,.005),'Pearl',0)
+for x in [-3.7,3.7]:box('Edge line',(x,0,.002),(.08,8,.005),'Cyan',0)
+finish('Road8m',[{'center':[0,0,-.16],'size':[8,8,.3]}])
+box('Planter',(0,0,.55),(2.6,1.1,1.1),'Pearl',.24)
+box('Planter band',(0,-.555,.4),(2.05,.03,.11),'Coral',.025)
+box('Dark soil',(0,0,1.07),(2.12,.7,.09),'Ink',.05)
+for x in [-.7,0,.7]:orb('Sculpted foliage',(x,0,1.32),(.58,.37,.45),'Lime')
+finish('PlanterCover',[{'center':[0,0,.58],'size':[2.6,1.1,1.16]}])
+box('Lamp foot',(0,0,.12),(.65,.65,.24),'Pearl',.1)
+box('Lamp spine',(0,0,2.5),(.16,.2,5),'Chrome',.05)
+box('Lamp arch',(.5,0,4.9),(1.2,.22,.22),'Pearl',.1)
+box('Lamp head',(.95,0,4.8),(.65,.45,.12),'Cyan',.05)
+box('Wayfinding panel',(0,-.15,3.65),(.65,.16,.9),'Ink',.13)
+label('01',(0,-.25,3.43),.42,'Lime')
+finish('StreetLamp',[{'center':[0,0,2.5],'size':[.3,.3,5]}])
+box('Kiosk capsule',(0,0,1.35),(1.35,.85,2.7),'Pearl',.3)
+box('Kiosk screen',(0,-.43,1.75),(1.02,.06,1.15),'Ink',.16)
+label('RELAY',(0,-.48,1.95),.18,'Cyan');label('ACCESS',(0,-.48,1.64),.16,'Pearl')
+box('Interface',(0,-.48,1.05),(.8,.12,.12),'Cyan',.03)
+finish('InfoKiosk',[{'center':[0,0,1.35],'size':[1.35,.85,2.7]}])
+box('Arch left',(-5.1,0,3),(.45,.6,6),'Pearl',.2)
+box('Arch right',(5.1,0,3),(.45,.6,6),'Pearl',.2)
+box('Arch crown',(0,0,6),(10.7,.65,.6),'Pearl',.28)
+box('Arch sign',(0,-.4,6),(7,.22,.72),'Ink',.22)
+label('N E O N   G A T E W A Y',(0,-.53,5.82),.38,'Cyan')
+finish('GatewayArch',[{'center':[-5.1,0,3],'size':[.45,.6,6]},{'center':[5.1,0,3],'size':[.45,.6,6]}])
+box('Bench seat',(0,0,.55),(2.4,.7,.22),'Pearl',.1)
+for x in [-.9,.9]:box('Bench support',(x,0,.25),(.18,.5,.5),'Chrome',.05)
+finish('Bench',[{'center':[0,0,.35],'size':[2.4,.7,.7]}])
+box('Service cap',(0,0,.01),(1.2,1.2,.025),'Chrome',.08)
+for x in [-.4,-.2,0,.2,.4]:box('Drain',(x,0,.026),(.045,.8,.012),'Ink',0)
+finish('Drain',[])
+
+# Arrange a legible source library; exports retain origin-centred module pivots.
+for i,(name,meta) in enumerate(modules.items()):
+    o=bpy.data.objects['SM_'+name];o.hide_set(False);o.hide_render=False;o.location=((i%4)*13,(i//4)*13,0)
+    o['export_origin']='FBX uses local module origin';o['collision_proxy']=json.dumps(meta['collision_boxes'])
+bpy.context.scene['kit_version']='street_v004';bpy.context.scene['front']='Module front is Blender -Y; validate the imported transform in Unreal.'
+bpy.ops.wm.save_as_mainfile(filepath=str(OUT/'NeonGateway_StreetKit.blend'))
+(OUT/'kit.json').write_text(json.dumps({'version':4,'units':'metres','materials':{n:{'base_color':c,'metallic':m,'roughness':r} for n,(c,m,r) in PALETTE.items()},'modules':modules,'scope':'Original procedural exterior street kit; no interiors or third-party geometry'},indent=2))
+print('STREET_KIT_COMPLETE',len(modules),sum(m['triangles'] for m in modules.values()))

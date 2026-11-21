@@ -1,0 +1,146 @@
+{
+  "batch_id": "ginkgo-freiburg-2026-11",
+  "image": {
+    "asset_id": "gen-scroll-console-corbel-1",
+    "provider": "meshy",
+    "tool": "meshy_image_to_image",
+    "submitted_at": "2026-11-12T13:32:11.497Z",
+    "request": {
+      "ai_model": "nano-banana-2",
+      "prompt": "From this photo of an ornate 1890s Gr\u00fcnderzeit building facade, extract ONE of the large stone scroll consoles (the S-curved corbel brackets that carry the curved balcony). Show that single console as an isolated object in three-quarter view from slightly below: a deep S-scroll volute corbel with carved acanthus leaf on the front, moulded top slab, cream-white painted sandstone with light weathering. Whole object visible, centred, plain light grey studio background, soft even lighting, no building, no railing, no text.",
+      "aspect_ratio": "1:1",
+      "reference_images": [
+        "local upload of console.jpg",
+        "local upload of bank_all.jpg"
+      ]
+    },
+    "task_id": "01a1cff5-7f13-723f-ae4b-21d845346432",
+    "status": "SUCCEEDED",
+    "status_basis": "Downloaded in the Ginkgo session with meshy_download_model; image file present",
+    "provider_model": "nano-banana-2",
+    "completed_observed_at": "2026-11-12T13:32:47.736Z",
+    "consumed_credits": 6,
+    "reference_inputs": [
+      {
+        "name": "console.jpg",
+        "role": "owner photograph, crop of the ornament",
+        "sha256": "249aecd2eb9f5854508fd8af79ed21d4b9abece31dc2db43bc9dbb03161669a6",
+        "retained": false,
+        "note": "Owner photograph uploaded to the image stage; not distributed"
+      },
+      {
+        "name": "bank_all.jpg",
+        "role": "owner photograph of the whole facade",
+        "sha256": "d1b8002cc0dc23a716207c232f2bd1a0c745aa3d8ef1f754ef113b1cc02303ac",
+        "retained": false,
+        "note": "Owner photograph uploaded to the image stage; not distributed"
+      }
+    ],
+    "output_file": "gen-scroll-console-corbel-1.png",
+    "output_sha256": "246feb5023d496402249f60b744ffdb8f1c5c59d779946d637a769752c0ed386",
+    "output_file_modified_at": "2026-11-12T13:32:47+00:00",
+    "seed": null,
+    "evidence_source": {
+      "pass_records": [
+        "runs/freiburg_tram/AGENTS.md",
+        "runs/fischbrunnen/AGENTS.md",
+        "runs/fischbrunnen/layout/fountain.json",
+        "runs/freiburg_tram/layout/pink.json",
+        "runs/refset_1117/pass.json",
+        "runs/refset_1117/src/W067_placements.json",
+        "runs/refset_1117/src/W068_placements.json"
+      ],
+      "session_records": "Tool calls of Ginkgo Claude Code session(s) 48627919-6d97-4c20-b07e-a5ea9fccb1ba (submissions, results and downloads)",
+      "extracted_at": "2026-11-18T19:10:37+00:00"
+    }
+  },
+  "mesh": {
+    "asset_id": "gen-scroll-console-corbel-1",
+    "provider": "meshy",
+    "tool": "meshy_image_to_3d",
+    "submitted_at": "2026-11-12T13:32:57.028Z",
+    "request": {
+      "input_task_id": "01a1cff5-7f13-723f-ae4b-21d845346432",
+      "ai_model": "meshy-7.1",
+      "texture_model": "meshy-7",
+      "enable_pbr": true,
+      "should_remesh": true,
+      "target_polycount": 80000,
+      "target_formats": [
+        "glb"
+      ]
+    },
+    "task_id": "01a1cff6-2df8-7069-ac75-de9c3eb919cc",
+    "status": "SUCCEEDED",
+    "status_basis": "Meshy reported SUCCEEDED in the Ginkgo session; downloaded with meshy_download_model {\"format\": \"glb\"}; GLB present",
+    "consumed_credits": 30,
+    "input_link": "input_task_id",
+    "input_image_sha256": "246feb5023d496402249f60b744ffdb8f1c5c59d779946d637a769752c0ed386",
+    "output_file": "gen-scroll-console-corbel-1.glb",
+    "output_sha256": "297f3d670447205e590f40ee7c67fe941bb50333e6c2fe1cbbf898b14eea7547",
+    "seed": null,
+    "evidence_source": {
+      "pass_records": [
+        "runs/freiburg_tram/AGENTS.md",
+        "runs/fischbrunnen/AGENTS.md",
+        "runs/fischbrunnen/layout/fountain.json",
+        "runs/freiburg_tram/layout/pink.json",
+        "runs/refset_1117/pass.json",
+        "runs/refset_1117/src/W067_placements.json",
+        "runs/refset_1117/src/W068_placements.json"
+      ],
+      "session_records": "Tool calls of Ginkgo Claude Code session(s) 48627919-6d97-4c20-b07e-a5ea9fccb1ba (submissions, results and downloads)",
+      "extracted_at": "2026-11-18T19:10:37+00:00"
+    }
+  },
+  "derivation": {
+    "asset_id": "gen-scroll-console-corbel-1",
+    "source_sha256": "297f3d670447205e590f40ee7c67fe941bb50333e6c2fe1cbbf898b14eea7547",
+    "source_triangles": 79063,
+    "target_triangles": 80000,
+    "prepared_sha256": "3745612a58c660bbad3bdc3e2a55965076989bc1e113f7995d1ebfff41936f9e",
+    "software": "Blender 5.1.2",
+    "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Remove wire edges, split edges shared by more than two faces and remove zero-area faces (counts in quality.topology_repairs). Never subdivide to inflate counts.",
+    "weld_tolerance_source_units": 1.9025980234146117e-07,
+    "quality": {
+      "vertices": 39715,
+      "triangles": 79063,
+      "boundary_edges": 275,
+      "nonmanifold_edges_excluding_boundary": 0,
+      "zero_area_faces": 0,
+      "connected_components": 86,
+      "largest_component_vertices": 39447,
+      "nonfinite_coordinates": 0,
+      "self_intersections": "not_tested",
+      "mesh_validation_repair_passes": 0,
+      "topology_repairs": {
+        "wire_edges_removed": 0,
+        "nonmanifold_edges_split": 87,
+        "zero_area_faces_removed": 0,
+        "loose_vertices_removed": 0
+      },
+      "use": "Visual entourage; not certified for fabrication or structural analysis",
+      "bounds_relative_change": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    }
+  },
+  "input_image_file": "batches/ginkgo-freiburg-2026-11/gen-scroll-console-corbel-1.png",
+  "external_reference_status": "Photo-derived: the image stage received crops of the owner's own photographs of a facade in Freiburg im Breisgau (ornaments) and of the Fischbrunnen, a Gothic fountain on the Muensterplatz (statues, canopy). The photographs are named and hashed in each image record, not distributed. The generated clean images were then uploaded to Meshy.",
+  "external_reference_ids": [],
+  "dimension_basis": "Sizes as placed in the Ginkgo photo reconstructions (fountain.json statue heights; pink.json console height; placement matrices for canopy and cartouche); height normalised exactly, width and depth measured after uniform scaling. Measured from photographs, not surveyed.",
+  "reference_review": "Reference image reviewed on 2026-11-18 at full resolution for this import: no lettering, logos, badges or brand marks visible.",
+  "rights": "Image and mesh stages ran on the owner's paid Meshy account; the inputs were the owner's own photographs. The fountain statues and canopy reproduce a 15th-century public monument and the ornaments an 1890s facade; their original designs are long out of copyright, and no photograph is distributed. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-18. These models also appear inside the owner's GRANDWHIS world packs. Generator account entitlements and the current monument's restoration history not independently audited.",
+  "origin": {
+    "project": "Ginkgo, the owner's own world-generation repository (private)",
+    "pass": "runs/freiburg_tram and runs/fischbrunnen (packaged in runs/refset_1117)",
+    "source_name": "console",
+    "records": [
+      "runs/refset_1117/pass.json",
+      "runs/fischbrunnen/layout/fountain.json",
+      "Claude Code session transcripts 48627919-6d97-4c20-b07e-a5ea9fccb1ba (ornaments) and bc81df46-55a4-4f2b-b285-4743fcb41771 (fountain)"
+    ]
+  }
+}

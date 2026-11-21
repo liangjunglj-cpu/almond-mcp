@@ -53,14 +53,12 @@ build-backend = "hatchling.build"
 packages = ["almond_mcp"]
 
 # Manifests and audited JSON ship inside the wheel as almond_mcp/data/ so a
-# fresh install can scaffold the user data directory. Only the original,
-# generated CC BY 4.0 model pack is included. Downloaded 3D Warehouse models
-# are NEVER included; see THIRD-PARTY-NOTICES.md and docs/licensing-audit.md.
+# fresh install can scaffold the user data directory. Downloaded 3D Warehouse
+# models are NEVER included; see THIRD-PARTY-NOTICES.md and docs/licensing-audit.md.
 [tool.hatch.build.targets.wheel.force-include]
 "DrawingAssetfiles/manifest.json" = "almond_mcp/data/DrawingAssetfiles/manifest.json"
 "DiagramAssetfiles/manifest.json" = "almond_mcp/data/DiagramAssetfiles/manifest.json"
 "GeneratedAssetfiles/manifest.json" = "almond_mcp/data/GeneratedAssetfiles/manifest.json"
-"GeneratedAssetfiles/models" = "almond_mcp/data/GeneratedAssetfiles/models"
 "GeneratedAssetfiles/previews" = "almond_mcp/data/GeneratedAssetfiles/previews"
 "GeneratedAssetfiles/passport.schema.json" = "almond_mcp/data/GeneratedAssetfiles/passport.schema.json"
 "GeneratedAssetfiles/README.md" = "almond_mcp/data/GeneratedAssetfiles/README.md"
@@ -68,7 +66,14 @@ packages = ["almond_mcp"]
 "GeneratedAssetfiles/provenance.json" = "almond_mcp/data/GeneratedAssetfiles/provenance.json"
 "GeneratedAssetfiles/structural-loads.json" = "almond_mcp/data/GeneratedAssetfiles/structural-loads.json"
 "GeneratedAssetfiles/source-register.json" = "almond_mcp/data/GeneratedAssetfiles/source-register.json"
-"GeneratedAssetfiles/batches" = "almond_mcp/data/GeneratedAssetfiles/batches"
+# GeneratedAssetfiles/models (the generated CC BY 4.0 GLBs and .almond.json
+# contracts) and GeneratedAssetfiles/batches (generation evidence: request
+# records and input images) are deliberately NOT in the wheel, to keep it under
+# PyPI's 100 MB file limit. The catalogue and previews ship; each model file
+# downloads, sha256-verified, from the matching GitHub release on first use
+# (almond_mcp/model_store.py). Both folders ship in the sdist, the Rhino plugin
+# archive and the repository; tools/prepare_release.ps1 stages the model files
+# as GitHub release assets and tools/verify_release.py checks them.
 "DrawingRecipes" = "almond_mcp/data/DrawingRecipes"
 "Draftingfiles" = "almond_mcp/data/Draftingfiles"
 "capsules" = "almond_mcp/data/capsules"

@@ -1,0 +1,133 @@
+{
+  "batch_id": "y2k-twofronts-2026-09",
+  "route": "meshy_text_to_3d",
+  "preview": {
+    "asset_id": "gen-holo-sign-pod-1",
+    "provider": "meshy",
+    "tool": "meshy_text_to_3d",
+    "submitted_at": "2026-09-06T02:02:03.418Z",
+    "request": {
+      "prompt": "Y2K futurist holographic sign pod, a chrome sphere on a slim chrome stalk with a flat translucent magenta glass disc floating above it like a screen, small cyan glowing ring at the base, glossy white accent panels, rounded soft forms, clean single street prop, no text, no letters",
+      "ai_model": "meshy-6",
+      "target_formats": [
+        "glb",
+        "obj",
+        "fbx"
+      ],
+      "auto_size": true,
+      "origin_at": "bottom",
+      "response_format": "json"
+    },
+    "task_id": "01a07473-9d0f-74c1-bc21-fbc2c7012389",
+    "status": "SUCCEEDED",
+    "status_basis": "meshy_get_task_status reported SUCCEEDED at 2026-09-06T02:04:13.886Z",
+    "consumed_credits": 20,
+    "provider_model": "meshy-6",
+    "seed": null,
+    "evidence_source": {
+      "pass_records": [
+        "runs/twofronts/meshy/README.md",
+        "ProjectY2K: docs/MESHY_NOTES.md",
+        "ProjectY2K: twofronts/world/place_assets.py"
+      ],
+      "session_records": "Tool calls of Ginkgo Claude Code session b7a7d8b6-56a0-48d3-ac67-77626f9af289 (submissions, results and downloads)",
+      "extracted_at": "2026-11-20T17:30:15+00:00"
+    }
+  },
+  "mesh": {
+    "asset_id": "gen-holo-sign-pod-1",
+    "provider": "meshy",
+    "tool": "meshy_text_to_3d_refine",
+    "submitted_at": "2026-09-06T02:04:58.260Z",
+    "request": {
+      "preview_task_id": "01a07473-9d0f-74c1-bc21-fbc2c7012389",
+      "ai_model": "meshy-6",
+      "enable_pbr": true,
+      "texture_prompt": "mirror chrome sphere and stalk, translucent magenta glass disc, cyan glowing ring, glossy white accent panels, clean Y2K finish",
+      "target_formats": [
+        "glb",
+        "obj",
+        "fbx"
+      ],
+      "response_format": "json"
+    },
+    "task_id": "01a07476-3d50-73f8-a665-71fc376f70d2",
+    "status": "SUCCEEDED",
+    "status_basis": "meshy_get_task_status reported SUCCEEDED at 2026-09-06T02:09:08.469Z",
+    "consumed_credits": 10,
+    "provider_model": "meshy-6",
+    "input_link": "preview_task_id",
+    "output_file": "gen-holo-sign-pod-1.obj",
+    "output_format": "obj",
+    "output_sha256": "dbd3722808f4c1926ebd00eaca840b741fead76334d62d1aaa44f7680b5e35e7",
+    "output_file_modified_at": "2026-09-06T02:10:01+00:00",
+    "seed": null,
+    "evidence_source": {
+      "pass_records": [
+        "runs/twofronts/meshy/README.md",
+        "ProjectY2K: docs/MESHY_NOTES.md",
+        "ProjectY2K: twofronts/world/place_assets.py"
+      ],
+      "session_records": "Tool calls of Ginkgo Claude Code session b7a7d8b6-56a0-48d3-ac67-77626f9af289 (submissions, results and downloads)",
+      "extracted_at": "2026-11-20T17:30:15+00:00"
+    },
+    "download": {
+      "tool": "meshy_download_model",
+      "format": "obj",
+      "reported_file_size_bytes": 40093637
+    }
+  },
+  "derivation": {
+    "asset_id": "gen-holo-sign-pod-1",
+    "source_sha256": "dbd3722808f4c1926ebd00eaca840b741fead76334d62d1aaa44f7680b5e35e7",
+    "source_triangles": 250705,
+    "target_triangles": 40000,
+    "prepared_sha256": "815c2dc0923c80bcd309ec6e560cc15133f0774380c0ad63313100043b2dc0e9",
+    "software": "Blender 5.1.2",
+    "source_format": "obj",
+    "source_file": "gen-holo-sign-pod-1.obj",
+    "method": "Remove provider PBR materials and textures; Import the provider OBJ geometry (Y-up to Z-up, -Z forward; material library and texture maps not loaded) and export GLB; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Remove wire edges, split edges shared by more than two faces and remove zero-area faces (counts in quality.topology_repairs). Never subdivide to inflate counts.",
+    "weld_tolerance_source_units": 3.000000119209289e-08,
+    "quality": {
+      "vertices": 20005,
+      "triangles": 39999,
+      "boundary_edges": 7,
+      "nonmanifold_edges_excluding_boundary": 0,
+      "zero_area_faces": 0,
+      "connected_components": 3,
+      "largest_component_vertices": 16966,
+      "nonfinite_coordinates": 0,
+      "self_intersections": "not_tested",
+      "mesh_validation_repair_passes": 0,
+      "topology_repairs": {
+        "wire_edges_removed": 0,
+        "nonmanifold_edges_split": 2,
+        "zero_area_faces_removed": 0,
+        "loose_vertices_removed": 0
+      },
+      "use": "Visual entourage; not certified for fabrication or structural analysis",
+      "bounds_relative_change": [
+        0.00012255434214357297,
+        0.00010334993049134374,
+        8.096297260272611e-05
+      ]
+    }
+  },
+  "input_image_file": null,
+  "external_reference_status": "Text prompts only: no image was given to any stage.",
+  "external_reference_ids": [],
+  "dimension_basis": "Heights are the target heights at which Project Y2K's Neon Front scene placed each prop (twofronts/world/place_assets.py: planter pod 1.1 m, vending machine 2.4 m, kiosk 2.6 m, holo sign 3.4 m, hover scooter 1.2 m, hover car 1.6 m); Meshy's OBJ units are arbitrary, so each mesh was scaled uniformly to that height and its width and depth measured after scaling. Y2K's later ginkgo_props_v061 pass used 1.9 m for the vending machine and 1.78 m for the scooter. Speculative designs; not a physical survey.",
+  "reference_review": "Reviewed on 2026-11-20: text-to-3D has no input image. The library geometry was checked in its archive preview (640 px) and in untextured front, side, back and three-quarter views (rendered 900 px, viewed at 450 px) The prompt asks for no text or letters. Meshy's texture atlases for this route are fragmented per triangle and are not distributed. The disc face carries large raised 'Y2K' lettering in the geometry although the prompt asked for no text or letters. 'Y2K' is a generic name for the era and style, not a brand mark; no logos or other lettering. Flagged for the owner.",
+  "rights": "Meshy-6 text-to-3D preview and refine on the owner's Meshy account on 2026-09-06 (the same account, by the account ID in the result URLs, as the library's other Meshy batches). This was the account's first recorded use (MESHY_NOTES: balance 3,320 credits, no prior tasks). Whether the account was on a paid plan on 2026-09-06 is unknown: neither MESHY_NOTES, the Ginkgo README nor session b7a7d8b6 records the plan, and paid status is not asserted here; the owner should confirm it. Text prompts only. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-20 (\"increase the range of models, from the ones i used for my project y2k games, (except for the operatives and bosses)\"). Provider textures are not distributed.",
+  "origin": {
+    "project": "Project Y2K ('Two Fronts'), the owner's game project (private); generated from a Ginkgo session",
+    "pass": "runs/twofronts",
+    "source_name": "holosign",
+    "records": [
+      "runs/twofronts/meshy/README.md and ProjectY2K docs/MESHY_NOTES.md (task ledger, rounds 1 and 2)",
+      "ProjectY2K: twofronts/world/place_assets.py (scene target heights)",
+      "ProjectY2K: twofronts/meshy/models/<prop>/model.obj (byte-identical to the Ginkgo downloads, SHA-256 checked 2026-11-20)",
+      "Claude Code session transcript b7a7d8b6-56a0-48d3-ac67-77626f9af289 (the tool calls that submitted the previews and refines and downloaded the OBJs)"
+    ]
+  }
+}

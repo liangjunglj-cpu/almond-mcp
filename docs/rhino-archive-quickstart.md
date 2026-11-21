@@ -21,7 +21,7 @@ Source links and download links open in your browser. The archive runs locally w
 open; no Python, Meshy login, AI subscription or Internet connection is needed
 to browse the included files after installation. Rhino's licence is separate.
 
-Search and rotate 50 generated models, inspect the 10 linked drawing packages,
+Search and rotate 144 generated models, inspect the 10 linked drawing packages,
 and download GLB, SVG, DXF and A3 SVG sheets. Choose 1:50 or 1:100 drawing views;
 DXF geometry uses full-size millimetres. Viewports fit drawings to the screen,
 so screen size is not print scale. Import downloaded DXFs into Rhino using
@@ -49,7 +49,7 @@ records, original checksums, full passports and a derivation record containing
 actual triangle counts, geometry fingerprint, units and reduction method.
 Undo removes a placement. Use Explode only when you need independent geometry.
 
-Placement is available for the 50 included generated GLBs, inside the Rhino
+Placement is available for the 144 included generated GLBs, inside the Rhino
 panel. Browser downloads and the seven community catalogue entries do not have
 native placement. Imported models use the current Rhino layer.
 

@@ -2,8 +2,9 @@
 
 Subcommands:
   serve         start the MCP server (default when no subcommand is given)
-  fetch-assets  report which library model files are missing, with the
-                original download URL and expected sha256 for each
+  fetch-assets  download the generated models (the PyPI package ships none;
+                they otherwise download on first use) and report which other
+                library model files are missing, with source URL and sha256
   doctor        check directories, manifests, state DB, and the Rhino bridge
   paths         print every resolved directory and the state DB location
   design-codes  list the design code profiles and any profile files that fail validation
@@ -36,10 +37,12 @@ _MODEL_LIBRARIES = (
 
 
 def cmd_audit_assets(args: argparse.Namespace) -> int:
-    """Verify the bundled generated pack, including embedded/sidecar agreement."""
+    """Verify the generated pack on disk, including embedded/sidecar agreement.
+    Models not downloaded yet are listed, not failed, unless --require-models."""
     from almond_mcp.asset_passport import audit_library
     try:
-        result = audit_library(Path(paths.resolve_dir("RHINO_MCP_GENERATED_ASSET_DIR")))
+        result = audit_library(Path(paths.resolve_dir("RHINO_MCP_GENERATED_ASSET_DIR")),
+                               require_models=getattr(args, "require_models", False))
     except (OSError, ValueError, KeyError) as exc:
         result = {"status": "error", "message": str(exc)}
     print(json.dumps(result, indent=2))
@@ -59,21 +62,6 @@ def _sha256(path: Path) -> str:
         for chunk in iter(lambda: handle.read(1 << 20), b""):
             digest.update(chunk)
     return digest.hexdigest().upper()
-
-
-def _download(url: str, target: Path) -> bool:
-    """Fetch one redistributable file (the generated library only). Returns
-    True on success; never raises, so fetch-assets keeps going."""
-    import urllib.request
-    try:
-        target.parent.mkdir(parents=True, exist_ok=True)
-        with urllib.request.urlopen(url, timeout=60) as response, target.open("wb") as out:
-            for chunk in iter(lambda: response.read(1 << 20), b""):
-                out.write(chunk)
-        return True
-    except Exception as exc:  # network, 404, permissions - report and continue
-        print(f"                download failed: {exc}")
-        return False
 
 
 def _asset_status(library_dir: Path, asset: dict) -> tuple[str, str]:
@@ -99,9 +87,13 @@ def cmd_fetch_assets(args: argparse.Namespace) -> int:
     command prints (and with --open, opens) the source page for each missing
     file. Re-run afterwards to verify the sha256 of what you saved.
     """
+    from almond_mcp import model_store
     missing_urls: list[str] = []
     problems = 0
-    for env_var, label in _MODEL_LIBRARIES:
+    libraries = _MODEL_LIBRARIES
+    if getattr(args, "generated", False):
+        libraries = tuple(lib for lib in _MODEL_LIBRARIES if lib[0] == "RHINO_MCP_GENERATED_ASSET_DIR")
+    for env_var, label in libraries:
         library_dir = Path(paths.resolve_dir(env_var))
         manifest = _load_manifest(library_dir)
         if manifest is None:
@@ -111,18 +103,22 @@ def cmd_fetch_assets(args: argparse.Namespace) -> int:
         print(f"\n[{label}] {library_dir}")
         for asset in manifest.get("assets", []):
             status, detail = _asset_status(library_dir, asset)
-            # Generated assets are ours (CC BY 4.0) and carry a download_url,
-            # so - unlike 3D Warehouse content - they can be fetched directly.
-            if (status in ("missing", "hash-mismatch") and asset.get("download_url")
-                    and not getattr(args, "no_download", False)):
-                if _download(asset["download_url"], library_dir / asset["file"]):
-                    contract = asset.get("contract_file")
-                    if contract and asset.get("contract_download_url"):
-                        _download(asset["contract_download_url"], library_dir / contract)
-                    status, detail = _asset_status(library_dir, asset)
-                    if status == "ok":
-                        print(f"  downloaded    {asset['asset_id']}")
-                        continue
+            generated = env_var == "RHINO_MCP_GENERATED_ASSET_DIR"
+            if generated and status == "ok" and not model_store.is_local(asset, library_dir):
+                status = "missing"  # the GLB is there but its contract is not
+            # Generated assets are ours (CC BY 4.0), so - unlike 3D Warehouse
+            # content - they are fetched directly: GLB + contract from this
+            # version's GitHub release, sha256-verified (almond_mcp.model_store).
+            if (generated and status in ("missing", "hash-mismatch")
+                    and model_store.is_obtainable(asset) and not getattr(args, "no_download", False)):
+                try:
+                    model_store.ensure_generated_files(asset, library_dir)
+                    print(f"  downloaded    {asset['asset_id']}")
+                    continue
+                except model_store.ModelUnavailable as exc:
+                    print(f"  failed        {asset['asset_id']}\n                {exc}")
+                    problems += 1
+                    continue
             if status == "ok":
                 if args.verbose:
                     print(f"  ok            {asset['asset_id']}")
@@ -143,6 +139,10 @@ def cmd_fetch_assets(args: argparse.Namespace) -> int:
         print("\nAll manifest assets are present with matching hashes.")
         return 0
     print(f"\n{problems} asset(s) need attention.")
+    if getattr(args, "generated", False):
+        print("Generated models come from this version's GitHub release: re-run when online,")
+        print(f"or set {model_store.BASE_URL_ENV} to a folder or mirror holding those files.")
+        return 1
     print("Save each download into the library's models/ folder using the")
     print("expected file name, then re-run `almond-mcp fetch-assets` to verify.")
     if args.open and missing_urls:
@@ -182,7 +182,10 @@ def cmd_doctor(args: argparse.Namespace) -> int:
         present = sum(
             1 for asset in assets if _asset_status(library_dir, asset)[0] == "ok"
         )
-        check(label, True, f"{present}/{len(assets)} model files present")
+        note = ""
+        if env_var == "RHINO_MCP_GENERATED_ASSET_DIR" and present < len(assets):
+            note = " (the rest download on first use; `almond-mcp fetch-assets --generated` prefetches)"
+        check(label, True, f"{present}/{len(assets)} model files present{note}")
 
     print("State database:")
     db_path = Path(paths.resolve_state_db())
@@ -298,6 +301,8 @@ def main(argv: list[str] | None = None) -> int:
     )
     fetch.add_argument("--no-download", action="store_true",
                      help="do not auto-download the generated (CC BY 4.0) models")
+    fetch.add_argument("--generated", action="store_true",
+                       help="only the generated library: download every model now (prefetch for offline use)")
     fetch.add_argument(
         "--open", action="store_true", help="open missing assets' source pages"
     )
@@ -306,7 +311,9 @@ def main(argv: list[str] | None = None) -> int:
     )
     sub.add_parser("doctor", help="check directories, manifests, DB, and bridge")
     sub.add_parser("paths", help="print resolved directories")
-    sub.add_parser("audit-assets", help="verify generated GLBs, embedded passports, contracts and previews offline")
+    audit = sub.add_parser("audit-assets", help="verify generated GLBs, embedded passports, contracts and previews offline")
+    audit.add_argument("--require-models", action="store_true",
+                       help="fail for models not downloaded yet (default: list them)")
 
     sub.add_parser("solve", help="native structural study: JSON on stdin, JSON on stdout")
     sub.add_parser("environment", help="environment workspace engine (rooms, constructions, studies): JSON on stdin, JSON on stdout")

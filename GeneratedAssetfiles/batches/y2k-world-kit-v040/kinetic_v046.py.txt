@@ -1,0 +1,176 @@
+"""Mirai Ward kinetic + parkour pieces v046b (owner playtest 2026-10-01: "parkour sites, kinetic elements like trains").
+
+    blender -b --factory-startup --python kinetic_v046.py -- --variant Train_Lead [--render]
+
+Built with the v040 kit library (same materials and export as the kit; kit/MW_<Variant>.fbx). Unlike the buildings these
+run along +X (a car's length, a viaduct's span), origin at the centre, Z=0 at the rail / deck top unless noted:
+  Train_Lead / Train_Mid   20 m commuter car, 3 m wide, white body with pink and teal livery, lit window band,
+                           doors, roof units and pantograph, bogies; the lead car has a raked nose, headlights and a
+                           destination board. Origin: centre of the car at rail level.
+  Viaduct_20               20 m elevated track deck (5.6 m wide), two rails, parapets with a cool lamp strip.
+  Viaduct_Pillar           column hanging from Z=0 down 40 m with a cap (scale Z in Unreal to reach the ground).
+  Blimp                    40 m airship, idol billboards on both flanks, gondola and fins (no collision needed).
+  Parkour_Platform         6 x 6 m floating slab with neon edges and an arrow mark (top at Z=0).
+  Parkour_WallRun          20 m x 8 m wall-run panel, flat both sides, chevrons (base at Z=0).
+"""
+from __future__ import annotations
+
+import math
+import sys
+from pathlib import Path
+
+HERE = Path(__file__).resolve().parent
+sys.path.insert(0, str(HERE))
+import kit_v040 as K  # noqa: E402
+
+L = K.L
+
+
+def train(variant, lead):
+    Lc, W, H = 20.0, 3.0, 3.8
+    x0, x1, y0, y1 = -Lc / 2, Lc / 2, -W / 2, W / 2
+    with K.grp("Structure"):
+        # bogies and underframe
+        for bx in (-6.5, 6.5):
+            L.boxz(bx - 1.4, y0 + 0.3, 0.15, bx + 1.4, y1 - 0.3, 0.9, "SteelDark")
+            for wx in (-0.8, 0.8):
+                for wy in (y0 + 0.25, y1 - 0.25):
+                    L.cyl(0.42, 0.18, (bx + wx, wy, 0.45), "Black", rot=(math.radians(90), 0, 0), n=12)
+        L.boxz(x0 + 0.3, y0 + 0.1, 0.9, x1 - 0.3, y1 - 0.1, 1.15, "SteelDark")
+        # body: white shell, pink skirt, teal stripe, window band
+        nose = 3.2 if lead else 0.0
+        bx0 = x0 + 0.15 + nose
+        L.boxz(bx0, y0, 1.15, x1 - 0.15, y1, 1.6, "PaintPink")
+        L.boxz(bx0, y0, 1.6, x1 - 0.15, y1, H - 0.35, "PaintWhite")
+        L.boxz(bx0 + 0.1, y0 - 0.01, 2.35, x1 - 0.25, y1 + 0.01, 2.55, "PaintTeal")
+        L.boxz(bx0, y0 + 0.08, H - 0.35, x1 - 0.15, y1 - 0.08, H, "PaintWhite")
+        for f, c in (("S", y0), ("N", y1)):
+            # window band with door gaps
+            u = bx0 + 0.8
+            while u < x1 - 1.2:
+                if abs(((u - bx0) % 5.0) - 2.5) < 0.8:
+                    K.fbox(f, c, u, u + 1.3, 1.25, 3.25, 0.0, 0.02, "SteelDark")     # door
+                    K.fquad(f, c, u + 0.15, u + 1.15, 2.0, 3.1, 0.03, "GlassBlue")
+                    u += 1.6
+                    continue
+                K.fquad(f, c, u, u + 1.1, 2.65, 3.25, 0.02, "GlassLit")
+                u += 1.3
+        # roof units, pantograph
+        for rx in (-5.0, 0.0, 5.0):
+            L.boxz(rx - 1.2, y0 + 0.5, H, rx + 1.2, y1 - 0.5, H + 0.35, "PlasticWhite")
+        L.strut((2.0, 0.0, H + 0.35), (3.2, 0.0, H + 1.6), 0.04, "SteelDark", n=6)
+        L.strut((4.4, 0.0, H + 0.35), (3.2, 0.0, H + 1.6), 0.04, "SteelDark", n=6)
+        L.boxz(2.6, -0.8, H + 1.55, 3.8, 0.8, H + 1.65, "SteelDark")
+        if lead:
+            # raked nose: stepped wedges from the cab front down to the coupler
+            for k in range(6):
+                t = k / 6.0
+                xa = x0 + 0.15 + nose * t
+                L.boxz(xa, y0 + 0.08 * (6 - k), 1.15 + 0.1 * k, xa + nose / 6.0 + 0.02, y1 - 0.08 * (6 - k), 1.6 + (H - 1.9) * t, "PaintWhite")
+            L.boxz(x0 + 0.15 + nose * 0.5, y0 + 0.4, 2.0, x0 + 0.15 + nose + 0.05, y1 - 0.4, 3.0, "Glass")
+    with K.grp("Signs"):
+        if lead:
+            for wy in (y0 + 0.5, y1 - 0.5):
+                L.boxz(x0 + 0.1, wy - 0.25, 1.3, x0 + 0.3, wy + 0.25, 1.5, "LampWarm")
+            K.lightbox("Term_Line2", "W", x0 + 0.15 + nose, 0.0, 3.4, 2.2, 0.5, depth=0.08, emission=1.5)
+        for f, c in (("S", y0), ("N", y1)):
+            L.boxz(bx0, (c - 0.02) if f == "S" else c, 1.62, x1 - 0.15, c if f == "S" else c + 0.02, 1.68, "LampCool")
+    K.REC["notes"].append("Train car: length along +X, origin at the car centre on the rail; Unreal: ATFTrainLine CarLength 2000.")
+
+
+def viaduct(variant):
+    Lv, W = 20.0, 5.6
+    x0, x1, y0, y1 = -Lv / 2, Lv / 2, -W / 2, W / 2
+    with K.grp("Structure"):
+        L.boxz(x0, y0, -1.6, x1, y1, -0.25, "ConcreteWeathered")
+        L.boxz(x0, y0 + 0.4, -2.4, x1, y1 - 0.4, -1.6, "ConcreteDark")
+        L.boxz(x0, y0, -0.25, x1, y1, 0.0, "ConcreteDark")
+        for ry in (-0.72, 0.72):
+            L.boxz(x0, ry - 0.06, 0.0, x1, ry + 0.06, 0.16, "Galvanized")
+        for k in range(10):
+            xs = x0 + 1.0 + k * 2.0
+            L.boxz(xs - 0.12, -1.3, 0.0, xs + 0.12, 1.3, 0.06, "SteelDark")
+        for (ya, yb) in ((y0, y0 + 0.25), (y1 - 0.25, y1)):
+            L.boxz(x0, ya, 0.0, x1, yb, 1.1, "PaintWhite")
+    with K.grp("Signs"):
+        for (ya, yb) in ((y0 - 0.02, y0), (y1, y1 + 0.02)):
+            L.boxz(x0, ya, -0.9, x1, yb, -0.75, "LampCool")
+    K.REC["notes"].append("Viaduct deck 20 m along +X, rails on top at Z=0..0.16; tile end to end.")
+
+
+def pillar(variant):
+    with K.grp("Structure"):
+        L.boxz(-2.2, -2.2, -2.4, 2.2, 2.2, -1.6, "ConcreteDark")
+        L.boxz(-0.8, -0.8, -40.0, 0.8, 0.8, -2.4, "ConcreteWeathered")
+        L.boxz(-1.2, -1.2, -40.0, 1.2, 1.2, -39.0, "ConcreteDark")
+    with K.grp("Signs"):
+        for z in (-12.0, -24.0):
+            K.lightbox("Neon_StackCity" if z < -20 else "Neon_NoSleep", "S", -0.8, 0.0, z, 1.4, 3.4, depth=0.1, emission=1.4)
+
+
+def blimp(variant):
+    Lb, R = 40.0, 6.0
+    with K.grp("Structure"):
+        n = 44
+        for k in range(n):
+            xa, xb = -Lb / 2 + Lb * k / n, -Lb / 2 + Lb * (k + 1) / n
+            xm = (xa + xb) / 2
+            r = R * math.sqrt(max(0.0, 1.0 - (xm / (Lb / 2)) ** 2)) + 0.3
+            L.cyl(r, xb - xa + 0.02, (xm, 0.0, 0.0), "PaintWhite" if k % 6 else "PaintPink",
+                  rot=(0, math.radians(90), 0), n=20)
+        for (fy, fz) in ((0, 1), (0, -1), (1, 0), (-1, 0)):
+            L.boxz(-Lb / 2 + 1.0, -0.15 + fy * 1.0 - (3.5 if fy < 0 else 0) * abs(fy), -0.15 + fz * 1.0 - (3.5 if fz < 0 else 0),
+                   -Lb / 2 + 6.0, 0.15 + fy * 1.0 + (3.5 if fy > 0 else 0), 0.15 + fz * 1.0 + (3.5 if fz > 0 else 0), "PaintTeal")
+        L.boxz(-4.0, -1.4, -R - 1.6, 4.0, 1.4, -R + 0.4, "PlasticWhite")
+        K.fquad("S", -1.4, -3.6, 3.6, -R - 1.2, -R - 0.2, 0.02, "GlassLit")
+        K.fquad("N", 1.4, -3.6, 3.6, -R - 1.2, -R - 0.2, 0.02, "GlassLit")
+    with K.grp("Signs"):
+        a = L.DECALS["Billboard_Idols"]["aspect"]
+        hb = 8.0                       # the idol poster is portrait: fit its height to the envelope, not its width
+        w = hb * a
+        for (face, c) in (("S", -R - 0.4), ("N", R + 0.4)):
+            K.fbox(face, c, -w / 2 - 0.4, w / 2 + 0.4, -w / a / 2 - 0.4, w / a / 2 + 0.4, -0.4, 0.0, "SignBack")
+            L.decal("Billboard_Idols", K.fpoint(face, c, 0.0, 0.0, 0.02), w, K.NORM[face], offset=0.01, height=w / a, emission=1.4)
+    K.REC["notes"].append("Blimp: length along +X, origin at the envelope centre; ATFKineticMover Orbit, no collision.")
+
+
+def platform(variant):
+    with K.grp("Structure"):
+        L.boxz(-3.0, -3.0, -0.6, 3.0, 3.0, 0.0, "PaintPink")
+        L.boxz(-2.6, -2.6, -1.2, 2.6, 2.6, -0.6, "SteelDark")
+    with K.grp("Signs"):
+        for (xa, ya, xb, yb) in ((-3.02, -3.02, 3.02, -2.9), (-3.02, 2.9, 3.02, 3.02), (-3.02, -3.02, -2.9, 3.02), (2.9, -3.02, 3.02, 3.02)):
+            L.boxz(xa, ya, -0.45, xb, yb, -0.15, "MW_PadGlow")
+        L.decal("Mark_Arrow", (0.0, 0.0, 0.0), 3.0, (0, 0, 1), up=(0, 1, 0), offset=0.01, emission=1.2)
+    K.roof(0.0, -3.0, -3.0, 3.0, 3.0, "floating platform top")
+
+
+def wallrun(variant):
+    with K.grp("Structure"):
+        L.boxz(-10.0, -0.4, 0.0, 10.0, 0.4, 8.0, "PaintTeal")
+        L.boxz(-10.2, -0.5, 7.6, 10.2, 0.5, 8.2, "PaintWhite")
+        L.boxz(-10.2, -0.5, 0.0, 10.2, 0.5, 0.4, "PaintWhite")
+    with K.grp("Signs"):
+        for k in range(5):
+            x = -8.0 + k * 4.0
+            for face, c in (("S", -0.4), ("N", 0.4)):
+                L.decal("Mark_Arrow", K.fpoint(face, c, x, 4.0, 0.0), 2.4, K.NORM[face], up=(1, 0, 0), offset=0.01, emission=1.0)
+    K.wallrun("S", (10.0, -0.4), (-10.0, -0.4), 0.4, 7.6, "wall-run panel south face")
+    K.wallrun("N", (-10.0, 0.4), (10.0, 0.4), 0.4, 7.6, "wall-run panel north face")
+
+
+VAR = {
+    "Train_Lead": (lambda v: train(v, True), 4701, "Kinetic", (20, 3)),
+    "Train_Mid": (lambda v: train(v, False), 4702, "Kinetic", (20, 3)),
+    "Viaduct_20": (lambda v: viaduct(v), 4703, "Kinetic", (20, 5.6)),
+    "Viaduct_Pillar": (lambda v: pillar(v), 4704, "Kinetic", (4.4, 4.4)),
+    "Blimp": (lambda v: blimp(v), 4705, "Kinetic", (40, 12)),
+    "Parkour_Platform": (lambda v: platform(v), 4706, "Parkour", (6, 6)),
+    "Parkour_WallRun": (lambda v: wallrun(v), 4707, "Parkour", (20, 1)),
+}
+K.VARIANTS.update(VAR)
+
+if __name__ == "__main__":
+    a = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+    var = a[a.index("--variant") + 1]
+    K.build_variant(var, render="--render" in a, samples=12)

@@ -1,0 +1,147 @@
+{
+  "batch_id": "ginkgo-refset-1007",
+  "image": {
+    "asset_id": "gen-water-tanks-rooftop-pair-1",
+    "provider": "higgsfield",
+    "tool": "generate_image_batch",
+    "submitted_at": "2026-10-06T22:09:32.799Z",
+    "request": {
+      "model": "gpt_image_2_5",
+      "aspect_ratio": "1:1",
+      "medias": [
+        {
+          "role": "image_references",
+          "value": "ea488d3b-563d-4a2f-a036-72bf9f08ed98"
+        }
+      ],
+      "prompt": "Clean 3D model reference of ONLY a pair of stainless steel rooftop water tanks like in the reference image: two vertical cylindrical brushed-steel tanks with conical tops and ribbed bands, standing on a galvanised steel frame platform with cross bracing, a small ladder and pipes with valves underneath. Three-quarter view from slightly above, entire object in frame with margin, isolated on a plain neutral grey studio backdrop, soft even studio lighting, slightly weathered, no text, no logos."
+    },
+    "batch_context": "Last two rate-limited hero reference images (water tanks, planter box).",
+    "task_id": "9f8304b9-32a7-41fe-baed-c7e3b795d017",
+    "status": "COMPLETED",
+    "provider_model": "gpt_image_2_5",
+    "provider_reported_model": "gpt_image_2_5",
+    "completed_observed_at": "2026-10-06T22:09:56.440Z",
+    "provider_output_name": "hf_20261006_220935_9f8304b9-32a7-41fe-baed-c7e3b795d017.png",
+    "consumed_credits": "0.25 (Higgsfield cost quote for gpt_image_2_5 returned in the Ginkgo session)",
+    "concept_reference": {
+      "job_id": "ea488d3b-563d-4a2f-a036-72bf9f08ed98",
+      "name": "W057_b.png",
+      "sha256": "a30eb343bf49b14182e84d663fee0f1d94d7346ef4467358c594aa7c94cf929f",
+      "retained": false,
+      "submitted_at": "2026-10-06T22:03:47.913Z",
+      "model": "gpt_image_2_5",
+      "prompt": "Environment concept art, steep overhead view looking down onto a cluttered pale-yellow concrete rooftop in a dense Japanese city: stepped roof levels connected by a teal-railed concrete stair, a small yellow canvas awning over a door, rows of weathered white AC outdoor units, two stainless steel water tanks on steel frames, a cage ladder, many TV antennas and a satellite dish, grey electrical cabinets, pipes and ducts, a perimeter railing; next door a galvanised corrugated-metal vertical farm building with green plants spilling over its balconies. Warm low morning sunlight with long crisp shadows, realistic high-detail 3D render. No readable words, no logos, no brands.",
+      "note": "Concept image generated in the same Ginkgo session from a text-only prompt (no image input); given to this image request as its only image reference by Higgsfield job ID. Not distributed."
+    },
+    "reference_inputs": [],
+    "output_file": "gen-water-tanks-rooftop-pair-1.png",
+    "output_sha256": "a04271eb6b7dba946cd47213f38aa7e9904bf30dc1efd4fffc1c7bd776126819",
+    "output_file_modified_at": "2026-10-06T22:10:12+00:00",
+    "seed": null,
+    "evidence_source": {
+      "pass_records": [
+        "runs/refset_1007/pass.json",
+        "runs/refset_1007/concept/jobs.json",
+        "runs/refset_1007/meshy/jobs.json",
+        "ProjectY2K: twofronts/meshy/ginkgo_props_v061/out/conditioning.json"
+      ],
+      "session_records": "Tool calls of Ginkgo Claude Code session(s) 7ee433c3-63f6-4781-b345-d2c4f70b8e73 (submissions, results and downloads)",
+      "extracted_at": "2026-11-20T17:58:55+00:00"
+    },
+    "status_basis": "Provider reported completed; curl of the job's result URL in the Ginkgo session (Bash, 2026-10-06T22:10:05.505Z)"
+  },
+  "mesh": {
+    "asset_id": "gen-water-tanks-rooftop-pair-1",
+    "provider": "higgsfield",
+    "tool": "generate_3d",
+    "submitted_at": "2026-10-06T22:13:00.531Z",
+    "request": {
+      "model": "tripo_h3_1_image_to_3d",
+      "medias": [
+        {
+          "role": "image_references",
+          "value": "9f8304b9-32a7-41fe-baed-c7e3b795d017"
+        }
+      ],
+      "geometry_quality": "detailed",
+      "texture_quality": "detailed",
+      "pbr": true
+    },
+    "task_id": "88e99826-5149-454d-b264-87b0be54de8e",
+    "status": "COMPLETED",
+    "status_basis": "Higgsfield jobs_wait reported completed; GLB downloaded with curl from the job's result URL in the Ginkgo session (Bash, 2026-10-06T22:21:19.627Z)",
+    "provider_model": "tripo_h3_1_image_to_3d",
+    "completed_observed_at": "2026-10-06T22:19:29.192Z",
+    "provider_output_name": "hf_20261006_221412_88e99826-5149-454d-b264-87b0be54de8e.glb",
+    "consumed_credits": "18 Higgsfield credits (cost quote returned in the Ginkgo session)",
+    "input_link": "media_job_id",
+    "input_image_sha256": "a04271eb6b7dba946cd47213f38aa7e9904bf30dc1efd4fffc1c7bd776126819",
+    "output_file": "gen-water-tanks-rooftop-pair-1.glb",
+    "output_sha256": "9ff061e234eb97b39e60dc91ec7850f53a3f453753e77810561b4341a13b4f01",
+    "seed": null,
+    "evidence_source": {
+      "pass_records": [
+        "runs/refset_1007/pass.json",
+        "runs/refset_1007/concept/jobs.json",
+        "runs/refset_1007/meshy/jobs.json",
+        "ProjectY2K: twofronts/meshy/ginkgo_props_v061/out/conditioning.json"
+      ],
+      "session_records": "Tool calls of Ginkgo Claude Code session(s) 7ee433c3-63f6-4781-b345-d2c4f70b8e73 (submissions, results and downloads)",
+      "extracted_at": "2026-11-20T17:58:55+00:00"
+    }
+  },
+  "derivation": {
+    "asset_id": "gen-water-tanks-rooftop-pair-1",
+    "source_sha256": "9ff061e234eb97b39e60dc91ec7850f53a3f453753e77810561b4341a13b4f01",
+    "source_triangles": 1833921,
+    "target_triangles": 80000,
+    "prepared_sha256": "94a75e5b8b6793cb387e8723e1a266530eb77e1a9f7a70bf2d61053c35f55104",
+    "software": "Blender 5.1.2",
+    "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Remove wire edges, split edges shared by more than two faces and remove zero-area faces (counts in quality.topology_repairs). Never subdivide to inflate counts.",
+    "weld_tolerance_source_units": 9.782013893127441e-08,
+    "quality": {
+      "vertices": 39738,
+      "triangles": 79999,
+      "boundary_edges": 9,
+      "nonmanifold_edges_excluding_boundary": 0,
+      "zero_area_faces": 0,
+      "connected_components": 3,
+      "largest_component_vertices": 39732,
+      "nonfinite_coordinates": 0,
+      "self_intersections": "not_tested",
+      "mesh_validation_repair_passes": 0,
+      "topology_repairs": {
+        "wire_edges_removed": 0,
+        "nonmanifold_edges_split": 5,
+        "zero_area_faces_removed": 0,
+        "loose_vertices_removed": 0
+      },
+      "use": "Visual entourage; not certified for fabrication or structural analysis",
+      "bounds_relative_change": [
+        0.0004731035435754576,
+        0.0002516645709436583,
+        0.00014648268506417696
+      ]
+    }
+  },
+  "input_image_file": "batches/ginkgo-refset-1007/gen-water-tanks-rooftop-pair-1.png",
+  "external_reference_status": "Two-step image stage. The concept images were generated in the Ginkgo session from text-only prompts that describe an owner reference set of 9 images pasted into the session on 2026-10-06 (third-party photographs and artworks: a toy-like drone hangar, habitat units, a red ring megastructure, an overgrown capsule car in a pink flower forest, a six-wheeled rover, a Tokyo vertical-farm building and a Tokyo rooftop; described in runs/refset_1007/pass.json). Each single-object reference image then took one concept image as its only image reference (named and hashed in the image record as concept_reference, not distributed). No owner reference photograph was uploaded to any generator. Design-proximity review 2026-11-20: the generated references were compared with the owner's reference photographs; the rover and capsule tram share subject and colourway with two of them but differ in form (see their reference_review); the others are generic types. Provider textures are not distributed; only geometry ships.",
+  "external_reference_ids": [],
+  "dimension_basis": "Sci-fi vehicles use the sizes Project Y2K content v061 gave them (twofronts/meshy/ginkgo_props_v061 condition_ginkgo_props.py SPEC, longest horizontal side): capsule tram 9.0 m, six-wheeled rover 5.4 m, drone launcher vehicle 3.2 m, shuttle 12.0 m, drone 1.4 m; each mesh was scaled uniformly so that side matches, and height, width and depth were measured after scaling. The planter box keeps Y2K's 1.9 m length, a real trough length. Real-world heights replace stylised ones for the rest: rooftop water tank pair 3.0 m overall (about 2 m stainless tanks on a 1 m stand; Y2K used 5.2 m), flower clump 0.60 m (the prompt's \"about knee high\"; Y2K used 0.85 m). Not a physical survey.",
+  "reference_review": "Reference image reviewed on 2026-11-20 at 1000 px (from 1024 px): no lettering, logos, plates or brand marks. Image reference: concept W057_b.png (Higgsfield job ea488d3b). Design proximity: The owner's reference photographs for this pass (9 images pasted into Ginkgo session 7ee433c3 on 2026-10-06; extracted from the transcript to a scratch folder for this comparison only, not retained or distributed) were compared with the generated image; the owner's Tokyo rooftop photograph shows generic rooftop tanks among other clutter. Generic type.",
+  "rights": "Concept and reference images generated on the owner's Higgsfield account (gpt_image_2_5); meshes with Tripo H3.1 through the owner's Higgsfield account (water tanks, rover, capsule tram, drone, launcher, shuttle) or with Meshy-7.1 image-to-3D on the owner's Meshy account (planter box, flower clump). Owner approved release in the Almond library under CC BY 4.0 on 2026-11-20 (\"increase the range of models, from the ones i used for my project y2k games, (except for the operatives and bosses)\") and chose this group, Ginkgo props reused in Project Y2K, the same day. The Ginkgo pass records an owner go-ahead on 2026-10-07 (\"go ahead with the plan\") that covered generation for the GRANDWHIS world packs, not this library. Generator account entitlements and the Tripo terms not independently audited. Provider textures are not distributed.",
+  "origin": {
+    "project": "Ginkgo, the owner's own world-generation repository (private); reused in Project Y2K, the owner's game project (private)",
+    "pass": "runs/refset_1007",
+    "source_name": "water_tanks",
+    "records": [
+      "runs/refset_1007/pass.json (owner reference set described; AI-assisted content statement)",
+      "runs/refset_1007/concept/jobs.json (concept image job IDs)",
+      "runs/refset_1007/meshy/jobs.json (reference image, Tripo and Meshy IDs)",
+      "ProjectY2K: twofronts/meshy/ginkgo_props_v061/condition_ginkgo_props.py and out/conditioning.json (content v061 conditioned these props for the Mirai Ward hub as SM_GK61_<Name>.fbx)",
+      "ProjectY2K: twofronts/infrastructure/scripts/world_fill_v061.py (places the conditioned props in the hub)",
+      "Claude Code session transcript 7ee433c3-63f6-4781-b345-d2c4f70b8e73 (the tool calls that submitted the concept, reference image, Tripo and Meshy jobs, the curl downloads and the Meshy downloads)"
+    ]
+  }
+}

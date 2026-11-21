@@ -1,0 +1,112 @@
+{
+  "batch_id": "ginkgo-meshbank-2026-11",
+  "image": {
+    "asset_id": "gen-bistro-chair-rattan-1",
+    "provider": "meshy",
+    "tool": "meshy_text_to_image",
+    "submitted_at": "2026-11-13T12:38:38.773Z",
+    "request": {
+      "ai_model": "nano-banana",
+      "aspect_ratio": "1:1",
+      "prompt": "A classic French bistro cafe chair with a bent rattan frame and a woven two-tone cream and dark green seat and back, slightly worn, photorealistic. Single object, isolated on a plain white background, three-quarter view from slightly above, soft even studio lighting, no cast shadow, no text, no logo, realistic real-world proportions."
+    },
+    "task_id": "01a1d4eb-011f-705b-8e12-8f801f57de05",
+    "status": "SUCCEEDED",
+    "status_basis": "Downloaded in the Ginkgo session with meshy_download_model; image file present",
+    "provider_model": "nano-banana",
+    "completed_observed_at": "2026-11-13T12:39:09.365Z",
+    "consumed_credits": "3 (Meshy price table for nano-banana; not returned in the session)",
+    "reference_inputs": [],
+    "output_file": "gen-bistro-chair-rattan-1.png",
+    "output_sha256": "16085887fde9b9452c578f3714732ae40a9c0bb76b54d2183413c7467021eae5",
+    "output_file_modified_at": "2026-11-13T12:39:09+00:00",
+    "seed": null,
+    "evidence_source": {
+      "pass_records": [
+        "publishing/library/meshbank/gen/meta.json",
+        "publishing/library/meshbank/gen/refs/tasks.json",
+        "publishing/library/meshbank/BANK.md"
+      ],
+      "session_records": "Tool calls of Ginkgo Claude Code session(s) 48627919-6d97-4c20-b07e-a5ea9fccb1ba (submissions, results and downloads)",
+      "extracted_at": "2026-11-18T19:10:36+00:00"
+    }
+  },
+  "mesh": {
+    "asset_id": "gen-bistro-chair-rattan-1",
+    "provider": "meshy",
+    "tool": "meshy_image_to_3d",
+    "submitted_at": "2026-11-13T12:40:09.212Z",
+    "request": {
+      "input_task_id": "01a1d4eb-011f-705b-8e12-8f801f57de05",
+      "ai_model": "meshy-7.1",
+      "texture_model": "meshy-7",
+      "enable_pbr": true,
+      "texture_resolution": "2k",
+      "target_formats": [
+        "glb"
+      ]
+    },
+    "task_id": "01a1d4ec-5246-772a-9f89-cc0c816d37fe",
+    "status": "SUCCEEDED",
+    "status_basis": "Meshy reported SUCCEEDED in the Ginkgo session; downloaded with meshy_download_model {\"format\": \"glb\", \"include_textures\": false}; GLB present",
+    "consumed_credits": 30,
+    "input_link": "input_task_id",
+    "input_image_sha256": "16085887fde9b9452c578f3714732ae40a9c0bb76b54d2183413c7467021eae5",
+    "output_file": "gen-bistro-chair-rattan-1.glb",
+    "output_sha256": "6a4f9b2ddbcf37d732282ee62338cb7d8bb47d349bd27b2a8b36ef13806d4612",
+    "seed": null,
+    "evidence_source": {
+      "pass_records": [
+        "publishing/library/meshbank/gen/meta.json",
+        "publishing/library/meshbank/gen/refs/tasks.json",
+        "publishing/library/meshbank/BANK.md"
+      ],
+      "session_records": "Tool calls of Ginkgo Claude Code session(s) 48627919-6d97-4c20-b07e-a5ea9fccb1ba (submissions, results and downloads)",
+      "extracted_at": "2026-11-18T19:10:36+00:00"
+    }
+  },
+  "derivation": {
+    "asset_id": "gen-bistro-chair-rattan-1",
+    "source_sha256": "6a4f9b2ddbcf37d732282ee62338cb7d8bb47d349bd27b2a8b36ef13806d4612",
+    "source_triangles": 1833558,
+    "target_triangles": 40000,
+    "prepared_sha256": "1ae54e470f889c7db0b4038e731c02fc333c71a950328dd02a82c14b7f281ed9",
+    "software": "Blender 5.1.2",
+    "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Never subdivide to inflate counts.",
+    "weld_tolerance_source_units": 1.9034090042114256e-07,
+    "quality": {
+      "vertices": 19812,
+      "triangles": 40000,
+      "boundary_edges": 0,
+      "nonmanifold_edges_excluding_boundary": 0,
+      "zero_area_faces": 0,
+      "connected_components": 1,
+      "largest_component_vertices": 19812,
+      "nonfinite_coordinates": 0,
+      "self_intersections": "not_tested",
+      "mesh_validation_repair_passes": 0,
+      "use": "Visual entourage; not certified for fabrication or structural analysis",
+      "bounds_relative_change": [
+        0.0008694088240738473,
+        0.00015079740920684683,
+        3.4571407241657644e-05
+      ]
+    }
+  },
+  "input_image_file": "batches/ginkgo-meshbank-2026-11/gen-bistro-chair-rattan-1.png",
+  "external_reference_status": "Original descriptive text-to-image prompts; no external images were given to either generator.",
+  "external_reference_ids": [],
+  "dimension_basis": "Real-world heights recorded with each prop in the Ginkgo mesh bank (gen/meta.json real_height_m); height normalised exactly, width and depth measured after uniform scaling. Not a physical survey.",
+  "reference_review": "Reference image reviewed on 2026-11-18 at full resolution for this import: no lettering, logos, badges or brand marks visible.",
+  "rights": "Generated on the owner's paid Meshy account in the owner's Ginkgo project; the account owns the output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-18. These models also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+  "origin": {
+    "project": "Ginkgo, the owner's own world-generation repository (private)",
+    "pass": "publishing/library/meshbank (gen set, 2026-11-13)",
+    "source_name": "bistro_chair",
+    "records": [
+      "publishing/library/meshbank/gen/meta.json",
+      "publishing/library/meshbank/BANK.md",
+      "Claude Code session transcript 48627919-6d97-4c20-b07e-a5ea9fccb1ba (the tool calls that submitted the image and mesh tasks)"
+    ]
+  }
+}

@@ -1,0 +1,306 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-bed-low-duvet-1",
+  "library_id": "generated_assets",
+  "name": "Low bed (Light timber frame with rumpled duvet; generated prop; detailed geometry edition)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-bed-low-duvet-1.glb",
+  "dimensions_mm": {
+    "width": 1408.3,
+    "depth": 1999.2,
+    "height": 530.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -704.15,
+        -999.6,
+        0.0
+      ],
+      "max": [
+        704.15,
+        999.6,
+        530.0
+      ]
+    },
+    "footprint": [
+      [
+        -704.15,
+        -999.6
+      ],
+      [
+        704.15,
+        -999.6
+      ],
+      [
+        704.15,
+        999.6
+      ],
+      [
+        -704.15,
+        999.6
+      ]
+    ],
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "primary"
+  },
+  "materials": [
+    {
+      "material_id": "fabric-linen",
+      "objects": [
+        "gen-bed-low-duvet-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-bed-low-duvet-1",
+    "library_id": "generated_assets",
+    "name": "Low bed (Light timber frame with rumpled duvet; generated prop; detailed geometry edition)",
+    "category": "bed",
+    "tags": [
+      "bed",
+      "duvet",
+      "bedroom",
+      "japanese",
+      "detailed",
+      "meshy",
+      "ginkgo-refset-1024"
+    ],
+    "dimensions_mm": {
+      "width": 1408.3,
+      "depth": 1999.2,
+      "height": 530.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 1410.0,
+      "depth": 2000.0,
+      "height": 530.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -704.15,
+          -999.6,
+          0.0
+        ],
+        "max": [
+          704.15,
+          999.6,
+          530.0
+        ]
+      },
+      "footprint": [
+        [
+          -704.15,
+          -999.6
+        ],
+        [
+          704.15,
+          -999.6
+        ],
+        [
+          704.15,
+          999.6
+        ],
+        [
+          -704.15,
+          999.6
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "primary"
+    },
+    "materials": [
+      {
+        "material_id": "fabric-linen",
+        "objects": [
+          "gen-bed-low-duvet-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "Product photo of a low Japanese bed with a light wooden frame, a rumpled grey-beige linen duvet and one pillow, a folded blanket at the foot. Single object centred, three-quarter view from slightly above, whole bed in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos.",
+        "image_task_id": null,
+        "image_model": "gpt_image_2_5",
+        "mesh_task_id": "01a16f47-ca08-74b7-a9ef-c87acdd3173b",
+        "mesh_model": "meshy-7.1",
+        "generated_at": "2026-10-24",
+        "orientation_correction": null,
+        "scale_applied": 1049.851049,
+        "captured_generation": {
+          "batch_id": "ginkgo-refset-1024",
+          "image": {
+            "asset_id": "gen-bed-low-duvet-1",
+            "provider": "higgsfield",
+            "tool": "generate_image_batch",
+            "submitted_at": "2026-10-24T18:54:27.982Z",
+            "request": {
+              "model": "gpt_image_2_5",
+              "aspect_ratio": "1:1",
+              "prompt": "Product photo of a low Japanese bed with a light wooden frame, a rumpled grey-beige linen duvet and one pillow, a folded blanket at the foot. Single object centred, three-quarter view from slightly above, whole bed in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos."
+            },
+            "batch_context": "Resubmitting rate-limited clean prop reference images for Meshy image-to-3D.",
+            "status": "COMPLETED",
+            "task_id": "80ca1c2a-ecd5-41dd-97ad-41af88fd54a0",
+            "provider_model": "gpt_image_2_5",
+            "completed_observed_at": "2026-10-24T18:56:02.127Z",
+            "provider_output_name": "hf_20261024_185452_80ca1c2a-ecd5-41dd-97ad-41af88fd54a0.png",
+            "output_file": "gen-bed-low-duvet-1.png",
+            "output_sha256": "4506be8f251b07d7b67eb7f1adb52ef80c6961274c9aa70b7cf581ef906dba1e",
+            "output_file_modified_at": "2026-10-24T18:56:37+00:00",
+            "seed": null,
+            "consumed_credits": "about 0.25 (Ginkgo MESH_SOURCES.md)",
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "mesh": {
+            "asset_id": "gen-bed-low-duvet-1",
+            "provider": "meshy",
+            "tool": "meshy_image_to_3d",
+            "submitted_at": "2026-10-24T18:58:22.162Z",
+            "request": {
+              "ai_model": "meshy-7.1",
+              "enable_pbr": true,
+              "texture_resolution": "4k",
+              "target_formats": [
+                "glb"
+              ],
+              "image": "local upload of ref_bed_duvet.png"
+            },
+            "input_image_sha256": "4506be8f251b07d7b67eb7f1adb52ef80c6961274c9aa70b7cf581ef906dba1e",
+            "status": "SUCCEEDED",
+            "status_basis": "Downloaded in the Ginkgo session with meshy_download_model; GLB present",
+            "task_id": "01a16f47-ca08-74b7-a9ef-c87acdd3173b",
+            "output_file": "gen-bed-low-duvet-1.glb",
+            "output_sha256": "9c99ac89053627d0fba38f63b75bb40aab98fbcffdc652724d3170aa59f22bbd",
+            "seed": null,
+            "consumed_credits": 30,
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-bed-low-duvet-1",
+            "source_sha256": "9c99ac89053627d0fba38f63b75bb40aab98fbcffdc652724d3170aa59f22bbd",
+            "source_triangles": 522710,
+            "target_triangles": 80000,
+            "prepared_sha256": "cde9c6070d210903d61788389a4fb92b0e7d9606f21b55d0f6bd0c659c5d26da",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.9042329788208008e-07,
+            "quality": {
+              "vertices": 39914,
+              "triangles": 80000,
+              "boundary_edges": 0,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 2,
+              "largest_component_vertices": 39368,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                0.000151279691083671,
+                2.760759700971537e-05,
+                1.086213086907791e-05
+              ]
+            }
+          },
+          "input_image_file": "batches/ginkgo-refset-1024/gen-bed-low-duvet-1.png",
+          "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+          "external_reference_ids": [],
+          "dimension_basis": "Real-world sizes authored in the Ginkgo pass (runs/refset_1024/worlds/jp.py PROPS); height normalised exactly, width and depth measured after uniform scaling. Not a physical survey.",
+          "reference_review": "Ginkgo reference image reviewed in that session for a clean, unbranded single object; re-checked for this import: no lettering, logos or brand marks visible.",
+          "rights": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private)",
+            "pass": "runs/refset_1024",
+            "source_name": "bed_duvet",
+            "records": [
+              "runs/refset_1024/MESH_SOURCES.md",
+              "runs/refset_1024/meshy/jobs.json",
+              "runs/refset_1024/pass.json",
+              "Claude Code session transcript c849f85f-3384-47ae-bf45-2e1a471d157c (the tool calls that submitted the image and mesh jobs)"
+            ]
+          }
+        }
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "bedroom"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.001,
+      "triangle_count": 80000,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "F66F75AE24DE8C93E9A0FA4F90DF229B0A251F7659DD3100A4097AF36AA337EC"
+}

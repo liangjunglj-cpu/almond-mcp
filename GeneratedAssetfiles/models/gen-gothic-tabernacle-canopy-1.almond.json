@@ -1,0 +1,336 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-gothic-tabernacle-canopy-1",
+  "library_id": "generated_assets",
+  "name": "Tabernacle canopy (Gothic fountain-column canopy with pinnacles, spire and finial cross; generated ornament; detailed geometry edition)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-gothic-tabernacle-canopy-1.glb",
+  "dimensions_mm": {
+    "width": 656.4,
+    "depth": 668.3,
+    "height": 1710.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -328.2,
+        -334.15,
+        0.0
+      ],
+      "max": [
+        328.2,
+        334.15,
+        1710.0
+      ]
+    },
+    "footprint": [
+      [
+        -328.2,
+        -334.15
+      ],
+      [
+        328.2,
+        -334.15
+      ],
+      [
+        328.2,
+        334.15
+      ],
+      [
+        -328.2,
+        334.15
+      ]
+    ],
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "fixed"
+  },
+  "materials": [
+    {
+      "material_id": "brick-red",
+      "objects": [
+        "gen-gothic-tabernacle-canopy-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-gothic-tabernacle-canopy-1",
+    "library_id": "generated_assets",
+    "name": "Tabernacle canopy (Gothic fountain-column canopy with pinnacles, spire and finial cross; generated ornament; detailed geometry edition)",
+    "category": "ornament",
+    "tags": [
+      "gothic",
+      "canopy",
+      "tabernacle",
+      "spire",
+      "fountain",
+      "sandstone",
+      "detailed",
+      "meshy",
+      "ginkgo-freiburg-2026-11"
+    ],
+    "dimensions_mm": {
+      "width": 656.4,
+      "depth": 668.3,
+      "height": 1710.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 660.0,
+      "depth": 670.0,
+      "height": 1710.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -328.2,
+          -334.15,
+          0.0
+        ],
+        "max": [
+          328.2,
+          334.15,
+          1710.0
+        ]
+      },
+      "footprint": [
+        [
+          -328.2,
+          -334.15
+        ],
+        [
+          328.2,
+          -334.15
+        ],
+        [
+          328.2,
+          334.15
+        ],
+        [
+          -328.2,
+          334.15
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "fixed"
+    },
+    "materials": [
+      {
+        "material_id": "brick-red",
+        "objects": [
+          "gen-gothic-tabernacle-canopy-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "Clean, sharp, high-resolution front view of the upper part of this Gothic fountain column in weathered dark red sandstone: an open square tabernacle canopy with pointed tracery arches, crocketed pinnacles at the four corners, a tapering spire with a small finial cross on top, and below it a ring of pointed tracery arches. Remove the statues: the niche inside the tabernacle is empty. Same proportions and red sandstone colour as the reference. Isolated on a plain light grey background, soft even daylight, no buildings, no plants, whole canopy visible.",
+        "image_task_id": "01a1d5e9-9e75-7555-a2b8-8da736f9be7f",
+        "image_model": "nano-banana-pro",
+        "mesh_task_id": "01a1d5ea-5e9a-711f-89f5-3096bbb26bfa",
+        "mesh_model": "meshy-7.1",
+        "generated_at": "2026-11-13",
+        "orientation_correction": null,
+        "scale_applied": 898.892776,
+        "captured_generation": {
+          "batch_id": "ginkgo-freiburg-2026-11",
+          "image": {
+            "asset_id": "gen-gothic-tabernacle-canopy-1",
+            "provider": "meshy",
+            "tool": "meshy_image_to_image",
+            "submitted_at": "2026-11-13T17:16:58.083Z",
+            "request": {
+              "ai_model": "nano-banana-pro",
+              "prompt": "Clean, sharp, high-resolution front view of the upper part of this Gothic fountain column in weathered dark red sandstone: an open square tabernacle canopy with pointed tracery arches, crocketed pinnacles at the four corners, a tapering spire with a small finial cross on top, and below it a ring of pointed tracery arches. Remove the statues: the niche inside the tabernacle is empty. Same proportions and red sandstone colour as the reference. Isolated on a plain light grey background, soft even daylight, no buildings, no plants, whole canopy visible.",
+              "aspect_ratio": "9:16",
+              "reference_images": [
+                "local upload of canopy_crop.jpg"
+              ]
+            },
+            "task_id": "01a1d5e9-9e75-7555-a2b8-8da736f9be7f",
+            "status": "SUCCEEDED",
+            "status_basis": "Downloaded in the Ginkgo session with meshy_download_model; image file present",
+            "provider_model": "nano-banana-pro",
+            "completed_observed_at": "2026-11-13T17:17:28.986Z",
+            "consumed_credits": 9,
+            "reference_inputs": [
+              {
+                "name": "canopy_crop.jpg",
+                "role": "owner photograph, crop of the fountain",
+                "sha256": "be3caf464878db849f3b1f20586c29f3255866d9df5f3644575fe540a466d9b2",
+                "retained": false,
+                "note": "Owner photograph uploaded to the image stage; not distributed"
+              }
+            ],
+            "output_file": "gen-gothic-tabernacle-canopy-1.png",
+            "output_sha256": "e5abc2cc751d1e094c07b7e6f49f58b8dd34cb16eb1844da96d312acf4823f03",
+            "output_file_modified_at": "2026-11-13T17:17:28+00:00",
+            "seed": null,
+            "evidence_source": {
+              "pass_records": [
+                "runs/freiburg_tram/AGENTS.md",
+                "runs/fischbrunnen/AGENTS.md",
+                "runs/fischbrunnen/layout/fountain.json",
+                "runs/freiburg_tram/layout/pink.json",
+                "runs/refset_1117/pass.json",
+                "runs/refset_1117/src/W067_placements.json",
+                "runs/refset_1117/src/W068_placements.json"
+              ],
+              "session_records": "Tool calls of Ginkgo Claude Code session(s) bc81df46-55a4-4f2b-b285-4743fcb41771 (submissions, results and downloads)",
+              "extracted_at": "2026-11-18T19:10:37+00:00"
+            }
+          },
+          "mesh": {
+            "asset_id": "gen-gothic-tabernacle-canopy-1",
+            "provider": "meshy",
+            "tool": "meshy_image_to_3d",
+            "submitted_at": "2026-11-13T17:17:44.317Z",
+            "request": {
+              "ai_model": "meshy-7.1",
+              "texture_model": "meshy-7",
+              "enable_pbr": true,
+              "target_formats": [
+                "glb"
+              ],
+              "image": "local upload of canopy_clean.png"
+            },
+            "task_id": "01a1d5ea-5e9a-711f-89f5-3096bbb26bfa",
+            "status": "SUCCEEDED",
+            "status_basis": "Meshy reported SUCCEEDED in the Ginkgo session; downloaded with meshy_download_model {\"format\": \"glb\"}; GLB present",
+            "consumed_credits": 30,
+            "input_link": "upload",
+            "input_image_sha256": "e5abc2cc751d1e094c07b7e6f49f58b8dd34cb16eb1844da96d312acf4823f03",
+            "output_file": "gen-gothic-tabernacle-canopy-1.glb",
+            "output_sha256": "7088cd52ef615fe61ba4a48cc88636a4d20c7d187c35d4de58a42af74261acb7",
+            "seed": null,
+            "evidence_source": {
+              "pass_records": [
+                "runs/freiburg_tram/AGENTS.md",
+                "runs/fischbrunnen/AGENTS.md",
+                "runs/fischbrunnen/layout/fountain.json",
+                "runs/freiburg_tram/layout/pink.json",
+                "runs/refset_1117/pass.json",
+                "runs/refset_1117/src/W067_placements.json",
+                "runs/refset_1117/src/W068_placements.json"
+              ],
+              "session_records": "Tool calls of Ginkgo Claude Code session(s) bc81df46-55a4-4f2b-b285-4743fcb41771 (submissions, results and downloads)",
+              "extracted_at": "2026-11-18T19:10:37+00:00"
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-gothic-tabernacle-canopy-1",
+            "source_sha256": "7088cd52ef615fe61ba4a48cc88636a4d20c7d187c35d4de58a42af74261acb7",
+            "source_triangles": 3080436,
+            "target_triangles": 80000,
+            "prepared_sha256": "34027d8bdf2891427b975d8cea3213cb4a9f34fd47aa59c8f4e226f234832bae",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.9028429985046387e-07,
+            "quality": {
+              "vertices": 39430,
+              "triangles": 80000,
+              "boundary_edges": 0,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 2,
+              "largest_component_vertices": 39388,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                0.0011023175737794523,
+                0.0004132622482732458,
+                0.00026412392674595564
+              ]
+            }
+          },
+          "input_image_file": "batches/ginkgo-freiburg-2026-11/gen-gothic-tabernacle-canopy-1.png",
+          "external_reference_status": "Photo-derived: the image stage received crops of the owner's own photographs of a facade in Freiburg im Breisgau (ornaments) and of the Fischbrunnen, a Gothic fountain on the Muensterplatz (statues, canopy). The photographs are named and hashed in each image record, not distributed. The generated clean images were then uploaded to Meshy.",
+          "external_reference_ids": [],
+          "dimension_basis": "Sizes as placed in the Ginkgo photo reconstructions (fountain.json statue heights; pink.json console height; placement matrices for canopy and cartouche); height normalised exactly, width and depth measured after uniform scaling. Measured from photographs, not surveyed.",
+          "reference_review": "Reference image reviewed on 2026-11-18 at full resolution for this import: no lettering, logos, badges or brand marks visible.",
+          "rights": "Image and mesh stages ran on the owner's paid Meshy account; the inputs were the owner's own photographs. The fountain statues and canopy reproduce a 15th-century public monument and the ornaments an 1890s facade; their original designs are long out of copyright, and no photograph is distributed. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-18. These models also appear inside the owner's GRANDWHIS world packs. Generator account entitlements and the current monument's restoration history not independently audited.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private)",
+            "pass": "runs/freiburg_tram and runs/fischbrunnen (packaged in runs/refset_1117)",
+            "source_name": "canopy",
+            "records": [
+              "runs/refset_1117/pass.json",
+              "runs/fischbrunnen/layout/fountain.json",
+              "Claude Code session transcripts 48627919-6d97-4c20-b07e-a5ea9fccb1ba (ornaments) and bc81df46-55a4-4f2b-b285-4743fcb41771 (fountain)"
+            ]
+          }
+        }
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "architecture",
+        "streetscape"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.005,
+      "triangle_count": 80000,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "DEBE1E8DF676617226942B7E8DF359D86306ADBD3A7DC4AA95FFA7DF47316CAC"
+}

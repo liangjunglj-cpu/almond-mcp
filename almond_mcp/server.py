@@ -24,7 +24,7 @@ from fastmcp import FastMCP
 from fastmcp.resources import ResourceContent, ResourceResult
 from almond_mcp.ghx_parser import GHParser, validate_capsule_manifest
 from almond_mcp.retrieval_store import AlmondStore
-from almond_mcp import asset_passport, asset_loads, bridge_client, conditioning, exchange, paths, drafting, native_structure, structure_study, design_codes
+from almond_mcp import asset_passport, asset_loads, bridge_client, conditioning, exchange, paths, drafting, native_structure, structure_study, design_codes, model_store
 
 # ── Constants ────────────────────────────────────────────────────────────────
 
@@ -147,6 +147,11 @@ class AssetLibraryIndexer:
             record["library_id"] = self.library_id
             record["_resolved_file"] = str(resolved_file)
             record["file_available"] = resolved_file.is_file()
+            if self.library_id == "generated_assets":
+                # The wheel ships no generated model files: an asset with verifiable
+                # checksums is available and downloads on first use (model_store).
+                record["file_local"] = model_store.is_local(record, self.directory)
+                record["file_available"] = record["file_local"] or model_store.is_obtainable(record)
             self.assets[asset_id] = record
 
         print(f"Indexed {len(self.assets)} {self.label} assets.", file=sys.stderr)
@@ -889,6 +894,7 @@ def get_generated_asset_passport(asset_id: str) -> dict:
         return {"status": "error", "message": "Library has no passport; upgrade the asset pack."}
     out = {"status": "success", "passport": asset["passport"],
            "file_available": asset.get("file_available", False),
+           "file_local": model_store.is_local(asset, Path(GENERATED_LIBRARY_DIR)),
            "preview_uri": f"almond://generated/{asset_id}/preview"}
     try:
         table = asset_loads.LoadTable(_structural_loads_path())
@@ -934,6 +940,12 @@ def search_detail_sources(query: str = "") -> dict:
             matches.append({**source, "matched_terms": matched})
     matches.sort(key=lambda s: (-len(s["matched_terms"]), s["source_id"]))
     return {"status": "success", "scope": data["scope"], "sources": matches}
+
+
+def _generated_model_path(asset: dict) -> Path:
+    """Local GLB of a generated asset, downloaded and verified on first use
+    (the PyPI wheel carries no model files; see model_store)."""
+    return model_store.ensure_generated_files(asset, GENERATED_LIBRARY_DIR)["model"]
 
 
 @mcp.tool(annotations={"readOnlyHint": True, "openWorldHint": False})
@@ -992,8 +1004,7 @@ def generate_asset_drawing_views(asset_id: str = "", source_glb: str = "",
             asset = generated_asset_indexer.get(asset_id)
             if not asset:
                 raise ValueError("Unknown generated asset ID")
-            model = (Path(GENERATED_LIBRARY_DIR)/asset["file"]).resolve()
-            model.relative_to(Path(GENERATED_LIBRARY_DIR).resolve())
+            model = _generated_model_path(asset)
             if drafting.sha(model.read_bytes()) != asset["sha256"]:
                 raise ValueError("Source model checksum differs from catalogue")
             record_result = get_generation_sources(asset_id)
@@ -1033,8 +1044,7 @@ def audit_asset_drawing(package_dir: str, source_glb: str = "") -> dict:
         if source is None:
             asset = generated_asset_indexer.get(manifest["source"]["asset_id"])
             if asset:
-                source = (Path(GENERATED_LIBRARY_DIR)/asset["file"]).resolve()
-                source.relative_to(Path(GENERATED_LIBRARY_DIR).resolve())
+                source = _generated_model_path(asset)
         return drafting.audit_package(package, source)
     except (OSError, ValueError, KeyError, IndexError, TypeError, struct.error) as exc:
         return {"status": "error", "message": str(exc)}
@@ -1054,7 +1064,7 @@ def asset_drawing_resource(asset_id: str, view: str, scale: str) -> ResourceResu
         raise ValueError(result["message"])
     filename = f"{view}-1-{scale}.svg"
     model = generated_asset_indexer.get(asset_id)
-    source = (Path(GENERATED_LIBRARY_DIR)/model["file"]).resolve() if model else None
+    source = _generated_model_path(model) if model else None
     checked = drafting.audit_package(Path(result["package_dir"]), source)
     if checked["status"] != "success":
         raise ValueError("Drawing package is modified or stale")
@@ -3644,20 +3654,15 @@ def place_generated_asset(
     if not asset:
         return json.dumps({"status": "error",
                            "message": f"Unknown generated asset_id: {asset_id}"})
-    if not asset.get("file_available"):
-        return json.dumps({"status": "error",
-                           "message": f"Model file missing for {asset_id}; run "
-                                      "almond-mcp fetch-assets to download it."})
     values = [x_mm, y_mm, z_mm, rotation_degrees]
     if not all(isinstance(v, (int, float)) and math.isfinite(v) for v in values):
         return json.dumps({"status": "error", "message": "Placement values must be finite numbers."})
     contract_rel = str(asset.get("contract_file") or "").strip()
     if not contract_rel:
         return json.dumps({"status": "error", "message": f"{asset_id} has no contract_file."})
-    library_root = Path(GENERATED_LIBRARY_DIR).resolve()
-    contract_path = (library_root / contract_rel).resolve()
     try:
-        contract_path.relative_to(library_root)
+        # First placement on a PyPI install downloads the GLB + contract (sha256-verified).
+        contract_path = model_store.ensure_generated_files(asset, GENERATED_LIBRARY_DIR)["contract"]
         contract = exchange.load_contract(contract_path)
     except Exception as exc:
         return json.dumps({"status": "error", "message": str(exc)})
@@ -4102,6 +4107,11 @@ def repository_asset_resource(asset_id: str) -> str:
     record = repository.records.get(asset_id)
     if not record:
         raise ValueError("Unknown repository asset ID")
+    if record["kind"] == "model" and not record.get("local", True):
+        try:  # local_files promises paths on disk: fetch the model + contract now
+            repository.ensure(record["model"])
+        except OSError as exc:
+            record["download_error"] = str(exc)
     # HTTP URLs are relative to `almond-mcp library`; provide resolved locations
     # for MCP clients that do not have a browser server running.
     urls = {record["model"], record["preview"], record["contract"], record.get("generation_image")}
@@ -4110,7 +4120,10 @@ def repository_asset_resource(asset_id: str) -> str:
         for view in record["drawing"]["views"]:
             urls.update([view["svg"], view["dxf"]])
         urls.update(sheet["svg"] for sheet in record["drawing"]["sheets"])
-    record["local_files"] = {url: str(repository.files[url][1]) for url in urls if url in repository.files}
+    record["local_files"] = {url: str(repository.files[url][1]) for url in urls
+                             if url in repository.files and repository.files[url][1].is_file()}
+    record["local"] = all(repository.files[u][1].is_file() for u in (record["model"], record["contract"])
+                          if u in repository.files)
     return json.dumps(record)
 
 

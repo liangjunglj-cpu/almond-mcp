@@ -1,0 +1,633 @@
+{
+  "batch_id": "y2k-world-kit-v040",
+  "route": "procedural_script",
+  "purpose": "Street details, a shrine and commuter railcars from Project Y2K's Mirai Ward kit (world_v040: kit_v060_details.py, kit_v040.py, kinetic_v046.py; Blender scripts), re-derived as Almond library geometry. Library derivation (tools/prepare_organic_meshes.py, procedural route): Blender FBX import at the authored metre size, engine collision hulls (UCX_*) removed, recorded edits applied, kit material slots removed, weld/degenerate cleanup, triangulation, normals recalculated, hard edges kept; no decimation (the target is the source triangle count) and no subdivision. tools/build_generated_assets.py then scales the GLB to millimetres (height = the authored height) and puts the bottom centre on the origin.",
+  "origin": {
+    "project": "Project Y2K, the owner's game project (private repository)",
+    "pass": "twofronts/world_v040/kit",
+    "pass_date": "2026-09-27 to 2026-10-10",
+    "pass_records": [
+      "twofronts/world_v040/kit_v060_details.py",
+      "twofronts/world_v040/kit_v040.py",
+      "twofronts/world_v040/kinetic_v046.py",
+      "twofronts/world_v040/kit/kit_v060.json",
+      "twofronts/world_v040/kit/kit_v040.json"
+    ],
+    "records": [
+      "twofronts/world_v040/kit_v060_details.py, twofronts/world_v040/kit_v040.py, twofronts/world_v040/kinetic_v046.py (the generators, retained as .py.txt; kit_v040.py with one local path redacted)",
+      "twofronts/world_v040/kit/kit_v060.json, twofronts/world_v040/kit/kit_v040.json (kit records; retained, kit_v040.json with local paths redacted)",
+      "twofronts/world_v040/kit/MW60_*.fbx, MW_Shrine.fbx, MW_Train_*.fbx (SHA-256 checked)",
+      "Claude Code session transcripts f2628003-8252-4ccb-8906-36416d1f5fc8, 09c7fb46-e676-445d-99fe-baacaffc9f03, 5772745b-5dde-425b-9074-b55221d6a766 and 6e4feafa-de41-49cf-af90-dfa40f758867"
+    ],
+    "excluded": {
+      "MW60_Cable10": "Owner-chosen exclusion: overhead cable, low fit",
+      "MW_Blimp, MW_Airship_Cargo, MW_AdBalloon, MW_SignDrone": "Billboard and advertising textures may show operatives",
+      "MW_SkyGondola, MW_SkyCable": "Low fit for the library",
+      "MW_JumpPad, MW_Parkour_Platform, MW_Parkour_WallRun": "Game-only pieces",
+      "MW_* buildings, bridges, viaduct, plaza, road, sidewalk, slab, gate, vitrine and works modules": "Building-scale or infrastructure modules, not placeable objects",
+      "world/neon_signs_v021 (ten Chinese neon signs)": "Lettering tessellated from Windows system fonts (font licences)",
+      "combat_v016/pickups": "Game items (the ammo cell is weapon-adjacent)",
+      "art/effects_v072 FX meshes": "Game effects, not objects"
+    }
+  },
+  "generator": {
+    "scripts": {
+      "twofronts/world_v040/kit_v060_details.py": {
+        "sha256": "054b23e8ce2c0395e47bf7d70b2c0e9ead6977ac61b9e3eecdd835d5640bdeb1",
+        "size_bytes": 9863,
+        "last_modified_at": "2026-10-10T01:48:11+00:00",
+        "retained_as": "kit_v060_details.py.txt",
+        "retained_sha256": "2e1fda9c2891d9a2f1bd39aa9ffb0dd1718adbcc26e9242eebf54b5dc12c630d",
+        "role": "generator",
+        "dependencies": [],
+        "authoring": {
+          "tool": "Claude Code",
+          "project": "Project Y2K",
+          "sessions": [
+            {
+              "session": "f2628003-8252-4ccb-8906-36416d1f5fc8",
+              "actions": "Write of the script (2026-10-10T00:56:34Z) after the owner asked to \"continue to add architectural details\"; scripted edits at 00:58:18Z and 01:48:11Z, the last run in the same command as the build (FBX files and kit_v060.json written 01:48:16Z)"
+            }
+          ],
+          "basis": "Tool calls in the session transcript; the FBX files are newer than the last script edit."
+        }
+      },
+      "twofronts/world_v040/kit_v040.py": {
+        "sha256": "e2cdaad0dcccb4ffe7510e4a735fb6e976363a298da83bad876df962121b0d5e",
+        "size_bytes": 91765,
+        "last_modified_at": "2026-09-27T11:02:22+00:00",
+        "retained_as": "kit_v040.py.txt",
+        "retained_sha256": "ca7047bc12d9865d80ce244d9f5e5dd2aa8c243446f92097e594252d17cf2854",
+        "redact_local_paths": "<owner's Ginkgo repository>",
+        "redaction_anchor": "Ginkgo",
+        "redaction_note": "1 line(s) held an absolute local path; the retained copy replaces each path up to its project folder with \"<owner's Ginkgo repository>\", keeping the part after the Ginkgo folder. The project file hash is of the unredacted file.",
+        "role": "generator",
+        "dependencies": [
+          {
+            "path": "Ginkgo: publishing/worldpack/gwlib.py",
+            "sha256_now": "b5dbd2da56f3f49092f3eb48749daed447bf5e7c78ef271805cc35d31dea8ac8",
+            "last_modified_at": "2026-10-03T19:18:48+00:00",
+            "retained": false,
+            "use": "geometry helpers (boxz, cyl, strut, decal) and material set-up; the owner's Ginkgo world-pack library",
+            "note": "Modified after these exports; the version the export used is not retained."
+          },
+          {
+            "path": "Ginkgo: publishing/worldpack/gwrender.py",
+            "sha256_now": "7c47a6748b956ee8a828242a8ac34a9cf285402e4a54097d7531a0712bce624e",
+            "last_modified_at": "2026-10-03T18:51:22+00:00",
+            "retained": false,
+            "use": "tile renders only (no geometry)"
+          }
+        ],
+        "authoring": {
+          "tool": "Claude Code",
+          "project": "Project Y2K",
+          "sessions": [
+            {
+              "session": "09c7fb46-e676-445d-99fe-baacaffc9f03",
+              "subagent": "agent-aa9e550516cb8c0d7",
+              "actions": "Written by a subagent of this session on 2026-09-26 (2 Writes, 4 Edits, 10:33-10:50Z)"
+            },
+            {
+              "session": "5772745b-5dde-425b-9074-b55221d6a766",
+              "actions": "9 Edits on 2026-09-27 (10:49-11:02Z); the file was last modified 11:02:22Z and MW_Shrine.fbx was written 11:04:51Z"
+            }
+          ],
+          "basis": "Tool calls in the session transcripts; the export command for MW_Shrine.fbx was not pinned to a tool call. The FBX is newer than the last script edit."
+        }
+      },
+      "twofronts/world_v040/kinetic_v046.py": {
+        "sha256": "11fcb6138acd3436a3980d8e68c9d2b302510a53b2cc824d7aa9fff4442279ef",
+        "size_bytes": 9570,
+        "last_modified_at": "2026-10-01T00:14:04+00:00",
+        "retained_as": "kinetic_v046.py.txt",
+        "retained_sha256": "1392ca6c4e019dde9e8181a1275dcf6b390fe0e5890cb43ab6add851b5cc9cb5",
+        "role": "generator",
+        "dependencies": [
+          {
+            "path": "twofronts/world_v040/kit_v040.py",
+            "sha256": "e2cdaad0dcccb4ffe7510e4a735fb6e976363a298da83bad876df962121b0d5e",
+            "retained": "yes (kit_v040.py.txt in this batch)",
+            "use": "kit library: materials, grp(), fbox(), fquad(), lightbox() and the FBX export"
+          },
+          {
+            "path": "Ginkgo: publishing/worldpack/gwlib.py",
+            "sha256_now": "b5dbd2da56f3f49092f3eb48749daed447bf5e7c78ef271805cc35d31dea8ac8",
+            "last_modified_at": "2026-10-03T19:18:48+00:00",
+            "retained": false,
+            "use": "geometry helpers (boxz, cyl, strut, decal) and material set-up; the owner's Ginkgo world-pack library",
+            "note": "Modified after these exports; the version the export used is not retained."
+          },
+          {
+            "path": "Ginkgo: publishing/worldpack/gwrender.py",
+            "sha256_now": "7c47a6748b956ee8a828242a8ac34a9cf285402e4a54097d7531a0712bce624e",
+            "last_modified_at": "2026-10-03T18:51:22+00:00",
+            "retained": false,
+            "use": "tile renders only (no geometry)"
+          }
+        ],
+        "authoring": {
+          "tool": "Claude Code",
+          "project": "Project Y2K",
+          "sessions": [
+            {
+              "session": "6e4feafa-de41-49cf-af90-dfa40f758867",
+              "actions": "Write of the script (2026-10-01T00:12:43Z) after the owner asked for \"kinetic elements like trains\"; the build of all seven variants started 00:12:45Z (MW_Train_Lead.fbx and MW_Train_Mid.fbx written 00:13:00Z)"
+            }
+          ],
+          "basis": "Tool calls in the session transcript."
+        },
+        "post_export_edit": {
+          "at": "2026-10-01T00:14:03Z",
+          "session": "6e4feafa-de41-49cf-af90-dfa40f758867",
+          "change": "Two text replacements inside blimp(): segment count 18 to 44 and the poster width fitted to its height; the Blimp variant alone was re-exported",
+          "affected_variants": [
+            "MW_Blimp"
+          ]
+        }
+      }
+    },
+    "kit_records": {
+      "twofronts/world_v040/kit/kit_v060.json": {
+        "sha256": "9b68c083537f95b9ff08b1adcba70ec92fd1f62acb5777f36a26d352cae62797",
+        "size_bytes": 1869,
+        "last_modified_at": "2026-10-10T01:48:16+00:00",
+        "retained_as": "kit_v060.json",
+        "retained_sha256": "33ca28670af296a6c872e7705c2cc71dc493249ee21847bcf58b619a41432096"
+      },
+      "twofronts/world_v040/kit/kit_v040.json": {
+        "sha256": "3c23cc1c14ede21f696ebf5885f3dd7c08f645780759d673fadfbae1e9011af0",
+        "size_bytes": 84039,
+        "last_modified_at": "2026-10-01T00:23:38+00:00",
+        "retained_as": "kit_v040.json",
+        "retained_sha256": "df0dd6ff9eb277f1cb66f408bd0f2b895e80314ba38a7e6c453faf450ded1c23",
+        "redact_local_paths": "<Project Y2K>",
+        "redaction_anchor": "ProjectY2K",
+        "redaction_note": "119 line(s) held an absolute local path; the retained copy replaces each path up to its project folder with \"<Project Y2K>\", keeping the part after the ProjectY2K folder. The project file hash is of the unredacted file."
+      }
+    }
+  },
+  "strip_source_materials": true,
+  "external_reference_ids": [],
+  "external_reference_status": "Style reference only: kit_v040.py says it builds \"in the style of the owner's Ginkgo refset_0924 world run\" (the owner's own generated world images); kit_v060_details.py and kinetic_v046.py follow the owner's text requests. No external image was an input to these pieces, and the pieces use no Ginkgo or Meshy geometry (the shrine, railcars and street details are built from boxes, cylinders and struts).",
+  "variant_suffix": "procedural kit piece; low-poly edition",
+  "recipe_override": "procedural_script",
+  "dimension_basis": "Authored kit sizes in metres from the scripts (kit records: kit_v060.json min/max, kit_v040.json bounds_m); the library keeps them (height = authored height, width and depth measured). The wall AC rig is assumed to hang with its drain line reaching ground level (mount height 0). Not a physical survey.",
+  "rights": "Procedural geometry built by a Blender script in the owner's Project Y2K game repository (private); see each script's authoring record for the Claude Code session that wrote it, or that none was found. The owner's own project geometry: no generation provider, account or credits are involved, and the scripts build every piece from Blender primitives (no imported or third-party geometry in these pieces). Owner approved release in the Almond library under CC BY 4.0 on 2026-11-20 (\"increase the range of models, from the ones i used for my project y2k games, (except for the operatives and bosses)\") and chose the procedural kit pieces on 2026-11-20. Kit material colours and textures are not distributed; Almond materials are assigned.",
+  "estimated_credits": 0,
+  "repair_nonmanifold": true,
+  "assets": [
+    {
+      "asset_id": "gen-utility-pole-1",
+      "source_name": "MW60_UtilityPole",
+      "source_file": "twofronts/world_v040/kit/MW60_UtilityPole.fbx",
+      "source_sha256": "3edd457610b81071f16cdfe648679db1e461f600443b7bd4185ca8dc767d9fa3",
+      "source_exported_at": "2026-10-10T01:48:16+00:00",
+      "generator_script": "twofronts/world_v040/kit_v060_details.py",
+      "kit_record": "twofronts/world_v040/kit/kit_v060.json",
+      "kit_entry": {
+        "anchors": [
+          {
+            "z": 9.84,
+            "x": [
+              -0.95,
+              -0.35,
+              0.35,
+              0.95
+            ]
+          },
+          {
+            "z": 9.040000000000001,
+            "x": [
+              -0.95,
+              -0.35,
+              0.35,
+              0.95
+            ]
+          }
+        ],
+        "lamp": [
+          2.15,
+          0,
+          6.41
+        ],
+        "collision": "UCX column 0.44 x 0.44 x 10.5 m",
+        "ucx": [
+          "UCX_MW60_UtilityPole_00"
+        ],
+        "fbx": "MW60_UtilityPole.fbx",
+        "materials": [
+          "ConcreteWeathered",
+          "ConcreteDark",
+          "SteelDark",
+          "PlasticWhite",
+          "Galvanized",
+          "LampCool",
+          "PaintYellow",
+          "SignBack"
+        ],
+        "min": [
+          -1.1,
+          -0.3,
+          0.0
+        ],
+        "max": [
+          2.425,
+          0.3,
+          10.5
+        ],
+        "tris": 852
+      },
+      "product": "Utility pole",
+      "variant": "10.5 m concrete pole with crossarms, insulators, a transformer and a lamp arm",
+      "category": "site_furniture",
+      "material": "concrete-smooth",
+      "height_mm": 10500,
+      "width_hint_mm": 3525,
+      "depth_hint_mm": 600,
+      "target_triangles": 852,
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "tags": [
+        "utility pole",
+        "power",
+        "street light",
+        "tokyo",
+        "streetscape",
+        "urban"
+      ],
+      "prompt": null,
+      "edits": [],
+      "reference_review": "Reviewed on 2026-11-20: procedural geometry, so there is no input image. The prepared library mesh was rendered untextured from the front three-quarter view (500 px, viewed in a 300 px contact sheet) and the script code that models it was read: no lettering, logos, brand marks or characters in the geometry. A straight-on front render (600 px, viewed at 400 px) also shows only blank panels. The address plate is a plain box (the kit gives it a yellow material, no text)."
+    },
+    {
+      "asset_id": "gen-vending-row-1",
+      "source_name": "MW60_VendingRow",
+      "source_file": "twofronts/world_v040/kit/MW60_VendingRow.fbx",
+      "source_sha256": "e39285ea1449c37daf9dd26bd105e589e2148d2f2b9ea088ffa40cd525bdb12a",
+      "source_exported_at": "2026-10-10T01:48:16+00:00",
+      "generator_script": "twofronts/world_v040/kit_v060_details.py",
+      "kit_record": "twofronts/world_v040/kit/kit_v060.json",
+      "kit_entry": {
+        "collision": "UCX box",
+        "face": "-Y",
+        "ucx": [
+          "UCX_MW60_VendingRow_00"
+        ],
+        "fbx": "MW60_VendingRow.fbx",
+        "materials": [
+          "PaintRed",
+          "GlassLit",
+          "ShopLit",
+          "Black",
+          "ScreenCyan",
+          "SteelDark",
+          "PaintWhite",
+          "PaintBlue"
+        ],
+        "min": [
+          -1.7,
+          -0.83,
+          0.0
+        ],
+        "max": [
+          2.22,
+          0.03,
+          1.99
+        ],
+        "tris": 252
+      },
+      "product": "Vending machine row",
+      "variant": "Three street vending machines with lit fronts and a can bin",
+      "category": "site_furniture",
+      "material": "steel-painted-vermilion",
+      "height_mm": 1990,
+      "width_hint_mm": 3920,
+      "depth_hint_mm": 860,
+      "target_triangles": 252,
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "tags": [
+        "vending",
+        "drinks",
+        "kiosk",
+        "japan",
+        "streetscape",
+        "urban"
+      ],
+      "prompt": null,
+      "edits": [],
+      "reference_review": "Reviewed on 2026-11-20: procedural geometry, so there is no input image. The prepared library mesh was rendered untextured from the front three-quarter view (500 px, viewed in a 300 px contact sheet) and the script code that models it was read: no lettering, logos, brand marks or characters in the geometry. A straight-on front render (600 px, viewed at 400 px) also shows only blank panels. The kit's lit fronts are plain material slots (no texture)."
+    },
+    {
+      "asset_id": "gen-wall-ac-rig-1",
+      "source_name": "MW60_WallACRig",
+      "source_file": "twofronts/world_v040/kit/MW60_WallACRig.fbx",
+      "source_sha256": "3e6193060373f51d303454569d17c11915eb312be05a5dab7ff45f1ca139997e",
+      "source_exported_at": "2026-10-10T01:48:16+00:00",
+      "generator_script": "twofronts/world_v040/kit_v060_details.py",
+      "kit_record": "twofronts/world_v040/kit/kit_v060.json",
+      "kit_entry": {
+        "face": "-Y",
+        "wall_plane_y": 0.0,
+        "ucx": [],
+        "fbx": "MW60_WallACRig.fbx",
+        "materials": [
+          "PlasticWhite",
+          "Black",
+          "SteelDark",
+          "Cable"
+        ],
+        "min": [
+          -1.23,
+          -0.45,
+          -2.6
+        ],
+        "max": [
+          1.295,
+          0.0,
+          1.53
+        ],
+        "tris": 354
+      },
+      "product": "Wall AC rig",
+      "variant": "Two split AC units on wall brackets with pipe runs and a drain line",
+      "category": "building_services",
+      "material": "steel-galvanized",
+      "height_mm": 4130,
+      "width_hint_mm": 2525,
+      "depth_hint_mm": 450,
+      "target_triangles": 354,
+      "support_plane": "wall",
+      "placement_priority": "fixed",
+      "tags": [
+        "air-conditioning",
+        "split unit",
+        "facade",
+        "services",
+        "wall-mounted",
+        "tokyo"
+      ],
+      "prompt": null,
+      "edits": [],
+      "reference_review": "Reviewed on 2026-11-20: procedural geometry, so there is no input image. The prepared library mesh was rendered untextured from the front three-quarter view (500 px, viewed in a 300 px contact sheet) and the script code that models it was read: no lettering, logos, brand marks or characters in the geometry.",
+      "mount_height_mm": 0
+    },
+    {
+      "asset_id": "gen-shrine-lantern-1",
+      "source_name": "MW_Shrine",
+      "source_file": "twofronts/world_v040/kit/MW_Shrine.fbx",
+      "source_sha256": "7e1967ad44b3e404f79da52f3798390501fe83f462a7ee90624521d0b3f71b36",
+      "source_exported_at": "2026-09-27T11:04:51+00:00",
+      "generator_script": "twofronts/world_v040/kit_v040.py",
+      "kit_record": "twofronts/world_v040/kit/kit_v040.json",
+      "kit_entry": {
+        "family": "Shrine",
+        "fbx_rel": "MW_Shrine.fbx",
+        "footprint_m": [
+          4,
+          4
+        ],
+        "height_m": 4.02,
+        "bounds_m": {
+          "min": [
+            -2.0,
+            -2.0,
+            0.0
+          ],
+          "max": [
+            2.0,
+            2.0,
+            4.02
+          ],
+          "size": [
+            4.0,
+            4.0,
+            4.02
+          ]
+        },
+        "roof_heights": [
+          {
+            "z": 0.55,
+            "rect": [
+              -1.75,
+              -1.75,
+              1.75,
+              1.75
+            ],
+            "note": "plinth top"
+          }
+        ],
+        "wallrun_faces": [],
+        "climb_routes": [],
+        "notes": [
+          "Checkpoint: lantern hangs under the nuki (1.21-2.99 m), trigger volume suggested 3x3x3 m."
+        ],
+        "groups": {
+          "SM_MW_Shrine_Structure": 144,
+          "SM_MW_Shrine_Signs": 712,
+          "SM_MW_Shrine_Props": 216
+        },
+        "tris": 1072,
+        "floating_parts": 0,
+        "validation": {
+          "passed": true,
+          "triangles": 1072,
+          "max_bounds_error_m": 0.0,
+          "textures_missing": [],
+          "unused_material_slots": []
+        }
+      },
+      "product": "Lantern shrine",
+      "variant": "Plinth with a red gate frame, a hanging paper-lantern form and two offering boxes, 4 m",
+      "category": "ornament",
+      "material": "steel-painted-vermilion",
+      "height_mm": 4020,
+      "width_hint_mm": 4000,
+      "depth_hint_mm": 4000,
+      "target_triangles": 1072,
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "tags": [
+        "shrine",
+        "gate",
+        "lantern",
+        "japan",
+        "streetscape",
+        "landmark"
+      ],
+      "prompt": null,
+      "edits": [],
+      "reference_review": "Reviewed on 2026-11-20: procedural geometry, so there is no input image. The prepared library mesh was rendered untextured from the front three-quarter view (500 px, viewed in a 300 px contact sheet) and the script code that models it was read: no lettering, logos, brand marks or characters in the geometry. A straight-on front render (600 px, viewed at 400 px) also shows only blank panels. A torii-style gate frame over a paper-lantern form with two offering boxes: generic street-shrine elements, not a model of a specific shrine."
+    },
+    {
+      "asset_id": "gen-commuter-railcar-lead-1",
+      "source_name": "MW_Train_Lead",
+      "source_file": "twofronts/world_v040/kit/MW_Train_Lead.fbx",
+      "source_sha256": "8156f528a99d0da549aea0131a6ad68e22a7f2dbdb399dbc3708b269143f4f5b",
+      "source_exported_at": "2026-10-01T00:13:00+00:00",
+      "generator_script": "twofronts/world_v040/kinetic_v046.py",
+      "kit_record": "twofronts/world_v040/kit/kit_v040.json",
+      "kit_entry": {
+        "family": "Kinetic",
+        "fbx_rel": "MW_Train_Lead.fbx",
+        "footprint_m": [
+          20,
+          3
+        ],
+        "height_m": 5.45,
+        "bounds_m": {
+          "min": [
+            -9.9,
+            -1.53,
+            0.03
+          ],
+          "max": [
+            9.85,
+            1.53,
+            5.45
+          ],
+          "size": [
+            19.75,
+            3.06,
+            5.42
+          ]
+        },
+        "roof_heights": [],
+        "wallrun_faces": [],
+        "climb_routes": [],
+        "notes": [
+          "Train car: length along +X, origin at the car centre on the rail; Unreal: ATFTrainLine CarLength 2000."
+        ],
+        "groups": {
+          "SM_MW_Train_Lead_Structure": 652,
+          "SM_MW_Train_Lead_Signs": 62,
+          "SM_MW_Train_Lead_Glass": 56
+        },
+        "tris": 770,
+        "floating_parts": 0,
+        "validation": {
+          "passed": true,
+          "triangles": 770,
+          "max_bounds_error_m": 0.0,
+          "textures_missing": [],
+          "unused_material_slots": []
+        }
+      },
+      "product": "Commuter railcar, lead",
+      "variant": "20 m car with a raked nose, window band, doors, roof units and a pantograph",
+      "category": "vehicle",
+      "material": "plaster-white",
+      "height_mm": 5420,
+      "width_hint_mm": 19750,
+      "depth_hint_mm": 3060,
+      "target_triangles": 770,
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "tags": [
+        "train",
+        "railcar",
+        "commuter",
+        "rail",
+        "transit",
+        "vehicle"
+      ],
+      "prompt": null,
+      "edits": [
+        {
+          "op": "remove_faces_by_material",
+          "materials": [
+            "M_Decal_Term_Line2"
+          ],
+          "removes": "the destination-board decal quad (2 triangles)",
+          "reason": "Its kit texture is a lettered destination board; the quad is cleanly separable by its material slot. The lightbox behind it stays as blank geometry."
+        }
+      ],
+      "reference_review": "Reviewed on 2026-11-20: procedural geometry, so there is no input image. The prepared library mesh was rendered untextured from the front three-quarter view (500 px, viewed in a 300 px contact sheet) and the script code that models it was read: no lettering, logos, brand marks or characters in the geometry. The destination-board decal quad (a lettered kit texture, not shipped) was removed as a recorded edit; the lightbox behind it is blank geometry, and the livery is plain material slots. A generic commuter car, not a specific operator's rolling stock."
+    },
+    {
+      "asset_id": "gen-commuter-railcar-mid-1",
+      "source_name": "MW_Train_Mid",
+      "source_file": "twofronts/world_v040/kit/MW_Train_Mid.fbx",
+      "source_sha256": "d446b892149415519ec1ec8b313ae9796086065fd9d64558dc3ec099524be90b",
+      "source_exported_at": "2026-10-01T00:13:00+00:00",
+      "generator_script": "twofronts/world_v040/kinetic_v046.py",
+      "kit_record": "twofronts/world_v040/kit/kit_v040.json",
+      "kit_entry": {
+        "family": "Kinetic",
+        "fbx_rel": "MW_Train_Mid.fbx",
+        "footprint_m": [
+          20,
+          3
+        ],
+        "height_m": 5.45,
+        "bounds_m": {
+          "min": [
+            -9.85,
+            -1.53,
+            0.03
+          ],
+          "max": [
+            9.85,
+            1.53,
+            5.45
+          ],
+          "size": [
+            19.7,
+            3.06,
+            5.42
+          ]
+        },
+        "roof_heights": [],
+        "wallrun_faces": [],
+        "climb_routes": [],
+        "notes": [
+          "Train car: length along +X, origin at the car centre on the rail; Unreal: ATFTrainLine CarLength 2000."
+        ],
+        "groups": {
+          "SM_MW_Train_Mid_Structure": 604,
+          "SM_MW_Train_Mid_Signs": 24,
+          "SM_MW_Train_Mid_Glass": 52
+        },
+        "tris": 680,
+        "floating_parts": 0,
+        "validation": {
+          "passed": true,
+          "triangles": 680,
+          "max_bounds_error_m": 0.0,
+          "textures_missing": [],
+          "unused_material_slots": []
+        }
+      },
+      "product": "Commuter railcar, middle",
+      "variant": "20 m middle car with a window band, doors, roof units and a pantograph",
+      "category": "vehicle",
+      "material": "plaster-white",
+      "height_mm": 5420,
+      "width_hint_mm": 19700,
+      "depth_hint_mm": 3060,
+      "target_triangles": 680,
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "tags": [
+        "train",
+        "railcar",
+        "commuter",
+        "rail",
+        "transit",
+        "vehicle"
+      ],
+      "prompt": null,
+      "edits": [],
+      "reference_review": "Reviewed on 2026-11-20: procedural geometry, so there is no input image. The prepared library mesh was rendered untextured from the front three-quarter view (500 px, viewed in a 300 px contact sheet) and the script code that models it was read: no lettering, logos, brand marks or characters in the geometry. The livery is plain material slots. A generic commuter car, not a specific operator's rolling stock."
+    }
+  ],
+  "release_assets": [
+    "gen-utility-pole-1",
+    "gen-vending-row-1",
+    "gen-wall-ac-rig-1",
+    "gen-shrine-lantern-1",
+    "gen-commuter-railcar-lead-1",
+    "gen-commuter-railcar-mid-1"
+  ]
+}

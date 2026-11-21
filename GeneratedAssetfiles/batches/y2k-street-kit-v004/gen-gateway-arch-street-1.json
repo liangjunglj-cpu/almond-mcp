@@ -1,0 +1,169 @@
+{
+  "batch_id": "y2k-street-kit-v004",
+  "route": "procedural_script",
+  "generator": {
+    "script": {
+      "path": "twofronts/infrastructure/scripts/build_street_kit.py",
+      "sha256": "ba4124fe145b9c4673777af34f52ff307b1672c929c72fc8e8f265604ec6e408",
+      "size_bytes": 8706,
+      "last_modified_at": "2026-09-11T21:42:55+00:00",
+      "retained_as": "build_street_kit.py.txt",
+      "retained_sha256": "ba4124fe145b9c4673777af34f52ff307b1672c929c72fc8e8f265604ec6e408",
+      "role": "generator",
+      "dependencies": [],
+      "authoring": {
+        "tool": "not found",
+        "sessions": [],
+        "basis": "No retained Claude Code transcript (Project Y2K or Ginkgo projects) writes or edits this file. The earliest retained Project Y2K transcript starts on 2026-09-12; the script (last modified 2026-09-11T21:42:55+00:00) and its FBX outputs are older. The script refuses to run once the kit .blend exists, and the kit record lists one run. Who wrote the script (a Claude session, the owner or another tool) is therefore not established."
+      },
+      "modified_at": "2026-09-11T21:42:55+00:00",
+      "redacted_lines": [],
+      "retained_file": "batches/y2k-street-kit-v004/build_street_kit.py.txt"
+    },
+    "kit_record": {
+      "path": "twofronts/infrastructure/world/street_v004/kit.json",
+      "sha256": "d53f3acdd5c1dd73eb0598f49874481779d985ceccc482306c22461d3a387ba3",
+      "size_bytes": 7836,
+      "last_modified_at": "2026-09-11T21:43:02+00:00",
+      "retained_as": "street_v004.kit.json",
+      "retained_sha256": "9c0fce2c8652c4119dfc0bca517e52f26a9218ae0a3010915243b75382da24d3",
+      "modified_at": "2026-09-11T21:43:02+00:00",
+      "redacted_lines": [],
+      "retained_file": "batches/y2k-street-kit-v004/street_v004.kit.json"
+    }
+  },
+  "mesh": {
+    "asset_id": "gen-gateway-arch-street-1",
+    "tool": "blender_procedural_script",
+    "source_name": "SM_GatewayArch",
+    "source_file": "twofronts/infrastructure/world/street_v004/SM_GatewayArch.fbx",
+    "generator_script": "twofronts/infrastructure/scripts/build_street_kit.py",
+    "generator_script_sha256": "ba4124fe145b9c4673777af34f52ff307b1672c929c72fc8e8f265604ec6e408",
+    "kit_record": "twofronts/infrastructure/world/street_v004/kit.json",
+    "kit_entry": {
+      "file": "SM_GatewayArch.fbx",
+      "triangles": 1896,
+      "vertices": 1560,
+      "dimensions_m": [
+        10.699999809265137,
+        0.8579999804496765,
+        6.360000133514404
+      ],
+      "collision_boxes": [
+        {
+          "center": [
+            -5.1,
+            0,
+            3
+          ],
+          "size": [
+            0.45,
+            0.6,
+            6
+          ]
+        },
+        {
+          "center": [
+            5.1,
+            0,
+            3
+          ],
+          "size": [
+            0.45,
+            0.6,
+            6
+          ]
+        }
+      ],
+      "sha256": "693578947cc74014b320de84dd47a330b8ea6b669d18273aa4d8cccd36fc30e7"
+    },
+    "output_file": "gen-gateway-arch-street-1.fbx",
+    "output_format": "fbx",
+    "output_sha256": "693578947cc74014b320de84dd47a330b8ea6b669d18273aa4d8cccd36fc30e7",
+    "output_file_modified_at": "2026-09-11T21:43:02+00:00",
+    "evidence_source": {
+      "project_files": [
+        "twofronts/infrastructure/scripts/build_street_kit.py",
+        "twofronts/infrastructure/world/street_v004/kit.json",
+        "twofronts/infrastructure/world/street_v004/SM_GatewayArch.fbx"
+      ],
+      "authoring": {
+        "tool": "not found",
+        "sessions": [],
+        "basis": "No retained Claude Code transcript (Project Y2K or Ginkgo projects) writes or edits this file. The earliest retained Project Y2K transcript starts on 2026-09-12; the script (last modified 2026-09-11T21:42:55+00:00) and its FBX outputs are older. The script refuses to run once the kit .blend exists, and the kit record lists one run. Who wrote the script (a Claude session, the owner or another tool) is therefore not established."
+      },
+      "extracted_at": "2026-11-20T18:55:00+00:00"
+    }
+  },
+  "derivation": {
+    "asset_id": "gen-gateway-arch-street-1",
+    "source_sha256": "693578947cc74014b320de84dd47a330b8ea6b669d18273aa4d8cccd36fc30e7",
+    "source_triangles": 1896,
+    "target_triangles": 1896,
+    "prepared_sha256": "adc0236f2473fb39968cf4c37d041a9404e95ea0ecc77fc51b96a2cc76d8dfdc",
+    "software": "Blender 5.1.2",
+    "source_format": "fbx",
+    "source_file": "gen-gateway-arch-street-1.fbx",
+    "source_edits": [
+      {
+        "op": "remove_thin_loose_parts",
+        "axis": "y",
+        "max_thickness_m": 0.0065,
+        "removes": "the spaced words \"NEON GATEWAY\" on the sign band",
+        "reason": "Tessellated lettering (Blender text objects converted to mesh and joined into the piece by the script's label() helper, 6 mm thick) removed as loose parts no thicker than 6.5 mm along Y; it is cleanly separable from the bevelled boxes, the thinnest of which is 80 mm. Lettering is not shipped.",
+        "triangles_removed": 1144
+      }
+    ],
+    "method": "Import the kit FBX with Blender (file axes and FBX_SCALE_UNITS honoured: metres, Z-up); remove engine collision hulls (UCX_*) and apply the recorded edits (source_edits); remove the kit material slots (Almond materials are assigned; kit textures are not shipped); Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Remove wire edges, split edges shared by more than two faces and remove zero-area faces (counts in quality.topology_repairs). Mark edges sharper than 30 degrees as sharp (flat-shaded hard edges; shading only). Never subdivide to inflate counts.",
+    "weld_tolerance_source_units": 1.0699999809265137e-06,
+    "quality": {
+      "vertices": 368,
+      "triangles": 720,
+      "boundary_edges": 0,
+      "nonmanifold_edges_excluding_boundary": 0,
+      "zero_area_faces": 0,
+      "connected_components": 4,
+      "largest_component_vertices": 96,
+      "nonfinite_coordinates": 0,
+      "self_intersections": "not_tested",
+      "mesh_validation_repair_passes": 0,
+      "topology_repairs": {
+        "wire_edges_removed": 0,
+        "nonmanifold_edges_split": 0,
+        "zero_area_faces_removed": 0,
+        "loose_vertices_removed": 0
+      },
+      "use": "Visual entourage; not certified for fabrication or structural analysis",
+      "bounds_relative_change": [
+        0.0,
+        0.02680652964035543,
+        0.0
+      ]
+    }
+  },
+  "edits": [
+    {
+      "op": "remove_thin_loose_parts",
+      "axis": "y",
+      "max_thickness_m": 0.0065,
+      "removes": "the spaced words \"NEON GATEWAY\" on the sign band",
+      "reason": "Tessellated lettering (Blender text objects converted to mesh and joined into the piece by the script's label() helper, 6 mm thick) removed as loose parts no thicker than 6.5 mm along Y; it is cleanly separable from the bevelled boxes, the thinnest of which is 80 mm. Lettering is not shipped."
+    }
+  ],
+  "input_image_file": null,
+  "external_reference_status": "No external reference recorded: neither the script nor its kit record names one, and the kit record states \"Original procedural exterior street kit; no interiors or third-party geometry\". No authoring session was found, so no session record could confirm or rule out references.",
+  "external_reference_ids": [],
+  "dimension_basis": "Authored kit sizes: the script builds each module in metres and the kit record lists its dimensions; the library keeps them (height = authored height, width and depth measured). Not a physical survey.",
+  "reference_review": "Reviewed on 2026-11-20: procedural geometry, so there is no input image. The prepared library mesh was rendered untextured from the front three-quarter view (500 px, viewed in a 300 px contact sheet) and the script code that models it was read: no lettering, logos, brand marks or characters in the geometry. The source FBX carried tessellated lettering (the words \"NEON GATEWAY\" on the sign band), removed as a recorded edit (edits); the front render (600 px, viewed at 400 px) shows the panel blank.",
+  "rights": "Procedural geometry built by a Blender script in the owner's Project Y2K game repository (private); see each script's authoring record for the Claude Code session that wrote it, or that none was found. The owner's own project geometry: no generation provider, account or credits are involved, and the scripts build every piece from Blender primitives (no imported or third-party geometry in these pieces). Owner approved release in the Almond library under CC BY 4.0 on 2026-11-20 (\"increase the range of models, from the ones i used for my project y2k games, (except for the operatives and bosses)\") and chose the procedural kit pieces on 2026-11-20. Kit material colours and textures are not distributed; Almond materials are assigned.",
+  "origin": {
+    "project": "Project Y2K, the owner's game project (private repository)",
+    "pass": "twofronts/infrastructure/world/street_v004",
+    "source_name": "SM_GatewayArch",
+    "records": [
+      "twofronts/infrastructure/scripts/build_street_kit.py (the generator, retained as build_street_kit.py.txt)",
+      "twofronts/infrastructure/world/street_v004/kit.json (kit record with each module's triangle count, size and FBX SHA-256; retained)",
+      "twofronts/infrastructure/world/street_v004/SM_*.fbx (the exported pieces, SHA-256 checked)"
+    ]
+  }
+}
