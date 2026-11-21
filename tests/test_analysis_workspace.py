@@ -109,22 +109,23 @@ def test_panel_solver_package_pin(version, package):
 
 
 @pytest.mark.skipif(not HOST, reason="Build the standalone .NET archive host")
-@pytest.mark.parametrize("user_value, expected", [(None, "1"), ("0", "0")])
-def test_panel_solver_uses_system_certificates(tmp_path, user_value, expected):
-    """uv must use the Windows certificate store (UV_NATIVE_TLS=1), or a TLS-inspecting proxy breaks the first-run
-    download from PyPI; a value the user set themselves is kept."""
+@pytest.mark.parametrize("user_var, user_value, expected", [(None, None, ("1", "1")), ("UV_NATIVE_TLS", "0", ("0", None)),
+                                                       ("UV_SYSTEM_CERTS", "0", (None, "0"))])
+def test_panel_solver_uses_system_certificates(tmp_path, user_var, user_value, expected):
+    """uv must use the Windows certificate store (UV_SYSTEM_CERTS=1, plus the deprecated UV_NATIVE_TLS=1 for older
+    uv), or a TLS-inspecting proxy breaks the first-run download from PyPI; a setting the user chose is kept."""
     import sys
     probe = ("import os,json,sys; sys.stdin.read(); "
-             "print(json.dumps({'protocol': 1, 'status': 'ok', 'uv_native_tls': os.environ.get('UV_NATIVE_TLS')}))")
+             "print(json.dumps({'protocol': 1, 'status': 'ok', 'tls': [os.environ.get('UV_NATIVE_TLS'), os.environ.get('UV_SYSTEM_CERTS')]}))")
     source = tmp_path / "request.json"
     source.write_text(json.dumps({"ping": True}), encoding="utf-8")
     env = {k: v for k, v in os.environ.items() if k.upper() not in ("UV_NATIVE_TLS", "UV_SYSTEM_CERTS")}
     env["ALMOND_SOLVER_COMMAND"] = f'"{sys.executable}" -c "{probe}"'
-    if user_value is not None:
-        env["UV_NATIVE_TLS"] = user_value
+    if user_var:
+        env[user_var] = user_value
     run = subprocess.run([HOST, "--solve", str(source)], capture_output=True, timeout=120, env=env)
     reply = json.loads(run.stdout.decode("utf-8"))
-    assert reply.get("uv_native_tls") == expected, reply
+    assert tuple(reply.get("tls")) == expected, reply
 
 
 def test_results_page_presentation():
