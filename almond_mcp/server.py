@@ -3320,8 +3320,28 @@ public class Script
             + ",\\"width\\":" + ((after.Max.X - after.Min.X) * toMM).ToString("F1")
             + ",\\"depth\\":" + ((after.Max.Y - after.Min.Y) * toMM).ToString("F1")
             + ",\\"height\\":" + ((after.Max.Z - after.Min.Z) * toMM).ToString("F1") + "}}");
+
+        // 6. drop the layers the import created (e.g. <asset_id>_root) once
+        //    the move has emptied them; children before parents
+        var newLayers = new List<Layer>();
+        foreach (string s in new string[] {{ {", ".join('"%s"' % g for g in contract.get("_imported_layer_ids", []))} }})
+        {{
+            int index = doc.Layers.FindId(new Guid(s))?.Index ?? -1;
+            if (index >= 0 && index != layerIndex) newLayers.Add(doc.Layers[index]);
+        }}
+        var inUse = new ObjectEnumeratorSettings {{ HiddenObjects = true, LockedObjects = true, IncludeLights = true }};
+        foreach (var l in newLayers.OrderByDescending(x => x.FullPath.Split(new[] {{ "::" }}, StringSplitOptions.None).Length))
+        {{
+            if (l.IsDeleted || l.GetChildren() != null) continue;
+            inUse.LayerIndexFilter = l.Index;
+            if (doc.Objects.GetObjectList(inUse).Any()) continue;
+            doc.Layers.Delete(l.Index, true);
+        }}
+
         doc.Views.Redraw();
-        return imported.Select(o => o.Id).ToList();
+        // ids are already known to the caller; a non-empty return makes
+        // older bridges draw a scale dimension on the current layer
+        return new List<Guid>();
     }}
 }}
 """
@@ -3492,6 +3512,15 @@ def import_asset_contract(
     return json.dumps(_receive_contract(contract, x_mm, y_mm, z_mm, rotation_degrees, layer))
 
 
+def _read_guid_lines(path: Path) -> list[str]:
+    """GUID strings a bridge script wrote one per line; [] if absent."""
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return []
+    return [line.strip() for line in lines if line.strip()]
+
+
 def _receive_contract(contract: dict, x_mm: float, y_mm: float, z_mm: float,
                       rotation_degrees: float, layer: str) -> dict:
     """Import a loaded contract's GLB into Rhino, restore materials and
@@ -3509,14 +3538,25 @@ public class Script
     public static List<Guid> Run(RhinoDoc doc)
     {
         var before = new HashSet<Guid>(doc.Objects.Select(o => o.Id));
+        var layersBefore = new HashSet<Guid>(doc.Layers.Where(l => !l.IsDeleted).Select(l => l.Id));
         RhinoApp.RunScript("_-Import \\"%s\\" _Enter", false);
         var added = doc.Objects.Where(o => !before.Contains(o.Id)).Select(o => o.Id).ToList();
-        File.WriteAllLines(Path.Combine(Path.GetTempPath(), "almond_imported.txt"),
-            added.Select(g => g.ToString()));
-        return added;
+        var addedLayers = doc.Layers.Where(l => !l.IsDeleted && !layersBefore.Contains(l.Id))
+            .Select(l => l.Id).ToList();
+        File.WriteAllLines(@"%s", added.Select(g => g.ToString()));
+        File.WriteAllLines(@"%s", addedLayers.Select(g => g.ToString()));
+        // Ids travel in the files: a non-empty return makes older bridges
+        // draw a scale dimension on the current layer.
+        return new List<Guid>();
     }
 }
-""" % contract["_resolved_file"].replace("\\", "\\\\")
+"""
+    # Python picks the paths, so both processes need not share one %TEMP%.
+    stem = Path(tempfile.gettempdir()) / f"almond_import_{uuid.uuid4().hex}"
+    objects_file = stem.with_suffix(".objects.txt")
+    layers_file = stem.with_suffix(".layers.txt")
+    import_script = import_script % (contract["_resolved_file"].replace("\\", "\\\\"),
+                                     objects_file, layers_file)
     try:
         result = json.loads(_send_and_receive(
             json.dumps({"type": "execute", "script": import_script}).encode("utf-8"),
@@ -3527,7 +3567,10 @@ public class Script
         return {"status": "error", "message": f"Import failed: {exc}"}
     if result.get("status") != "success":
         return result
-    imported = result.get("guids") or []
+    imported = _read_guid_lines(objects_file)
+    contract["_imported_layer_ids"] = _read_guid_lines(layers_file)
+    for path in (objects_file, layers_file):
+        path.unlink(missing_ok=True)
     if not imported:
         return {"status": "error",
                            "message": "Rhino imported no objects from the GLB."}
