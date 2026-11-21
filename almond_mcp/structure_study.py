@@ -22,11 +22,12 @@ DEFAULTS = {
     "diameter_mm": None, "wall_mm": None, "span_m": None, "floor_imposed_kn_m2": 0.0, "floor_dead_kn_m2": 0.0,
     "asset_loads": False, "design_basis": "en1990", "uls_combination": None, "connections": "rigid",
     "stability": "auto", "view": "deflection", "design_code": design_codes.DEFAULT, "deflection_limit_ratio": None,
-    "fabrication": "cold_formed",
+    "fabrication": "cold_formed", "lateral_restraint": "joints",
 }
 CHOICES = {
     "structure": ("beam", "frame", "truss"), "design_basis": ("en1990", "unfactored"),
     "connections": ("rigid", "simple"), "stability": ("auto", "off"), "fabrication": ("cold_formed", "hot_finished"),
+    "lateral_restraint": ("joints", "continuous"),
     "view": ("deflection", "buckling"),
 }
 
@@ -134,7 +135,7 @@ def run(request: dict) -> dict:
     common = dict(fixed_supports=s["fixed_rotations"], self_weight=s["self_weight"], diameter_mm=s["diameter_mm"],
                   wall_mm=s["wall_mm"], asset_loads=assets, floor_loads=floor, design_basis=s["design_basis"],
                   uls=s["uls_combination"], connections=s["connections"], stability=s["stability"],
-                  design_code=code, fabrication=s["fabrication"])
+                  design_code=code, fabrication=s["fabrication"], lateral_restraint=s["lateral_restraint"])
     limit_ratio = float(s["deflection_limit_ratio"] or code.deflection_limit_ratio)
     validation = native_structure.validate(model, s["structure"], s["load_kn"], s["material"],
                                            span_m=s["span_m"], limit_ratio=limit_ratio, detail=True, **common)

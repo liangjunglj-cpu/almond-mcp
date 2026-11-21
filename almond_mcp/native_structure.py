@@ -64,8 +64,10 @@ ASSUMPTIONS = [
     "from Table 6.2, L_cr = the member between its joints, 5.2.2(7)b); compression + bending by "
     "6.3.3 (6.61)/(6.62) with Annex B factors and Table B.3 Cm; shear 6.2.6 (V_pl,Rd with the 6.2.6(3) "
     "shear area, eta = 1.0; webs past hw/tw = 72 epsilon / eta flagged as not covered) and bending with "
-    "high shear 6.2.8. Local bow imperfections (5.3.2(6), Table 5.1) where alpha_cr < 10. Not checked: "
-    "lateral-torsional buckling, torsion.",
+    "high shear 6.2.8. Local bow imperfections (5.3.2(6), Table 5.1) where alpha_cr < 10. Lateral-torsional "
+    "buckling of I-sections (6.3.2.2, Table 6.4 curves; M_cr from an eigen analysis of each segment between "
+    "lateral restraints with gravity loads on the top flange; Annex B Table B.2), unless lateral_restraint is "
+    "'continuous'; hollow sections are not susceptible. Not checked: torsion.",
     "Preliminary design check, not an engineer's sign-off.",
 ]
 
@@ -81,6 +83,11 @@ def section_from_spec(spec: dict | None, diameter_mm=None, wall_mm=None) -> tupl
     try:
         if shape in ("rect", "rectangular", "solid_rectangle") and spec.get("height") and spec.get("width"):
             return fs.rect(spec["width"] * to_mm, spec["height"] * to_mm), notes      # solid: concrete, timber
+        if shape in ("i", "i_section", "wide_flange", "h") and spec.get("height") and spec.get("width"):
+            web, flange = spec.get("web"), spec.get("flange")
+            if not (web and flange):
+                raise ValueError("an I-section needs web and flange thicknesses")
+            return fs.i_section(spec["height"] * to_mm, spec["width"] * to_mm, web * to_mm, flange * to_mm), notes
         if shape == "box" and spec.get("height") and spec.get("width"):
             t = spec.get("wall") or min(spec["height"], spec["width"]) / 10
             return fs.rhs(spec["height"] * to_mm, spec["width"] * to_mm, t * to_mm), notes
@@ -393,6 +400,13 @@ def _fabrication(value) -> str:
     return v
 
 
+def _lateral_restraint(value) -> str:
+    v = (value or "joints").lower()
+    if v not in ec3.LATERAL_RESTRAINT:
+        raise ValueError("lateral_restraint must be 'joints' or 'continuous'.")
+    return v
+
+
 def _role(a, b) -> str:
     d = np.asarray(b, float) - np.asarray(a, float)
     L = float(np.linalg.norm(d)) or 1.0
@@ -583,6 +597,10 @@ def member_table(model: dict, frame, sls, envelope, deflections=None) -> list[di
             "shear_utilization": _r(det.get("shear"), 4),
             "v_pl_rd_kn": [_r(det["v_pl_rd_y_kn"], 3), _r(det["v_pl_rd_z_kn"], 3)] if "v_pl_rd_y_kn" in det else None,
             "shear_rho": _r(det.get("rho"), 4), "shear_buckling": det.get("shear_buckling"),
+            "ltb_utilization": _r(det.get("ltb"), 4), "m_cr_knm": _r(det.get("m_cr_knm"), 3),
+            "lambda_lt": _r(det.get("lambda_lt"), 3), "chi_lt": _r(det.get("chi_lt"), 3),
+            "ltb_curve": det.get("curve_lt"), "cm_lt": _r(det.get("cm_lt"), 3),
+            "ltb_length_m": _r(det.get("length_lt_m"), 3), "ltb_ends": det.get("ltb_ends"),
             "buckling_length_m": _r(det.get("length_cr_m"), 3),
             "max_stress_mpa": round(float(det.get("max_stress_mpa", 0.0)), 2),
             "n_tension_kn": round(max(float(N.max()), 0.0), 3), "n_compression_kn": round(max(-float(N.min()), 0.0), 3),
@@ -827,7 +845,7 @@ def bow_loads(bows: list, direction, ndof: int) -> tuple[np.ndarray, dict]:
 
 
 def _solve_design(frame, design_basis, uls, plastic=False, stations=11, stability="auto", design_code=None,
-                  fabrication="cold_formed"):
+                  fabrication="cold_formed", lateral_restraint="joints"):
     """Solve SLS + ULS combinations; per-element ULS envelope. Returns (sls, uls_results, envelope,
     stability report) with envelope[i] = (utilization, governing name, element result).
 
@@ -841,7 +859,7 @@ def _solve_design(frame, design_basis, uls, plastic=False, stations=11, stabilit
         res = fs.solve_combinations(frame, {sls[0]: sls[1], **dict(ulss)}, stations=stations, plastic=plastic)
         members = ec3.groups(frame)
         for r_ in res.values():
-            ec3.apply(frame, r_, members, plastic, fabrication)
+            ec3.apply(frame, r_, members, plastic, fabrication, lateral_restraint)
         envelope = []
         for i in range(len(frame.elements)):
             best = max(((res[n].elements[i].utilization, n) for n, _ in ulss), key=lambda t: t[0])
@@ -861,7 +879,7 @@ def _solve_design(frame, design_basis, uls, plastic=False, stations=11, stabilit
         asm = fs.prepare(frame)
     members = ec3.groups(frame)
     sls_res = fs.solve_linear(asm, sls[1], stations=stations, plastic=plastic)
-    ec3.apply(frame, sls_res, members, plastic, fabrication)
+    ec3.apply(frame, sls_res, members, plastic, fabrication, lateral_restraint)
     report = {"mode": "auto", "alpha_cr": {}, "sway_imperfection": None, "sway_imperfections": {},
               "second_order": [], "iterations": 0, "elements_per_member": STABILITY_SUBDIVISION,
               "bow_imperfection": {"basis": "EN 1993-1-1 5.3.2(6): frames with alpha_cr < 10, compressed members with "
@@ -909,7 +927,7 @@ def _solve_design(frame, design_basis, uls, plastic=False, stations=11, stabilit
             except fs.MechanismError as exc:
                 report["method"] = "unstable"
                 raise InstabilityError(f"Instability under {vname}: {exc}", report) from None
-            ec3.apply(frame, r_, members, plastic, fabrication)
+            ec3.apply(frame, r_, members, plastic, fabrication, lateral_restraint)
             report["iterations"] = max(report["iterations"], r_.iterations)
             variants.append((vname, factors, r_))
     report["method"] = "second-order (P-Delta)" if report["second_order"] else "first-order"
@@ -936,7 +954,8 @@ def view_result(model: dict, load_kn: float = 10.0, material: str = "Steel", fix
                 stations: int = 13, asset_loads: dict | None = None,
                 floor_loads: dict | None = None, design_basis: str = "en1990",
                 uls: str | None = None, connections: str = "rigid", stability: str = "auto",
-                view: str = "deflection", design_code=None, fabrication: str = "cold_formed") -> tuple[dict, float]:
+                view: str = "deflection", design_code=None, fabrication: str = "cold_formed",
+                lateral_restraint: str = "joints") -> tuple[dict, float]:
     """Solve and package the result for the bridge's ``structure_draw`` overlay.
 
     Returns (result, span_m): per-element start/end points and sampled global displacements in
@@ -950,7 +969,8 @@ def view_result(model: dict, load_kn: float = 10.0, material: str = "Steel", fix
     code = design_profile(design_basis, design_code)
     res, ulss, envelope, stab = _solve_design(frame, design_basis, uls, stations=stations,
                                               stability="off" if want_mode else stability, design_code=code,
-                                              fabrication=_fabrication(fabrication))
+                                              fabrication=_fabrication(fabrication),
+                                              lateral_restraint=_lateral_restraint(lateral_restraint))
     span = float(span_m or model.get("max_member_span_m") or model.get("max_span_m") or 5.0)
     buckling = None
     if want_mode:
@@ -1001,7 +1021,7 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
              asset_loads: dict | None = None, floor_loads: dict | None = None,
              design_basis: str = "en1990", uls: str | None = None, connections: str = "rigid",
              stability: str = "auto", design_code=None, detail: bool = False,
-             fabrication: str = "cold_formed") -> dict:
+             fabrication: str = "cold_formed", lateral_restraint: str = "joints") -> dict:
     """Run the native check and return a bridge-compatible validation result.
 
     ``detail``: add "members" (every member's geometry, section, ULS design forces and checks, SLS
@@ -1022,7 +1042,8 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
         result["design_code"] = code.summary()
         result["warnings"] += _code_warnings(code, uls, info)
         res, ulss, envelope, stab = _solve_design(frame, design_basis, uls, plastic=plastic, stability=stability,
-                                                  design_code=code, fabrication=_fabrication(fabrication))
+                                                  design_code=code, fabrication=_fabrication(fabrication),
+                                                  lateral_restraint=_lateral_restraint(lateral_restraint))
     except InstabilityError as exc:
         result["verdict"] = METHOD_PREFIX + f"FAILED: {exc}"
         result["status"] = "fail"
@@ -1102,10 +1123,15 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
     })
     uls_used = code.uls(uls or None)[0] if code.factored else "unfactored"
     r["fabrication"] = _fabrication(fabrication)
+    r["lateral_restraint"] = _lateral_restraint(lateral_restraint)
     result["design_code"]["uls_expression"] = uls_used
     result["assumptions"] = result["assumptions"] + [
         ("Hollow sections: cold-formed (EN 10219), buckling curve c" if _fabrication(fabrication) == "cold_formed"
          else "Hollow sections: hot-finished (EN 10210), buckling curve a (a0 for S460)") + ".",
+        ("I-section beams: unrestrained laterally between their joints (lateral-torsional buckling checked)."
+         if _lateral_restraint(lateral_restraint) == "joints" else
+         "I-section beams: compression flange held continuously (lateral_restraint='continuous'): no "
+         "lateral-torsional buckling check."),
         f"Design code: {code.name} ({code.basis}); gamma_M0 = {code.gamma_M0:g}, gamma_M1 = {code.gamma_M1:g}; "
         f"deflection limit span/{limit_ratio:g}"
         + (f"; unverified values: {', '.join(code.unverified)}." if code.unverified else "."),

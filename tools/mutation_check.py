@@ -100,6 +100,29 @@ MUTANTS = [
     # floor loads above 2:1
     ("bays above 2:1: short beams unloaded again", "almond_mcp/floor_loads.py",
      "if r < 0.5 else [(0.0, 0.0), (0.5, q * L / 2), (1.0, 0.0)]", "if r < 0.5 else [(0.0, 0.0), (1.0, 0.0)]"),
+    # 6.3.2 lateral-torsional buckling
+    ("warping constant /24 -> /12", "almond_mcp/frame_solver.py",
+     "Iw = tf * b ** 3 * (h - tf) ** 2 / 24", "Iw = tf * b ** 3 * (h - tf) ** 2 / 12"),
+    ("M_cr: warping stiffness dropped", "almond_mcp/ltb.py",
+     "kt += w * (G * It * np.outer(d1, d1) + E * Iw * np.outer(d2, d2))", "kt += w * (G * It * np.outer(d1, d1))"),
+    ("M_cr: coupling term doubled", "almond_mcp/ltb.py",
+     "kc += w * M * np.outer(d2, N)", "kc += w * 2 * M * np.outer(d2, N)"),
+    ("M_cr: point loads at the shear centre", "almond_mcp/ltb.py",
+     "Q[4 * i + 2, 4 * i + 2] += P * zg", "Q[4 * i + 2, 4 * i + 2] += 0.0"),
+    ("M_cr: cantilever root free to turn laterally", "almond_mcp/ltb.py",
+     "fixed |= {4 * node, 4 * node + 1, 4 * node + 2}", "fixed |= {4 * node, 4 * node + 2}"),
+    ("gravity on the bottom flange (stabilising)", "almond_mcp/ec3.py",
+     "zg = s_.dims_mm[0] / 2000 if", "zg = -s_.dims_mm[0] / 2000 if"),
+    ("Table 6.4 curve a -> b for h/b <= 2", "almond_mcp/ec3.py",
+     'return "a" if h / b <= 2 else "b"', 'return "b" if h / b <= 2 else "b"'),
+    ("Table B.2 kzy 0.05 -> 0.1 (class 3)", "almond_mcp/ec3.py",
+     "kzy = max(1 - 0.05 * lam_z * n_z / d, 1 - 0.05 * n_z / d)", "kzy = max(1 - 0.1 * lam_z * n_z / d, 1 - 0.1 * n_z / d)"),
+    ("Annex B without chi_LT", "almond_mcp/ec3.py",
+     "my_r, mz_r = chi_lt * Wy * fy / gamma_m1", "my_r, mz_r = Wy * fy / gamma_m1"),
+    ("LTB segment stops at a free intermediate node", "almond_mcp/ec3.py",
+     "if _supported(frame, n) or len(touching) != 2:", "if True:"),
+    ("lateral restraint ignored (no LTB)", "almond_mcp/ec3.py",
+     '    if lateral_restraint == "joints":\n        for seg in ltb_segments', '    if False:\n        for seg in ltb_segments'),
 ]
 
 
