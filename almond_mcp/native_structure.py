@@ -68,6 +68,11 @@ from . import floor_loads as fl
 from . import frame_solver as fs
 
 METHOD_PREFIX = "[ALMOND NATIVE FEA (LINEAR 3D FRAME), HIGH CONFIDENCE] "
+
+
+def method_prefix(confidence: str = "high") -> str:
+    """Verdict prefix naming the method and the run's confidence (low for indicative materials)."""
+    return f"[ALMOND NATIVE FEA (LINEAR 3D FRAME), {(confidence or 'high').upper()} CONFIDENCE] "
 LINE_TYPES = ("beam", "frame", "truss", "canopy", "highrise")
 ASSUMPTIONS = [
     "Linear-elastic 3D frame analysis (Almond native solver); second-order (P-Delta) where the stability "
@@ -632,6 +637,23 @@ INDICATIVE_FAMILIES = {
     "concrete": "EN 1992 (cracking, reinforcement, gamma_c / gamma_s)",
     "aluminium": "EN 1999 (alloy buckling classes, gamma_M1 = 1.1)",
 }
+
+
+def _class4_hint(shape: str, mat) -> str:
+    """How to get a section of this family out of Class 4 (EN 1993-1-1 Table 5.2, Class 3 limits)."""
+    eps = ec3.epsilon(mat.fy)
+    grade = f"{mat.name}, epsilon = {eps:.2f}"
+    if shape == "chs":
+        return f"Use thicker walls: a CHS is Class 4 beyond d/t = 90 x 235/fy = {90 * eps ** 2:.1f} ({grade})."
+    if shape == "rhs":
+        return (f"Use thicker walls or a narrower box: an RHS wall is Class 4 beyond c/t = 42 epsilon = "
+                f"{42 * eps:.1f} in compression, up to 124 epsilon = {124 * eps:.1f} in pure bending "
+                f"(c = side - 3t; {grade}).")
+    if shape == "i":
+        return (f"Use a stockier I section: Class 4 beyond a flange outstand c/tf = 14 epsilon = {14 * eps:.1f}, or a "
+                f"web c/tw = 42 epsilon = {42 * eps:.1f} in compression, up to 124 epsilon = {124 * eps:.1f} in "
+                f"bending ({grade}).")
+    return "Use a stockier section: thicker plates make the section Class 3 or better."
 
 
 def _code_warnings(code: dc.Profile, uls, info: dict) -> list[str]:
@@ -1607,10 +1629,11 @@ def _view_result(model, load_kn, material, fixed_supports, self_weight, diameter
         gov, where = _governing_deflection(model, frame, dc_, limit_mm)
         drift = _storey_drift_check(frame, res, code, kind)
         umax, governing = max(((u, n) for u, n, _ in envelope), key=lambda t: t[0])
-        slender, thin_webs = _uncovered_members(frame, envelope)
+        unc = _uncovered_members(frame, envelope, info["material"])
+        slender, thin_webs = unc["class4"], unc["thin_webs"]
         indicative = INDICATIVE_FAMILIES.get(info["material"].family)
         failures, _ = check_failures(dmax_mm, limit_mm, ratio, umax, governing, len(slender), indicative, drift,
-                                     where, len(thin_webs))
+                                     where, len(thin_webs), unc["hints"])
         status = "fail" if failures else "indicative" if indicative else "pass"
         verdict = {"status": status, "passed": None if status == "indicative" else not failures,
                    "failures": failures, "max_deflection_mm": round(dmax_mm, 3),
@@ -1708,21 +1731,25 @@ def _storey_drift_check(frame, res, code, structure_type: str) -> dict:
     return drift
 
 
-def _uncovered_members(frame, envelope) -> tuple[list, list]:
-    """(Class 4 members, members whose webs need the EN 1993-1-5 shear buckling check), by source GUIDs."""
-    slender = sorted({tuple(frame.elements[i].tag or [str(i)]) for i, (_, _, er) in enumerate(envelope)
-                      if er.util_detail.get("class") == 4})
-    thin_webs = sorted({tuple(frame.elements[i].tag or [str(i)]) for i, (_, _, er) in enumerate(envelope)
-                        if er.util_detail.get("shear_buckling")})
-    return slender, thin_webs
+def _uncovered_members(frame, envelope, mat) -> dict:
+    """Members outside these checks: "class4" (Class 4 sections) and "thin_webs" (webs that need the
+    EN 1993-1-5 shear buckling check), by source GUIDs; "elements", their analysis elements; "hints",
+    how to get each failing section family out of Class 4 for the actual steel grade."""
+    slender_idx = [i for i, (_, _, er) in enumerate(envelope) if er.util_detail.get("class") == 4]
+    web_idx = [i for i, (_, _, er) in enumerate(envelope) if er.util_detail.get("shear_buckling")]
+    return {"class4": sorted({tuple(frame.elements[i].tag or [str(i)]) for i in slender_idx}),
+            "thin_webs": sorted({tuple(frame.elements[i].tag or [str(i)]) for i in web_idx}),
+            "elements": sorted(set(slender_idx) | set(web_idx)),
+            "hints": [_class4_hint(shape, mat) for shape in sorted({frame.elements[i].section.shape
+                                                                   for i in slender_idx})]}
 
 
 def check_failures(dmax_mm, limit_mm, limit_ratio, umax, governing, slender: int, indicative, drift: dict | None,
-                   where: str = "", thin_webs: int = 0):
+                   where: str = "", thin_webs: int = 0, class4_hints: list | None = None):
     """(failures, suggestions) of the native checks: deflection (``where`` names the governing member),
     Class 4 sections, webs past the shear buckling limit, utilization (not for indicative materials) and
-    storey drift (where checked). validate() and the overlay verdict (view_result) share it, so both
-    judge a model the same way."""
+    storey drift (where checked). ``class4_hints``: the Class 4 suggestions per failing section family.
+    validate() and the overlay verdict (view_result) share it, so both judge a model the same way."""
     failures, sug = [], []
     if dmax_mm > limit_mm:
         failures.append(f"Deflection {dmax_mm:.1f}mm ({SLS[0]}){where} exceeds L/{limit_ratio:g} limit "
@@ -1731,7 +1758,7 @@ def check_failures(dmax_mm, limit_mm, limit_ratio, umax, governing, slender: int
     if slender:
         failures.append(f"{slender} member(s) have Class 4 (slender) sections, which these checks do not "
                         "cover (EN 1993-1-5/-1-6 effective sections)")
-        sug.append("Use thicker walls: Class 4 starts at d/t = 90 x 235/fy for CHS (59.6 for S355)")
+        sug += class4_hints or ["Use thicker walls: Class 4 starts at d/t = 90 x 235/fy for CHS (59.6 for S355)"]
     if thin_webs:
         failures.append(f"{thin_webs} member(s) have webs with hw/tw > 72 epsilon / eta, which need the shear "
                         "buckling check of EN 1993-1-5 (not covered)")
@@ -1791,19 +1818,21 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
         code = design_profile(design_basis, design_code)
         result["design_code"] = code.summary()
         result["warnings"] += _code_warnings(code, uls, info)
+        if info["material"].family in INDICATIVE_FAMILIES:
+            result["confidence"] = "low"
         res, ulss, envelope, stab = _solve_design(frame, design_basis, uls, plastic=plastic, stability=stability,
                                                   design_code=code, fabrication=_fabrication(fabrication),
                                                   lateral_restraint=_lateral_restraint(lateral_restraint))
         result["warnings"] += stab.pop("warnings", [])
     except InstabilityError as exc:
-        result["verdict"] = METHOD_PREFIX + f"FAILED: {exc}"
+        result["verdict"] = method_prefix(result["confidence"]) + f"FAILED: {exc}"
         result["status"] = "fail"
         result["results"]["stability"] = exc.report
         result["suggestions"] = ["Brace the frame, fix the column bases, or use stiffer columns: it buckles "
                                  "before reaching the design loads."]
         return result
     except fs.MechanismError as exc:
-        result["verdict"] = METHOD_PREFIX + f"FAILED: {exc}"
+        result["verdict"] = method_prefix(result["confidence"]) + f"FAILED: {exc}"
         result["status"] = "fail"
         result["suggestions"] = ["Add supports or bracing so every part of the structure is restrained."]
         labels = set(((locals().get("info") or {}).get("support_labels") or {}).values())
@@ -1926,15 +1955,16 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
             result["assumptions"] = result["assumptions"] + [
                 "Asset loads: estimated self weight + in-use load per placed asset (structural-loads.json), "
                 "carried by the nearest member or shared by the lever rule between two parallel members."]
-    slender, thin_webs = _uncovered_members(frame, envelope)
+    unc = _uncovered_members(frame, envelope, mat)
+    slender, thin_webs = unc["class4"], unc["thin_webs"]
     indicative = INDICATIVE_FAMILIES.get(mat.family)
     failures, sug = check_failures(dcheck_mm, limit_mm, limit_ratio, umax, governing, len(slender), indicative, drift,
-                                   where, len(thin_webs))
+                                   where, len(thin_webs), unc["hints"])
     if indicative and not failures:
         # no capacity verdict without the material's own design code; deflection and stability still decide fail
         result["passed"] = None
         result["status"] = "indicative"
-        result["verdict"] = METHOD_PREFIX + (
+        result["verdict"] = method_prefix(result["confidence"]) + (
             f"INDICATIVE ONLY ({mat.name}): forces, deflection and stability are computed, but member capacity "
             f"is not checked to {indicative}, so there is no pass/fail. Deflection {dcheck_mm:.1f}mm ({SLS[0]}, "
             f"limit {limit_mm:.1f}mm){where}; utilization {umax:.2f} against the characteristic strength, for comparison only.")
@@ -1943,12 +1973,16 @@ def validate(model: dict, structure_type: str = "beam", load_kn: float = 10.0, m
     else:
         result["passed"] = not failures
         result["status"] = "pass" if not failures else "fail"
-        result["verdict"] = METHOD_PREFIX + (
+        result["verdict"] = method_prefix(result["confidence"]) + (
             f"PASSED: Configured checks satisfied. Deflection {dcheck_mm:.1f}mm ({SLS[0]}, limit {limit_mm:.1f}mm){where}, "
             f"Utilization {umax:.2f} ({governing})" + _drift_note(drift, dcheck_mm / limit_mm)
             if not failures else "FAILED: " + "; ".join(failures))
     result["suggestions"] = sug
-    worst = sorted(elem_util, key=lambda e: -e["utilization"])
+    # failing members first (over capacity, or outside the checks at any utilization), then by utilization
+    failing = {tuple(frame.elements[i].tag or []) for i in unc["elements"]}
+    if not indicative:
+        failing |= {tuple(frame.elements[i].tag or []) for i, (u, _, _) in enumerate(envelope) if u > 1.0}
+    worst = sorted(elem_util, key=lambda e: (tuple(e["source_guids"]) not in failing, -e["utilization"]))
     seen = []
     for e in worst:
         for g in e["source_guids"]:

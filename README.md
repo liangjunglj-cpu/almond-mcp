@@ -325,8 +325,8 @@ or span-rule heuristics (rule_based, low) — and always labels which one
 ran. Pass criteria: deflection ≤ span/250 and utilization below yield.
 Every run is recorded in the local state database;
 `export_structural_report()` renders the history to a Markdown report
-(inputs, pathway, span/deflection/utilization/reactions, warnings,
-PASS/FAIL). Details: `docs/structural-validation.md`.
+(inputs, loads and design settings, pathway, span/deflection/utilization/
+reactions, warnings, PASS/FAIL/INDICATIVE). Details: `docs/structural-validation.md`.
 
 On top of the solver, a **construction knowledge layer**
 (`get_construction_guidance`, `Constructionfiles/manifest.json`) grounds

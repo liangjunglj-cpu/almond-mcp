@@ -2155,6 +2155,9 @@ def execute_rhino_script(script: str) -> str:
         System, System.Collections.Generic, System.Linq,
         Rhino, Rhino.Geometry, Rhino.DocObjects
 
+    On a runtime error the script's changes are undone; a script that changed nothing leaves
+    the document (and its undo history) as it was.
+
     Args:
         script: C# source code containing a class with public static List<Guid> Run(RhinoDoc doc).
     Returns:
@@ -2344,11 +2347,27 @@ def validate_structure(
     outside every curated system's range for this structure_type/material).
 
     Returns:
-        JSON from the bridge plus the construction_check. Top-level fields: status
-        ("pass"|"fail"|"error"), passed (bool), verdict (text), suggestions,
-        confidence ("high"|"medium"|"low"), warnings, and worst_member_guids
+        JSON from the bridge plus the construction_check. Top-level fields: status,
+        passed, verdict (text), suggestions, confidence ("high"|"medium"|"low"),
+        warnings, and worst_member_guids
         (up to 5 Rhino GUIDs of the most over-utilized members — edit those
-        first). The results object carries the numbers: max_deflection_mm (native:
+        first). status is one of:
+            "pass" / "fail"  — the configured checks ran; passed is true / false.
+            "indicative"     — native engine, Concrete/Wood/Aluminium: forces,
+                               deflection and stability are computed but member
+                               capacity is not checked to that material's code, so
+                               there is no pass/fail (passed is null, confidence
+                               "low"). A deflection or stability failure still
+                               returns "fail".
+            "unavailable"    — Karamba route: the setup needs the Karamba API and
+                               Karamba could not solve it; no estimate was
+                               substituted (no verdict).
+            "incomplete"     — Karamba route: the API solve ran but returned no
+                               deflection or utilization, so it cannot establish a
+                               pass (passed is false).
+            "error"          — bad input or no bridge; see message.
+        Runs with status pass, fail or indicative are recorded for
+        export_structural_report. The results object carries the numbers: max_deflection_mm (native:
         the governing member's deflection relative to its supports, i.e. the largest
         deflection / limit; for beam/frame every member is checked against its own span, and a
         frame working as a surface (vault, gridshell, arch) globally against the span between its
@@ -2432,7 +2451,7 @@ def validate_structure(
     # export_structural_report can render an auditable history. Neither step
     # may ever break validation itself.
     try:
-        if isinstance(result, dict) and result.get("status") in ("pass", "fail"):
+        if isinstance(result, dict) and result.get("status") in RECORDED_STATUSES:
             span = None
             results_block = result.get("results")
             if isinstance(results_block, dict):
@@ -2445,13 +2464,66 @@ def validate_structure(
                     result["warnings"].extend(check["warnings"])
             except Exception:
                 pass
-            retrieval_store.record_validation_run(request, result, guids)
+            settings = _run_settings(result, engine=engine, fixed_supports=fixed_supports, self_weight=self_weight,
+                                     span_m=span_m, floor_load_kn_m2=floor_load_kn_m2,
+                                     floor_dead_kn_m2=floor_dead_kn_m2, asset_loads=asset_loads,
+                                     design_basis=design_basis, uls_combination=uls_combination,
+                                     design_code=design_code, connections=connections, stability=stability,
+                                     fabrication=fabrication)
+            retrieval_store.record_validation_run(request, result, guids, settings)
     except Exception:
         pass
     return json.dumps(result)
 
 
 KARAMBA_ONLY_TYPES = ("shell", "gridshell", "membrane")
+RECORDED_STATUSES = ("pass", "fail", "indicative")     # runs with numbers worth reporting
+
+
+def _run_settings(result: dict, **requested) -> dict:
+    """The options a validate_structure run was made with, as the report needs them.
+
+    Native runs record what the solver actually applied (design code, ULS expression, connection
+    and stability outcome, floor and asset load totals); the Karamba route takes none of these, so
+    only the requested values are kept, flagged as not applied."""
+    res = result.get("results") if isinstance(result.get("results"), dict) else {}
+    native = res.get("analysis_method") == "native"
+    out = {k: v for k, v in requested.items() if v is not None}
+    out["applied_by"] = "native" if native else "karamba"
+    if not native:
+        return out
+    code = result.get("design_code") or {}
+    if code:
+        out["design_code_name"] = code.get("name")
+        out["uls_expression"] = code.get("uls_expression")
+        ratio = (code.get("values") or {}).get("deflection_limit_ratio")
+        if ratio:
+            out["deflection_limit_ratio"] = ratio
+        if code.get("unverified"):
+            out["design_code_unverified"] = list(code["unverified"])
+    out["design_basis"] = res.get("design_basis", out.get("design_basis"))
+    conn = res.get("connections") or {}
+    if conn:
+        out["connections"] = conn.get("mode", out.get("connections"))
+        out["pinned_ends"] = conn.get("pinned_ends", 0)
+    stab = res.get("stability") or {}
+    if stab:
+        out["stability"] = stab.get("mode", out.get("stability"))
+        out["stability_method"] = stab.get("method")
+        if stab.get("min_alpha_cr") is not None:
+            out["min_alpha_cr"] = stab["min_alpha_cr"]
+    if res.get("support_mode"):
+        out["support_mode"] = res["support_mode"]
+    out["support_points"] = len(res.get("support_points_m") or [])
+    floor = result.get("floor_loads") or {}
+    if floor:
+        out["floor_area_m2"] = floor.get("area_m2", 0.0)
+        out["floor_load_kn"] = floor.get("total_kn", 0.0)
+    assets = result.get("asset_loads") or {}
+    if assets:
+        out["asset_loads_applied"] = assets.get("applied", 0)
+        out["asset_load_kn"] = assets.get("total_kn", 0.0)
+    return out
 
 
 def _structural_loads_path() -> Path:
@@ -2865,6 +2937,65 @@ def _native_view(request: dict, guids, required: bool, asset_spec=None, floor_sp
     return json.dumps(parsed), None
 
 
+def _run_result_label(run: dict) -> str:
+    status = run.get("status") or ("pass" if run["passed"] else "fail")
+    return {"pass": "PASS", "fail": "FAIL", "indicative": "INDICATIVE"}.get(status, status.upper())
+
+
+def _run_setting_lines(run: dict) -> list[str]:
+    """Report bullets for the loads and design settings a run was made with."""
+    st = run.get("settings") or {}
+    members = f"- input: {run['member_count']} member(s)"
+    objects = run.get("object_count") or run["member_count"]
+    if objects != run["member_count"]:
+        members += f" from {objects} object(s)"
+    if st.get("support_points"):
+        members += f", {st['support_points']} support point(s)"
+    lines = [members + f", material {run['material']}"]
+    if not st:
+        lines.append(f"- loads: {run['load_kn']:.1f} kN (other settings were not recorded for this older run)")
+        return lines
+    loads = [f"point load {run['load_kn']:.1f} kN"]
+    imposed, dead = st.get("floor_load_kn_m2") or 0.0, st.get("floor_dead_kn_m2") or 0.0
+    if imposed or dead:
+        floor = f"floor {imposed:g} kN/m2 imposed + {dead:g} kN/m2 dead"
+        if "floor_load_kn" in st:
+            floor += f" ({st['floor_load_kn']:.1f} kN over {st.get('floor_area_m2', 0.0):.1f} m2)"
+        loads.append(floor)
+    if st.get("asset_loads"):
+        if "asset_load_kn" in st:
+            loads.append(f"asset loads {st['asset_load_kn']:.1f} kN from {st.get('asset_loads_applied', 0)} placement(s)")
+        else:
+            loads.append("asset loads requested")
+    loads.append("self weight" if st.get("self_weight", True) else "no self weight")
+    lines.append("- loads: " + ", ".join(loads))
+    if st.get("applied_by") == "native":
+        code = st.get("design_code_name") or st.get("design_code", "eurocode")
+        design = f"- design: {code}, basis {st.get('design_basis', 'en1990')}"
+        if st.get("uls_expression"):
+            design += f", ULS {st['uls_expression']}"
+        if st.get("deflection_limit_ratio"):
+            design += f", deflection limit span/{st['deflection_limit_ratio']:g}"
+        if st.get("design_code_unverified"):
+            design += f" (unverified values: {', '.join(st['design_code_unverified'])})"
+        lines.append(design)
+        conn = f"- connections: {st.get('connections', 'rigid')}"
+        if st.get("pinned_ends"):
+            conn += f" ({st['pinned_ends']} pinned member end(s))"
+        conn += f"; supports {st.get('support_mode', 'fixed' if st.get('fixed_supports', True) else 'pinned')}"
+        lines.append(conn)
+        stab = f"- stability: {st.get('stability', 'auto')}"
+        if st.get("stability_method"):
+            stab += f", {st['stability_method']}"
+        if st.get("min_alpha_cr") is not None:
+            stab += f" (min alpha_cr {st['min_alpha_cr']:.2f})"
+        lines.append(stab)
+    else:
+        lines.append("- design: Karamba route: unfactored G + Q, deflection limit L/250, material yield strength; "
+                     "floor and asset loads, design code, connections and stability options are not applied")
+    return lines
+
+
 def _render_validation_report(runs: list[dict]) -> str:
     """Markdown report of persisted validate_structure runs, newest first."""
     from datetime import datetime, timezone
@@ -2877,18 +3008,32 @@ def _render_validation_report(runs: list[dict]) -> str:
         "",
         "## How a run works",
         "",
-        "`validate_structure(guids, structure_type, load_kn, material)` sends the",
-        "referenced Rhino geometry to the bridge, which extracts member axes and",
-        "tries three analysis pathways in strict order of confidence:",
+        "`validate_structure` reads the referenced Rhino geometry through the bridge",
+        "and analyses it on one of two routes (each run below names its method):",
         "",
-        "1. **api** — direct Karamba 3.1 solve (real FEA), confidence *high*;",
-        "2. **template** — audited capsule GHX definition, confidence *medium*;",
-        "3. **rule_based** — span/slenderness heuristics (UDL `w = load/span`,",
-        "   `5wL^4/384EI`), confidence *low*. An estimate, not FEA.",
+        "- **native**: Almond's built-in linear-elastic 3D frame solver, the default",
+        "  for line models (beams, columns, trusses, frames). Deflection is checked at",
+        "  SLS against span/limit and members at ULS (EN 1993-1-1 checks), with the",
+        "  load factors, ULS expression and deflection limit of the run's design code",
+        "  profile (Eurocode recommended values: L/250). Steel runs get a pass/fail at",
+        "  confidence *high*. Concrete, timber and aluminium runs are **indicative**:",
+        "  forces, deflection and stability are computed, but member capacity is not",
+        "  checked to that material's code, so there is no pass/fail (confidence",
+        "  *low*); a deflection or stability failure still fails the run.",
+        "- **Karamba**: shells, gridshells and membranes, or engine=\"karamba\". It",
+        "  tries three pathways in strict order of confidence:",
+        "  1. **api**: direct Karamba 3.1 solve (real FEA), confidence *high*;",
+        "  2. **template**: audited capsule GHX definition, confidence *medium*;",
+        "  3. **rule_based**: span/slenderness heuristics (UDL `w = load/span`,",
+        "     `5wL^4/384EI`), confidence *low*. An estimate, not FEA.",
         "",
-        "Pass criteria: max deflection within **L/250** of the detected span, and",
-        "material utilization below yield (default S235 steel, fy = 235 MPa).",
-        "The applied load defaults to **10 kN** unless load_kn is given.",
+        "  Karamba runs check unfactored loads: deflection within **L/250** of the",
+        "  detected span and utilization below the material's yield strength (S235,",
+        "  fy = 235 MPa, for plain \"Steel\").",
+        "",
+        "Each run's loads, design code, connections and stability are listed under",
+        "Run details. *members* counts structural members; support points and other",
+        "objects passed in are not counted as members.",
         "",
         "## Runs",
         "",
@@ -2902,18 +3047,19 @@ def _render_validation_report(runs: list[dict]) -> str:
             f"| {run['confidence']} | {run['span_m']:.1f} "
             f"| {run['max_deflection_mm']:.2f} | {run['deflection_limit_mm']:.1f} "
             f"| {run['utilization_ratio']:.2f} | {run['reactions_kn']:.2f} "
-            f"| {run['member_count']} | {'PASS' if run['passed'] else 'FAIL'} |"
+            f"| {run['member_count']} | {_run_result_label(run)} |"
         )
     lines.append("")
     lines.append("## Run details")
     for run in runs:
+        label = _run_result_label(run)
+        if label == "INDICATIVE":
+            label = "INDICATIVE, no pass/fail"
         lines += [
             "",
-            f"### Run {run['id']} — {run['structure_type']}, "
-            f"{run['analysis_method']} ({'PASS' if run['passed'] else 'FAIL'})",
+            f"### Run {run['id']} — {run['structure_type']}, {run['analysis_method']} ({label})",
             "",
-            f"- input: {run['member_count']} object(s), load {run['load_kn']:.1f} kN, "
-            f"material {run['material']}",
+            *_run_setting_lines(run),
             f"- verdict: {run['verdict']}",
         ]
         if run["warnings"]:
@@ -2923,13 +3069,17 @@ def _render_validation_report(runs: list[dict]) -> str:
         "",
         "## Reading the numbers",
         "",
-        "- Only **api** runs are finite element analysis; reactions_kn is",
-        "  populated on the api path only and should equal the applied load",
-        "  plus self-weight (equilibrium).",
-        "- Known gaps in karambaCommon 3.1.60519 (issue #6): api-mode",
-        "  max_deflection and per-element utilization may read 0.0 due to",
-        "  signature drift — trust reactions and stability diagnostics;",
-        "  cross-check deflection against the rule_based estimate.",
+        "- native and **api** runs are finite element analysis. reactions_kn should",
+        "  equal the applied load plus self-weight (equilibrium); on the Karamba route",
+        "  it is populated on the api path only.",
+        "- INDICATIVE runs report utilization against the characteristic strength,",
+        "  without material factors, for comparison only: have the members designed",
+        "  to the material's own code.",
+        "- Karamba **api** runs only: karambaCommon 3.1.60519 (issue #6) may",
+        "  read max_deflection and per-element utilization as 0.0 due to",
+        "  signature drift; trust reactions and stability diagnostics and",
+        "  cross-check deflection against the rule_based estimate. This does",
+        "  not affect native runs.",
         "- rule_based results are labeled LOW CONFIDENCE for a reason: treat",
         "  them as sanity checks, not engineering.",
         "",
@@ -2942,10 +3092,12 @@ def export_structural_report(path: str = "", limit: int = 50) -> str:
     """
     (BETA) Renders the persisted validate_structure history to a Markdown report.
 
-    Every successful validate_structure call is recorded in the local state
-    database (inputs, analysis method, confidence, numbers, warnings). This
-    tool writes them to a .md file, newest first, with an explanation of the
-    analysis pathways and pass criteria.
+    Every validate_structure call that returns pass, fail or indicative is
+    recorded in the local state database (inputs, loads and design settings,
+    analysis method, confidence, numbers, warnings). This tool writes them to a
+    .md file, newest first, with an explanation of the analysis routes and pass
+    criteria. Indicative runs (native concrete, timber, aluminium) are labelled
+    INDICATIVE: they carry no pass/fail.
 
     Args:
         path: Output file path. Default:
