@@ -1,0 +1,103 @@
+{
+  "batch_id": "ginkgo-refset-1024",
+  "image": {
+    "asset_id": "gen-laundry-basket-1",
+    "provider": "higgsfield",
+    "tool": "generate_image_batch",
+    "submitted_at": "2026-10-24T18:53:16.129Z",
+    "request": {
+      "model": "gpt_image_2_5",
+      "aspect_ratio": "1:1",
+      "prompt": "Product photo of a white plastic laundry basket with a perforated lattice, heaped with dark folded clothes and a grey towel draped over the rim. Single object centred, three-quarter view from slightly above, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos."
+    },
+    "batch_context": "Clean single-object reference images for Meshy image-to-3D props of a photoreal apartment-block world pack.",
+    "status": "COMPLETED",
+    "task_id": "2a7b4c2e-5d5b-4982-8499-c243ccc8c2ae",
+    "provider_model": "gpt_image_2_5",
+    "completed_observed_at": "2026-10-24T18:55:01.053Z",
+    "provider_output_name": "hf_20261024_185330_2a7b4c2e-5d5b-4982-8499-c243ccc8c2ae.png",
+    "output_file": "gen-laundry-basket-1.png",
+    "output_sha256": "be4e242d8509d00f15b46aff865007df9ef0066c3fbc92087e14a6eaaf85cdd4",
+    "output_file_modified_at": "2026-10-24T18:55:47+00:00",
+    "seed": null,
+    "consumed_credits": "about 0.25 (Ginkgo MESH_SOURCES.md)",
+    "evidence_source": {
+      "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+      "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+      "extracted_at": "2026-11-05T01:46:49+00:00"
+    }
+  },
+  "mesh": {
+    "asset_id": "gen-laundry-basket-1",
+    "provider": "meshy",
+    "tool": "meshy_image_to_3d",
+    "submitted_at": "2026-10-24T18:58:22.158Z",
+    "request": {
+      "ai_model": "meshy-7.1",
+      "enable_pbr": true,
+      "texture_resolution": "4k",
+      "target_formats": [
+        "glb"
+      ],
+      "image": "local upload of ref_laundry_basket.png"
+    },
+    "input_image_sha256": "be4e242d8509d00f15b46aff865007df9ef0066c3fbc92087e14a6eaaf85cdd4",
+    "status": "SUCCEEDED",
+    "status_basis": "Downloaded in the Ginkgo session with meshy_download_model; GLB present",
+    "task_id": "01a16f47-c229-7548-9402-79e276cc58e0",
+    "output_file": "gen-laundry-basket-1.glb",
+    "output_sha256": "4afd7867fcb796e0c10ea8f27584300d6df5649e05e1ab3e4e518a2786dfeee0",
+    "seed": null,
+    "consumed_credits": 30,
+    "evidence_source": {
+      "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+      "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+      "extracted_at": "2026-11-05T01:46:49+00:00"
+    }
+  },
+  "derivation": {
+    "asset_id": "gen-laundry-basket-1",
+    "source_sha256": "4afd7867fcb796e0c10ea8f27584300d6df5649e05e1ab3e4e518a2786dfeee0",
+    "source_triangles": 5387576,
+    "target_triangles": 80000,
+    "prepared_sha256": "c6a5a36e9c6b708e94d6b4bd4ba9dfe853fcfcb235165edfd2cefcf9aeb1abd1",
+    "software": "Blender 5.1.2",
+    "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Never subdivide to inflate counts.",
+    "weld_tolerance_source_units": 1.9025299549102782e-07,
+    "quality": {
+      "vertices": 36478,
+      "triangles": 80000,
+      "boundary_edges": 0,
+      "nonmanifold_edges_excluding_boundary": 0,
+      "zero_area_faces": 0,
+      "connected_components": 2,
+      "largest_component_vertices": 36309,
+      "nonfinite_coordinates": 0,
+      "self_intersections": "not_tested",
+      "mesh_validation_repair_passes": 0,
+      "use": "Visual entourage; not certified for fabrication or structural analysis",
+      "bounds_relative_change": [
+        0.00027193701487595727,
+        0.0003901093884675556,
+        0.0015016214393936396
+      ]
+    }
+  },
+  "input_image_file": "batches/ginkgo-refset-1024/gen-laundry-basket-1.png",
+  "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+  "external_reference_ids": [],
+  "dimension_basis": "Real-world sizes authored in the Ginkgo pass (runs/refset_1024/worlds/jp.py PROPS); height normalised exactly, width and depth measured after uniform scaling. Not a physical survey.",
+  "reference_review": "Ginkgo reference image reviewed in that session for a clean, unbranded single object; re-checked for this import: no lettering, logos or brand marks visible.",
+  "rights": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+  "origin": {
+    "project": "Ginkgo, the owner's own world-generation repository (private)",
+    "pass": "runs/refset_1024",
+    "source_name": "laundry_basket",
+    "records": [
+      "runs/refset_1024/MESH_SOURCES.md",
+      "runs/refset_1024/meshy/jobs.json",
+      "runs/refset_1024/pass.json",
+      "Claude Code session transcript c849f85f-3384-47ae-bf45-2e1a471d157c (the tool calls that submitted the image and mesh jobs)"
+    ]
+  }
+}

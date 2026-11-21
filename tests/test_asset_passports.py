@@ -2,8 +2,10 @@
 import asyncio
 import copy
 import json
+import re
 import struct
 import shutil
+import tempfile
 from pathlib import Path
 
 import pytest
@@ -23,7 +25,7 @@ def asset():
 def test_all_shipped_assets_have_consistent_verified_passports():
     result = ap.audit_library(LIBRARY)
     assert result["status"] == "success", result
-    assert result["checked"] == 50
+    assert result["checked"] == 144
 
 
 def test_audit_detects_tampering_and_contract_load_rejects_model_changes(asset, tmp_path):
@@ -178,6 +180,75 @@ def test_rhino_restore_script_scales_numeric_mm_glbs(asset):
     contract.pop("passport")
     script = server._restore_and_place_script(contract, {}, 0, 0, 0, 0, "TEST")
     assert "Transform.Scale(Point3d.Origin, 1.0)" in script
+
+
+def _fake_import_bridge(tmp_path, object_ids, layer_ids):
+    """Stands in for Rhino: the import script names its id files, the
+    restore script writes the size report."""
+    scripts = []
+
+    def bridge(payload, timeout=60.0):
+        script = json.loads(payload.decode("utf-8"))["script"]
+        scripts.append(script)
+        if len(scripts) == 1:
+            objects_path, layers_path = re.findall(r'File\.WriteAllLines\(@"([^"]+)"', script)
+            Path(objects_path).write_text("".join(g + "\n" for g in object_ids), encoding="utf-8")
+            Path(layers_path).write_text("".join(g + "\n" for g in layer_ids), encoding="utf-8")
+        return json.dumps({"status": "success", "guids": []})
+
+    return bridge, scripts
+
+
+def test_placement_scripts_return_no_guids_and_clean_up_import_layers(asset, tmp_path, monkeypatch):
+    # Live 2026-11: every placement left two stray LinearDimensions (bridges
+    # dimension any script that returns GUIDs) and an empty <asset_id>_root
+    # layer. Ids now travel through files instead of the return value.
+    server = load_server_module()
+    monkeypatch.setattr(tempfile, "tempdir", str(tmp_path))
+    contract = server.exchange.load_contract(LIBRARY / asset["contract_file"])
+    object_ids = ["11111111-1111-1111-1111-111111111111", "22222222-2222-2222-2222-222222222222"]
+    layer_id = "33333333-3333-3333-3333-333333333333"
+    bridge, scripts = _fake_import_bridge(tmp_path, object_ids, [layer_id])
+    monkeypatch.setattr(server, "_send_and_receive", bridge)
+
+    result = server._receive_contract(contract, 0, 0, 0, 180, "TEST")
+
+    assert result["status"] == "success", result
+    assert result["imported_guids"] == object_ids
+    import_script, restore_script = scripts
+    for script in scripts:
+        run_body = script[script.index("public static List<Guid> Run"):]
+        returns = [line.strip() for line in run_body.splitlines() if line.strip().startswith("return ")]
+        assert returns and all(r == "return new List<Guid>();" for r in returns), returns
+    assert str(tmp_path) in import_script
+    assert f'new string[] {{ "{layer_id}" }}' in restore_script
+    assert "doc.Layers.Delete(" in restore_script
+    # the per-call id files are removed once read
+    assert not list(tmp_path.glob("almond_import_*.txt"))
+
+
+def test_placement_without_new_layers_still_imports(asset, tmp_path, monkeypatch):
+    server = load_server_module()
+    monkeypatch.setattr(tempfile, "tempdir", str(tmp_path))
+    contract = server.exchange.load_contract(LIBRARY / asset["contract_file"])
+    bridge, scripts = _fake_import_bridge(tmp_path, ["11111111-1111-1111-1111-111111111111"], [])
+    monkeypatch.setattr(server, "_send_and_receive", bridge)
+    result = server._receive_contract(contract, 0, 0, 0, 0, "TEST")
+    assert result["status"] == "success", result
+    # an empty C# array needs its element type spelled out
+    assert "new string[] {  }" in scripts[1]
+
+
+def test_placement_reports_an_import_that_added_nothing(asset, tmp_path, monkeypatch):
+    server = load_server_module()
+    monkeypatch.setattr(tempfile, "tempdir", str(tmp_path))
+    contract = server.exchange.load_contract(LIBRARY / asset["contract_file"])
+    bridge, scripts = _fake_import_bridge(tmp_path, [], [])
+    monkeypatch.setattr(server, "_send_and_receive", bridge)
+    result = server._receive_contract(contract, 0, 0, 0, 0, "TEST")
+    assert result["status"] == "error"
+    assert "imported no objects" in result["message"]
+    assert len(scripts) == 1
 
 
 def test_startup_diagnostics_do_not_pollute_mcp_stdout(capsys):

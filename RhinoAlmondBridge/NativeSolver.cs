@@ -125,8 +125,12 @@ namespace RhinoAlmondBridge
             // uv trusts only its bundled certificates by default. Behind security software or a proxy that inspects HTTPS
             // (common in offices) the first-run download then fails with "invalid peer certificate: UnknownIssuer".
             // Use the Windows certificate store instead, unless the user has chosen a setting of their own.
+            // UV_SYSTEM_CERTS is uv's current name; UV_NATIVE_TLS (deprecated) keeps older uv versions working.
             if (!info.EnvironmentVariables.ContainsKey("UV_NATIVE_TLS") && !info.EnvironmentVariables.ContainsKey("UV_SYSTEM_CERTS"))
+            {
+                info.EnvironmentVariables["UV_SYSTEM_CERTS"] = "1";
                 info.EnvironmentVariables["UV_NATIVE_TLS"] = "1";
+            }
             Process process;
             try { process = Process.Start(info); }
             catch (Exception ex) { return Error("Could not start the native solver (" + command.Label + "): " + ex.Message); }

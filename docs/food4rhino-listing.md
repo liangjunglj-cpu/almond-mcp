@@ -1,17 +1,17 @@
-# Food4Rhino listing - Almond 0.6.0
+# Food4Rhino listing - Almond 0.8.0
 
-almondbridge 0.6.0 and almond-mcp 0.6.0 were published to Yak and PyPI on
-27 September 2026. The existing [Food4Rhino listing](https://www.food4rhino.com/en/app/almond-mcp)
-was updated the same day with 0.6.0 first in downloads.
-Update the existing Almond MCP listing, preserving the permanent plugin GUID.
-Use the Rhino Account that owns the existing app / Yak package.
+Prepared for the 0.8.0 stable release (almondbridge 0.8.0 on Yak, almond-mcp 0.8.0 on PyPI). Update the
+existing [Food4Rhino listing](https://www.food4rhino.com/en/app/almond-mcp), preserving the permanent plugin
+GUID, with the Rhino Account that owns the existing app / Yak package. Put 0.8.0 first in downloads and keep
+0.6.0 as the previous stable download. Publish the GitHub release, PyPI and Yak first
+([release-0.8.md](release-0.8.md)).
 
 ## Listing fields
 
 | Field | Prepared value |
 | --- | --- |
 | App name | Almond MCP |
-| Release | almondbridge 0.6.0 / almond-mcp 0.6.0 |
+| Release | almondbridge 0.8.0 / almond-mcp 0.8.0 |
 | Platform | Rhino 8 for Windows only |
 | GUID | c337dbb8-394a-4593-9c2b-a3d7cfc91893 |
 | Code licence | MIT |
@@ -20,82 +20,98 @@ Use the Rhino Account that owns the existing app / Yak package.
 | Support | https://github.com/liangjunglj-cpu/almond-mcp/issues |
 | Support email | liangjung.lj@gmail.com |
 | Icon | assets/almond-icon-512.png |
-| Categories | Architecture; AI / automation; select the closest offered categories |
+| Categories | Architecture; Structure / analysis; Environment / simulation; AI / automation (closest offered) |
 
 ## Short description
 
-Almond for Rhino 8: browse 50 generated 3D models and linked SVG/DXF drawings in an offline Object Archive, with embedded metadata and source records. Includes an optional MCP bridge for AI-assisted modelling. Windows; free and open source.
+Almond for Rhino 8: an offline library of 144 generated 3D models with linked drawings, a built-in structural
+analysis engine with Eurocode steel checks, and (beta) climate, daylight and thermal studies. Optional MCP
+bridge for AI-assisted modelling. Windows; free and open source.
 
 ## Description
 
-Almond combines an architectural Object Archive with a semantic MCP bridge for
-Rhino 8. Install almondbridge, restart Rhino, and run **AlmondLibrary** to open
-its compact library in a dockable side panel that follows Rhino appearance settings. Use AlmondLibraryBrowser
-for full-size browsing. Browsing the included collection needs no
-Python installation, Meshy account or AI subscription.
+Almond is a working library for architecture inside Rhino 8. Install almondbridge, restart Rhino and run
+**Almond**: one docked panel with three workspaces, Models, Structure and Environment, that follows Rhino's
+appearance. Browsing models and running the structural engine need no AI subscription.
 
-The package includes 50 generated GLB models with embedded Almond passports,
-spatial contracts, measured mesh dimensions, coloured previews and source records.
-Previews can follow the active Rhino viewport, approximating Ghosted, Arctic,
-Shaded and Rendered; scene lighting and custom edge settings are not reproduced.
-Ten models have linked drawing packages: 60 plan/front/right view-scale pairs
-in SVG and DXF, plus 20 A3 SVG sheets at 1:50 and 1:100. Search the collection,
-rotate a model, inspect its drawings and download the representation you need.
-DXFs use full-size millimetres; SVG sheets retain their declared paper scale.
-The docked panel also offers Place and thumbnail dragging into the viewport,
-with shared blocks and a Light detail option for heavier generated models.
+**Models.** 144 generated 3D models: furniture, people, plants and trees, street furniture, building services,
+vehicles and boats, ornament, and a Blender-scripted street and services kit. Every model carries an embedded
+passport, real-world dimensions, an Almond material, a preview and its source record (how it was generated or
+built, with checksums and known evidence gaps). Search, rotate, Place or drag into the viewport; ten models
+have linked plan and elevation drawings (SVG, DXF, A3 sheets). Generated geometry is a design aid; dimensions
+are not manufacturer specifications.
 
-Source histories include recorded generation prompts, provider task IDs,
-checksums, attribution and known evidence gaps. Generated geometry is a design
-aid; its dimensions are not manufacturer specifications. Derived drawings are
-silhouettes and do not infer construction layers, hidden edges or performance.
+**Structure.** Draw a frame as centre lines with support points and press Run. Almond's own 3D frame solver
+(checked against OpenSees on twelve typologies) gives the deflected shape, buckling factor α_cr, P-Δ where it
+matters, EN 1990 load combinations, floor and placed-model loads, support types per point (fixed, pinned,
+rollers, springs, lateral restraints), and EN 1993-1-1 steel member checks: classes, buckling curves,
+interaction, shear, bow imperfections and lateral-torsional buckling. Each member is judged against its own
+span, sway as storey drift. The Almond Results panel lists every member, combination and load with CSV export.
+Concrete, timber and aluminium are indicative; gravity loads only. Karamba3D can be used as an alternative
+engine (beta; Karamba is installed and licensed separately).
 
-Seven optional community drawing elements remain searchable as catalogue records
-and source links. Their third-party model files are not redistributed. Six
-architectural detail reference directories are research leads, not attributed
-inputs to the existing generated models.
+**Environment (beta).** Load an EPW weather file, define rooms and constructions, and study climate, sun path,
+shadows, daylight (daylight factor, sDA/ASE/UDI, EN 17037), solar radiation, ISO 13790 thermal energy and
+comfort, with code packs for envelope checks. Results are design-stage comparisons, not compliance
+simulations.
 
-For AI-assisted modelling, the separate almond-mcp Python package connects an
-MCP-compatible client to the Rhino bridge. It adds asset retrieval, spatial
-contracts, layout validation, material metadata, drawing generation and optional
-Karamba-based structural workflows. Python/uv and an MCP client are required for
-these AI features, but are not required to browse the included archive.
+**For AI-assisted modelling**, the almond-mcp Python package connects an MCP client (Claude, Codex) to the Rhino
+bridge: model retrieval and placement, layout checks, drawings, structural and environmental studies, twelve
+benchmarked structural reference typologies and ten annotated Grasshopper teaching definitions. Model files
+download on first use. Python/uv and an MCP client are needed only for these AI features.
 
-Code is MIT. Included generated models and derived drawings are CC BY 4.0,
-attributed to Almond generated asset library. Other components retain their
-included licence notices. Not affiliated with Meshy, McNeel, Trimble, IKEA or
-Karamba3D. Karamba and downloaded community model files are not bundled.
+Code is MIT. Included generated models and derived drawings are CC BY 4.0, attributed to Almond generated asset
+library. Other components keep their included licence notices. Not affiliated with Meshy, Tripo, McNeel,
+Trimble, IKEA or Karamba3D. Karamba and downloaded community model files are not bundled.
 
 ## Downloads
 
-Primary file: `almondbridge-0.6.0-rh8_0-win.yak`.
-Optional upload wrapper: `almondbridge-0.6.0-food4rhino.zip` containing the
-same Yak and quickstart guide. Both are in `dist/release-0.6.0/` after preparation.
-Use the current form's supported upload type; do not rename an extension.
-If the existing listing is linked to Yak, update the matching package rather
-than creating a duplicate app. The permanent GUID remains unchanged.
+Primary file: `almondbridge-0.8.0-rh8_0-win.yak`. Optional upload wrapper:
+`almondbridge-0.8.0-food4rhino.zip` (the same Yak and the quickstart guide). Both are in
+`dist/release-0.8.0/` after preparation. Use the current form's supported upload type; do not rename an
+extension. If the listing is linked to Yak, update the matching package rather than creating a duplicate app.
 
-Download title: **Almond 0.6.0 - Rhino 8 Windows + Object Archive**.
-Description: Install through Rhino Package Manager (search almondbridge) or use
-the provided Yak package. Restart Rhino, then run Almond. The 50 generated
-models are included. See rhino-archive-quickstart.md for optional MCP setup
-with almond-mcp 0.6.0 from PyPI.
+Download title: **Almond 0.8.0 - Rhino 8 Windows: Models, Structure, Environment (beta)**.
+Description: Install through Rhino Package Manager (search almondbridge) or use the provided Yak. Restart
+Rhino, then run Almond. All 144 models are included. See rhino-archive-quickstart.md for optional MCP setup with
+almond-mcp 0.8.0 from PyPI.
 
 ## Release notes
 
-- First stable 0.6 release: no longer requires Include pre-releases.
-- Adds AlmondLibrary and the bundled offline Neo Swiss Object Archive.
-- Drag thumbnails from the docked panel into a viewport, or Place with snaps.
-- Previews can follow the active Rhino viewport display mode.
-- Includes 50 generated models, metadata, source evidence and previews.
-- Links 10 drawing packages with SVG, DXF and A3 sheets.
-- Adds a shared MCP repository search and per-object resources.
-- Adds compact Karamba help buttons with setup guidance and support diagrams.
-- Adds audited packaging, checksum verification, isolated builds and CI artifacts.
-- Windows / Rhino 8.0 SDK compatibility; in-Rhino runtime smoke is a release gate.
+- Stable release; replaces 0.6.0. No "Include pre-releases" needed.
+- Structure workspace out of beta: Almond's own frame solver, EN 1990 combinations, stability (α_cr, P-Δ) and
+  EN 1993-1-1 steel checks now including shear, bow imperfections, lateral-torsional buckling and Table B.3 Cm.
+- Support types per support point from the Supports tab; per-member deflection spans and storey drift.
+- Environment workspace (beta): climate, daylight, radiation, thermal and comfort studies for rooms, with
+  constructions and code packs, and a tutorial model.
+- Model library grows from 50 to 144 models, labelled by how each was made (Meshy, Tripo, Scripted).
+- MCP: structural reference typologies, Grasshopper teaching definitions, scene-metadata audit (pilot); model
+  files download on first use.
 
-Suggested screenshots: archive overview; model with metadata; plan/DXF view.
-Use screenshots from the candidate being released, not unrelated project imagery.
+## Gallery images
+
+Upload in this order (1200 × 800; full 1920 × 1080 versions beside them). The renders are made in Blender
+from the release's own model files and Almond materials; the panel captures come from the release candidate
+in Rhino 8 (dark theme, the tester's setting). Files are in `dist/release-0.8.0/food4rhino-images/` after preparation (not tracked in git).
+
+| # | File | Caption |
+|---|---|---|
+| 1 | `harbour-street-1200x800.png` | A waterfront street furnished from the library: fishing boats, street furniture, people and trees |
+| 2 | `library-lineup-1200x800.png` | 40 of the 144 library models at true relative scale |
+| 3 | `panel-models.png` | The Models workspace in Rhino: search, previews, Place and drag |
+| 4 | `structure-overlay.png` | The native structural engine: deflected shape and member utilisation in the viewport |
+| 5 | `structure-results.png` | Almond Results: every member, combination and check, with CSV export |
+| 6 | `environment-daylight.png` | Environment (beta): a room daylight study on the tutorial model |
+| 7 | `environment-results.png` | Environment (beta): the results tab with the daylight plan |
+| 8 | `y2k-district-1200x800.png` | A plaza assembled from the scripted street and services kit |
+| 9 | `interior-living-1200x800.png` | An interior from the furniture models |
+| 10 | `model-detail-1200x800.png` | One model up close, with its mesh |
+
+## Earlier listing: 0.6.0
+
+almondbridge 0.6.0 and almond-mcp 0.6.0 were published to Yak and PyPI on 27 September 2026 and the listing
+was updated the same day. Its text and the rc.6/rc.7 notes are in git history
+(`git show origin/master:docs/food4rhino-listing.md`).
 
 ## Publication references
 
@@ -103,17 +119,3 @@ Checked 19 September 2026: [Food4Rhino FAQ](https://www.food4rhino.com/en/faq),
 [McNeel package publishing](https://developer.rhino3d.com/guides/yak/pushing-a-package-to-the-server/),
 and [Rhino plugin installation](https://www.rhino3d.com/en/docs/guides/scripts-plugins/how-to-use/).
 Food4Rhino account access and any listing review remain separate from local builds.
-
-### rc.6 placement and rc.7 workspace
-
-Compact model tiles, thumbnail-to-viewport placement, a keyboard-accessible
-Place action, shared blocks, optional lighter meshes and embedded derivation
-records. Viewport dragging was confirmed by the user on rc.6. The user accepted the preview update and authorized prerelease publication.
-The Yak is published; the comprehensive native checklist remains only partially recorded.
-
-The rc.7 menu separates Models and Karamba Validation. The analysis workspace
-shows assumptions, support/load diagrams, view toggles, mapped utilization,
-deflection limits and exportable analysis records. Karamba installation and
-licensing are separate. This is first-order screening, not full code verification.
-The active IKEA catalogue and supplier links/tools have been retired. Native
-acceptance of the new Karamba workspace is pending.

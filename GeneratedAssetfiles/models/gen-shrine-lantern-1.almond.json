@@ -1,0 +1,546 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-shrine-lantern-1",
+  "library_id": "generated_assets",
+  "name": "Lantern shrine (Plinth with a red gate frame, a hanging paper-lantern form and two offering boxes, 4 m; procedural kit piece; low-poly edition)",
+  "source_app": "blender",
+  "source_units": "m",
+  "file": "gen-shrine-lantern-1.glb",
+  "dimensions_mm": {
+    "width": 4000.0,
+    "depth": 4000.0,
+    "height": 4020.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "ground",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -2000.0,
+        -2000.0,
+        0.0
+      ],
+      "max": [
+        2000.0,
+        2000.0,
+        4020.0
+      ]
+    },
+    "footprint": [
+      [
+        -2000.0,
+        -2000.0
+      ],
+      [
+        2000.0,
+        -2000.0
+      ],
+      [
+        2000.0,
+        2000.0
+      ],
+      [
+        -2000.0,
+        2000.0
+      ]
+    ],
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "fixed"
+  },
+  "materials": [
+    {
+      "material_id": "steel-painted-vermilion",
+      "objects": [
+        "gen-shrine-lantern-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-shrine-lantern-1",
+    "library_id": "generated_assets",
+    "name": "Lantern shrine (Plinth with a red gate frame, a hanging paper-lantern form and two offering boxes, 4 m; procedural kit piece; low-poly edition)",
+    "category": "ornament",
+    "tags": [
+      "shrine",
+      "gate",
+      "lantern",
+      "japan",
+      "streetscape",
+      "landmark",
+      "procedural",
+      "low-poly",
+      "y2k-world-kit-v040"
+    ],
+    "dimensions_mm": {
+      "width": 4000.0,
+      "depth": 4000.0,
+      "height": 4020.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 4000.0,
+      "depth": 4000.0,
+      "height": 4020.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "ground",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -2000.0,
+          -2000.0,
+          0.0
+        ],
+        "max": [
+          2000.0,
+          2000.0,
+          4020.0
+        ]
+      },
+      "footprint": [
+        [
+          -2000.0,
+          -2000.0
+        ],
+        [
+          2000.0,
+          -2000.0
+        ],
+        [
+          2000.0,
+          2000.0
+        ],
+        [
+          -2000.0,
+          2000.0
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "fixed"
+    },
+    "materials": [
+      {
+        "material_id": "steel-painted-vermilion",
+        "objects": [
+          "gen-shrine-lantern-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "procedural_script",
+      "parameters": {
+        "prompt": null,
+        "generated_at": "2026-09-27",
+        "orientation_correction": null,
+        "scale_applied": 1000.000005,
+        "generation_route": "procedural_script",
+        "generator_script": "twofronts/world_v040/kit_v040.py",
+        "generator_script_sha256": "e2cdaad0dcccb4ffe7510e4a735fb6e976363a298da83bad876df962121b0d5e",
+        "source_file": "twofronts/world_v040/kit/MW_Shrine.fbx",
+        "source_sha256": "7e1967ad44b3e404f79da52f3798390501fe83f462a7ee90624521d0b3f71b36",
+        "captured_generation": {
+          "batch_id": "y2k-world-kit-v040",
+          "route": "procedural_script",
+          "generator": {
+            "script": {
+              "path": "twofronts/world_v040/kit_v040.py",
+              "sha256": "e2cdaad0dcccb4ffe7510e4a735fb6e976363a298da83bad876df962121b0d5e",
+              "size_bytes": 91765,
+              "last_modified_at": "2026-09-27T11:02:22+00:00",
+              "retained_as": "kit_v040.py.txt",
+              "retained_sha256": "ca7047bc12d9865d80ce244d9f5e5dd2aa8c243446f92097e594252d17cf2854",
+              "redact_local_paths": "<owner's Ginkgo repository>",
+              "redaction_anchor": "Ginkgo",
+              "redaction_note": "1 line(s) held an absolute local path; the retained copy replaces each path up to its project folder with \"<owner's Ginkgo repository>\", keeping the part after the Ginkgo folder. The project file hash is of the unredacted file.",
+              "role": "generator",
+              "dependencies": [
+                {
+                  "path": "Ginkgo: publishing/worldpack/gwlib.py",
+                  "sha256_now": "b5dbd2da56f3f49092f3eb48749daed447bf5e7c78ef271805cc35d31dea8ac8",
+                  "last_modified_at": "2026-10-03T19:18:48+00:00",
+                  "retained": false,
+                  "use": "geometry helpers (boxz, cyl, strut, decal) and material set-up; the owner's Ginkgo world-pack library",
+                  "note": "Modified after these exports; the version the export used is not retained."
+                },
+                {
+                  "path": "Ginkgo: publishing/worldpack/gwrender.py",
+                  "sha256_now": "7c47a6748b956ee8a828242a8ac34a9cf285402e4a54097d7531a0712bce624e",
+                  "last_modified_at": "2026-10-03T18:51:22+00:00",
+                  "retained": false,
+                  "use": "tile renders only (no geometry)"
+                }
+              ],
+              "authoring": {
+                "tool": "Claude Code",
+                "project": "Project Y2K",
+                "sessions": [
+                  {
+                    "session": "09c7fb46-e676-445d-99fe-baacaffc9f03",
+                    "subagent": "agent-aa9e550516cb8c0d7",
+                    "actions": "Written by a subagent of this session on 2026-09-26 (2 Writes, 4 Edits, 10:33-10:50Z)"
+                  },
+                  {
+                    "session": "5772745b-5dde-425b-9074-b55221d6a766",
+                    "actions": "9 Edits on 2026-09-27 (10:49-11:02Z); the file was last modified 11:02:22Z and MW_Shrine.fbx was written 11:04:51Z"
+                  }
+                ],
+                "basis": "Tool calls in the session transcripts; the export command for MW_Shrine.fbx was not pinned to a tool call. The FBX is newer than the last script edit."
+              },
+              "modified_at": "2026-09-27T11:02:22+00:00",
+              "redacted_lines": [
+                38
+              ],
+              "retained_file": "batches/y2k-world-kit-v040/kit_v040.py.txt"
+            },
+            "kit_record": {
+              "path": "twofronts/world_v040/kit/kit_v040.json",
+              "sha256": "3c23cc1c14ede21f696ebf5885f3dd7c08f645780759d673fadfbae1e9011af0",
+              "size_bytes": 84039,
+              "last_modified_at": "2026-10-01T00:23:38+00:00",
+              "retained_as": "kit_v040.json",
+              "retained_sha256": "df0dd6ff9eb277f1cb66f408bd0f2b895e80314ba38a7e6c453faf450ded1c23",
+              "redact_local_paths": "<Project Y2K>",
+              "redaction_anchor": "ProjectY2K",
+              "redaction_note": "119 line(s) held an absolute local path; the retained copy replaces each path up to its project folder with \"<Project Y2K>\", keeping the part after the ProjectY2K folder. The project file hash is of the unredacted file.",
+              "modified_at": "2026-10-01T00:23:38+00:00",
+              "redacted_lines": [
+                3,
+                4,
+                14,
+                15,
+                16,
+                47,
+                396,
+                397,
+                409,
+                672,
+                673,
+                685,
+                920,
+                921,
+                933,
+                1144,
+                1145,
+                1157,
+                1348,
+                1349,
+                1361,
+                1531,
+                1532,
+                1544,
+                1745,
+                1746,
+                1758,
+                1872,
+                1873,
+                1885,
+                1999,
+                2000,
+                2012,
+                2126,
+                2127,
+                2139,
+                2223,
+                2224,
+                2236,
+                2320,
+                2321,
+                2333,
+                2379,
+                2380,
+                2392,
+                2438,
+                2439,
+                2451,
+                2497,
+                2498,
+                2510,
+                2556,
+                2557,
+                2569,
+                2614,
+                2615,
+                2627,
+                2670,
+                2671,
+                2683,
+                2730,
+                2731,
+                2743,
+                2799,
+                2800,
+                2812,
+                2858,
+                2859,
+                2871,
+                2959,
+                2960,
+                2972,
+                3060,
+                3061,
+                3073,
+                3170,
+                3171,
+                3183,
+                3271,
+                3272,
+                3284,
+                3382,
+                3383,
+                3395,
+                3473,
+                3474,
+                3486,
+                3574,
+                3575,
+                3587,
+                3675,
+                3676,
+                3688,
+                3776,
+                3777,
+                3789,
+                3867,
+                3868,
+                3880,
+                3916,
+                3917,
+                3929,
+                3965,
+                3966,
+                3978,
+                4013,
+                4014,
+                4026,
+                4059,
+                4060,
+                4072,
+                4108,
+                4109,
+                4121,
+                4165,
+                4166,
+                4178,
+                4250,
+                4251
+              ],
+              "retained_file": "batches/y2k-world-kit-v040/kit_v040.json"
+            }
+          },
+          "mesh": {
+            "asset_id": "gen-shrine-lantern-1",
+            "tool": "blender_procedural_script",
+            "source_name": "MW_Shrine",
+            "source_file": "twofronts/world_v040/kit/MW_Shrine.fbx",
+            "generator_script": "twofronts/world_v040/kit_v040.py",
+            "generator_script_sha256": "e2cdaad0dcccb4ffe7510e4a735fb6e976363a298da83bad876df962121b0d5e",
+            "kit_record": "twofronts/world_v040/kit/kit_v040.json",
+            "kit_entry": {
+              "family": "Shrine",
+              "fbx_rel": "MW_Shrine.fbx",
+              "footprint_m": [
+                4,
+                4
+              ],
+              "height_m": 4.02,
+              "bounds_m": {
+                "min": [
+                  -2.0,
+                  -2.0,
+                  0.0
+                ],
+                "max": [
+                  2.0,
+                  2.0,
+                  4.02
+                ],
+                "size": [
+                  4.0,
+                  4.0,
+                  4.02
+                ]
+              },
+              "roof_heights": [
+                {
+                  "z": 0.55,
+                  "rect": [
+                    -1.75,
+                    -1.75,
+                    1.75,
+                    1.75
+                  ],
+                  "note": "plinth top"
+                }
+              ],
+              "wallrun_faces": [],
+              "climb_routes": [],
+              "notes": [
+                "Checkpoint: lantern hangs under the nuki (1.21-2.99 m), trigger volume suggested 3x3x3 m."
+              ],
+              "groups": {
+                "SM_MW_Shrine_Structure": 144,
+                "SM_MW_Shrine_Signs": 712,
+                "SM_MW_Shrine_Props": 216
+              },
+              "tris": 1072,
+              "floating_parts": 0,
+              "validation": {
+                "passed": true,
+                "triangles": 1072,
+                "max_bounds_error_m": 0.0,
+                "textures_missing": [],
+                "unused_material_slots": []
+              }
+            },
+            "output_file": "gen-shrine-lantern-1.fbx",
+            "output_format": "fbx",
+            "output_sha256": "7e1967ad44b3e404f79da52f3798390501fe83f462a7ee90624521d0b3f71b36",
+            "output_file_modified_at": "2026-09-27T11:04:51+00:00",
+            "evidence_source": {
+              "project_files": [
+                "twofronts/world_v040/kit_v040.py",
+                "twofronts/world_v040/kit/kit_v040.json",
+                "twofronts/world_v040/kit/MW_Shrine.fbx"
+              ],
+              "authoring": {
+                "tool": "Claude Code",
+                "project": "Project Y2K",
+                "sessions": [
+                  {
+                    "session": "09c7fb46-e676-445d-99fe-baacaffc9f03",
+                    "subagent": "agent-aa9e550516cb8c0d7",
+                    "actions": "Written by a subagent of this session on 2026-09-26 (2 Writes, 4 Edits, 10:33-10:50Z)"
+                  },
+                  {
+                    "session": "5772745b-5dde-425b-9074-b55221d6a766",
+                    "actions": "9 Edits on 2026-09-27 (10:49-11:02Z); the file was last modified 11:02:22Z and MW_Shrine.fbx was written 11:04:51Z"
+                  }
+                ],
+                "basis": "Tool calls in the session transcripts; the export command for MW_Shrine.fbx was not pinned to a tool call. The FBX is newer than the last script edit."
+              },
+              "extracted_at": "2026-11-20T18:55:02+00:00"
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-shrine-lantern-1",
+            "source_sha256": "7e1967ad44b3e404f79da52f3798390501fe83f462a7ee90624521d0b3f71b36",
+            "source_triangles": 1072,
+            "target_triangles": 1072,
+            "prepared_sha256": "a34370143aca5e8eee4e116ba2bedeb36e7366b8b81feb97f7f6ca2659df84bd",
+            "software": "Blender 5.1.2",
+            "source_format": "fbx",
+            "source_file": "gen-shrine-lantern-1.fbx",
+            "source_edits": [],
+            "method": "Import the kit FBX with Blender (file axes and FBX_SCALE_UNITS honoured: metres, Z-up); remove engine collision hulls (UCX_*) and apply the recorded edits (source_edits); remove the kit material slots (Almond materials are assigned; kit textures are not shipped); Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Remove wire edges, split edges shared by more than two faces and remove zero-area faces (counts in quality.topology_repairs). Mark edges sharper than 30 degrees as sharp (flat-shaded hard edges; shading only). Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 4.0199999809265134e-07,
+            "quality": {
+              "vertices": 612,
+              "triangles": 1072,
+              "boundary_edges": 48,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 27,
+              "largest_component_vertices": 264,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "topology_repairs": {
+                "wire_edges_removed": 0,
+                "nonmanifold_edges_split": 0,
+                "zero_area_faces_removed": 0,
+                "loose_vertices_removed": 0
+              },
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            }
+          },
+          "edits": [],
+          "input_image_file": null,
+          "external_reference_status": "Style reference only: kit_v040.py says it builds \"in the style of the owner's Ginkgo refset_0924 world run\" (the owner's own generated world images); kit_v060_details.py and kinetic_v046.py follow the owner's text requests. No external image was an input to these pieces, and the pieces use no Ginkgo or Meshy geometry (the shrine, railcars and street details are built from boxes, cylinders and struts).",
+          "external_reference_ids": [],
+          "dimension_basis": "Authored kit sizes in metres from the scripts (kit records: kit_v060.json min/max, kit_v040.json bounds_m); the library keeps them (height = authored height, width and depth measured). The wall AC rig is assumed to hang with its drain line reaching ground level (mount height 0). Not a physical survey.",
+          "reference_review": "Reviewed on 2026-11-20: procedural geometry, so there is no input image. The prepared library mesh was rendered untextured from the front three-quarter view (500 px, viewed in a 300 px contact sheet) and the script code that models it was read: no lettering, logos, brand marks or characters in the geometry. A straight-on front render (600 px, viewed at 400 px) also shows only blank panels. A torii-style gate frame over a paper-lantern form with two offering boxes: generic street-shrine elements, not a model of a specific shrine.",
+          "rights": "Procedural geometry built by a Blender script in the owner's Project Y2K game repository (private); see each script's authoring record for the Claude Code session that wrote it, or that none was found. The owner's own project geometry: no generation provider, account or credits are involved, and the scripts build every piece from Blender primitives (no imported or third-party geometry in these pieces). Owner approved release in the Almond library under CC BY 4.0 on 2026-11-20 (\"increase the range of models, from the ones i used for my project y2k games, (except for the operatives and bosses)\") and chose the procedural kit pieces on 2026-11-20. Kit material colours and textures are not distributed; Almond materials are assigned.",
+          "origin": {
+            "project": "Project Y2K, the owner's game project (private repository)",
+            "pass": "twofronts/world_v040/kit",
+            "source_name": "MW_Shrine",
+            "records": [
+              "twofronts/world_v040/kit_v060_details.py, twofronts/world_v040/kit_v040.py, twofronts/world_v040/kinetic_v046.py (the generators, retained as .py.txt; kit_v040.py with one local path redacted)",
+              "twofronts/world_v040/kit/kit_v060.json, twofronts/world_v040/kit/kit_v040.json (kit records; retained, kit_v040.json with local paths redacted)",
+              "twofronts/world_v040/kit/MW60_*.fbx, MW_Shrine.fbx, MW_Train_*.fbx (SHA-256 checked)",
+              "Claude Code session transcripts f2628003-8252-4ccb-8906-36416d1f5fc8, 09c7fb46-e676-445d-99fe-baacaffc9f03, 5772745b-5dde-425b-9074-b55221d6a766 and 6e4feafa-de41-49cf-af90-dfa40f758867"
+            ]
+          }
+        }
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "architecture",
+        "streetscape"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.0,
+      "triangle_count": 1072,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "7DCA24E3AF6A4D841DF26BAC159246D978115F3477B56B9634EB4BFBCF83D0DE"
+}

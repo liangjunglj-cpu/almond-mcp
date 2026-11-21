@@ -28,6 +28,9 @@ function placeModel(id, drag = false) {
 
 const esc = (value) => String(value ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const human = (value) => String(value || '').replaceAll('_', ' ');
+// How a library model was made: Meshy or Tripo generation, or a Blender script (procedural kit pieces).
+const MAKERS = {meshy: ['MESHY', 'MESHY MODEL'], tripo: ['TRIPO', 'TRIPO MODEL'], procedural_script: ['SCRIPTED', 'SCRIPTED MODEL']};
+const maker = (a) => MAKERS[a.metadata?.geometry_source?.generator] || ['GENERATED', 'GENERATED MODEL'];
 const external = (url) => { try { const u = new URL(url); return ['http:', 'https:'].includes(u.protocol) ? u.href : ''; } catch { return ''; } };
 const link = (url, title, cls = '') => url ? `<a class="download ${cls}" href="${esc(url)}?download=1" ${panelMode ? 'target="_blank" rel="noopener"' : 'download'}>${esc(title)} ↙</a>` : '';
 let data, selected, currentView = '3d', filter = 'all';
@@ -64,7 +67,7 @@ function render() {
     <button class="card-save" data-save="${esc(a.id)}" aria-label="${saved.has(a.id) ? 'Unsave' : 'Save'} ${esc(a.name)}" aria-pressed="${saved.has(a.id)}">${saved.has(a.id) ? '−' : '+'}</button>
     <button class="card-open" data-open="${esc(a.id)}" aria-label="Explore ${esc(a.name)}">
       <div class="card-stage" ${a.kind === 'model' ? `data-asset-id="${esc(a.id)}"` : ''} ${canPlace(a) ? `data-drag="${esc(a.id)}" title="Drag into a Rhino viewport; Esc cancels"` : ''}><span class="card-index">${String(data.assets.indexOf(a)+1).padStart(3,'0')}</span>${a.preview ? `<img src="${esc(a.preview)}" alt="${esc(a.name)}" loading="lazy" draggable="false">` : `<div class="placeholder">${esc(a.format.toUpperCase())}<small>${a.available ? 'LOCAL FILE' : 'FILE NOT INSTALLED'}</small></div>`}<span class="card-format">${esc(a.format.toUpperCase())}</span>${a.drawing ? '<span class="card-status">DRAWING-READY</span>' : ''}</div>
-      <div class="card-name"><span>${esc(a.name)}</span><span aria-hidden="true">↗</span></div><div class="card-sub"><span>${esc(human(a.category))}</span><span>${a.kind === 'model' ? 'MESHY / 3D' : 'DRAWING ELEMENT'}</span></div>
+      <div class="card-name"><span>${esc(a.name)}</span><span aria-hidden="true">↗</span></div><div class="card-sub"><span>${esc(human(a.category))}</span><span>${a.kind === 'model' ? maker(a)[0] + ' / 3D' : 'DRAWING ELEMENT'}</span></div>
     </button>${placementButton(a)}</article>`).join('');
   $('grid').querySelectorAll('img').forEach(img => img.addEventListener('error', () => {
     img.replaceWith(Object.assign(document.createElement('span'), {className:'placeholder', textContent:'No preview'}));
@@ -85,7 +88,7 @@ function evidence(a) {
   const origin = external(a.source_url);
   const dl = (label, value) => value ? `<dt>${esc(label)}</dt><dd>${esc(value)}</dd>` : '';
   return `<details open><summary>Source & attribution</summary><p>${esc(a.publisher)}<br>${esc(a.license)}</p>${origin ? `<p><a href="${esc(origin)}" target="_blank" rel="noopener noreferrer">${a.kind === 'model' ? 'Generation provider' : 'Original source'} ↗</a></p>` : '<p>No external source link recorded.</p>'}${p ? `<dl>${dl('Generated', g.generated_at)}${dl('Mesh model',g.mesh_model)}${dl('Mesh task ID', g.mesh_task_id)}${dl('Image provider',p.image_generation?.provider)}${dl('Image task / job ID',p.image_generation?.id)}</dl><p>${esc(p.rights_evidence)}</p>` : '<p>Representation-only element. Check the original source terms for project use. Downloaded community files are local to this installation and are excluded from the distributable plugin.</p>'}</details>
-    ${p ? `<details><summary>Generation prompt & evidence gaps</summary><p>${esc(g.prompt || 'Prompt not recorded.')}</p><ul>${p.evidence_gaps.map(gap => `<li>${esc(gap)}</li>`).join('')}</ul><p>Reference directories are research leads; they are not evidence of inputs used for this model.</p></details>` : ''}
+    ${p ? `<details><summary>Generation prompt & evidence gaps</summary><p>${esc(g.generation_route === 'procedural_script' ? `Built by a script, not a generator: ${g.generator_script || 'script not recorded'}.` : (g.prompt || 'Prompt not recorded.'))}</p><ul>${p.evidence_gaps.map(gap => `<li>${esc(gap)}</li>`).join('')}</ul><p>Reference directories are research leads; they are not evidence of inputs used for this model.</p></details>` : ''}
     ${a.drawing ? `<details><summary>Drawing method & limitations</summary><p>Plan, front and right silhouettes at 1:50 and 1:100. SVGs and A3 sheets carry paper scale; DXF geometry uses real-world millimetres. On-screen previews are fitted to the viewer.</p><ul>${a.drawing.source.limitations.map(s => `<li>${esc(s)}</li>`).join('')}</ul><p>Geometry fingerprint: ${esc(a.drawing.source.geometry_sha256)}</p>${link(a.drawing.record,'Drawing record')}</details>` : '<details><summary>Drawing availability</summary><p>No derived drawing package is attached to this object. For a supported GLB, the Almond MCP drawing tool can generate a new projection package.</p></details>'}
     <details><summary>Object record</summary><dl>${dl('Object ID',a.id)}${dl('MCP resource',a.uri)}${dl('Drawing roles',a.roles.map(human).join(', '))}${dl('Model SHA-256',a.metadata.sha256)}</dl><p>The record connects this object’s files, dimensions and source history.</p>${link(a.record_url,'Complete record JSON')}${link(a.contract,'Spatial contract')}</details>`;
 }
@@ -95,7 +98,7 @@ function openObject(id) {
   selected = a;
   currentView = a.format === 'glb' && a.available ? '3d' : 'preview';
   $('object-number').textContent = `OBJECT / ${String(data.assets.indexOf(a)+1).padStart(3,'0')}`;
-  $('object-kind').textContent = `${a.kind === 'model' ? 'MESHY MODEL' : 'DRAWING ELEMENT'} / ${human(a.category).toUpperCase()}`;
+  $('object-kind').textContent = `${a.kind === 'model' ? maker(a)[1] : 'DRAWING ELEMENT'} / ${human(a.category).toUpperCase()}`;
   $('object-title').textContent = a.name;
   $('object-variant').textContent = a.variant;
   $('object-tags').innerHTML = a.tags.map(t => `<span>${esc(t)}</span>`).join('');
@@ -126,9 +129,9 @@ function renderViewer() {
     model.setAttribute('scale','0.001 0.001 0.001'); model.setAttribute('interaction-prompt','none');
     model.setAttribute('camera-orbit','35deg 70deg auto');
     if(a.preview) model.setAttribute('poster',a.preview);
-    $('viewer-caption').textContent = 'Loading model…';
+    $('viewer-caption').textContent = a.local === false ? 'Downloading model (first view)…' : 'Loading model…';
     model.addEventListener('load',() => { if(currentView === '3d') $('viewer-caption').textContent='DRAG TO ORBIT · SCROLL TO ZOOM'; },{once:true});
-    model.addEventListener('error',() => { if(currentView === '3d') { const notice=document.createElement('p');notice.className='viewer-notice';notice.textContent='3D preview unavailable. You can still download the GLB.';viewer.append(notice);$('viewer-caption').textContent='Preview unavailable'; } },{once:true});
+    model.addEventListener('error',() => { if(currentView === '3d') { const notice=document.createElement('p');notice.className='viewer-notice';notice.textContent=a.local === false ? '3D preview unavailable: the model could not be downloaded. Check the connection, or run almond-mcp fetch-assets --generated.' : '3D preview unavailable. You can still download the GLB.';viewer.append(notice);$('viewer-caption').textContent='Preview unavailable'; } },{once:true});
     viewer.append(model);
     window.almondPreviewModel(model);
   } else {
@@ -138,7 +141,7 @@ function renderViewer() {
     $('viewer-caption').textContent = isDrawing ? `${currentView.toUpperCase()} / 1:${scale} · FITTED PREVIEW${rep?.method === 'raster_projection' ? ' · APPROXIMATED' : ''}` : a.preview ? 'DRAWING ELEMENT · FITTED PREVIEW' : 'No browser preview for this file.';
   }
   const drawingLinks = isDrawing ? (currentView === 'sheet' ? link(sheet?.svg,`A3 sheet 1:${scale}`,'primary') : link(rep?.svg,`${human(currentView)} SVG`,'primary')+link(rep?.dxf,`${human(currentView)} DXF`)) : '';
-  $('downloads').innerHTML = placementButton(a) + drawingLinks + link(a.model,`Download ${a.format.toUpperCase()}`,isDrawing ? '' : 'primary') + link(a.record_url,'Record JSON') + (!a.available ? '<p class="small-note">Model file is not installed. See the original source below.</p>' : '');
+  $('downloads').innerHTML = placementButton(a) + drawingLinks + link(a.model,`Download ${a.format.toUpperCase()}`,isDrawing ? '' : 'primary') + link(a.record_url,'Record JSON') + (!a.available ? '<p class="small-note">Model file is not installed. See the original source below.</p>' : a.local === false ? '<p class="small-note">The model file downloads from the Almond release on first view or placement.</p>' : '');
 }
 
 function renderSources() {

@@ -1,0 +1,353 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-cartouche-shell-scroll-1",
+  "library_id": "generated_assets",
+  "name": "Cartouche (Baroque shell-and-scroll relief on a backing plate; generated ornament; detailed geometry edition)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-cartouche-shell-scroll-1.glb",
+  "dimensions_mm": {
+    "width": 841.3,
+    "depth": 98.2,
+    "height": 700.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "wall",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -420.65,
+        -49.1,
+        0.0
+      ],
+      "max": [
+        420.65,
+        49.1,
+        700.0
+      ]
+    },
+    "footprint": [
+      [
+        -420.65,
+        -49.1
+      ],
+      [
+        420.65,
+        -49.1
+      ],
+      [
+        420.65,
+        49.1
+      ],
+      [
+        -420.65,
+        49.1
+      ]
+    ],
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "fixed",
+    "mount_height_mm": 8355
+  },
+  "materials": [
+    {
+      "material_id": "plaster-white",
+      "objects": [
+        "gen-cartouche-shell-scroll-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-cartouche-shell-scroll-1",
+    "library_id": "generated_assets",
+    "name": "Cartouche (Baroque shell-and-scroll relief on a backing plate; generated ornament; detailed geometry edition)",
+    "category": "ornament",
+    "tags": [
+      "cartouche",
+      "relief",
+      "facade",
+      "ornament",
+      "baroque",
+      "detailed",
+      "meshy",
+      "ginkgo-freiburg-2026-11"
+    ],
+    "dimensions_mm": {
+      "width": 841.3,
+      "depth": 98.2,
+      "height": 700.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 840.0,
+      "depth": 100.0,
+      "height": 700.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "wall",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -420.65,
+          -49.1,
+          0.0
+        ],
+        "max": [
+          420.65,
+          49.1,
+          700.0
+        ]
+      },
+      "footprint": [
+        [
+          -420.65,
+          -49.1
+        ],
+        [
+          420.65,
+          -49.1
+        ],
+        [
+          420.65,
+          49.1
+        ],
+        [
+          -420.65,
+          49.1
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "fixed",
+      "mount_height_mm": 8355
+    },
+    "materials": [
+      {
+        "material_id": "plaster-white",
+        "objects": [
+          "gen-cartouche-shell-scroll-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "From this photo of an ornate 1890s Gr\u00fcnderzeit building facade, extract the carved stone cartouche ornament seen on the underside of the curved corner balcony (top right of the photo): a baroque shell-and-scroll cartouche with acanthus leaves. Show that single ornament as an isolated relief object, front view, cream-white painted sandstone with light weathering, on a flat thin backing plate. Whole object visible, centred, plain light grey studio background, soft even lighting, no building, no text.",
+        "image_task_id": "01a1cff5-82d0-707a-aa9b-bd323ad9320b",
+        "image_model": "nano-banana-2",
+        "mesh_task_id": "01a1cff6-3279-707e-b6bb-051d4ef55676",
+        "mesh_model": "meshy-7.1",
+        "generated_at": "2026-11-12",
+        "orientation_correction": null,
+        "scale_applied": 442.061252,
+        "captured_generation": {
+          "batch_id": "ginkgo-freiburg-2026-11",
+          "image": {
+            "asset_id": "gen-cartouche-shell-scroll-1",
+            "provider": "meshy",
+            "tool": "meshy_image_to_image",
+            "submitted_at": "2026-11-12T13:32:14.851Z",
+            "request": {
+              "ai_model": "nano-banana-2",
+              "prompt": "From this photo of an ornate 1890s Gr\u00fcnderzeit building facade, extract the carved stone cartouche ornament seen on the underside of the curved corner balcony (top right of the photo): a baroque shell-and-scroll cartouche with acanthus leaves. Show that single ornament as an isolated relief object, front view, cream-white painted sandstone with light weathering, on a flat thin backing plate. Whole object visible, centred, plain light grey studio background, soft even lighting, no building, no text.",
+              "aspect_ratio": "1:1",
+              "reference_images": [
+                "local upload of cartouche.jpg",
+                "local upload of bank_all.jpg"
+              ]
+            },
+            "task_id": "01a1cff5-82d0-707a-aa9b-bd323ad9320b",
+            "status": "SUCCEEDED",
+            "status_basis": "Downloaded in the Ginkgo session with meshy_download_model; image file present",
+            "provider_model": "nano-banana-2",
+            "completed_observed_at": "2026-11-12T13:32:48.592Z",
+            "consumed_credits": 6,
+            "reference_inputs": [
+              {
+                "name": "cartouche.jpg",
+                "role": "owner photograph, crop of the ornament",
+                "sha256": "c5d755c1959f26123fcc9a76985fe47aa3f0bd4f2f468ae531d6c377bee36bca",
+                "retained": false,
+                "note": "Owner photograph uploaded to the image stage; not distributed"
+              },
+              {
+                "name": "bank_all.jpg",
+                "role": "owner photograph of the whole facade",
+                "sha256": "d1b8002cc0dc23a716207c232f2bd1a0c745aa3d8ef1f754ef113b1cc02303ac",
+                "retained": false,
+                "note": "Owner photograph uploaded to the image stage; not distributed"
+              }
+            ],
+            "output_file": "gen-cartouche-shell-scroll-1.png",
+            "output_sha256": "8cce43b46eabaee6f65a9dd117a16f8817beab0dadc18e6ee4590c5a491b5749",
+            "output_file_modified_at": "2026-11-12T13:32:48+00:00",
+            "seed": null,
+            "evidence_source": {
+              "pass_records": [
+                "runs/freiburg_tram/AGENTS.md",
+                "runs/fischbrunnen/AGENTS.md",
+                "runs/fischbrunnen/layout/fountain.json",
+                "runs/freiburg_tram/layout/pink.json",
+                "runs/refset_1117/pass.json",
+                "runs/refset_1117/src/W067_placements.json",
+                "runs/refset_1117/src/W068_placements.json"
+              ],
+              "session_records": "Tool calls of Ginkgo Claude Code session(s) 48627919-6d97-4c20-b07e-a5ea9fccb1ba (submissions, results and downloads)",
+              "extracted_at": "2026-11-18T19:10:37+00:00"
+            }
+          },
+          "mesh": {
+            "asset_id": "gen-cartouche-shell-scroll-1",
+            "provider": "meshy",
+            "tool": "meshy_image_to_3d",
+            "submitted_at": "2026-11-12T13:32:58.484Z",
+            "request": {
+              "input_task_id": "01a1cff5-82d0-707a-aa9b-bd323ad9320b",
+              "ai_model": "meshy-7.1",
+              "texture_model": "meshy-7",
+              "enable_pbr": true,
+              "should_remesh": true,
+              "target_polycount": 80000,
+              "target_formats": [
+                "glb"
+              ]
+            },
+            "task_id": "01a1cff6-3279-707e-b6bb-051d4ef55676",
+            "status": "SUCCEEDED",
+            "status_basis": "Meshy reported SUCCEEDED in the Ginkgo session; downloaded with meshy_download_model {\"format\": \"glb\"}; GLB present",
+            "consumed_credits": 30,
+            "input_link": "input_task_id",
+            "input_image_sha256": "8cce43b46eabaee6f65a9dd117a16f8817beab0dadc18e6ee4590c5a491b5749",
+            "output_file": "gen-cartouche-shell-scroll-1.glb",
+            "output_sha256": "7b95642e2fda17f7387186da044d075e0ffe9806aae5fae1bf7fa8e0a2c80844",
+            "seed": null,
+            "evidence_source": {
+              "pass_records": [
+                "runs/freiburg_tram/AGENTS.md",
+                "runs/fischbrunnen/AGENTS.md",
+                "runs/fischbrunnen/layout/fountain.json",
+                "runs/freiburg_tram/layout/pink.json",
+                "runs/refset_1117/pass.json",
+                "runs/refset_1117/src/W067_placements.json",
+                "runs/refset_1117/src/W068_placements.json"
+              ],
+              "session_records": "Tool calls of Ginkgo Claude Code session(s) 48627919-6d97-4c20-b07e-a5ea9fccb1ba (submissions, results and downloads)",
+              "extracted_at": "2026-11-18T19:10:37+00:00"
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-cartouche-shell-scroll-1",
+            "source_sha256": "7b95642e2fda17f7387186da044d075e0ffe9806aae5fae1bf7fa8e0a2c80844",
+            "source_triangles": 78569,
+            "target_triangles": 80000,
+            "prepared_sha256": "3f2a2dc58591a09bdaa34c46dc90a2cdaca56a748ab86407ec693987df6b0bd2",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Remove wire edges, split edges shared by more than two faces and remove zero-area faces (counts in quality.topology_repairs). Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.903043031692505e-07,
+            "quality": {
+              "vertices": 39925,
+              "triangles": 78569,
+              "boundary_edges": 1069,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 219,
+              "largest_component_vertices": 39187,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "topology_repairs": {
+                "wire_edges_removed": 0,
+                "nonmanifold_edges_split": 335,
+                "zero_area_faces_removed": 0,
+                "loose_vertices_removed": 0
+              },
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            }
+          },
+          "input_image_file": "batches/ginkgo-freiburg-2026-11/gen-cartouche-shell-scroll-1.png",
+          "external_reference_status": "Photo-derived: the image stage received crops of the owner's own photographs of a facade in Freiburg im Breisgau (ornaments) and of the Fischbrunnen, a Gothic fountain on the Muensterplatz (statues, canopy). The photographs are named and hashed in each image record, not distributed. The generated clean images were then uploaded to Meshy.",
+          "external_reference_ids": [],
+          "dimension_basis": "Sizes as placed in the Ginkgo photo reconstructions (fountain.json statue heights; pink.json console height; placement matrices for canopy and cartouche); height normalised exactly, width and depth measured after uniform scaling. Measured from photographs, not surveyed.",
+          "reference_review": "Reference image reviewed on 2026-11-18 at full resolution for this import: no lettering, logos, badges or brand marks visible.",
+          "rights": "Image and mesh stages ran on the owner's paid Meshy account; the inputs were the owner's own photographs. The fountain statues and canopy reproduce a 15th-century public monument and the ornaments an 1890s facade; their original designs are long out of copyright, and no photograph is distributed. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-18. These models also appear inside the owner's GRANDWHIS world packs. Generator account entitlements and the current monument's restoration history not independently audited.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private)",
+            "pass": "runs/freiburg_tram and runs/fischbrunnen (packaged in runs/refset_1117)",
+            "source_name": "cartouche",
+            "records": [
+              "runs/refset_1117/pass.json",
+              "runs/fischbrunnen/layout/fountain.json",
+              "Claude Code session transcripts 48627919-6d97-4c20-b07e-a5ea9fccb1ba (ornaments) and bc81df46-55a4-4f2b-b285-4743fcb41771 (fountain)"
+            ]
+          }
+        }
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "architecture",
+        "streetscape"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.018,
+      "triangle_count": 78569,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "61FFB96CD700FABA49AA7D07490477B293262D7CF3022BFCEA075454EB71A9F8"
+}

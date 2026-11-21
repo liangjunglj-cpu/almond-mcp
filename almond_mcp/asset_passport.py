@@ -50,6 +50,8 @@ def build_passport(asset: dict, contract: dict) -> dict:
         "storage": ["living_room", "office"], "lighting": ["interior"],
         "column": ["architecture"], "railing": ["architecture"],
         "table": ["living_room", "dining_room"], "seating": ["living_room"],
+        "building_services": ["architecture", "streetscape"], "household": ["interior"],
+        "ornament": ["architecture", "streetscape"],
     }.get(category, [])
     label = (asset["product"] + " " + asset.get("variant", "")).lower()
     if category == "seating" and any(t in label for t in ("task", "office")):
@@ -132,10 +134,15 @@ def read_embedded_passport(path: Path) -> dict:
     return AssetPassport.model_validate(gltf["asset"]["extras"]["almond"]["passport"]).model_dump()
 
 
-def audit_library(library: Path) -> dict:
-    """Offline release/install check; report every broken model, never download."""
+def audit_library(library: Path, require_models: bool = True) -> dict:
+    """Offline release/install check; report every broken model, never download.
+
+    With require_models=False an asset whose GLB and contract are both absent is
+    counted as not downloaded instead of failing (a PyPI install fetches model
+    files on first use); a half-present or changed file still fails."""
     manifest = json.loads((library / "manifest.json").read_text(encoding="utf-8"))
     failures = []
+    not_downloaded = []
     render_path = library / "previews" / "render-record.json"
     render_records = None
     if render_path.is_file():
@@ -154,6 +161,9 @@ def audit_library(library: Path) -> dict:
             contract_path = (library / asset["contract_file"]).resolve()
             model.relative_to(library.resolve())
             contract_path.relative_to(library.resolve())
+            if not require_models and not model.exists() and not contract_path.exists():
+                not_downloaded.append(asset_id)
+                continue
             contract_bytes = contract_path.read_bytes()
             contract = json.loads(contract_bytes)
             model_hash = hashlib.sha256(model.read_bytes()).hexdigest().upper()
@@ -179,9 +189,12 @@ def audit_library(library: Path) -> dict:
                     raise ValueError("Preview checksum mismatch")
         except (OSError, ValueError, KeyError) as exc:
             failures.append({"asset_id": asset_id, "error": str(exc)})
-    return {"status": "error" if failures else "success",
-            "asset_pack_version": manifest.get("asset_pack_version"),
-            "checked": len(manifest["assets"]), "failures": failures}
+    result = {"status": "error" if failures else "success",
+              "asset_pack_version": manifest.get("asset_pack_version"),
+              "checked": len(manifest["assets"]) - len(not_downloaded), "failures": failures}
+    if not require_models:
+        result["not_downloaded"] = not_downloaded
+    return result
 
 
 def enrich_asset(asset: dict, contract: dict, glb_path: Path, contract_path: Path) -> None:

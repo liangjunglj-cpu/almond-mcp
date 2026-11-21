@@ -1,6 +1,6 @@
 [project]
 name = "almond-mcp"
-version = "0.7.0rc2"
+version = "0.8.0"
 description = "Almond - MCP server for Rhino 8 with a semantic scene layer: curated furniture/drawing/diagram libraries, audited Karamba capsules, structured retrieval (SQLite FTS5 + R-tree scene ledger), and a TCP bridge into Rhino (RhinoAlmondBridge, port 5000)"
 readme = "README.md"
 requires-python = ">=3.12"
@@ -53,14 +53,12 @@ build-backend = "hatchling.build"
 packages = ["almond_mcp"]
 
 # Manifests and audited JSON ship inside the wheel as almond_mcp/data/ so a
-# fresh install can scaffold the user data directory. Only the original,
-# generated CC BY 4.0 model pack is included. Downloaded 3D Warehouse models
-# are NEVER included; see THIRD-PARTY-NOTICES.md and docs/licensing-audit.md.
+# fresh install can scaffold the user data directory. Downloaded 3D Warehouse
+# models are NEVER included; see THIRD-PARTY-NOTICES.md and docs/licensing-audit.md.
 [tool.hatch.build.targets.wheel.force-include]
 "DrawingAssetfiles/manifest.json" = "almond_mcp/data/DrawingAssetfiles/manifest.json"
 "DiagramAssetfiles/manifest.json" = "almond_mcp/data/DiagramAssetfiles/manifest.json"
 "GeneratedAssetfiles/manifest.json" = "almond_mcp/data/GeneratedAssetfiles/manifest.json"
-"GeneratedAssetfiles/models" = "almond_mcp/data/GeneratedAssetfiles/models"
 "GeneratedAssetfiles/previews" = "almond_mcp/data/GeneratedAssetfiles/previews"
 "GeneratedAssetfiles/passport.schema.json" = "almond_mcp/data/GeneratedAssetfiles/passport.schema.json"
 "GeneratedAssetfiles/README.md" = "almond_mcp/data/GeneratedAssetfiles/README.md"
@@ -68,13 +66,29 @@ packages = ["almond_mcp"]
 "GeneratedAssetfiles/provenance.json" = "almond_mcp/data/GeneratedAssetfiles/provenance.json"
 "GeneratedAssetfiles/structural-loads.json" = "almond_mcp/data/GeneratedAssetfiles/structural-loads.json"
 "GeneratedAssetfiles/source-register.json" = "almond_mcp/data/GeneratedAssetfiles/source-register.json"
-"GeneratedAssetfiles/batches" = "almond_mcp/data/GeneratedAssetfiles/batches"
+# GeneratedAssetfiles/models (the generated CC BY 4.0 GLBs and .almond.json
+# contracts) and GeneratedAssetfiles/batches (generation evidence: request
+# records and input images) are deliberately NOT in the wheel, to keep it under
+# PyPI's 100 MB file limit. The catalogue and previews ship; each model file
+# downloads, sha256-verified, from the matching GitHub release on first use
+# (almond_mcp/model_store.py). Both folders ship in the sdist, the Rhino plugin
+# archive and the repository; tools/prepare_release.ps1 stages the model files
+# as GitHub release assets and tools/verify_release.py checks them.
 "DrawingRecipes" = "almond_mcp/data/DrawingRecipes"
 "Draftingfiles" = "almond_mcp/data/Draftingfiles"
 "capsules" = "almond_mcp/data/capsules"
 "Materialfiles/manifest.json" = "almond_mcp/data/Materialfiles/manifest.json"
 "Constructionfiles/manifest.json" = "almond_mcp/data/Constructionfiles/manifest.json"
 "Historyfiles/manifest.json" = "almond_mcp/data/Historyfiles/manifest.json"
+"StructuralReferences" = "almond_mcp/data/StructuralReferences"
+"ParametricLibrary/catalogue.json" = "almond_mcp/data/ParametricLibrary/catalogue.json"
+"ParametricLibrary/source-register.json" = "almond_mcp/data/ParametricLibrary/source-register.json"
+"ParametricLibrary/README.md" = "almond_mcp/data/ParametricLibrary/README.md"
+"ParametricLibrary/definitions" = "almond_mcp/data/ParametricLibrary/definitions"
+"ParametricLibrary/lessons" = "almond_mcp/data/ParametricLibrary/lessons"
+"ParametricLibrary/previews" = "almond_mcp/data/ParametricLibrary/previews"
+"ParametricLibrary/LICENSES" = "almond_mcp/data/ParametricLibrary/LICENSES"
+"ParametricLibrary/capsules" = "almond_mcp/data/ParametricLibrary/capsules"
 
 [tool.hatch.build.targets.sdist]
 include = [
@@ -92,6 +106,7 @@ include = [
     "/tools/run_meshy_batch.py", "/tools/prepare_organic_meshes.py", "/tools/import_organic_batch.py", "/GeneratedAssetfiles/batches",
     "/tools/build_archive_bundle.py", "/tools/verify_object_archive_install.py",
     "/tools/render_generated_previews.py", "/tools/verify_release.py",
+    "/StructuralReferences", "/ParametricLibrary", "/tools/parametric_library",
     "/README.md", "/AGENTS.md", "/LICENSE", "/THIRD-PARTY-NOTICES.md",
     "/pyproject.toml", "/uv.lock", "/.gitattributes",
 ]

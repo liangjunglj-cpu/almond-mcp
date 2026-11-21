@@ -1,0 +1,323 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-dress-form-mannequin-1",
+  "library_id": "generated_assets",
+  "name": "Dress form (Shop dress form on a wooden tripod stand, wearing a summer sundress; generated prop; detailed geometry edition)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-dress-form-mannequin-1.glb",
+  "dimensions_mm": {
+    "width": 540.1,
+    "depth": 481.4,
+    "height": 1720.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "floor",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -270.05,
+        -240.7,
+        0.0
+      ],
+      "max": [
+        270.05,
+        240.7,
+        1720.0
+      ]
+    },
+    "footprint": [
+      [
+        -270.05,
+        -240.7
+      ],
+      [
+        270.05,
+        -240.7
+      ],
+      [
+        270.05,
+        240.7
+      ],
+      [
+        -270.05,
+        240.7
+      ]
+    ],
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "accessory"
+  },
+  "materials": [
+    {
+      "material_id": "fabric-linen",
+      "objects": [
+        "gen-dress-form-mannequin-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-dress-form-mannequin-1",
+    "library_id": "generated_assets",
+    "name": "Dress form (Shop dress form on a wooden tripod stand, wearing a summer sundress; generated prop; detailed geometry edition)",
+    "category": "household",
+    "tags": [
+      "dress form",
+      "mannequin",
+      "shop fixture",
+      "boutique",
+      "retail",
+      "clothing",
+      "detailed",
+      "meshy",
+      "ginkgo-lausanne-market"
+    ],
+    "dimensions_mm": {
+      "width": 540.1,
+      "depth": 481.4,
+      "height": 1720.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 540.0,
+      "depth": 481.0,
+      "height": 1720.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "floor",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -270.05,
+          -240.7,
+          0.0
+        ],
+        "max": [
+          270.05,
+          240.7,
+          1720.0
+        ]
+      },
+      "footprint": [
+        [
+          -270.05,
+          -240.7
+        ],
+        [
+          270.05,
+          -240.7
+        ],
+        [
+          270.05,
+          240.7
+        ],
+        [
+          -270.05,
+          240.7
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "accessory"
+    },
+    "materials": [
+      {
+        "material_id": "fabric-linen",
+        "objects": [
+          "gen-dress-form-mannequin-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "Shop display dress form mannequin on a wooden tripod stand, wearing a light blue summer sundress, second-hand clothing boutique, realistic",
+        "mesh_task_id": "01a15a14-5059-76af-9594-a2735b85a87d",
+        "mesh_model": "unspecified: the refine request named no ai_model, so the provider default applied (not recorded)",
+        "generated_at": "2026-10-20",
+        "orientation_correction": null,
+        "scale_applied": 905.614003,
+        "generation_route": "meshy_text_to_3d",
+        "preview_task_id": "01a15a10-4973-74e6-ab6d-f72d458d29b6",
+        "preview_model": "meshy-6",
+        "captured_generation": {
+          "batch_id": "ginkgo-lausanne-market",
+          "route": "meshy_text_to_3d",
+          "preview": {
+            "asset_id": "gen-dress-form-mannequin-1",
+            "provider": "meshy",
+            "tool": "meshy_text_to_3d",
+            "submitted_at": "2026-10-20T16:06:16.638Z",
+            "request": {
+              "prompt": "Shop display dress form mannequin on a wooden tripod stand, wearing a light blue summer sundress, second-hand clothing boutique, realistic",
+              "ai_model": "meshy-6",
+              "target_formats": [
+                "glb"
+              ]
+            },
+            "task_id": "01a15a10-4973-74e6-ab6d-f72d458d29b6",
+            "status": "SUCCEEDED",
+            "status_basis": "meshy_get_task_status reported SUCCEEDED at 2026-10-20T16:10:19.454Z",
+            "consumed_credits": 20,
+            "provider_model": "meshy-6",
+            "seed": null,
+            "evidence_source": {
+              "pass_records": [
+                "ProjectY2K: twofronts/meshy/ginkgo_props_v061/out/conditioning.json"
+              ],
+              "session_records": "Tool calls of Ginkgo Claude Code session e4edd362-e50f-46af-9ed5-ee8428fc6b4e (submissions, results and downloads)",
+              "extracted_at": "2026-11-20T17:58:59+00:00"
+            }
+          },
+          "mesh": {
+            "asset_id": "gen-dress-form-mannequin-1",
+            "provider": "meshy",
+            "tool": "meshy_text_to_3d_refine",
+            "submitted_at": "2026-10-20T16:10:40.547Z",
+            "request": {
+              "preview_task_id": "01a15a10-4973-74e6-ab6d-f72d458d29b6",
+              "texture_prompt": "light sky blue cotton summer dress with subtle fabric weave, cream linen dress form mannequin torso, dark walnut wooden neck knob and tripod stand",
+              "enable_pbr": true,
+              "target_formats": [
+                "glb"
+              ]
+            },
+            "task_id": "01a15a14-5059-76af-9594-a2735b85a87d",
+            "status": "SUCCEEDED",
+            "status_basis": "meshy_get_task_status reported SUCCEEDED at 2026-10-20T16:18:28.955Z",
+            "consumed_credits": 10,
+            "provider_model": "unspecified: the refine request named no ai_model, so the provider default applied (not recorded)",
+            "input_link": "preview_task_id",
+            "output_file": "gen-dress-form-mannequin-1.glb",
+            "output_format": "glb",
+            "output_sha256": "e025d55238be00c158adc6d1368822b58e39eb9570556963428f701754557386",
+            "output_file_modified_at": "2026-10-20T16:18:44+00:00",
+            "seed": null,
+            "evidence_source": {
+              "pass_records": [
+                "ProjectY2K: twofronts/meshy/ginkgo_props_v061/out/conditioning.json"
+              ],
+              "session_records": "Tool calls of Ginkgo Claude Code session e4edd362-e50f-46af-9ed5-ee8428fc6b4e (submissions, results and downloads)",
+              "extracted_at": "2026-11-20T17:58:59+00:00"
+            },
+            "download": {
+              "tool": "meshy_download_model",
+              "format": "glb",
+              "reported_file_size_bytes": 10543452
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-dress-form-mannequin-1",
+            "source_sha256": "e025d55238be00c158adc6d1368822b58e39eb9570556963428f701754557386",
+            "source_triangles": 197450,
+            "target_triangles": 60000,
+            "prepared_sha256": "b704e024810cefaa47f9649fc2fbbc110eb8479c958802e0b7286883498e5047",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Remove wire edges, split edges shared by more than two faces and remove zero-area faces (counts in quality.topology_repairs). Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.8993510007858275e-07,
+            "quality": {
+              "vertices": 29936,
+              "triangles": 60000,
+              "boundary_edges": 0,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 1,
+              "largest_component_vertices": 29936,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "topology_repairs": {
+                "wire_edges_removed": 0,
+                "nonmanifold_edges_split": 0,
+                "zero_area_faces_removed": 0,
+                "loose_vertices_removed": 0
+              },
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                0.000363089402967856,
+                0.0004546419243344818,
+                4.5879877192560735e-05
+              ]
+            }
+          },
+          "input_image_file": null,
+          "external_reference_status": "Text prompts only: no image was given to any stage, and the prompt asks for a generic shop dress form.",
+          "external_reference_ids": [],
+          "dimension_basis": "1.72 m overall, the height Project Y2K v061 gave it and a real size for a dress form on a tripod stand. Scaled uniformly to that height; width and depth measured after scaling. Not a physical survey.",
+          "reference_review": "Reviewed on 2026-11-20: text-to-3D has no input image. The library geometry was checked in its archive preview: a headless dress form, not a human figure or character; no lettering, logos or brand marks in the geometry.",
+          "rights": "Meshy-6 text-to-3D preview and refine on the owner's Meshy account on 2026-10-20 (the same account, by the account ID in the result URLs, as the library's other Meshy batches); the plan on that date was not independently audited. Text prompts only. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-20 (\"increase the range of models, from the ones i used for my project y2k games, (except for the operatives and bosses)\") and chose this group, Ginkgo props reused in Project Y2K, the same day. Provider textures are not distributed.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private); reused in Project Y2K, the owner's game project (private)",
+            "pass": "runs/lausanne_market",
+            "source_name": "mannequin",
+            "records": [
+              "ProjectY2K: twofronts/meshy/ginkgo_props_v061/condition_ginkgo_props.py and out/conditioning.json (content v061 conditioned these props for the Mirai Ward hub as SM_GK61_<Name>.fbx)",
+              "ProjectY2K: twofronts/infrastructure/scripts/world_fill_v061.py (places the conditioned props in the hub)",
+              "Claude Code session transcript e4edd362-e50f-46af-9ed5-ee8428fc6b4e (the tool calls that submitted the preview and refine and downloaded the GLB)"
+            ]
+          }
+        }
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "interior"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.001,
+      "triangle_count": 60000,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "6FD80FDEE60407D2E5FC87033231BF2DCACA47CFBFCF6D1C3C39F1F9E8DB29B9"
+}

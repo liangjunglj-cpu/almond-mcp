@@ -1,0 +1,377 @@
+{
+ "kit": "district_v016",
+ "modules": [
+  {
+   "asset": "SM_KitGroundPlain",
+   "file": "SM_KitGroundPlain.fbx",
+   "note": "8 m paving slab",
+   "triangles": 108,
+   "dimensions_m": [
+    8.0,
+    8.0,
+    0.24
+   ],
+   "materials": [
+    "TFKitConcrete"
+   ]
+  },
+  {
+   "asset": "SM_KitGroundCracked",
+   "file": "SM_KitGroundCracked.fbx",
+   "note": "8 m slab with raised crack ridges",
+   "triangles": 180,
+   "dimensions_m": [
+    8.0,
+    8.0,
+    0.265
+   ],
+   "materials": [
+    "TFKitConcrete"
+   ]
+  },
+  {
+   "asset": "SM_KitGroundDrain",
+   "file": "SM_KitGroundDrain.fbx",
+   "note": "8 m slab with a grated channel",
+   "triangles": 240,
+   "dimensions_m": [
+    8.0,
+    8.0,
+    0.35
+   ],
+   "materials": [
+    "TFKitConcrete",
+    "TFKitMetal"
+   ]
+  },
+  {
+   "asset": "SM_KitGroundKerb",
+   "file": "SM_KitGroundKerb.fbx",
+   "note": "8 m slab with a kerbed edge",
+   "triangles": 216,
+   "dimensions_m": [
+    8.0,
+    8.0,
+    0.46
+   ],
+   "materials": [
+    "TFKitConcrete"
+   ]
+  },
+  {
+   "asset": "SM_KitWallBlank",
+   "file": "SM_KitWallBlank.fbx",
+   "note": "4 m concrete wall",
+   "triangles": 256,
+   "dimensions_m": [
+    4.14,
+    0.514,
+    4.004
+   ],
+   "materials": [
+    "TFKitConcrete"
+   ]
+  },
+  {
+   "asset": "SM_KitWallShutter",
+   "file": "SM_KitWallShutter.fbx",
+   "note": "4 m wall with a roller shutter",
+   "triangles": 372,
+   "dimensions_m": [
+    4.0,
+    0.55,
+    4.0
+   ],
+   "materials": [
+    "TFKitConcrete",
+    "TFKitMetal"
+   ]
+  },
+  {
+   "asset": "SM_KitWallShopfront",
+   "file": "SM_KitWallShopfront.fbx",
+   "note": "4 m glazed shopfront with a lit fascia",
+   "triangles": 396,
+   "dimensions_m": [
+    4.0,
+    0.63,
+    4.0
+   ],
+   "materials": [
+    "TFKitConcrete",
+    "TFKitGlass",
+    "TFKitMetal",
+    "TFKitPaint",
+    "TFKitEmissive"
+   ]
+  },
+  {
+   "asset": "SM_KitWallPipes",
+   "file": "SM_KitWallPipes.fbx",
+   "note": "4 m wall behind a pipe run",
+   "triangles": 520,
+   "dimensions_m": [
+    4.0,
+    0.88,
+    4.0
+   ],
+   "materials": [
+    "TFKitConcrete",
+    "TFKitMetal"
+   ]
+  },
+  {
+   "asset": "SM_KitPillar",
+   "file": "SM_KitPillar.fbx",
+   "note": "4 m square pillar",
+   "triangles": 432,
+   "dimensions_m": [
+    0.95,
+    0.95,
+    4.02
+   ],
+   "materials": [
+    "TFKitConcrete",
+    "TFKitMetal"
+   ]
+  },
+  {
+   "asset": "SM_KitStair",
+   "file": "SM_KitStair.fbx",
+   "note": "10-step flight, 1.8 m rise",
+   "triangles": 1384,
+   "dimensions_m": [
+    2.2,
+    3.2,
+    2.654
+   ],
+   "materials": [
+    "TFKitConcrete",
+    "TFKitMetal"
+   ]
+  },
+  {
+   "asset": "SM_KitStallCounter",
+   "file": "SM_KitStallCounter.fbx",
+   "note": "2.4 m market counter",
+   "triangles": 276,
+   "dimensions_m": [
+    2.6,
+    1.05,
+    1.07
+   ],
+   "materials": [
+    "TFKitPaint",
+    "TFKitMetal"
+   ]
+  },
+  {
+   "asset": "SM_KitStallAwning",
+   "file": "SM_KitStallAwning.fbx",
+   "note": "3.2 m awning with a bulb string",
+   "triangles": 264,
+   "dimensions_m": [
+    3.2,
+    1.898,
+    2.6
+   ],
+   "materials": [
+    "TFKitMetal",
+    "TFKitPaint",
+    "TFKitEmissive"
+   ]
+  },
+  {
+   "asset": "SM_KitCrateStack",
+   "file": "SM_KitCrateStack.fbx",
+   "note": "three stacked crates, 1.8 m",
+   "triangles": 396,
+   "dimensions_m": [
+    0.916,
+    0.887,
+    1.78
+   ],
+   "materials": [
+    "TFKitConcrete",
+    "TFKitMetal"
+   ]
+  },
+  {
+   "asset": "SM_KitProduceBin",
+   "file": "SM_KitProduceBin.fbx",
+   "note": "1.1 m produce bin",
+   "triangles": 272,
+   "dimensions_m": [
+    1.2,
+    0.7,
+    0.59
+   ],
+   "materials": [
+    "TFKitMetal",
+    "TFKitPaint"
+   ]
+  },
+  {
+   "asset": "SM_KitSignBar",
+   "file": "SM_KitSignBar.fbx",
+   "note": "3.4 m sign mast with a lit panel",
+   "triangles": 212,
+   "dimensions_m": [
+    1.87,
+    0.155,
+    3.4
+   ],
+   "materials": [
+    "TFKitMetal",
+    "TFKitPaint",
+    "TFKitEmissive"
+   ]
+  },
+  {
+   "asset": "SM_KitContainer",
+   "file": "SM_KitContainer.fbx",
+   "note": "6 m shipping container",
+   "triangles": 1292,
+   "dimensions_m": [
+    6.2,
+    2.46,
+    2.61
+   ],
+   "materials": [
+    "TFKitPaint",
+    "TFKitMetal"
+   ]
+  },
+  {
+   "asset": "SM_KitContainerOpen",
+   "file": "SM_KitContainerOpen.fbx",
+   "note": "6 m container, doors open",
+   "triangles": 1248,
+   "dimensions_m": [
+    6.786,
+    3.611,
+    2.61
+   ],
+   "materials": [
+    "TFKitPaint",
+    "TFKitMetal"
+   ]
+  },
+  {
+   "asset": "SM_KitPipeRun",
+   "file": "SM_KitPipeRun.fbx",
+   "note": "4 m pipe run on stands",
+   "triangles": 288,
+   "dimensions_m": [
+    4.0,
+    1.2,
+    1.8
+   ],
+   "materials": [
+    "TFKitMetal"
+   ]
+  },
+  {
+   "asset": "SM_KitCatwalk",
+   "file": "SM_KitCatwalk.fbx",
+   "note": "4 m catwalk at 2.6 m",
+   "triangles": 532,
+   "dimensions_m": [
+    4.0,
+    1.503,
+    3.68
+   ],
+   "materials": [
+    "TFKitMetal"
+   ]
+  },
+  {
+   "asset": "SM_KitFloodlightMast",
+   "file": "SM_KitFloodlightMast.fbx",
+   "note": "6 m floodlight mast, three heads",
+   "triangles": 568,
+   "dimensions_m": [
+    1.3,
+    0.867,
+    6.31
+   ],
+   "materials": [
+    "TFKitMetal",
+    "TFKitEmissive"
+   ]
+  },
+  {
+   "asset": "SM_KitFencePanel",
+   "file": "SM_KitFencePanel.fbx",
+   "note": "3 m mesh fence panel",
+   "triangles": 228,
+   "dimensions_m": [
+    3.114,
+    0.12,
+    2.4
+   ],
+   "materials": [
+    "TFKitMetal"
+   ]
+  },
+  {
+   "asset": "SM_KitBollard",
+   "file": "SM_KitBollard.fbx",
+   "note": "1 m bollard with reflective bands",
+   "triangles": 348,
+   "dimensions_m": [
+    0.34,
+    0.34,
+    1.04
+   ],
+   "materials": [
+    "TFKitMetal",
+    "TFKitEmissive"
+   ]
+  },
+  {
+   "asset": "SM_KitBarrel",
+   "file": "SM_KitBarrel.fbx",
+   "note": "0.9 m barrel",
+   "triangles": 416,
+   "dimensions_m": [
+    0.61,
+    0.61,
+    0.93
+   ],
+   "materials": [
+    "TFKitPaint",
+    "TFKitMetal"
+   ]
+  },
+  {
+   "asset": "SM_KitAirHandler",
+   "file": "SM_KitAirHandler.fbx",
+   "note": "1.9 m air handler",
+   "triangles": 376,
+   "dimensions_m": [
+    2.006,
+    1.5,
+    1.38
+   ],
+   "materials": [
+    "TFKitMetal"
+   ]
+  },
+  {
+   "asset": "SM_KitAntennaMast",
+   "file": "SM_KitAntennaMast.fbx",
+   "note": "5 m antenna mast with a beacon",
+   "triangles": 468,
+   "dimensions_m": [
+    1.014,
+    0.9,
+    5.32
+   ],
+   "materials": [
+    "TFKitMetal",
+    "TFKitEmissive"
+   ]
+  }
+ ]
+}

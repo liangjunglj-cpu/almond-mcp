@@ -1,14 +1,12 @@
 # Almond workspace for Rhino 8
 
-Install **almondbridge 0.7.0-rc.2** from Rhino's Package Manager (search
-`almondbridge` with **Include pre-releases** ticked), or install the supplied
-**almondbridge-0.7.0-rc.2-rh8_0-win.yak**. Save your work, restart Rhino, and
-run **Almond**. Windows / Rhino 8.0+. This is a pre-release; the stable version
-remains 0.6.0.
+Install **almondbridge 0.8.0** from Rhino's Package Manager (search
+`almondbridge`), or install the supplied **almondbridge-0.8.0-rh8_0-win.yak**.
+Save your work, restart Rhino, and run **Almond**. Windows / Rhino 8.0+.
 
 Browsing and placing the included library models need neither Python nor an
 MCP client. The structural engine and the optional AI workflow use the matching
-`almond-mcp 0.7.0rc2` Python package through uv (see below).
+`almond-mcp 0.8.0` Python package through uv (see below).
 
 The archive opens in a dockable **Almond** panel inside Rhino. Its background,
 text, controls and font follow Rhino appearance settings, including theme changes.
@@ -21,7 +19,7 @@ Source links and download links open in your browser. The archive runs locally w
 open; no Python, Meshy login, AI subscription or Internet connection is needed
 to browse the included files after installation. Rhino's licence is separate.
 
-Search and rotate 50 generated models, inspect the 10 linked drawing packages,
+Search and rotate 144 generated models, inspect the 10 linked drawing packages,
 and download GLB, SVG, DXF and A3 SVG sheets. Choose 1:50 or 1:100 drawing views;
 DXF geometry uses full-size millimetres. Viewports fit drawings to the screen,
 so screen size is not print scale. Import downloaded DXFs into Rhino using
@@ -49,7 +47,7 @@ records, original checksums, full passports and a derivation record containing
 actual triangle counts, geometry fingerprint, units and reduction method.
 Undo removes a placement. Use Explode only when you need independent geometry.
 
-Placement is available for the 50 included generated GLBs, inside the Rhino
+Placement is available for the 144 included generated GLBs, inside the Rhino
 panel. Browser downloads and the seven community catalogue entries do not have
 native placement. Imported models use the current Rhino layer.
 
@@ -76,7 +74,7 @@ Choose **Structure** from the Almond menu, or run **AlmondStructure** (the older
 **AlmondKaramba** still works). The step-by-step guide is the
 [Structure workspace tutorial](https://github.com/liangjunglj-cpu/almond-mcp/blob/master/docs/structural-tutorial.md).
 
-**Almond native** is built in. Rhino runs `uvx almond-mcp@0.7.0rc2 solve`, so uv
+**Almond native** is built in. Rhino runs `uvx almond-mcp@0.8.0 solve`, so uv
 must be installed (`winget install astral-sh.uv`); the first run downloads the
 engine, later runs take a few seconds. It analyses frames drawn as centre lines:
 
@@ -110,7 +108,7 @@ Install [uv](https://docs.astral.sh/uv/getting-started/installation/). Configure
 your MCP client with command `uvx` and these arguments:
 
 ```json
-["--from", "almond-mcp==0.7.0rc2", "almond-mcp"]
+["--from", "almond-mcp==0.8.0", "almond-mcp"]
 ```
 
 The MCP client launches its own stdio server. It connects to the Rhino bridge
@@ -123,7 +121,7 @@ an AI client. See the repository README for client-specific setup.
 - Native engine unavailable with *invalid peer certificate* or *UnknownIssuer*: security software or a
   proxy inspects HTTPS and uv does not trust it. The panel asks uv to use the Windows certificates; for
   the MCP server (and older plugins) run once in PowerShell
-  `[Environment]::SetEnvironmentVariable('UV_NATIVE_TLS','1','User')`, then restart Rhino and the MCP client.
+  `[Environment]::SetEnvironmentVariable('UV_SYSTEM_CERTS','1','User')` (older uv versions read `UV_NATIVE_TLS` instead), then restart Rhino and the MCP client.
 - Archive folder missing: reinstall the full Yak package; copying only the RHP
   is insufficient. Keep its dependencies and `archive` directory together.
 - Model download reports the file changed: reinstall that release. The host

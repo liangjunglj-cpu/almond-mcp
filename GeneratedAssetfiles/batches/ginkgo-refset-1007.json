@@ -1,0 +1,288 @@
+{
+  "batch_id": "ginkgo-refset-1007",
+  "purpose": "Vehicles, rooftop services and planting generated for the Ginkgo world pass refset_1007 (W054-W057, 2026-10-06) and reused in the owner's Project Y2K game (content v061, Mirai Ward hub), re-derived as Almond library geometry.",
+  "origin": {
+    "project": "Ginkgo, the owner's own world-generation repository (private); reused in Project Y2K, the owner's game project (private)",
+    "pass": "runs/refset_1007",
+    "pass_date": "2026-10-06",
+    "pass_records": [
+      "runs/refset_1007/pass.json",
+      "runs/refset_1007/concept/jobs.json",
+      "runs/refset_1007/meshy/jobs.json",
+      "ProjectY2K: twofronts/meshy/ginkgo_props_v061/out/conditioning.json"
+    ],
+    "records": [
+      "runs/refset_1007/pass.json (owner reference set described; AI-assisted content statement)",
+      "runs/refset_1007/concept/jobs.json (concept image job IDs)",
+      "runs/refset_1007/meshy/jobs.json (reference image, Tripo and Meshy IDs)",
+      "ProjectY2K: twofronts/meshy/ginkgo_props_v061/condition_ginkgo_props.py and out/conditioning.json (content v061 conditioned these props for the Mirai Ward hub as SM_GK61_<Name>.fbx)",
+      "ProjectY2K: twofronts/infrastructure/scripts/world_fill_v061.py (places the conditioned props in the hub)",
+      "Claude Code session transcript 7ee433c3-63f6-4781-b345-d2c4f70b8e73 (the tool calls that submitted the concept, reference image, Tripo and Meshy jobs, the curl downloads and the Meshy downloads)"
+    ],
+    "used_in_project_y2k": "Confirmed 2026-11-20: ginkgo_props_v061 SPEC conditions WaterTanks, Rover, CapsuleTram, Drone, Launcher, Shuttle, PlanterBox and FlowerClump from runs/refset_1007/meshy/<name>_near.glb (Ginkgo LODs baked from these downloads) and world_fill_v061.py places them (roof kit, the tram, rover, cafe, garden and statue vignettes, and air traffic).",
+    "excluded": {
+      "ac_unit": "Same design family as the Tripo condenser the owner left out of ginkgo-refset-1024",
+      "hab_module": "Building-scale habitat module with an exterior stair (building and stair rules)",
+      "*_near/_far/_hd.glb and Project Y2K SM_GK61_*.fbx": "Decimated, re-baked scene and game derivatives of these downloads",
+      "concept/*.png": "Concept art used as image references; named and hashed in each image record, not distributed",
+      "W054-W057 scenes": "Paid GRANDWHIS products; assembled scenes, not placeable objects"
+    }
+  },
+  "image_provider": "higgsfield",
+  "image_settings": {
+    "model": "gpt_image_2_5",
+    "aspect_ratio": "1:1",
+    "image_reference": "one refset_1007 concept image per request (generated in the same session from a text-only prompt; Higgsfield job ID in the request)"
+  },
+  "mesh_settings": {
+    "meshy": {
+      "ai_model": "meshy-7.1",
+      "enable_pbr": true,
+      "texture_resolution": "4k",
+      "target_formats": [
+        "glb"
+      ]
+    },
+    "tripo": {
+      "model": "tripo_h3_1_image_to_3d",
+      "geometry_quality": "detailed",
+      "texture_quality": "detailed",
+      "pbr": true,
+      "route": "Higgsfield generate_3d"
+    }
+  },
+  "strip_source_materials": true,
+  "external_reference_ids": [],
+  "external_reference_status": "Two-step image stage. The concept images were generated in the Ginkgo session from text-only prompts that describe an owner reference set of 9 images pasted into the session on 2026-10-06 (third-party photographs and artworks: a toy-like drone hangar, habitat units, a red ring megastructure, an overgrown capsule car in a pink flower forest, a six-wheeled rover, a Tokyo vertical-farm building and a Tokyo rooftop; described in runs/refset_1007/pass.json). Each single-object reference image then took one concept image as its only image reference (named and hashed in the image record as concept_reference, not distributed). No owner reference photograph was uploaded to any generator. Design-proximity review 2026-11-20: the generated references were compared with the owner's reference photographs; the rover and capsule tram share subject and colourway with two of them but differ in form (see their reference_review); the others are generic types. Provider textures are not distributed; only geometry ships.",
+  "variant_suffix": "generated prop; detailed geometry edition",
+  "dimension_basis": "Sci-fi vehicles use the sizes Project Y2K content v061 gave them (twofronts/meshy/ginkgo_props_v061 condition_ginkgo_props.py SPEC, longest horizontal side): capsule tram 9.0 m, six-wheeled rover 5.4 m, drone launcher vehicle 3.2 m, shuttle 12.0 m, drone 1.4 m; each mesh was scaled uniformly so that side matches, and height, width and depth were measured after scaling. The planter box keeps Y2K's 1.9 m length, a real trough length. Real-world heights replace stylised ones for the rest: rooftop water tank pair 3.0 m overall (about 2 m stainless tanks on a 1 m stand; Y2K used 5.2 m), flower clump 0.60 m (the prompt's \"about knee high\"; Y2K used 0.85 m). Not a physical survey.",
+  "rights": "Concept and reference images generated on the owner's Higgsfield account (gpt_image_2_5); meshes with Tripo H3.1 through the owner's Higgsfield account (water tanks, rover, capsule tram, drone, launcher, shuttle) or with Meshy-7.1 image-to-3D on the owner's Meshy account (planter box, flower clump). Owner approved release in the Almond library under CC BY 4.0 on 2026-11-20 (\"increase the range of models, from the ones i used for my project y2k games, (except for the operatives and bosses)\") and chose this group, Ginkgo props reused in Project Y2K, the same day. The Ginkgo pass records an owner go-ahead on 2026-10-07 (\"go ahead with the plan\") that covered generation for the GRANDWHIS world packs, not this library. Generator account entitlements and the Tripo terms not independently audited. Provider textures are not distributed.",
+  "estimated_credits": "0 for this import (generation already paid in Ginkgo: 0.25 Higgsfield credit per image, 18 Higgsfield credits per Tripo mesh, 30 Meshy credits per Meshy mesh)",
+  "repair_nonmanifold": true,
+  "assets": [
+    {
+      "asset_id": "gen-water-tanks-rooftop-pair-1",
+      "ginkgo_name": "water_tanks",
+      "product": "Rooftop water tanks",
+      "variant": "Pair of vertical stainless water tanks with conical tops on a braced galvanised stand, with ladder and valved pipework",
+      "category": "building_services",
+      "material": "steel-galvanized",
+      "height_mm": 3000,
+      "width_hint_mm": 1283,
+      "depth_hint_mm": 2879,
+      "target_triangles": 80000,
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "tags": [
+        "water tank",
+        "rooftop",
+        "services",
+        "stainless steel",
+        "tokyo",
+        "roofscape"
+      ],
+      "prompt": "Clean 3D model reference of ONLY a pair of stainless steel rooftop water tanks like in the reference image: two vertical cylindrical brushed-steel tanks with conical tops and ribbed bands, standing on a galvanised steel frame platform with cross bracing, a small ladder and pipes with valves underneath. Three-quarter view from slightly above, entire object in frame with margin, isolated on a plain neutral grey studio backdrop, soft even studio lighting, slightly weathered, no text, no logos.",
+      "image_job_id": "9f8304b9-32a7-41fe-baed-c7e3b795d017",
+      "mesh_task_id": "88e99826-5149-454d-b264-87b0be54de8e",
+      "reference_review": "Reference image reviewed on 2026-11-20 at 1000 px (from 1024 px): no lettering, logos, plates or brand marks. Image reference: concept W057_b.png (Higgsfield job ea488d3b). Design proximity: The owner's reference photographs for this pass (9 images pasted into Ginkgo session 7ee433c3 on 2026-10-06; extracted from the transcript to a scratch folder for this comparison only, not retained or distributed) were compared with the generated image; the owner's Tokyo rooftop photograph shows generic rooftop tanks among other clutter. Generic type."
+    },
+    {
+      "asset_id": "gen-rover-six-wheel-1",
+      "ginkgo_name": "rover",
+      "product": "Exploration rover",
+      "variant": "Six-wheeled armoured exploration rover with wraparound cab windows, roof sensor mast, antennas and dish, big knobbly tyres",
+      "category": "vehicle",
+      "material": "plaster-white",
+      "length_mm": 5400,
+      "height_mm": 4084,
+      "width_hint_mm": 5400,
+      "depth_hint_mm": 2946,
+      "target_triangles": 80000,
+      "support_plane": "ground",
+      "placement_priority": "movable",
+      "tags": [
+        "rover",
+        "vehicle",
+        "sci-fi",
+        "six-wheeled",
+        "expedition",
+        "concept vehicle"
+      ],
+      "prompt": "Clean 3D model reference of ONLY the six-wheeled exploration rover from the reference image, same design: blue-and-white rounded armoured hull panels, wraparound cab windows, roof antennas and a small dish, orange hazard panels, six big knobbly tyres with orange hubs. Three-quarter front view from slightly above, entire vehicle in frame with margin, isolated on a plain neutral grey studio backdrop, soft even studio lighting, clean undamaged, no text, no logos, no numbers.",
+      "image_job_id": "2487552b-b2c6-4fb8-b78f-6298ef072d55",
+      "mesh_task_id": "11f4edef-2785-43a4-99b3-4a527a552a8e",
+      "reference_review": "Reference image reviewed on 2026-11-20 at full resolution (1024 px): one abstract orange glyph panel on the rear flank, no legible lettering, numbers, logos or brand marks. Image reference: concept W055_b.png (Higgsfield job 6c780057). Design proximity: The owner's reference photographs for this pass (9 images pasted into Ginkgo session 7ee433c3 on 2026-10-06; extracted from the transcript to a scratch folder for this comparison only, not retained or distributed) were compared with the generated image at 700 px. The owner's reference is a hunched blue-and-white armoured six-wheeler with a tall front cab; the generated rover shares the subject and colourway but has a different, bus-like body with a wraparound windscreen and roof mast. Judged a generic six-wheeled rover type; the colourway is texture only and not distributed."
+    },
+    {
+      "asset_id": "gen-capsule-tram-overgrown-1",
+      "ginkgo_name": "capsule_tram",
+      "product": "Capsule tram car",
+      "variant": "Abandoned rounded capsule tram car with windscreen, porthole, sliding side door, open roof hatch, vines and moss, on a low bogie frame",
+      "category": "vehicle",
+      "material": "plaster-white",
+      "length_mm": 9000,
+      "height_mm": 4160,
+      "width_hint_mm": 5263,
+      "depth_hint_mm": 9000,
+      "target_triangles": 80000,
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "tags": [
+        "tram",
+        "capsule",
+        "vehicle",
+        "abandoned",
+        "overgrown",
+        "sci-fi",
+        "ruin"
+      ],
+      "prompt": "Clean 3D model reference of ONLY the abandoned capsule tram car from the reference image, same design: long rounded white capsule body with a faded yellow band, big front windscreen, round porthole, tall side doorway, rust streaks, moss patches and a few vines, short bogie underframe. Side three-quarter view from slightly above, entire car in frame with margin, isolated on a plain neutral grey studio backdrop, soft even studio lighting, no flowers around it, no text, no logos, no numbers.",
+      "image_job_id": "c1eba9f7-420b-4329-a25e-95d672f56f92",
+      "mesh_task_id": "70691e1a-1d0f-4d3c-bef1-95ca16b23675",
+      "reference_review": "Reference image reviewed on 2026-11-20 at full resolution (1024 px): no lettering, numbers, logos or brand marks. Image reference: concept W056_b.png (Higgsfield job a4679b5c). Design proximity: The owner's reference photographs for this pass (9 images pasted into Ginkgo session 7ee433c3 on 2026-10-06; extracted from the transcript to a scratch folder for this comparison only, not retained or distributed) were compared with the generated image at 700 px. The owner's reference is an overgrown bullet-nosed rail car with a yellow band, a porthole and a lit doorway; the generated car shares the subject, the band and the porthole but is a short bean-shaped pod with a different nose, door and underframe. Judged a generic abandoned-capsule type; the band is texture only and not distributed. The width measured after scaling (5.3 m at 9 m length) reflects the single-view Tripo reconstruction."
+    },
+    {
+      "asset_id": "gen-drone-quadcopter-1",
+      "ginkgo_name": "drone",
+      "product": "Quadcopter drone",
+      "variant": "Toy-like rounded quadcopter with camera eye, four propeller arms and short landing legs",
+      "category": "vehicle",
+      "material": "ceramic-teal",
+      "length_mm": 1400,
+      "height_mm": 454,
+      "width_hint_mm": 1308,
+      "depth_hint_mm": 1400,
+      "target_triangles": 60000,
+      "support_plane": "ground",
+      "placement_priority": "movable",
+      "tags": [
+        "drone",
+        "quadcopter",
+        "uav",
+        "delivery",
+        "vehicle",
+        "sci-fi"
+      ],
+      "prompt": "Clean 3D model reference of ONLY one small quadcopter drone from the reference image, same design: rounded teal body with a camera eye, four arms with lime-green propeller rings, short landing legs. Three-quarter view from slightly above, entire object in frame with margin, isolated on a plain neutral grey studio backdrop, soft even studio lighting, no landing pad, no text, no logos, no numbers.",
+      "image_job_id": "ce8a0601-789e-476f-8134-9e4711279807",
+      "mesh_task_id": "c6894c78-29e9-4aad-9d96-106e1e70fe5f",
+      "reference_review": "Reference image reviewed on 2026-11-20 at 1000 px (from 1024 px): no lettering, numbers, logos or brand marks. Image reference: concept W054_b.png (Higgsfield job f4595f0c). Design proximity: the owner's drone-hangar references show tiny drones in an aerial scene; generic type. Not armed."
+    },
+    {
+      "asset_id": "gen-drone-launcher-vehicle-1",
+      "ginkgo_name": "launcher",
+      "product": "Drone launcher vehicle",
+      "variant": "Chunky rounded wheeled service vehicle with a folding crane boom on top and two fold-out ramp wings",
+      "category": "vehicle",
+      "material": "ceramic-teal",
+      "length_mm": 3200,
+      "height_mm": 2205,
+      "width_hint_mm": 1861,
+      "depth_hint_mm": 3200,
+      "target_triangles": 80000,
+      "support_plane": "ground",
+      "placement_priority": "movable",
+      "tags": [
+        "service vehicle",
+        "drone launcher",
+        "crane",
+        "ramp",
+        "vehicle",
+        "sci-fi"
+      ],
+      "prompt": "Clean 3D model reference of ONLY the teal drone launcher vehicle from the reference image, same design: chunky rounded teal cab body with lime-green trim, square side hatch, two fold-out ramp wings deployed on the sides, short wheeled chassis, tall lime boom arm folded upright on top (no landing canopy, no drones). Three-quarter view from slightly above, entire object in frame with margin, isolated on a plain neutral grey studio backdrop, soft even studio lighting, no ground clutter, no text, no logos, no numbers.",
+      "image_job_id": "00ec84fa-2f67-4e06-b783-08aee1485782",
+      "mesh_task_id": "cc8cbcb9-c15b-4062-8963-fb3e3d18d07b",
+      "reference_review": "Reference image reviewed on 2026-11-20 at 1000 px (from 1024 px): hazard-stripe edging and blank panels, no lettering, numbers, logos or brand marks. Checked for armament: the \"launcher\" is a drone launch and service vehicle (crane boom, deployable ramps, wheeled chassis) from the drone-hangar world, not a weapon; no barrels, tubes or munitions. Image reference: concept W054_b.png (Higgsfield job f4595f0c). Design proximity: the owner's drone-hangar references show a central launcher at small scale; the generated vehicle is a different, generic form."
+    },
+    {
+      "asset_id": "gen-shuttle-craft-1",
+      "ginkgo_name": "shuttle",
+      "product": "Shuttle craft",
+      "variant": "Compact wedge-hulled sci-fi shuttle with swept wings, twin rear engine pods and a small canopy",
+      "category": "vehicle",
+      "material": "steel-painted-charcoal",
+      "length_mm": 12000,
+      "height_mm": 3171,
+      "width_hint_mm": 12000,
+      "depth_hint_mm": 11991,
+      "target_triangles": 80000,
+      "support_plane": "ground",
+      "placement_priority": "movable",
+      "tags": [
+        "spacecraft",
+        "shuttle",
+        "sci-fi",
+        "vehicle",
+        "aircraft"
+      ],
+      "prompt": "Clean 3D model reference of ONLY one small sci-fi shuttle craft like the dark ships docking at the ring in the reference image: compact wedge-shaped gunmetal hull with chunky panel lines, short swept wings, twin rear engine pods, small canopy, a coral-red stripe accent. Three-quarter view from slightly above, entire craft in frame with margin, isolated on a plain neutral grey studio backdrop, soft even studio lighting, no text, no logos, no numbers.",
+      "image_job_id": "47ba94f5-ef49-4a0a-81d9-b4f4ba20838e",
+      "mesh_task_id": "8cee331a-4417-4228-8a7a-13191f31ebde",
+      "reference_review": "Reference image reviewed on 2026-11-20 at 1000 px (from 1024 px): stripe accents only, no lettering, numbers, insignia, logos or brand marks; no visible weapons (two small nose probes, no barrels or missiles). Image reference: concept W056_c.png (Higgsfield job 598c1d93). Design proximity: the owner's ring-megastructure artwork shows tiny ships at the rim; the generated craft is a generic wedge-hull type and not recognisably any franchise ship. The craft has no landing gear; place it on a pad or raise it."
+    },
+    {
+      "asset_id": "gen-planter-box-galvanised-1",
+      "ginkgo_name": "planter_box",
+      "product": "Planter box",
+      "variant": "Long galvanised corrugated-metal planter trough overflowing with leafy plants, herbs, tomatoes and trailing vines",
+      "category": "vegetation",
+      "material": "steel-galvanized",
+      "length_mm": 1900,
+      "height_mm": 782,
+      "width_hint_mm": 1900,
+      "depth_hint_mm": 614,
+      "target_triangles": 80000,
+      "support_plane": "ground",
+      "placement_priority": "accessory",
+      "tags": [
+        "planter",
+        "trough",
+        "herbs",
+        "balcony",
+        "vertical farm",
+        "planting"
+      ],
+      "prompt": "Clean 3D model reference of ONLY one long rectangular galvanised metal balcony planter box overflowing with lush leafy green plants, trailing vines spilling over the front edge, a few small tomato-like red fruits and herbs, like the vertical farm balconies in the reference image. Three-quarter view from slightly above, entire object in frame with margin, isolated on a plain neutral grey studio backdrop, soft even studio lighting, no text, no logos.",
+      "image_job_id": "1e503551-4f4c-47aa-9f11-ce082d78f07f",
+      "mesh_task_id": "01a11346-d86d-7199-b5bf-186463ae66fb",
+      "reference_review": "Reference image reviewed on 2026-11-20 at 1000 px (from 1024 px): no lettering, labels, logos or brand marks. Image reference: concept W057_a.png (Higgsfield job 7c99b546). Design proximity: the owner's Tokyo vertical-farm photograph shows planted balconies, not this trough; generic type."
+    },
+    {
+      "asset_id": "gen-flower-clump-magenta-1",
+      "ginkgo_name": "flower_clump",
+      "product": "Flower clump",
+      "variant": "Dense clump of magenta flower spikes and pink daisy-like blooms on leafy stems, on a small soil base",
+      "category": "vegetation",
+      "material": "foliage-pine",
+      "height_mm": 600,
+      "width_hint_mm": 733,
+      "depth_hint_mm": 705,
+      "target_triangles": 125000,
+      "support_plane": "ground",
+      "placement_priority": "accessory",
+      "tags": [
+        "flowers",
+        "perennial",
+        "meadow",
+        "planting",
+        "clump",
+        "garden"
+      ],
+      "prompt": "Clean 3D model reference of ONLY one dense clump of magenta and pink flowers like the meadow in the reference image: a mound of leafy green stems with tall magenta flower spikes and pink daisy-like blooms, about knee high, roots hidden in a small soil base. Three-quarter view from slightly above, entire clump in frame with margin, isolated on a plain neutral grey studio backdrop, soft even studio lighting, no text.",
+      "image_job_id": "688fb345-4f6a-4b62-aeb1-1325a122d791",
+      "mesh_task_id": "01a11346-d1b8-765f-b4f1-ba4580a33edd",
+      "reference_review": "Reference image reviewed on 2026-11-20 at 1000 px (from 1024 px): plant only, no text. Image reference: concept W056_b.png (Higgsfield job a4679b5c). Generic plant type."
+    }
+  ],
+  "release_assets": [
+    "gen-water-tanks-rooftop-pair-1",
+    "gen-rover-six-wheel-1",
+    "gen-capsule-tram-overgrown-1",
+    "gen-drone-quadcopter-1",
+    "gen-drone-launcher-vehicle-1",
+    "gen-shuttle-craft-1",
+    "gen-planter-box-galvanised-1",
+    "gen-flower-clump-magenta-1"
+  ]
+}

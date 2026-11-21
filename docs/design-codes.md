@@ -35,6 +35,7 @@ flagged; Off gives 59.5 % unfactored.
 | `uls_expression` | `"either"` (the user chooses), `"6.10"` or `"6.10ab"` (prescribed) | either | EN 1990 6.4.3.2(3) |
 | `uls_default` | Expression used when the user does not choose | 6.10 | — |
 | `deflection_limit_ratio` | Deflection limit = span / ratio | 250 (indicative) | EN 1990 A1.4 (left to NA / project) |
+| `storey_drift_limit_ratio` | Storey drift limit = storey height / ratio (optional; missing = 300) | 300 (project default) | None: EN 1993-1-1 7.2.2 / EN 1990 A1.4.3 leave it to NA / project. Marked `"project_default": true, "verified": false`; reported as `project_defaults`, not as an unverified code value |
 | `gamma_M0` | Resistance of cross-sections | 1.0 | EN 1993-1-1 6.1 |
 | `gamma_M1` | Resistance of members to instability | 1.0 | EN 1993-1-1 6.1 |
 | `imposed_floor_kn_m2` | Suggested imposed floor loads by use (shown in the panel; optional) | A 2.0, B 3.0 | EN 1991-1-1 Table 6.2 |

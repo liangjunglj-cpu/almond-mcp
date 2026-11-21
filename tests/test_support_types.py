@@ -1,6 +1,7 @@
 """Support types per support point (fixed, pinned, rollers, springs) against closed forms.
 
 Each expected value is a textbook result worked here, not taken from the solver."""
+import json
 import math
 
 import pytest
@@ -157,3 +158,33 @@ def test_spring_support_settles_and_reports_its_force():
     assert out["results"]["equilibrium_error_kn"] < 1e-6
     r = out["results"]
     assert r["max_displacement_mm"] > r["max_deflection_mm"]                 # the settlement is not beam deflection
+
+
+def test_overlay_reports_the_checked_deflection_and_support_types():
+    """view_result (the Rhino overlay) carries the same member deflection validate checks, and the support
+    type per support point for its symbols."""
+    L = 6.0
+    beam = [((0, 0, 3), (L / 2, 0, 3)), ((L / 2, 0, 3), (L, 0, 3))]
+    m = model(beam, supports=[((0, 0, 3), "fixed"), ((L, 0, 3), "roller-x kz=5000")])
+    kw = dict(load_kn=20.0, self_weight=False, stability="off", design_basis="unfactored")
+    view, _ = ns.view_result(m, **kw)
+    checked = ns.validate(m, "beam", **kw)["results"]
+    # the overlay samples 13 stations per element, validate 11: the peaks agree to the sampling
+    assert view["max_deflection_mm"] == pytest.approx(checked["max_deflection_mm"], rel=0.01)
+    assert view["max_displacement_mm"] > view["max_deflection_mm"]
+    assert view["support_types"] == ["fixed", "roller-x kz=5000"]
+
+
+def test_set_support_type_tool_validates_then_asks_the_bridge(monkeypatch, tmp_path):
+    from tests.test_capsules import _load_server
+    server = _load_server(monkeypatch, tmp_path, tmp_path)
+    sent = []
+    monkeypatch.setattr(server, "_send_and_receive", lambda payload, timeout=None: (sent.append(json.loads(payload)) or
+                        json.dumps({"status": "ok", "updated": [], "errors": []})))
+    assert json.loads(server.set_support_type(["g1", "g2"], "Fixed RX=8000"))["status"] == "ok"
+    assert sent[-1] == {"type": "set_support", "guids": ["g1", "g2"], "spec": "fixed rx=8000"}
+    server.set_support_type(["g1"], "default")
+    assert sent[-1]["spec"] == ""
+    bad = json.loads(server.set_support_type(["g1"], "hinge"))
+    assert bad["status"] == "error" and "not understood" in bad["message"] and len(sent) == 2   # nothing sent
+    assert json.loads(server.set_support_type([], "fixed"))["status"] == "error"

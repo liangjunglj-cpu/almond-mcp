@@ -1,0 +1,103 @@
+{
+  "batch_id": "ginkgo-refset-1024",
+  "image": {
+    "asset_id": "gen-electric-kettle-1",
+    "provider": "higgsfield",
+    "tool": "generate_image_batch",
+    "submitted_at": "2026-10-24T18:54:34.783Z",
+    "request": {
+      "model": "gpt_image_2_5",
+      "aspect_ratio": "1:1",
+      "prompt": "Product photo of a white plastic electric kettle with a curved spout sitting on its round power base, slightly yellowed, a black handle. Single object centred, three-quarter view, whole object in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no logos."
+    },
+    "batch_context": "Resubmitting rate-limited clean interior prop reference images for Meshy image-to-3D.",
+    "status": "COMPLETED",
+    "task_id": "26e58667-3c2c-436b-8091-74f395e276a7",
+    "provider_model": "gpt_image_2_5",
+    "completed_observed_at": "2026-10-24T18:56:02.127Z",
+    "provider_output_name": "hf_20261024_185456_26e58667-3c2c-436b-8091-74f395e276a7.png",
+    "output_file": "gen-electric-kettle-1.png",
+    "output_sha256": "c89340a5c97dacb08ed47b3282d5bd80d1c9983f2a7fe49b922c427a3fae848e",
+    "output_file_modified_at": "2026-10-24T18:56:37+00:00",
+    "seed": null,
+    "consumed_credits": "about 0.25 (Ginkgo MESH_SOURCES.md)",
+    "evidence_source": {
+      "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+      "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+      "extracted_at": "2026-11-05T01:46:49+00:00"
+    }
+  },
+  "mesh": {
+    "asset_id": "gen-electric-kettle-1",
+    "provider": "meshy",
+    "tool": "meshy_image_to_3d",
+    "submitted_at": "2026-10-24T18:58:25.588Z",
+    "request": {
+      "ai_model": "meshy-7.1",
+      "enable_pbr": true,
+      "texture_resolution": "4k",
+      "target_formats": [
+        "glb"
+      ],
+      "image": "local upload of ref_kettle.png"
+    },
+    "input_image_sha256": "c89340a5c97dacb08ed47b3282d5bd80d1c9983f2a7fe49b922c427a3fae848e",
+    "status": "SUCCEEDED",
+    "status_basis": "Downloaded in the Ginkgo session with meshy_download_model; GLB present",
+    "task_id": "01a16f47-d7af-76e8-912e-aa9bd244c680",
+    "output_file": "gen-electric-kettle-1.glb",
+    "output_sha256": "25ed07e418ba188ca6922cf70694c938f6876a03ef6fda839fcb21d4b5428978",
+    "seed": null,
+    "consumed_credits": 30,
+    "evidence_source": {
+      "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+      "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+      "extracted_at": "2026-11-05T01:46:49+00:00"
+    }
+  },
+  "derivation": {
+    "asset_id": "gen-electric-kettle-1",
+    "source_sha256": "25ed07e418ba188ca6922cf70694c938f6876a03ef6fda839fcb21d4b5428978",
+    "source_triangles": 224352,
+    "target_triangles": 40000,
+    "prepared_sha256": "138f0c13fbdd4b65b7f0bfdc732be36e3c14073e36ac0b03708be2b32b1034b4",
+    "software": "Blender 5.1.2",
+    "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Never subdivide to inflate counts.",
+    "weld_tolerance_source_units": 1.8732030391693114e-07,
+    "quality": {
+      "vertices": 19908,
+      "triangles": 40000,
+      "boundary_edges": 0,
+      "nonmanifold_edges_excluding_boundary": 0,
+      "zero_area_faces": 0,
+      "connected_components": 1,
+      "largest_component_vertices": 19908,
+      "nonfinite_coordinates": 0,
+      "self_intersections": "not_tested",
+      "mesh_validation_repair_passes": 0,
+      "use": "Visual entourage; not certified for fabrication or structural analysis",
+      "bounds_relative_change": [
+        7.728361347263153e-06,
+        6.370789293161353e-05,
+        5.6893514813887564e-05
+      ]
+    }
+  },
+  "input_image_file": "batches/ginkgo-refset-1024/gen-electric-kettle-1.png",
+  "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+  "external_reference_ids": [],
+  "dimension_basis": "Real-world sizes authored in the Ginkgo pass (runs/refset_1024/worlds/jp.py PROPS); height normalised exactly, width and depth measured after uniform scaling. Not a physical survey.",
+  "reference_review": "Ginkgo reference image reviewed in that session for a clean, unbranded single object; re-checked for this import: no lettering, logos or brand marks visible.",
+  "rights": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+  "origin": {
+    "project": "Ginkgo, the owner's own world-generation repository (private)",
+    "pass": "runs/refset_1024",
+    "source_name": "kettle",
+    "records": [
+      "runs/refset_1024/MESH_SOURCES.md",
+      "runs/refset_1024/meshy/jobs.json",
+      "runs/refset_1024/pass.json",
+      "Claude Code session transcript c849f85f-3384-47ae-bf45-2e1a471d157c (the tool calls that submitted the image and mesh jobs)"
+    ]
+  }
+}

@@ -1,0 +1,126 @@
+{
+  "batch_id": "ginkgo-refset-1003",
+  "image": {
+    "asset_id": "gen-water-bladder-strapped-1",
+    "provider": "higgsfield",
+    "tool": "generate_image_batch",
+    "submitted_at": "2026-10-03T16:42:46.875Z",
+    "request": {
+      "model": "gpt_image_2_5",
+      "aspect_ratio": "1:1",
+      "prompt": "Product-style 3D render of a single original soft storage tank, front three-quarter view, whole object in frame with margin. A tall upright translucent frosted white inflatable bladder in the shape of a big jug, crinkled quilted plastic skin, a rigid white screw cap and bail handle on top, wrapped by two wide lime green webbing straps with orange side-release buckles, a small blank dark label plate on the front, a short orange hose tail at the base. No text, no logos, no letters. Plain flat light grey studio background, soft even lighting."
+    },
+    "batch_context": null,
+    "task_id": "ab88a218-6120-4cc8-b025-70431e48dff4",
+    "status": "COMPLETED",
+    "provider_model": "gpt_image_2_5",
+    "provider_reported_model": "gpt_image_2_5",
+    "completed_observed_at": "2026-10-03T16:43:08.732Z",
+    "provider_output_name": "hf_20261003_164250_ab88a218-6120-4cc8-b025-70431e48dff4.png",
+    "consumed_credits": "not returned in the session",
+    "reference_inputs": [],
+    "output_file": "gen-water-bladder-strapped-1.png",
+    "output_sha256": "121631579addcaaf89ad6d423e7a5a93802bc994557364bd82b3ab47ea43553c",
+    "output_file_modified_at": "2026-10-03T16:43:25+00:00",
+    "seed": null,
+    "evidence_source": {
+      "pass_records": [
+        "runs/refset_1003/pass.json",
+        "runs/refset_1003/meshy/jobs.json",
+        "ProjectY2K: twofronts/meshy/ginkgo_props_v061/out/conditioning.json"
+      ],
+      "session_records": "Tool calls of Ginkgo Claude Code session(s) 280c8dd8-c841-4c5a-9ea9-09100393e169 (submissions, results and downloads)",
+      "extracted_at": "2026-11-20T17:58:55+00:00"
+    },
+    "status_basis": "Provider reported completed; curl of the job's result URL in the Ginkgo session (Bash, 2026-10-03T16:43:18.454Z)"
+  },
+  "mesh": {
+    "asset_id": "gen-water-bladder-strapped-1",
+    "provider": "meshy",
+    "tool": "meshy_image_to_3d",
+    "submitted_at": "2026-10-03T16:45:16.261Z",
+    "request": {
+      "ai_model": "meshy-7",
+      "enable_pbr": true,
+      "texture_resolution": "4k",
+      "should_remesh": true,
+      "target_polycount": 100000,
+      "target_formats": [
+        "glb"
+      ],
+      "response_format": "json",
+      "image": "local upload of ref_bladder_tank.png"
+    },
+    "task_id": "01a102a7-fab7-7691-9383-0e09c1ec7feb",
+    "status": "SUCCEEDED",
+    "status_basis": "meshy_download_model returned the completed GLB (the tool refuses tasks that are not completed); the session did not query this task's status",
+    "consumed_credits": "not returned in the session",
+    "provider_model": "meshy-7",
+    "input_link": "upload",
+    "input_image_sha256": "121631579addcaaf89ad6d423e7a5a93802bc994557364bd82b3ab47ea43553c",
+    "output_file": "gen-water-bladder-strapped-1.glb",
+    "output_sha256": "5447bf85c1f791959eab65b7e827463620817adc51e9d1383403385b4127d5d1",
+    "seed": null,
+    "evidence_source": {
+      "pass_records": [
+        "runs/refset_1003/pass.json",
+        "runs/refset_1003/meshy/jobs.json",
+        "ProjectY2K: twofronts/meshy/ginkgo_props_v061/out/conditioning.json"
+      ],
+      "session_records": "Tool calls of Ginkgo Claude Code session(s) 280c8dd8-c841-4c5a-9ea9-09100393e169 (submissions, results and downloads)",
+      "extracted_at": "2026-11-20T17:58:55+00:00"
+    }
+  },
+  "derivation": {
+    "asset_id": "gen-water-bladder-strapped-1",
+    "source_sha256": "5447bf85c1f791959eab65b7e827463620817adc51e9d1383403385b4127d5d1",
+    "source_triangles": 99419,
+    "target_triangles": 50000,
+    "prepared_sha256": "dd4a1eae451cd1b456ecb54617cc72e9aeb6f9e8db2e1552f80bea8a0066c2a4",
+    "software": "Blender 5.1.2",
+    "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Remove wire edges, split edges shared by more than two faces and remove zero-area faces (counts in quality.topology_repairs). Never subdivide to inflate counts.",
+    "weld_tolerance_source_units": 1.9030401706695556e-07,
+    "quality": {
+      "vertices": 26580,
+      "triangles": 49977,
+      "boundary_edges": 2797,
+      "nonmanifold_edges_excluding_boundary": 0,
+      "zero_area_faces": 0,
+      "connected_components": 471,
+      "largest_component_vertices": 24274,
+      "nonfinite_coordinates": 0,
+      "self_intersections": "not_tested",
+      "mesh_validation_repair_passes": 1,
+      "topology_repairs": {
+        "wire_edges_removed": 0,
+        "nonmanifold_edges_split": 795,
+        "zero_area_faces_removed": 0,
+        "loose_vertices_removed": 0
+      },
+      "use": "Visual entourage; not certified for fabrication or structural analysis",
+      "bounds_relative_change": [
+        6.238380140810753e-05,
+        0.0001972340781818107,
+        2.5056599726707666e-05
+      ]
+    }
+  },
+  "input_image_file": "batches/ginkgo-refset-1003/gen-water-bladder-strapped-1.png",
+  "external_reference_status": "Text prompts only: no image was given to the image model or to Meshy. The prompts were written from an owner reference set of 10 images pasted into the Ginkgo session on 2026-10-03 (third-party photographs and artworks, described in runs/refset_1003/pass.json; never uploaded to a generator, not distributed). Note: runs/refset_1003/refs_contact.jpg is a contact sheet of the generated images and decals, not of the owner's references. Design-proximity review 2026-11-20: each generated image was compared with the reference photographs. The soft seat, bladder tank and canister are generic types in different forms and were imported (comparisons in each asset's reference_review); the pack unit and cube rover were excluded as close copies of specific third-party designs, and the lander as a replica of a specific artwork. Provider textures (the colourways that follow the references) are not distributed; only geometry ships.",
+  "external_reference_ids": [],
+  "dimension_basis": "Real-world sizes chosen for this import, not the stylised scene sizes: soft seat 0.90 m high (a lounge chair with a tall round backrest; also the height Project Y2K v061 used), bladder tank 0.45 m (a portable collapsible water container with a carry handle; Y2K v061 used 1.35 m and the Ginkgo scenes were larger still), canister 0.65 m (sized as a portable extinguisher-type pressure canister; Y2K v061 used 1.25 m). Each mesh was scaled uniformly to that height; width and depth were measured after scaling. Not a physical survey.",
+  "reference_review": "Reference image reviewed on 2026-11-20 at full resolution (1024 px): a blank dark label patch, no lettering, logos or brand marks. Design proximity: The owner's reference photographs for this pass (10 images pasted into Ginkgo session 280c8dd8 on 2026-10-03; extracted from the transcript to a scratch folder for this comparison only, not retained or distributed) were compared side by side at 800 px with the generated image. The closest reference is a crinkled clear bottle with a narrow neck, green webbing straps, orange buckles and a printed label. The generated container is a square-section jerrycan with a quilted skin, a bail handle and a bottom spout; it shares the strap colourway (texture only, not distributed) but not the form. Generic type.",
+  "rights": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5, text prompts only); meshes with Meshy-7 image-to-3D on the owner's Meshy account (the same account, by the account ID in the result URLs, as the library's other Meshy batches). Owner approved release in the Almond library under CC BY 4.0 on 2026-11-20 (\"increase the range of models, from the ones i used for my project y2k games, (except for the operatives and bosses)\") and chose this group, Ginkgo props reused in Project Y2K, the same day. The Ginkgo pass records an owner approval on 2026-10-03 that covered generation for the GRANDWHIS world packs, not this library. The prompts were written from third-party reference photographs (see external_reference_status). Generator account entitlements not independently audited. Provider textures are not distributed.",
+  "origin": {
+    "project": "Ginkgo, the owner's own world-generation repository (private); reused in Project Y2K, the owner's game project (private)",
+    "pass": "runs/refset_1003",
+    "source_name": "bladder_tank",
+    "records": [
+      "runs/refset_1003/pass.json (owner reference set described; AI-assisted content statement)",
+      "runs/refset_1003/meshy/jobs.json (Meshy task IDs)",
+      "ProjectY2K: twofronts/meshy/ginkgo_props_v061/condition_ginkgo_props.py and out/conditioning.json (content v061 conditioned these props for the Mirai Ward hub as SM_GK61_<Name>.fbx)",
+      "ProjectY2K: twofronts/infrastructure/scripts/world_fill_v061.py (places the conditioned props in the hub)",
+      "Claude Code session transcript 280c8dd8-c841-4c5a-9ea9-09100393e169 (the tool calls that submitted the image and Meshy jobs, the curl downloads of the images and the GLB downloads)"
+    ]
+  }
+}

@@ -177,42 +177,6 @@ class RhinoBridgeServer:
 
         self._layers_created = True
 
-    # ── Bounding Box & Dimensioning ──────────────────────────────────────────
-
-    def _add_scale_dimensions(self, guids):
-        """Add an aligned dimension spanning the bounding box of created geometry."""
-        if not IN_RHINO or not guids:
-            return
-
-        bbox = Rhino.Geometry.BoundingBox.Empty
-        for guid_str in guids:
-            try:
-                guid = System.Guid(guid_str) if 'System' in dir() else Rhino.RhinoMath.UnsetIntIndex
-                obj = sc.doc.Objects.FindId(guid)
-                if obj and obj.Geometry:
-                    bbox.Union(obj.Geometry.GetBoundingBox(True))
-            except:
-                pass
-
-        if not bbox.IsValid:
-            return
-
-        try:
-            pt0 = bbox.Min
-            pt1 = Rhino.Geometry.Point3d(bbox.Max.X, bbox.Min.Y, bbox.Min.Z)
-            plane = Rhino.Geometry.Plane.WorldXY
-            plane.Origin = pt0
-
-            dim = Rhino.Geometry.LinearDimension.Create(
-                Rhino.Geometry.AnnotationType.Aligned,
-                sc.doc.DimStyles.Current,
-                plane, plane.XAxis, pt0, pt1, pt0, 0
-            )
-            if dim:
-                sc.doc.Objects.AddLinearDimension(dim)
-        except Exception as e:
-            print(f"Dimension error: {e}")
-
     # ── Script Execution ─────────────────────────────────────────────────────
 
     def _execute_script(self, script_code: str) -> dict:
@@ -234,9 +198,6 @@ class RhinoBridgeServer:
             exec(script_code, exec_globals)
             guids = [str(g) for g in exec_globals.get("created_objects", [])]
             result["guids"] = guids
-
-            if guids:
-                self._add_scale_dimensions(guids)
 
             if IN_RHINO:
                 sc.doc.EndUndoRecord(undo_sn)

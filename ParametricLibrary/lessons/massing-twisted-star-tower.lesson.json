@@ -1,0 +1,97 @@
+{
+  "id": "massing-twisted-star-tower",
+  "title": "Twisted star tower (loft massing)",
+  "category": "massing",
+  "level": "intermediate",
+  "summary": "A star-shaped floor outline is made from a circle, filleted, copied up in floors and rotated a little more at each level; lofting the floors gives a twisting tower mass.",
+  "how_to_use": [
+    "'Star points' sets the number of star points; 'Star depth' how deep the star is cut in; 'Corner fillet' rounds the corners.",
+    "'Floor height' and 'Floors' set the stacking; 'Twist per floor' is the extra rotation (degrees) of each level.",
+    "Loft options: the Value List picks the loft type; the toggle and 'Refit' adjust it.",
+    "Bake 'Loft' for the tower envelope, or the Rot3D output for the floor-plate outlines."
+  ],
+  "concepts": [
+    "Alternating lists: Longest List repeats a short pattern (1, 0) over all points",
+    "Amplitude: moving points along their own direction to make a star",
+    "Series as floor heights and as rotation angles",
+    "Loft and Loft Options"
+  ],
+  "source": {
+    "author": "Lucas Becker (runxel)",
+    "repo": "runxel/grasshopper-examples",
+    "path": "gh/star_curve_loft.ghx",
+    "commit": "0e57586bdc00a4c3663983e67f36a0ce1f6c7ee6",
+    "licence": "BlueOak-1.0.0",
+    "licence_url": "https://blueoakcouncil.org/license/1.0.0"
+  },
+  "readme_extra": [
+    "553bd0ad",
+    "d1cacb49",
+    "b17af262"
+  ],
+  "drop_notes": [
+    "9515ba38"
+  ],
+  "labels": {
+    "aa487dcb": "Star points x2",
+    "469da06b": "Star depth",
+    "2a6368c6": "Corner fillet",
+    "2cc968c0": "Floor height",
+    "8b75028e": "Floors",
+    "0afeff33": "Twist per floor",
+    "50dc4fec": "Refit",
+    "5584ee20": "Star pattern (1,0)",
+    "ed1c970a": "Adjust seam",
+    "2d4fac53": "Loft type"
+  },
+  "steps": [
+    {
+      "title": "1  INPUTS - change these",
+      "select": {
+        "inputs": true
+      },
+      "explain": "Star shape, number and height of floors, twist per floor, and the loft options."
+    },
+    {
+      "title": "2  Star floor outline",
+      "select": {
+        "guids": [
+          "31359a6b",
+          "d68fca39",
+          "f41a3512",
+          "2efa2916",
+          "8749211e",
+          "c3e576da",
+          "dbf3c0e9",
+          "4dc97ef1",
+          "79f2ee77"
+        ]
+      },
+      "explain": "A Circle is divided into points. Longest List repeats the pattern 1,0,1,0 over the points, so every second point is pushed outward along its own direction (Vector + Amplitude) by Star depth. A closed PolyLine joins them into a star and Fillet rounds the corners."
+    },
+    {
+      "title": "3  Stack and twist the floors",
+      "select": {
+        "guids": [
+          "9cbd6aec",
+          "e23ac24e",
+          "33d990ad",
+          "7eca80ff",
+          "f19d1138"
+        ]
+      },
+      "explain": "One Series gives each floor its height (Unit Z) and another gives each floor its rotation angle. Move copies the outline up; Rotate 3D twists each copy around the vertical axis."
+    },
+    {
+      "title": "4  RESULT - loft the tower",
+      "select": {
+        "outputs": true,
+        "guids": [
+          "d54f0669",
+          "b3dadae9"
+        ]
+      },
+      "explain": "Loft skins all floor outlines into one twisting envelope, using the Loft Options from step 1."
+    }
+  ]
+}

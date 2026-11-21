@@ -1,0 +1,131 @@
+{
+  "batch_id": "ginkgo-daxi-2026-11",
+  "image": {
+    "asset_id": "gen-fishing-trawler-offshore-1",
+    "provider": "higgsfield",
+    "tool": "generate_image_batch",
+    "submitted_at": "2026-10-15T03:05:20.988Z",
+    "request": {
+      "model": "nano_banana_pro",
+      "resolution": "2k",
+      "aspect_ratio": "16:9",
+      "medias": [
+        {
+          "value": "7541720a-3002-4785-b6b9-6b1bd975abaa",
+          "role": "image_references"
+        }
+      ],
+      "prompt": "Photorealistic isolated product shot of ONE larger Taiwanese offshore fishing trawler (about 22 m), steel hull painted white with a dark red boot topping, a tall white superstructure with a bridge deck, railings, a tall forward mast with a red boom derrick and lamps, net drum at the stern, weathered with rust streaks. Whole boat visible bow to stern in three-quarter view from slightly above, hull fully out of the water, plain flat light grey studio background, soft overcast light. No people, no water, no flags, exactly one boat."
+    },
+    "task_id": "445b1c44-108e-4689-8366-6871d447ea29",
+    "status": "COMPLETED",
+    "provider_model": "nano_banana_pro",
+    "provider_reported_model": "nano_banana_2",
+    "completed_observed_at": "2026-10-15T03:07:06.122Z",
+    "provider_output_name": "hf_20261015_030523_445b1c44-108e-4689-8366-6871d447ea29.png",
+    "reference_inputs": [
+      {
+        "name": "daxi_ref.jpg",
+        "role": "owner photograph (daxi_ref)",
+        "sha256": "c61e641ee44b18b5ca441f344ba8d75ac4fdf3e0452f3e536e5ef42a1305ee9f",
+        "retained": false,
+        "note": "Owner photograph uploaded to the image stage; not distributed"
+      }
+    ],
+    "output_file": "gen-fishing-trawler-offshore-1.png",
+    "output_sha256": "4df19c77a70e5bc681aa2771afb5955a79f8abe22b98f10a0894e95212502702",
+    "output_file_modified_at": "2026-10-15T03:07:15+00:00",
+    "seed": null,
+    "evidence_source": {
+      "pass_records": [
+        "runs/daxi_harbour/blender/layout.json",
+        "runs/daxi_harbour/blender/build_scene.py"
+      ],
+      "session_records": "Tool calls of Ginkgo Claude Code session(s) 32f853ff-f053-42f0-973f-1c12ffd01fac (submissions, results and downloads)",
+      "extracted_at": "2026-11-20T16:57:59+00:00"
+    },
+    "status_basis": "Provider reported completed; curl of the job's result URL in the Ginkgo session (Bash)"
+  },
+  "mesh": {
+    "asset_id": "gen-fishing-trawler-offshore-1",
+    "provider": "meshy",
+    "tool": "meshy_image_to_3d",
+    "submitted_at": "2026-10-15T03:07:29.356Z",
+    "request": {
+      "ai_model": "latest",
+      "enable_pbr": true,
+      "should_remesh": true,
+      "target_polycount": 150000,
+      "target_formats": [
+        "glb"
+      ],
+      "image": "local upload of mid2_ref.png"
+    },
+    "task_id": "01a13d87-8ebd-74f7-a952-fa215591f45a",
+    "status": "SUCCEEDED",
+    "provider_model": "latest",
+    "consumed_credits": 30,
+    "input_link": "upload",
+    "input_image_sha256": "4df19c77a70e5bc681aa2771afb5955a79f8abe22b98f10a0894e95212502702",
+    "output_file": "gen-fishing-trawler-offshore-1.glb",
+    "output_sha256": "167f73119a969ab78e6bf31bc3f2646fa1be40f00ed0d050b479e4281b5e7cb5",
+    "seed": null,
+    "evidence_source": {
+      "pass_records": [
+        "runs/daxi_harbour/blender/layout.json",
+        "runs/daxi_harbour/blender/build_scene.py"
+      ],
+      "session_records": "Tool calls of Ginkgo Claude Code session(s) 32f853ff-f053-42f0-973f-1c12ffd01fac (submissions, results and downloads)",
+      "extracted_at": "2026-11-20T16:57:59+00:00"
+    }
+  },
+  "derivation": {
+    "asset_id": "gen-fishing-trawler-offshore-1",
+    "source_sha256": "167f73119a969ab78e6bf31bc3f2646fa1be40f00ed0d050b479e4281b5e7cb5",
+    "source_triangles": 148159,
+    "target_triangles": 80000,
+    "prepared_sha256": "8b20f2c977b85015dea1c4de15316d01089b74499f0b86f1db1029c2b500a414",
+    "software": "Blender 5.1.2",
+    "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Remove wire edges, split edges shared by more than two faces and remove zero-area faces (counts in quality.topology_repairs). Never subdivide to inflate counts.",
+    "weld_tolerance_source_units": 1.9024828672409056e-07,
+    "quality": {
+      "vertices": 39767,
+      "triangles": 79994,
+      "boundary_edges": 578,
+      "nonmanifold_edges_excluding_boundary": 0,
+      "zero_area_faces": 0,
+      "connected_components": 161,
+      "largest_component_vertices": 39075,
+      "nonfinite_coordinates": 0,
+      "self_intersections": "not_tested",
+      "mesh_validation_repair_passes": 1,
+      "topology_repairs": {
+        "wire_edges_removed": 0,
+        "nonmanifold_edges_split": 175,
+        "zero_area_faces_removed": 0,
+        "loose_vertices_removed": 0
+      },
+      "use": "Visual entourage; not certified for fabrication or structural analysis",
+      "bounds_relative_change": [
+        0.00012087084909045783,
+        0.0,
+        1.9489775529857814e-05
+      ]
+    }
+  },
+  "input_image_file": "batches/ginkgo-daxi-2026-11/gen-fishing-trawler-offshore-1.png",
+  "external_reference_status": "Photo-derived: each image request took crops of the owner's own photograph of Daxi fishing harbour (Yilan, Taiwan) as Higgsfield media references. The two hero boats (14 m and 16 m) were prompted to match specific boats in that photograph; the three smaller boats follow the photograph's general harbour craft. The photograph and crops are named and hashed in each image record, not distributed. The Higgsfield job results report model nano_banana_2 for requests that named nano_banana_pro; both are recorded.",
+  "external_reference_ids": [],
+  "dimension_basis": "Lengths are the sizes written into each image prompt in the Ginkgo session (14, 16, 11, 15 and 22 m); each mesh was scaled uniformly so its overall length matches, and height and beam were measured after scaling. The Daxi scene itself placed the hero boats at 18 and 19 m. Not a physical survey.",
+  "reference_review": "Reference image reviewed on 2026-11-20 (downscaled to 900 px wide): no hull numbers, boat names, lettering, logos or brand marks visible.",
+  "rights": "Reference images generated on the owner's Higgsfield account (nano_banana_pro) from crops of the owner's own photograph; meshes with Tripo H3.1 through the owner's Higgsfield account (the two hero boats) or on the owner's paid Meshy account (three harbour boats). The hero boats are modelled on specific working boats in the owner's photograph; no hull numbers, names, lettering or marks appear in the reference images. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-20. Generator account entitlements and the Tripo terms not independently audited.",
+  "origin": {
+    "project": "Ginkgo, the owner's own world-generation repository (private)",
+    "pass": "runs/daxi_harbour",
+    "source_name": "mid2",
+    "records": [
+      "runs/daxi_harbour/blender/layout.json",
+      "Claude Code session transcript 32f853ff-f053-42f0-973f-1c12ffd01fac (the tool calls that uploaded the photo crops and submitted the image, Tripo and Meshy jobs, and the crop of the boatR image)"
+    ]
+  }
+}

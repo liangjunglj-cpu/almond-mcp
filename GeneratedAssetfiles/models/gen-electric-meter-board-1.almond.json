@@ -1,0 +1,309 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-electric-meter-board-1",
+  "library_id": "generated_assets",
+  "name": "Electric meter board (Five glass-domed meters on a steel board; generated prop; detailed geometry edition)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-electric-meter-board-1.glb",
+  "dimensions_mm": {
+    "width": 1252.3,
+    "depth": 176.2,
+    "height": 630.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "wall",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -626.15,
+        -88.1,
+        0.0
+      ],
+      "max": [
+        626.15,
+        88.1,
+        630.0
+      ]
+    },
+    "footprint": [
+      [
+        -626.15,
+        -88.1
+      ],
+      [
+        626.15,
+        -88.1
+      ],
+      [
+        626.15,
+        88.1
+      ],
+      [
+        -626.15,
+        88.1
+      ]
+    ],
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "fixed",
+    "mount_height_mm": 1920
+  },
+  "materials": [
+    {
+      "material_id": "aluminium-anodized",
+      "objects": [
+        "gen-electric-meter-board-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-electric-meter-board-1",
+    "library_id": "generated_assets",
+    "name": "Electric meter board (Five glass-domed meters on a steel board; generated prop; detailed geometry edition)",
+    "category": "building_services",
+    "tags": [
+      "electric",
+      "meter",
+      "facade",
+      "services",
+      "detailed",
+      "meshy",
+      "ginkgo-refset-1024"
+    ],
+    "dimensions_mm": {
+      "width": 1252.3,
+      "depth": 176.2,
+      "height": 630.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 1250.0,
+      "depth": 180.0,
+      "height": 630.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "wall",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -626.15,
+          -88.1,
+          0.0
+        ],
+        "max": [
+          626.15,
+          88.1,
+          630.0
+        ]
+      },
+      "footprint": [
+        [
+          -626.15,
+          -88.1
+        ],
+        [
+          626.15,
+          -88.1
+        ],
+        [
+          626.15,
+          88.1
+        ],
+        [
+          -626.15,
+          88.1
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "fixed",
+      "mount_height_mm": 1920
+    },
+    "materials": [
+      {
+        "material_id": "aluminium-anodized",
+        "objects": [
+          "gen-electric-meter-board-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "Product photo of a row of five round glass-domed electric meters mounted on a weathered white steel board, black bakelite bases, grey conduit wires hanging below each meter. Single object centred, straight-on view slightly from above, whole board in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no numbers, no logos.",
+        "image_task_id": null,
+        "image_model": "gpt_image_2_5",
+        "mesh_task_id": "01a16f47-90ee-76ad-9308-c9a945e8a2df",
+        "mesh_model": "meshy-7.1",
+        "generated_at": "2026-10-24",
+        "orientation_correction": null,
+        "scale_applied": 658.091766,
+        "captured_generation": {
+          "batch_id": "ginkgo-refset-1024",
+          "image": {
+            "asset_id": "gen-electric-meter-board-1",
+            "provider": "higgsfield",
+            "tool": "generate_image_batch",
+            "submitted_at": "2026-10-24T18:53:16.129Z",
+            "request": {
+              "model": "gpt_image_2_5",
+              "aspect_ratio": "1:1",
+              "prompt": "Product photo of a row of five round glass-domed electric meters mounted on a weathered white steel board, black bakelite bases, grey conduit wires hanging below each meter. Single object centred, straight-on view slightly from above, whole board in frame, plain neutral light-grey studio backdrop, soft even lighting, photoreal, no text, no numbers, no logos."
+            },
+            "batch_context": "Clean single-object reference images for Meshy image-to-3D props of a photoreal apartment-block world pack.",
+            "status": "COMPLETED",
+            "task_id": "3211234c-6626-4040-80c6-8052d57c3838",
+            "provider_model": "gpt_image_2_5",
+            "completed_observed_at": "2026-10-24T18:55:01.053Z",
+            "provider_output_name": "hf_20261024_185330_3211234c-6626-4040-80c6-8052d57c3838.png",
+            "output_file": "gen-electric-meter-board-1.png",
+            "output_sha256": "1b7558e00bb9a776e71f39e4686fc4dc287579df62f1957bf347deab469e41bb",
+            "output_file_modified_at": "2026-10-24T18:55:46+00:00",
+            "seed": null,
+            "consumed_credits": "about 0.25 (Ginkgo MESH_SOURCES.md)",
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "mesh": {
+            "asset_id": "gen-electric-meter-board-1",
+            "provider": "meshy",
+            "tool": "meshy_image_to_3d",
+            "submitted_at": "2026-10-24T18:58:06.738Z",
+            "request": {
+              "ai_model": "meshy-7.1",
+              "enable_pbr": true,
+              "texture_resolution": "4k",
+              "target_formats": [
+                "glb"
+              ],
+              "image": "local upload of ref_electric_meters.png"
+            },
+            "input_image_sha256": "1b7558e00bb9a776e71f39e4686fc4dc287579df62f1957bf347deab469e41bb",
+            "status": "SUCCEEDED",
+            "status_basis": "Downloaded in the Ginkgo session with meshy_download_model; GLB present",
+            "task_id": "01a16f47-90ee-76ad-9308-c9a945e8a2df",
+            "output_file": "gen-electric-meter-board-1.glb",
+            "output_sha256": "5f7992b4281e54f8224a938c0c664a996cb3783cc71fce92763c898b8e3093bc",
+            "seed": null,
+            "consumed_credits": 30,
+            "evidence_source": {
+              "pass_records": "Ginkgo runs/refset_1024/meshy/jobs.json",
+              "session_records": "Tool calls of Ginkgo Claude Code session c849f85f-3384-47ae-bf45-2e1a471d157c (image and mesh submissions)",
+              "extracted_at": "2026-11-05T01:46:49+00:00"
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-electric-meter-board-1",
+            "source_sha256": "5f7992b4281e54f8224a938c0c664a996cb3783cc71fce92763c898b8e3093bc",
+            "source_triangles": 394030,
+            "target_triangles": 80000,
+            "prepared_sha256": "45c775f55f8236cd1a956c8daae562665b069121766ac8b4a5b9fba62694c984",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.9030489921569822e-07,
+            "quality": {
+              "vertices": 39970,
+              "triangles": 80000,
+              "boundary_edges": 0,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 1,
+              "largest_component_vertices": 39970,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                3.8586984710283155e-05,
+                4.675869817549787e-06,
+                8.952534756441871e-05
+              ]
+            }
+          },
+          "input_image_file": "batches/ginkgo-refset-1024/gen-electric-meter-board-1.png",
+          "external_reference_status": "Original descriptive prompts for single-object product images. The owner's photographic scene references (runs/refset_1024_refs) were not uploaded to either generator.",
+          "external_reference_ids": [],
+          "dimension_basis": "Real-world sizes authored in the Ginkgo pass (runs/refset_1024/worlds/jp.py PROPS); height normalised exactly, width and depth measured after uniform scaling. Not a physical survey.",
+          "reference_review": "Ginkgo reference image reviewed in that session for a clean, unbranded single object; re-checked for this import: no lettering, logos or brand marks visible.",
+          "rights": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5) and meshes on the owner's paid Meshy account; the Ginkgo pass records both as owner-owned output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-05. These props also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private)",
+            "pass": "runs/refset_1024",
+            "source_name": "electric_meters",
+            "records": [
+              "runs/refset_1024/MESH_SOURCES.md",
+              "runs/refset_1024/meshy/jobs.json",
+              "runs/refset_1024/pass.json",
+              "Claude Code session transcript c849f85f-3384-47ae-bf45-2e1a471d157c (the tool calls that submitted the image and mesh jobs)"
+            ]
+          }
+        }
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "architecture",
+        "streetscape"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.021,
+      "triangle_count": 80000,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "317C6ABC92151FB16E74D5ABB901F4EB24800B13C308759923ADDB32DE34F4EB"
+}

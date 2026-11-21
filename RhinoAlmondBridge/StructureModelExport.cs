@@ -85,6 +85,8 @@ namespace RhinoAlmondBridge
                     members,
                     shells = cond.Shells.Count,
                     anchor_points = cond.AnchorPoints.Select(M).ToList(),
+                    // each support point with the designer's almond:support type (null = the analysis default)
+                    supports = cond.Supports.Select(sp => new { point_m = M(sp.Location), spec = sp.Spec, source_guid = sp.SourceGuid }).ToList(),
                     tolerance_m = cond.Tolerance * s,
                     max_span_m = cond.MaxSpan * s,
                     max_member_span_m = cond.MaxMemberSpan * s,

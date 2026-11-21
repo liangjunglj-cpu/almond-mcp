@@ -234,3 +234,12 @@
 .analysis-runbar .analysis-button.primary{width:100%}
 
 #advanced-summary.error{color:var(--busy)}
+/* Beta features: the simulation workspaces are still under test, and say so wherever they appear. */
+.beta-tag{display:inline-block;font:600 11px/1.6 var(--mono);letter-spacing:.04em;color:var(--muted);border:1px solid var(--line);border-radius:2px;padding:0 5px;vertical-align:middle;white-space:nowrap}
+h1 .beta-tag{font-size:12px;vertical-align:.6em;letter-spacing:.04em}
+.workspace-title .beta-tag{margin:0 auto 0 10px;align-self:center;color:var(--muted)}
+.beta-note{font-size:12px;line-height:1.5;color:var(--muted);margin:10px 0}
+.tutorial-row{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:10px 0 4px}
+.tutorial-row .field-help{margin:0;flex:1 1 180px}
+.tutorial-status{margin:4px 0}
+.tutorial-row .analysis-button{width:auto;flex:none}

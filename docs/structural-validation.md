@@ -1,5 +1,9 @@
 # Structural validation: process, inputs, and verified behavior
 
+> **Stable since 0.8.0** (the native engine). Its verdicts are design-stage checks, not certification or
+> code compliance. The Karamba route (`engine="karamba"`, shells) is still **(BETA)**, under test.
+> Status per feature: [simulation-stable-readiness.md](simulation-stable-readiness.md).
+
 How Almond's `validate_structure` works, what goes in, what comes out, and
 the dimension matrix it has been verified against (live sessions,
 2026-07-14, bridge 0.2.3, Karamba 3.1.60519).
@@ -72,6 +76,7 @@ fixed, or pinned). A support point can carry its own type in the model's
 | `pinned` (`pin`) | three translations | simple base plate |
 | `roller` | vertical | sliding bearing |
 | `roller-x` / `roller-y` | vertical + y / x (slides along x / y) | expansion joint |
+| `lateral-x` / `lateral-y` | that horizontal direction only | out-of-plane bracing of a planar truss or frame, a deck |
 | `spring kz=50000` | only the listed springs | soil, elastic bearing |
 
 Spring keys: `kx ky kz` in kN/m, `rx ry rz` in kNm/rad; a sprung direction is
@@ -81,19 +86,51 @@ the default with a warning. Results report `support_types`, `support_mode`
 ("mixed" when they differ) and each support's `restraint` and reactions (a
 spring's reaction is its force on the structure).
 
-In Rhino this will be the `almond:support` user text on a support point, read
-by the next almondbridge release; until then the `supports` list can only be
-sent by a model JSON (the `almond-mcp solve` protocol).
+Setting a type, three ways (all write the same `almond:support` user text on
+the Rhino point object): the Almond panel's Supports tab lists the captured
+support points with a type picker and a springs field; the MCP tool
+`set_support_type(guids=[...], support="roller-x")` sets it from Claude (checked
+with the native parser first; `""` or `"default"` clears it); or edit the user
+text in Rhino's Properties. almondbridge releases after 0.7.0rc2
+export it in the `supports` list (older bridges send plain anchor points, which
+take the default). A support point lying part-way along a member splits the
+member there, so a column under the middle of a continuous beam acts on it. The
+Rhino overlay draws each type (block = fixed, triangle = pinned, triangle on
+rollers = roller, zigzag = spring). The Karamba route applies the restraints but
+holds sprung directions rigid, with a warning.
 
 ## Pass criteria
 
 - **Deflection:** `max_deflection_mm ≤ span_mm / 250` (e.g. 24 mm for a 6 m
   span, 48 mm for 12 m). On the native engine `max_deflection_mm` is each
   member's deflection relative to what supports it (beam ends on columns, a
-  cantilever's root, a truss chord's end posts), so column shortening in a tall
-  frame does not count as beam deflection; the absolute maximum is reported as
-  `max_displacement_mm`. Storey drift is not checked.
-- **Strength:** utilization < 1.0 against yield (S235: fy = 235 MPa).
+  cantilever's root, a truss chord's end posts; a column or brace between the
+  floors that hold it, from the chord through their displaced positions), so
+  column shortening and sway in a tall frame do not count as deflection; the
+  absolute maximum is reported as `max_displacement_mm`. For beam/frame each member
+  is checked against its own span (between the points that hold it, however it was
+  drawn in pieces; a column between floors: the storey height), so
+  `max_deflection_mm` and `deflection_limit_mm` are the governing member's
+  (`governing_deflection` names it).
+- **Storey drift (native engine):** the horizontal displacement of every column
+  line between consecutive floors ≤ storey height / 300
+  (`results.storey_drift`: per storey, governing first). h/300 is a project
+  default in the design code profile (`storey_drift_limit_ratio`, marked
+  `project_default`, `verified: false`): EN 1993-1-1 7.2.2 / EN 1990 A1.4.3
+  leave horizontal limits to the project or the National Annex. Reported but
+  not judged for `structure_type="truss"` (a spanning truss's posts turn with
+  it).
+- **Strength:** utilization < 1.0 against yield (S235: fy = 235 MPa). On the
+  native engine (EN 1993-1-1, per member) this is the worst of: cross-section
+  6.2.1(7), shear 6.2.6 (V_pl,Rd with the 6.2.6(3) shear area, η = 1.0), bending
+  reduced by high shear 6.2.8, flexural buckling 6.3.1, lateral-torsional
+  buckling of I-sections 6.3.2 (numerical M_cr, gravity on the top flange; off
+  with `lateral_restraint="continuous"`) and compression + bending 6.3.3
+  (Annex B, Table B.2 for unrestrained I-sections). Class 4 sections and webs past h_w/t_w = 72ε/η (shear
+  buckling, EN 1993-1-5) fail as not covered. With α_cr < 10 the ULS analysis is
+  second order with sway imperfections (5.3.2(3), m per sway direction counting
+  columns with ≥ 50 % of their row's average load) and local bow imperfections
+  (5.3.2(6), Table 5.1) where the clause requires them. Not checked: torsion. See [native-solver.md](native-solver.md).
 - Rule-based pathway: mid-span UDL deflection `5wL⁴/384EI`, moment `wL²/8`,
   with load sharing across members.
 
@@ -174,7 +211,13 @@ still returns no stations in this build; member shapes are interpolated
 and draws it in every viewport through a display conduit (nothing is baked): ghosted
 undeformed axes, the exaggerated deformed shape coloured blue → red by
 displacement or utilization, supports, load arrows and a legend with
-max δ, the L/limit check and PASS/FAIL. `reanalyze=False` updates only the
+max δ, the L/limit check and PASS/FAIL. On the native engine the PASS/FAIL is
+validate_structure's verdict for the same inputs (member deflection, Class 4,
+utilization, storey drift; pass the same `structure_type`): the server computes
+it and sends it with the result, and overrides the status an older bridge
+judges from the absolute displacement. The legend reads "max δ (member)" with
+the absolute displacement and the storey drift as secondary lines; the
+absolute maximum still sets the automatic deformation scale. `reanalyze=False` updates only the
 display (`scale`, `color_by`, `reveal`, `title`), so a staged construction
 sequence can be played back with `reveal` from 0 to 1, and `physics=False`
 draws the same members as plain geometry (physics off) for comparisons.
@@ -194,6 +237,11 @@ export_structural_report()            # → %LOCALAPPDATA%\Almond\reports\struct
 export_structural_report(path="C:\\project\\checks.md", limit=10)
 ```
 
-The report contains the pathway explanation, a run table (span, deflection
-vs limit, utilization, reactions, member count, PASS/FAIL), per-run verdicts
-and warnings, and the interpretation notes above.
+Runs that return `pass`, `fail` or `indicative` are recorded. The report
+contains the explanation of both routes (native and Karamba), a run table
+(span, deflection vs limit, utilization, reactions, member count,
+PASS/FAIL/INDICATIVE), and per run the loads (point load, floor and asset
+loads), design code and ULS expression, connections, supports and stability,
+the verdict and warnings, and the interpretation notes above. Member counts
+exclude support points. Native concrete, timber and aluminium runs are
+INDICATIVE, with no pass/fail, and their verdicts read LOW CONFIDENCE.

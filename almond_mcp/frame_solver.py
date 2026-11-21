@@ -31,6 +31,16 @@ DOF = 6   # ux uy uz rx ry rz per node
 PIVOT_TOL = 1e-13   # Cholesky pivot / own diagonal below this = singular (mechanism)
 
 
+def _finite_vector(values, size, label):
+    try:
+        vector = np.asarray(values, dtype=float)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ValueError(f"{label} must contain {size} finite numbers.") from exc
+    if vector.shape != (size,) or not np.all(np.isfinite(vector)):
+        raise ValueError(f"{label} must contain {size} finite numbers.")
+    return vector.copy()
+
+
 # ------------------------------------------------------------------ materials
 @dataclass(frozen=True)
 class Material:
@@ -81,10 +91,23 @@ class Section:
     buckling_curve: str      # EN 1993-1-1 Table 6.2 curve for flexural buckling
     slender: bool = False    # class 4-ish: use elastic moduli
     dims_mm: tuple = ()
+    Iw: float = 0.0          # warping constant, m6 (I-sections; ~0 for hollow and solid sections)
+
+
+def _positive_dimensions(*values: float) -> tuple[float, ...]:
+    """Reject nonphysical dimensions before computing any section properties."""
+    try:
+        dimensions = tuple(float(v) for v in values)
+    except (TypeError, ValueError, OverflowError) as exc:
+        raise ValueError("Section dimensions must be finite positive numbers.") from exc
+    if any(isinstance(v, bool) for v in values) or not all(math.isfinite(v) and v > 0 for v in dimensions):
+        raise ValueError("Section dimensions must be finite positive numbers.")
+    return dimensions
 
 
 def chs(d_mm: float, t_mm: float) -> Section:
     """Circular hollow section, outer diameter and wall in mm."""
+    d_mm, t_mm = _positive_dimensions(d_mm, t_mm)
     D, t = d_mm / 1000, t_mm / 1000
     if not (0 < t < D / 2):
         raise ValueError(f"CHS {d_mm}x{t_mm}: wall must be between 0 and D/2.")
@@ -99,6 +122,7 @@ def chs(d_mm: float, t_mm: float) -> Section:
 
 def rhs(h_mm: float, b_mm: float, t_mm: float) -> Section:
     """Rectangular hollow section (depth h along local z, width b), mm."""
+    h_mm, b_mm, t_mm = _positive_dimensions(h_mm, b_mm, t_mm)
     h, b, t = h_mm / 1000, b_mm / 1000, t_mm / 1000
     if not (0 < 2 * t < min(h, b)):
         raise ValueError(f"RHS {h_mm}x{b_mm}x{t_mm}: wall too thick.")
@@ -116,6 +140,7 @@ def rhs(h_mm: float, b_mm: float, t_mm: float) -> Section:
 
 def rect(b_mm: float, h_mm: float) -> Section:
     """Solid rectangle (timber, concrete), width b and depth h in mm."""
+    b_mm, h_mm = _positive_dimensions(b_mm, h_mm)
     b, h = b_mm / 1000, h_mm / 1000
     a, c = max(b, h), min(b, h)
     J = a * c ** 3 * (1 / 3 - 0.21 * c / a * (1 - c ** 4 / (12 * a ** 4)))
@@ -125,6 +150,9 @@ def rect(b_mm: float, h_mm: float) -> Section:
 
 def i_section(h_mm: float, b_mm: float, tw_mm: float, tf_mm: float) -> Section:
     """Doubly symmetric I-section (no root radii), depth along local z, mm."""
+    h_mm, b_mm, tw_mm, tf_mm = _positive_dimensions(h_mm, b_mm, tw_mm, tf_mm)
+    if 2 * tf_mm >= h_mm or tw_mm >= b_mm:
+        raise ValueError("I-section flanges must leave a positive web depth and the web must fit within the width.")
     h, b, tw, tf = h_mm / 1000, b_mm / 1000, tw_mm / 1000, tf_mm / 1000
     hw = h - 2 * tf
     A = 2 * b * tf + hw * tw
@@ -133,8 +161,9 @@ def i_section(h_mm: float, b_mm: float, tw_mm: float, tf_mm: float) -> Section:
     J = (2 * b * tf ** 3 + (h - tf) * tw ** 3) / 3
     Wpl_y = b * tf * (h - tf) + tw * hw ** 2 / 4
     Wpl_z = tf * b ** 2 / 2 + hw * tw ** 2 / 4
+    Iw = tf * b ** 3 * (h - tf) ** 2 / 24          # two flanges b x tf, centroids h - tf apart
     return Section(f"I {h_mm:g}x{b_mm:g}x{tw_mm:g}x{tf_mm:g}", "i", A, Iy, Iz, J, Iy / (h / 2), Iz / (b / 2),
-                   Wpl_y, Wpl_z, "b" if h / b > 1.2 else "c", dims_mm=(h_mm, b_mm, tw_mm, tf_mm))
+                   Wpl_y, Wpl_z, "b" if h / b > 1.2 else "c", dims_mm=(h_mm, b_mm, tw_mm, tf_mm), Iw=Iw)
 
 
 # ------------------------------------------------------------------ model
@@ -181,7 +210,7 @@ class Frame:
     gamma_m: tuple = (1.0, 1.0)                          # (gamma_M0, gamma_M1) for the member checks
 
     def add_node(self, xyz) -> int:
-        self.nodes.append(tuple(float(v) for v in xyz))
+        self.nodes.append(tuple(_finite_vector(xyz, 3, "Node coordinates")))
         return len(self.nodes) - 1
 
     def add_element(self, n1, n2, section, mat, **kw) -> int:
@@ -208,16 +237,16 @@ class Frame:
 
     def load(self, node, fx=0.0, fy=0.0, fz=0.0, mx=0.0, my=0.0, mz=0.0, case="Q"):
         cur = np.asarray(self.nodal_loads.get((node, case), np.zeros(6)), float)
-        self.nodal_loads[(node, case)] = cur + np.array([fx, fy, fz, mx, my, mz], float)
+        self.nodal_loads[(node, case)] = _finite_vector(cur + _finite_vector([fx, fy, fz, mx, my, mz], 6, "Nodal load"), 6, "Accumulated nodal load")
 
     def udl(self, element, w, case="Q"):
         """Uniform member load, global vector kN/m."""
-        w = np.asarray(w, float)
+        w = _finite_vector(w, 3, "Uniform member load")
         self.member_loads.append((element, w, w, case))
 
     def linear_load(self, element, w_start, w_end, case="Q"):
         """Member load varying linearly from w_start at n1 to w_end at n2 (global vectors, kN/m)."""
-        self.member_loads.append((element, np.asarray(w_start, float), np.asarray(w_end, float), case))
+        self.member_loads.append((element, _finite_vector(w_start, 3, "Member start load"), _finite_vector(w_end, 3, "Member end load"), case))
 
     def cases(self) -> list:
         found = {c for (_, c) in self.nodal_loads} | {m[3] for m in self.member_loads}
@@ -366,6 +395,9 @@ class ElementResult:
     max_sag: float                  # max deflection relative to the displaced chord, m
     utilization: float = float("nan")
     util_detail: dict = field(default_factory=dict)
+    Vy: np.ndarray | None = None    # (n,) shear force along local y, kN (pairs with Mz)
+    Vz: np.ndarray | None = None    # (n,) shear force along local z, kN (pairs with My)
+    w_local: tuple | None = None    # member load (local wx, wy, wz kN/m) at n1 and at n2, this combination
 
 
 @dataclass
@@ -533,18 +565,44 @@ def _local_end_displacements(m, ei, uc, fe):
     return ul
 
 
-def _axial_forces(m: _Assembly, f: dict, uc: np.ndarray) -> np.ndarray:
+def _axial_forces(m: _Assembly, f: dict, uc: np.ndarray, members: "_MemberLoads | None" = None) -> np.ndarray:
     """Mean axial force per member (tension positive) for displacements uc: EA * elongation / L."""
     N = np.zeros(len(m.frame.elements))
     for ei, e in enumerate(m.frame.elements):
         fe = sum(f[c] * m.feq[c][ei] for c in m.cases)
+        if members is not None and ei in members.fe:
+            fe = fe + members.fe[ei]
         ul = _local_end_displacements(m, ei, uc, fe)
         N[ei] = e.material.E * e.section.A * (ul[6] - ul[0]) / m.geo[ei][1]
     return N
 
 
+class _MemberLoads:
+    """Extra uniform member loads outside the load cases (e.g. equivalent bow imperfection loads):
+    their global equivalent nodal load vector, and per element the local load and fixed-end forces
+    the internal force recovery adds."""
+
+    def __init__(self, m: _Assembly, loads: dict):
+        self.vector = np.zeros(m.ndof)
+        self.wl, self.fe = {}, {}
+        for ei, w in loads.items():
+            e = m.frame.elements[ei]
+            R, L, T, idx = m.geo[ei]
+            kl, rec = m.kloc[ei]
+            wl = R @ np.asarray(w, float)
+            fe = fixed_end_forces(wl, wl, L, e.truss)
+            fc = fe
+            if rec is not None:                                 # same condensation as the case loads
+                r, cc, inv, Krc = rec
+                fc = np.zeros(12)
+                fc[cc] = fe[cc] - Krc.T @ inv @ fe[r]
+            self.vector[idx] += T.T @ fc
+            self.wl[ei], self.fe[ei] = (wl, wl), fe
+
+
 def _results(m: _Assembly, combo: dict, uc: np.ndarray, Fc: np.ndarray, stations: int, plastic: bool,
-             Kt: np.ndarray | None = None, N: np.ndarray | None = None) -> "FrameResult":
+             Kt: np.ndarray | None = None, N: np.ndarray | None = None,
+             members: _MemberLoads | None = None) -> "FrameResult":
     frame, f = m.frame, _factors(m, combo)
     s = np.linspace(0.0, 1.0, max(2, stations))
     Rv = (m.K if Kt is None else Kt) @ uc - Fc
@@ -559,10 +617,13 @@ def _results(m: _Assembly, combo: dict, uc: np.ndarray, Fc: np.ndarray, stations
         R, L, T, idx = m.geo[ei]
         kl, _ = m.kloc[ei]
         fe = sum(f[c] * m.feq[c][ei] for c in m.cases)
+        w = (sum(f[c] * m.wl[c][ei][0] for c in m.cases), sum(f[c] * m.wl[c][ei][1] for c in m.cases))
+        if members is not None and ei in members.fe:
+            fe = fe + members.fe[ei]
+            w = (w[0] + members.wl[ei][0], w[1] + members.wl[ei][1])
         ul = _local_end_displacements(m, ei, uc, fe)
         k_end = kl if N is None else kl + geometric_stiffness(e, L, N[ei])
         fl = k_end @ ul - fe
-        w = (sum(f[c] * m.wl[c][ei][0] for c in m.cases), sum(f[c] * m.wl[c][ei][1] for c in m.cases))
         ers.append(_element_result(ei, e, m.X, R, L, ul, fl, w, s))
         member_utilization(ers[-1], e, gamma_m0=frame.gamma_m[0], gamma_m1=frame.gamma_m[1], plastic=plastic)
     return FrameResult(uc.reshape(len(frame.nodes), DOF), Rv.reshape(len(frame.nodes), DOF), ers,
@@ -655,14 +716,19 @@ def critical_load_factor(frame_or_assembly, combination: dict, extra: np.ndarray
 
 
 def solve_second_order(frame_or_assembly, combination: dict, extra: np.ndarray | None = None, stations: int = 11,
-                       plastic: bool = False, max_iter: int = 50, tol: float = 1e-6) -> "FrameResult":
+                       plastic: bool = False, max_iter: int = 50, tol: float = 1e-6,
+                       member_loads: dict | None = None) -> "FrameResult":
     """Second-order (P-Delta) analysis: solve (K + K_G(N)) u = F, updating the axial forces N until
-    they settle. Raises MechanismError if the frame loses stability under the combination."""
+    they settle. Raises MechanismError if the frame loses stability under the combination.
+    ``member_loads`` {element: global uniform load kN/m} adds member loads outside the load cases."""
     m = frame_or_assembly if isinstance(frame_or_assembly, _Assembly) else _assemble(frame_or_assembly)
     f = _factors(m, combination)
+    ml = _MemberLoads(m, member_loads) if member_loads else None
+    if ml is not None:
+        extra = ml.vector if extra is None else extra + ml.vector
     Fc = sum(f[c] * m.F[c] for c in m.cases) + (extra if extra is not None else 0.0)
     uc = sum(f[c] * m.u[c] for c in m.cases) + (_solve_linear(m, extra) if extra is not None else 0.0)
-    N = _axial_forces(m, f, uc)
+    N = _axial_forces(m, f, uc, ml)
     it, converged, Kt = 0, False, m.K
     for it in range(1, max_iter + 1):
         Kt = m.K + _kg_global(m, N)
@@ -674,13 +740,13 @@ def solve_second_order(frame_or_assembly, combination: dict, extra: np.ndarray |
                                  "stiffness not positive definite).") from None
         uc = np.zeros(m.ndof)
         uc[m.free] = np.linalg.solve(Kff, Fc[m.free])
-        N_new = _axial_forces(m, f, uc)
+        N_new = _axial_forces(m, f, uc, ml)
         change = float(np.max(np.abs(N_new - N))) if N.size else 0.0
         N = N_new
         if change <= tol * max(1.0, float(np.max(np.abs(N)))):
             converged = True
             break
-    res = _results(m, combination, uc, Fc, stations, plastic, Kt=Kt, N=N)
+    res = _results(m, combination, uc, Fc, stations, plastic, Kt=Kt, N=N, members=ml)
     res.iterations, res.converged = it, converged
     return res
 
@@ -749,12 +815,16 @@ def _element_result(ei, e, X, R, L, ul, fl, wl, s):
         Mz = E * s_.Iz * kv
         My = -E * s_.Iy * kw
         tors = float(fl[9])
+    # shear: the start's end force plus the member load integrated up to the station (equilibrium of [0, x])
+    Vy = -(fl[1] + wa[1] * x + (wb[1] - wa[1]) * x ** 2 / (2 * L))
+    Vz = -(fl[2] + wa[2] * x + (wb[2] - wa[2]) * x ** 2 / (2 * L))
     loc = np.stack([u_ax, v, w], axis=1)
     disp = loc @ R                                   # back to global
     pts = X[e.n1] + np.outer(s, X[e.n2] - X[e.n1])
     chord = np.outer(1 - s, disp[0]) + np.outer(s, disp[-1])
     sag = float(np.max(np.linalg.norm(disp - chord, axis=1)))
-    return ElementResult(ei, L, fl, pts, disp, N, My, Mz, tors, sag)
+    return ElementResult(ei, L, fl, pts, disp, N, My, Mz, tors, sag, Vy=Vy, Vz=Vz,
+                         w_local=(np.asarray(wa, float), np.asarray(wb, float)))
 
 
 # ------------------------------------------------------------------ member checks
@@ -808,16 +878,20 @@ def prepare(frame: Frame) -> "_Assembly":
 
 
 def solve_linear(frame_or_assembly, combination: dict, extra: np.ndarray | None = None, stations: int = 11,
-                 plastic: bool = False) -> "FrameResult":
-    """First-order result of one combination, plus an optional extra global load vector."""
+                 plastic: bool = False, member_loads: dict | None = None) -> "FrameResult":
+    """First-order result of one combination, plus an optional extra global load vector and extra
+    uniform member loads ({element: global kN/m})."""
     m = frame_or_assembly if isinstance(frame_or_assembly, _Assembly) else _assemble(frame_or_assembly)
     f = _factors(m, combination)
     uc = sum(f[c] * m.u[c] for c in m.cases)
     Fc = sum(f[c] * m.F[c] for c in m.cases)
+    ml = _MemberLoads(m, member_loads) if member_loads else None
+    if ml is not None:
+        extra = ml.vector if extra is None else extra + ml.vector
     if extra is not None:
         uc = uc + _solve_linear(m, extra)
         Fc = Fc + extra
-    return _results(m, combination, uc, Fc, stations, plastic)
+    return _results(m, combination, uc, Fc, stations, plastic, members=ml)
 
 
 def mode_result(frame_or_assembly, mode: np.ndarray, stations: int = 13) -> "FrameResult":

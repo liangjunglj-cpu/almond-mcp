@@ -1,0 +1,327 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-tree-broadleaf-green-1",
+  "library_id": "generated_assets",
+  "name": "Broadleaf tree (Mature green broadleaf (zelkova or elm type) with flared roots and a vase-shaped crown; generated tree; detailed geometry edition)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-tree-broadleaf-green-1.glb",
+  "dimensions_mm": {
+    "width": 7158.0,
+    "depth": 4060.2,
+    "height": 7000.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "ground",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -3579.0,
+        -2030.1,
+        0.0
+      ],
+      "max": [
+        3579.0,
+        2030.1,
+        7000.0
+      ]
+    },
+    "footprint": [
+      [
+        -3579.0,
+        -2030.1
+      ],
+      [
+        3579.0,
+        -2030.1
+      ],
+      [
+        3579.0,
+        2030.1
+      ],
+      [
+        -3579.0,
+        2030.1
+      ]
+    ],
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "accessory"
+  },
+  "materials": [
+    {
+      "material_id": "foliage-pine",
+      "objects": [
+        "gen-tree-broadleaf-green-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-tree-broadleaf-green-1",
+    "library_id": "generated_assets",
+    "name": "Broadleaf tree (Mature green broadleaf (zelkova or elm type) with flared roots and a vase-shaped crown; generated tree; detailed geometry edition)",
+    "category": "vegetation",
+    "tags": [
+      "tree",
+      "broadleaf",
+      "deciduous",
+      "street tree",
+      "planting",
+      "landscape",
+      "detailed",
+      "meshy",
+      "y2k-trees-refset-0923b"
+    ],
+    "dimensions_mm": {
+      "width": 7158.0,
+      "depth": 4060.2,
+      "height": 7000.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 7158.0,
+      "depth": 4060.0,
+      "height": 7000.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "ground",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -3579.0,
+          -2030.1,
+          0.0
+        ],
+        "max": [
+          3579.0,
+          2030.1,
+          7000.0
+        ]
+      },
+      "footprint": [
+        [
+          -3579.0,
+          -2030.1
+        ],
+        [
+          3579.0,
+          -2030.1
+        ],
+        [
+          3579.0,
+          2030.1
+        ],
+        [
+          -3579.0,
+          2030.1
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "accessory"
+    },
+    "materials": [
+      {
+        "material_id": "foliage-pine",
+        "objects": [
+          "gen-tree-broadleaf-green-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "A single mature green broadleaf tree like a zelkova or elm, full view from trunk base to crown top, three-quarter view, centred, isolated on a plain light grey background. Thick gnarled trunk with visible roots flaring at the base, branching into several twisting limbs, a wide irregular vase-shaped crown of layered fresh green leaf clusters with open gaps and drooping edges, natural asymmetric silhouette (not round or ball-shaped). Clean game-asset concept render, soft even lighting, no ground shadow, no text.",
+        "image_task_id": null,
+        "image_model": "gpt_image_2_5",
+        "mesh_task_id": "01a0d28f-00fd-73ed-99ac-e9de9a3a15c6",
+        "mesh_model": "meshy-7",
+        "generated_at": "2026-09-24",
+        "orientation_correction": null,
+        "scale_applied": 3843.619815,
+        "captured_generation": {
+          "batch_id": "y2k-trees-refset-0923b",
+          "image": {
+            "asset_id": "gen-tree-broadleaf-green-1",
+            "provider": "higgsfield",
+            "tool": "generate_image_batch",
+            "submitted_at": "2026-09-24T08:34:56.926Z",
+            "request": {
+              "model": "gpt_image_2_5",
+              "aspect_ratio": "1:1",
+              "use_unlim": false,
+              "prompt": "A single mature green broadleaf tree like a zelkova or elm, full view from trunk base to crown top, three-quarter view, centred, isolated on a plain light grey background. Thick gnarled trunk with visible roots flaring at the base, branching into several twisting limbs, a wide irregular vase-shaped crown of layered fresh green leaf clusters with open gaps and drooping edges, natural asymmetric silhouette (not round or ball-shaped). Clean game-asset concept render, soft even lighting, no ground shadow, no text."
+            },
+            "task_id": "80ba954e-8670-4c82-9143-031879020348",
+            "status": "COMPLETED",
+            "provider_model": "gpt_image_2_5",
+            "provider_reported_model": "gpt_image_2_5",
+            "completed_observed_at": "2026-09-24T08:35:37.590Z",
+            "provider_output_name": "hf_20260924_083502_80ba954e-8670-4c82-9143-031879020348.png",
+            "consumed_credits": "not returned in the session",
+            "reference_inputs": [],
+            "output_file": "gen-tree-broadleaf-green-1.png",
+            "output_sha256": "5c387762c52addf6f6ce6d5a2bf09fc16b3681add911bc37cc38c6727f07bef7",
+            "output_file_modified_at": "2026-09-24T08:35:57+00:00",
+            "seed": null,
+            "evidence_source": {
+              "pass_records": [
+                "runs/refset_0923b/pass.json",
+                "ProjectY2K: twofronts/meshy/ginkgo_props_v061/out/conditioning.json"
+              ],
+              "session_records": "Tool calls of Ginkgo Claude Code session(s) 61af4758-8f9a-4e2f-8a91-2da1d4920088 (submissions, results and downloads)",
+              "extracted_at": "2026-11-20T17:29:46+00:00"
+            },
+            "status_basis": "Provider reported completed; curl of the job's result URL in the Ginkgo session (Bash, 2026-09-24T08:35:52.887Z)"
+          },
+          "mesh": {
+            "asset_id": "gen-tree-broadleaf-green-1",
+            "provider": "meshy",
+            "tool": "meshy_image_to_3d",
+            "submitted_at": "2026-09-24T08:36:17.908Z",
+            "request": {
+              "ai_model": "meshy-7",
+              "should_texture": true,
+              "enable_pbr": true,
+              "target_formats": [
+                "glb"
+              ],
+              "target_polycount": 30000,
+              "should_remesh": true,
+              "response_format": "json",
+              "image": "local upload of ref_tree_green_broadleaf.png"
+            },
+            "task_id": "01a0d28f-00fd-73ed-99ac-e9de9a3a15c6",
+            "status": "SUCCEEDED",
+            "status_basis": "meshy_get_task_status reported SUCCEEDED at 2026-09-24T08:42:02.215Z",
+            "consumed_credits": 30,
+            "provider_model": "meshy-7",
+            "input_link": "upload",
+            "input_image_sha256": "5c387762c52addf6f6ce6d5a2bf09fc16b3681add911bc37cc38c6727f07bef7",
+            "output_file": "gen-tree-broadleaf-green-1.glb",
+            "output_sha256": "b282fdd1acc4b4524e5b474117f2065d13726dcb4931ee1b0e7c729a663ce074",
+            "seed": null,
+            "evidence_source": {
+              "pass_records": [
+                "runs/refset_0923b/pass.json",
+                "ProjectY2K: twofronts/meshy/ginkgo_props_v061/out/conditioning.json"
+              ],
+              "session_records": "Tool calls of Ginkgo Claude Code session(s) 61af4758-8f9a-4e2f-8a91-2da1d4920088 (submissions, results and downloads)",
+              "extracted_at": "2026-11-20T17:29:46+00:00"
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-tree-broadleaf-green-1",
+            "source_sha256": "b282fdd1acc4b4524e5b474117f2065d13726dcb4931ee1b0e7c729a663ce074",
+            "source_triangles": 24546,
+            "target_triangles": 30000,
+            "prepared_sha256": "38a25e86e98f506850b8c8e5f6728411131bb065ca17341c0c3ece0d710bf9bb",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Remove wire edges, split edges shared by more than two faces and remove zero-area faces (counts in quality.topology_repairs). Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 1.86231791973114e-07,
+            "quality": {
+              "vertices": 23397,
+              "triangles": 24546,
+              "boundary_edges": 16068,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 3336,
+              "largest_component_vertices": 2411,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "topology_repairs": {
+                "wire_edges_removed": 0,
+                "nonmanifold_edges_split": 4060,
+                "zero_area_faces_removed": 0,
+                "loose_vertices_removed": 0
+              },
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                0.0,
+                0.0,
+                0.0
+              ]
+            }
+          },
+          "input_image_file": "batches/y2k-trees-refset-0923b/gen-tree-broadleaf-green-1.png",
+          "external_reference_status": "Reference images generated by Higgsfield gpt_image_2_5 from text prompts only (no media references in the request); Meshy received those images as uploads. The Ginkgo pass refset_0923b followed an owner reference set of 7 images; none was given to either generator.",
+          "external_reference_ids": [],
+          "dimension_basis": "Heights are the sizes Project Y2K's ginkgo_props_v061 conditioning gave the trees (maple 6.5 m, broadleaf 7.0 m); each mesh was scaled uniformly to that height and its spread measured after scaling. Not a survey of a real tree.",
+          "reference_review": "Reference image reviewed on 2026-11-20 at full resolution (1024 px): an isolated tree on a plain grey background; no lettering, logos or marks.",
+          "rights": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5, text prompts only); meshes with Meshy-7 image-to-3D on the owner's Meshy account on 2026-09-24 (the same account, by the account ID in the result URLs, as the library's other Meshy batches; balance 882 credits recorded, subscription plan not recorded or independently audited). The same trees appear in the owner's Ginkgo world packs (GRANDWHIS) and in Project Y2K. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-20 (\"increase the range of models, from the ones i used for my project y2k games, (except for the operatives and bosses)\"). Provider textures are not distributed.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private); reused in Project Y2K, the owner's game project (private)",
+            "pass": "runs/refset_0923b",
+            "source_name": "tree_green_broadleaf",
+            "records": [
+              "runs/refset_0923b/pass.json (AI-assisted content statement)",
+              "ProjectY2K: twofronts/meshy/ginkgo_props_v061/out/conditioning.json (game sizes)",
+              "Claude Code session transcript 61af4758-8f9a-4e2f-8a91-2da1d4920088 (the image batch, the curl download of the images, the Meshy uploads and downloads)"
+            ]
+          }
+        }
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "landscape"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.0,
+      "triangle_count": 24546,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "FC815781681CB6F5181DEA977E0EE3CC4F0F210F7F74FC1E40D37035A54042F1"
+}

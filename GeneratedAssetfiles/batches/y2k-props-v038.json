@@ -1,0 +1,161 @@
+{
+  "batch_id": "y2k-props-v038",
+  "route": "meshy_text_to_3d",
+  "purpose": "Street-clutter props generated with Meshy text-to-3D for the owner's Ginkgo world pass refset_0923 (2026-09-23) and reused unchanged in the owner's Project Y2K game (twofronts/meshy/props_v038), re-derived as Almond library geometry.",
+  "origin": {
+    "project": "Ginkgo, the owner's own world-generation repository (private); reused in Project Y2K, the owner's game project (private)",
+    "pass": "runs/refset_0923",
+    "pass_date": "2026-09-23",
+    "pass_records": [
+      "runs/refset_0923/pass.json",
+      "ProjectY2K: twofronts/meshy/props_v038/out/conditioning.json"
+    ],
+    "records": [
+      "runs/refset_0923/pass.json (AI-assisted content statement)",
+      "ProjectY2K: twofronts/meshy/props_v038/raw/{garbage,boxes,ivy,rubble}.glb (byte-identical to the Ginkgo downloads, SHA-256 checked 2026-11-20)",
+      "ProjectY2K: twofronts/meshy/props_v038/out/conditioning.json (game sizes)",
+      "Claude Code session transcript c4b3b37a-2d74-4b83-bdf3-8455978b8e74 (the tool calls that submitted the previews and refines and downloaded the GLBs)"
+    ],
+    "excluded": {
+      "Project Y2K props_v038/out/props SM_*.fbx and ginkgo_props_v061 SM_GK61_TrashHeap/CardboardStack": "Decimated, textured game derivatives of these downloads",
+      "Ginkgo refset_0923b, refset_0924 and refset_1003 copies": "Byte-identical copies of the refset_0923 downloads"
+    }
+  },
+  "text_to_3d_settings": {
+    "preview": {
+      "ai_model": "meshy-6",
+      "should_remesh": true,
+      "topology": "triangle",
+      "target_polycount": "15000-25000 per prop (in each request)"
+    },
+    "refine": {
+      "ai_model": "meshy-6",
+      "enable_pbr": true,
+      "texture_prompt": "per prop, in each request"
+    }
+  },
+  "strip_source_materials": true,
+  "external_reference_ids": [],
+  "external_reference_status": "Text prompts only: no image was given to any stage. The Ginkgo pass refset_0923 designed its scenes from an owner reference set of 8 images; none of them was submitted to Meshy for these props, and the prompts ask for plain, unbranded objects.",
+  "variant_suffix": "generated prop; detailed geometry edition",
+  "dimension_basis": "Heights are the sizes Project Y2K's props_v038 conditioning gave each prop (out/conditioning.json: bag heap 0.72 m, box stack 1.30 m, ivy clump 1.60 m, rubble pile 0.28 m); each mesh was scaled uniformly to that height and its width and depth measured after scaling. Y2K's later ginkgo_props_v061 pass used 0.9 m for the bag heap and 1.0 m for the box stack. Not a physical survey.",
+  "rights": "Meshy-6 text-to-3D preview and refine on the owner's Meshy account on 2026-09-23 (the same account, by the account ID in the result URLs, as the library's other Meshy batches). The session records the balance (1,023 credits) but not the subscription plan; the plan on that date was not independently audited. Text prompts only. The same props appear in the owner's Ginkgo world packs (GRANDWHIS) and in Project Y2K. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-20 (\"increase the range of models, from the ones i used for my project y2k games, (except for the operatives and bosses)\"). Provider textures are not distributed.",
+  "estimated_credits": "0 for this import (generation already paid in Ginkgo: 20 Meshy credits per preview, 10 per refine)",
+  "repair_nonmanifold": true,
+  "assets": [
+    {
+      "asset_id": "gen-refuse-bag-heap-1",
+      "ginkgo_name": "garbage",
+      "product": "Refuse bag heap",
+      "variant": "Heap of tied black and grey bin bags with crushed cans and paper scraps",
+      "category": "household",
+      "material": "rubber-black",
+      "height_mm": 720,
+      "width_hint_mm": 1516,
+      "depth_hint_mm": 1443,
+      "target_triangles": 25000,
+      "support_plane": "ground",
+      "placement_priority": "accessory",
+      "tags": [
+        "refuse",
+        "bin bags",
+        "litter",
+        "clutter",
+        "alley",
+        "streetscape"
+      ],
+      "prompt": "A heap of black and grey plastic garbage bags piled on a street kerb, tied bin bags slumped against each other, a few loose crushed drink cans and paper scraps around the base, realistic urban litter pile, game-ready prop",
+      "preview_task_id": "01a0cdfa-9aab-7522-86ec-d089b265b6c0",
+      "mesh_task_id": "01a0cdff-10b9-779f-a6a5-312e6e2281c4",
+      "refine_texture_prompt": "glossy black and dark grey plastic bin bags with wrinkles and knots, a few crushed aluminium cans, damp grey paper scraps, grimy street dirt",
+      "reference_review": "Reviewed on 2026-11-20: text-to-3D has no input image. The library geometry was checked in its archive preview (640 px) and in untextured front, side, back and three-quarter views (rendered 900 px, viewed at 450 px) and in Project Y2K's textured props_v038 review sheet (1024 px): no lettering, logos or brand marks in the geometry."
+    },
+    {
+      "asset_id": "gen-cardboard-box-stack-1",
+      "ginkgo_name": "boxes",
+      "product": "Cardboard box stack",
+      "variant": "Stack of worn, crushed corrugated boxes with an open flap on top",
+      "category": "household",
+      "material": "wood-oak",
+      "height_mm": 1300,
+      "width_hint_mm": 483,
+      "depth_hint_mm": 526,
+      "target_triangles": 15000,
+      "support_plane": "ground",
+      "placement_priority": "accessory",
+      "tags": [
+        "cardboard",
+        "boxes",
+        "clutter",
+        "alley",
+        "market",
+        "streetscape"
+      ],
+      "prompt": "A messy stack of worn corrugated cardboard boxes, some crushed and sagging, one open flap box on top, plain unbranded brown cardboard with packing tape, realistic street market prop, game-ready",
+      "preview_task_id": "01a0cdfa-ab08-75b3-970d-201a3d2212d1",
+      "mesh_task_id": "01a0cdff-1d3b-722e-914f-6d87883fc234",
+      "refine_texture_prompt": "plain brown corrugated cardboard, water stained and scuffed, beige packing tape, no printing, no logos",
+      "reference_review": "Reviewed on 2026-11-20: text-to-3D has no input image. The library geometry was checked in its archive preview (640 px) and in untextured front, side, back and three-quarter views (rendered 900 px, viewed at 450 px) and in Project Y2K's textured props_v038 review sheet (1024 px): no lettering, logos or brand marks in the geometry. The provider base-colour texture (2048 px, viewed at 1024 px) has a few small red-and-blue printed patches on box faces with no legible text; textures are not distributed."
+    },
+    {
+      "asset_id": "gen-ivy-clump-1",
+      "ginkgo_name": "ivy",
+      "product": "Ivy clump",
+      "variant": "Ivy and vines draped over a low wall block, stones at the base",
+      "category": "vegetation",
+      "material": "foliage-pine",
+      "height_mm": 1600,
+      "width_hint_mm": 1633,
+      "depth_hint_mm": 1508,
+      "target_triangles": 25000,
+      "support_plane": "ground",
+      "placement_priority": "accessory",
+      "tags": [
+        "ivy",
+        "vines",
+        "climber",
+        "overgrowth",
+        "planting",
+        "ruin"
+      ],
+      "prompt": "A dense clump of overgrown climbing ivy and leafy vines spilling over a low wall edge, lush green leaves, tangled woody stems hanging down, industrial ruin overgrowth, realistic foliage prop, game-ready",
+      "preview_task_id": "01a0cdfa-b69f-76f1-b836-6b5da5654a9c",
+      "mesh_task_id": "01a0cdff-3026-7550-b603-9769443faced",
+      "refine_texture_prompt": "lush saturated green ivy leaves with lighter young leaves, brown woody vine stems, natural foliage",
+      "reference_review": "Reviewed on 2026-11-20: text-to-3D has no input image. The library geometry was checked in its archive preview (640 px) and in untextured front, side, back and three-quarter views (rendered 900 px, viewed at 450 px) and in Project Y2K's textured props_v038 review sheet (1024 px): no lettering, logos or brand marks in the geometry."
+    },
+    {
+      "asset_id": "gen-rubble-pile-1",
+      "ginkgo_name": "rubble",
+      "product": "Rubble pile",
+      "variant": "Low heap of broken brick, tile shards, concrete chunks and a pallet plank",
+      "category": "landscape",
+      "material": "brick-red",
+      "height_mm": 282,
+      "width_hint_mm": 1837,
+      "depth_hint_mm": 1821,
+      "target_triangles": 25000,
+      "support_plane": "ground",
+      "placement_priority": "accessory",
+      "tags": [
+        "rubble",
+        "debris",
+        "brick",
+        "construction",
+        "ruin",
+        "streetscape"
+      ],
+      "prompt": "A low pile of construction rubble: broken red bricks, cracked pink ceramic tile shards, concrete chunks, a snapped wooden pallet plank and dust, spread in a loose heap on the ground, realistic urban debris prop, game-ready",
+      "preview_task_id": "01a0cdfa-c3f2-770a-90c6-8f3093cabb17",
+      "mesh_task_id": "01a0cdff-4179-71da-b6bb-80a42d36a490",
+      "refine_texture_prompt": "broken red clay bricks, cracked pale pink ceramic tile shards, grey concrete chunks, a weathered pale wood plank, dusty",
+      "reference_review": "Reviewed on 2026-11-20: text-to-3D has no input image. The library geometry was checked in its archive preview (640 px) and in untextured front, side, back and three-quarter views (rendered 900 px, viewed at 450 px) and in Project Y2K's textured props_v038 review sheet (1024 px): no lettering, logos or brand marks in the geometry."
+    }
+  ],
+  "release_assets": [
+    "gen-refuse-bag-heap-1",
+    "gen-cardboard-box-stack-1",
+    "gen-ivy-clump-1",
+    "gen-rubble-pile-1"
+  ]
+}

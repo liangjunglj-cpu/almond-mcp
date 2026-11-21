@@ -1,5 +1,9 @@
 # Almond in Rhino: the Structure workspace
 
+> **Stable since 0.8.0** (the native engine). Its verdicts are design-stage checks, not certification or
+> code compliance. The Karamba route (`engine="karamba"`, shells) is still **(BETA)**, under test.
+> Status per feature: [simulation-stable-readiness.md](simulation-stable-readiness.md).
+
 This tutorial shows how to check a structure inside Rhino 8 with Almond. You draw the frame, set the loads, run the analysis, and read where it bends, how hard each member works and whether it could buckle. Change a size and check again in seconds.
 
 It covers the Rhino panel. Every step can also be driven by Claude or another MCP client (see [Use it from Claude](#use-it-from-claude)).
@@ -11,6 +15,20 @@ It covers the Rhino panel. Every step can also be driven by Claude or another MC
 The screenshots show the A07 apartment mezzanine from the generated model library.
 
 ---
+
+## Tutorial model
+
+**Place tutorial model** at the top of the Structure workspace (or the `place_simulation_tutorial` MCP
+tool with `part="structure"`) draws a 6 x 4 m single-bay frame beside your model on
+`Almond Tutorial::Structure` layers: four columns and four beams as line axes, each with its section as
+`almond:section` user text (beams `box 100x200x6`, columns `box 150x150x8`), a point at each column base,
+numbered dots for members, supports, loads and how to run, and a notes block that explains each number.
+Select the members and the support points, then **Use Rhino selection** and **Run native analysis**. With
+the default 10 kN plus a 2.0 + 1.0 kN/m² floor load (Loads tab, **Floor loads and model loads**) it passes;
+delete the `almond:section` text and the default CHS 114.3 × 4 fails (72 mm, 303 %).
+
+Advanced options sit in collapsed sections on each tab (Section, Floor loads and model loads, Joints and
+support locations, Combinations, stability and deflection): the defaults suit a first check.
 
 ## 0. Install
 
@@ -37,7 +55,7 @@ Almond analyses **centre lines**: one curve for each beam and each column, meeti
 | Key | Value | Example |
 |---|---|---|
 | `almond:section` | `rect W x D`, `box W x D x t` or `chs D x t`, in mm unless a unit follows | `rect 300x640`, `rect 30x64 cm`, `chs 219.1x8` |
-| `almond:release` | `pinned`, `pinned_start`, `pinned_end` or `rigid` | `pinned` for a simply supported beam |
+| `almond:release` | `pinned`, `pinned_start`, `pinned_end` or `rigid`; `bar` (a pin-jointed truss bar) or `hinged` (pinned in its vertical plane, continuous in plan) | `pinned` for a simply supported beam |
 
 The panel's **Override beam section** sets one tube size for every member and takes precedence over both.
 
@@ -88,7 +106,7 @@ The workspace is split into five tabs. **Run** and its status line stay in view 
 | | Support locations | Points, else lowest nodes | *Require selected points* refuses a model without support points. |
 | **Code** | Design code, ULS expression | Eurocode, code default | A National Annex profile you added, or *Off* for unfactored comparisons. |
 | | Stability | αcr, sway imperfection, P-Δ | *Off · first order* only for comparisons. |
-| | Deflection span, limit | Blank: longest member, span/250 | The real span when beams are drawn in pieces, or a stricter limit such as 300. |
+| | Deflection span, limit | Blank: each member's own span between its supports, span/250 | One span to check every member against, or a stricter limit such as 300. |
 | | Steel tubes | Cold-formed · EN 10219 | *Hot-finished* only when the tubes are specified as EN 10210. |
 | **Results** | Viewport overlay | Deflected shape · utilization | Or *First buckling mode*. |
 
@@ -135,14 +153,14 @@ Click **Open full results ↗**, or type `AlmondResults`. The **Almond Results**
 
 | Tab | What it lists |
 |---|---|
-| Members | Every member's role, section, Class (EN 1993 Table 5.2), length and utilization, with the check and combination that govern. Also its forces (N, V, M, T), stress, slenderness λ̄ and χ, buckling length, the 6.61/6.62 terms, its own sag and L/δ, and its end releases. |
+| Members | Every member's role, section, Class (EN 1993 Table 5.2), length and utilization, with the check and combination that govern. Also its forces (N, V, M, T), shear utilization V/V_pl,Rd ("· web" marks a web too slender for these checks), lateral-torsional buckling M/M_b,Rd with M_cr and χ_LT (I-sections; hover for the segment working), stress, slenderness λ̄ and χ, buckling length, the 6.61/6.62 terms, its own sag and L/δ, and its end releases. |
 | Supports | The reactions at each support (Fx, Fy, Fz, Mx, My, Mz) for the combination you pick, with totals. |
-| Combinations | Each combination's factors, largest deflection and utilization, and the stability details: αcr, sway imperfection, P-Δ iterations. |
-| Loads | The settings used, the floor bays, and every placed model counted as a load. |
+| Combinations | Each combination's factors, largest deflection and utilization, and the stability details: αcr, sway imperfection φ per direction with its column count m, local bow imperfections (applied, or why not), P-Δ iterations. |
+| Loads | The settings used, the floor bays (and how many span one way, over 2:1), and every placed model counted as a load. |
 | Notes | The verdict, suggestions, warnings and assumptions. |
 
 - **Sort** by clicking a column heading. The table opens with the hardest-working member first.
-- **Filter** with the chips (*Over 100%*, *80–100%*, *Columns*, *Beams*, *Braces*) or type a member name, section or layer.
+- **Filter** with the chips (*Failing*: over 100% or outside the checks, *80–100%*, *Columns*, *Beams*, *Braces*) or type a member name, section or layer.
 - **Click a row** to select that member in Rhino.
 - **Save CSV** writes the member table for a spreadsheet or calculation report.
 
@@ -153,7 +171,8 @@ Click **Open full results ↗**, or type `AlmondResults`. The **Almond Results**
 - **A design-stage tool.** It sizes and compares options early. It does not replace a structural engineer's design and sign-off.
 - **Steel is the checked case.** Concrete, timber and aluminium are **indicative**: forces, deflection and stability are computed, but their own codes (EN 1992, EN 1995, EN 1999) are not applied, so there is no capacity pass/fail. Excess deflection and instability still fail.
 - **Gravity loads only.** Self-weight, floors, people, placed items, and the code's sway imperfection. Wind is not checked yet. Snow is entered by you as an area or total load.
-- **Not yet covered:** member bow imperfections (EN 1993 5.3.2(6)), the shear check 6.2.6, and Class 4 (slender) sections, which fail as "not covered" rather than pass unchecked.
+- **Not yet covered:** torsion. Class 4 (slender) sections and webs slender enough to buckle in shear (h_w/t_w > 72ε) fail as "not covered" rather than pass unchecked. Shear (EN 1993 6.2.6, 6.2.8), member bow imperfections (5.3.2(6), in sway-sensitive frames) and lateral-torsional buckling of I-section beams (6.3.2) are checked.
+- **I-section beams are assumed unrestrained between their joints.** If a deck or slab holds the top flange, set `lateral_restraint` to `continuous` so lateral-torsional buckling is not checked against a restraint that exists.
 - **National Annexes.** Only the Eurocode recommended values ship. A practice can add its country's annex as a profile file (`%LOCALAPPDATA%\Almond\design-codes`); unchecked values are flagged. See [Design codes](design-codes.md).
 
 ## 8. Use it from Claude
@@ -162,6 +181,7 @@ With the MCP server registered (`uvx almond-mcp`), Claude can run the same engin
 
 - `validate_structure`: solve and check. Pass `detail=True` for the per-member and per-support tables. `design_code`, `fabrication`, `floor_load_kn_m2` and `asset_loads` match the panel settings.
 - `visualize_structure`: draw the deflected shape or a buckling mode (`view="buckling"`) in the viewport.
+- `list_structural_references`, `analyze_structural_reference`, `place_structural_reference`: twelve benchmarked typologies (Pratt truss, portal, arch, moment frame, braced tower, canopy, ...) solved here with their benchmark loads, or drawn in Rhino with the section, release and support user text already set, so a user's frame can be compared with a verified one.
 
 A typical request: *"Check the frame on layer Structure with 2 kN/m² imposed and 1 kN/m² build-up, simple joints. If it fails, find the lightest CHS that passes."*
 
@@ -170,7 +190,7 @@ A typical request: *"Check the frame on layer Structure with 2 kN/m² imposed an
 | You see | Do this |
 |---|---|
 | Native engine unavailable | Install uv (`winget install astral-sh.uv`), restart Rhino, then click **Check engines**. The first run downloads the engine. |
-| Native engine unavailable: *invalid peer certificate* / *UnknownIssuer* | Security software or a proxy on your network inspects HTTPS, and uv does not trust it. From 0.7.0-rc.2 the panel tells uv to use the Windows certificates itself. For older versions and for the MCP server, run once in PowerShell: `[Environment]::SetEnvironmentVariable('UV_NATIVE_TLS','1','User')`, then restart Rhino and your MCP client. |
+| Native engine unavailable: *invalid peer certificate* / *UnknownIssuer* | Security software or a proxy on your network inspects HTTPS, and uv does not trust it. From 0.7.0-rc.2 the panel tells uv to use the Windows certificates itself (0.8.0 sets both `UV_SYSTEM_CERTS` and the older `UV_NATIVE_TLS`). For older versions and for the MCP server, run once in PowerShell: `[Environment]::SetEnvironmentVariable('UV_SYSTEM_CERTS','1','User')` (older uv versions read `UV_NATIVE_TLS` instead), then restart Rhino and your MCP client. |
 | Nothing captured | The structural layer is probably hidden. Show it, select the curves, and capture again. |
 | "Select at most 200 structural objects per study" | Join segments into continuous curves (step 1), or check part of the structure. |
 | "The model changed" | You edited the geometry after capturing. Click **Use Rhino selection** again. |

@@ -1,0 +1,340 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-hover-car-bubble-1",
+  "library_id": "generated_assets",
+  "name": "Hover car (Speculative Y2K egg-shaped two-seat bubble car on a hover skirt, no wheels; generated Y2K prop; detailed geometry edition)",
+  "source_app": "meshy",
+  "source_units": "m",
+  "file": "gen-hover-car-bubble-1.glb",
+  "dimensions_mm": {
+    "width": 2825.7,
+    "depth": 2110.6,
+    "height": 1600.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "ground",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -1412.85,
+        -1055.3,
+        0.0
+      ],
+      "max": [
+        1412.85,
+        1055.3,
+        1600.0
+      ]
+    },
+    "footprint": [
+      [
+        -1412.85,
+        -1055.3
+      ],
+      [
+        1412.85,
+        -1055.3
+      ],
+      [
+        1412.85,
+        1055.3
+      ],
+      [
+        -1412.85,
+        1055.3
+      ]
+    ],
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "movable"
+  },
+  "materials": [
+    {
+      "material_id": "polycarbonate-opal",
+      "objects": [
+        "gen-hover-car-bubble-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-hover-car-bubble-1",
+    "library_id": "generated_assets",
+    "name": "Hover car (Speculative Y2K egg-shaped two-seat bubble car on a hover skirt, no wheels; generated Y2K prop; detailed geometry edition)",
+    "category": "vehicle",
+    "tags": [
+      "car",
+      "hover car",
+      "bubble car",
+      "vehicle",
+      "y2k",
+      "retro-futurist",
+      "sci-fi",
+      "detailed",
+      "meshy",
+      "y2k-twofronts-2026-09"
+    ],
+    "dimensions_mm": {
+      "width": 2825.7,
+      "depth": 2110.6,
+      "height": 1600.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 2826.0,
+      "depth": 2111.0,
+      "height": 1600.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "ground",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -1412.85,
+          -1055.3,
+          0.0
+        ],
+        "max": [
+          1412.85,
+          1055.3,
+          1600.0
+        ]
+      },
+      "footprint": [
+        [
+          -1412.85,
+          -1055.3
+        ],
+        [
+          1412.85,
+          -1055.3
+        ],
+        [
+          1412.85,
+          1055.3
+        ],
+        [
+          -1412.85,
+          1055.3
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "movable"
+    },
+    "materials": [
+      {
+        "material_id": "polycarbonate-opal",
+        "objects": [
+          "gen-hover-car-bubble-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "meshy",
+      "parameters": {
+        "prompt": "Y2K futurist bubble hover car, a glossy pearlescent white egg-shaped two-seat car with a large translucent cyan bubble canopy, chrome bumpers and chrome seam rings, no wheels, a rounded chrome hover skirt, magenta glowing light strips, rounded soft forms everywhere, clean single vehicle prop, no people, no text",
+        "mesh_task_id": "01a07476-3233-715b-bb09-3495a1bf25c8",
+        "mesh_model": "meshy-6",
+        "generated_at": "2026-09-06",
+        "orientation_correction": null,
+        "scale_applied": 1142.506003,
+        "generation_route": "meshy_text_to_3d",
+        "preview_task_id": "01a07473-90c1-7768-888e-b09208fb0006",
+        "preview_model": "meshy-6",
+        "captured_generation": {
+          "batch_id": "y2k-twofronts-2026-09",
+          "route": "meshy_text_to_3d",
+          "preview": {
+            "asset_id": "gen-hover-car-bubble-1",
+            "provider": "meshy",
+            "tool": "meshy_text_to_3d",
+            "submitted_at": "2026-09-06T02:02:00.418Z",
+            "request": {
+              "prompt": "Y2K futurist bubble hover car, a glossy pearlescent white egg-shaped two-seat car with a large translucent cyan bubble canopy, chrome bumpers and chrome seam rings, no wheels, a rounded chrome hover skirt, magenta glowing light strips, rounded soft forms everywhere, clean single vehicle prop, no people, no text",
+              "ai_model": "meshy-6",
+              "target_formats": [
+                "glb",
+                "obj",
+                "fbx"
+              ],
+              "auto_size": true,
+              "origin_at": "bottom",
+              "response_format": "json"
+            },
+            "task_id": "01a07473-90c1-7768-888e-b09208fb0006",
+            "status": "SUCCEEDED",
+            "status_basis": "meshy_get_task_status reported SUCCEEDED at 2026-09-06T02:04:11.950Z",
+            "consumed_credits": 20,
+            "provider_model": "meshy-6",
+            "seed": null,
+            "evidence_source": {
+              "pass_records": [
+                "runs/twofronts/meshy/README.md",
+                "ProjectY2K: docs/MESHY_NOTES.md",
+                "ProjectY2K: twofronts/world/place_assets.py"
+              ],
+              "session_records": "Tool calls of Ginkgo Claude Code session b7a7d8b6-56a0-48d3-ac67-77626f9af289 (submissions, results and downloads)",
+              "extracted_at": "2026-11-20T17:30:15+00:00"
+            }
+          },
+          "mesh": {
+            "asset_id": "gen-hover-car-bubble-1",
+            "provider": "meshy",
+            "tool": "meshy_text_to_3d_refine",
+            "submitted_at": "2026-09-06T02:04:56.008Z",
+            "request": {
+              "preview_task_id": "01a07473-90c1-7768-888e-b09208fb0006",
+              "ai_model": "meshy-6",
+              "enable_pbr": true,
+              "texture_prompt": "glossy pearlescent white egg-shaped body, translucent cyan bubble canopy, mirror chrome bumpers and seam rings, magenta glowing light strips, clean Y2K toy-like finish",
+              "target_formats": [
+                "glb",
+                "obj",
+                "fbx"
+              ],
+              "response_format": "json"
+            },
+            "task_id": "01a07476-3233-715b-bb09-3495a1bf25c8",
+            "status": "SUCCEEDED",
+            "status_basis": "meshy_get_task_status reported SUCCEEDED at 2026-09-06T02:09:37.064Z",
+            "consumed_credits": 10,
+            "provider_model": "meshy-6",
+            "input_link": "preview_task_id",
+            "output_file": "gen-hover-car-bubble-1.obj",
+            "output_format": "obj",
+            "output_sha256": "9d930faee214365aea382f60dc54339a75f59e3b5b294a701617fa52a6eec56c",
+            "output_file_modified_at": "2026-09-06T02:09:51+00:00",
+            "seed": null,
+            "evidence_source": {
+              "pass_records": [
+                "runs/twofronts/meshy/README.md",
+                "ProjectY2K: docs/MESHY_NOTES.md",
+                "ProjectY2K: twofronts/world/place_assets.py"
+              ],
+              "session_records": "Tool calls of Ginkgo Claude Code session b7a7d8b6-56a0-48d3-ac67-77626f9af289 (submissions, results and downloads)",
+              "extracted_at": "2026-11-20T17:30:15+00:00"
+            },
+            "download": {
+              "tool": "meshy_download_model",
+              "format": "obj",
+              "reported_file_size_bytes": 94510144
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-hover-car-bubble-1",
+            "source_sha256": "9d930faee214365aea382f60dc54339a75f59e3b5b294a701617fa52a6eec56c",
+            "source_triangles": 545313,
+            "target_triangles": 60000,
+            "prepared_sha256": "d3e2468f697c46bab627ae9e0ad831653c3371f195a341713dd4f1e00e6f175c",
+            "software": "Blender 5.1.2",
+            "source_format": "obj",
+            "source_file": "gen-hover-car-bubble-1.obj",
+            "method": "Remove provider PBR materials and textures; Import the provider OBJ geometry (Y-up to Z-up, -Z forward; material library and texture maps not loaded) and export GLB; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Remove wire edges, split edges shared by more than two faces and remove zero-area faces (counts in quality.topology_repairs). Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 2.4726619720458984e-07,
+            "quality": {
+              "vertices": 29933,
+              "triangles": 59999,
+              "boundary_edges": 7,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 2,
+              "largest_component_vertices": 29930,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "topology_repairs": {
+                "wire_edges_removed": 0,
+                "nonmanifold_edges_split": 2,
+                "zero_area_faces_removed": 0,
+                "loose_vertices_removed": 0
+              },
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                0.00022369863320135115,
+                0.00011214172236006578,
+                0.00030738967329075803
+              ]
+            }
+          },
+          "input_image_file": null,
+          "external_reference_status": "Text prompts only: no image was given to any stage.",
+          "external_reference_ids": [],
+          "dimension_basis": "Heights are the target heights at which Project Y2K's Neon Front scene placed each prop (twofronts/world/place_assets.py: planter pod 1.1 m, vending machine 2.4 m, kiosk 2.6 m, holo sign 3.4 m, hover scooter 1.2 m, hover car 1.6 m); Meshy's OBJ units are arbitrary, so each mesh was scaled uniformly to that height and its width and depth measured after scaling. Y2K's later ginkgo_props_v061 pass used 1.9 m for the vending machine and 1.78 m for the scooter. Speculative designs; not a physical survey.",
+          "reference_review": "Reviewed on 2026-11-20: text-to-3D has no input image. The library geometry was checked in its archive preview (640 px) and in untextured front, side, back and three-quarter views (rendered 900 px, viewed at 450 px) The prompt asks for no text or letters. Meshy's texture atlases for this route are fragmented per triangle and are not distributed. No lettering, logos or brand marks in the geometry.",
+          "rights": "Meshy-6 text-to-3D preview and refine on the owner's Meshy account on 2026-09-06 (the same account, by the account ID in the result URLs, as the library's other Meshy batches). This was the account's first recorded use (MESHY_NOTES: balance 3,320 credits, no prior tasks). Whether the account was on a paid plan on 2026-09-06 is unknown: neither MESHY_NOTES, the Ginkgo README nor session b7a7d8b6 records the plan, and paid status is not asserted here; the owner should confirm it. Text prompts only. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-20 (\"increase the range of models, from the ones i used for my project y2k games, (except for the operatives and bosses)\"). Provider textures are not distributed.",
+          "origin": {
+            "project": "Project Y2K ('Two Fronts'), the owner's game project (private); generated from a Ginkgo session",
+            "pass": "runs/twofronts",
+            "source_name": "hovercar",
+            "records": [
+              "runs/twofronts/meshy/README.md and ProjectY2K docs/MESHY_NOTES.md (task ledger, rounds 1 and 2)",
+              "ProjectY2K: twofronts/world/place_assets.py (scene target heights)",
+              "ProjectY2K: twofronts/meshy/models/<prop>/model.obj (byte-identical to the Ginkgo downloads, SHA-256 checked 2026-11-20)",
+              "Claude Code session transcript b7a7d8b6-56a0-48d3-ac67-77626f9af289 (the tool calls that submitted the previews and refines and downloaded the OBJs)"
+            ]
+          }
+        }
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "streetscape"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.0,
+      "triangle_count": 59999,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "0EE186F3EAB9B2FDAC21C277858862407A9B4982008BEFBA585C7B283A97D7CD"
+}

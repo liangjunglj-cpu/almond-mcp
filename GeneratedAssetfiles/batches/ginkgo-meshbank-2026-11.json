@@ -1,0 +1,231 @@
+{
+  "batch_id": "ginkgo-meshbank-2026-11",
+  "purpose": "Cafe-terrace and street props the owner's Ginkgo project generated for its shared mesh bank on 2026-11-13, re-derived as Almond library geometry.",
+  "origin": {
+    "project": "Ginkgo, the owner's own world-generation repository (private)",
+    "pass": "publishing/library/meshbank (gen set, 2026-11-13)",
+    "pass_date": "2026-11-13",
+    "pass_records": [
+      "publishing/library/meshbank/gen/meta.json",
+      "publishing/library/meshbank/gen/refs/tasks.json",
+      "publishing/library/meshbank/BANK.md"
+    ],
+    "records": [
+      "publishing/library/meshbank/gen/meta.json",
+      "publishing/library/meshbank/BANK.md",
+      "Claude Code session transcript 48627919-6d97-4c20-b07e-a5ea9fccb1ba (the tool calls that submitted the image and mesh tasks)"
+    ],
+    "excluded": {
+      "box_shrub_planter, shrub_organic_planter": "Reference images only; no mesh was generated",
+      "lausanne_market walker, sitter, bike": "Older pass (before the refset_1024 import), not part of this request"
+    }
+  },
+  "image_provider": "meshy",
+  "image_settings": {
+    "tool": "meshy_text_to_image",
+    "ai_model": "nano-banana"
+  },
+  "mesh_settings": {
+    "ai_model": "meshy-7.1",
+    "texture_model": "meshy-7",
+    "enable_pbr": true,
+    "texture_resolution": "2k",
+    "target_formats": [
+      "glb"
+    ],
+    "download": "include_textures false"
+  },
+  "strip_source_materials": true,
+  "external_reference_ids": [],
+  "external_reference_status": "Original descriptive text-to-image prompts; no external images were given to either generator.",
+  "variant_suffix": "generated prop; detailed geometry edition",
+  "dimension_basis": "Real-world heights recorded with each prop in the Ginkgo mesh bank (gen/meta.json real_height_m); height normalised exactly, width and depth measured after uniform scaling. Not a physical survey.",
+  "rights": "Generated on the owner's paid Meshy account in the owner's Ginkgo project; the account owns the output with commercial rights. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-18. These models also appear inside the owner's GRANDWHIS world packs. Generator account entitlements not independently audited.",
+  "estimated_credits": "0 for this import (generation already paid in Ginkgo: 3 Meshy credits per image and 30 per mesh)",
+  "assets": [
+    {
+      "asset_id": "gen-bistro-chair-rattan-1",
+      "ginkgo_name": "bistro_chair",
+      "product": "Bistro chair",
+      "variant": "French cafe chair, bent rattan frame, woven two-tone seat and back",
+      "category": "seating",
+      "material": "wood-oak",
+      "height_mm": 880,
+      "width_hint_mm": 520,
+      "depth_hint_mm": 590,
+      "target_triangles": 40000,
+      "support_plane": "floor",
+      "placement_priority": "secondary",
+      "tags": [
+        "bistro",
+        "cafe",
+        "chair",
+        "rattan",
+        "terrace"
+      ],
+      "prompt": "A classic French bistro cafe chair with a bent rattan frame and a woven two-tone cream and dark green seat and back, slightly worn, photorealistic. Single object, isolated on a plain white background, three-quarter view from slightly above, soft even studio lighting, no cast shadow, no text, no logo, realistic real-world proportions.",
+      "image_job_id": "01a1d4eb-011f-705b-8e12-8f801f57de05",
+      "mesh_task_id": "01a1d4ec-5246-772a-9f89-cc0c816d37fe",
+      "reference_review": "Reference image reviewed on 2026-11-18 at full resolution for this import: no lettering, logos, badges or brand marks visible."
+    },
+    {
+      "asset_id": "gen-bistro-table-marble-1",
+      "ginkgo_name": "bistro_table",
+      "product": "Bistro table",
+      "variant": "Round marble top on a cast-iron pedestal",
+      "category": "table",
+      "material": "plaster-white",
+      "height_mm": 730,
+      "width_hint_mm": 690,
+      "depth_hint_mm": 690,
+      "target_triangles": 40000,
+      "support_plane": "floor",
+      "placement_priority": "secondary",
+      "tags": [
+        "bistro",
+        "cafe",
+        "table",
+        "marble",
+        "terrace"
+      ],
+      "prompt": "A small round outdoor bistro cafe table, 60 cm white marble top with a brass edge band on a black cast-iron pedestal base with three curved feet, slightly weathered, photorealistic. Single object, empty table top, isolated on a plain white background, three-quarter view from slightly above, soft even studio lighting, no cast shadow, no text, no logo, realistic real-world proportions.",
+      "image_job_id": "01a1d4eb-0221-768d-9289-b8bc8982ed23",
+      "mesh_task_id": "01a1d4ec-55d0-77de-8b74-dd2455a35746",
+      "reference_review": "Reference image reviewed on 2026-11-18 at full resolution for this import: no lettering, logos, badges or brand marks visible."
+    },
+    {
+      "asset_id": "gen-cafe-parasol-1",
+      "ginkgo_name": "cafe_parasol",
+      "product": "Cafe parasol",
+      "variant": "Open square canvas parasol, wooden pole, concrete base",
+      "category": "site_furniture",
+      "material": "fabric-linen",
+      "height_mm": 2700,
+      "width_hint_mm": 2580,
+      "depth_hint_mm": 2590,
+      "target_triangles": 40000,
+      "support_plane": "ground",
+      "placement_priority": "movable",
+      "tags": [
+        "parasol",
+        "umbrella",
+        "cafe",
+        "terrace",
+        "shade"
+      ],
+      "prompt": "An open square cafe terrace parasol, 3 m wide, plain cream canvas canopy with a short valance, wooden centre pole and ribs, heavy square concrete base, slightly sun-faded, photorealistic. Single object, whole parasol visible from base to top, isolated on a plain white background, three-quarter view from slightly below canopy height, soft even studio lighting, no cast shadow, no text, no logo, realistic real-world proportions.",
+      "image_job_id": "01a1d4eb-0314-7655-b029-b28405bee1a5",
+      "mesh_task_id": "01a1d4ec-599b-76d8-81db-9af1e92c1b0e",
+      "reference_review": "Reference image reviewed on 2026-11-18 at full resolution for this import: no lettering, logos, badges or brand marks visible."
+    },
+    {
+      "asset_id": "gen-olive-tree-potted-1",
+      "ginkgo_name": "olive_tree_pot",
+      "product": "Potted olive tree",
+      "variant": "Small olive tree in a terracotta pot",
+      "category": "vegetation",
+      "material": "foliage-pine",
+      "height_mm": 1800,
+      "width_hint_mm": 880,
+      "depth_hint_mm": 820,
+      "target_triangles": 80000,
+      "support_plane": "floor",
+      "placement_priority": "accessory",
+      "tags": [
+        "olive",
+        "tree",
+        "planter",
+        "terracotta",
+        "plant"
+      ],
+      "prompt": "A small olive tree about 1.8 m tall with a slender gnarled trunk and an airy crown of silvery green leaves, growing in a large weathered terracotta pot, photorealistic. Single object, whole tree and pot visible, isolated on a plain white background, eye-level three-quarter view, soft even studio lighting, no cast shadow, no text, realistic real-world proportions.",
+      "image_job_id": "01a1d4eb-04d7-73c7-9296-75202053381b",
+      "mesh_task_id": "01a1d4ec-5d66-74d5-bbeb-1c9820ce7f6c",
+      "reference_review": "Reference image reviewed on 2026-11-18 at full resolution for this import: no lettering, logos, badges or brand marks visible."
+    },
+    {
+      "asset_id": "gen-street-lamp-cast-iron-1",
+      "ginkgo_name": "street_lamp_classic",
+      "product": "Street lamp",
+      "variant": "Traditional cast-iron post with a four-sided glass lantern",
+      "category": "site_furniture",
+      "material": "steel-painted-charcoal",
+      "height_mm": 4000,
+      "width_hint_mm": 860,
+      "depth_hint_mm": 850,
+      "target_triangles": 40000,
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "tags": [
+        "street-lamp",
+        "lantern",
+        "cast-iron",
+        "lighting",
+        "streetscape"
+      ],
+      "prompt": "A traditional European cast-iron street lamp post, 4 m tall, fluted dark green-black column with an ornate base, a single four-sided glass lantern on top with a small finial, slightly weathered paint, photorealistic. Single object, whole lamp visible from base to finial, isolated on a plain white background, eye-level three-quarter view, soft even studio lighting, no cast shadow, no text, realistic real-world proportions.",
+      "image_job_id": "01a1d4eb-05b5-7333-b545-4285e59479d9",
+      "mesh_task_id": "01a1d4ec-6147-7092-b931-3d7c351437c1",
+      "reference_review": "Reference image reviewed on 2026-11-18 at full resolution for this import: no lettering, logos, badges or brand marks visible."
+    },
+    {
+      "asset_id": "gen-bicycle-city-basket-1",
+      "ginkgo_name": "city_bicycle",
+      "product": "Bicycle",
+      "variant": "Step-through city bicycle with wicker basket and rear rack",
+      "category": "vehicle",
+      "material": "steel-painted-charcoal",
+      "height_mm": 1100,
+      "width_hint_mm": 610,
+      "depth_hint_mm": 1680,
+      "target_triangles": 60000,
+      "support_plane": "ground",
+      "placement_priority": "accessory",
+      "tags": [
+        "bicycle",
+        "bike",
+        "city",
+        "basket",
+        "streetscape"
+      ],
+      "prompt": "A used European city bicycle standing upright on its kickstand, dark blue step-through steel frame, wicker front basket, rear rack, mudguards, chain guard, dynamo headlight, a coiled cable lock around the seat post, slightly worn, photorealistic. Single object, isolated on a plain white background, three-quarter side view, soft even studio lighting, no cast shadow, no text, no logo, realistic real-world proportions.",
+      "image_job_id": "01a1d4eb-0691-722a-aacf-bbc651c4e66d",
+      "mesh_task_id": "01a1d4ec-6496-7407-91af-546bd451a5e7",
+      "reference_review": "Reference image reviewed on 2026-11-18 at full resolution for this import: no lettering, logos, badges or brand marks visible."
+    },
+    {
+      "asset_id": "gen-person-standing-coat-1",
+      "ginkgo_name": "pedestrian_coat",
+      "product": "Person standing",
+      "variant": "Adult pedestrian in a camel coat and scarf",
+      "category": "human_figure",
+      "material": "plaster-white",
+      "height_mm": 1800,
+      "width_hint_mm": 600,
+      "depth_hint_mm": 370,
+      "target_triangles": 60000,
+      "support_plane": "floor",
+      "placement_priority": "accessory",
+      "tags": [
+        "person",
+        "pedestrian",
+        "figure",
+        "scale",
+        "coat"
+      ],
+      "prompt": "Full-body photorealistic adult pedestrian standing in a relaxed natural pose with arms at the sides and hands visible, wearing a camel wool autumn coat, grey scarf, dark trousers and brown leather shoes, generic non-identifiable face, neutral expression. Single figure, whole body from head to shoes, isolated on a plain white background, front three-quarter view at eye level, soft even studio lighting, no cast shadow, no text, no logo, realistic proportions.",
+      "image_job_id": "01a1d4eb-0776-70fb-ac69-0471b163e927",
+      "mesh_task_id": "01a1d4ec-6889-72de-ba08-142a57a9edfc",
+      "reference_review": "Reference image reviewed on 2026-11-18 at full resolution for this import: no lettering, logos, badges or brand marks visible."
+    }
+  ],
+  "release_assets": [
+    "gen-bistro-chair-rattan-1",
+    "gen-bistro-table-marble-1",
+    "gen-cafe-parasol-1",
+    "gen-olive-tree-potted-1",
+    "gen-street-lamp-cast-iron-1",
+    "gen-bicycle-city-basket-1",
+    "gen-person-standing-coat-1"
+  ]
+}

@@ -1,0 +1,577 @@
+"""Model the modular kit the v016 districts are assembled from, in Blender.
+
+One kit, three atmospheres. The districts differ by layout, palette, lighting and weather, not by
+geometry, so the kit has to carry enough variety to read as a market, a flooded service level and a
+container yard. Every module is built at metre scale with its origin at the base centre and its pivot on
+a grid multiple, so the district builder can place them without per-piece fudging.
+
+Modules fall into four families:
+
+* ground     -- 8 m slabs: plain, cracked, drain, and a kerbed edge
+* structure  -- 4 m walls: blank, shuttered, shopfront, pipe-covered; plus a pillar and a stair flight
+* market     -- stall counter, awning, crate stack, produce bin, hanging sign bar
+* industrial -- shipping container and its open variant, pipe run, catwalk, floodlight mast, fence panel,
+                bollard, barrel, air handler, antenna mast
+
+Run:
+    blender --background --factory-startup --python scripts/build_district_kit_v016.py -- --out <dir>
+"""
+from __future__ import annotations
+
+import argparse
+import json
+import math
+import sys
+from pathlib import Path
+
+import bmesh
+import bpy
+from mathutils import Vector
+
+CONCRETE = "TFKitConcrete"
+METAL = "TFKitMetal"
+PAINT = "TFKitPaint"
+GLASS = "TFKitGlass"
+EMISSIVE = "TFKitEmissive"
+
+
+def reset() -> None:
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+    for name, base, rough, metal in (
+        (CONCRETE, (0.42, 0.43, 0.45, 1.0), 0.78, 0.0),
+        (METAL, (0.34, 0.35, 0.38, 1.0), 0.42, 1.0),
+        (PAINT, (0.62, 0.24, 0.26, 1.0), 0.5, 0.0),
+        (GLASS, (0.12, 0.16, 0.2, 1.0), 0.12, 0.0),
+        (EMISSIVE, (0.2, 0.9, 0.85, 1.0), 0.3, 0.0),
+    ):
+        material = bpy.data.materials.new(name)
+        material.use_nodes = True
+        principled = next(n for n in material.node_tree.nodes if n.type == "BSDF_PRINCIPLED")
+        principled.inputs["Base Color"].default_value = base
+        principled.inputs["Roughness"].default_value = rough
+        principled.inputs["Metallic"].default_value = metal
+        if name == EMISSIVE:
+            principled.inputs["Emission Color"].default_value = base
+            principled.inputs["Emission Strength"].default_value = 4.0
+
+
+def box(name, size, location=(0, 0, 0), rotation=(0, 0, 0), bevel=0.0, segments=2, material=CONCRETE):
+    bpy.ops.mesh.primitive_cube_add(size=1.0, location=location, rotation=rotation)
+    obj = bpy.context.active_object
+    obj.name = name
+    obj.scale = size
+    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+    if bevel > 0.0:
+        modifier = obj.modifiers.new("Bevel", "BEVEL")
+        modifier.width = bevel
+        modifier.segments = segments
+        modifier.limit_method = "ANGLE"
+        bpy.context.view_layer.objects.active = obj
+        bpy.ops.object.modifier_apply(modifier=modifier.name)
+    assign(obj, material)
+    return obj
+
+
+def tube(name, radius, depth, location=(0, 0, 0), rotation=(0, 0, 0), verts=16, material=METAL):
+    bpy.ops.mesh.primitive_cylinder_add(radius=radius, depth=depth, location=location,
+                                        rotation=rotation, vertices=verts)
+    obj = bpy.context.active_object
+    obj.name = name
+    assign(obj, material)
+    return obj
+
+
+def assign(obj, material_name) -> None:
+    obj.data.materials.clear()
+    obj.data.materials.append(bpy.data.materials[material_name])
+
+
+def finish(name, parts):
+    bpy.ops.object.select_all(action="DESELECT")
+    for part in parts:
+        part.select_set(True)
+    bpy.context.view_layer.objects.active = parts[0]
+    if len(parts) > 1:
+        bpy.ops.object.join()
+    obj = bpy.context.view_layer.objects.active
+    obj.name = name
+    # The join keeps the active part's own transform, so bake it in before measuring or exporting;
+    # without this a module whose first part was rotated ships rotated.
+    bpy.ops.object.transform_apply(location=False, rotation=True, scale=True)
+    bpy.ops.object.origin_set(type="ORIGIN_GEOMETRY", center="BOUNDS")
+    obj.location = (0, 0, 0)
+    bpy.context.view_layer.update()
+    lowest = min(Vector(c).z for c in obj.bound_box)
+    for vertex in obj.data.vertices:
+        vertex.co.z -= lowest
+    obj.data.update()
+    metre_uv(obj)
+    return obj
+
+
+def metre_uv(obj) -> None:
+    """Planar-project each face on its dominant axis so one UV unit is one metre, as the v009 kit does."""
+    layer = obj.data.uv_layers.get("UVMap") or obj.data.uv_layers.new(name="UVMap")
+    for polygon in obj.data.polygons:
+        axis = max(range(3), key=lambda k: abs(polygon.normal[k]))
+        others = [i for i in range(3) if i != axis]
+        for loop_index in polygon.loop_indices:
+            co = obj.data.vertices[obj.data.loops[loop_index].vertex_index].co
+            layer.data[loop_index].uv = (co[others[0]], co[others[1]])
+
+
+def scatter_panel_lines(obj, count, seed, depth=0.02):
+    """Cut shallow horizontal grooves so a flat wall catches a highlight instead of reading as a slab."""
+    import random
+    rng = random.Random(seed)
+    mesh = bmesh.new()
+    mesh.from_mesh(obj.data)
+    faces = [f for f in mesh.faces if abs(f.normal.z) < 0.4]
+    for _ in range(count):
+        if not faces:
+            break
+        face = rng.choice(faces)
+        try:
+            result = bmesh.ops.inset_individual(mesh, faces=[face], thickness=rng.uniform(0.04, 0.12),
+                                                depth=-depth)
+            faces = [f for f in mesh.faces if abs(f.normal.z) < 0.4]
+            del result
+        except Exception:
+            break
+    mesh.to_mesh(obj.data)
+    mesh.free()
+
+
+# --------------------------------------------------------------------------- ground
+
+
+def ground_plain():
+    slab = box("Slab", (8.0, 8.0, 0.24), bevel=0.02)
+    return finish("SM_KitGroundPlain", [slab]), "8 m paving slab"
+
+
+def ground_cracked():
+    parts = [box("Slab", (8.0, 8.0, 0.24), bevel=0.02)]
+    for index in range(6):
+        angle = index * 1.047
+        crack = box(f"Crack{index}", (2.6, 0.06, 0.05),
+                    location=(math.cos(angle) * 1.4, math.sin(angle) * 1.4, 0.12),
+                    rotation=(0, 0, angle))
+        parts.append(crack)
+    return finish("SM_KitGroundCracked", parts), "8 m slab with raised crack ridges"
+
+
+def ground_drain():
+    parts = [box("Slab", (8.0, 8.0, 0.24), bevel=0.02)]
+    channel = box("Channel", (8.0, 0.5, 0.1), location=(0, 0, 0.14), material=METAL)
+    parts.append(channel)
+    for index in range(10):
+        bar = box(f"Bar{index}", (0.1, 0.5, 0.06), location=(-3.6 + index * 0.8, 0, 0.2), material=METAL)
+        parts.append(bar)
+    return finish("SM_KitGroundDrain", parts), "8 m slab with a grated channel"
+
+
+def ground_kerb():
+    parts = [box("Slab", (8.0, 8.0, 0.24), bevel=0.02)]
+    kerb = box("Kerb", (8.0, 0.4, 0.34), location=(0, 3.8, 0.17), bevel=0.03)
+    parts.append(kerb)
+    return finish("SM_KitGroundKerb", parts), "8 m slab with a kerbed edge"
+
+
+# --------------------------------------------------------------------------- structure
+
+
+def wall_blank():
+    wall = box("Wall", (4.0, 0.4, 4.0), bevel=0.03)
+    scatter_panel_lines(wall, 5, seed=11)
+    plinth = box("Plinth", (4.1, 0.5, 0.35), location=(0, 0, -1.8), bevel=0.03)
+    return finish("SM_KitWallBlank", [wall, plinth]), "4 m concrete wall"
+
+
+def wall_shutter():
+    parts = [box("Wall", (4.0, 0.4, 4.0), bevel=0.03)]
+    frame = box("Frame", (3.2, 0.12, 2.9), location=(0, -0.24, -0.4), material=METAL)
+    parts.append(frame)
+    for index in range(12):
+        slat = box(f"Slat{index}", (3.1, 0.06, 0.2), location=(0, -0.32, -1.7 + index * 0.23), material=METAL)
+        parts.append(slat)
+    lintel = box("Lintel", (3.5, 0.3, 0.3), location=(0, -0.2, 1.2), bevel=0.02, material=METAL)
+    parts.append(lintel)
+    return finish("SM_KitWallShutter", parts), "4 m wall with a roller shutter"
+
+
+def wall_shopfront():
+    parts = [box("Wall", (4.0, 0.4, 4.0), bevel=0.03)]
+    glazing = box("Glass", (3.2, 0.08, 2.4), location=(0, -0.22, -0.4), material=GLASS)
+    parts.append(glazing)
+    for x in (-1.6, -0.55, 0.55, 1.6):
+        mullion = box(f"Mullion{x}", (0.12, 0.16, 2.5), location=(x, -0.26, -0.4), material=METAL)
+        parts.append(mullion)
+    sill = box("Sill", (3.4, 0.3, 0.16), location=(0, -0.28, -1.68), bevel=0.02, material=METAL)
+    parts.append(sill)
+    fascia = box("Fascia", (3.6, 0.22, 0.5), location=(0, -0.26, 1.25), bevel=0.02, material=PAINT)
+    parts.append(fascia)
+    strip = box("Strip", (3.3, 0.06, 0.1), location=(0, -0.4, 1.05), material=EMISSIVE)
+    parts.append(strip)
+    return finish("SM_KitWallShopfront", parts), "4 m glazed shopfront with a lit fascia"
+
+
+def wall_pipes():
+    parts = [box("Wall", (4.0, 0.4, 4.0), bevel=0.03)]
+    for index, (z, radius) in enumerate(((-1.1, 0.14), (-0.5, 0.1), (0.3, 0.18), (1.1, 0.08))):
+        pipe = tube(f"Pipe{index}", radius, 4.0, location=(0, -0.3 - radius, z),
+                    rotation=(0, math.pi / 2, 0), verts=14)
+        parts.append(pipe)
+        for x in (-1.4, 0.0, 1.4):
+            clamp = box(f"Clamp{index}{x}", (0.1, 0.16, radius * 2.6),
+                        location=(x, -0.3 - radius, z), material=METAL)
+            parts.append(clamp)
+    valve = tube("Valve", 0.22, 0.12, location=(1.2, -0.62, 0.3), rotation=(math.pi / 2, 0, 0), verts=16)
+    parts.append(valve)
+    return finish("SM_KitWallPipes", parts), "4 m wall behind a pipe run"
+
+
+def pillar():
+    parts = [box("Shaft", (0.7, 0.7, 4.0), bevel=0.04)]
+    for z in (-1.9, 1.9):
+        cap = box(f"Cap{z}", (0.95, 0.95, 0.22), location=(0, 0, z), bevel=0.03)
+        parts.append(cap)
+    band = box("Band", (0.78, 0.78, 0.14), location=(0, 0, -0.6), bevel=0.02, material=METAL)
+    parts.append(band)
+    return finish("SM_KitPillar", parts), "4 m square pillar"
+
+
+def stair_flight():
+    parts = []
+    for index in range(10):
+        step = box(f"Step{index}", (2.2, 0.32, 0.18), location=(0, index * 0.32, index * 0.18), bevel=0.01)
+        parts.append(step)
+    for side in (-1, 1):
+        rail = box(f"Rail{side}", (0.08, 3.3, 0.08), location=(side * 1.05, 1.44, 1.72),
+                   rotation=(math.atan2(1.8, 3.2), 0, 0), material=METAL)
+        parts.append(rail)
+        for index in range(5):
+            post = tube(f"Post{side}{index}", 0.035, 1.0,
+                        location=(side * 1.05, index * 0.64, index * 0.36 + 0.5), verts=8)
+            parts.append(post)
+    return finish("SM_KitStair", parts), "10-step flight, 1.8 m rise"
+
+
+# --------------------------------------------------------------------------- market
+
+
+def stall_counter():
+    parts = [box("Counter", (2.4, 0.9, 0.95), bevel=0.03, material=PAINT)]
+    top = box("Top", (2.6, 1.05, 0.1), location=(0, 0, 0.52), bevel=0.02, material=METAL)
+    parts.append(top)
+    for index in range(3):
+        panel = box(f"Panel{index}", (0.68, 0.04, 0.6), location=(-0.78 + index * 0.78, -0.47, -0.05),
+                    material=METAL)
+        parts.append(panel)
+    for side in (-1, 1):
+        leg = box(f"Leg{side}", (0.1, 0.1, 0.9), location=(side * 1.1, 0.4, -0.05), material=METAL)
+        parts.append(leg)
+    return finish("SM_KitStallCounter", parts), "2.4 m market counter"
+
+
+def stall_awning():
+    parts = []
+    for side in (-1, 1):
+        post = tube(f"Post{side}", 0.05, 2.6, location=(side * 1.5, 0, 1.3), verts=10)
+        parts.append(post)
+    beam = box("Beam", (3.2, 0.09, 0.09), location=(0, 0, 2.55), material=METAL)
+    parts.append(beam)
+    canopy = box("Canopy", (3.2, 1.9, 0.06), location=(0, 0.85, 2.38),
+                 rotation=(math.radians(-11), 0, 0), material=PAINT)
+    parts.append(canopy)
+    valance = box("Valance", (3.2, 0.06, 0.26), location=(0, 1.78, 2.1), material=PAINT)
+    parts.append(valance)
+    for index in range(4):
+        bulb = tube(f"Bulb{index}", 0.05, 0.07, location=(-1.2 + index * 0.8, 1.6, 2.02),
+                    verts=10, material=EMISSIVE)
+        parts.append(bulb)
+    cable = box("Cable", (2.8, 0.02, 0.02), location=(0, 1.6, 2.09), material=METAL)
+    parts.append(cable)
+    return finish("SM_KitStallAwning", parts), "3.2 m awning with a bulb string"
+
+
+def crate_stack():
+    parts = []
+    heights = ((0, 0, 0.3), (0.1, 0.05, 0.9), (-0.08, -0.04, 1.5))
+    for index, (x, y, z) in enumerate(heights):
+        crate = box(f"Crate{index}", (0.62, 0.62, 0.58), location=(x, y, z),
+                    rotation=(0, 0, math.radians(index * 9)), bevel=0.02)
+        parts.append(crate)
+        for side in (-1, 1):
+            band = box(f"Band{index}{side}", (0.64, 0.05, 0.05), location=(x, y + side * 0.3, z),
+                       rotation=(0, 0, math.radians(index * 9)), material=METAL)
+            parts.append(band)
+    return finish("SM_KitCrateStack", parts), "three stacked crates, 1.8 m"
+
+
+def produce_bin():
+    parts = [box("Bin", (1.1, 0.7, 0.5), bevel=0.03, material=METAL)]
+    contents = box("Contents", (1.0, 0.6, 0.12), location=(0, 0, 0.28), bevel=0.05, material=PAINT)
+    parts.append(contents)
+    for side in (-1, 1):
+        handle = tube(f"Handle{side}", 0.03, 0.4, location=(side * 0.57, 0, 0.1),
+                      rotation=(math.pi / 2, 0, 0), verts=8)
+        parts.append(handle)
+    return finish("SM_KitProduceBin", parts), "1.1 m produce bin"
+
+
+def sign_bar():
+    parts = []
+    mast = tube("Mast", 0.07, 3.4, location=(0, 0, 1.7), verts=12)
+    parts.append(mast)
+    arm = box("Arm", (1.5, 0.08, 0.08), location=(0.7, 0, 3.2), material=METAL)
+    parts.append(arm)
+    panel = box("Panel", (1.2, 0.1, 0.55), location=(1.2, 0, 2.85), bevel=0.02, material=PAINT)
+    parts.append(panel)
+    face = box("Face", (1.1, 0.03, 0.46), location=(1.2, -0.07, 2.85), material=EMISSIVE)
+    parts.append(face)
+    for index in range(3):
+        hanger = box(f"Hanger{index}", (0.04, 0.04, 0.3), location=(0.3 + index * 0.45, 0, 3.05),
+                     material=METAL)
+        parts.append(hanger)
+    return finish("SM_KitSignBar", parts), "3.4 m sign mast with a lit panel"
+
+
+# --------------------------------------------------------------------------- industrial
+
+
+def container(open_door=False):
+    parts = []
+    body = box("Body", (6.06, 2.44, 2.59), bevel=0.03, material=PAINT)
+    parts.append(body)
+    for index in range(18):
+        rib = box(f"Rib{index}", (0.1, 2.46, 2.3), location=(-2.9 + index * 0.34, 0, 0), material=PAINT)
+        parts.append(rib)
+    for x in (-3.03, 3.03):
+        end = box(f"End{x}", (0.06, 2.46, 2.61), location=(x, 0, 0), material=METAL)
+        parts.append(end)
+    for x in (-1, 1):
+        for y in (-1, 1):
+            for z in (-1, 1):
+                corner = box(f"Corner{x}{y}{z}", (0.3, 0.3, 0.3),
+                             location=(x * 2.88, y * 1.07, z * 1.15), bevel=0.03, material=METAL)
+                parts.append(corner)
+    if open_door:
+        for side in (-1, 1):
+            door = box(f"Door{side}", (0.08, 1.15, 2.4), location=(3.2, side * 1.5, 0),
+                       rotation=(0, 0, math.radians(side * -62)), material=PAINT)
+            parts.append(door)
+        interior = box("Interior", (5.6, 2.2, 0.06), location=(0, 0, -1.24), material=METAL)
+        parts.append(interior)
+    else:
+        for side in (-1, 1):
+            door = box(f"Door{side}", (0.07, 1.2, 2.45), location=(3.05, side * 0.61, 0), material=PAINT)
+            parts.append(door)
+            rod = tube(f"Rod{side}", 0.04, 2.3, location=(3.1, side * 0.3, 0), verts=8)
+            parts.append(rod)
+    name = "SM_KitContainerOpen" if open_door else "SM_KitContainer"
+    return finish(name, parts), ("6 m container, doors open" if open_door else "6 m shipping container")
+
+
+def pipe_run():
+    parts = []
+    for index, (y, radius) in enumerate(((-0.35, 0.16), (0.0, 0.22), (0.4, 0.12))):
+        pipe = tube(f"Pipe{index}", radius, 4.0, location=(0, y, 1.4 + index * 0.1),
+                    rotation=(0, math.pi / 2, 0), verts=16)
+        parts.append(pipe)
+    for x in (-1.6, 1.6):
+        stand = box(f"Stand{x}", (0.14, 1.1, 1.4), location=(x, 0, 0.7), material=METAL)
+        parts.append(stand)
+        saddle = box(f"Saddle{x}", (0.2, 1.2, 0.12), location=(x, 0, 1.45), material=METAL)
+        parts.append(saddle)
+    flange = tube("Flange", 0.3, 0.08, location=(0.9, 0.0, 1.5), rotation=(0, math.pi / 2, 0), verts=16)
+    parts.append(flange)
+    return finish("SM_KitPipeRun", parts), "4 m pipe run on stands"
+
+
+def catwalk():
+    parts = [box("Deck", (4.0, 1.4, 0.08), location=(0, 0, 2.6), material=METAL)]
+    for index in range(12):
+        plank = box(f"Plank{index}", (0.24, 1.36, 0.1), location=(-1.8 + index * 0.33, 0, 2.62),
+                    material=METAL)
+        parts.append(plank)
+    for side in (-1, 1):
+        rail = box(f"Rail{side}", (4.0, 0.06, 0.06), location=(0, side * 0.68, 3.65), material=METAL)
+        parts.append(rail)
+        mid = box(f"Mid{side}", (4.0, 0.05, 0.05), location=(0, side * 0.68, 3.15), material=METAL)
+        parts.append(mid)
+        for index in range(5):
+            post = tube(f"Post{side}{index}", 0.04, 1.05, location=(-1.8 + index * 0.9, side * 0.68, 3.15),
+                        verts=8)
+            parts.append(post)
+    for x in (-1.8, 1.8):
+        leg = box(f"Leg{x}", (0.14, 0.14, 2.6), location=(x, 0, 1.3), material=METAL)
+        parts.append(leg)
+        brace = box(f"Brace{x}", (0.09, 0.09, 2.2), location=(x, 0.4, 1.4),
+                    rotation=(math.radians(18), 0, 0), material=METAL)
+        parts.append(brace)
+    return finish("SM_KitCatwalk", parts), "4 m catwalk at 2.6 m"
+
+
+def floodlight_mast():
+    parts = []
+    base = box("Base", (0.7, 0.7, 0.22), bevel=0.03, material=METAL)
+    parts.append(base)
+    mast = tube("Mast", 0.11, 6.0, location=(0, 0, 3.1), verts=14)
+    parts.append(mast)
+    head = box("Head", (1.3, 0.5, 0.2), location=(0, 0, 6.1), material=METAL)
+    parts.append(head)
+    for index in range(3):
+        housing = box(f"Housing{index}", (0.38, 0.42, 0.32), location=(-0.42 + index * 0.42, 0.1, 5.92),
+                      rotation=(math.radians(28), 0, 0), bevel=0.02, material=METAL)
+        parts.append(housing)
+        lens = box(f"Lens{index}", (0.32, 0.06, 0.26), location=(-0.42 + index * 0.42, 0.28, 5.83),
+                   rotation=(math.radians(28), 0, 0), material=EMISSIVE)
+        parts.append(lens)
+    for index in range(3):
+        angle = index * 2.094
+        stay = box(f"Stay{index}", (0.06, 0.06, 1.6),
+                   location=(math.cos(angle) * 0.3, math.sin(angle) * 0.3, 0.9),
+                   rotation=(math.radians(math.sin(angle) * 12), math.radians(math.cos(angle) * -12), 0),
+                   material=METAL)
+        parts.append(stay)
+    return finish("SM_KitFloodlightMast", parts), "6 m floodlight mast, three heads"
+
+
+def fence_panel():
+    parts = []
+    for x in (-1.5, 1.5):
+        post = tube(f"Post{x}", 0.06, 2.4, location=(x, 0, 1.2), verts=10)
+        parts.append(post)
+    for z in (0.2, 2.3):
+        rail = box(f"Rail{z}", (3.0, 0.05, 0.05), location=(0, 0, z), material=METAL)
+        parts.append(rail)
+    mesh_panel = box("Mesh", (2.9, 0.02, 2.0), location=(0, 0, 1.25), material=METAL)
+    parts.append(mesh_panel)
+    for index in range(10):
+        wire = box(f"Wire{index}", (0.03, 0.03, 2.0), location=(-1.3 + index * 0.29, 0, 1.25),
+                   material=METAL)
+        parts.append(wire)
+    return finish("SM_KitFencePanel", parts), "3 m mesh fence panel"
+
+
+def bollard():
+    parts = [tube("Post", 0.12, 1.0, location=(0, 0, 0.5), verts=16, material=METAL)]
+    cap = tube("Cap", 0.14, 0.08, location=(0, 0, 1.0), verts=16, material=METAL)
+    parts.append(cap)
+    for z in (0.62, 0.78):
+        stripe = tube(f"Stripe{z}", 0.125, 0.08, location=(0, 0, z), verts=16, material=EMISSIVE)
+        parts.append(stripe)
+    plate = box("Plate", (0.34, 0.34, 0.04), location=(0, 0, 0.02), bevel=0.01, material=METAL)
+    parts.append(plate)
+    return finish("SM_KitBollard", parts), "1 m bollard with reflective bands"
+
+
+def barrel():
+    parts = [tube("Body", 0.29, 0.88, location=(0, 0, 0.44), verts=20, material=PAINT)]
+    for z in (0.18, 0.44, 0.7):
+        rib = tube(f"Rib{z}", 0.305, 0.06, location=(0, 0, z), verts=20, material=METAL)
+        parts.append(rib)
+    lid = tube("Lid", 0.3, 0.05, location=(0, 0, 0.885), verts=20, material=METAL)
+    parts.append(lid)
+    bung = tube("Bung", 0.06, 0.04, location=(0.14, 0, 0.91), verts=10, material=METAL)
+    parts.append(bung)
+    return finish("SM_KitBarrel", parts), "0.9 m barrel"
+
+
+def air_handler():
+    parts = [box("Body", (1.9, 1.5, 1.0), bevel=0.04, material=METAL)]
+    cowl = tube("Cowl", 0.55, 0.28, location=(0.35, 0, 0.62), verts=20, material=METAL)
+    parts.append(cowl)
+    for index in range(4):
+        angle = index * math.pi / 2
+        blade = box(f"Blade{index}", (0.5, 0.1, 0.03), location=(0.35, 0, 0.74),
+                    rotation=(0, 0, angle), material=METAL)
+        parts.append(blade)
+    grille = box("Grille", (0.06, 1.2, 0.7), location=(-0.98, 0, 0.05), material=METAL)
+    parts.append(grille)
+    for index in range(7):
+        louvre = box(f"Louvre{index}", (0.1, 1.2, 0.05), location=(-1.0, 0, -0.26 + index * 0.1),
+                     rotation=(0, math.radians(22), 0), material=METAL)
+        parts.append(louvre)
+    for x in (-1, 1):
+        for y in (-1, 1):
+            foot = box(f"Foot{x}{y}", (0.2, 0.2, 0.14), location=(x * 0.8, y * 0.6, -0.55),
+                       material=METAL)
+            parts.append(foot)
+    return finish("SM_KitAirHandler", parts), "1.9 m air handler"
+
+
+def antenna_mast():
+    parts = [box("Base", (0.8, 0.8, 0.2), bevel=0.03, material=METAL)]
+    mast = tube("Mast", 0.08, 5.0, location=(0, 0, 2.6), verts=12)
+    parts.append(mast)
+    for index, z in enumerate((1.6, 2.8, 4.0)):
+        span = 0.9 - index * 0.22
+        cross = box(f"Cross{index}", (span, 0.05, 0.05), location=(0, 0, z), material=METAL)
+        parts.append(cross)
+        for side in (-1, 1):
+            element = tube(f"Element{index}{side}", 0.025, 0.5,
+                           location=(side * span * 0.45, 0, z + 0.25), verts=8)
+            parts.append(element)
+    dish = tube("Dish", 0.45, 0.06, location=(0.3, 0, 4.7), rotation=(0, math.radians(58), 0),
+                verts=20, material=METAL)
+    parts.append(dish)
+    beacon = tube("Beacon", 0.07, 0.12, location=(0, 0, 5.16), verts=10, material=EMISSIVE)
+    parts.append(beacon)
+    return finish("SM_KitAntennaMast", parts), "5 m antenna mast with a beacon"
+
+
+MODULES = [
+    ground_plain, ground_cracked, ground_drain, ground_kerb,
+    wall_blank, wall_shutter, wall_shopfront, wall_pipes, pillar, stair_flight,
+    stall_counter, stall_awning, crate_stack, produce_bin, sign_bar,
+    lambda: container(False), lambda: container(True),
+    pipe_run, catwalk, floodlight_mast, fence_panel, bollard, barrel, air_handler, antenna_mast,
+]
+
+
+def triangles(obj) -> int:
+    return sum(len(p.vertices) - 2 for p in obj.data.polygons)
+
+
+def export(obj, path: Path) -> None:
+    bpy.ops.object.select_all(action="DESELECT")
+    obj.select_set(True)
+    bpy.context.view_layer.objects.active = obj
+    bpy.ops.export_scene.fbx(
+        filepath=str(path), use_selection=True, object_types={"MESH"},
+        axis_forward="-Y", axis_up="Z", apply_unit_scale=True,
+        apply_scale_options="FBX_SCALE_UNITS", bake_anim=False,
+        mesh_smooth_type="FACE", path_mode="STRIP",
+    )
+
+
+def main() -> None:
+    argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--out", required=True)
+    args = parser.parse_args(argv)
+    out = Path(args.out)
+    out.mkdir(parents=True, exist_ok=True)
+    records = []
+    for builder in MODULES:
+        reset()
+        obj, note = builder()
+        path = out / f"{obj.name}.fbx"
+        export(obj, path)
+        bpy.context.view_layer.update()
+        records.append({
+            "asset": obj.name, "file": path.name, "note": note,
+            "triangles": triangles(obj),
+            "dimensions_m": [round(v, 3) for v in obj.dimensions],
+            "materials": [m.name for m in obj.data.materials],
+        })
+        print(f"{obj.name}: {triangles(obj)} tris, {[round(v,2) for v in obj.dimensions]} m")
+    (out / "kit.json").write_text(json.dumps({"kit": "district_v016", "modules": records}, indent=1),
+                                  encoding="utf-8")
+    print(f"\n{len(records)} modules -> {out}")
+
+
+if __name__ == "__main__":
+    main()

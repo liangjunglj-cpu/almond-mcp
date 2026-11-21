@@ -1,0 +1,279 @@
+"""Megastructure kit v020, modelled in Blender from the owner's 2026-09-19 reference images.
+
+References (docs/references/infrastructure_v020): brutalist concrete towers with thick corner fins framing a
+dark, dense window grid; rooftops crowded with lattice masts, whip and panel antennas and satellite dishes;
+facades carrying AC units, pipe bundles, conduit and scaffolding; bolt-on accretion boxes stacked up a tower;
+vertical neon signs. Everything is kit-bashable at metre scale, origin at the base centre, UVs in metres so
+the TexturePackV008 materials tile correctly (see build_district_kit_v016.metre_uv).
+
+Facing: wall-mounted modules (AC stack, pipes, accretion, sign) are built with their back on Blender y=0 and
+their front toward Blender -Y. The FBX export (axis_forward -Y) flips Y, so in Unreal the front faces local +Y
+(the same flip the v016 stair showed: it climbs toward local -Y).
+
+Material slot names map in Unreal (import_megastructure_kit_v020.py):
+  MegaConcrete -> MI_Concrete_Monolithic, MegaConcreteDark -> MI_Concrete_Dark_Stained,
+  MegaMetal -> MI_Metal_Panel_Painted, MegaWindow -> MI_Facade_WindowBand, MegaWhite / MegaRust / MegaGlass /
+  MegaSign -> new instances in /Game/TwoFronts/WorldV020/Mega.
+
+Run:
+    blender --background --factory-startup --python scripts/build_megastructure_kit_v020.py -- --out <dir>
+"""
+from __future__ import annotations
+
+import argparse
+import importlib.util
+import json
+import math
+import random
+import sys
+from pathlib import Path
+
+import bpy
+
+_spec = importlib.util.spec_from_file_location("kit16", str(Path(__file__).with_name("build_district_kit_v016.py")))
+kit16 = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(kit16)  # main() is guarded; only helpers load
+
+CONC, DARK, METAL, WINDOW = "MegaConcrete", "MegaConcreteDark", "MegaMetal", "MegaWindow"
+WHITE, RUST, GLASS, SIGN = "MegaWhite", "MegaRust", "MegaGlass", "MegaSign"
+MATS = {CONC: (0.62, 0.62, 0.6), DARK: (0.3, 0.3, 0.32), METAL: (0.35, 0.36, 0.38), WINDOW: (0.08, 0.1, 0.12),
+        WHITE: (0.86, 0.86, 0.84), RUST: (0.45, 0.25, 0.12), GLASS: (0.05, 0.06, 0.08), SIGN: (1.0, 0.3, 0.6)}
+
+
+def reset() -> None:
+    bpy.ops.wm.read_factory_settings(use_empty=True)
+    for name, rgb in MATS.items():
+        m = bpy.data.materials.new(name)
+        m.use_nodes = True
+        bsdf = next(n for n in m.node_tree.nodes if n.type == "BSDF_PRINCIPLED")
+        bsdf.inputs["Base Color"].default_value = (*rgb, 1.0)
+
+
+box, tube, finish = kit16.box, kit16.tube, kit16.finish
+
+
+def rot(x, y, angle):
+    c, s = math.cos(angle), math.sin(angle)
+    return x * c - y * s, x * s + y * c
+
+
+def rbox(name, size, loc, angle, material, bevel=0.0):
+    """Box whose local layout is authored for the -Y face, rotated about Z by angle."""
+    x, y = rot(loc[0], loc[1], angle)
+    sx, sy = (size[0], size[1]) if abs(math.sin(angle)) < 0.5 else (size[1], size[0])
+    return box(name, (sx, sy, size[2]), (x, y, loc[2]), bevel=bevel, material=material)
+
+
+def cone(name, r1, r2, depth, loc, rotation, material, verts=20):
+    bpy.ops.mesh.primitive_cone_add(radius1=r1, radius2=r2, depth=depth, location=loc, rotation=rotation,
+                                    vertices=verts)
+    obj = bpy.context.active_object
+    obj.name = name
+    kit16.assign(obj, material)
+    return obj
+
+
+# --------------------------------------------------------------------------- towers
+def mega_core():
+    """24 m tower segment, 20 x 20 m: corner fins frame a recessed dark window grid on every face (ref 3, 6)."""
+    parts = [box("Core", (17.6, 17.6, 24.0), (0, 0, 12.0), material=DARK)]
+    for k in range(4):
+        a = k * math.pi / 2
+        parts.append(rbox(f"Window{k}", (11.6, 0.3, 23.0), (0, -8.85, 11.8), a, WINDOW))
+        for side in (-1, 1):
+            parts.append(rbox(f"Fin{k}{side}", (3.0, 2.4, 24.0), (side * 7.3, -8.9, 12.0), a, CONC, bevel=0.05))
+        for level in range(1, 8):
+            parts.append(rbox(f"Band{k}{level}", (11.8, 0.5, 0.35), (0, -9.1, level * 3.0), a, CONC))
+        # Horizontal louvre shelf at mid-height (ref 3's bracketed ledge).
+        parts.append(rbox(f"Ledge{k}", (12.0, 1.4, 0.5), (0, -9.5, 12.0), a, METAL))
+        # Greebles: window units, vents and service boxes breaking up the grid (ref 3, 6 density).
+        rng = random.Random(100 + k)
+        for g in range(46):
+            w, h, d = rng.uniform(0.5, 2.6), rng.uniform(0.3, 1.4), rng.uniform(0.15, 0.7)
+            x, z = rng.uniform(-5.2, 5.2), rng.uniform(0.8, 23.2)
+            mat = rng.choices((DARK, METAL, WHITE, CONC), weights=(4, 3, 1, 2))[0]
+            parts.append(rbox(f"Greeble{k}_{g}", (w, d, h), (x, -9.0 - d / 2, z), a, mat))
+        # A service pipe riser on one fin per face.
+        px, py = rot(-8.9, -10.35, a)
+        parts.append(tube(f"Riser{k}", 0.22, 24.0, (px, py, 12.0), verts=10, material=METAL))
+    return finish("SM_MegaCore", parts), "24 m stackable tower segment, fins + window grid"
+
+
+def mega_base():
+    """Stepped podium base 24 x 24 x 8 m with buttress feet and service doors (ref 3 base)."""
+    parts = [box("Podium", (24.0, 24.0, 8.0), (0, 0, 4.0), material=CONC, bevel=0.1)]
+    for k in range(4):
+        a = k * math.pi / 2
+        for side in (-1, 1):
+            parts.append(rbox(f"Buttress{k}{side}", (3.4, 3.0, 10.0), (side * 9.0, -12.6, 5.0), a, CONC, bevel=0.08))
+        parts.append(rbox(f"Door{k}", (5.0, 0.3, 4.2), (0, -12.05, 2.1), a, METAL))
+        parts.append(rbox(f"Vent{k}", (8.0, 0.25, 1.2), (0, -12.05, 6.4), a, DARK))
+    return finish("SM_MegaBase", parts), "podium base with buttresses"
+
+
+def mega_cap():
+    parts = [box("Roof", (20.0, 20.0, 0.6), (0, 0, 0.3), material=CONC)]
+    for k in range(4):
+        a = k * math.pi / 2
+        parts.append(rbox(f"Parapet{k}", (20.0, 0.4, 1.3), (0, -9.8, 1.25), a, CONC))
+        for i in range(9):
+            x = -8.0 + i * 2.0
+            px, py = rot(x, -9.5, a)
+            parts.append(tube(f"Post{k}{i}", 0.04, 1.1, (px, py, 2.45), verts=6, material=WHITE))
+        rx, ry = rot(0, -9.5, a)
+        rail = box(f"Rail{k}", (18.0, 0.06, 0.06), (rx, ry, 3.0), material=WHITE) if abs(math.sin(a)) < 0.5 else \
+            box(f"Rail{k}", (0.06, 18.0, 0.06), (rx, ry, 3.0), material=WHITE)
+        parts.append(rail)
+    rng = random.Random(7)
+    for i in range(5):
+        parts.append(box(f"Plant{i}", (rng.uniform(2, 4), rng.uniform(2, 3.5), rng.uniform(1.5, 2.8)),
+                         (rng.uniform(-6, 6), rng.uniform(-6, 6), 1.6), material=WHITE, bevel=0.04))
+    parts.append(box("StairHouse", (4.0, 3.0, 3.2), (6.0, 6.0, 2.2), material=CONC))
+    return finish("SM_MegaCap", parts), "roof: parapet, railing, plant boxes, stair house"
+
+
+def antenna_cluster():
+    """Rooftop telecom clutter (ref 1): lattice mast, whips, panel antennas, dishes."""
+    rng = random.Random(11)
+    parts = [box("Plinth", (8.0, 8.0, 0.3), (0, 0, 0.15), material=CONC)]
+    h = 14.0
+    for cx, cy in ((-0.6, -0.6), (0.6, -0.6), (0.6, 0.6), (-0.6, 0.6)):
+        parts.append(tube(f"Leg{cx}{cy}", 0.06, h, (cx - 1.8, cy - 1.8, h / 2), verts=6, material=WHITE))
+    for i in range(1, int(h / 1.4)):
+        z = i * 1.4
+        for a in range(4):
+            dx, dy = rot(0, -0.6, a * math.pi / 2)
+            size = (1.2, 0.04, 0.04) if a % 2 == 0 else (0.04, 1.2, 0.04)
+            parts.append(box(f"Ring{i}{a}", size, (dx - 1.8, dy - 1.8, z), material=WHITE))
+        parts.append(box(f"Brace{i}", (0.03, 1.6, 0.03), (-1.8 - 0.6, -1.8, z - 0.7), (0.75, 0, 0), material=WHITE))
+    for i in range(3):
+        parts.append(box(f"TopPanel{i}", (0.35, 0.15, 1.8), rot_loc(-1.8, -1.8, 0.8, i * 2.09, h + 0.9), material=WHITE))
+    for i in range(6):
+        x, y = rng.uniform(-3.5, 3.5), rng.uniform(-3.5, 3.5)
+        if abs(x + 1.8) < 1.2 and abs(y + 1.8) < 1.2:
+            x += 3.0
+        tall = rng.uniform(4.0, 10.0)
+        parts.append(tube(f"Whip{i}", 0.05, tall, (x, y, tall / 2 + 0.3), verts=6, material=METAL))
+        for j in range(rng.randint(1, 3)):
+            parts.append(box(f"Panel{i}{j}", (0.32, 0.14, rng.uniform(1.2, 2.4)),
+                             (x + rng.choice((-0.25, 0.25)), y, rng.uniform(2.0, tall - 0.5)), material=WHITE))
+    for i, (x, y, r) in enumerate(((2.4, 2.0, 1.1), (-2.6, 2.6, 0.8))):
+        parts.append(tube(f"DishPole{i}", 0.07, 2.2, (x, y, 1.4), verts=8, material=METAL))
+        parts.append(cone(f"Dish{i}", r, r * 0.15, 0.35, (x, y - 0.2, 2.6), (math.radians(70), 0, math.radians(20 * i)),
+                          WHITE))
+    return finish("SM_MegaAntennaCluster", parts), "rooftop lattice mast, whips, panels, dishes"
+
+
+def rot_loc(cx, cy, r, a, z):
+    return (cx + r * math.cos(a), cy + r * math.sin(a), z)
+
+
+def dish():
+    parts = [tube("Stand", 0.1, 2.4, (0, 0, 1.2), verts=10, material=METAL),
+             cone("Dish", 1.5, 0.2, 0.45, (0, -0.35, 2.6), (math.radians(75), 0, 0), WHITE, verts=28),
+             tube("Feed", 0.03, 1.4, (0, -1.0, 2.9), (math.radians(60), 0, 0), verts=6, material=METAL),
+             box("Head", (0.2, 0.2, 0.2), (0, -1.55, 3.25), material=WHITE)]
+    return finish("SM_MegaDish", parts), "3 m satellite dish on a stand"
+
+
+# --------------------------------------------------------------------------- facade clutter (front = Blender -Y)
+def ac_stack():
+    parts = []
+    for c in range(3):
+        for r in range(2):
+            x, z = (c - 1) * 1.05, 0.5 + r * 0.9
+            parts.append(box(f"AC{c}{r}", (0.95, 0.4, 0.7), (x, -0.25, z), material=WHITE, bevel=0.02))
+            parts.append(tube(f"Fan{c}{r}", 0.24, 0.04, (x + 0.15, -0.47, z), (math.radians(90), 0, 0), verts=16,
+                              material=DARK))
+            parts.append(box(f"Grille{c}{r}", (0.26, 0.02, 0.5), (x - 0.3, -0.46, z), material=METAL))
+        parts.append(box(f"Bracket{c}", (0.06, 0.5, 1.9), ((c - 1) * 1.05, -0.2, 0.9), material=RUST))
+    parts.append(tube("Drain", 0.03, 1.8, (1.7, -0.1, 0.9), verts=6, material=METAL))
+    return finish("SM_MegaACStack", parts), "2 x 3 wall AC units on brackets"
+
+
+def pipe_bundle():
+    parts = []
+    for i, (x, r) in enumerate(((-0.35, 0.14), (0.0, 0.1), (0.32, 0.17))):
+        parts.append(tube(f"Pipe{i}", r, 12.0, (x, -0.35, 6.0), verts=12, material=METAL))
+    for z in range(1, 12, 2):
+        parts.append(box(f"Clamp{z}", (1.0, 0.5, 0.12), (0, -0.25, float(z)), material=RUST))
+    parts.append(tube("Conduit", 0.04, 12.0, (0.7, -0.08, 6.0), verts=6, material=DARK))
+    parts.append(box("JunctionBox", (0.5, 0.25, 0.6), (0.7, -0.15, 3.0), material=WHITE))
+    return finish("SM_MegaPipeBundle", parts), "12 m vertical pipe bundle with clamps and conduit"
+
+
+def scaffold():
+    parts = []
+    w, d, h = 4.0, 1.2, 8.0
+    for x in (-w / 2, 0, w / 2):
+        for y in (-0.15, -0.15 - d):
+            parts.append(tube(f"Std{x}{y}", 0.03, h, (x, y, h / 2), verts=6, material=RUST))
+    for z in (2.0, 4.0, 6.0, 8.0):
+        for y in (-0.15, -0.15 - d):
+            parts.append(box(f"Ledger{z}{y}", (w, 0.05, 0.05), (0, y, z), material=RUST))
+        parts.append(box(f"Plank{z}", (w, d, 0.05), (0, -0.15 - d / 2, z - 0.05), material=DARK))
+    for i in range(4):
+        z = 1.0 + i * 2.0
+        parts.append(box(f"Diag{i}", (w * 1.12, 0.04, 0.04), (0, -0.15 - d, z), (0, math.radians(45 if i % 2 else -45), 0),
+                         material=RUST))
+    return finish("SM_MegaScaffold", parts), "4 x 8 m tube scaffold bay with planks"
+
+
+def accretion():
+    """Bolt-on apartment box (ref 5): slot windows, balcony, AC, canopy."""
+    parts = [box("Shell", (6.0, 3.4, 3.2), (0, -1.7, 1.6), material=DARK, bevel=0.04)]
+    for i, x in enumerate((-1.9, 0.0, 1.9)):
+        parts.append(box(f"Win{i}", (1.3, 0.1, 0.9), (x, -3.42, 1.9), material=GLASS))
+        parts.append(box(f"Sill{i}", (1.5, 0.25, 0.08), (x, -3.5, 1.4), material=CONC))
+    parts.append(box("Balcony", (2.4, 1.0, 0.15), (1.6, -3.9, 0.35), material=CONC))
+    parts.append(box("BalconyRail", (2.4, 0.05, 0.9), (1.6, -4.38, 0.85), material=METAL))
+    parts.append(box("Canopy", (6.4, 0.9, 0.08), (0, -3.8, 3.3), (math.radians(-8), 0, 0), material=RUST))
+    parts.append(box("AC", (0.9, 0.4, 0.6), (-2.0, -3.65, 0.6), material=WHITE))
+    parts.append(tube("Fan", 0.2, 0.04, (-1.85, -3.87, 0.6), (math.radians(90), 0, 0), verts=14, material=DARK))
+    return finish("SM_MegaAccretion", parts), "6 x 3.4 x 3.2 m bolt-on dwelling box"
+
+
+def slot_wall():
+    """8 x 12 m concrete panel with stacked slot windows and grime-ready flat areas (ref 1)."""
+    parts = [box("Wall", (8.0, 0.8, 12.0), (0, -0.4, 6.0), material=CONC)]
+    for i in range(4):
+        parts.append(box(f"Slot{i}", (2.2, 0.2, 0.6), (1.6, -0.82, 3.0 + i * 2.2), material=GLASS))
+    parts.append(box("Seam", (0.25, 0.9, 12.0), (-1.5, -0.45, 6.0), material=DARK))
+    parts.append(box("Lamp", (0.5, 0.3, 0.3), (-2.8, -0.95, 7.5), material=WHITE))
+    return finish("SM_MegaSlotWall", parts), "8 x 12 m slot-window wall panel"
+
+
+def neon_sign():
+    parts = [box("Frame", (1.5, 0.35, 7.2), (0, -0.55, 3.6), material=METAL),
+             box("Panel", (1.25, 0.08, 6.9), (0, -0.76, 3.6), material=SIGN)]
+    for z in (1.0, 6.2):
+        parts.append(box(f"Arm{z}", (0.12, 0.6, 0.12), (0, -0.3, z), material=RUST))
+    return finish("SM_MegaNeonSign", parts), "7 m vertical neon sign on arms"
+
+
+MODULES = [mega_core, mega_base, mega_cap, antenna_cluster, dish, ac_stack, pipe_bundle, scaffold, accretion,
+           slot_wall, neon_sign]
+
+
+def main() -> None:
+    argv = sys.argv[sys.argv.index("--") + 1:] if "--" in sys.argv else []
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--out", required=True)
+    args = parser.parse_args(argv)
+    out = Path(args.out).resolve()
+    out.mkdir(parents=True, exist_ok=True)
+    records = []
+    for builder in MODULES:
+        reset()
+        obj, note = builder()
+        kit16.export(obj, out / f"{obj.name}.fbx")
+        records.append({"asset": obj.name, "note": note, "triangles": kit16.triangles(obj),
+                        "dimensions_m": [round(v, 2) for v in obj.dimensions],
+                        "materials": [m.name for m in obj.data.materials]})
+        print(f"{obj.name}: {kit16.triangles(obj)} tris {[round(v, 1) for v in obj.dimensions]}")
+    (out / "kit.json").write_text(json.dumps({"kit": "megastructure_v020", "front": "unreal local +Y",
+                                              "modules": records}, indent=1), encoding="utf-8")
+
+
+if __name__ == "__main__":
+    main()

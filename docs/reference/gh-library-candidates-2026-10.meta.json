@@ -1,0 +1,7 @@
+{
+ "generated": "2026-10-11",
+ "method": "gh search code/repos + gh api repos/O/R/license, git/trees/<sha>?recursive=1; each candidate file fetched in-memory via gh api and parsed (GHALibraries chunk for plugins, base64/plain script code for Python imports). Nothing cloned.",
+ "verdict_semantics": "accept = permissive licence (MIT/BSD/Apache/BlueOak/BSL/CC0/CC-BY) and architectural content; conditional = usable only with caveats (share-alike/LGPL licence, README-only licence, or heavy closed-source plugin dependence); exclude = no licence, copyleft/NC, or off-topic.",
+ "plugin_field": "gha:<assembly> = Grasshopper plugin referenced in GHALibraries; py:<pkg> = third-party Python package imported by script components; py-local:<mod> = module expected next to the file in the same repo. Empty list = vanilla Rhino 8 (GhPython/script components count as vanilla).",
+ "raw_url_note": "raw URLs are pinned to commit_sha; no git-lfs pointers were encountered among fetched files."
+}

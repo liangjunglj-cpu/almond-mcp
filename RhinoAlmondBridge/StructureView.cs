@@ -45,6 +45,10 @@ namespace RhinoAlmondBridge
         [JsonProperty("load_label")] public string LoadLabel { get; set; }
         /// <summary>Replaces PASS when there is no capacity verdict (e.g. "INDICATIVE" for concrete).</summary>
         [JsonProperty("verdict_label")] public string VerdictLabel { get; set; }
+        /// <summary>The native checks' verdict ("pass" | "fail" | "indicative"), computed by the MCP server
+        /// exactly as validate_structure judges the model (member deflection, Class 4, utilization, storey
+        /// drift). When present the legend and the reply use it instead of judging the displacement field.</summary>
+        [JsonProperty("verdict_status")] public string VerdictStatus { get; set; }
         [JsonProperty("show_legend")] public bool ShowLegend { get; set; } = true;
         [JsonProperty("clear")] public bool Clear { get; set; }
     }
@@ -136,11 +140,15 @@ namespace RhinoAlmondBridge
                 if (res.Elements.Count == 0 || res.Elements.Any(x => x.SampleDispM == null || x.SampleDispM.Count < 2))
                     return Error("structure_draw needs elements with at least two displacement samples.");
                 res.SupportPointsM = result["support_points_m"]?.ToObject<List<double[]>>() ?? new List<double[]>();
+                res.SupportTypes = result["support_types"]?.ToObject<List<string>>() ?? new List<string>();
                 res.LoadedPointsM = result["loaded_points_m"]?.ToObject<List<double[]>>() ?? new List<double[]>();
                 res.MaxDisplacementMM = result["max_displacement_mm"]?.Value<double>()
                     ?? res.Elements.Max(x => x.SampleDispM.Max(d => Len(d))) * 1000.0;
                 res.Warnings = result["warnings"]?.ToObject<List<string>>() ?? new List<string>();
                 double spanM = Math.Max(1e-3, req.SpanM ?? 5.0);
+                // the checked deflection: each member's deflection relative to its supports (the absolute
+                // maximum above includes column shortening and sway, and only scales the drawing)
+                var drift = result["storey_drift"] as JObject;
                 _conduit.Data = new StructureData
                 {
                     Result = res, ToDoc = RhinoMath.UnitScale(UnitSystem.Meters, doc.ModelUnitSystem), SpanM = spanM,
@@ -150,10 +158,19 @@ namespace RhinoAlmondBridge
                     BucklingAlpha = jobj["buckling_alpha"] != null && jobj["buckling_alpha"].Type != JTokenType.Null
                         ? jobj["buckling_alpha"].Value<double>() : (double?)null,
                     VerdictLabel = string.IsNullOrWhiteSpace(req.VerdictLabel) ? null : req.VerdictLabel.Trim(),
+                    MaxDeflectionMM = Num(result["max_deflection_mm"]),
+                    DriftMM = Num(drift?["max_drift_mm"]),
+                    DriftLimitMM = Num(drift?["limit_mm"]),
+                    DriftUtilization = Num(drift?["utilization"]),
+                    DriftChecked = drift?["checked"]?.Type == JTokenType.Boolean && drift["checked"].Value<bool>(),
                 };
             }
             else if (_conduit.Data == null)
                 return Error("Nothing to display yet: send a result first.");
+            if (!string.IsNullOrWhiteSpace(req.VerdictStatus))
+                _conduit.Data.VerdictStatus = req.VerdictStatus.Trim().ToLowerInvariant();
+            else if (result != null)
+                _conduit.Data.VerdictStatus = null;
             return Present(doc, req);
         }
 
@@ -179,10 +196,10 @@ namespace RhinoAlmondBridge
             double maxUtil = r.Elements.Where(e => !double.IsNaN(e.Utilization)).Select(e => e.Utilization).DefaultIfEmpty(double.NaN).Max();
             return JsonConvert.SerializeObject(new
             {
-                status = r.MaxDisplacementMM > data.LimitMM ? "fail"
-                    : data.VerdictLabel != null ? "indicative"
-                    : (double.IsNaN(maxUtil) || maxUtil <= 1.0) ? "pass" : "fail",
+                status = data.Status(maxUtil),
                 analysis_method = data.Engine,
+                max_deflection_mm = Math.Round(data.CheckedDeflectionMM, 3),
+                deflection_measure = data.MaxDeflectionMM.HasValue ? "member, relative to its supports" : "absolute displacement",
                 max_displacement_mm = Math.Round(r.MaxDisplacementMM, 3),
                 deflection_limit_mm = Math.Round(data.LimitMM, 3),
                 span_m = Math.Round(data.SpanM, 3),
@@ -200,6 +217,9 @@ namespace RhinoAlmondBridge
         }
 
         private static double Len(double[] d) => Math.Sqrt(d[0] * d[0] + d[1] * d[1] + d[2] * d[2]);
+
+        private static double? Num(JToken t) =>
+            t != null && (t.Type == JTokenType.Float || t.Type == JTokenType.Integer) ? t.Value<double>() : (double?)null;
 
         private static string Error(string msg, List<string> warnings = null) =>
             JsonConvert.SerializeObject(new { status = "error", message = msg, warnings = warnings ?? new List<string>() });
@@ -219,6 +239,28 @@ namespace RhinoAlmondBridge
         public string Title, ColorBy = "displacement", Material;
         public string Engine = "api", DefaultTitle = "ALMOND  //  KARAMBA LIVE ANALYSIS";
         public bool ShowLegend = true;
+        /// <summary>Native solver: the largest member deflection relative to its supports (what the
+        /// span/limit check reads); null on the Karamba route, which only has the absolute maximum.</summary>
+        public double? MaxDeflectionMM;
+        /// <summary>Native solver: governing storey drift, its limit (h/ratio) and drift/limit.</summary>
+        public double? DriftMM, DriftLimitMM, DriftUtilization;
+        public bool DriftChecked;
+        /// <summary>The MCP server's verdict for this result (validate_structure's checks), when sent.</summary>
+        public string VerdictStatus;
+
+        /// <summary>The deflection judged against the limit: member-relative when the solver sent it.</summary>
+        public double CheckedDeflectionMM => MaxDeflectionMM ?? (Result?.MaxDisplacementMM ?? 0.0);
+
+        /// <summary>Serviceability fails: member deflection over span/limit, or storey drift over h/limit.</summary>
+        public bool Deflects => CheckedDeflectionMM > LimitMM || (DriftChecked && (DriftUtilization ?? 0.0) > 1.0);
+
+        public string Status(double maxUtil)
+        {
+            if (VerdictStatus == "pass" || VerdictStatus == "fail" || VerdictStatus == "indicative") return VerdictStatus;
+            if (Deflects) return "fail";
+            if (VerdictLabel != null) return "indicative";
+            return (double.IsNaN(maxUtil) || maxUtil <= 1.0) ? "pass" : "fail";
+        }
     }
 
     public class StructureConduit : DisplayConduit
@@ -243,10 +285,29 @@ namespace RhinoAlmondBridge
         protected override void CalculateBoundingBox(CalculateBoundingBoxEventArgs e)
         {
             if (Data?.Result == null) return;
+            // everything drawn, not just the undeformed members: the view's clipping planes come from this box,
+            // so support symbols below a base, load arrows and the exaggerated shape would otherwise be cut off
+            var pts = new List<Point3d>();
             foreach (var el in Data.Result.Elements)
             {
-                e.IncludeBoundingBox(new BoundingBox(new[] { P(el.StartM, new double[3], 0), P(el.EndM, new double[3], 0) }));
+                int n = el.SampleDispM.Count;
+                for (int i = 0; i < n; i++)
+                {
+                    double t = n > 1 ? i / (double)(n - 1) : 0;
+                    var m = new[] { el.StartM[0] + t * (el.EndM[0] - el.StartM[0]), el.StartM[1] + t * (el.EndM[1] - el.StartM[1]),
+                                    el.StartM[2] + t * (el.EndM[2] - el.StartM[2]) };
+                    pts.Add(P(m, new double[3], 0));
+                    pts.Add(P(m, el.SampleDispM[i], Data.Scale));
+                }
             }
+            double reach = Data.SpanM * 0.12 * Data.ToDoc;                // the load arrow length; symbols are smaller
+            foreach (var s in Data.Result.SupportPointsM.Concat(Data.Result.LoadedPointsM))
+            {
+                var p = P(s, new double[3], 0);
+                pts.Add(p + new Vector3d(reach, reach, reach));
+                pts.Add(p - new Vector3d(reach, reach, reach));
+            }
+            if (pts.Count > 0) e.IncludeBoundingBox(new BoundingBox(pts));
         }
 
         protected override void DrawForeground(DrawEventArgs e)
@@ -318,18 +379,15 @@ namespace RhinoAlmondBridge
             }
             // supports (triangles) and loaded nodes (arrows)
             double arrow = Data.SpanM * 0.12 * Data.ToDoc;
-            foreach (var s in r.SupportPointsM)
+            for (int si = 0; si < r.SupportPointsM.Count; si++)
             {
+                var s = r.SupportPointsM[si];
                 if (!NearShown(s)) continue;
                 var p = new Point3d(s[0] * Data.ToDoc, s[1] * Data.ToDoc, s[2] * Data.ToDoc);
-                double h = arrow * 0.22;
                 var side = e.Viewport.CameraX; side.Z = 0;
                 if (!side.Unitize()) side = Vector3d.XAxis;
-                var down = new Vector3d(0, 0, -h);
-                var tri = new[] { p, p + down + side * h * 0.8, p + down - side * h * 0.8 };
-                e.Display.DrawPolygon(tri, Color.FromArgb(233, 68, 43), true);
-                e.Display.DrawPolyline(new[] { tri[0], tri[1], tri[2], tri[0] }, Color.White, Math.Max(1, thick / 3));
-                e.Display.DrawLine(p + down * 1.25 + side * h, p + down * 1.25 - side * h, Color.White, Math.Max(1, thick / 3));
+                string glyph = si < r.SupportTypes.Count ? SupportSpec.Glyph(r.SupportTypes[si]) : "pinned";
+                DrawSupport(e, p, side, arrow * 0.22, glyph, Math.Max(1, thick / 3));
             }
             if (Data.Reveal >= 0.999)
                 foreach (var lp in r.LoadedPointsM)
@@ -341,17 +399,66 @@ namespace RhinoAlmondBridge
             if (Data.ShowLegend) DrawLegend(e, byUtil, dpi);
         }
 
+        /// <summary>Support symbol under point p: fixed = filled block on hatching, pinned = triangle on a
+        /// ground line, roller = triangle on rollers, spring = zigzag to a ground line.</summary>
+        private static void DrawSupport(DrawEventArgs e, Point3d p, Vector3d side, double h, string glyph, int w)
+        {
+            var red = Color.FromArgb(233, 68, 43);
+            var down = new Vector3d(0, 0, -h);
+            Point3d ground;
+            if (glyph == "fixed")
+            {
+                var box = new[] { p + side * h * 0.8, p - side * h * 0.8, p - side * h * 0.8 + down * 0.6, p + side * h * 0.8 + down * 0.6 };
+                e.Display.DrawPolygon(box, red, true);
+                e.Display.DrawPolyline(new[] { box[0], box[1], box[2], box[3], box[0] }, Color.White, w);
+                ground = p + down * 0.6;
+                for (int k = 0; k < 4; k++)                         // hatching
+                {
+                    var a = ground + side * h * (-0.8 + 0.5 * k);
+                    e.Display.DrawLine(a, a + down * 0.35 - side * h * 0.3, Color.White, w);
+                }
+                return;
+            }
+            if (glyph == "spring")
+            {
+                var pts = new List<Point3d> { p };
+                for (int k = 1; k <= 6; k++)
+                    pts.Add(p + down * (k / 7.0) + side * h * (k % 2 == 1 ? 0.45 : -0.45));
+                pts.Add(p + down);
+                e.Display.DrawPolyline(pts, red, w + 1);
+                ground = p + down;
+            }
+            else
+            {
+                var tri = new[] { p, p + down + side * h * 0.8, p + down - side * h * 0.8 };
+                e.Display.DrawPolygon(tri, red, true);
+                e.Display.DrawPolyline(new[] { tri[0], tri[1], tri[2], tri[0] }, Color.White, w);
+                ground = p + down;
+                if (glyph == "roller")
+                {
+                    foreach (double f in new[] { -0.45, 0.45 })
+                        e.Display.DrawCircle(new Circle(new Plane(ground + side * h * f + down * 0.18, side, Vector3d.ZAxis), h * 0.18), Color.White, w);
+                    ground += down * 0.36;
+                }
+            }
+            e.Display.DrawLine(ground + down * 0.25 + side * h, ground + down * 0.25 - side * h, Color.White, w);
+        }
+
         private void DrawLegend(DrawEventArgs e, bool byUtil, float dpi)
         {
             if (Data.BucklingAlpha.HasValue) { DrawBucklingLegend(e, dpi); return; }
             var r = Data.Result;
             var vp = e.Viewport.Bounds;
-            int w = (int)(380 * dpi), h = (int)(300 * dpi);
+            bool member = Data.MaxDeflectionMM.HasValue;                   // native: member-relative deflection
+            bool drift = Data.DriftMM.HasValue && Data.DriftLimitMM.HasValue;
+            int extra = (member ? 24 : 0) + (drift ? 24 : 0);
+            int w = (int)(380 * dpi), h = (int)((300 + extra) * dpi);
             int x0 = vp.Width - w - (int)(30 * dpi), y0 = (int)(30 * dpi);
             double maxU = r.Elements.Where(x => !double.IsNaN(x.Utilization)).Select(x => x.Utilization).DefaultIfEmpty(double.NaN).Max();
-            bool deflects = r.MaxDisplacementMM > Data.LimitMM;
-            bool indicative = Data.VerdictLabel != null && !deflects;      // no capacity verdict: only deflection can fail
-            bool pass = !deflects && (double.IsNaN(maxU) || maxU <= 1.0);
+            // the server's verdict when sent (validate_structure's checks, Class 4 included), else judged here
+            string status = Data.Status(maxU);
+            bool indicative = status == "indicative";                       // no capacity verdict
+            bool pass = status == "pass";
             var amber = Color.FromArgb(255, 186, 60);
             var accent = indicative ? amber : pass ? Color.FromArgb(40, 220, 90) : Color.FromArgb(233, 68, 43);
             e.Display.Draw2dRectangle(new Rectangle(x0, y0, w, h), Color.FromArgb(0, 0, 0, 0), 0, Color.FromArgb(215, 10, 10, 12));
@@ -360,22 +467,44 @@ namespace RhinoAlmondBridge
             int fs = Math.Max(10, (int)(16 * dpi)), fb = Math.Max(14, (int)(30 * dpi));
             DrawTitle(e, accent, tx, y0 + 18 * dpi, w - (int)(40 * dpi), fs);
             e.Display.Draw2dText(byUtil ? "UTILIZATION" : "DISPLACEMENT", Color.White, new Point2d(tx, y0 + 50 * dpi), false, fs, "Consolas");
-            e.Display.Draw2dText(string.Format("max δ {0:0.0} mm", r.MaxDisplacementMM), Color.White,
-                new Point2d(tx, y0 + 76 * dpi), false, fb, "Arial Black");
-            e.Display.Draw2dText(string.Format("limit L/{0:0} = {1:0.0} mm", Data.LimitRatio, Data.LimitMM), Color.FromArgb(200, 200, 205),
-                new Point2d(tx, y0 + 122 * dpi), false, fs, "Consolas");
+            var grey = Color.FromArgb(200, 200, 205);
+            var warn = Color.FromArgb(255, 120, 100);
+            // The verdict word is right-aligned on the title row band; the headline value keeps clear of it.
+            string verdictText = indicative ? Data.VerdictLabel : pass ? "PASS" : "FAIL";
+            int verdictSize = indicative ? Math.Max(10, (int)(20 * dpi)) : fb;
+            int right = x0 + w - (int)(18 * dpi);
+            int verdictX = right - (int)e.Display.Measure2dText(verdictText ?? "", new Point2d(0, 0), false, 0, verdictSize, "Arial Black").Width;
+            string headline = string.Format(member ? "max δ (member) {0:0.0} mm" : "max δ {0:0.0} mm", Data.CheckedDeflectionMM);
+            e.Display.Draw2dText(headline, Color.White, new Point2d(tx, y0 + 76 * dpi), false,
+                FitSize(e, headline, member ? Math.Max(12, (int)(24 * dpi)) : fb, right - tx, "Arial Black"), "Arial Black");
+            e.Display.Draw2dText(string.Format("limit L/{0:0} = {1:0.0} mm", Data.LimitRatio, Data.LimitMM),
+                Data.CheckedDeflectionMM > Data.LimitMM ? warn : grey, new Point2d(tx, y0 + 122 * dpi), false, fs, "Consolas");
+            double y = 146;
+            if (member)
+            {
+                // the absolute maximum (column shortening and sway included) is not the checked value
+                e.Display.Draw2dText(string.Format("displacement {0:0.0} mm (absolute)", r.MaxDisplacementMM), grey,
+                    new Point2d(tx, y0 + y * dpi), false, fs, "Consolas");
+                y += 24;
+            }
+            if (drift)
+            {
+                bool over = Data.DriftChecked && (Data.DriftUtilization ?? 0) > 1.0;
+                e.Display.Draw2dText(string.Format("storey drift {0:0.0} mm / limit {1:0.0} mm{2}", Data.DriftMM, Data.DriftLimitMM,
+                    Data.DriftChecked ? "" : " (info)"), over ? warn : grey, new Point2d(tx, y0 + y * dpi), false, fs, "Consolas");
+                y += 24;
+            }
             if (!double.IsNaN(maxU))
-                e.Display.Draw2dText(maxU > 10 ? "utilization > 10  (unstable)" : string.Format("utilization {0:0.00}", maxU), maxU > 1 ? Color.FromArgb(255, 120, 100) : Color.FromArgb(200, 200, 205),
-                    new Point2d(tx, y0 + 146 * dpi), false, fs, "Consolas");
-            e.Display.Draw2dText(Data.LoadLabel ?? string.Format("load {0:0} kN{1}  ·  {2}", Data.LoadKN, Data.SelfWeight ? " + self weight" : "", Data.Material),
-                Color.FromArgb(200, 200, 205), new Point2d(tx, y0 + 170 * dpi), false, fs, "Consolas");
-            if (indicative)
-                e.Display.Draw2dText(Data.VerdictLabel, amber, new Point2d(tx + 190 * dpi, y0 + 54 * dpi), false, Math.Max(10, (int)(20 * dpi)), "Arial Black");
-            else
-                e.Display.Draw2dText(pass ? "PASS" : "FAIL", pass ? Color.FromArgb(40, 220, 90) : Color.FromArgb(240, 40, 30),
-                    new Point2d(tx + 220 * dpi, y0 + 50 * dpi), false, fb, "Arial Black");
+                e.Display.Draw2dText(maxU > 10 ? "utilization > 10  (unstable)" : string.Format("utilization {0:0.00}", maxU), maxU > 1 ? warn : grey,
+                    new Point2d(tx, y0 + y * dpi), false, fs, "Consolas");
+            string loadText = Data.LoadLabel ?? string.Format("load {0:0} kN{1}  ·  {2}", Data.LoadKN, Data.SelfWeight ? " + self weight" : "", Data.Material);
+            e.Display.Draw2dText(loadText, grey, new Point2d(tx, y0 + (y + 24) * dpi), false,
+                FitSize(e, loadText, fs, right - tx, "Consolas"), "Consolas");
+            if (!string.IsNullOrEmpty(verdictText))
+                e.Display.Draw2dText(verdictText, indicative ? amber : pass ? Color.FromArgb(40, 220, 90) : Color.FromArgb(240, 40, 30),
+                    new Point2d(verdictX, y0 + 44 * dpi), false, verdictSize, "Arial Black");
             // gradient bar
-            int bx = tx, by = (int)(y0 + 206 * dpi), bw = w - (int)(48 * dpi), bh = (int)(16 * dpi);
+            int bx = tx, by = (int)(y0 + (206 + extra) * dpi), bw = w - (int)(48 * dpi), bh = (int)(16 * dpi);
             for (int i = 0; i < bw; i++)
                 e.Display.Draw2dLine(new System.Drawing.Point(bx + i, by), new System.Drawing.Point(bx + i, by + bh), Ramp((double)i / bw), 1);
             string lo = byUtil ? "0" : "0 mm", hi = byUtil ? "1.0" : string.Format("{0:0.0} mm", r.MaxDisplacementMM);
@@ -384,6 +513,14 @@ namespace RhinoAlmondBridge
             e.Display.Draw2dText(hi, Color.White, new Point2d(bx + bw - hiBox.Width, by + bh + 16 * dpi), false, fs, "Consolas");
             e.Display.Draw2dText(string.Format("deformation shown x{0:0}", Data.Scale), Color.FromArgb(160, 160, 168),
                 new Point2d(tx, by + bh + 44 * dpi), false, fs, "Consolas");
+        }
+
+        /// <summary>The largest text height (down to 8 px) at which text fits the given width.</summary>
+        private static int FitSize(DrawEventArgs e, string text, int size, int width, string font)
+        {
+            while (size > 8 && e.Display.Measure2dText(text, new Point2d(0, 0), false, 0, size, font).Width > width)
+                size--;
+            return size;
         }
 
         /// <summary>Legend for a buckling mode: alpha_cr and its EN 1993-1-1 5.2.1 classification.</summary>
@@ -413,9 +550,13 @@ namespace RhinoAlmondBridge
         /// <summary>Legend title shrunk to fit the panel width (long stage/iteration titles).</summary>
         private void DrawTitle(DrawEventArgs e, Color c, int x, double y, int maxW, int fs)
         {
+            // The native engine is stable (0.8.0); the Karamba route is still in beta and its legend says so.
+            string title = Data.Title ?? "";
+            if (Data.Engine != "native" && title.IndexOf("BETA", StringComparison.OrdinalIgnoreCase) < 0)
+                title = ("(BETA)  " + title).Trim();   // first: long titles are cut at the end
             int size = fs;
-            while (size > 8 && e.Display.Measure2dText(Data.Title, new Point2d(0, 0), false, 0, size, "Consolas").Width > maxW) size--;
-            e.Display.Draw2dText(Data.Title, c, new Point2d(x, y), false, size, "Consolas");
+            while (size > 8 && e.Display.Measure2dText(title, new Point2d(0, 0), false, 0, size, "Consolas").Width > maxW) size--;
+            e.Display.Draw2dText(title, c, new Point2d(x, y), false, size, "Consolas");
         }
 
         private void DrawOffLegend(DrawEventArgs e, float dpi, int shown, int n)

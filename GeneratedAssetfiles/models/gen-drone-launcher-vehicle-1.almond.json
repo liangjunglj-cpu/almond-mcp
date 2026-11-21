@@ -1,0 +1,352 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-drone-launcher-vehicle-1",
+  "library_id": "generated_assets",
+  "name": "Drone launcher vehicle (Chunky rounded wheeled service vehicle with a folding crane boom on top and two fold-out ramp wings; generated prop; detailed geometry edition)",
+  "source_app": "tripo",
+  "source_units": "m",
+  "file": "gen-drone-launcher-vehicle-1.glb",
+  "dimensions_mm": {
+    "width": 1861.4,
+    "depth": 3200.8,
+    "height": 2205.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "ground",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -930.7,
+        -1600.4,
+        0.0
+      ],
+      "max": [
+        930.7,
+        1600.4,
+        2205.0
+      ]
+    },
+    "footprint": [
+      [
+        -930.7,
+        -1600.4
+      ],
+      [
+        930.7,
+        -1600.4
+      ],
+      [
+        930.7,
+        1600.4
+      ],
+      [
+        -930.7,
+        1600.4
+      ]
+    ],
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "movable"
+  },
+  "materials": [
+    {
+      "material_id": "ceramic-teal",
+      "objects": [
+        "gen-drone-launcher-vehicle-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-drone-launcher-vehicle-1",
+    "library_id": "generated_assets",
+    "name": "Drone launcher vehicle (Chunky rounded wheeled service vehicle with a folding crane boom on top and two fold-out ramp wings; generated prop; detailed geometry edition)",
+    "category": "vehicle",
+    "tags": [
+      "service vehicle",
+      "drone launcher",
+      "crane",
+      "ramp",
+      "vehicle",
+      "sci-fi",
+      "detailed",
+      "tripo",
+      "ginkgo-refset-1007"
+    ],
+    "dimensions_mm": {
+      "width": 1861.4,
+      "depth": 3200.8,
+      "height": 2205.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 1861.0,
+      "depth": 3200.0,
+      "height": 2205.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "ground",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -930.7,
+          -1600.4,
+          0.0
+        ],
+        "max": [
+          930.7,
+          1600.4,
+          2205.0
+        ]
+      },
+      "footprint": [
+        [
+          -930.7,
+          -1600.4
+        ],
+        [
+          930.7,
+          -1600.4
+        ],
+        [
+          930.7,
+          1600.4
+        ],
+        [
+          -930.7,
+          1600.4
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "movable"
+    },
+    "materials": [
+      {
+        "material_id": "ceramic-teal",
+        "objects": [
+          "gen-drone-launcher-vehicle-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "tripo",
+      "parameters": {
+        "prompt": "Clean 3D model reference of ONLY the teal drone launcher vehicle from the reference image, same design: chunky rounded teal cab body with lime-green trim, square side hatch, two fold-out ramp wings deployed on the sides, short wheeled chassis, tall lime boom arm folded upright on top (no landing canopy, no drones). Three-quarter view from slightly above, entire object in frame with margin, isolated on a plain neutral grey studio backdrop, soft even studio lighting, no ground clutter, no text, no logos, no numbers.",
+        "image_task_id": null,
+        "image_model": "gpt_image_2_5",
+        "mesh_task_id": "cc8cbcb9-c15b-4062-8963-fb3e3d18d07b",
+        "mesh_model": "tripo_h3_1_image_to_3d",
+        "generated_at": "2026-10-06",
+        "orientation_correction": null,
+        "scale_applied": 3261.372928,
+        "captured_generation": {
+          "batch_id": "ginkgo-refset-1007",
+          "image": {
+            "asset_id": "gen-drone-launcher-vehicle-1",
+            "provider": "higgsfield",
+            "tool": "generate_image_batch",
+            "submitted_at": "2026-10-06T22:08:46.118Z",
+            "request": {
+              "model": "gpt_image_2_5",
+              "aspect_ratio": "1:1",
+              "medias": [
+                {
+                  "role": "image_references",
+                  "value": "f4595f0c-03cd-4adf-88b0-cd4946d5f2a9"
+                }
+              ],
+              "prompt": "Clean 3D model reference of ONLY the teal drone launcher vehicle from the reference image, same design: chunky rounded teal cab body with lime-green trim, square side hatch, two fold-out ramp wings deployed on the sides, short wheeled chassis, tall lime boom arm folded upright on top (no landing canopy, no drones). Three-quarter view from slightly above, entire object in frame with margin, isolated on a plain neutral grey studio backdrop, soft even studio lighting, no ground clutter, no text, no logos, no numbers."
+            },
+            "batch_context": "Remaining rate-limited hero reference images (launcher, drone, shuttle, tram).",
+            "task_id": "00ec84fa-2f67-4e06-b783-08aee1485782",
+            "status": "COMPLETED",
+            "provider_model": "gpt_image_2_5",
+            "provider_reported_model": "gpt_image_2_5",
+            "completed_observed_at": "2026-10-06T22:09:26.943Z",
+            "provider_output_name": "hf_20261006_220912_00ec84fa-2f67-4e06-b783-08aee1485782.png",
+            "consumed_credits": "0.25 (Higgsfield cost quote for gpt_image_2_5 returned in the Ginkgo session)",
+            "concept_reference": {
+              "job_id": "f4595f0c-03cd-4adf-88b0-cd4946d5f2a9",
+              "name": "W054_b.png",
+              "sha256": "f5457cacae301016217c7f4b8bbcc90d1cc25a24b989f132faf6950cc621cf56",
+              "retained": false,
+              "submitted_at": "2026-10-06T22:03:47.913Z",
+              "model": "gpt_image_2_5",
+              "prompt": "Environment concept art, low dramatic three-quarter view at ground level on a drone launch apron: a chunky rounded teal launcher vehicle with lime trim, side ramp wings deployed, a tall lime boom arm arcing overhead, a lime cross-shaped landing canopy looming above on a black mast. Small teal quadcopter drones with lime propellers parked in a row on square pads with white corner brackets, teal hose lines, hazard stripes, glossy painted asphalt with subtle wear. Sunny daylight, soft shadow, crisp bevelled toy-like hard-surface design, high-detail stylised realistic 3D render, shallow depth of field. No readable words, no logos, no brands; only simple numerals and abstract glyphs.",
+              "note": "Concept image generated in the same Ginkgo session from a text-only prompt (no image input); given to this image request as its only image reference by Higgsfield job ID. Not distributed."
+            },
+            "reference_inputs": [],
+            "output_file": "gen-drone-launcher-vehicle-1.png",
+            "output_sha256": "3fd1d38940ead13a5256af4c5c33ce680ef85448b59552544c27c570f69e929c",
+            "output_file_modified_at": "2026-10-06T22:10:07+00:00",
+            "seed": null,
+            "evidence_source": {
+              "pass_records": [
+                "runs/refset_1007/pass.json",
+                "runs/refset_1007/concept/jobs.json",
+                "runs/refset_1007/meshy/jobs.json",
+                "ProjectY2K: twofronts/meshy/ginkgo_props_v061/out/conditioning.json"
+              ],
+              "session_records": "Tool calls of Ginkgo Claude Code session(s) 7ee433c3-63f6-4781-b345-d2c4f70b8e73 (submissions, results and downloads)",
+              "extracted_at": "2026-11-20T17:58:55+00:00"
+            },
+            "status_basis": "Provider reported completed; curl of the job's result URL in the Ginkgo session (Bash, 2026-10-06T22:10:05.505Z)"
+          },
+          "mesh": {
+            "asset_id": "gen-drone-launcher-vehicle-1",
+            "provider": "higgsfield",
+            "tool": "generate_3d",
+            "submitted_at": "2026-10-06T22:11:12.306Z",
+            "request": {
+              "model": "tripo_h3_1_image_to_3d",
+              "medias": [
+                {
+                  "role": "image_references",
+                  "value": "00ec84fa-2f67-4e06-b783-08aee1485782"
+                }
+              ],
+              "geometry_quality": "detailed",
+              "texture_quality": "detailed",
+              "pbr": true
+            },
+            "task_id": "cc8cbcb9-c15b-4062-8963-fb3e3d18d07b",
+            "status": "COMPLETED",
+            "status_basis": "Higgsfield jobs_wait reported completed; GLB downloaded with curl from the job's result URL in the Ginkgo session (Bash, 2026-10-06T22:16:54.256Z)",
+            "provider_model": "tripo_h3_1_image_to_3d",
+            "completed_observed_at": "2026-10-06T22:16:47.212Z",
+            "provider_output_name": "hf_20261006_221158_cc8cbcb9-c15b-4062-8963-fb3e3d18d07b.glb",
+            "consumed_credits": "18 Higgsfield credits (cost quote returned in the Ginkgo session)",
+            "input_link": "media_job_id",
+            "input_image_sha256": "3fd1d38940ead13a5256af4c5c33ce680ef85448b59552544c27c570f69e929c",
+            "output_file": "gen-drone-launcher-vehicle-1.glb",
+            "output_sha256": "c919e202772a2dec3ecf6c20eac6ee56df0219f4b198a3d2db2f35ce368a9bb4",
+            "seed": null,
+            "evidence_source": {
+              "pass_records": [
+                "runs/refset_1007/pass.json",
+                "runs/refset_1007/concept/jobs.json",
+                "runs/refset_1007/meshy/jobs.json",
+                "ProjectY2K: twofronts/meshy/ginkgo_props_v061/out/conditioning.json"
+              ],
+              "session_records": "Tool calls of Ginkgo Claude Code session(s) 7ee433c3-63f6-4781-b345-d2c4f70b8e73 (submissions, results and downloads)",
+              "extracted_at": "2026-11-20T17:58:55+00:00"
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-drone-launcher-vehicle-1",
+            "source_sha256": "c919e202772a2dec3ecf6c20eac6ee56df0219f4b198a3d2db2f35ce368a9bb4",
+            "source_triangles": 1908491,
+            "target_triangles": 80000,
+            "prepared_sha256": "08b417afbd2fb500bfaf3b05ab624b33560239b113463079b588190a547579d9",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Remove wire edges, split edges shared by more than two faces and remove zero-area faces (counts in quality.topology_repairs). Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 9.810715317726134e-08,
+            "quality": {
+              "vertices": 39954,
+              "triangles": 79999,
+              "boundary_edges": 49,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 16,
+              "largest_component_vertices": 39909,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 0,
+              "topology_repairs": {
+                "wire_edges_removed": 0,
+                "nonmanifold_edges_split": 16,
+                "zero_area_faces_removed": 0,
+                "loose_vertices_removed": 0
+              },
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                0.00022719025507355012,
+                0.0003653783868659654,
+                5.1570988964954386e-05
+              ]
+            }
+          },
+          "input_image_file": "batches/ginkgo-refset-1007/gen-drone-launcher-vehicle-1.png",
+          "external_reference_status": "Two-step image stage. The concept images were generated in the Ginkgo session from text-only prompts that describe an owner reference set of 9 images pasted into the session on 2026-10-06 (third-party photographs and artworks: a toy-like drone hangar, habitat units, a red ring megastructure, an overgrown capsule car in a pink flower forest, a six-wheeled rover, a Tokyo vertical-farm building and a Tokyo rooftop; described in runs/refset_1007/pass.json). Each single-object reference image then took one concept image as its only image reference (named and hashed in the image record as concept_reference, not distributed). No owner reference photograph was uploaded to any generator. Design-proximity review 2026-11-20: the generated references were compared with the owner's reference photographs; the rover and capsule tram share subject and colourway with two of them but differ in form (see their reference_review); the others are generic types. Provider textures are not distributed; only geometry ships.",
+          "external_reference_ids": [],
+          "dimension_basis": "Sci-fi vehicles use the sizes Project Y2K content v061 gave them (twofronts/meshy/ginkgo_props_v061 condition_ginkgo_props.py SPEC, longest horizontal side): capsule tram 9.0 m, six-wheeled rover 5.4 m, drone launcher vehicle 3.2 m, shuttle 12.0 m, drone 1.4 m; each mesh was scaled uniformly so that side matches, and height, width and depth were measured after scaling. The planter box keeps Y2K's 1.9 m length, a real trough length. Real-world heights replace stylised ones for the rest: rooftop water tank pair 3.0 m overall (about 2 m stainless tanks on a 1 m stand; Y2K used 5.2 m), flower clump 0.60 m (the prompt's \"about knee high\"; Y2K used 0.85 m). Not a physical survey.",
+          "reference_review": "Reference image reviewed on 2026-11-20 at 1000 px (from 1024 px): hazard-stripe edging and blank panels, no lettering, numbers, logos or brand marks. Checked for armament: the \"launcher\" is a drone launch and service vehicle (crane boom, deployable ramps, wheeled chassis) from the drone-hangar world, not a weapon; no barrels, tubes or munitions. Image reference: concept W054_b.png (Higgsfield job f4595f0c). Design proximity: the owner's drone-hangar references show a central launcher at small scale; the generated vehicle is a different, generic form.",
+          "rights": "Concept and reference images generated on the owner's Higgsfield account (gpt_image_2_5); meshes with Tripo H3.1 through the owner's Higgsfield account (water tanks, rover, capsule tram, drone, launcher, shuttle) or with Meshy-7.1 image-to-3D on the owner's Meshy account (planter box, flower clump). Owner approved release in the Almond library under CC BY 4.0 on 2026-11-20 (\"increase the range of models, from the ones i used for my project y2k games, (except for the operatives and bosses)\") and chose this group, Ginkgo props reused in Project Y2K, the same day. The Ginkgo pass records an owner go-ahead on 2026-10-07 (\"go ahead with the plan\") that covered generation for the GRANDWHIS world packs, not this library. Generator account entitlements and the Tripo terms not independently audited. Provider textures are not distributed.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private); reused in Project Y2K, the owner's game project (private)",
+            "pass": "runs/refset_1007",
+            "source_name": "launcher",
+            "records": [
+              "runs/refset_1007/pass.json (owner reference set described; AI-assisted content statement)",
+              "runs/refset_1007/concept/jobs.json (concept image job IDs)",
+              "runs/refset_1007/meshy/jobs.json (reference image, Tripo and Meshy IDs)",
+              "ProjectY2K: twofronts/meshy/ginkgo_props_v061/condition_ginkgo_props.py and out/conditioning.json (content v061 conditioned these props for the Mirai Ward hub as SM_GK61_<Name>.fbx)",
+              "ProjectY2K: twofronts/infrastructure/scripts/world_fill_v061.py (places the conditioned props in the hub)",
+              "Claude Code session transcript 7ee433c3-63f6-4781-b345-d2c4f70b8e73 (the tool calls that submitted the concept, reference image, Tripo and Meshy jobs, the curl downloads and the Meshy downloads)"
+            ]
+          }
+        }
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "streetscape"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.0,
+      "triangle_count": 79999,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "67DD7142EC9701CB3C5513D696801210003B4013CD66704E4221A4AF9C78658E"
+}

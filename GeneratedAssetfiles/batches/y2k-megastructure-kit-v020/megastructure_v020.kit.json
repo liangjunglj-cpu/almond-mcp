@@ -1,0 +1,176 @@
+{
+ "kit": "megastructure_v020",
+ "front": "unreal local +Y",
+ "modules": [
+  {
+   "asset": "SM_MegaCore",
+   "note": "24 m stackable tower segment, fins + window grid",
+   "triangles": 3660,
+   "dimensions_m": [
+    21.12,
+    21.14,
+    24.0
+   ],
+   "materials": [
+    "MegaConcreteDark",
+    "MegaWindow",
+    "MegaConcrete",
+    "MegaMetal",
+    "MegaWhite"
+   ]
+  },
+  {
+   "asset": "SM_MegaBase",
+   "note": "podium base with buttresses",
+   "triangles": 1068,
+   "dimensions_m": [
+    28.2,
+    28.2,
+    10.0
+   ],
+   "materials": [
+    "MegaConcrete",
+    "MegaMetal",
+    "MegaConcreteDark"
+   ]
+  },
+  {
+   "asset": "SM_MegaCap",
+   "note": "roof: parapet, railing, plant boxes, stair house",
+   "triangles": 1380,
+   "dimensions_m": [
+    20.0,
+    20.0,
+    3.8
+   ],
+   "materials": [
+    "MegaConcrete",
+    "MegaWhite"
+   ]
+  },
+  {
+   "asset": "SM_MegaAntennaCluster",
+   "note": "rooftop lattice mast, whips, panels, dishes",
+   "triangles": 1176,
+   "dimensions_m": [
+    8.0,
+    8.0,
+    15.8
+   ],
+   "materials": [
+    "MegaConcrete",
+    "MegaWhite",
+    "MegaMetal"
+   ]
+  },
+  {
+   "asset": "SM_MegaDish",
+   "note": "3 m satellite dish on a stand",
+   "triangles": 176,
+   "dimensions_m": [
+    3.0,
+    1.91,
+    3.99
+   ],
+   "materials": [
+    "MegaMetal",
+    "MegaWhite"
+   ]
+  },
+  {
+   "asset": "SM_MegaACStack",
+   "note": "2 x 3 wall AC units on brackets",
+   "triangles": 1136,
+   "dimensions_m": [
+    3.25,
+    0.54,
+    1.9
+   ],
+   "materials": [
+    "MegaWhite",
+    "MegaConcreteDark",
+    "MegaMetal",
+    "MegaRust"
+   ]
+  },
+  {
+   "asset": "SM_MegaPipeBundle",
+   "note": "12 m vertical pipe bundle with clamps and conduit",
+   "triangles": 236,
+   "dimensions_m": [
+    1.45,
+    0.52,
+    12.0
+   ],
+   "materials": [
+    "MegaMetal",
+    "MegaRust",
+    "MegaConcreteDark",
+    "MegaWhite"
+   ]
+  },
+  {
+   "asset": "SM_MegaScaffold",
+   "note": "4 x 8 m tube scaffold bay with planks",
+   "triangles": 312,
+   "dimensions_m": [
+    4.05,
+    1.26,
+    9.2
+   ],
+   "materials": [
+    "MegaRust",
+    "MegaConcreteDark"
+   ]
+  },
+  {
+   "asset": "SM_MegaAccretion",
+   "note": "6 x 3.4 x 3.2 m bolt-on dwelling box",
+   "triangles": 280,
+   "dimensions_m": [
+    6.4,
+    4.41,
+    3.4
+   ],
+   "materials": [
+    "MegaConcreteDark",
+    "MegaGlass",
+    "MegaConcrete",
+    "MegaMetal",
+    "MegaRust",
+    "MegaWhite"
+   ]
+  },
+  {
+   "asset": "SM_MegaSlotWall",
+   "note": "8 x 12 m slot-window wall panel",
+   "triangles": 84,
+   "dimensions_m": [
+    8.0,
+    1.1,
+    12.0
+   ],
+   "materials": [
+    "MegaConcrete",
+    "MegaGlass",
+    "MegaConcreteDark",
+    "MegaWhite"
+   ]
+  },
+  {
+   "asset": "SM_MegaNeonSign",
+   "note": "7 m vertical neon sign on arms",
+   "triangles": 48,
+   "dimensions_m": [
+    1.5,
+    0.8,
+    7.2
+   ],
+   "materials": [
+    "MegaMetal",
+    "MegaSign",
+    "MegaRust"
+   ]
+  }
+ ]
+}

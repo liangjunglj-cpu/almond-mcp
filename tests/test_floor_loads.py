@@ -62,11 +62,35 @@ def test_rectangular_two_way_trapezoids():
     assert loads["y0-4@x0"] == pytest.approx(short) and loads["x0-6@y0"] == pytest.approx(long)
 
 
-def test_one_way_bay_loads_only_the_long_beams():
-    f, _ = grid([0, 6], [0, 2])                     # ratio 3: one-way
-    fl.apply(f, imposed_kn_m2=1.0)
+def test_one_way_bay_short_beams_carry_their_end_strips():
+    """6 x 2 bay (ratio 3, one-way): the 45-degree end strips go to the short beams, s^2 / 4 = 1.0 kN each
+    per kN/m2; the long beams take the rest, s l / 2 - s^2 / 4 = 5.0 kN."""
+    f, _ = grid([0, 6], [0, 2])
+    rep = fl.apply(f, imposed_kn_m2=1.0)
     loads = element_loads(f)
-    assert loads.get("y0-2@x0", 0.0) == pytest.approx(0.0) and loads["x0-6@y0"] == pytest.approx(6.0)
+    assert loads["y0-2@x0"] == pytest.approx(1.0) and loads["y0-2@x6"] == pytest.approx(1.0)
+    assert loads["x0-6@y0"] == pytest.approx(5.0) and loads["x0-6@y2"] == pytest.approx(5.0)
+    assert rep["levels"][0]["one_way_bays"] == 1
+
+
+@pytest.mark.parametrize("ratio", [2.5, 3.0, 6.0])
+def test_one_way_bay_conserves_the_load(ratio):
+    """Every bay above 2:1 sends exactly area x q to its beams (q = 3.5 kN/m2 = 2.5 imposed + 1.0 dead),
+    and each short beam its end strip, q s^2 / 4."""
+    s, q = 2.0, 3.5
+    f, _ = grid([0, s * ratio], [0, s])
+    rep = fl.apply(f, imposed_kn_m2=2.5, dead_kn_m2=1.0)
+    loads = element_loads(f)
+    assert sum(loads.values()) == pytest.approx(s * s * ratio * q, rel=1e-12)
+    assert rep["total_kn"] == pytest.approx(s * s * ratio * q)
+    assert loads["y0-2.0@x0"] == pytest.approx(q * s ** 2 / 4, rel=1e-12)
+    assert rep["levels"][0]["one_way_bays"] == 1
+
+
+def test_bay_at_2_to_1_is_two_way():
+    f, _ = grid([0, 4], [0, 2])
+    rep = fl.apply(f, imposed_kn_m2=1.0)
+    assert "one_way_bays" not in rep["levels"][0] and sum(element_loads(f).values()) == pytest.approx(8.0)
 
 
 def test_triangular_shape_matches_closed_form_on_a_simple_beam():
@@ -191,16 +215,19 @@ def test_crossed_bay_in_a_larger_floor_is_not_dropped():
 
 def test_crossing_members_with_overhangs_load_only_the_enclosed_part():
     """Two beams crossed by two others past their ends: one-way bay 6 x 2 on the parts between the
-    crossings, nothing on the overhangs."""
+    crossings (long beams 5.0 kN, short ends 1.0 kN each), nothing on the overhangs."""
     f = fs.Frame()
     for a, b, tag in (((-1, 0), (7, 0), "L0"), ((-1, 2), (7, 2), "L2"), ((0, -1), (0, 3), "T0"), ((6, -1), (6, 3), "T6")):
         f.add_element(f.add_node((*a, 3.0)), f.add_node((*b, 3.0)), SEC, STEEL, tag=[tag])
     rep = fl.apply(f, imposed_kn_m2=1.0)
     loads = element_loads(f)
-    assert rep["area_m2"] == pytest.approx(12.0) and loads["L0"] == pytest.approx(6.0) and loads["L2"] == pytest.approx(6.0)
+    assert rep["area_m2"] == pytest.approx(12.0) and loads["L0"] == pytest.approx(5.0) and loads["L2"] == pytest.approx(5.0)
+    assert loads["T0"] == pytest.approx(1.0) and loads["T6"] == pytest.approx(1.0)
     for ei, wa, wb, _ in f.member_loads:
         e = f.elements[ei]
-        assert 0.0 - 1e-9 <= min(f.nodes[e.n1][0], f.nodes[e.n2][0]) and max(f.nodes[e.n1][0], f.nodes[e.n2][0]) <= 6.0 + 1e-9
+        xs = (f.nodes[e.n1][0], f.nodes[e.n2][0])
+        ys = (f.nodes[e.n1][1], f.nodes[e.n2][1])
+        assert 0.0 - 1e-9 <= min(xs) and max(xs) <= 6.0 + 1e-9 and 0.0 - 1e-9 <= min(ys) and max(ys) <= 2.0 + 1e-9
 
 
 def test_stub_inside_a_bay_does_not_drop_it():

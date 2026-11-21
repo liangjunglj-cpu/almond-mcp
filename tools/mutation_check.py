@@ -12,10 +12,11 @@ import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-TESTS = ["tests/test_frame_solver.py", "tests/test_native_structure.py", "tests/test_load_combinations.py",
+TESTS = ["tests/test_rigorous_validation.py", "tests/test_frame_solver.py", "tests/test_native_structure.py", "tests/test_load_combinations.py",
          "tests/test_end_releases.py", "tests/test_stability.py", "tests/test_floor_loads.py",
          "tests/test_asset_loads.py", "tests/test_design_codes.py", "tests/test_structure_study.py",
-         "tests/test_validate_engines.py", "tests/test_visualize_native.py", "tests/test_hand_calculations.py", "tests/test_ec3.py"]
+         "tests/test_validate_engines.py", "tests/test_visualize_native.py", "tests/test_hand_calculations.py", "tests/test_ec3.py",
+         "tests/test_deflection_verdicts.py", "tests/test_curved_members.py", "tests/test_deflection_combined.py"]
 
 MUTANTS = [
     ("load factor gamma_G 1.35 -> 1.30", "almond_mcp/code_profiles/eurocode.json", '"gamma_G": {"value": 1.35', '"gamma_G": {"value": 1.30'),
@@ -46,6 +47,18 @@ MUTANTS = [
     ("Annex B class-3 kyy 0.6 -> 0.3", "almond_mcp/ec3.py",
      "kyy = cm_y * min(1 + 0.6 * lam_y * n_y, 1 + 0.6 * n_y)", "kyy = cm_y * min(1 + 0.3 * lam_y * n_y, 1 + 0.3 * n_y)"),
     ("Table B.3 Cm floor 0.4 -> 0.2", "almond_mcp/ec3.py", "return max(0.4, 0.6 + 0.4 * psi)", "return max(0.2, 0.6 + 0.4 * psi)"),
+    ("Table B.3 point loads on the uniform-load column", "almond_mcp/ec3.py",
+     'uniform = load != "concentrated"', "uniform = True"),
+    ("Table B.3 row 2 alpha_s factor 0.8 -> 0.6", "almond_mcp/ec3.py",
+     "cm = 0.1 - 0.8 * a if uniform else -0.8 * a", "cm = 0.1 - 0.6 * a if uniform else -0.6 * a"),
+    ("Table B.3 row 3 uniform 0.95 -> 1.0", "almond_mcp/ec3.py",
+     "0.95 + 0.05 * a if uniform", "1.0 + 0.0 * a if uniform"),
+    ("Table B.3 row 3 psi < 0 term dropped", "almond_mcp/ec3.py", "a *= 1 + 2 * psi", "a *= 1 + 0 * psi"),
+    ("Table B.3 Ms at the peak, not mid-span", "almond_mcp/ec3.py",
+     'out["ms"] = float(np.interp(0.5, tu, Mu))', 'out["ms"] = float(Mu[np.argmax(np.abs(Mu))])'),
+    ("sway buckling mode Cm 0.9 -> 0.6", "almond_mcp/ec3.py", "SWAY_CM = 0.9", "SWAY_CM = 0.6"),
+    ("cantilever tip not seen as a free end", "almond_mcp/ec3.py",
+     "if not held and touching.get(n, 0) <= own.count(n):", "if False:"),
     ("cold-formed tubes on the hot-finished curve", "almond_mcp/ec3.py",
      'if fabrication == "hot_finished":', "if True:"),
     ("CHS class-3 limit not scaled by fy", "almond_mcp/ec3.py",
@@ -55,7 +68,108 @@ MUTANTS = [
      "out.setdefault(i, []).append(i)"),
     ("deflection limit ratio ignored by the overlay", "almond_mcp/structure_study.py",
      '"deflection_limit_ratio": limit_ratio}', '"deflection_limit_ratio": 250.0}'),
+    # 6.2.6 shear, 6.2.8 bending and shear
+    ("V_pl,Rd without the 1/sqrt(3)", "almond_mcp/ec3.py",
+     "vpl_y, vpl_z = (a * fy / math.sqrt(3) / gamma_m0 for a in (av_y, av_z))",
+     "vpl_y, vpl_z = (a * fy / gamma_m0 for a in (av_y, av_z))"),
+    ("RHS shear areas swapped (h <-> b)", "almond_mcp/ec3.py",
+     "return A * b / (b + h), A * h / (b + h)", "return A * h / (b + h), A * b / (b + h)"),
+    ("I shear area loses the tw tf term", "almond_mcp/ec3.py",
+     "max(A - 2 * b * tf + tw * tf, eta * hw * tw)", "max(A - 2 * b * tf, eta * hw * tw)"),
+    ("CHS shear area 2A/pi -> A/pi", "almond_mcp/ec3.py",
+     "return 2 * A / math.pi, 2 * A / math.pi", "return A / math.pi, A / math.pi"),
+    ("shear buckling limit 72 eps -> 60 eps", "almond_mcp/ec3.py",
+     "return r is not None and r > 72 * epsilon(fy) / eta", "return r is not None and r > 60 * epsilon(fy) / eta"),
+    ("high-shear threshold 0.5 V_pl -> 0.6 V_pl", "almond_mcp/ec3.py",
+     "np.where(r > 0.5, np.minimum((2 * r - 1) ** 2, 1.0), 0.0)", "np.where(r > 0.6, np.minimum((2 * r - 1) ** 2, 1.0), 0.0)"),
+    ("rho not squared", "almond_mcp/ec3.py",
+     "np.where(r > 0.5, np.minimum((2 * r - 1) ** 2, 1.0), 0.0)", "np.where(r > 0.5, np.minimum((2 * r - 1), 1.0), 0.0)"),
+    ("(6.30) A_w^2/(4 tw) -> A_w^2/(6 tw)", "almond_mcp/ec3.py",
+     "web = hw ** 2 * tw / 4 if use_plastic", "web = hw ** 2 * tw / 6 if use_plastic"),
+    ("shear ignored: moment not reduced by 6.2.8", "almond_mcp/ec3.py",
+     "        Wy, Wz = _reduced_moduli(s, Wy, Wz, use_plastic, rho_y, rho_z)\n", ""),
+    ("shear diagram ignores the member load", "almond_mcp/frame_solver.py",
+     "Vz = -(fl[2] + wa[2] * x + (wb[2] - wa[2]) * x ** 2 / (2 * L))", "Vz = -(fl[2] + 0.0 * x)"),
+    # 5.3.2(6) local bow imperfections
+    ("Table 5.1 curve c e0 L/200 -> L/250", "almond_mcp/ec3.py",
+     'BOW_ELASTIC = {"a0": 350, "a": 300, "b": 250, "c": 200, "d": 150}',
+     'BOW_ELASTIC = {"a0": 350, "a": 300, "b": 250, "c": 250, "d": 150}'),
+    ("bow condition 0.5 sqrt(A fy/N) -> 0.25", "almond_mcp/ec3.py",
+     "limit = 0.5 * math.sqrt(section.A * fy / n_ed)", "limit = 0.25 * math.sqrt(section.A * fy / n_ed)"),
+    ("bow equivalent load 8 N e0/L^2 -> 4", "almond_mcp/native_structure.py",
+     'w[ei] = w.get(ei, np.zeros(3)) + 8 * N * ax["e0"] / L ** 2 * v', 'w[ei] = w.get(ei, np.zeros(3)) + 4 * N * ax["e0"] / L ** 2 * v'),
+    ("bow needs no moment-resistant end", "almond_mcp/native_structure.py",
+     "if not any(_moment_resistant(frame, at, n, own, el, axis) for n, el in zip((A, B), ends)):",
+     "if False:"),
+    ("bows left out of the second-order analysis", "almond_mcp/native_structure.py",
+     "            if bows and label:                                  # bows bulge the way the frame sways\n",
+     "            if False:\n"),
+    # 5.3.2(3)b sway imperfection m
+    ("m counts every column (no 50 % rule)", "almond_mcp/native_structure.py",
+     "ms.append(sum(1 for k in row if load[k] >= 0.5 * avg) if avg > 0 else len(row))",
+     "ms.append(len(row))"),
+    ("m over the whole plan, not per row", "almond_mcp/native_structure.py",
+     "for row in _rows([k[1 - axis] for k in keys]):", "for row in [list(range(len(keys)))]:"),
+    # floor loads above 2:1
+    ("bays above 2:1: short beams unloaded again", "almond_mcp/floor_loads.py",
+     "if r < 0.5 else [(0.0, 0.0), (0.5, q * L / 2), (1.0, 0.0)]", "if r < 0.5 else [(0.0, 0.0), (1.0, 0.0)]"),
+    # 6.3.2 lateral-torsional buckling
+    ("warping constant /24 -> /12", "almond_mcp/frame_solver.py",
+     "Iw = tf * b ** 3 * (h - tf) ** 2 / 24", "Iw = tf * b ** 3 * (h - tf) ** 2 / 12"),
+    ("M_cr: warping stiffness dropped", "almond_mcp/ltb.py",
+     "kt += w * (G * It * np.outer(d1, d1) + E * Iw * np.outer(d2, d2))", "kt += w * (G * It * np.outer(d1, d1))"),
+    ("M_cr: coupling term doubled", "almond_mcp/ltb.py",
+     "kc += w * M * np.outer(d2, N)", "kc += w * 2 * M * np.outer(d2, N)"),
+    ("M_cr: point loads at the shear centre", "almond_mcp/ltb.py",
+     "Q[4 * i + 2, 4 * i + 2] += P * zg", "Q[4 * i + 2, 4 * i + 2] += 0.0"),
+    ("M_cr: cantilever root free to turn laterally", "almond_mcp/ltb.py",
+     "fixed |= {4 * node, 4 * node + 1, 4 * node + 2}", "fixed |= {4 * node, 4 * node + 2}"),
+    ("gravity on the bottom flange (stabilising)", "almond_mcp/ec3.py",
+     "zg = s_.dims_mm[0] / 2000 if", "zg = -s_.dims_mm[0] / 2000 if"),
+    ("Table 6.4 curve a -> b for h/b <= 2", "almond_mcp/ec3.py",
+     'return "a" if h / b <= 2 else "b"', 'return "b" if h / b <= 2 else "b"'),
+    ("Table B.2 kzy 0.05 -> 0.1 (class 3)", "almond_mcp/ec3.py",
+     "kzy = max(1 - 0.05 * lam_z * n_z / d, 1 - 0.05 * n_z / d)", "kzy = max(1 - 0.1 * lam_z * n_z / d, 1 - 0.1 * n_z / d)"),
+    ("Annex B without chi_LT", "almond_mcp/ec3.py",
+     "my_r, mz_r = chi_lt * Wy * fy / gamma_m1", "my_r, mz_r = Wy * fy / gamma_m1"),
+    ("LTB segment stops at a free intermediate node", "almond_mcp/ec3.py",
+     "if _supported(frame, n) or len(touching) != 2:", "if True:"),
+    ("lateral restraint ignored (no LTB)", "almond_mcp/ec3.py",
+     '    if lateral_restraint == "joints":\n        for seg in ltb_segments', '    if False:\n        for seg in ltb_segments'),
+    ("column sway counted as deflection (cantilever from the base)", "almond_mcp/native_structure.py",
+     'chord = first and g["steep"] and len(g["held"]) >= 2', "chord = False"),
+    ("storey drift left out of the verdict", "almond_mcp/native_structure.py",
+     'if worst and drift.get("checked") and worst["utilization"] > 1.0:', "if False:"),
+    ("storey drift limit h/300 -> h/200", "almond_mcp/code_profiles/eurocode.json",
+     '"storey_drift_limit_ratio": {"value": 300', '"storey_drift_limit_ratio": {"value": 200'),
+    ("overlay keeps the bridge's absolute-displacement verdict", "almond_mcp/server.py",
+     "_apply_verdict(parsed, verdict)                 # the native checks decide", "pass  # the native checks decide"),
+    # deflection span per member (PR #37) together with the member-relative measure
+    ("every member against its whole length (no span between supports)", "almond_mcp/native_structure.py",
+     'gaps = np.concatenate([[2 * (u[0] - g["t"][0])], np.diff(u), [2 * (g["t"][1] - u[-1])]])',
+     'gaps = np.full(len(u) + 1, g["t"][1] - g["t"][0])'),
+    ("cantilever span = its overhang, not twice", "almond_mcp/native_structure.py",
+     'gaps = np.concatenate([[2 * (u[0] - g["t"][0])], np.diff(u), [2 * (g["t"][1] - u[-1])]])',
+     'gaps = np.concatenate([[u[0] - g["t"][0]], np.diff(u), [g["t"][1] - u[-1]]])'),
+    ("panel overlay judges every member against the governing span", "almond_mcp/structure_study.py",
+     'native_structure.view_result(model, s["load_kn"], s["material"], span_m=s["span_m"],',
+     'native_structure.view_result(model, s["load_kn"], s["material"], '
+     'span_m=(validation.get("results") or {}).get("span_m") or s["span_m"],'),
 ]
+
+
+def mutate(original: bytes, old: str, new: str) -> tuple[int, bytes | None]:
+    """(times ``old`` occurs, the mutated bytes or None unless exactly once). Matching ignores line endings:
+    mutant targets are written with LF, a Windows checkout has CRLF (core.autocrlf), and a multi-line
+    target would otherwise never match there. The mutated file keeps the original line endings."""
+    text = original.decode("utf-8")
+    crlf = "\r\n" in text
+    lf, old, new = (s.replace("\r\n", "\n") for s in (text, old, new))
+    count = lf.count(old)
+    if count != 1:
+        return count, None
+    out = lf.replace(old, new)
+    return 1, (out.replace("\n", "\r\n") if crlf else out).encode("utf-8")
 
 
 def run_tests():
@@ -70,27 +184,37 @@ def main():
     print(f"baseline: exit {code} | {tail}", flush=True)
     if code != 0:
         sys.exit("baseline must pass")
-    survived = []
+    survived, skipped, errors = [], [], []
+    attempted, caught_count = 0, 0
     for name, rel, old, new in MUTANTS:
         if only and not any(o in name.lower() for o in only):
             continue
         path = ROOT / rel
         original = path.read_bytes()
-        text = original.decode("utf-8")
-        if text.count(old) != 1:
-            print(f"SKIP {name}: target found {text.count(old)} times", flush=True)
+        count, mutated = mutate(original, old, new)
+        if mutated is None:
+            print(f"SKIP {name}: target found {count} times", flush=True)
+            skipped.append(name)
             continue
+        attempted += 1
         try:
-            path.write_bytes(text.replace(old, new).encode("utf-8"))
+            path.write_bytes(mutated)
             code, tail = run_tests()
         finally:
             path.write_bytes(original)
-        caught = code != 0
+        caught = code == 1
+        if code not in (0, 1):
+            errors.append(name)
+            print(f"ERROR   {name}: pytest exit {code} | {tail}", flush=True)
+            continue
         if not caught:
             survived.append(name)
+        else:
+            caught_count += 1
         print(f"{'CAUGHT  ' if caught else 'MISSED  '} {name} | {tail}", flush=True)
-    ran = [m for m in MUTANTS if not only or any(o in m[0].lower() for o in only)]
-    print(f"\n{len(ran) - len(survived)}/{len(ran)} planted errors caught")
+    print(f"\n{caught_count}/{attempted} planted errors caught; {len(skipped)} skipped, {len(errors)} runner errors")
+    if not attempted or survived or skipped or errors:
+        sys.exit(1)
 
 
 if __name__ == "__main__":

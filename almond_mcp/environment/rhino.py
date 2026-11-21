@@ -358,6 +358,56 @@ public class Script {
 }
 '''
 
+_CS_SUN_VIEWS = r'''
+using System;
+using System.Collections.Generic;
+using Rhino;
+using Rhino.Display;
+
+public class Script {
+  public static List<Guid> Run(RhinoDoc doc) {
+    // (altitude, azimuth clockwise from north, output path) per shot; the document's own north is kept,
+    // so the shadows follow the same north as the analysis export
+    double[] alt = new double[] { __ALT__ };
+    double[] az = new double[] { __AZ__ };
+    string[] outs = new string[] { __OUTS__ };
+    var view = doc.Views.Find("__VIEW__", false) ?? doc.Views.ActiveView;
+    if (view == null) throw new Exception("No viewport to capture");
+    var vp = view.ActiveViewport;
+    var sun = doc.Lights.Sun;
+    bool enabled = sun.Enabled, manual = sun.ManualControl;
+    double alt0 = sun.Altitude, az0 = sun.Azimuth;
+    var mode0 = vp.DisplayMode;
+    var gp = doc.GroundPlane;
+    bool gp0 = gp.Enabled;
+    var rendered = DisplayModeDescription.FindByName("__MODE__");
+    try {
+      sun.Enabled = true;
+      sun.ManualControl = true;
+      if (__GROUND__) gp.Enabled = true;
+      if (rendered != null) vp.DisplayMode = rendered;
+      for (int i = 0; i < outs.Length; i++) {
+        sun.Altitude = alt[i];
+        sun.Azimuth = az[i];
+        view.Redraw();
+        var cap = new ViewCapture { Width = __W__, Height = __H__, ScaleScreenItems = false, DrawAxes = false,
+                                    DrawGrid = false, DrawGridAxes = false, TransparentBackground = false };
+        using (var bmp = cap.CaptureToBitmap(view)) {
+          if (bmp == null) throw new Exception("The viewport capture failed");
+          bmp.Save(outs[i], System.Drawing.Imaging.ImageFormat.Png);
+        }
+      }
+    } finally {
+      sun.Altitude = alt0; sun.Azimuth = az0; sun.ManualControl = manual; sun.Enabled = enabled;
+      gp.Enabled = gp0;
+      vp.DisplayMode = mode0;
+      view.Redraw();
+    }
+    return new List<Guid>();
+  }
+}
+'''
+
 TAG_KEYS = ("construction", "room", "room_use", "room_set", "room_heat_c", "room_cool_c", "room_height")
 
 _GUID = re.compile(r"^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")
@@ -390,6 +440,24 @@ def draw_script(in_path: str, label: str, tag: str) -> str:
     name = safe_label(label)
     return (_CS_DRAW.replace("__IN__", _path_literal(in_path)).replace("__LAYER__", f"{RESULT_ROOT}::{name}")
             .replace("__TAG__", safe_label(tag)).replace("__NAME__", name))
+
+
+def sun_views_script(shots: list[tuple[float, float, str]], view: str = "", width: int = 1600, height: int = 1000,
+                     mode: str = "Rendered", ground_plane: bool = True) -> str:
+    """C# that captures ``view`` with the document sun at each (altitude, azimuth, png path) in turn, in a
+    display mode with sun shadows, and restores the sun, ground plane and display mode afterwards."""
+    if not shots:
+        raise ValueError("No sun positions to capture")
+    if not 200 <= int(width) <= 6000 or not 200 <= int(height) <= 6000:
+        raise ValueError("width and height must be 200..6000 pixels")
+    for name in (view, mode):
+        if _SAFE.sub("", name) != name:
+            raise ValueError(f"Not a view or display-mode name: {name!r}")
+    return (_CS_SUN_VIEWS.replace("__ALT__", ", ".join(f"{float(a):.6f}" for a, _, _ in shots))
+            .replace("__AZ__", ", ".join(f"{float(z):.6f}" for _, z, _ in shots))
+            .replace("__OUTS__", ", ".join('@"' + _path_literal(p) + '"' for _, _, p in shots))
+            .replace("__VIEW__", view).replace("__MODE__", mode).replace("__GROUND__", "true" if ground_plane else "false")
+            .replace("__W__", str(int(width))).replace("__H__", str(int(height))))
 
 
 def clear_script(label: str = "") -> str:

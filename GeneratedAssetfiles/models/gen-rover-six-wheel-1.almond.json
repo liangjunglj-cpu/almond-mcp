@@ -1,0 +1,352 @@
+{
+  "schema_version": 1,
+  "asset_id": "gen-rover-six-wheel-1",
+  "library_id": "generated_assets",
+  "name": "Exploration rover (Six-wheeled armoured exploration rover with wraparound cab windows, roof sensor mast, antennas and dish, big knobbly tyres; generated prop; detailed geometry edition)",
+  "source_app": "tripo",
+  "source_units": "m",
+  "file": "gen-rover-six-wheel-1.glb",
+  "dimensions_mm": {
+    "width": 5398.0,
+    "depth": 2944.4,
+    "height": 4084.0
+  },
+  "spatial": {
+    "metadata_version": 1,
+    "units": "mm",
+    "anchor": "bottom_center",
+    "support_plane": "ground",
+    "bounds_source": "measured_from_normalised_glb",
+    "geometry_bounds_status": "measured",
+    "local_aabb": {
+      "min": [
+        -2699.0,
+        -1472.2,
+        0.0
+      ],
+      "max": [
+        2699.0,
+        1472.2,
+        4084.0
+      ]
+    },
+    "footprint": [
+      [
+        -2699.0,
+        -1472.2
+      ],
+      [
+        2699.0,
+        -1472.2
+      ],
+      [
+        2699.0,
+        1472.2
+      ],
+      [
+        -2699.0,
+        1472.2
+      ]
+    ],
+    "clearance_mm": {
+      "front": 0,
+      "back": 0,
+      "left": 0,
+      "right": 0
+    },
+    "collision_shape": "oriented_box",
+    "placement_priority": "movable"
+  },
+  "materials": [
+    {
+      "material_id": "plaster-white",
+      "objects": [
+        "gen-rover-six-wheel-1_part1"
+      ]
+    }
+  ],
+  "object_count": 1,
+  "license": "CC-BY-4.0",
+  "passport": {
+    "schema_version": 1,
+    "asset_id": "gen-rover-six-wheel-1",
+    "library_id": "generated_assets",
+    "name": "Exploration rover (Six-wheeled armoured exploration rover with wraparound cab windows, roof sensor mast, antennas and dish, big knobbly tyres; generated prop; detailed geometry edition)",
+    "category": "vehicle",
+    "tags": [
+      "rover",
+      "vehicle",
+      "sci-fi",
+      "six-wheeled",
+      "expedition",
+      "concept vehicle",
+      "detailed",
+      "tripo",
+      "ginkgo-refset-1007"
+    ],
+    "dimensions_mm": {
+      "width": 5398.0,
+      "depth": 2944.4,
+      "height": 4084.0
+    },
+    "nominal_dimensions_mm": {
+      "width": 5400.0,
+      "depth": 2946.0,
+      "height": 4084.0
+    },
+    "coordinate_convention": {
+      "contract_axes": "X width, Y depth, Z up",
+      "glb_axes": "X width, Y up, Z depth",
+      "glb_numeric_units": "mm",
+      "contract_units": "mm",
+      "note": "Legacy Almond GLBs use numeric millimetres; generic glTF readers assume metres. Apply 0.001 outside the Almond import workflow."
+    },
+    "spatial": {
+      "metadata_version": 1,
+      "units": "mm",
+      "anchor": "bottom_center",
+      "support_plane": "ground",
+      "bounds_source": "measured_from_normalised_glb",
+      "geometry_bounds_status": "measured",
+      "local_aabb": {
+        "min": [
+          -2699.0,
+          -1472.2,
+          0.0
+        ],
+        "max": [
+          2699.0,
+          1472.2,
+          4084.0
+        ]
+      },
+      "footprint": [
+        [
+          -2699.0,
+          -1472.2
+        ],
+        [
+          2699.0,
+          -1472.2
+        ],
+        [
+          2699.0,
+          1472.2
+        ],
+        [
+          -2699.0,
+          1472.2
+        ]
+      ],
+      "clearance_mm": {
+        "front": 0,
+        "back": 0,
+        "left": 0,
+        "right": 0
+      },
+      "collision_shape": "oriented_box",
+      "placement_priority": "movable"
+    },
+    "materials": [
+      {
+        "material_id": "plaster-white",
+        "objects": [
+          "gen-rover-six-wheel-1_part1"
+        ]
+      }
+    ],
+    "provenance": {
+      "type": "generated",
+      "format": "glb",
+      "generator": "tripo",
+      "parameters": {
+        "prompt": "Clean 3D model reference of ONLY the six-wheeled exploration rover from the reference image, same design: blue-and-white rounded armoured hull panels, wraparound cab windows, roof antennas and a small dish, orange hazard panels, six big knobbly tyres with orange hubs. Three-quarter front view from slightly above, entire vehicle in frame with margin, isolated on a plain neutral grey studio backdrop, soft even studio lighting, clean undamaged, no text, no logos, no numbers.",
+        "image_task_id": null,
+        "image_model": "gpt_image_2_5",
+        "mesh_task_id": "11f4edef-2785-43a4-99b3-4a527a552a8e",
+        "mesh_model": "tripo_h3_1_image_to_3d",
+        "generated_at": "2026-10-06",
+        "orientation_correction": null,
+        "scale_applied": 5498.603917,
+        "captured_generation": {
+          "batch_id": "ginkgo-refset-1007",
+          "image": {
+            "asset_id": "gen-rover-six-wheel-1",
+            "provider": "higgsfield",
+            "tool": "generate_image_batch",
+            "submitted_at": "2026-10-06T22:08:09.882Z",
+            "request": {
+              "model": "gpt_image_2_5",
+              "aspect_ratio": "1:1",
+              "medias": [
+                {
+                  "role": "image_references",
+                  "value": "6c780057-9988-4419-b039-990bc5830650"
+                }
+              ],
+              "prompt": "Clean 3D model reference of ONLY the six-wheeled exploration rover from the reference image, same design: blue-and-white rounded armoured hull panels, wraparound cab windows, roof antennas and a small dish, orange hazard panels, six big knobbly tyres with orange hubs. Three-quarter front view from slightly above, entire vehicle in frame with margin, isolated on a plain neutral grey studio backdrop, soft even studio lighting, clean undamaged, no text, no logos, no numbers."
+            },
+            "batch_context": "Clean single-object reference images for 3D hero generation, using the approved concept art as design reference.",
+            "task_id": "2487552b-b2c6-4fb8-b78f-6298ef072d55",
+            "status": "COMPLETED",
+            "provider_model": "gpt_image_2_5",
+            "provider_reported_model": "gpt_image_2_5",
+            "completed_observed_at": "2026-10-06T22:08:37.113Z",
+            "provider_output_name": "hf_20261006_220815_2487552b-b2c6-4fb8-b78f-6298ef072d55.png",
+            "consumed_credits": "0.25 (Higgsfield cost quote for gpt_image_2_5 returned in the Ginkgo session)",
+            "concept_reference": {
+              "job_id": "6c780057-9988-4419-b039-990bc5830650",
+              "name": "W055_b.png",
+              "sha256": "f002887eac00f1041783018a470c6e17fa599b86f2dec9cf84147f430b251a75",
+              "retained": false,
+              "submitted_at": "2026-10-06T22:03:47.913Z",
+              "model": "gpt_image_2_5",
+              "prompt": "Environment concept art, low three-quarter view on a wet reflective white salt flat: a large blue-and-white six-wheeled exploration rover with rounded armoured hull panels, many antennas, orange hazard panels, chunky knobbly tyres with orange hubs, in front of a stacked grey industrial habitat module with an orange zig-zag steel stair, orange catwalk railings, fold-out panel shades and cyan-lit doorway. Huge pale moon in a deep blue sky, mirror reflections in shallow water on the salt, scattered debris. Crisp sunlight, realistic high-detail hard-surface 3D render. No readable words, no logos, no brands; only simple numerals.",
+              "note": "Concept image generated in the same Ginkgo session from a text-only prompt (no image input); given to this image request as its only image reference by Higgsfield job ID. Not distributed."
+            },
+            "reference_inputs": [],
+            "output_file": "gen-rover-six-wheel-1.png",
+            "output_sha256": "342adea762afeef838e55be1158c573ec9b736370abc2ea996cd1412d79f3a6a",
+            "output_file_modified_at": "2026-10-06T22:10:08+00:00",
+            "seed": null,
+            "evidence_source": {
+              "pass_records": [
+                "runs/refset_1007/pass.json",
+                "runs/refset_1007/concept/jobs.json",
+                "runs/refset_1007/meshy/jobs.json",
+                "ProjectY2K: twofronts/meshy/ginkgo_props_v061/out/conditioning.json"
+              ],
+              "session_records": "Tool calls of Ginkgo Claude Code session(s) 7ee433c3-63f6-4781-b345-d2c4f70b8e73 (submissions, results and downloads)",
+              "extracted_at": "2026-11-20T17:58:55+00:00"
+            },
+            "status_basis": "Provider reported completed; curl of the job's result URL in the Ginkgo session (Bash, 2026-10-06T22:10:05.505Z)"
+          },
+          "mesh": {
+            "asset_id": "gen-rover-six-wheel-1",
+            "provider": "higgsfield",
+            "tool": "generate_3d",
+            "submitted_at": "2026-10-06T22:11:15.437Z",
+            "request": {
+              "model": "tripo_h3_1_image_to_3d",
+              "medias": [
+                {
+                  "role": "image_references",
+                  "value": "2487552b-b2c6-4fb8-b78f-6298ef072d55"
+                }
+              ],
+              "geometry_quality": "detailed",
+              "texture_quality": "detailed",
+              "pbr": true
+            },
+            "task_id": "11f4edef-2785-43a4-99b3-4a527a552a8e",
+            "status": "COMPLETED",
+            "status_basis": "Higgsfield jobs_wait reported completed; GLB downloaded with curl from the job's result URL in the Ginkgo session (Bash, 2026-10-06T22:16:54.256Z)",
+            "provider_model": "tripo_h3_1_image_to_3d",
+            "completed_observed_at": "2026-10-06T22:16:47.212Z",
+            "provider_output_name": "hf_20261006_221244_11f4edef-2785-43a4-99b3-4a527a552a8e.glb",
+            "consumed_credits": "18 Higgsfield credits (cost quote returned in the Ginkgo session)",
+            "input_link": "media_job_id",
+            "input_image_sha256": "342adea762afeef838e55be1158c573ec9b736370abc2ea996cd1412d79f3a6a",
+            "output_file": "gen-rover-six-wheel-1.glb",
+            "output_sha256": "67f3521861b638460e7f673452b534e027b8276a870363e0d0a75461e5c8d3cb",
+            "seed": null,
+            "evidence_source": {
+              "pass_records": [
+                "runs/refset_1007/pass.json",
+                "runs/refset_1007/concept/jobs.json",
+                "runs/refset_1007/meshy/jobs.json",
+                "ProjectY2K: twofronts/meshy/ginkgo_props_v061/out/conditioning.json"
+              ],
+              "session_records": "Tool calls of Ginkgo Claude Code session(s) 7ee433c3-63f6-4781-b345-d2c4f70b8e73 (submissions, results and downloads)",
+              "extracted_at": "2026-11-20T17:58:55+00:00"
+            }
+          },
+          "derivation": {
+            "asset_id": "gen-rover-six-wheel-1",
+            "source_sha256": "67f3521861b638460e7f673452b534e027b8276a870363e0d0a75461e5c8d3cb",
+            "source_triangles": 1917415,
+            "target_triangles": 80000,
+            "prepared_sha256": "606dabf6c23defc25f49ccf99137f5692af5e0003ebc57567f73b69470d777f4",
+            "software": "Blender 5.1.2",
+            "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Remove wire edges, split edges shared by more than two faces and remove zero-area faces (counts in quality.topology_repairs). Never subdivide to inflate counts.",
+            "weld_tolerance_source_units": 9.818010330200195e-08,
+            "quality": {
+              "vertices": 39781,
+              "triangles": 79998,
+              "boundary_edges": 42,
+              "nonmanifold_edges_excluding_boundary": 0,
+              "zero_area_faces": 0,
+              "connected_components": 16,
+              "largest_component_vertices": 39733,
+              "nonfinite_coordinates": 0,
+              "self_intersections": "not_tested",
+              "mesh_validation_repair_passes": 1,
+              "topology_repairs": {
+                "wire_edges_removed": 0,
+                "nonmanifold_edges_split": 19,
+                "zero_area_faces_removed": 0,
+                "loose_vertices_removed": 0
+              },
+              "use": "Visual entourage; not certified for fabrication or structural analysis",
+              "bounds_relative_change": [
+                0.00010369181723430854,
+                0.00016805274942088578,
+                0.00016341637175201935
+              ]
+            }
+          },
+          "input_image_file": "batches/ginkgo-refset-1007/gen-rover-six-wheel-1.png",
+          "external_reference_status": "Two-step image stage. The concept images were generated in the Ginkgo session from text-only prompts that describe an owner reference set of 9 images pasted into the session on 2026-10-06 (third-party photographs and artworks: a toy-like drone hangar, habitat units, a red ring megastructure, an overgrown capsule car in a pink flower forest, a six-wheeled rover, a Tokyo vertical-farm building and a Tokyo rooftop; described in runs/refset_1007/pass.json). Each single-object reference image then took one concept image as its only image reference (named and hashed in the image record as concept_reference, not distributed). No owner reference photograph was uploaded to any generator. Design-proximity review 2026-11-20: the generated references were compared with the owner's reference photographs; the rover and capsule tram share subject and colourway with two of them but differ in form (see their reference_review); the others are generic types. Provider textures are not distributed; only geometry ships.",
+          "external_reference_ids": [],
+          "dimension_basis": "Sci-fi vehicles use the sizes Project Y2K content v061 gave them (twofronts/meshy/ginkgo_props_v061 condition_ginkgo_props.py SPEC, longest horizontal side): capsule tram 9.0 m, six-wheeled rover 5.4 m, drone launcher vehicle 3.2 m, shuttle 12.0 m, drone 1.4 m; each mesh was scaled uniformly so that side matches, and height, width and depth were measured after scaling. The planter box keeps Y2K's 1.9 m length, a real trough length. Real-world heights replace stylised ones for the rest: rooftop water tank pair 3.0 m overall (about 2 m stainless tanks on a 1 m stand; Y2K used 5.2 m), flower clump 0.60 m (the prompt's \"about knee high\"; Y2K used 0.85 m). Not a physical survey.",
+          "reference_review": "Reference image reviewed on 2026-11-20 at full resolution (1024 px): one abstract orange glyph panel on the rear flank, no legible lettering, numbers, logos or brand marks. Image reference: concept W055_b.png (Higgsfield job 6c780057). Design proximity: The owner's reference photographs for this pass (9 images pasted into Ginkgo session 7ee433c3 on 2026-10-06; extracted from the transcript to a scratch folder for this comparison only, not retained or distributed) were compared with the generated image at 700 px. The owner's reference is a hunched blue-and-white armoured six-wheeler with a tall front cab; the generated rover shares the subject and colourway but has a different, bus-like body with a wraparound windscreen and roof mast. Judged a generic six-wheeled rover type; the colourway is texture only and not distributed.",
+          "rights": "Concept and reference images generated on the owner's Higgsfield account (gpt_image_2_5); meshes with Tripo H3.1 through the owner's Higgsfield account (water tanks, rover, capsule tram, drone, launcher, shuttle) or with Meshy-7.1 image-to-3D on the owner's Meshy account (planter box, flower clump). Owner approved release in the Almond library under CC BY 4.0 on 2026-11-20 (\"increase the range of models, from the ones i used for my project y2k games, (except for the operatives and bosses)\") and chose this group, Ginkgo props reused in Project Y2K, the same day. The Ginkgo pass records an owner go-ahead on 2026-10-07 (\"go ahead with the plan\") that covered generation for the GRANDWHIS world packs, not this library. Generator account entitlements and the Tripo terms not independently audited. Provider textures are not distributed.",
+          "origin": {
+            "project": "Ginkgo, the owner's own world-generation repository (private); reused in Project Y2K, the owner's game project (private)",
+            "pass": "runs/refset_1007",
+            "source_name": "rover",
+            "records": [
+              "runs/refset_1007/pass.json (owner reference set described; AI-assisted content statement)",
+              "runs/refset_1007/concept/jobs.json (concept image job IDs)",
+              "runs/refset_1007/meshy/jobs.json (reference image, Tripo and Meshy IDs)",
+              "ProjectY2K: twofronts/meshy/ginkgo_props_v061/condition_ginkgo_props.py and out/conditioning.json (content v061 conditioned these props for the Mirai Ward hub as SM_GK61_<Name>.fbx)",
+              "ProjectY2K: twofronts/infrastructure/scripts/world_fill_v061.py (places the conditioned props in the hub)",
+              "Claude Code session transcript 7ee433c3-63f6-4781-b345-d2c4f70b8e73 (the tool calls that submitted the concept, reference image, Tripo and Meshy jobs, the curl downloads and the Meshy downloads)"
+            ]
+          }
+        }
+      }
+    },
+    "usage": {
+      "suggested_rooms": [
+        "streetscape"
+      ],
+      "basis": "category_and_label_heuristic",
+      "drawing_roles": [
+        "interior_perspective",
+        "exterior_perspective",
+        "axonometric"
+      ],
+      "intended_use": [
+        "visualisation",
+        "concept_layout"
+      ],
+      "clearance_basis": "authored_design_allowance_not_code_certification"
+    },
+    "quality": {
+      "dimension_basis": "measured_normalised_geometry",
+      "plan_dimension_deviation": 0.001,
+      "triangle_count": 79998,
+      "topology_review": "not_performed",
+      "warnings": [
+        "Generated representation; not a manufacturer-verified product."
+      ]
+    },
+    "rights": {
+      "model_license": "CC-BY-4.0",
+      "metadata_license": "MIT",
+      "attribution": "Almond generated asset library (github.com/liangjunglj-cpu/almond-mcp)"
+    }
+  },
+  "model_sha256": "69EDBA8EBBFAB608B0AF0236ED8C6B9FF7A289A789FEDB554BD36571AAB7E955"
+}

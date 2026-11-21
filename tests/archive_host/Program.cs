@@ -32,6 +32,7 @@ class Program
             try
             {
                 var mesh = ArchiveMeshData.Decode(File.ReadAllBytes(args[1]), args[2]);
+                Console.OutputEncoding = new System.Text.UTF8Encoding(false);   // names may be non-ASCII
                 Console.WriteLine(JsonConvert.SerializeObject(mesh));
             }
             catch (Exception ex) { Console.Error.WriteLine(ex.Message); Environment.ExitCode = 1; }

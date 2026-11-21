@@ -1,0 +1,916 @@
+{
+  "schema": "almond-parametric-source-register/1",
+  "items": [
+    {
+      "id": "facade-attractor-perforation",
+      "source": {
+        "repo_url": "https://github.com/runxel/grasshopper-examples",
+        "path": "gh/attractor_1_point.ghx",
+        "commit": "0e57586bdc00a4c3663983e67f36a0ce1f6c7ee6",
+        "raw_url": "https://raw.githubusercontent.com/runxel/grasshopper-examples/0e57586bdc00a4c3663983e67f36a0ce1f6c7ee6/gh/attractor_1_point.ghx",
+        "author": "Lucas Becker (runxel)",
+        "access_date": "2026-10-11",
+        "upstream_sha256": "fab98bc9d58d852410b5f1d577402ed5cb773b2044853cf73051afcfcafe0570"
+      },
+      "rights": {
+        "licence": "BlueOak-1.0.0",
+        "licence_url": "https://blueoakcouncil.org/license/1.0.0",
+        "licence_file": "LICENSES/runxel__grasshopper-examples.txt",
+        "copyright": null,
+        "adaptation": "permitted by licence",
+        "redistribution": "permitted by licence",
+        "obligations": "keep the licence text and copyright notice with every copy (embedded in the definition's LICENCE panel and in LICENSES/)"
+      },
+      "relationship": "adapted_definition",
+      "derivation": [
+        {
+          "step": "annotate",
+          "tool": "tools/parametric_library/annotate_ghx.py",
+          "lesson": "lessons/facade-attractor-perforation.lesson.json",
+          "input_sha256": "fab98bc9d58d852410b5f1d577402ed5cb773b2044853cf73051afcfcafe0570",
+          "output_sha256": "b21acef3a1b1727be145c0a5c6239ebd057b09581e2ddf460d7ac3c00b96eb7e",
+          "changes": "objects moved into stage blocks; nicknames relabelled per lesson; groups, scribbles, README/LICENCE/step panels added; original groups split across stages and listed notes removed",
+          "relabelled": [
+            [
+              "Number Slider",
+              "Size Rectangle",
+              "Panel size"
+            ],
+            [
+              "Number Slider",
+              "Division number",
+              "Grid count"
+            ],
+            [
+              "MD Slider",
+              "MD Slider",
+              "Attractor (drag)"
+            ],
+            [
+              "Control Knob",
+              "circlesize",
+              "Hole size"
+            ],
+            [
+              "Control Knob",
+              "amplitude",
+              "Arrow length"
+            ]
+          ],
+          "dropped_groups": [
+            "Show vectors to the Attractor point",
+            "make it colorful"
+          ],
+          "dropped_notes": [
+            "7d1e5898"
+          ],
+          "value_overrides": {},
+          "logic_fingerprint_unchanged_except_overrides": true,
+          "logic_objects": 26
+        }
+      ]
+    },
+    {
+      "id": "facade-diagrid-on-surface",
+      "source": {
+        "repo_url": "https://github.com/runxel/grasshopper-examples",
+        "path": "gh/diagrid_on_surface.ghx",
+        "commit": "0e57586bdc00a4c3663983e67f36a0ce1f6c7ee6",
+        "raw_url": "https://raw.githubusercontent.com/runxel/grasshopper-examples/0e57586bdc00a4c3663983e67f36a0ce1f6c7ee6/gh/diagrid_on_surface.ghx",
+        "author": "Lucas Becker (runxel)",
+        "access_date": "2026-10-11",
+        "upstream_sha256": "fb82f13dfaf0e077ca5e8668b4a324efb82465d7328b4319ddb10543f0e78ffe"
+      },
+      "rights": {
+        "licence": "BlueOak-1.0.0",
+        "licence_url": "https://blueoakcouncil.org/license/1.0.0",
+        "licence_file": "LICENSES/runxel__grasshopper-examples.txt",
+        "copyright": null,
+        "adaptation": "permitted by licence",
+        "redistribution": "permitted by licence",
+        "obligations": "keep the licence text and copyright notice with every copy (embedded in the definition's LICENCE panel and in LICENSES/)"
+      },
+      "relationship": "adapted_definition",
+      "derivation": [
+        {
+          "step": "annotate",
+          "tool": "tools/parametric_library/annotate_ghx.py",
+          "lesson": "lessons/facade-diagrid-on-surface.lesson.json",
+          "input_sha256": "fb82f13dfaf0e077ca5e8668b4a324efb82465d7328b4319ddb10543f0e78ffe",
+          "output_sha256": "ed7c86083c523443448cd3dad3fcae6a5663234eba0fbb685cb7de86bae6ea8b",
+          "changes": "objects moved into stage blocks; nicknames relabelled per lesson; groups, scribbles, README/LICENCE/step panels added; original groups split across stages and listed notes removed",
+          "relabelled": [
+            [
+              "Number Slider",
+              "",
+              "Bays U"
+            ],
+            [
+              "Number Slider",
+              "",
+              "Bays V"
+            ],
+            [
+              "MD Slider",
+              "MD Slider",
+              "Diagonal A start"
+            ],
+            [
+              "MD Slider",
+              "MD Slider",
+              "Diagonal A end"
+            ],
+            [
+              "MD Slider",
+              "MD Slider",
+              "Diagonal B start"
+            ],
+            [
+              "MD Slider",
+              "MD Slider",
+              "Diagonal B end"
+            ]
+          ],
+          "dropped_groups": [],
+          "dropped_notes": [
+            "64df48f1"
+          ],
+          "value_overrides": {},
+          "logic_fingerprint_unchanged_except_overrides": true,
+          "logic_objects": 15
+        }
+      ]
+    },
+    {
+      "id": "facade-louvre-rotation",
+      "source": {
+        "repo_url": "https://github.com/runxel/grasshopper-examples",
+        "path": "gh/rotate_by_length.ghx",
+        "commit": "0e57586bdc00a4c3663983e67f36a0ce1f6c7ee6",
+        "raw_url": "https://raw.githubusercontent.com/runxel/grasshopper-examples/0e57586bdc00a4c3663983e67f36a0ce1f6c7ee6/gh/rotate_by_length.ghx",
+        "author": "Lucas Becker (runxel)",
+        "access_date": "2026-10-11",
+        "upstream_sha256": "e4992998076c9cb4fc71525486a3544d5191b1528eda8d3e3293765909701ff7"
+      },
+      "rights": {
+        "licence": "BlueOak-1.0.0",
+        "licence_url": "https://blueoakcouncil.org/license/1.0.0",
+        "licence_file": "LICENSES/runxel__grasshopper-examples.txt",
+        "copyright": null,
+        "adaptation": "permitted by licence",
+        "redistribution": "permitted by licence",
+        "obligations": "keep the licence text and copyright notice with every copy (embedded in the definition's LICENCE panel and in LICENSES/)"
+      },
+      "relationship": "adapted_definition",
+      "derivation": [
+        {
+          "step": "annotate",
+          "tool": "tools/parametric_library/annotate_ghx.py",
+          "lesson": "lessons/facade-louvre-rotation.lesson.json",
+          "input_sha256": "e4992998076c9cb4fc71525486a3544d5191b1528eda8d3e3293765909701ff7",
+          "output_sha256": "7194a917f8012bc795b4eeebcb44e7bcd2a8f0991f0930ae142bed2e30fd6852",
+          "changes": "objects moved into stage blocks; nicknames relabelled per lesson; groups, scribbles, README/LICENCE/step panels added; original groups split across stages and listed notes removed",
+          "relabelled": [
+            [
+              "Number Slider",
+              "",
+              "Blade count"
+            ],
+            [
+              "Number Slider",
+              "Total distance",
+              "Base length"
+            ],
+            [
+              "Number Slider",
+              "Multiplicator",
+              "Growth step"
+            ],
+            [
+              "Number Slider",
+              "Multiplicator",
+              "Growth power"
+            ],
+            [
+              "Panel",
+              "",
+              "Angle at shortest (x pi)"
+            ],
+            [
+              "Panel",
+              "",
+              "Angle at longest (x pi)"
+            ]
+          ],
+          "dropped_groups": [],
+          "dropped_notes": [
+            "8622d59e"
+          ],
+          "value_overrides": {},
+          "logic_fingerprint_unchanged_except_overrides": true,
+          "logic_objects": 27
+        }
+      ]
+    },
+    {
+      "id": "facade-spiral-fins",
+      "source": {
+        "repo_url": "https://github.com/runxel/grasshopper-examples",
+        "path": "gh/spiral_panels.ghx",
+        "commit": "0e57586bdc00a4c3663983e67f36a0ce1f6c7ee6",
+        "raw_url": "https://raw.githubusercontent.com/runxel/grasshopper-examples/0e57586bdc00a4c3663983e67f36a0ce1f6c7ee6/gh/spiral_panels.ghx",
+        "author": "Lucas Becker (runxel)",
+        "access_date": "2026-10-11",
+        "upstream_sha256": "9a48c72c7faf4a1a990eb76e6819b74a9db491a749852798a29cc2567b47fdd2"
+      },
+      "rights": {
+        "licence": "BlueOak-1.0.0",
+        "licence_url": "https://blueoakcouncil.org/license/1.0.0",
+        "licence_file": "LICENSES/runxel__grasshopper-examples.txt",
+        "copyright": null,
+        "adaptation": "permitted by licence",
+        "redistribution": "permitted by licence",
+        "obligations": "keep the licence text and copyright notice with every copy (embedded in the definition's LICENCE panel and in LICENSES/)"
+      },
+      "relationship": "adapted_definition",
+      "derivation": [
+        {
+          "step": "annotate",
+          "tool": "tools/parametric_library/annotate_ghx.py",
+          "lesson": "lessons/facade-spiral-fins.lesson.json",
+          "input_sha256": "9a48c72c7faf4a1a990eb76e6819b74a9db491a749852798a29cc2567b47fdd2",
+          "output_sha256": "d437ec2ceae6cd4a1915ed984e7d823ce07321d344650020c6dd782429e81659",
+          "changes": "objects moved into stage blocks; nicknames relabelled per lesson; groups, scribbles, README/LICENCE/step panels added; original groups split across stages and listed notes removed",
+          "relabelled": [
+            [
+              "Number Slider",
+              "Slider",
+              "Field X"
+            ],
+            [
+              "Number Slider",
+              "Slider",
+              "Field Y"
+            ],
+            [
+              "Number Slider",
+              "Factor",
+              "Grid spacing"
+            ],
+            [
+              "Number Slider",
+              "z1",
+              "Fin z1"
+            ],
+            [
+              "Number Slider",
+              "z2",
+              "Fin z2"
+            ],
+            [
+              "Number Slider",
+              "z3",
+              "Fin z3"
+            ],
+            [
+              "Number Slider",
+              "z4",
+              "Fin z4"
+            ],
+            [
+              "Number Slider",
+              "x",
+              "Fin width"
+            ],
+            [
+              "Number Slider",
+              "depth",
+              "Fin depth"
+            ],
+            [
+              "Number Slider",
+              "x",
+              "Disturbance X"
+            ],
+            [
+              "Number Slider",
+              "y",
+              "Disturbance Y"
+            ],
+            [
+              "Number Slider",
+              "z",
+              "Disturbance Z"
+            ]
+          ],
+          "dropped_groups": [],
+          "dropped_notes": [
+            "f410b3b2"
+          ],
+          "value_overrides": {},
+          "logic_fingerprint_unchanged_except_overrides": true,
+          "logic_objects": 36
+        }
+      ]
+    },
+    {
+      "id": "facade-voronoi-screen",
+      "source": {
+        "repo_url": "https://github.com/runxel/grasshopper-examples",
+        "path": "gh/voronoi_on_surface.ghx",
+        "commit": "0e57586bdc00a4c3663983e67f36a0ce1f6c7ee6",
+        "raw_url": "https://raw.githubusercontent.com/runxel/grasshopper-examples/0e57586bdc00a4c3663983e67f36a0ce1f6c7ee6/gh/voronoi_on_surface.ghx",
+        "author": "Lucas Becker (runxel)",
+        "access_date": "2026-10-11",
+        "upstream_sha256": "6cdaf51b7beec07993ae34602edaa68825900f8a003d0dab7835fe8a91fd6a4a"
+      },
+      "rights": {
+        "licence": "BlueOak-1.0.0",
+        "licence_url": "https://blueoakcouncil.org/license/1.0.0",
+        "licence_file": "LICENSES/runxel__grasshopper-examples.txt",
+        "copyright": null,
+        "adaptation": "permitted by licence",
+        "redistribution": "permitted by licence",
+        "obligations": "keep the licence text and copyright notice with every copy (embedded in the definition's LICENCE panel and in LICENSES/)"
+      },
+      "relationship": "adapted_definition",
+      "derivation": [
+        {
+          "step": "annotate",
+          "tool": "tools/parametric_library/annotate_ghx.py",
+          "lesson": "lessons/facade-voronoi-screen.lesson.json",
+          "input_sha256": "6cdaf51b7beec07993ae34602edaa68825900f8a003d0dab7835fe8a91fd6a4a",
+          "output_sha256": "f67bf09045d5d487bbf9d9a69b8ac93c32ead6f5aff37dc85d1308f2562dd88d",
+          "changes": "objects moved into stage blocks; nicknames relabelled per lesson; groups, scribbles, README/LICENCE/step panels added; original groups split across stages and listed notes removed",
+          "relabelled": [
+            [
+              "Number Slider",
+              "Number of Points",
+              "Number of Points"
+            ],
+            [
+              "Number Slider",
+              "X",
+              "Cell box X"
+            ],
+            [
+              "Number Slider",
+              "Y",
+              "Cell box Y"
+            ],
+            [
+              "Number Slider",
+              "Z",
+              "Cell box Z"
+            ],
+            [
+              "Number Slider",
+              "",
+              "Rib width"
+            ],
+            [
+              "Number Slider",
+              "",
+              "Cap scale"
+            ],
+            [
+              "Digit Scroller",
+              "offset",
+              "Shell thickness"
+            ],
+            [
+              "Digit Scroller",
+              "offset",
+              "Cutter offset"
+            ],
+            [
+              "Boolean Toggle",
+              "",
+              "Run cutter script"
+            ]
+          ],
+          "dropped_groups": [
+            ""
+          ],
+          "dropped_notes": [
+            "3fe456fd"
+          ],
+          "value_overrides": {
+            "27ee5376-d6b4-4bae-85e7-beb28b2b6090": {
+              "ToggleValue": "false",
+              "reason": "upstream saved the cutter-script toggle as on, so the GhPython script would add geometry to the Rhino document and run _OffsetSrf as soon as the file opens; the teaching copy opens with it off"
+            }
+          },
+          "logic_fingerprint_unchanged_except_overrides": true,
+          "logic_objects": 52
+        }
+      ]
+    },
+    {
+      "id": "landscape-paving-patterns",
+      "source": {
+        "repo_url": "https://github.com/baharmon/computational-design-library",
+        "path": "05-random-paving/random-paving.gh",
+        "commit": "3b49802218466afb9dcdb0452cb0afe566b51382",
+        "raw_url": "https://raw.githubusercontent.com/baharmon/computational-design-library/3b49802218466afb9dcdb0452cb0afe566b51382/05-random-paving/random-paving.gh",
+        "author": "Brendan Harmon (baharmon)",
+        "access_date": "2026-10-11",
+        "upstream_sha256": "a94669548955faa542f3bcc58ec28246cd7f6b8df2169e6ec1e58b075b4c8b88"
+      },
+      "rights": {
+        "licence": "MIT",
+        "licence_url": "https://github.com/baharmon/computational-design-library/blob/3b49802218466afb9dcdb0452cb0afe566b51382/LICENSE.txt",
+        "licence_file": "LICENSES/baharmon__computational-design-library.txt",
+        "copyright": "Copyright (c) 2023 Brendan Harmon",
+        "adaptation": "permitted by licence",
+        "redistribution": "permitted by licence",
+        "obligations": "keep the licence text and copyright notice with every copy (embedded in the definition's LICENCE panel and in LICENSES/)"
+      },
+      "relationship": "adapted_definition",
+      "derivation": [
+        {
+          "step": "convert",
+          "tool": "tools/parametric_library/gh_convert.ps1 (Rhino 8 GH_IO.dll)",
+          "note": "archive-level .gh -> .ghx conversion; nothing instantiated or solved",
+          "input_sha256": "a94669548955faa542f3bcc58ec28246cd7f6b8df2169e6ec1e58b075b4c8b88",
+          "output_sha256": "591b391754dd72f97998f6244fc01ce1bc0aa6743aaa9f88a74f726355268eda"
+        },
+        {
+          "step": "annotate",
+          "tool": "tools/parametric_library/annotate_ghx.py",
+          "lesson": "lessons/landscape-paving-patterns.lesson.json",
+          "input_sha256": "591b391754dd72f97998f6244fc01ce1bc0aa6743aaa9f88a74f726355268eda",
+          "output_sha256": "ce5cabf59c6457b22162d7f5d8360f67557bf72d06a2d9bdc257ee5ecaa3f8d5",
+          "changes": "objects moved into stage blocks; nicknames relabelled per lesson; groups, scribbles, README/LICENCE/step panels added; original groups split across stages and listed notes removed",
+          "relabelled": [
+            [
+              "Curve",
+              "Curve",
+              "Attractor curve"
+            ],
+            [
+              "Number Slider",
+              "Seed",
+              "Attractor seed"
+            ],
+            [
+              "Number Slider",
+              "Factor",
+              "Contrast"
+            ],
+            [
+              "Number Slider",
+              "Distance",
+              "Sample distance"
+            ],
+            [
+              "Number Slider",
+              "X",
+              "Paver X"
+            ],
+            [
+              "Number Slider",
+              "Y",
+              "Paver Y"
+            ],
+            [
+              "Number Slider",
+              "Z",
+              "Paver height"
+            ],
+            [
+              "Number Slider",
+              "Extent X",
+              "Area X"
+            ],
+            [
+              "Number Slider",
+              "Extent Y",
+              "Area Y"
+            ],
+            [
+              "Number Slider",
+              "Offset",
+              "Joint"
+            ],
+            [
+              "Number Slider",
+              "Seed",
+              "Colour seed"
+            ],
+            [
+              "Panel",
+              "",
+              "Bond shift ratio"
+            ]
+          ],
+          "dropped_groups": [
+            "",
+            "",
+            "",
+            ""
+          ],
+          "dropped_notes": [
+            "aba2f15e",
+            "fa2b7522",
+            "64a94093",
+            "2304eb63",
+            "f3a1a24e"
+          ],
+          "value_overrides": {},
+          "logic_fingerprint_unchanged_except_overrides": true,
+          "logic_objects": 53
+        }
+      ]
+    },
+    {
+      "id": "massing-twisted-star-tower",
+      "source": {
+        "repo_url": "https://github.com/runxel/grasshopper-examples",
+        "path": "gh/star_curve_loft.ghx",
+        "commit": "0e57586bdc00a4c3663983e67f36a0ce1f6c7ee6",
+        "raw_url": "https://raw.githubusercontent.com/runxel/grasshopper-examples/0e57586bdc00a4c3663983e67f36a0ce1f6c7ee6/gh/star_curve_loft.ghx",
+        "author": "Lucas Becker (runxel)",
+        "access_date": "2026-10-11",
+        "upstream_sha256": "68e8c15fafd4727e3b69ae273ba59e9e859758c73fd3a4367aac01dcef70608a"
+      },
+      "rights": {
+        "licence": "BlueOak-1.0.0",
+        "licence_url": "https://blueoakcouncil.org/license/1.0.0",
+        "licence_file": "LICENSES/runxel__grasshopper-examples.txt",
+        "copyright": null,
+        "adaptation": "permitted by licence",
+        "redistribution": "permitted by licence",
+        "obligations": "keep the licence text and copyright notice with every copy (embedded in the definition's LICENCE panel and in LICENSES/)"
+      },
+      "relationship": "adapted_definition",
+      "derivation": [
+        {
+          "step": "annotate",
+          "tool": "tools/parametric_library/annotate_ghx.py",
+          "lesson": "lessons/massing-twisted-star-tower.lesson.json",
+          "input_sha256": "68e8c15fafd4727e3b69ae273ba59e9e859758c73fd3a4367aac01dcef70608a",
+          "output_sha256": "021f04314bf5db52edfaa534c2fa3b2bf6c710eec4c2af916d4bebadd35098ac",
+          "changes": "objects moved into stage blocks; nicknames relabelled per lesson; groups, scribbles, README/LICENCE/step panels added; original groups split across stages and listed notes removed",
+          "relabelled": [
+            [
+              "Number Slider",
+              "Sides",
+              "Star points x2"
+            ],
+            [
+              "Number Slider",
+              "Offset",
+              "Star depth"
+            ],
+            [
+              "Number Slider",
+              "",
+              "Corner fillet"
+            ],
+            [
+              "Number Slider",
+              "",
+              "Floor height"
+            ],
+            [
+              "Number Slider",
+              "",
+              "Floors"
+            ],
+            [
+              "Number Slider",
+              "",
+              "Twist per floor"
+            ],
+            [
+              "Number Slider",
+              "",
+              "Refit"
+            ],
+            [
+              "Number",
+              "Num",
+              "Star pattern (1,0)"
+            ],
+            [
+              "Boolean Toggle",
+              "",
+              "Adjust seam"
+            ],
+            [
+              "Value List",
+              "List",
+              "Loft type"
+            ]
+          ],
+          "dropped_groups": [
+            "",
+            "Star shape generator"
+          ],
+          "dropped_notes": [
+            "9515ba38"
+          ],
+          "value_overrides": {},
+          "logic_fingerprint_unchanged_except_overrides": true,
+          "logic_objects": 29
+        }
+      ]
+    },
+    {
+      "id": "massing-twisting-polygon-tower",
+      "source": {
+        "repo_url": "https://github.com/oderby/VVD",
+        "path": "examples/versionTower.ghx",
+        "commit": "548fa5333b0c4eeeccbf9be7438eff3874c31db9",
+        "raw_url": "https://raw.githubusercontent.com/oderby/VVD/548fa5333b0c4eeeccbf9be7438eff3874c31db9/examples/versionTower.ghx",
+        "author": "Owen Derby (oderby)",
+        "access_date": "2026-10-11",
+        "upstream_sha256": "21edb0176d57905021651ff5bdc143ea7bd8bca05fae05e4fbf48e9f3b1dee6f"
+      },
+      "rights": {
+        "licence": "MIT",
+        "licence_url": "https://github.com/oderby/VVD/blob/548fa5333b0c4eeeccbf9be7438eff3874c31db9/LICENSE",
+        "licence_file": "LICENSES/oderby__VVD.txt",
+        "copyright": "Copyright (c) 2015 Owen Derby",
+        "adaptation": "permitted by licence",
+        "redistribution": "permitted by licence",
+        "obligations": "keep the licence text and copyright notice with every copy (embedded in the definition's LICENCE panel and in LICENSES/)"
+      },
+      "relationship": "adapted_definition",
+      "derivation": [
+        {
+          "step": "annotate",
+          "tool": "tools/parametric_library/annotate_ghx.py",
+          "lesson": "lessons/massing-twisting-polygon-tower.lesson.json",
+          "input_sha256": "21edb0176d57905021651ff5bdc143ea7bd8bca05fae05e4fbf48e9f3b1dee6f",
+          "output_sha256": "a5adb5f198673ac1b9a70e903620129543ddf06a6f38a877cf0b7edcf31130af",
+          "changes": "objects moved into stage blocks; nicknames relabelled per lesson; groups, scribbles, README/LICENCE/step panels added; original groups split across stages and listed notes removed",
+          "relabelled": [
+            [
+              "Number Slider",
+              "Number Slider",
+              "Plate radius"
+            ],
+            [
+              "Number Slider",
+              "Number Slider",
+              "Plate sides"
+            ],
+            [
+              "Number Slider",
+              "Number Slider",
+              "Floors"
+            ],
+            [
+              "Number Slider",
+              "Number Slider",
+              "Total twist (deg)"
+            ],
+            [
+              "Number Slider",
+              "Number Slider",
+              "Floor height"
+            ]
+          ],
+          "dropped_groups": [],
+          "dropped_notes": [],
+          "value_overrides": {},
+          "logic_fingerprint_unchanged_except_overrides": true,
+          "logic_objects": 17
+        }
+      ]
+    },
+    {
+      "id": "site-terrain-from-levels",
+      "source": {
+        "repo_url": "https://github.com/nonoesp/GettingArchitectureDoneKit",
+        "path": "Inbox/More/GADHelper_TerrainFromRLs.gh",
+        "commit": "853a38ceeb6023a2b7a5c43cbfd25e059e45f016",
+        "raw_url": "https://raw.githubusercontent.com/nonoesp/GettingArchitectureDoneKit/853a38ceeb6023a2b7a5c43cbfd25e059e45f016/Inbox/More/GADHelper_TerrainFromRLs.gh",
+        "author": "Nono Martínez Alonso (nonoesp)",
+        "access_date": "2026-10-11",
+        "upstream_sha256": "053adce52236f9c31e0bfcbdb009e4482c819e7c0b45d7737f4c148029154c49"
+      },
+      "rights": {
+        "licence": "MIT",
+        "licence_url": "https://github.com/nonoesp/GettingArchitectureDoneKit/blob/853a38ceeb6023a2b7a5c43cbfd25e059e45f016/LICENSE",
+        "licence_file": "LICENSES/nonoesp__GettingArchitectureDoneKit.txt",
+        "copyright": "Copyright (c) 2014 Nono Martínez Alonso (@nonoesp)",
+        "adaptation": "permitted by licence",
+        "redistribution": "permitted by licence",
+        "obligations": "keep the licence text and copyright notice with every copy (embedded in the definition's LICENCE panel and in LICENSES/)"
+      },
+      "relationship": "adapted_definition",
+      "derivation": [
+        {
+          "step": "convert",
+          "tool": "tools/parametric_library/gh_convert.ps1 (Rhino 8 GH_IO.dll)",
+          "note": "archive-level .gh -> .ghx conversion; nothing instantiated or solved",
+          "input_sha256": "053adce52236f9c31e0bfcbdb009e4482c819e7c0b45d7737f4c148029154c49",
+          "output_sha256": "4e05493bbf7c52a48f7937603287180854cfd0d23a9bf3163519802ebb9bf9e5"
+        },
+        {
+          "step": "annotate",
+          "tool": "tools/parametric_library/annotate_ghx.py",
+          "lesson": "lessons/site-terrain-from-levels.lesson.json",
+          "input_sha256": "4e05493bbf7c52a48f7937603287180854cfd0d23a9bf3163519802ebb9bf9e5",
+          "output_sha256": "a778303871a0d402f209de9b0b22b40682e74a0fd64cca5bf8c5e03d6a71d55a",
+          "changes": "objects moved into stage blocks; nicknames relabelled per lesson; groups, scribbles, README/LICENCE/step panels added; original groups split across stages and listed notes removed",
+          "relabelled": [
+            [
+              "Curve",
+              "Crv_RLs",
+              "Level curves"
+            ],
+            [
+              "Curve",
+              "Crv_Boundary",
+              "Site boundary"
+            ],
+            [
+              "Number Slider",
+              "Slider",
+              "Points per contour"
+            ],
+            [
+              "Number Slider",
+              "Slider",
+              "Section count"
+            ],
+            [
+              "Number Slider",
+              "Slider",
+              "Section degree"
+            ],
+            [
+              "Number Slider",
+              "Slider",
+              "Section points"
+            ],
+            [
+              "Panel",
+              "",
+              "Contour rebuild degree"
+            ]
+          ],
+          "dropped_groups": [],
+          "dropped_notes": [],
+          "value_overrides": {},
+          "logic_fingerprint_unchanged_except_overrides": true,
+          "logic_objects": 26
+        }
+      ]
+    },
+    {
+      "id": "structure-shell-roof-ribs",
+      "source": {
+        "repo_url": "https://github.com/runxel/grasshopper-examples",
+        "path": "gh/shell_roof.ghx",
+        "commit": "0e57586bdc00a4c3663983e67f36a0ce1f6c7ee6",
+        "raw_url": "https://raw.githubusercontent.com/runxel/grasshopper-examples/0e57586bdc00a4c3663983e67f36a0ce1f6c7ee6/gh/shell_roof.ghx",
+        "author": "Lucas Becker (runxel)",
+        "access_date": "2026-10-11",
+        "upstream_sha256": "c357dd83cfeae539f6b54f067e64552cb36765a7fedcb6eaddddbc8f832a808e"
+      },
+      "rights": {
+        "licence": "BlueOak-1.0.0",
+        "licence_url": "https://blueoakcouncil.org/license/1.0.0",
+        "licence_file": "LICENSES/runxel__grasshopper-examples.txt",
+        "copyright": null,
+        "adaptation": "permitted by licence",
+        "redistribution": "permitted by licence",
+        "obligations": "keep the licence text and copyright notice with every copy (embedded in the definition's LICENCE panel and in LICENSES/)"
+      },
+      "relationship": "adapted_definition",
+      "derivation": [
+        {
+          "step": "annotate",
+          "tool": "tools/parametric_library/annotate_ghx.py",
+          "lesson": "lessons/structure-shell-roof-ribs.lesson.json",
+          "input_sha256": "c357dd83cfeae539f6b54f067e64552cb36765a7fedcb6eaddddbc8f832a808e",
+          "output_sha256": "04b307a37d24ed2b8c7c6f93758c8c4fba225affd90d5decf323349e940317a3",
+          "changes": "objects moved into stage blocks; nicknames relabelled per lesson; groups, scribbles, README/LICENCE/step panels added; original groups split across stages and listed notes removed",
+          "relabelled": [
+            [
+              "Number Slider",
+              "SubD in U",
+              "Ribs U"
+            ],
+            [
+              "Number Slider",
+              "SubD in V",
+              "Ribs V"
+            ],
+            [
+              "Number Slider",
+              "Offset",
+              "Rib depth"
+            ],
+            [
+              "Number Slider",
+              "",
+              "Brace radius"
+            ]
+          ],
+          "dropped_groups": [
+            ""
+          ],
+          "dropped_notes": [
+            "15acf1e6"
+          ],
+          "value_overrides": {},
+          "logic_fingerprint_unchanged_except_overrides": true,
+          "logic_objects": 30
+        }
+      ],
+      "harnessed": {
+        "capsule_id": "parametric_shell_roof_ribs_v1",
+        "definition": "capsules/structure-shell-roof-ribs.harnessed.ghx",
+        "manifest": "capsules/parametric_shell_roof_ribs_v1.capsule.json",
+        "audited": false,
+        "derivation": {
+          "step": "harness",
+          "tool": "tools/parametric_library/harness_ghx.py",
+          "input": "definitions/structure-shell-roof-ribs.ghx",
+          "input_sha256": "04b307a37d24ed2b8c7c6f93758c8c4fba225affd90d5decf323349e940317a3",
+          "output_sha256": "59933ada2f0a169943ca1d75fefbb614215f484b16940447dd50720397f0d7b8",
+          "manifest_sha256": "46ff99bd3b4a59432e19efebb4fc762066761ab004e727c89111bbaace022c49",
+          "changes": "ALMOND_IN_*/ALMOND_OUT_* params, a group, titles and a note added; every wire leaving a replaced input moved to its ALMOND_IN_* param; replaced sliders and params left in place, disconnected; no component, value or script changed",
+          "replaced": [
+            {
+              "port": "ALMOND_IN_BASE_SRF",
+              "object": "cce800f9-63b1-408d-9a02-5576012da7c4",
+              "type": "Surface",
+              "nickname": "Base Srf"
+            },
+            {
+              "port": "ALMOND_IN_RIBS_U",
+              "object": "fa156fd0-bef3-4934-9a9d-e852f56f9102",
+              "type": "Number Slider",
+              "nickname": "Ribs U"
+            },
+            {
+              "port": "ALMOND_IN_RIBS_V",
+              "object": "be1f76a0-fca3-4103-a7d4-cfc86e71cab1",
+              "type": "Number Slider",
+              "nickname": "Ribs V"
+            },
+            {
+              "port": "ALMOND_IN_RIB_DEPTH",
+              "object": "151b36b9-fe1a-4913-8055-40ea1ef458ee",
+              "type": "Number Slider",
+              "nickname": "Rib depth"
+            },
+            {
+              "port": "ALMOND_IN_BRACE_RADIUS",
+              "object": "2c1c3d87-72c1-40c5-bc04-6c785f9dba47",
+              "type": "Number Slider",
+              "nickname": "Brace radius"
+            }
+          ],
+          "rewired_sources": {
+            "ALMOND_IN_BASE_SRF": 3,
+            "ALMOND_IN_RIBS_U": 2,
+            "ALMOND_IN_RIBS_V": 2,
+            "ALMOND_IN_RIB_DEPTH": 1,
+            "ALMOND_IN_BRACE_RADIUS": 1
+          },
+          "defaults": {
+            "ALMOND_IN_BASE_SRF": {
+              "sample_copied_from": "cce800f9-63b1-408d-9a02-5576012da7c4"
+            },
+            "ALMOND_IN_RIBS_U": 16,
+            "ALMOND_IN_RIBS_V": 10,
+            "ALMOND_IN_RIB_DEPTH": 1.8,
+            "ALMOND_IN_BRACE_RADIUS": 0.08
+          },
+          "harness_objects": [
+            "030f63cc-beb8-59cd-9dfe-dd837da2916d",
+            "c576d5f8-a4ca-54e4-ad69-d8818fd73114",
+            "06a31dab-5d2c-53cb-abd5-939c6e79aef5",
+            "cc327bc1-2616-5943-9fb2-9382f38a73f8",
+            "7b063300-b5a9-5ff0-b275-c73aae2f2d8b",
+            "8d1cfab7-971b-5b60-96f3-f7612191e302",
+            "587b3c61-e180-51b5-b052-8afff18367f4",
+            "f9c769a4-cece-53c7-99bf-e4ca713155ab",
+            "4091cbb7-26c4-5975-95ab-b324348eb7a7",
+            "7917d808-6872-58d7-9278-26e9a930fc56",
+            "96a38bea-6446-5e10-8d20-a9791ae341e0",
+            "6c1bf8ea-2ace-59e2-af4d-ec265362c173",
+            "caa9f28b-ad35-53f5-998d-6dc089aabb95",
+            "c296ce7b-0a18-5f66-bb4b-ba8560061d1f"
+          ],
+          "substitutions": {
+            "06a31dab-5d2c-53cb-abd5-939c6e79aef5": "cce800f9-63b1-408d-9a02-5576012da7c4",
+            "cc327bc1-2616-5943-9fb2-9382f38a73f8": "fa156fd0-bef3-4934-9a9d-e852f56f9102",
+            "7b063300-b5a9-5ff0-b275-c73aae2f2d8b": "be1f76a0-fca3-4103-a7d4-cfc86e71cab1",
+            "8d1cfab7-971b-5b60-96f3-f7612191e302": "151b36b9-fe1a-4913-8055-40ea1ef458ee",
+            "587b3c61-e180-51b5-b052-8afff18367f4": "2c1c3d87-72c1-40c5-bc04-6c785f9dba47"
+          },
+          "logic_fingerprint_unchanged_after_mapping": true
+        }
+      }
+    }
+  ]
+}

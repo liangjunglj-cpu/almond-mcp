@@ -1,0 +1,130 @@
+{
+ "kit": "v060_details",
+ "meshes": {
+  "MW60_UtilityPole": {
+   "anchors": [
+    {
+     "z": 9.84,
+     "x": [
+      -0.95,
+      -0.35,
+      0.35,
+      0.95
+     ]
+    },
+    {
+     "z": 9.040000000000001,
+     "x": [
+      -0.95,
+      -0.35,
+      0.35,
+      0.95
+     ]
+    }
+   ],
+   "lamp": [
+    2.15,
+    0,
+    6.41
+   ],
+   "collision": "UCX column 0.44 x 0.44 x 10.5 m",
+   "ucx": [
+    "UCX_MW60_UtilityPole_00"
+   ],
+   "fbx": "MW60_UtilityPole.fbx",
+   "materials": [
+    "ConcreteWeathered",
+    "ConcreteDark",
+    "SteelDark",
+    "PlasticWhite",
+    "Galvanized",
+    "LampCool",
+    "PaintYellow",
+    "SignBack"
+   ],
+   "min": [
+    -1.1,
+    -0.3,
+    0.0
+   ],
+   "max": [
+    2.425,
+    0.3,
+    10.5
+   ],
+   "tris": 852
+  },
+  "MW60_Cable10": {
+   "span": 10.0,
+   "sag": 0.5,
+   "ucx": [],
+   "fbx": "MW60_Cable10.fbx",
+   "materials": [
+    "Cable"
+   ],
+   "min": [
+    -0.002,
+    -0.961,
+    -0.512
+   ],
+   "max": [
+    10.002,
+    0.963,
+    0.012
+   ],
+   "tris": 640
+  },
+  "MW60_VendingRow": {
+   "collision": "UCX box",
+   "face": "-Y",
+   "ucx": [
+    "UCX_MW60_VendingRow_00"
+   ],
+   "fbx": "MW60_VendingRow.fbx",
+   "materials": [
+    "PaintRed",
+    "GlassLit",
+    "ShopLit",
+    "Black",
+    "ScreenCyan",
+    "SteelDark",
+    "PaintWhite",
+    "PaintBlue"
+   ],
+   "min": [
+    -1.7,
+    -0.83,
+    0.0
+   ],
+   "max": [
+    2.22,
+    0.03,
+    1.99
+   ],
+   "tris": 252
+  },
+  "MW60_WallACRig": {
+   "face": "-Y",
+   "wall_plane_y": 0.0,
+   "ucx": [],
+   "fbx": "MW60_WallACRig.fbx",
+   "materials": [
+    "PlasticWhite",
+    "Black",
+    "SteelDark",
+    "Cable"
+   ],
+   "min": [
+    -1.23,
+    -0.45,
+    -2.6
+   ],
+   "max": [
+    1.295,
+    0.0,
+    1.53
+   ],
+   "tris": 354
+  }
+ }
+}

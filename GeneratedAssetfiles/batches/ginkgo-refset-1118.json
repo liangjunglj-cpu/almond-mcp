@@ -1,0 +1,187 @@
+{
+  "batch_id": "ginkgo-refset-1118",
+  "purpose": "Hero props generated for the Ginkgo world pass refset_1118 (W069-W071): vehicles, a vending machine and planting, re-derived as Almond library geometry.",
+  "origin": {
+    "project": "Ginkgo, the owner's own world-generation repository (private)",
+    "pass": "runs/refset_1118",
+    "pass_date": "2026-11-18",
+    "pass_records": [
+      "runs/refset_1118/OWNER_DECISIONS.md",
+      "runs/refset_1118/pass.json",
+      "runs/refset_1118/concept/jobs.json",
+      "runs/refset_1118/lab/W069/layout/life.json",
+      "runs/refset_1118/lab/W070/layout/life.json"
+    ],
+    "records": [
+      "runs/refset_1118/OWNER_DECISIONS.md",
+      "runs/refset_1118/pass.json",
+      "Claude Code session transcript 5708e728-4dea-4745-a8f6-09778117e497 (the tool calls that submitted the image, Meshy and Tripo jobs)"
+    ],
+    "excluded": {
+      "code-grown palms and every procedural building": "Generated in Blender code for the scene, not placeable library objects",
+      "W069-W071 scenes": "Paid GRANDWHIS products; assembled scenes, not placeable objects"
+    }
+  },
+  "image_provider": "higgsfield",
+  "image_settings": {
+    "model": "gpt_image_2_5",
+    "aspect_ratio": "1:1",
+    "image_reference": "the owner-approved refset_1118 concept shot (Higgsfield job ID in the request)"
+  },
+  "mesh_settings": {
+    "meshy": {
+      "ai_model": "meshy-7.1",
+      "texture_model": "meshy-7",
+      "enable_pbr": true,
+      "texture_resolution": "4k"
+    },
+    "tripo": {
+      "model": "tripo_h3_1_image_to_3d",
+      "geometry_quality": "detailed",
+      "texture_quality": "detailed",
+      "pbr": true,
+      "route": "Higgsfield generate_3d"
+    }
+  },
+  "strip_source_materials": true,
+  "external_reference_ids": [],
+  "external_reference_status": "Each reference image took one owner-approved refset_1118 concept image (the owner's own generated design, Higgsfield job ID recorded in the request) as an image reference. The owner's style photographs (runs/refset_1118/ref) were not given to any generator.",
+  "variant_suffix": "generated prop; detailed geometry edition",
+  "dimension_basis": "Sizes authored in the Ginkgo pass (taxi: 4.7 m, the default length in W069 cg_life.py, which the W069 layout enlarged to 5.1 m to match its concept image; W069 life.json truck length, W070 vending height, W069 palm variant height, the shrub prompt's 1 m height); vehicles scaled by length, others by height; remaining dimensions measured after uniform scaling. Not a physical survey.",
+  "rights": "Reference images generated on the owner's Higgsfield account (gpt_image_2_5); meshes on the owner's paid Meshy account (palm, shrub clump) or with Tripo H3.1 through the owner's Higgsfield account (taxi, refuse truck, vending machine). The Ginkgo pass records the owner's rights confirmation on 2026-11-18, and the owner approved release of all five, the Tripo models included, in the Almond library under CC BY 4.0 on 2026-11-18. These models also appear inside the owner's GRANDWHIS world packs. Generator account entitlements and the Tripo terms not independently audited.",
+  "estimated_credits": "0 for this import (generation already paid in Ginkgo: 0.25 Higgsfield credit per image, 30 Meshy credits or 18 Higgsfield credits per mesh)",
+  "assets": [
+    {
+      "asset_id": "gen-taxi-sedan-1",
+      "ginkgo_name": "taxi",
+      "product": "Taxi",
+      "variant": "Sedan taxi with blank roof sign",
+      "category": "vehicle",
+      "material": "steel-painted-vermilion",
+      "height_mm": 1790,
+      "width_hint_mm": 2200,
+      "depth_hint_mm": 4700,
+      "target_triangles": 60000,
+      "support_plane": "ground",
+      "placement_priority": "movable",
+      "tags": [
+        "taxi",
+        "car",
+        "sedan",
+        "vehicle",
+        "streetscape"
+      ],
+      "prompt": "Product reference of a single modern yellow taxi sedan like the taxis in the reference image, three-quarter front view, whole car in frame, plain light grey studio backdrop, soft even light, realistic paint and glass, black roof sign box blank with no text, no logos, no readable words, no numbers on doors, no people.",
+      "image_job_id": "eb36ba97-f8a4-47a8-89ba-b4f4615bd54f",
+      "mesh_task_id": "0eb0fe9f-6662-4126-afbb-ad37d73e40de",
+      "reference_review": "Reference image reviewed on 2026-11-18 at full resolution for this import: no lettering, logos, badges or brand marks visible."
+    },
+    {
+      "asset_id": "gen-refuse-truck-rear-loader-1",
+      "ginkgo_name": "refuse_truck",
+      "product": "Refuse truck",
+      "variant": "Cab-over rear-loader compactor, plain white",
+      "category": "vehicle",
+      "material": "plaster-white",
+      "height_mm": 3540,
+      "width_hint_mm": 2990,
+      "depth_hint_mm": 8600,
+      "target_triangles": 60000,
+      "support_plane": "ground",
+      "placement_priority": "movable",
+      "tags": [
+        "truck",
+        "refuse",
+        "garbage",
+        "vehicle",
+        "streetscape"
+      ],
+      "prompt": "Product reference of a single white rear-loader refuse collection truck like the one in the reference image, cab-over cab, boxy compactor body with rounded rear hopper, three-quarter front view, whole truck in frame, plain light grey studio backdrop, soft even light, realistic, plain white livery with a thin grey stripe, no text, no logos, no readable words.",
+      "image_job_id": "f1cc27b2-88c7-4085-abcf-ca4514e6fe7b",
+      "mesh_task_id": "a274de55-6db1-46f5-b43c-2c3bcaf3762c",
+      "reference_review": "Reference image reviewed on 2026-11-18 at full resolution for this import: no lettering, logos, badges or brand marks visible."
+    },
+    {
+      "asset_id": "gen-vending-machine-drinks-1",
+      "ginkgo_name": "vending",
+      "product": "Vending machine",
+      "variant": "Street drink vending machine, unbranded",
+      "category": "site_furniture",
+      "material": "ceramic-teal",
+      "height_mm": 1830,
+      "width_hint_mm": 820,
+      "depth_hint_mm": 980,
+      "target_triangles": 40000,
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "tags": [
+        "vending",
+        "drinks",
+        "kiosk",
+        "japan",
+        "streetscape"
+      ],
+      "prompt": "Product reference of a single Japanese street drink vending machine, mint green body, front window with three rows of small plain drink bottles and cans in pastel colours, row of selection buttons, coin slot panel, lower dispensing flap, three-quarter front view, whole machine in frame, plain light grey studio backdrop, soft even light, realistic, no text, no logos, no brands, no readable words.",
+      "image_job_id": "4fdf1e32-11e8-4731-b49c-94f258841cb8",
+      "mesh_task_id": "30a95eb5-3744-42d3-9093-fd32c924e6da",
+      "reference_review": "Reference image reviewed on 2026-11-18 at full resolution for this import: no lettering, logos, badges or brand marks visible."
+    },
+    {
+      "asset_id": "gen-palm-tree-1",
+      "ginkgo_name": "palm",
+      "product": "Palm tree",
+      "variant": "Young fan palm with a curved ringed trunk",
+      "category": "vegetation",
+      "material": "foliage-pine",
+      "height_mm": 6400,
+      "width_hint_mm": 5550,
+      "depth_hint_mm": 5240,
+      "target_triangles": 80000,
+      "support_plane": "ground",
+      "placement_priority": "accessory",
+      "tags": [
+        "palm",
+        "tree",
+        "tropical",
+        "planting"
+      ],
+      "prompt": "Single young fan palm tree with a short slightly curved ringed trunk about 3 metres tall and a full crown of large glossy pinnate fronds, whole plant in frame from the base of the trunk, side view, plain light grey studio backdrop, soft even light, realistic, no pot, no ground clutter.",
+      "image_job_id": "f905e15e-9d0a-442b-8996-24c712f741db",
+      "mesh_task_id": "01a1ecec-68ff-7789-8911-eb7a28bf8b98",
+      "reference_review": "Reference image reviewed on 2026-11-18 at full resolution for this import: no lettering, logos, badges or brand marks visible."
+    },
+    {
+      "asset_id": "gen-shrub-clump-tropical-1",
+      "ginkgo_name": "shrub_clump",
+      "product": "Shrub clump",
+      "variant": "Dense tropical shrubs and ferns on a soil patch",
+      "category": "vegetation",
+      "material": "foliage-pine",
+      "height_mm": 1000,
+      "width_hint_mm": 1560,
+      "depth_hint_mm": 1390,
+      "target_triangles": 140000,
+      "support_plane": "ground",
+      "placement_priority": "accessory",
+      "tags": [
+        "shrub",
+        "fern",
+        "tropical",
+        "planting",
+        "bed"
+      ],
+      "prompt": "Single dense clump of tropical shrubs and ferns about 1.5 metres wide and 1 metre tall, broad glossy leaves mixed with fern fronds and a few small spiky leaves, whole clump in frame sitting on a thin patch of soil, side view, plain light grey studio backdrop, soft even light, realistic, no pot.",
+      "image_job_id": "258ccd73-4dc3-4d0f-98e6-75c5de618670",
+      "mesh_task_id": "01a1ecec-0451-7768-8a8c-241d5ce8ebb8",
+      "reference_review": "Reference image reviewed on 2026-11-18 at full resolution for this import: no lettering, logos, badges or brand marks visible."
+    }
+  ],
+  "repair_nonmanifold": true,
+  "release_assets": [
+    "gen-taxi-sedan-1",
+    "gen-refuse-truck-rear-loader-1",
+    "gen-vending-machine-drinks-1",
+    "gen-palm-tree-1",
+    "gen-shrub-clump-tropical-1"
+  ]
+}

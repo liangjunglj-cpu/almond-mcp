@@ -1,5 +1,9 @@
 # Native frame solver
 
+> **Stable since 0.8.0** (the native engine). Its verdicts are design-stage checks, not certification or
+> code compliance. The Karamba route (`engine="karamba"`, shells) is still **(BETA)**, under test.
+> Status per feature: [simulation-stable-readiness.md](simulation-stable-readiness.md).
+
 `validate_structure` analyses line models (beams, columns, trusses, frames) with
 Almond's own 3D frame solver by default. Users no longer need Karamba3D for these;
 Karamba remains available for shells and as a cross-check.
@@ -67,7 +71,11 @@ and reply catches a plugin/solver mismatch.
 (`structure_model`), solves it with `frame_solver`, and sends the solved field to the
 bridge (`structure_draw`), which draws it with the same overlay as the Karamba route —
 deformed shape coloured by displacement or utilization, supports, loads and a
-PASS/FAIL legend. Display-only updates (`reanalyze=False`: scale, colouring, reveal,
+PASS/FAIL legend. The PASS/FAIL is `validate`'s (`view_result` returns the same
+checks as `verdict`; the draw message carries `verdict_status`, and the server
+replaces the status of an older bridge, which judged the absolute displacement and
+ignored Class 4). The legend's headline is the member deflection, with the absolute
+displacement (which scales the drawing) and the storey drift below it. Display-only updates (`reanalyze=False`: scale, colouring, reveal,
 physics on/off, `display_guids`) resend no geometry.
 
 ![Karamba and the native engine on the same frame](images/native-solver/native-vs-karamba.jpg)
@@ -107,11 +115,66 @@ axes polygonized identically. `almond_mcp/native_structure.py` then applies:
 
 - **Supports:** declared Rhino points (snapped to the nearest node within 50 mm), else
   every lowest-Z node. `fixed_supports=False` pins them (translations only).
-- **Loads:** `load_kn` shared equally by the free nodes, acting downward; self weight
-  γ·A along every member unless `self_weight=False`.
-- **Deflection limit:** span/250. Span = longest member for beam/frame, else overall
-  extent; `span_m` overrides it when members are split at every node (a 6.2 m joist
-  drawn as two 3.1 m segments).
+- **Sections** from each member's spec (meters): CHS (`diameter`, `wall`), box/RHS (`height`,
+  `width`, `wall`), solid rectangle (`height`, `width`), and doubly symmetric I-sections
+  (`shape` "i", `height`, `width`, `web`, `flange`; no root radii, warping constant
+  I_w = t_f b³ (h − t_f)²/24). The Rhino bridge exports hollow and solid sections; I-sections
+  come from model JSON.
+- **Curved members:** the bridge polylines curves to the document tolerance (1 mm), often
+  dozens of vertices per piece. Each smooth run is analysed as equal chords within 1/500 of
+  its length of the curve, turning at most 0.1 rad each, at most 24 per piece
+  (`CURVE_SAGITTA_RATIO`, `MAX_CURVE_TURN`, `MAX_CURVE_SEGMENTS`; `curve_ratio=None` keeps
+  every vertex). The chords of one run are one member for the EN 1993 checks, with their
+  moments read in the member's chord axes (each chord's own turned axes would put false kinks
+  into the moment diagram). The real N·e bending of a curved member makes its diagram
+  non-linear; Table B.3 reads it as transverse load on the member (a pure N·e member takes
+  about 0.95 from the uniform-load row, see the C_m notes below). A 336-piece
+  diagrid vault exported with 15,456 vertices solves at 1,197 nodes; on a smaller vault the
+  results stay within 0.1 % of a 16-chords-per-piece reference.
+- **Size:** the dense solver works within a fixed 6 GB budget (`DENSE_BUDGET_GB`; measured
+  peaks: assembly 6 n², α_cr 10 n² doubles, so at most 11,180 DOF first-order and 8,660 DOF
+  with the stability check). The verdict never depends on what else is open: low free memory
+  only adds a warning. Before anything is assembled, the worst case (every bending member
+  compressed and refined) is estimated; over budget, curved members are coarsened (8, 4, 2
+  chords per piece), then the stability refinement drops to 3 or 2 elements per member (with
+  a warning). Only a model that still does not fit returns `status: "error"` ("Model too
+  large for the dense solver: N nodes ... X GB") with `results.model_size`, never a
+  `MemoryError`.
+- **Loads:** `load_kn` shared equally by the free joints (where members meet or end; the
+  vertices along a curve are not joints), acting downward; a curve only between supports
+  (a lone arch) carries it as a uniform line load. Self weight γ·A along every member
+  unless `self_weight=False`.
+- **Deflection limit:** span/250. For beam/frame every member is checked against its own
+  span: the drawn member (one curve or line, however it was split at joints, plus pieces
+  carrying on in line) between the points that support it, twice the overhang for a
+  cantilever. The governing member (largest deflection/limit) is named in the verdict and
+  in `results.governing_deflection`; `max_deflection_mm` and `deflection_limit_mm` are
+  its values, `largest_deflection_mm` the largest of any member. A frame working as a
+  surface (no straight columns, not taller than wide, at least half its member length curved
+  or inclined: vaults, gridshells, arches) is checked twice instead: **global**, the largest
+  node displacement against the structure's span (twice the largest plan distance from a
+  node to its nearest support: a vault's crown gives the distance between its springings),
+  and **local**, each member's sag between its own joints against its length.
+  `governing_deflection.kind` says which governs (`member`, `global`, `local`);
+  `results.surface_deflection` has both. Other structure types use the overall extent;
+  `span_m` overrides any of these. A column held at two or more points is measured floor to floor
+  (below), so its span is the storey height; a column held only at its base (a free-standing
+  post) still gets the cantilever rule (twice its height).
+- **Deflection measured** per member relative to what holds it (`member_deflections`):
+  beams from their supports (cantilevers from the root, root rotation included);
+  steep members (columns, braces, diagrid bars, ≥ ~45°) held at two or more points
+  — supports, a brace or column below, or a floor that reaches another member's
+  support path — from the chord through those points' displaced positions, so a
+  storey's sway is not column deflection. Pieces that kink by less than ~1.8° form
+  one member: the columns of a 60°-twisted tower are one helical member from the
+  foundation to the roof, measured floor to floor. A lone post (its arm is not a
+  floor) stays a cantilever.
+- **Storey drift** (`storey_drift`): per steep member line on a support path, the
+  horizontal displacement between consecutive held points over their height, at
+  SLS characteristic, against h / `storey_drift_limit_ratio` (300, a project default
+  in the profile: no Eurocode clause fixes it). Per storey in `results.storey_drift`;
+  it fails the check and names itself in the verdict when it governs (not judged for
+  `structure_type="truss"`).
 - **Member checks (EN 1993-1-1, `almond_mcp/ec3.py`), per member** (the member between its
   joints, whatever the analysis split it into), for every ULS combination:
   - **Section class** from Table 5.2 for the actual stresses, with ε = √(235/f_y):
@@ -124,19 +187,66 @@ axes polygonized identically. `almond_mcp/native_structure.py` then applies:
   - **Flexural buckling** 6.3.1 about both axes with L_cr = the member length, curves from
     Table 6.2: hollow sections **cold-formed (EN 10219) → curve c by default**, hot-finished
     (EN 10210) → a (a0 for S460) with `fabrication="hot_finished"`; rolled I by h/b and t_f.
+  - **Lateral-torsional buckling** 6.3.2.1–6.3.2.2 for steel I-sections:
+    M_b,Rd = χ_LT W_y f_y/γ_M1 (W_pl,y for Class 1/2 with plastic design, else W_el,y), χ_LT by
+    the **general case 6.3.2.2** with the Table 6.4 curves (I-sections treated as rolled, as for
+    Table 6.2: a for h/b ≤ 2, b above). **M_cr is computed numerically** (`almond_mcp/ltb.py`):
+    an eigen analysis of each segment between lateral restraints with thin-walled beam elements
+    (lateral displacement, its slope, twist and warping per node) under the segment's own ULS
+    moment diagram, member loads and nodal loads, **gravity loads on the top flange** (z_g = +h/2,
+    destabilising; members steeper than 45° take loads at the shear centre). Segments: the
+    members between joints, with pieces of one straight beam that meet nothing else merged (a
+    polyline beam with an intermediate point stays one segment); ends are forks (v = φ = 0,
+    lateral bending and warping free) where a support or another member is, a cantilever is
+    held at its root (v = v′ = φ = 0) and free at its tip. Hollow sections are not susceptible.
+    `lateral_restraint="continuous"` (a deck, slab or bracing holds the compression flange)
+    skips the check. Reported per member: `ltb_utilization`, `m_cr_knm`, `lambda_lt`, `chi_lt`,
+    `ltb_curve`, `cm_lt`, `ltb_length_m`, `ltb_ends`. The λ̄_LT,0 = 0.4 "ignore" rule of
+    6.3.2.2(4) (a Nationally Determined Parameter of 6.3.2.3) is not used: the curve's own 0.2
+    plateau applies.
   - **Compression + bending** 6.3.3 (6.61)/(6.62) with the **Annex B** interaction factors
-    (Class 3 form with elastic moduli, Class 1/2 form with plastic) and Table B.3 C_m:
-    0.6 + 0.4ψ ≥ 0.4 for linear moment diagrams, the table's upper bound 1.0 for members
-    with transverse load.
+    (Class 3 form with elastic moduli, Class 1/2 form with plastic) and Table B.3 C_m read
+    from each member's own moment diagram: the end moments M_h and ψM_h, the mid-span moment
+    M_s, and the transverse load on the member taken from the change of slope between its
+    stations (none → row 1, 0.6 + 0.4ψ; spread evenly → the uniform-load column; one or two
+    point loads standing out → the concentrated-load column; anything mixed → the uniform
+    column, which is never lower). Rows 2 (α_s = M_s/M_h) and 3 (α_h = M_h/M_s) meet row 1 as
+    the load goes to zero, so C_m has no cliff. C_m ≥ 0.4. A member with a free end (a
+    cantilever) buckles in a sway mode: C_m = 0.9 (Table B.3 note); frame sway is in the
+    global second-order analysis, so other members take the non-sway rows. Diagrams the
+    table does not draw (a concentrated moment inside the member, a peak away from both the
+    ends and mid-span) take its upper bound 1.0. The member results report the case used
+    (`cm_y_basis`, `cm_z_basis`).
+    Table B.1 for members not susceptible to torsional deformation;
+    **Table B.2** (k_zy with C_mLT, M_y,Rk × χ_LT) for unrestrained I-sections.
+  - **Shear** 6.2.6: V_pl,Rd = A_v (f_y/√3)/γ_M0 along both local axes (CHS: the
+    resultant), with the 6.2.6(3) shear areas: I/H (no root radii) A − 2bt_f + t_w t_f ≥
+    η h_w t_w parallel to the web, A − h_w t_w parallel to the flanges; RHS A·h/(b + h) and
+    A·b/(b + h); CHS 2A/π; solid bars A. η = 1.0, the 6.2.6(3) Note's conservative value (the
+    recommended 1.2 of EN 1993-1-5 is a Nationally Determined Parameter and is not applied).
+    Reported per member as `shear_utilization`, `v_pl_rd_kn` [y, z] and `shear_rho`.
+  - **Shear buckling flag** 6.2.6(6): webs (RHS walls) with h_w/t_w > 72ε/η need
+    EN 1993-1-5 and **fail as not covered**, like Class 4 (`shear_buckling: true`).
+  - **Bending with high shear** 6.2.8: where V_Ed > 0.5 V_pl,Rd at a station, ρ =
+    (2V_Ed/V_pl,Rd − 1)² and the bending resistance there uses (1 − ρ)f_y on the shear area:
+    eq. (6.30) W_pl,y − ρA_w²/(4t_w) for I-sections about the major axis (elastic moduli:
+    W_el,y − ρ t_w h_w³/(6h)); every other case reduces the whole modulus (safe side).
+    The buckling checks (6.3.3) keep the unreduced resistances.
   - γ_M0, γ_M1 from the design code profile.
 
-**Not covered:** shells, large-displacement (geometrically nonlinear) analysis beyond P-Δ, member bow imperfections (5.3.2(6)), lateral-torsional buckling (hollow sections are immune; I-sections are not checked for it), shear resistance (6.2.6) and torsion, Class 4 effective sections, aluminium to EN 1999, dynamics, connections. Results are a preliminary design check, not an engineer's sign-off.
+**Not covered:** shells, large-displacement (geometrically nonlinear) analysis beyond P-Δ, torsion, shear buckling resistance (EN 1993-1-5; flagged, see above), Class 4 effective sections, aluminium to EN 1999, dynamics, connections. Results are a preliminary design check, not an engineer's sign-off.
 
 ### Validation
 
 - `tests/test_hand_calculations.py` and `tests/test_ec3.py`: closed forms worked from first
   principles and from the standard's text (beam, cantilever, column buckling on curves a and
-  c, Table 5.2 classes by grade, Table B.3 C_m, an Annex B case where k = 1.3).
+  c, Table 5.2 classes by grade, every Table B.3 C_m sub-case, one solved member per Table
+  B.3 row (end moments, UDL with fixed ends, mid-span point load, cantilever, curved member),
+  an Annex B case where k = 1.3, shear areas and
+  V_pl,Rd per section type, ρ and eq. (6.30), the h_w/t_w flag, Table 5.1 bow amplitudes, the
+  5.3.2(6) condition, a bowed propped column against the closed-form second-order solution, the
+  5.3.2(3)b column count; M_cr exact for uniform moment, the 4.013 cantilever, C1 = 1.13 / 1.365
+  and the ECCS load-height formula, χ_LT and M_b,Rd end to end, Table B.2 k_zy).
 - `tools/mutation_check.py` plants known engineering errors one at a time (wrong factors,
   wrong curve, unscaled class limits, buckling length of one analysis element, ...) and
   reports whether the tests catch each.
@@ -156,15 +266,40 @@ With `stability="auto"` (the default), every ULS combination gets:
   Cholesky factor of K. Compression members are split into 4 elements first — one element
   per member overstates α_cr by ~22 % for a pin-ended column; four are within ~0.05 %.
 - **Sway imperfections** (5.3.2): φ = φ₀·α_h·α_m with φ₀ = 1/200, α_h = 2/√h (⅔…1),
-  α_m = √(0.5(1 + 1/m)), h the height of the structure and m the number of column lines,
-  applied as horizontal forces φ·V at every loaded node in +x, −x, +y and −y; the member
-  checks take the worst direction. No columns (no height) → no sway imperfection.
+  α_m = √(0.5(1 + 1/m)), h the height of the structure, applied as horizontal forces φ·V at
+  every loaded node in +x, −x, +y and −y; the member checks take the worst direction. No
+  columns (no height) → no sway imperfection.
+  **m per sway direction (5.3.2(3)b):** the columns in a row, i.e. the column lines standing in
+  one vertical plane parallel to the sway (lines within 50 mm across it), counting only those
+  that carry N_Ed ≥ 50 % of that row's average column load under the ULS combination (a line's
+  load is its largest compression). With several rows the smallest m governs (largest α_m, on
+  the safe side for every row). The report gives `phi_x`/`m_x` and `phi_y`/`m_y` per
+  combination (`sway_imperfections`) and the largest under `sway_imperfection`.
+- **Local bow imperfections** (5.3.2(6)–(7)), in the second-order analysis (α_cr < 10) only:
+  e0 from **Table 5.1, elastic analysis** (a0 L/350, a L/300, b L/250, c L/200, d L/150) with
+  the member's Table 6.2 curve about each axis, applied as the **equivalent loads of
+  Figure 5.4**: a uniform 8N_Ed·e0/L² along the member and 4N_Ed·e0/L against it at each end
+  (self-equilibrating), bulging the way the frame sways in each ±x/±y variant. A compressed
+  steel member gets a bow about an axis only when 5.3.2(6) asks for it: at least one
+  moment-resistant end (its own end not released about that axis, at a rotationally
+  restrained support or a joint with another unreleased bending member) **and** λ̄ >
+  0.5·√(A·f_y/N_Ed), λ̄ in-plane for the member hinged at its ends (i.e. N_Ed > N_cr/4).
+  Skipped otherwise, with the reason counted per member axis in
+  `stability.bow_imperfection.skipped`: "alpha_cr >= 10" (the clause covers frames sensitive
+  to second-order effects only), "no moment-resistant end" (pin-ended members and truss bars:
+  their bow is covered by the 6.3 member check), "lambda_bar <= 0.5 sqrt(A fy / N_Ed)", "not
+  steel". Applied bows are listed in `stability.bow_imperfection.applied` (member, axis,
+  curve, e0, N_Ed, λ̄ and its limit). The 6.3 member checks still run on these members
+  (5.2.2(3)b), which is conservative.
 - **Regime** (5.2.1): α_cr ≥ 10 → first-order results; 1 < α_cr < 10 → a second-order
   (P-Δ) ULS analysis, iterating (K + K_G(N))·u = F until the axial forces settle; α_cr ≤ 1
   (or a second-order stiffness that stops being positive definite) → **FAIL, unstable**.
 - Member buckling checks use L_cr = the member length, also when the stability check has
   split the member into elements: conservative for non-sway frames (α_cr ≥ 10) and permitted
   after a global second-order analysis with sway imperfections (5.2.2(7)b).
+- Extra member loads (the bows) are solved exactly like case loads: equivalent nodal loads
+  through the same static condensation, and the member's own load in the internal force
+  recovery (`member_loads` on `solve_linear` / `solve_second_order`).
 
 `visualize_structure(view="buckling")` draws the first buckling mode of the governing ULS
 combination with its α_cr and a STABLE / SWAY-SENSITIVE / UNSTABLE badge.
@@ -199,7 +334,10 @@ beam deflection, so `connections="simple"` models it:
   a rigid body.
 - **Per member:** a curve's user text `almond:release` = `pinned` | `pinned_start` |
   `pinned_end` | `rigid` overrides either mode (the bridge exports the curve's own start and
-  end so one-sided releases know the direction).
+  end so one-sided releases know the direction). Two more words ignore the orientation rule:
+  `bar` releases both bending axes at both ends (a pin-jointed truss bar, checked as a
+  compression member over its own length) and `hinged` releases major-axis bending only at
+  both ends (a planar truss member or simple beam that stays continuous in plan).
 
 **Sections per curve.** A curve's user text `almond:section` sets its section, in millimetres unless a
 unit follows (`rect 30x64 cm`):
@@ -224,6 +362,27 @@ Live, Atelier-07 mezzanine (2026-10-01), floor 2.0 Q + 1.0 G kN/m², EN 1990: wi
 joints CHS 219.1×8 passes (18.5 mm, u 0.86); with simple connections (14 pinned ends) it
 fails (25.9 mm > 24.8 mm, u 0.98); the next size tried, CHS 244.5×10, passes (15.7 mm,
 u 0.66).
+
+## Explicit loads in the model
+
+The conditioned model may carry its own loads in `model["loads"]`, each with a case G or Q:
+nodal forces and moments at a point (`{"point_m": [x, y, z], "force_kn": [fx, fy, fz], "case": "Q"}`,
+snapped to the nearest node within 50 mm) and line loads along a model member
+(`{"member": i, "w_start_kn_m": [...], "w_end_kn_m": [...], "case": "G"}`, uniform when `w_end` is
+omitted, otherwise varying linearly along the member and split exactly over its pieces). The
+structural reference library uses this to analyse its benchmark loads; the Rhino bridge does not
+export loads yet, so for drawn geometry the loads remain `load_kn`, the floor loads and the placed
+assets. Supports may be `lateral-x` / `lateral-y` as well as the types above: a horizontal restraint
+only, the out-of-plane bracing a planar truss or frame relies on.
+
+## Structural reference library
+
+`list_structural_references`, `get_structural_reference`, `analyze_structural_reference` and
+`place_structural_reference` expose twelve benchmarked typologies (the models of
+`benchmarks/` and `tests/test_structural_typologies.py`) as parametric line models:
+analysed here with their benchmark loads and compared with the textbook closed form, or
+drawn in Rhino with `almond:section`, `almond:release` and `almond:support` user text for
+`validate_structure`. See [StructuralReferences/README.md](../StructuralReferences/README.md).
 
 ## Load combinations (EN 1990)
 
@@ -265,7 +424,10 @@ ULS u 0.86 — up from 0.59 unfactored).
   supports (in the reactions, bending no member). Diagonals between supports that would
   cut an already closed bay are rejected.
 - **Distribution:** rectangular bays use 45° lines from the corners — short edges carry a
-  triangle, long edges a trapezoid; above 2:1 the bay spans one way onto its long edges.
+  triangle, long edges a trapezoid. Above 2:1 the bay spans one way onto its long edges
+  (q·s/2 along the middle l − s) with the 45° rule still applied at the short ends: each
+  short beam carries its triangular end strip (q·s²/4), so the bay's load q·s·l is conserved
+  and short beams are never left unloaded. Such bays are counted as `one_way_bays` per level.
   Other convex bays use a centroid fan (each edge a triangle peaking under the centroid).
 - **Exact:** members are split at the load shape's kinks and each part carries a linear
   load, solved exactly (a triangle on a simple span reproduces `WL³/60EI` and `WL/6`).

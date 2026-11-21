@@ -84,6 +84,7 @@ namespace RhinoAlmondBridge
                 paper = colour(PaintColor.PanelBackground), ink = colour(PaintColor.TextEnabled),
                 control = colour(PaintColor.NormalStart), field = colour(PaintColor.EditBoxBackground),
                 line = colour(PaintColor.NormalBorder), hover = colour(PaintColor.HotStart),
+                accent = colour(PaintColor.PressedEnd), tab = colour(PaintColor.InactiveTabBackground),
                 font = AppearanceSettings.DefaultFontFaceName
             }, new JsonSerializerSettings { StringEscapeHandling = StringEscapeHandling.EscapeHtml });
         }
@@ -148,7 +149,7 @@ namespace RhinoAlmondBridge
                         var action = Regex.Match(e.Uri.AbsolutePath, "^/almond-action/" + _session + "/(drag|place)/(light|original)/(gen-[a-z0-9-]{1,100})$");
                         if (_ready && action.Success)
                             LibraryPlacement.Request(action.Groups[3].Value, action.Groups[1].Value == "drag", action.Groups[2].Value == "light");
-                        var analysis = Regex.Match(e.Uri.AbsolutePath,"^/almond-action/"+_session+"/karamba/(status|capture|analyze|highlight|export|clear_view|results)$");
+                        var analysis = Regex.Match(e.Uri.AbsolutePath,"^/almond-action/"+_session+"/karamba/(status|capture|analyze|highlight|export|clear_view|results|set_support)$");
                         if (_ready && analysis.Success)
                         {
                             try {
@@ -157,7 +158,7 @@ namespace RhinoAlmondBridge
                                 _analysis.Request(analysis.Groups[1].Value,Uri.UnescapeDataString(query.Substring(6)));
                             } catch(Exception ex) { RhinoApp.WriteLine("Almond analysis: {0}",ex.Message); }
                         }
-                        var environment = Regex.Match(e.Uri.AbsolutePath,"^/almond-action/"+_session+"/environment/(catalogue|construction|browse_epw|site|define_room|remove_room|assign|clear_construction|select_room|clear_view|rooms|run)$");
+                        var environment = Regex.Match(e.Uri.AbsolutePath,"^/almond-action/"+_session+"/environment/(catalogue|construction|browse_epw|site|climate|setpoints|define_room|remove_room|assign|clear_construction|select_room|clear_view|rooms|run|charts|compare|open_folder|tutorial)$");
                         if (_ready && environment.Success)
                         {
                             try {

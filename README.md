@@ -1,56 +1,10 @@
 # Almond MCP for Rhino
 
-**0.7.0-rc.2 — structural analysis pre-release.** The Structure workspace now runs
-Almond's own 3D frame solver: floor and placed-model loads, EN 1990 combinations,
-rigid/simple joints, stability (αcr, sway imperfections, P-Δ), EN 1993-1-1 member
-checks, per-curve sections (`almond:section`) and the **Almond Results** panel for
-every member, support and combination. Concrete, timber and aluminium are indicative.
-Start with the [Structure workspace tutorial](docs/structural-tutorial.md); release
-notes and the pre-release checklist are in [docs/release-0.7.md](docs/release-0.7.md).
-Install from Rhino's Package Manager with **Include pre-releases** ticked; the
-stable release remains 0.6.0.
-
-**0.6.0 — Almond workspace release.** Run **Almond** in Rhino
-for a dockable Neo Swiss menu with **Models** and **Structural Validation**.
-**AlmondLibrary** opens models directly; **AlmondStructure** (or **AlmondKaramba**)
-opens the analysis workspace. Models retain compact tiles, Light/Original detail and
-shared-block viewport placement. The structural workspace runs Almond's built-in
-native solver (no Karamba needed: floor and placed-model loads, EN 1990
-combinations, rigid/simple connections, stability, a live viewport overlay) or,
-optionally, Karamba3D; both add selection capture, explicit assumptions,
-support/load diagram toggles, mapped utilization and an exportable result record.
-See [docs/native-solver.md](docs/native-solver.md#in-the-almond-panel).
-
-The active IKEA catalogue, source links and four supplier-specific MCP tools
-are retired. Existing local downloads and historical scene records are retained.
-Karamba and the generated model/source libraries remain available.
-See the [Rhino quickstart](docs/rhino-archive-quickstart.md) and
-[release infrastructure](docs/release-0.6.md). Viewport dragging was confirmed
-by the user on rc.6. Stable 0.6.0 passed its Rhino smoke test and is published
-on Rhino Package Manager (`almondbridge`) and PyPI (`almond-mcp`).
-
-Run
-`almond-mcp library --open` for the local Neo Swiss interface: 47 Meshy models,
-7 drawing elements, linked SVG/DXF views, downloads, and source evidence in
-one searchable catalogue. The same index is exposed through the MCP tool
-`search_asset_repository` and `almond://repository/{asset_id}` resources.
-See the [Object Archive guide](docs/object-archive-0.6-rc3.md).
-
-All 50 generated
-models now carry embedded asset passports and ship with the Python package,
-including their sidecar contracts and previews. New MCP tools recommend assets
-with reasons and check rotated clearance envelopes before placement. See
-[the release guide](docs/semantic-assets-0.6.md) for the workflow, packaging,
-verification and remaining Rhino integration checks. The
-[drafting update](docs/drafting-0.6-rc2.md) adds a ten-model SVG/DXF pilot,
-custom GLB drawing generation, source discovery and drawing revision checks.
-
 <p align="center"><img src="assets/almond-icon.svg" width="120" alt="Almond"></p>
 
-Almond exposes Rhino 8 and a semantic design layer as MCP tools: curated
-furniture/drawing/diagram libraries with spatial contracts, audited Karamba
-capsules, structured retrieval (SQLite FTS5 + R-tree scene ledger), script
-execution over a TCP bridge, and publishing into Chestnut.
+Almond lets an AI assistant such as Claude work in Rhino 8 with you: it places
+furniture and other 3D models at their real sizes, checks whether a structure
+will stand up, and studies sunlight and climate on your design.
 
 ## What Almond is
 
@@ -96,6 +50,116 @@ Two pieces work together:
 - **`almondbridge`** (a Rhino 8 plugin, on the Rhino Package Manager) —
   listens on `127.0.0.1:5000` (local only) inside Rhino and executes what
   the server sends. Starts automatically with Rhino.
+
+## What's new
+
+### 0.8.0
+
+> **Structural Validation (native engine) is stable from 0.8.0; Climate, Rooms & Comfort
+> (environmental analysis) and the Karamba route are in beta (BETA).** The beta tools, panel workspace and
+> viewport legends are labelled (BETA). Treat every result as a design-stage check, not certification or
+> code compliance. **Place tutorial model** in either workspace (or the `place_simulation_tutorial` tool) puts
+> an annotated example in Rhino that shows what each analysis needs. Status per feature:
+> [docs/simulation-stable-readiness.md](docs/simulation-stable-readiness.md).
+
+- **Structural checks.** EN 1993-1-1 shear (6.2.6, 6.2.8), lateral-torsional buckling of
+  I-sections (6.3.2), local bow imperfections (5.3.2(6)) and Table B.3 C_m read from each
+  member's own moment diagram. Deflection is measured relative to what holds each member (a
+  column floor to floor, sway checked as storey drift, h/300) and judged against the member's
+  own span, the governing member named; `visualize_structure` and the panel overlay give the
+  same verdict as `validate_structure`. Curved members are analysed as chords, and oversize
+  models are coarsened or refused instead of running out of memory.
+- **Generated asset library: 144 models** (Ginkgo props, Daxi harbour boats, Project Y2K kits),
+  each labelled by how it was made. The wheel carries no model files: they download from the
+  GitHub release on first use (`almond-mcp fetch-assets --generated` prefetches them).
+- **Structural reference library.** Twelve benchmarked building typologies (moment
+  frame, braced tower, Pratt truss, portal, warehouse, space grid, arch, L-bracket,
+  canopy, diagrid, Vierendeel girder, a frame on six support types) as parametric
+  line models: `list_structural_references`, `get_structural_reference`,
+  `analyze_structural_reference` (solved with their benchmark loads, no Rhino needed,
+  compared with the textbook closed form where one exists) and
+  `place_structural_reference` (drawn in Rhino with section, release and support user
+  text, ready for `validate_structure`). See
+  [StructuralReferences/README.md](StructuralReferences/README.md).
+- **Native solver.** Support types per support point (fixed, pinned, rollers, springs
+  and the horizontal-only `lateral-x` / `lateral-y`), the release words `bar` and
+  `hinged`, and explicit G/Q loads carried in the model. Fixes from a typology stress
+  test (false mechanisms, dropped floor bays, tower deflection failures), with the
+  typologies checked against closed forms in CI and cross-checked against OpenSees.
+  The Rhino bridge reads `almond:support` user text on support points (and splits members
+  there; the Supports tab and `set_support_type` write it); it does not export G/Q loads
+  yet, so drawn geometry uses `load_kn`, floor loads and placed-model loads.
+- **Parametric teaching library (Grasshopper).** Ten openly licensed architectural
+  definitions by other authors (facades, a shell roof, towers, terrain, paving),
+  annotated to read left to right, with their upstream logic and licences unchanged:
+  `list_parametric_definitions`, `get_parametric_definition`,
+  `open_parametric_definition`. The shell roof also ships as a harnessed capsule,
+  not yet audited. See [ParametricLibrary/README.md](ParametricLibrary/README.md).
+- **Environmental analysis.** A native engine on EPW weather files: climate summary
+  and sun path, annual daylight (sDA, ASE, UDI, EN 17037), daylight factor, solar
+  radiation, ISO 13790 thermal zones and comfort, plus user-defined rooms, layered
+  constructions and envelope code packs. In Rhino it is the Almond panel's
+  **Environment** workspace (Site, Rooms, Constructions, Study, Results). See
+  [docs/environmental-analysis.md](docs/environmental-analysis.md).
+- **Scene metadata audit (pilot).** `capture_scene_metadata_snapshot` records chosen
+  Rhino objects as a local baseline; `audit_scene_metadata` reports what was deleted,
+  moved, resized or had its Almond user text changed since, and
+  `show_scene_metadata_issues` marks them temporarily in the viewport. Read-only on
+  the model. See [docs/scene-metadata-audit.md](docs/scene-metadata-audit.md).
+- **Bridge security.** The bridge accepts only requests that carry the current Rhino
+  session's token (`%LOCALAPPDATA%\Almond\bridge.token`), with explicit request types
+  and size and read limits. Update `almond-mcp` and `almondbridge` together: an older
+  server gets `unauthorized` from a newer bridge.
+- **Undo after a failed script.** A script that fails and is rolled back no longer
+  leaves Rhino's Undo stuck (issue #35).
+
+### Earlier releases
+
+**0.7.0-rc.2 — structural analysis pre-release.** The Structure workspace now runs
+Almond's own 3D frame solver: floor and placed-model loads, EN 1990 combinations,
+rigid/simple joints, stability (αcr, sway imperfections, P-Δ), EN 1993-1-1 member
+checks, per-curve sections (`almond:section`) and the **Almond Results** panel for
+every member, support and combination. Concrete, timber and aluminium are indicative.
+Start with the [Structure workspace tutorial](docs/structural-tutorial.md); release
+notes and the pre-release checklist are in [docs/release-0.7.md](docs/release-0.7.md).
+Install from Rhino's Package Manager with **Include pre-releases** ticked; the
+stable release remains 0.6.0.
+
+**0.6.0 — Almond workspace release.** Run **Almond** in Rhino
+for a dockable Neo Swiss menu with **Models** and **Structural Validation**.
+**AlmondLibrary** opens models directly; **AlmondStructure** (or **AlmondKaramba**)
+opens the analysis workspace. Models retain compact tiles, Light/Original detail and
+shared-block viewport placement. The structural workspace runs Almond's built-in
+native solver (no Karamba needed: floor and placed-model loads, EN 1990
+combinations, rigid/simple connections, stability, a live viewport overlay) or,
+optionally, Karamba3D; both add selection capture, explicit assumptions,
+support/load diagram toggles, mapped utilization and an exportable result record.
+See [docs/native-solver.md](docs/native-solver.md#in-the-almond-panel).
+
+The active IKEA catalogue, source links and four supplier-specific MCP tools
+are retired. Existing local downloads and historical scene records are retained.
+Karamba and the generated model/source libraries remain available.
+See the [Rhino quickstart](docs/rhino-archive-quickstart.md) and
+[release infrastructure](docs/release-0.6.md). Viewport dragging was confirmed
+by the user on rc.6. Stable 0.6.0 passed its Rhino smoke test and is published
+on Rhino Package Manager (`almondbridge`) and PyPI (`almond-mcp`).
+
+Run
+`almond-mcp library --open` for the local Neo Swiss interface: 47 Meshy models,
+7 drawing elements, linked SVG/DXF views, downloads, and source evidence in
+one searchable catalogue. The same index is exposed through the MCP tool
+`search_asset_repository` and `almond://repository/{asset_id}` resources.
+See the [Object Archive guide](docs/object-archive-0.6-rc3.md).
+
+All 144 generated
+models now carry embedded asset passports. The Python package ships their
+catalogue and previews; each model file (GLB + sidecar contract) downloads from
+the matching GitHub release the first time it is used. New MCP tools recommend assets
+with reasons and check rotated clearance envelopes before placement. See
+[the release guide](docs/semantic-assets-0.6.md) for the workflow, packaging,
+verification and remaining Rhino integration checks. The
+[drafting update](docs/drafting-0.6-rc2.md) adds a ten-model SVG/DXF pilot,
+custom GLB drawing generation, source discovery and drawing revision checks.
 
 ## Setting up with an AI assistant?
 
@@ -165,15 +229,25 @@ and a Claude that supports MCP (Claude Desktop or Claude Code).
 
    Save each download into the library's `models/` folder under the exact
    file name shown; the command verifies every checksum.
+
+   The generated (CC BY 4.0) library needs none of this: the first placement
+   of a generated model downloads it from the GitHub release and checks its
+   sha256. To fetch all of them now, e.g. before working offline, run
+   `uvx almond-mcp fetch-assets --generated`.
 7. **Optional extras:** Karamba3D 3.1 enables `validate_structure` (found at
    runtime — never bundled); point `RHINO_MCP_LIBRARY_DIR` at your own
    Grasshopper definition library to expose it via `list_library`.
+
+You never need the large `almond_mcp-<version>.tar.gz` on the GitHub release page:
+the steps above install from the Rhino Package Manager and PyPI. It is the source
+archive, and its size (well over 100 MB) is expected; the release notes say why.
 
 ## CLI
 
 ```text
 almond-mcp               start the MCP server (also: almond-mcp serve)
-almond-mcp fetch-assets  report missing/invalid model files and their sources
+almond-mcp fetch-assets  download generated models; report missing/invalid model files and their sources
+                         (--generated: only the generated models, to prefetch for offline use)
 almond-mcp doctor        check directories, manifests, state DB, bridge port
 almond-mcp paths         print every resolved directory
 ```
@@ -190,6 +264,8 @@ locations:
 | `RHINO_MCP_DRAWING_RECIPE_DIR` | `DrawingRecipes` |
 | `RHINO_MCP_GENERATED_ASSET_DIR` | `GeneratedAssetfiles` |
 | `RHINO_MCP_CAPSULE_DIR` | `capsules` |
+| `RHINO_MCP_STRUCTURAL_REFERENCE_DIR` | `StructuralReferences` |
+| `RHINO_MCP_PARAMETRIC_DIR` | `ParametricLibrary` |
 | `RHINO_MCP_STATE_DB` | `%LOCALAPPDATA%\Almond\almond_state.sqlite3` |
 
 ## Rhino to Chestnut
@@ -270,13 +346,27 @@ create_generation_plan(
 )
 ```
 
+## Parametric teaching library (Grasshopper)
+
+`ParametricLibrary/` holds ten openly licensed architectural Grasshopper
+definitions (facades, a shell roof, towers, terrain, paving) by other authors,
+annotated so a student can read the canvas left to right: README, named
+inputs, numbered explained steps, result. The upstream logic is unchanged and
+each file keeps its licence. Use `list_parametric_definitions`,
+`get_parametric_definition` and `open_parametric_definition` (opens it in
+Grasshopper). Definitions with a lesson `harness` block also ship as runnable
+capsules (`ALMOND_IN_*`/`ALMOND_OUT_*` sockets, `run_gh_definition`); the first
+is the shell roof, `parametric_shell_roof_ribs_v1`, not yet audited.
+See [ParametricLibrary/README.md](ParametricLibrary/README.md).
+
 ## Generated asset library (open, redistributable)
 
 The optional drawing library describes community models that each user
 must download themselves. `GeneratedAssetfiles/` is different: 47 (and
 growing) architectural models generated with Meshy from Almond's own
 prompts, owned by the project and released under **CC BY 4.0**, so they ship
-with the repository and the 0.6 wheel for offline use. Categories:
+with the repository, the Rhino plugin and the GitHub release (the PyPI package
+downloads each model from that release on first use). Categories:
 
 | Group | Assets |
 | --- | --- |
@@ -318,8 +408,14 @@ or span-rule heuristics (rule_based, low) — and always labels which one
 ran. Pass criteria: deflection ≤ span/250 and utilization below yield.
 Every run is recorded in the local state database;
 `export_structural_report()` renders the history to a Markdown report
-(inputs, pathway, span/deflection/utilization/reactions, warnings,
-PASS/FAIL). Details: `docs/structural-validation.md`.
+(inputs, loads and design settings, pathway, span/deflection/utilization/
+reactions, warnings, PASS/FAIL/INDICATIVE). Details: `docs/structural-validation.md`.
+
+Start from a verified model: `list_structural_references`,
+`analyze_structural_reference` and `place_structural_reference` expose twelve
+benchmarked typologies as parametric line models, analysed with their benchmark
+loads (closed forms and OpenSees agree) or drawn in Rhino ready for
+`validate_structure`. See `StructuralReferences/README.md`.
 
 On top of the solver, a **construction knowledge layer**
 (`get_construction_guidance`, `Constructionfiles/manifest.json`) grounds
@@ -333,7 +429,7 @@ spans no real system covers — so geometry that merely solves numerically
 but could not be constructed as drawn is caught too. Details:
 `docs/construction-guidance.md`.
 
-## Environmental analysis: climate, daylight, radiation, thermal comfort
+## Environmental analysis: climate, daylight, radiation, thermal comfort (BETA)
 
 Point any analysis at an EPW weather file (`.epw`), the standard typical-year format for building simulation.
 The engine is native: there is no Radiance or EnergyPlus to install, and it is a clean-room

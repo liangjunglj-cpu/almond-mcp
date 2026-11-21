@@ -5,7 +5,8 @@
 Checks, against one allow-list of licences that permit commercial redistribution:
   1. the Python runtime dependency closure of almond-mcp (installed metadata; the optional `fast` extra too),
   2. the plugin's NuGet packages and the files vendored into the panel UI,
-  3. every source behind the bundled environment data (almond_mcp/environment/data/sources.json).
+  3. every source behind the bundled environment data (almond_mcp/environment/data/sources.json),
+  4. every adapted Grasshopper definition in the parametric teaching library (ParametricLibrary/source-register.json).
 
 Exit status 1 when anything is denied (copyleft that would bind the product, non-commercial or
 no-derivatives terms) or unknown; "review" items (weak copyleft used unmodified, method citations) are
@@ -22,7 +23,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 ALLOW = {"MIT", "BSD-2-Clause", "BSD-3-Clause", "Apache-2.0", "ISC", "PSF-2.0", "Python-2.0", "0BSD", "Unlicense",
-         "CC0-1.0", "CC-BY-4.0", "OGL-UK-3.0", "Zlib", "HPND", "MIT-CMU",
+         "CC0-1.0", "CC-BY-4.0", "OGL-UK-3.0", "Zlib", "HPND", "MIT-CMU", "BlueOak-1.0.0",
          "LicenseRef-EnergyPlus", "LicenseRef-PublicDomain-DE-UrhG-5", "LicenseRef-SG-ODL-1.0"}
 REVIEW = {"MPL-2.0", "LGPL-2.1", "LGPL-3.0", "LicenseRef-Method-Cited", "LicenseRef-McNeel-SDK"}
 DENY = re.compile(r"(?i)\b(A?GPL|SSPL|BUSL|CC-BY-(NC|ND|SA)|CC-BY-NC|non-?commercial)\b")
@@ -120,6 +121,12 @@ def scan() -> dict:
     src = json.loads((ROOT / "almond_mcp/environment/data/sources.json").read_text(encoding="utf-8"))["sources"]
     for s in src:
         rows.append({"component": f"data: {s['id']}", "kind": "environment data", "licence": s["licence"], "verdict": classify(s["licence"])})
+    register = ROOT / "ParametricLibrary" / "source-register.json"
+    if register.is_file():
+        for item in json.loads(register.read_text(encoding="utf-8"))["items"]:
+            lic = item["rights"]["licence"]
+            rows.append({"component": f"parametric: {item['id']}", "kind": "adapted Grasshopper definition",
+                         "licence": lic, "verdict": classify(lic)})
     bad = [r for r in rows if r["verdict"] in ("deny", "unknown")]
     return {"components": rows, "denied_or_unknown": bad, "review": [r for r in rows if r["verdict"] == "review"],
             "ok": not bad, "note": "Engineering licence check for commercial distribution; not legal advice."}

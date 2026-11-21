@@ -1,0 +1,147 @@
+{
+  "batch_id": "ginkgo-daxi-2026-11",
+  "image": {
+    "asset_id": "gen-fishing-boat-coastal-a-1",
+    "provider": "higgsfield",
+    "tool": "generate_image",
+    "submitted_at": "2026-10-15T03:02:06.948Z",
+    "request": {
+      "model": "nano_banana_pro",
+      "resolution": "2k",
+      "aspect_ratio": "16:9",
+      "medias": [
+        {
+          "value": "96c73386-7259-4363-95b9-02c4f6fd0b1d",
+          "role": "image_references"
+        },
+        {
+          "value": "7541720a-3002-4785-b6b9-6b1bd975abaa",
+          "role": "image_references"
+        }
+      ],
+      "prompt": "Photorealistic isolated product shot of ONE complete Taiwanese coastal fishing boat (Daxi harbour, Yilan), about 14 m long, shown whole from bow to stern in a three-quarter front view from slightly above, the bow pointing toward the right of the frame, the entire hull visible out of the water down to the keel, on a plain flat light grey studio background, soft even overcast lighting. Match the boat in the reference crop: old weathered off-white painted wooden hull with a black sheer stripe below the gunwale, a dark red painted triangular bow cap on top of the stem, grey-blue lower hull, white bulwarks with a flat white foredeck, a white wheelhouse aft, deck clutter like a winch drum and coiled lines left out. Real chipped paint, rust bleeding from bolts, waterline grime, fine scratches. IMPORTANT: no mast, no rigging, no hanging ropes, no floats, no buoys, no tyres, no flags, no people, no water. Exactly one boat."
+    },
+    "task_id": "c2830364-8b39-41d4-bd5a-ee371bdf36f6",
+    "status": "COMPLETED",
+    "provider_model": "nano_banana_pro",
+    "provider_reported_model": "nano_banana_2",
+    "completed_observed_at": "2026-10-15T03:04:08.314Z",
+    "provider_output_name": "hf_20261015_030213_c2830364-8b39-41d4-bd5a-ee371bdf36f6.png",
+    "reference_inputs": [
+      {
+        "name": "left_bow.png",
+        "role": "owner photograph (left_bow)",
+        "sha256": "1e551c802a26afa69a159c3fcbb0a3f91c4747ab18722a3e9b91e7a19e96b655",
+        "retained": false,
+        "note": "Owner photograph uploaded to the image stage; not distributed"
+      },
+      {
+        "name": "daxi_ref.jpg",
+        "role": "owner photograph (daxi_ref)",
+        "sha256": "c61e641ee44b18b5ca441f344ba8d75ac4fdf3e0452f3e536e5ef42a1305ee9f",
+        "retained": false,
+        "note": "Owner photograph uploaded to the image stage; not distributed"
+      }
+    ],
+    "output_file": "gen-fishing-boat-coastal-a-1.png",
+    "output_sha256": "63d60df2c1f3e61a2eead05d13e578bed45ebc1411946107be701948d15ecd58",
+    "output_file_modified_at": "2026-10-15T03:04:13+00:00",
+    "seed": null,
+    "evidence_source": {
+      "pass_records": [
+        "runs/daxi_harbour/blender/layout.json",
+        "runs/daxi_harbour/blender/build_scene.py"
+      ],
+      "session_records": "Tool calls of Ginkgo Claude Code session(s) 32f853ff-f053-42f0-973f-1c12ffd01fac (submissions, results and downloads)",
+      "extracted_at": "2026-11-20T16:57:59+00:00"
+    },
+    "status_basis": "Provider reported completed; curl of the job's result URL in the Ginkgo session (Bash)"
+  },
+  "mesh": {
+    "asset_id": "gen-fishing-boat-coastal-a-1",
+    "provider": "higgsfield",
+    "tool": "generate_3d",
+    "submitted_at": "2026-10-15T03:05:00.054Z",
+    "request": {
+      "model": "tripo_h3_1_image_to_3d",
+      "medias": [
+        {
+          "value": "c2830364-8b39-41d4-bd5a-ee371bdf36f6",
+          "role": "image_references"
+        }
+      ],
+      "geometry_quality": "detailed",
+      "texture_quality": "detailed",
+      "pbr": true
+    },
+    "task_id": "df82514b-8d01-4168-b4d7-3cfef42af815",
+    "status": "COMPLETED",
+    "status_basis": "Higgsfield jobs_wait reported completed; GLB downloaded with curl from the job's result URL in the Ginkgo session",
+    "provider_model": "tripo_h3_1_image_to_3d",
+    "completed_observed_at": "2026-10-15T03:08:15.373Z",
+    "provider_output_name": "hf_20261015_030503_df82514b-8d01-4168-b4d7-3cfef42af815.glb",
+    "consumed_credits": "18 Higgsfield credits (cost quote returned in the Ginkgo session)",
+    "input_link": "media_job_id",
+    "input_image_sha256": "63d60df2c1f3e61a2eead05d13e578bed45ebc1411946107be701948d15ecd58",
+    "output_file": "gen-fishing-boat-coastal-a-1.glb",
+    "output_sha256": "daa90b83c688dd825e35edac82b7a0a5aea1d790188d316e9944175c5bc57ce9",
+    "seed": null,
+    "evidence_source": {
+      "pass_records": [
+        "runs/daxi_harbour/blender/layout.json",
+        "runs/daxi_harbour/blender/build_scene.py"
+      ],
+      "session_records": "Tool calls of Ginkgo Claude Code session(s) 32f853ff-f053-42f0-973f-1c12ffd01fac (submissions, results and downloads)",
+      "extracted_at": "2026-11-20T16:57:59+00:00"
+    }
+  },
+  "derivation": {
+    "asset_id": "gen-fishing-boat-coastal-a-1",
+    "source_sha256": "daa90b83c688dd825e35edac82b7a0a5aea1d790188d316e9944175c5bc57ce9",
+    "source_triangles": 1968177,
+    "target_triangles": 80000,
+    "prepared_sha256": "e48038fc9ec4751d1c2c50de0d6340a72411fe9a43dc0af1a70993efc3301dcf",
+    "software": "Blender 5.1.2",
+    "method": "Remove provider PBR materials and textures; Validate mesh; weld coincident vertices; dissolve degenerates; recalculate normals; collapse decimation only when above target with validation between passes; triangulate and validate before measuring. Remove wire edges, split edges shared by more than two faces and remove zero-area faces (counts in quality.topology_repairs). Never subdivide to inflate counts.",
+    "weld_tolerance_source_units": 9.798853397369384e-08,
+    "quality": {
+      "vertices": 39953,
+      "triangles": 79998,
+      "boundary_edges": 6,
+      "nonmanifold_edges_excluding_boundary": 0,
+      "zero_area_faces": 0,
+      "connected_components": 2,
+      "largest_component_vertices": 39950,
+      "nonfinite_coordinates": 0,
+      "self_intersections": "not_tested",
+      "mesh_validation_repair_passes": 1,
+      "topology_repairs": {
+        "wire_edges_removed": 0,
+        "nonmanifold_edges_split": 1,
+        "zero_area_faces_removed": 0,
+        "loose_vertices_removed": 0
+      },
+      "use": "Visual entourage; not certified for fabrication or structural analysis",
+      "bounds_relative_change": [
+        6.137563665817749e-05,
+        0.00018965430891872197,
+        0.0001459069776696003
+      ]
+    }
+  },
+  "input_image_file": "batches/ginkgo-daxi-2026-11/gen-fishing-boat-coastal-a-1.png",
+  "external_reference_status": "Photo-derived: each image request took crops of the owner's own photograph of Daxi fishing harbour (Yilan, Taiwan) as Higgsfield media references. The two hero boats (14 m and 16 m) were prompted to match specific boats in that photograph; the three smaller boats follow the photograph's general harbour craft. The photograph and crops are named and hashed in each image record, not distributed. The Higgsfield job results report model nano_banana_2 for requests that named nano_banana_pro; both are recorded.",
+  "external_reference_ids": [],
+  "dimension_basis": "Lengths are the sizes written into each image prompt in the Ginkgo session (14, 16, 11, 15 and 22 m); each mesh was scaled uniformly so its overall length matches, and height and beam were measured after scaling. The Daxi scene itself placed the hero boats at 18 and 19 m. Not a physical survey.",
+  "reference_review": "Reference image reviewed on 2026-11-20 (downscaled to 900 px wide): no hull numbers, boat names, lettering, logos or brand marks visible.",
+  "rights": "Reference images generated on the owner's Higgsfield account (nano_banana_pro) from crops of the owner's own photograph; meshes with Tripo H3.1 through the owner's Higgsfield account (the two hero boats) or on the owner's paid Meshy account (three harbour boats). The hero boats are modelled on specific working boats in the owner's photograph; no hull numbers, names, lettering or marks appear in the reference images. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-20. Generator account entitlements and the Tripo terms not independently audited.",
+  "origin": {
+    "project": "Ginkgo, the owner's own world-generation repository (private)",
+    "pass": "runs/daxi_harbour",
+    "source_name": "boatL",
+    "records": [
+      "runs/daxi_harbour/blender/layout.json",
+      "Claude Code session transcript 32f853ff-f053-42f0-973f-1c12ffd01fac (the tool calls that uploaded the photo crops and submitted the image, Tripo and Meshy jobs, and the crop of the boatR image)"
+    ]
+  }
+}

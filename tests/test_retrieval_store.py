@@ -242,6 +242,68 @@ class SceneLedgerFixesTests(RetrievalStoreTests):
         self.assertEqual(self.store.get_scene(scene["scene_id"])["instances"], 1)
         self.assertTrue(keep["instance_id"])
 
+    def _local_aabb(self, asset_id):
+        asset = self.store.get_asset(asset_id)
+        dims = asset["dimensions_mm"]
+        bounds = asset.get("spatial", {}).get("local_aabb", {})
+        lo = bounds.get("min", [-dims["width"] / 2, -dims["depth"] / 2, 0])
+        hi = bounds.get("max", [dims["width"] / 2, dims["depth"] / 2, dims["height"]])
+        return lo, hi
+
+    def test_flush_against_wall_after_rotation_is_inside_room(self):
+        # Live 2026-11: a sofa flush on a wall at rotation 180 landed at
+        # min y = -1.7e-13 and failed outside_room.
+        scene = self.store.create_scene("Flush wall")
+        room = self.store.upsert_room(scene["scene_id"], "Lounge", [0, 0, 0, 5000, 5000, 3000])
+        asset_id = "ikea-sg-klippan-s49010615"
+        lo, hi = self._local_aabb(asset_id)
+        # rotated 180: world min y = y - hi[1]
+        instance = self.store.upsert_instance(
+            scene["scene_id"], asset_id, x_mm=2500, y_mm=hi[1],
+            z_mm=0, rotation_degrees=180, room_id=room["room_id"],
+        )
+        row = next(i for i in self.store.scene_instances(scene["scene_id"])
+                   if i["instance_id"] == instance["instance_id"])
+        self.assertAlmostEqual(row["min_y"], 0.0, places=6)
+        report = self.store.validate_scene(scene["scene_id"])
+        self.assertEqual(report["outside_room_count"], 0, report)
+        self.assertEqual(report["tolerance_mm"], 0.5)
+
+        # a real 1 mm overrun still fails
+        self.store.upsert_instance(
+            scene["scene_id"], asset_id, x_mm=2500, y_mm=hi[1] - 1.0,
+            z_mm=0, rotation_degrees=180, room_id=room["room_id"],
+            instance_id=instance["instance_id"],
+        )
+        report = self.store.validate_scene(scene["scene_id"])
+        self.assertEqual(report["outside_room_count"], 1)
+        self.assertEqual(report["outside_room"][0]["failing_axes"], ["y"])
+
+    def test_touching_instances_do_not_collide_but_overlaps_do(self):
+        scene = self.store.create_scene("Flush pair")
+        asset_id = "ikea-sg-kallax-70351886"
+        lo, hi = self._local_aabb(asset_id)
+        width = hi[0] - lo[0]
+        first = self.store.upsert_instance(
+            scene["scene_id"], asset_id, x_mm=1000.1, y_mm=1000.3, z_mm=0,
+            rotation_degrees=180,
+        )
+        second = self.store.upsert_instance(
+            scene["scene_id"], asset_id, x_mm=1000.1 + width, y_mm=1000.3, z_mm=0,
+            rotation_degrees=180,
+        )
+        report = self.store.validate_scene(scene["scene_id"])
+        self.assertEqual(report["collision_count"], 0, report)
+
+        self.store.upsert_instance(
+            scene["scene_id"], asset_id, x_mm=1000.1 + width - 1.0, y_mm=1000.3, z_mm=0,
+            rotation_degrees=180, instance_id=second["instance_id"],
+        )
+        report = self.store.validate_scene(scene["scene_id"])
+        self.assertEqual(report["collision_count"], 1)
+        self.assertEqual(sorted(report["collisions"][0]["instances"]),
+                         sorted([first["instance_id"], second["instance_id"]]))
+
     def test_retiring_a_library_keeps_assets_placed_in_scenes(self):
         # 0.6 retired the IKEA catalogue by syncing it empty; state databases
         # with IKEA scene instances must still open (FK instances -> assets).

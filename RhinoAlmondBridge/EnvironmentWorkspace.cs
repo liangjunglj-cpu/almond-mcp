@@ -24,6 +24,8 @@ namespace RhinoAlmondBridge
     {
         private static readonly Regex Id = new Regex("^[a-z0-9_]{1,64}$");
         private static readonly string[] RoomKeys = { "room", "room_use", "room_set", "room_heat_c", "room_cool_c", "room_height" };
+        private static readonly Regex RunId = new Regex("^[a-z]{2,16}-[0-9]{8}-[0-9]{6}-[0-9a-f]{6}$");
+        private static readonly HashSet<string> Studies = new HashSet<string> { "thermal", "daylight", "view_out", "sunlight", "shadows" };
         private readonly Action<JObject> _send;
         private static Action<RhinoDoc> _pending;
         internal bool Busy { get; private set; }
@@ -37,18 +39,8 @@ namespace RhinoAlmondBridge
             JObject input;
             try { input = string.IsNullOrWhiteSpace(json) ? new JObject() : JObject.Parse(json); }
             catch (Exception ex) { Send("error", "Bad request: " + ex.Message); return; }
-            switch (action)
-            {
-                case "catalogue": Engine(new JObject { ["action"] = "catalogue" }, "catalogue"); return;
-                case "construction":
-                    if (!Id.IsMatch((string)input["id"] ?? "")) { Send("error", "Pick a construction from the list."); return; }
-                    Engine(new JObject { ["action"] = "construction", ["id"] = input["id"] }, "construction"); return;
-                case "browse_epw": BrowseEpw(); return;
-                case "site":
-                    _epw = (string)input["epw_path"] ?? _epw;
-                    if (!File.Exists(_epw)) { Send("error", "Choose an EnergyPlus weather file (.epw) first."); return; }
-                    Engine(new JObject { ["action"] = "site", ["epw_path"] = _epw }, "site"); return;
-            }
+            try { if (EngineRequest(action, input)) return; }
+            catch (InvalidOperationException ex) { Send("error", ex.Message); return; }
             if (Rhino.Commands.Command.InCommand()) { Send("error", "Finish the current Rhino command first."); return; }
             Busy = true;
             Eto.Forms.Application.Instance.AsyncInvoke(() => {
@@ -62,6 +54,62 @@ namespace RhinoAlmondBridge
             });
         }
 
+        // Requests the engine answers without the document. Returns false for document actions.
+        private bool EngineRequest(string action, JObject input)
+        {
+            switch (action)
+            {
+                case "catalogue": Engine(new JObject { ["action"] = "catalogue" }, "catalogue"); return true;
+                case "construction":
+                    if (!Id.IsMatch((string)input["id"] ?? "")) { Send("error", "Pick a construction from the list."); return true; }
+                    Engine(new JObject { ["action"] = "construction", ["id"] = input["id"] }, "construction"); return true;
+                case "browse_epw": BrowseEpw(); return true;
+                case "tutorial":
+                    {
+                        string part = (string)input["part"] ?? "all";
+                        if (part != "all" && part != "environment" && part != "structure") { Send("error", "Unknown tutorial part."); return true; }
+                        if (Rhino.Commands.Command.InCommand()) { Send("error", "Finish the current Rhino command first."); return true; }
+                        PlaceTutorial(part); return true;
+                    }
+                case "site":
+                    _epw = (string)input["epw_path"] ?? _epw;
+                    if (!File.Exists(_epw)) { Send("error", "Choose an EnergyPlus weather file (.epw) first."); return true; }
+                    Engine(new JObject { ["action"] = "site", ["epw_path"] = _epw }, "site"); return true;
+                case "climate":
+                    if (!File.Exists(_epw)) { Send("error", "Choose an EnergyPlus weather file (.epw) first."); return true; }
+                    Engine(new JObject { ["action"] = "climate", ["epw_path"] = _epw }, "climate"); return true;
+                case "setpoints":
+                    {
+                        var req = new JObject { ["action"] = "setpoints", ["category"] = Category(input["category"]) };
+                        foreach (var k in new[] { "met", "clo_heating", "clo_cooling", "rh", "air_speed" }) req[k] = Number(input[k]);
+                        Engine(req, "setpoints"); return true;
+                    }
+                case "charts":
+                    if (!RunId.IsMatch((string)input["run_id"] ?? "") || !File.Exists(_epw)) { Send("error", "Run a thermal study first."); return true; }
+                    Engine(new JObject { ["action"] = "charts", ["run_id"] = input["run_id"], ["epw_path"] = _epw, ["room"] = Clean(input["room"]) }, "charts"); return true;
+                case "compare":
+                    {
+                        var kept = new JArray();
+                        foreach (var c in (input["cases"] as JArray) ?? new JArray())
+                        {
+                            if (!RunId.IsMatch((string)c["run_id"] ?? "")) { Send("error", "A kept case has no valid run."); return true; }
+                            kept.Add(new JObject { ["name"] = Clean(c["name"], 40), ["run_id"] = c["run_id"] });
+                        }
+                        Engine(new JObject { ["action"] = "compare", ["cases"] = kept, ["room"] = Clean(input["room"]),
+                            ["epw_path"] = File.Exists(_epw) ? _epw : "" }, "compare"); return true;
+                    }
+                case "open_folder":
+                    if (!RunId.IsMatch((string)input["run_id"] ?? "")) { Send("error", "Run a study first."); return true; }
+                    Engine(new JObject { ["action"] = "run_dir", ["run_id"] = input["run_id"] }, "notice", reply => {
+                        string dir = (string)reply["run_dir"] ?? "";
+                        if (!Directory.Exists(dir)) { Send("error", "The run folder is gone."); return; }
+                        System.Diagnostics.Process.Start("explorer.exe", "\"" + dir + "\"");
+                        Send("notice", "Opened " + dir);
+                    }); return true;
+            }
+            return false;
+        }
+
         internal static Result Run(RhinoDoc doc)
         {
             var action = _pending; _pending = null;
@@ -72,8 +120,16 @@ namespace RhinoAlmondBridge
 
         private void Send(string kind, string message) => _send(new JObject { ["kind"] = kind, ["message"] = message });
 
-        // Engine calls that need no document: run out of process and answer when done.
-        private void Engine(JObject request, string kind)
+        private static string Category(JToken t)
+        {
+            string c = ((string)t ?? "II").Trim();
+            if (c != "I" && c != "II" && c != "III" && c != "IV") throw new InvalidOperationException("Pick a comfort category.");
+            return c;
+        }
+
+        // Engine calls that need no document: run out of process and answer when done (to the panel, or to
+        // `then` when the reply is for the workspace itself).
+        private void Engine(JObject request, string kind, Action<JObject> then = null)
         {
             Busy = true;
             _send(new JObject { ["kind"] = "progress", ["message"] = "Working…" });
@@ -84,6 +140,11 @@ namespace RhinoAlmondBridge
                 Eto.Forms.Application.Instance.AsyncInvoke(() => {
                     Busy = false;
                     if ((string)reply["status"] != "ok") { Send("error", (string)reply["message"] ?? "The environment engine failed."); return; }
+                    if (then != null)
+                    {
+                        try { then(reply); } catch (Exception ex) { Send("error", ex.Message); }
+                        return;
+                    }
                     reply["kind"] = kind;
                     _send(reply);
                 });
@@ -98,6 +159,37 @@ namespace RhinoAlmondBridge
             _epw = dialog.FileName;
             _send(new JObject { ["kind"] = "epw", ["epw_path"] = _epw });
             Engine(new JObject { ["action"] = "site", ["epw_path"] = _epw }, "site");
+        }
+
+        // The tutorial model (BETA): the script comes from the Python package (almond_mcp.tutorial), the same one
+        // the place_simulation_tutorial MCP tool sends, and runs as one undo record.
+        private void PlaceTutorial(string part)
+        {
+            Busy = true;
+            _send(new JObject { ["kind"] = "tutorial", ["state"] = "busy", ["message"] = "Placing the tutorial model…" });
+            Task.Run(async () => {
+                JObject reply;
+                try { reply = await NativeSolver.RunAsync(new JObject { ["action"] = "tutorial_script", ["part"] = part }, 120000, "environment").ConfigureAwait(false); }
+                catch (Exception ex) { reply = new JObject { ["status"] = "error", ["message"] = ex.Message }; }
+                Eto.Forms.Application.Instance.AsyncInvoke(() => {
+                    Busy = false;
+                    try
+                    {
+                        if ((string)reply["status"] != "ok") throw new InvalidOperationException((string)reply["message"] ?? "The tutorial script could not be built.");
+                        var doc = RhinoDoc.ActiveDoc;
+                        var placed = new ScriptExecutor().Execute((string)reply["script"]);
+                        if (placed.Status != "success") throw new InvalidOperationException("Tutorial: " + placed.Message);
+                        var box = Rhino.Geometry.BoundingBox.Empty;
+                        foreach (var g in placed.Guids)
+                            if (Guid.TryParse(g, out Guid id) && doc?.Objects.FindId(id) is RhinoObject o) box.Union(o.Geometry.GetBoundingBox(true));
+                        if (box.IsValid) { box.Inflate(box.Diagonal.Length * 0.08); doc.Views.ActiveView?.ActiveViewport.ZoomBoundingBox(box); doc.Views.Redraw(); }
+                        string where = part == "all" ? "Almond Tutorial" : "Almond Tutorial::" + char.ToUpper(part[0]) + part.Substring(1);
+                        _send(new JObject { ["kind"] = "tutorial", ["state"] = "ok", ["part"] = part,
+                            ["message"] = $"Tutorial model placed on {where} ({placed.Guids.Count} objects). Read the numbered dots, then follow them in this workspace. Ctrl+Z removes it." });
+                    }
+                    catch (Exception ex) { _send(new JObject { ["kind"] = "tutorial", ["state"] = "error", ["message"] = ex.Message }); }
+                });
+            });
         }
 
         // Document actions run inside the AlmondEnvironmentAction command.
@@ -252,7 +344,9 @@ namespace RhinoAlmondBridge
 
         private void RunStudy(RhinoDoc doc, JObject input)
         {
-            if (!File.Exists(_epw) && (string)input["study"] != "daylight") throw new InvalidOperationException("Choose a weather file on the Site tab first.");
+            string study = (string)input["study"] ?? "thermal";
+            if (!Studies.Contains(study)) throw new InvalidOperationException("Pick a study.");
+            if (!File.Exists(_epw) && study != "daylight" && study != "view_out") throw new InvalidOperationException("Choose a weather file on the Site tab first.");
             Export(doc, data => {
                 string drawPath = Temp(".txt");
                 var request = new JObject { ["action"] = "run", ["export"] = data, ["epw_path"] = _epw, ["study"] = input["study"] ?? "thermal",
@@ -295,7 +389,12 @@ namespace RhinoAlmondBridge
         public override string EnglishName => "AlmondEnvironment";
         protected override Result RunCommand(RhinoDoc doc, RunMode mode)
         {
-            try { AlmondLibraryCommand.OpenPanel(doc, "environment"); return Result.Success; }
+            try
+            {
+                AlmondLibraryCommand.OpenPanel(doc, "environment");
+                RhinoApp.WriteLine("Almond Climate, Rooms & Comfort (BETA): still under test. Results are indicative design-stage comparisons. Use Place tutorial model to see what each study needs.");
+                return Result.Success;
+            }
             catch (Exception ex) { RhinoApp.WriteLine(ex.Message); return Result.Failure; }
         }
     }

@@ -1,0 +1,101 @@
+{
+  "id": "facade-attractor-perforation",
+  "title": "Attractor perforated panel",
+  "category": "facade",
+  "level": "beginner",
+  "summary": "A square panel is covered with a grid of circular perforations whose size grows with distance from an attractor point - the classic way to grade a perforated metal facade or screen from open to closed.",
+  "how_to_use": [
+    "Drag the attractor: the MD Slider moves the attractor point across the panel (the small symbol in the viewport).",
+    "'Panel size' sets the side of the square panel and 'Grid count' the number of holes per side.",
+    "'Hole size' divides the distance to the attractor: a bigger value gives smaller holes.",
+    "'Arrow length' only scales the arrows that visualise the attractor field; it does not change the panel.",
+    "Bake 'Boundary Surfaces' (step 4) to get the hole discs, then trim them from your panel in Rhino."
+  ],
+  "concepts": [
+    "Attractor logic: Distance from every grid point to one control point drives a parameter",
+    "Divide Surface: a UV grid of points on a surface",
+    "Division as a scale factor: distance / knob = radius",
+    "Area + Bounds + Gradient: colour-coding results by size"
+  ],
+  "source": {
+    "author": "Lucas Becker (runxel)",
+    "repo": "runxel/grasshopper-examples",
+    "path": "gh/attractor_1_point.ghx",
+    "commit": "0e57586bdc00a4c3663983e67f36a0ce1f6c7ee6",
+    "licence": "BlueOak-1.0.0",
+    "licence_url": "https://blueoakcouncil.org/license/1.0.0"
+  },
+  "readme_extra": [
+    "3603e78f",
+    "b86a9cd1",
+    "56e11a5a"
+  ],
+  "drop_notes": [
+    "7d1e5898"
+  ],
+  "labels": {
+    "6312cdb9": "Panel size",
+    "617b8ff0": "Grid count",
+    "578b059e": "Attractor (drag)",
+    "2cf9f75e": "Hole size",
+    "565b9c3e": "Arrow length"
+  },
+  "steps": [
+    {
+      "title": "1  INPUTS - change these",
+      "select": {
+        "inputs": true
+      },
+      "explain": "Panel size, grid count, the attractor position and two knobs. Drag the MD Slider dot to move the attractor."
+    },
+    {
+      "title": "2  Panel and point grid",
+      "select": {
+        "guids": [
+          "ef2dad13",
+          "929d0aba",
+          "75e44023"
+        ]
+      },
+      "explain": "A Rectangle is turned into a Surface and Divide Surface places a Grid count x Grid count lattice of points on it. Every hole will sit on one of these points."
+    },
+    {
+      "title": "3  Attractor field",
+      "select": {
+        "guids": [
+          "c2170b6f",
+          "f879969c",
+          "6b16de8a",
+          "d6c823c0",
+          "c1877050"
+        ]
+      },
+      "explain": "Distance measures how far each grid point is from the attractor. Dividing by 'Hole size' turns that distance into a radius. Vector 2Pt + Amplitude build arrows pointing at the attractor, for display only."
+    },
+    {
+      "title": "4  Perforations",
+      "select": {
+        "guids": [
+          "fb93ac47",
+          "ac9d474e"
+        ]
+      },
+      "explain": "Circle draws one hole on each grid point with its computed radius, and Boundary Surfaces turns the circles into flat discs ready to bake or to cut from a panel."
+    },
+    {
+      "title": "5  RESULT - colour by hole size",
+      "select": {
+        "outputs": true,
+        "guids": [
+          "8823d542",
+          "ba909b50",
+          "51894068",
+          "76002dcf",
+          "5b020d1d",
+          "d3fa0181"
+        ]
+      },
+      "explain": "Area measures each disc, Bounds finds the smallest and largest, and Gradient colours the discs from small to large in Custom Preview. Vector Display and Symbol Display show the attractor field."
+    }
+  ]
+}

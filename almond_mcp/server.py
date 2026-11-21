@@ -24,7 +24,7 @@ from fastmcp import FastMCP
 from fastmcp.resources import ResourceContent, ResourceResult
 from almond_mcp.ghx_parser import GHParser, validate_capsule_manifest
 from almond_mcp.retrieval_store import AlmondStore
-from almond_mcp import asset_passport, asset_loads, bridge_client, conditioning, exchange, paths, drafting, native_structure, structure_study, design_codes
+from almond_mcp import asset_passport, asset_loads, bridge_client, conditioning, exchange, paths, drafting, native_structure, structure_study, design_codes, model_store, structural_references, parametric_library, scene_audit
 
 # ── Constants ────────────────────────────────────────────────────────────────
 
@@ -38,6 +38,8 @@ DRAFTING_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_DRAFTING_DIR")
 CAPSULE_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_CAPSULE_DIR")
 MATERIAL_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_MATERIAL_DIR")
 CONSTRUCTION_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_CONSTRUCTION_DIR")
+STRUCTURAL_REFERENCE_DIR = paths.resolve_dir("RHINO_MCP_STRUCTURAL_REFERENCE_DIR")
+PARAMETRIC_LIBRARY_DIR = paths.resolve_dir("RHINO_MCP_PARAMETRIC_DIR")
 STATE_DB_PATH = paths.resolve_state_db()
 BRIDGE_HOST = '127.0.0.1'
 BRIDGE_PORT = 5000
@@ -59,12 +61,29 @@ mcp = FastMCP("Almond", instructions=(
     "Register placements in the scene ledger and validate_scene_layout. "
     "Use measured dimensions, not nominal prompt targets. Usage suggestions are "
     "heuristics and clearances are design allowances, not certified code compliance. "
+    "For structure, start from a benchmarked reference: list_structural_references, "
+    "analyze_structural_reference (no Rhino needed) to see a correct verdict for the typology, "
+    "place_structural_reference to draw it in Rhino, then validate_structure / visualize_structure "
+    "on the placed members, and compare. "
+    "To teach Grasshopper: list_parametric_definitions, get_parametric_definition for the "
+    "lesson steps, then open_parametric_definition to open the annotated canvas. "
     "For climate and environment (EPW weather files): climate_summary and sun_path for the site, "
     "analyze_daylight (annual sDA/ASE/UDI, daylight factor, point-in-time, glare), "
     "analyze_solar_radiation, analyze_thermal (energy and comfort) and thermal_comfort; each accepts "
     "a shoebox room to study without Rhino. Check the returned material classification before "
-    "trusting numbers, and show_environment_result to draw a saved run in Rhino."
+    "trusting numbers, and show_environment_result to draw a saved run in Rhino. For coursework-style "
+    "studies: shadow_study (shadow plans at dates and times), compare_thermal_cases and "
+    "compare_daylight_cases (design cases side by side, with CSVs and report charts), comfort_setpoints "
+    "(set-points from PMV), en17037_view_out and en17037_sunlight. "
+    "The environment tools and the Karamba structural route (engine='karamba'), marked (BETA), are "
+    "still under test: present their results to the user as beta, indicative design-stage results. "
+    "The native structural engine (the default for validate_structure / visualize_structure) is "
+    "stable; its verdicts are still design-stage checks, not code compliance. place_simulation_tutorial "
+    "places an annotated example model that shows what each analysis needs."
 ))
+
+structural_index = structural_references.ReferenceLibrary(STRUCTURAL_REFERENCE_DIR)
+parametric_index = parametric_library.ParametricLibrary(PARAMETRIC_LIBRARY_DIR)
 
 # ── Library Indexer ──────────────────────────────────────────────────────────
 
@@ -141,6 +160,11 @@ class AssetLibraryIndexer:
             record["library_id"] = self.library_id
             record["_resolved_file"] = str(resolved_file)
             record["file_available"] = resolved_file.is_file()
+            if self.library_id == "generated_assets":
+                # The wheel ships no generated model files: an asset with verifiable
+                # checksums is available and downloads on first use (model_store).
+                record["file_local"] = model_store.is_local(record, self.directory)
+                record["file_available"] = record["file_local"] or model_store.is_obtainable(record)
             self.assets[asset_id] = record
 
         print(f"Indexed {len(self.assets)} {self.label} assets.", file=sys.stderr)
@@ -501,10 +525,12 @@ retrieval_store.sync_assets(
 )
 
 
-def _sync_capsule_library(store: AlmondStore, capsules_dir: str) -> dict:
+def _sync_capsule_library(store: AlmondStore, capsules_dir: str,
+                          library_manifests: list[dict] = (), library_skipped: list[dict] = ()) -> dict:
     """Scan <capsules_dir>/*.capsule.json sidecars, validate each manifest via
     ghx_parser.validate_capsule_manifest, and sync the valid ones into the
-    AlmondStore capsule registry.
+    AlmondStore capsule registry together with the parametric library's
+    register-verified capsules (ParametricLibrary.capsule_manifests()).
 
     Invalid manifests are skipped loudly (stderr) rather than aborting startup,
     so one bad sidecar cannot take down the whole capsule library. The absolute
@@ -512,24 +538,33 @@ def _sync_capsule_library(store: AlmondStore, capsules_dir: str) -> dict:
     can hand it to the bridge.
     """
     manifests: list[dict] = []
-    skipped: list[dict] = []
+    skipped: list[dict] = list(library_skipped)
     directory = Path(capsules_dir)
-    if not directory.is_dir():
+    if directory.is_dir():
+        for manifest_path in sorted(directory.glob("*.capsule.json")):
+            try:
+                manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+            except (json.JSONDecodeError, OSError) as exc:
+                skipped.append({"file": manifest_path.name, "errors": [str(exc)]})
+                continue
+            errors = validate_capsule_manifest(manifest)
+            if errors:
+                skipped.append({"file": manifest_path.name, "errors": errors})
+                continue
+            manifest["_manifest_path"] = str(manifest_path.resolve())
+            manifests.append(manifest)
+    else:
         print(f"Capsule directory not found: {directory}", file=sys.stderr)
-        store.sync_capsules([])
-        return {"synced": 0, "skipped": skipped}
 
-    for manifest_path in sorted(directory.glob("*.capsule.json")):
-        try:
-            manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
-        except (json.JSONDecodeError, OSError) as exc:
-            skipped.append({"file": manifest_path.name, "errors": [str(exc)]})
-            continue
+    known = {m["capsule_id"] for m in manifests}
+    for manifest in library_manifests:
         errors = validate_capsule_manifest(manifest)
+        if manifest.get("capsule_id") in known:
+            errors = errors + [f"capsule_id {manifest['capsule_id']!r} already defined in {directory}"]
         if errors:
-            skipped.append({"file": manifest_path.name, "errors": errors})
+            skipped.append({"file": Path(manifest.get("_manifest_path", "?")).name, "errors": errors})
             continue
-        manifest["_manifest_path"] = str(manifest_path.resolve())
+        known.add(manifest["capsule_id"])
         manifests.append(manifest)
 
     for entry in skipped:
@@ -542,7 +577,7 @@ def _sync_capsule_library(store: AlmondStore, capsules_dir: str) -> dict:
     return {"synced": synced, "skipped": skipped}
 
 
-capsule_sync_report = _sync_capsule_library(retrieval_store, CAPSULE_LIBRARY_DIR)
+capsule_sync_report = _sync_capsule_library(retrieval_store, CAPSULE_LIBRARY_DIR, *parametric_index.capsule_manifests())
 
 # ── TCP Helpers ──────────────────────────────────────────────────────────────
 
@@ -883,6 +918,7 @@ def get_generated_asset_passport(asset_id: str) -> dict:
         return {"status": "error", "message": "Library has no passport; upgrade the asset pack."}
     out = {"status": "success", "passport": asset["passport"],
            "file_available": asset.get("file_available", False),
+           "file_local": model_store.is_local(asset, Path(GENERATED_LIBRARY_DIR)),
            "preview_uri": f"almond://generated/{asset_id}/preview"}
     try:
         table = asset_loads.LoadTable(_structural_loads_path())
@@ -928,6 +964,12 @@ def search_detail_sources(query: str = "") -> dict:
             matches.append({**source, "matched_terms": matched})
     matches.sort(key=lambda s: (-len(s["matched_terms"]), s["source_id"]))
     return {"status": "success", "scope": data["scope"], "sources": matches}
+
+
+def _generated_model_path(asset: dict) -> Path:
+    """Local GLB of a generated asset, downloaded and verified on first use
+    (the PyPI wheel carries no model files; see model_store)."""
+    return model_store.ensure_generated_files(asset, GENERATED_LIBRARY_DIR)["model"]
 
 
 @mcp.tool(annotations={"readOnlyHint": True, "openWorldHint": False})
@@ -986,8 +1028,7 @@ def generate_asset_drawing_views(asset_id: str = "", source_glb: str = "",
             asset = generated_asset_indexer.get(asset_id)
             if not asset:
                 raise ValueError("Unknown generated asset ID")
-            model = (Path(GENERATED_LIBRARY_DIR)/asset["file"]).resolve()
-            model.relative_to(Path(GENERATED_LIBRARY_DIR).resolve())
+            model = _generated_model_path(asset)
             if drafting.sha(model.read_bytes()) != asset["sha256"]:
                 raise ValueError("Source model checksum differs from catalogue")
             record_result = get_generation_sources(asset_id)
@@ -1027,8 +1068,7 @@ def audit_asset_drawing(package_dir: str, source_glb: str = "") -> dict:
         if source is None:
             asset = generated_asset_indexer.get(manifest["source"]["asset_id"])
             if asset:
-                source = (Path(GENERATED_LIBRARY_DIR)/asset["file"]).resolve()
-                source.relative_to(Path(GENERATED_LIBRARY_DIR).resolve())
+                source = _generated_model_path(asset)
         return drafting.audit_package(package, source)
     except (OSError, ValueError, KeyError, IndexError, TypeError, struct.error) as exc:
         return {"status": "error", "message": str(exc)}
@@ -1048,7 +1088,7 @@ def asset_drawing_resource(asset_id: str, view: str, scale: str) -> ResourceResu
         raise ValueError(result["message"])
     filename = f"{view}-1-{scale}.svg"
     model = generated_asset_indexer.get(asset_id)
-    source = (Path(GENERATED_LIBRARY_DIR)/model["file"]).resolve() if model else None
+    source = _generated_model_path(model) if model else None
     checked = drafting.audit_package(Path(result["package_dir"]), source)
     if checked["status"] != "success":
         raise ValueError("Drawing package is modified or stale")
@@ -1093,6 +1133,278 @@ def get_generated_asset(asset_id: str) -> str:
             "message": f"Unknown generated asset_id: {asset_id}",
         })
     return json.dumps({"status": "success", "asset": asset})
+
+
+# ── Structural reference library ──────────────────────────────────────────────
+
+def _reference_error(message: str) -> dict:
+    return {"status": "error", "message": message}
+
+
+def _reference_guard():
+    if not structural_index.available:
+        return _reference_error(f"Structural reference library not found in {STRUCTURAL_REFERENCE_DIR}")
+    return None
+
+
+@mcp.tool(annotations={"readOnlyHint": True, "openWorldHint": False})
+def list_structural_references(query: str = "", family: str = "", limit: int = 20) -> dict:
+    """List Almond's structural reference library: twelve benchmarked building typologies
+    (moment frame, braced tower, Pratt truss, gable portal, portal-frame warehouse,
+    double-layer space grid, parabolic arch, L-shaped cantilever, cantilever canopy,
+    diagrid tower, Vierendeel girder, a frame on six support types) as parametric line
+    models with their benchmark loads. They are the models the native solver is verified
+    against (closed forms and OpenSees), so a reference run shows what a correct
+    validate_structure result looks like for that typology. query matches titles,
+    summaries, what each exercises and the teaching notes (e.g. "truss", "buckling",
+    "cantilever"); family is frame, tower, truss, hall, roof, arch or cantilever.
+    No Rhino needed."""
+    err = _reference_guard()
+    if err:
+        return err
+    return {"status": "success", "library_dir": STRUCTURAL_REFERENCE_DIR,
+            **structural_index.search(query, family, limit)}
+
+
+@mcp.tool(annotations={"readOnlyHint": True, "openWorldHint": False})
+def get_structural_reference(reference_id: str, parameters: dict | None = None) -> dict:
+    """One reference in full: what it models and exercises, its parameters with ranges and
+    defaults, sections, the default study (material, supports, self weight, connections,
+    deflection span), how it was verified (closed form, OpenSees), related Karamba
+    capsules and parametric definitions, teaching notes, and the model it builds at the
+    given parameters: member and node counts, support types, the loads it applies (G and
+    Q; wind is dropped) and the nearest validate_structure call for the placed geometry.
+    Then analyze_structural_reference to solve it, or place_structural_reference to draw it."""
+    err = _reference_guard()
+    if err:
+        return err
+    try:
+        entry, params, model, report = structural_references.reference_model(structural_index, reference_id, parameters)
+    except KeyError:
+        return _reference_error(f"Unknown structural reference id: {reference_id}. Use list_structural_references.")
+    except ValueError as exc:
+        return _reference_error(str(exc))
+    report.pop("built", None)
+    study = structural_references.study_settings(entry)
+    if study.get("span_m") is None and study.get("span_parameter"):
+        study["span_m"] = params[study["span_parameter"]]
+    return {"status": "success",
+            **{k: v for k, v in entry.items() if k != "builder"},
+            "parameters_used": params, "model": report, "study_resolved": study,
+            "rhino": structural_references.rhino_study(entry, report, study),
+            "model_uri": f"almond://structural/{entry['id']}/model",
+            "how_to_use": [
+                "analyze_structural_reference(reference_id, parameters) solves it here with the native engine and "
+                "compares with the textbook value where one exists.",
+                "place_structural_reference(reference_id, parameters, x_mm, y_mm) draws it in Rhino with almond:section, "
+                "almond:release and almond:support user text.",
+                "validate_structure / visualize_structure on the placed members with the suggested rhino.validate_structure "
+                "arguments, and compare with the reference run.",
+                "Change one parameter at a time (the teaching notes suggest which) and run again."]}
+
+
+@mcp.tool(annotations={"readOnlyHint": True, "openWorldHint": False})
+def analyze_structural_reference(
+    reference_id: str,
+    parameters: dict | None = None,
+    material: str | None = None,
+    fixed_supports: bool | None = None,
+    self_weight: bool | None = None,
+    connections: str | None = None,
+    stability: str | None = None,
+    span_m: float | None = None,
+    load_kn: float = 0.0,
+    floor_load_kn_m2: float = 0.0,
+    floor_dead_kn_m2: float = 0.0,
+    design_basis: str = "en1990",
+    uls_combination: str | None = None,
+    design_code: str = "eurocode",
+    detail: bool = False,
+    fabrication: str = "cold_formed",
+) -> dict:
+    """Solve a structural reference with Almond's native engine, exactly as validate_structure
+    does for Rhino geometry, but from the reference's own model: no Rhino session needed.
+    The result has validate_structure's shape (verdict, deflection against the limit,
+    utilization, stability with alpha_cr, combinations, warnings, assumptions; members and
+    supports with detail=True) plus "reference": the parameters used, counts, the loads
+    applied (the benchmark's G and Q loads; wind dropped), the support types, conversion
+    notes and "checks", which compare the run with the benchmark frame and, for the Pratt
+    truss, portal, arch and L-bracket, with the textbook closed form (method of joints,
+    virtual work, the force method, funicular statics). A reference may fail honestly (the
+    canopy and diagrid are sizing exercises; the arch goes unstable above about 12 kN/m).
+
+    parameters: a subset of the reference's parameters (see get_structural_reference), e.g.
+    {"storeys": 3, "bay": 7.5}. The other arguments override the reference's default study
+    and mean what they mean on validate_structure; None keeps the study value. load_kn adds
+    an extra variable load shared over the free nodes on top of the reference loads (default
+    0); floor loads apply to frames with floor bays. Typed supports (planar references,
+    mixed-supports) ignore fixed_supports."""
+    err = _reference_guard()
+    if err:
+        return err
+    try:
+        return structural_references.analyze(
+            structural_index, reference_id, parameters, material=material, fixed_supports=fixed_supports,
+            self_weight=self_weight, connections=connections, stability=stability, span_m=span_m,
+            load_kn=load_kn, floor_imposed_kn_m2=floor_load_kn_m2, floor_dead_kn_m2=floor_dead_kn_m2,
+            design_basis=design_basis, uls_combination=uls_combination, design_code=design_code, detail=detail,
+            fabrication=fabrication)
+    except KeyError:
+        return _reference_error(f"Unknown structural reference id: {reference_id}. Use list_structural_references.")
+    except (ValueError, TypeError) as exc:
+        return _reference_error(str(exc))
+
+
+@mcp.tool(annotations={"readOnlyHint": False, "destructiveHint": False, "openWorldHint": False})
+def place_structural_reference(
+    reference_id: str,
+    parameters: dict | None = None,
+    x_mm: float = 0.0,
+    y_mm: float = 0.0,
+    z_mm: float = 0.0,
+    layer: str = "",
+    lateral_restraints: bool = False,
+) -> dict:
+    """Draw a structural reference in Rhino (through the bridge): one line per member with
+    almond:section (and almond:release for bars and pinned ends) user text, one point per
+    support with almond:support user text, on its own layer, in the document's units, with
+    the reference origin at (x_mm, y_mm, z_mm). Returns the GUIDs (members first, in the
+    reference's member order, then supports) and rhino.validate_structure, the nearest
+    validate_structure arguments: the bridge exports geometry, sections, releases and
+    support points but not loads, so the reference's variable loads become one load_kn.
+    The bridge (almondbridge 0.8.0 and later) reads almond:support on the support points, so
+    validate_structure applies each point's own type. lateral_restraints=True also places the
+    lateral-y restraint points of a planar reference (Pratt truss, portal, arch, Vierendeel);
+    leave it False for an older bridge, which ignores almond:support and would make every point
+    a full support."""
+    err = _reference_guard()
+    if err:
+        return err
+    try:
+        entry, params, model, report = structural_references.reference_model(
+            structural_index, reference_id, parameters, lateral_restraints=bool(lateral_restraints))
+        built = report.pop("built")
+        script = structural_references.place_script(entry, model, built, x_mm, y_mm, z_mm, layer)
+    except KeyError:
+        return _reference_error(f"Unknown structural reference id: {reference_id}. Use list_structural_references.")
+    except ValueError as exc:
+        return _reference_error(str(exc))
+    raw = execute_rhino_script(script)
+    try:
+        result = json.loads(raw)
+    except (TypeError, ValueError):
+        result = {"status": "error", "message": str(raw)[:500]}
+    if result.get("status") != "success":
+        return {"status": "error", "message": "Rhino could not draw the reference", "bridge": result}
+    guids = list(result.get("guids") or [])
+    n_members = len(model["members"])
+    n_supports = len(model.get("supports") or model.get("anchor_points") or [])
+    study = structural_references.study_settings(entry)
+    if study.get("span_m") is None and study.get("span_parameter"):
+        study["span_m"] = params[study["span_parameter"]]
+    return {"status": "success", "reference_id": entry["id"], "title": entry["title"], "parameters_used": params,
+            "layer": (layer or f"Almond Reference {entry['id']}").strip(),
+            "guids": guids, "member_guids": guids[:n_members], "support_guids": guids[n_members:],
+            "members": n_members, "supports": n_supports, "objects_created": len(guids),
+            "support_types": report["supports"], "loads_not_drawn": report["loads"],
+            "rhino": structural_references.rhino_study(entry, report, study),
+            "next": "validate_structure(guids=member_guids + support_guids, **rhino.validate_structure), or "
+                    "visualize_structure on the same GUIDs; compare with analyze_structural_reference."}
+
+
+@mcp.resource("almond://structural/catalogue", mime_type="application/json")
+def structural_catalogue_resource() -> ResourceResult:
+    """Compact catalogue of the structural reference library."""
+    return ResourceResult([ResourceContent(list_structural_references(limit=1000), mime_type="application/json")])
+
+
+@mcp.resource("almond://structural/{reference_id}/model", mime_type="application/json")
+def structural_model_resource(reference_id: str) -> ResourceResult:
+    """The reference's conditioned line model at its default parameters: the JSON validate_structure analyses
+    (members with sections and releases, typed supports or anchor points, G/Q loads)."""
+    try:
+        _, _, model, _ = structural_references.reference_model(structural_index, reference_id)
+    except KeyError:
+        raise ValueError("Unknown structural reference id")
+    return ResourceResult([ResourceContent(model, mime_type="application/json")])
+
+
+# ── Parametric (Grasshopper) teaching library ────────────────────────────────
+
+def _parametric_error(message: str) -> dict:
+    return {"status": "error", "message": message}
+
+
+@mcp.tool(annotations={"readOnlyHint": True, "openWorldHint": False})
+def list_parametric_definitions(query: str = "", category: str = "", level: str = "", limit: int = 20) -> dict:
+    """List the annotated parametric teaching library: openly licensed architectural
+    Grasshopper definitions (facades, structure, massing, site, landscape) reorganised
+    for learning. Each canvas reads left to right: README, green INPUTS with named
+    sliders, numbered explained steps, blue RESULT to bake. Upstream logic is unchanged.
+    query matches titles, summaries, steps and concepts (e.g. "attractor", "loft",
+    "Isotrim"); level is beginner, intermediate or advanced. No Rhino needed."""
+    if not parametric_index.available:
+        return _parametric_error(f"Parametric library not found in {PARAMETRIC_LIBRARY_DIR}")
+    return {"status": "success", "library_dir": PARAMETRIC_LIBRARY_DIR, **parametric_index.search(query, category, level, limit)}
+
+
+@mcp.tool(annotations={"readOnlyHint": True, "openWorldHint": False})
+def get_parametric_definition(definition_id: str) -> dict:
+    """Get one teaching definition: what it models, numbered how-to-use steps, the
+    concepts it teaches, each canvas step with its explanation, inputs, plugin and
+    script notes, the local .ghx path (integrity-checked against the source register),
+    the upstream author, commit and licence. Use the steps to walk a learner through
+    the canvas after open_parametric_definition."""
+    try:
+        return {"status": "success", **parametric_index.details(definition_id)}
+    except KeyError:
+        return _parametric_error(f"Unknown parametric definition id: {definition_id}")
+    except (OSError, ValueError) as exc:
+        return _parametric_error(str(exc))
+
+
+@mcp.tool(annotations={"readOnlyHint": False, "destructiveHint": False, "openWorldHint": False})
+def open_parametric_definition(definition_id: str) -> dict:
+    """Open a teaching definition in Rhino's Grasshopper editor through the bridge
+    (Rhino 8 with almondbridge running). Only library files that match the source
+    register can be opened. Opening solves the definition and adds its preview to
+    the viewport; nothing is baked. The Voronoi screen's script toggle is saved off."""
+    try:
+        path = parametric_index.verify(definition_id)
+    except KeyError:
+        return _parametric_error(f"Unknown parametric definition id: {definition_id}")
+    except (OSError, ValueError) as exc:
+        return _parametric_error(str(exc))
+    raw = execute_rhino_script(parametric_library.open_in_grasshopper_script(path))
+    try:
+        result = json.loads(raw)
+    except (TypeError, ValueError):
+        result = {"status": "error", "message": str(raw)[:500]}
+    if result.get("status") != "success":
+        return {"status": "error", "message": "Rhino could not open the definition", "bridge": result,
+                "definition_path": str(path)}
+    return {"status": "success", "definition_id": definition_id, "definition_path": str(path),
+            "next": "Read the README panel, then change the green INPUTS and follow the numbered steps."}
+
+
+@mcp.resource("almond://parametric/catalogue", mime_type="application/json")
+def parametric_catalogue_resource() -> ResourceResult:
+    """Compact catalogue of the parametric teaching library."""
+    return ResourceResult([ResourceContent(list_parametric_definitions(limit=1000), mime_type="application/json")])
+
+
+@mcp.resource("almond://parametric/{definition_id}/preview", mime_type="image/png")
+def parametric_preview_resource(definition_id: str) -> ResourceResult:
+    """Canvas layout preview rendered from the definition's XML (nothing solved)."""
+    try:
+        return ResourceResult([ResourceContent(parametric_index.preview(definition_id), mime_type="image/png")])
+    except KeyError:
+        raise ValueError("Unknown parametric definition id")
+
+
+@mcp.resource("almond://parametric/{definition_id}/lesson", mime_type="application/json")
+def parametric_lesson_resource(definition_id: str) -> ResourceResult:
+    return ResourceResult([ResourceContent(get_parametric_definition(definition_id), mime_type="application/json")])
 
 
 @mcp.tool()
@@ -1268,6 +1580,83 @@ def validate_scene_layout(scene_id: str, detail_limit: int = 50) -> str:
         })
     except Exception as exc:
         return json.dumps({"status": "error", "message": str(exc)})
+
+
+def _scene_inventory(guids: list[str]) -> dict:
+    ids = scene_audit.object_ids(guids)
+    reply = json.loads(_send_and_receive(json.dumps({'type':'scene_inventory','guids':ids}).encode('utf-8')))
+    if not isinstance(reply, dict) or reply.get('status') != 'ok':
+        message = reply.get('message', 'Unexpected scene inventory reply') if isinstance(reply, dict) else 'Unexpected reply'
+        raise ValueError(message + ' (Scene auditing needs a matching development almondbridge.)')
+    scene_audit.validate_inventory(reply)
+    if set(reply['requested_ids']) != set(ids):
+        raise ValueError('Bridge inventory did not match the requested object IDs')
+    return reply
+
+
+@mcp.tool(annotations={"readOnlyHint": False, "destructiveHint": False, "openWorldHint": False})
+def capture_scene_metadata_snapshot(name: str, guids: list[str]) -> dict:
+    """Explicitly record 1-500 Rhino objects as an immutable local baseline.
+
+    Reads hidden/locked objects too. Stores bounds and quantities in mm, Almond
+    user text, block transforms and geometry CRCs. Writes only a new local DB
+    record; geometry and existing snapshots are unchanged. Keep snapshot_id for
+    audit_scene_metadata. Requires the matching development bridge.
+    """
+    try:
+        inventory = _scene_inventory(guids)
+        return {'status':'success','snapshot':retrieval_store.capture_metadata_snapshot(name,inventory),
+                'scope':'Explicit objects only. Capture records current state, not verified metadata truth.'}
+    except (ValueError, OSError, KeyError) as exc:
+        return {'status':'error','message':str(exc)}
+
+
+@mcp.tool(annotations={"readOnlyHint": True, "openWorldHint": False})
+def audit_scene_metadata(snapshot_id: str, absolute_mm: float = 0.1,
+                         relative: float = 1e-6, detail_limit: int = 100) -> dict:
+    """Read-only comparison of the current Rhino document with a recorded snapshot.
+
+    Reports deleted/moved/resized objects, block transforms/definition changes,
+    changed Almond user text and geometric quantities. Never refreshes the
+    baseline, repairs metadata, selects objects or changes their appearance.
+    A unit conversion is compared physically in mm; native CRC/linear transform
+    checks are skipped across different unit systems and reported as limited
+    coverage. A different document is an error, not a deletion verdict.
+    """
+    try:
+        snapshot = retrieval_store.get_metadata_snapshot(snapshot_id)
+        if snapshot is None:
+            raise ValueError('Unknown metadata snapshot_id')
+        baseline = snapshot['inventory']
+        inventory = _scene_inventory(baseline['requested_ids'])
+        report = scene_audit.compare(baseline,inventory,absolute_mm,relative,detail_limit)
+        return {**report,'snapshot_id':snapshot_id,'baseline_created_at':snapshot['created_at'],
+                'document_key':inventory['document_key']}
+    except (ValueError, OSError, KeyError) as exc:
+        return {'status':'error','message':str(exc)}
+
+
+@mcp.tool(annotations={"readOnlyHint": False, "destructiveHint": False, "openWorldHint": False})
+def show_scene_metadata_issues(snapshot_id: str = "", clear: bool = False) -> dict:
+    """Show temporary warning boxes/labels for a fresh audit, or clear them.
+
+    Does not bake geometry, change attributes, alter selection or repair data.
+    Missing objects get a box at their recorded position. Requires the matching
+    development bridge; call with clear=True when finished reviewing.
+    """
+    try:
+        request = {'type':'scene_audit_overlay','clear':clear}
+        if not clear:
+            report = audit_scene_metadata(snapshot_id,detail_limit=scene_audit.MAX_OBJECTS)
+            if report['status'] != 'success':
+                return report
+            request.update(document_key=report['document_key'],issues=report['issues'])
+        reply = json.loads(_send_and_receive(json.dumps(request).encode('utf-8')))
+        if not isinstance(reply, dict):
+            raise ValueError('Unexpected overlay reply')
+        return reply
+    except (ValueError, OSError, KeyError) as exc:
+        return {'status':'error','message':str(exc)}
 
 
 @mcp.tool()
@@ -2149,6 +2538,9 @@ def execute_rhino_script(script: str) -> str:
         System, System.Collections.Generic, System.Linq,
         Rhino, Rhino.Geometry, Rhino.DocObjects
 
+    On a runtime error the script's changes are undone; a script that changed nothing leaves
+    the document (and its undo history) as it was.
+
     Args:
         script: C# source code containing a class with public static List<Guid> Run(RhinoDoc doc).
     Returns:
@@ -2236,9 +2628,11 @@ def validate_structure(
     design_code: str = "eurocode",
     detail: bool = False,
     fabrication: str = "cold_formed",
+    lateral_restraint: str = "joints",
 ) -> str:
     """
-    Validates AI-generated geometry with a structural analysis.
+    Validates AI-generated geometry with a structural analysis. The native engine is stable; the
+    Karamba route (engine="karamba", or auto for shells) is (BETA).
     Call this AFTER execute_rhino_script to verify the generated structure is buildable.
 
     engine="auto" (default) analyses line models (beams, columns, trusses, frames) with
@@ -2288,7 +2682,8 @@ def validate_structure(
         scene_id: scene ledger to read placements from (default: tagged Rhino objects).
         floor_load_kn_m2: imposed floor load in kN/m2 (e.g. 2.0 for homes, EN 1991-1-1
             category A) on every bay enclosed by beams on a level; the beams take it by the
-            45-degree rule (two-way, one-way above 2:1). Native engine only. A code floor load
+            45-degree rule (two-way; above 2:1 one-way with triangular end strips on the short
+            beams). Native engine only. A code floor load
             already covers movable furniture and people: combine it with asset_loads only for
             heavy specific items, and set load_kn to 0 to avoid double counting.
         floor_dead_kn_m2: superimposed dead load in kN/m2 (floor build-up, finishes) on the
@@ -2308,6 +2703,10 @@ def validate_structure(
         fabrication: hollow steel sections (CHS/RHS) are "cold_formed" (default, EN 10219,
             buckling curve c) or "hot_finished" (EN 10210, curve a; a0 for S460). The difference
             is up to about 23 % in buckling resistance; use hot_finished only when specified.
+        lateral_restraint: steel I-section beams are "joints" (default: unrestrained laterally
+            between their joints, so lateral-torsional buckling, EN 1993-1-1 6.3.2, is checked
+            with gravity loads on the top flange) or "continuous" (a deck, slab or bracing holds
+            the compression flange: no LTB check). Native engine.
         detail: native engine only. Adds "members" (per member: role, length, section, ULS design
             forces N/V/M/T, governing combination and check, slenderness, chi, stress,
             utilization, SLS deflection and span/deflection ratio, pinned ends) and "supports"
@@ -2320,8 +2719,10 @@ def validate_structure(
             "pinned_start" | "pinned_end" | "rigid" overrides either mode. Native engine.
         stability: "auto" (default): elastic critical load factor alpha_cr for every ULS
             combination (EN 1993-1-1 5.2.1) and sway imperfections phi = 1/200 x alpha_h x alpha_m
-            (5.3.2) in +/-x and +/-y; alpha_cr < 10 runs a second-order (P-Delta) ULS analysis,
-            alpha_cr <= 1 fails as unstable. "off": first-order without imperfections.
+            (5.3.2, m per sway direction: columns with at least half their row's average load)
+            in +/-x and +/-y; alpha_cr < 10 runs a second-order (P-Delta) ULS analysis with local
+            bow imperfections e0/L (Table 5.1) on the members 5.3.2(6) names, alpha_cr <= 1 fails
+            as unstable. "off": first-order without imperfections.
     Prefer calling get_construction_guidance BEFORE generating the geometry:
     pick a real construction system and size members from its depth/spacing
     rules. This tool cross-checks the analyzed span against that same library
@@ -2330,14 +2731,37 @@ def validate_structure(
     outside every curated system's range for this structure_type/material).
 
     Returns:
-        JSON from the bridge plus the construction_check. Top-level fields: status
-        ("pass"|"fail"|"error"), passed (bool), verdict (text), suggestions,
-        confidence ("high"|"medium"|"low"), warnings, and worst_member_guids
+        JSON from the bridge plus the construction_check. Top-level fields: status,
+        passed, verdict (text), suggestions, confidence ("high"|"medium"|"low"),
+        warnings, and worst_member_guids
         (up to 5 Rhino GUIDs of the most over-utilized members — edit those
-        first). The results object carries the numbers: max_deflection_mm (native:
-        member deflection relative to its supports; max_displacement_mm is the absolute
-        maximum), deflection_limit_mm, utilization_ratio, max_stress_mpa, yield_stress_mpa,
-        span_m, analysis_method ("native"|"api"|"template"|"rule_based"), reactions_kn
+        first). status is one of:
+            "pass" / "fail"  — the configured checks ran; passed is true / false.
+            "indicative"     — native engine, Concrete/Wood/Aluminium: forces,
+                               deflection and stability are computed but member
+                               capacity is not checked to that material's code, so
+                               there is no pass/fail (passed is null, confidence
+                               "low"). A deflection or stability failure still
+                               returns "fail".
+            "unavailable"    — Karamba route: the setup needs the Karamba API and
+                               Karamba could not solve it; no estimate was
+                               substituted (no verdict).
+            "incomplete"     — Karamba route: the API solve ran but returned no
+                               deflection or utilization, so it cannot establish a
+                               pass (passed is false).
+            "error"          — bad input or no bridge; see message.
+        Runs with status pass, fail or indicative are recorded for
+        export_structural_report. The results object carries the numbers: max_deflection_mm (native:
+        the governing member's deflection relative to its supports, i.e. the largest
+        deflection / limit; for beam/frame every member is checked against its own span, and a
+        frame working as a surface (vault, gridshell, arch) globally against the span between its
+        supports and locally per member between joints; governing_deflection {member, kind
+        (member|global|local), span_m, limit_mm} names it; largest_deflection_mm and
+        max_displacement_mm, the absolute maximum, alongside), deflection_limit_mm and span_m
+        (the governing member's), storey_drift (native: per storey drift vs h/300, a
+        project default; fails the check except for structure_type "truss"), utilization_ratio,
+        max_stress_mpa, yield_stress_mpa,
+        analysis_method ("native"|"api"|"template"|"rule_based"), reactions_kn
         (total vertical reaction, api path only), and per_element_utilization —
         a list of {source_guids, utilization} entries (utilization 1.0 = at
         capacity) keyed back to the Rhino objects that produced each element.
@@ -2381,7 +2805,7 @@ def validate_structure(
                                           self_weight, span_m, required=engine == "native", asset_spec=spec,
                                           floor_spec=floor, design=(design_basis, uls_combination, design_code),
                                           connections=connections, stability=stability, detail=detail,
-                                          fabrication=fabrication)
+                                          fabrication=fabrication, lateral_restraint=lateral_restraint)
         if isinstance(result, str):          # hard error (explicit native request, or no bridge)
             return result
     if result is None:
@@ -2411,7 +2835,7 @@ def validate_structure(
     # export_structural_report can render an auditable history. Neither step
     # may ever break validation itself.
     try:
-        if isinstance(result, dict) and result.get("status") in ("pass", "fail"):
+        if isinstance(result, dict) and result.get("status") in RECORDED_STATUSES:
             span = None
             results_block = result.get("results")
             if isinstance(results_block, dict):
@@ -2424,13 +2848,66 @@ def validate_structure(
                     result["warnings"].extend(check["warnings"])
             except Exception:
                 pass
-            retrieval_store.record_validation_run(request, result, guids)
+            settings = _run_settings(result, engine=engine, fixed_supports=fixed_supports, self_weight=self_weight,
+                                     span_m=span_m, floor_load_kn_m2=floor_load_kn_m2,
+                                     floor_dead_kn_m2=floor_dead_kn_m2, asset_loads=asset_loads,
+                                     design_basis=design_basis, uls_combination=uls_combination,
+                                     design_code=design_code, connections=connections, stability=stability,
+                                     fabrication=fabrication)
+            retrieval_store.record_validation_run(request, result, guids, settings)
     except Exception:
         pass
     return json.dumps(result)
 
 
 KARAMBA_ONLY_TYPES = ("shell", "gridshell", "membrane")
+RECORDED_STATUSES = ("pass", "fail", "indicative")     # runs with numbers worth reporting
+
+
+def _run_settings(result: dict, **requested) -> dict:
+    """The options a validate_structure run was made with, as the report needs them.
+
+    Native runs record what the solver actually applied (design code, ULS expression, connection
+    and stability outcome, floor and asset load totals); the Karamba route takes none of these, so
+    only the requested values are kept, flagged as not applied."""
+    res = result.get("results") if isinstance(result.get("results"), dict) else {}
+    native = res.get("analysis_method") == "native"
+    out = {k: v for k, v in requested.items() if v is not None}
+    out["applied_by"] = "native" if native else "karamba"
+    if not native:
+        return out
+    code = result.get("design_code") or {}
+    if code:
+        out["design_code_name"] = code.get("name")
+        out["uls_expression"] = code.get("uls_expression")
+        ratio = (code.get("values") or {}).get("deflection_limit_ratio")
+        if ratio:
+            out["deflection_limit_ratio"] = ratio
+        if code.get("unverified"):
+            out["design_code_unverified"] = list(code["unverified"])
+    out["design_basis"] = res.get("design_basis", out.get("design_basis"))
+    conn = res.get("connections") or {}
+    if conn:
+        out["connections"] = conn.get("mode", out.get("connections"))
+        out["pinned_ends"] = conn.get("pinned_ends", 0)
+    stab = res.get("stability") or {}
+    if stab:
+        out["stability"] = stab.get("mode", out.get("stability"))
+        out["stability_method"] = stab.get("method")
+        if stab.get("min_alpha_cr") is not None:
+            out["min_alpha_cr"] = stab["min_alpha_cr"]
+    if res.get("support_mode"):
+        out["support_mode"] = res["support_mode"]
+    out["support_points"] = len(res.get("support_points_m") or [])
+    floor = result.get("floor_loads") or {}
+    if floor:
+        out["floor_area_m2"] = floor.get("area_m2", 0.0)
+        out["floor_load_kn"] = floor.get("total_kn", 0.0)
+    assets = result.get("asset_loads") or {}
+    if assets:
+        out["asset_loads_applied"] = assets.get("applied", 0)
+        out["asset_load_kn"] = assets.get("total_kn", 0.0)
+    return out
 
 
 def _structural_loads_path() -> Path:
@@ -2476,7 +2953,7 @@ def _floor_spec(imposed, dead, engine):
 
 def _native_validation(guids, structure_type, load_kn, material, fixed_supports, self_weight, span_m, required,
                        asset_spec=None, floor_spec=None, design=("en1990", None, "eurocode"), connections="rigid",
-                       stability="auto", detail=False, fabrication="cold_formed"):
+                       stability="auto", detail=False, fabrication="cold_formed", lateral_restraint="joints"):
     """Native frame check on the bridge's exported line model.
 
     Returns (result_dict, None) when it ran, (None, note) to fall back to the Karamba
@@ -2507,7 +2984,7 @@ def _native_validation(guids, structure_type, load_kn, material, fixed_supports,
                                            asset_loads=asset_spec, floor_loads=floor_spec,
                                            design_basis=design[0], uls=design[1], connections=connections,
                                            stability=stability, design_code=design[2], detail=detail,
-                                           fabrication=fabrication)
+                                           fabrication=fabrication, lateral_restraint=lateral_restraint)
     except ValueError as e:
         return json.dumps({"status": "error", "message": str(e)}), None
     return result, None
@@ -2563,6 +3040,8 @@ def visualize_structure(
     design_code: str = "eurocode",
     fabrication: str = "cold_formed",
     view: str = "deflection",
+    lateral_restraint: str = "joints",
+    structure_type: str = "beam",
 ) -> str:
     """
     Run a live structural analysis on a line model and SHOW it in every Rhino viewport:
@@ -2616,11 +3095,16 @@ def visualize_structure(
         view: "deflection" (default) or "buckling": draw the first buckling mode of the
             governing ULS combination with its alpha_cr (STABLE >= 10, SWAY-SENSITIVE 1-10,
             UNSTABLE <= 1) instead of the deflected shape.
+        structure_type: as in validate_structure (sets the reference span; storey drift is
+            checked for every type except "truss"). With the same inputs the overlay's PASS/FAIL
+            is validate_structure's native verdict.
 
-    Returns JSON: status ("pass"|"fail"|"error"|"cleared"), max_displacement_mm,
-    deflection_limit_mm, span_m, max_utilization, scale, per-element
-    {source_guids, max_displacement_mm, utilization}, warnings.
-    The native engine reports analysis_method "native"; engine="karamba" needs
+    Returns JSON: status ("pass"|"fail"|"indicative"|"error"|"cleared"), max_deflection_mm
+    (native: each member's deflection relative to its supports, the value checked against
+    deflection_limit_mm, as in validate_structure), max_displacement_mm (absolute, incl. column
+    shortening and sway; it scales the drawing), storey_drift, failures, class4_members, span_m,
+    max_utilization, scale, per-element {source_guids, max_displacement_mm, utilization}, warnings.
+    The native engine reports analysis_method "native"; engine="karamba" (BETA) needs
     Karamba3D 3.1 (the trial caps models at 20 beam elements).
     """
     if not clear and not guids:
@@ -2690,10 +3174,21 @@ def visualize_structure(
         if not reanalyze and _VIEW_ENGINE == "native":
             draw = {k: v for k, v in request.items() if k not in ("guids", "reanalyze", "clear")}
             draw["type"] = "structure_draw"
-            return _bridge_call(draw, 30.0)
+            if _VIEW_VERDICT:
+                draw["verdict_status"] = _VIEW_VERDICT["status"]
+            out = _bridge_call(draw, 30.0)
+            try:
+                parsed = json.loads(out)
+            except Exception:
+                return out
+            if _VIEW_VERDICT and isinstance(parsed, dict) and parsed.get("status") in ("pass", "fail", "indicative"):
+                _apply_verdict(parsed, _VIEW_VERDICT)       # an older bridge judges the absolute displacement
+            return json.dumps(parsed)
         reply, note = _native_view(request, guids, required=engine == "native", asset_spec=spec, floor_spec=floor,
                                    design=(design_basis, uls_combination, design_code), connections=connections,
-                                   stability=stability, view=view, fabrication=fabrication)
+                                   stability=stability, view=view, fabrication=fabrication,
+                                   lateral_restraint=lateral_restraint,
+                                   structure_type=structure_type)
         if reply is not None:
             return reply
     out = _bridge_call(request, 90.0)
@@ -2712,6 +3207,25 @@ def visualize_structure(
 
 
 _VIEW_ENGINE: str | None = None   # which engine drew the current overlay ("native" | "api")
+_VIEW_VERDICT: dict | None = None  # the native checks' verdict for the overlay on screen
+
+
+def _apply_verdict(reply: dict, verdict: dict) -> None:
+    """Replace the bridge's own PASS/FAIL (older bridges judge the absolute nodal displacement, column
+    shortening and sway included, against span/limit, and ignore Class 4 sections) with the native
+    checks' verdict: member deflection relative to its supports and against each member's own span (the
+    governing member named), Class 4 sections and thin webs, utilization and storey drift, as
+    validate_structure judges them."""
+    reply["status"] = verdict["status"]
+    reply["passed"] = verdict["passed"]
+    for key in ("max_deflection_mm", "largest_deflection_mm", "deflection_measure", "governing_deflection",
+                "deflection_limit_mm", "span_m", "failures", "class4_members", "shear_buckling_members",
+                "utilization_combination"):
+        if key in verdict:
+            reply[key] = verdict[key]
+    drift = verdict["storey_drift"]
+    reply["storey_drift"] = {k: drift.get(k) for k in ("checked", "limit_ratio", "basis", "max_drift_mm",
+                                                        "utilization", "governing")}
 
 
 def _bridge_call(message: dict, timeout: float) -> str:
@@ -2726,11 +3240,12 @@ def _bridge_call(message: dict, timeout: float) -> str:
 
 
 def _native_view(request: dict, guids, required: bool, asset_spec=None, floor_spec=None, design=("en1990", None, "eurocode"),
-                 connections="rigid", stability="auto", view="deflection", fabrication="cold_formed"):
+                 connections="rigid", stability="auto", view="deflection", fabrication="cold_formed",
+                 lateral_restraint="joints", structure_type="beam"):
     """Solve natively and draw through the bridge's structure_draw overlay.
 
     Returns (reply_json, None) when it ran or must stop, (None, note) to fall back to Karamba."""
-    global _VIEW_ENGINE
+    global _VIEW_ENGINE, _VIEW_VERDICT
 
     def unavailable(msg):
         if required:
@@ -2755,7 +3270,9 @@ def _native_view(request: dict, guids, required: bool, asset_spec=None, floor_sp
             self_weight=request["self_weight"], diameter_mm=request.get("beam_diameter_mm"),
             wall_mm=request.get("beam_wall_mm"), span_m=request.get("span_m"), asset_loads=asset_spec,
             floor_loads=floor_spec, design_basis=design[0], uls=design[1], connections=connections,
-            stability=stability, view=view, design_code=design[2], fabrication=fabrication)
+            stability=stability, view=view, design_code=design[2], fabrication=fabrication,
+            lateral_restraint=lateral_restraint,
+            structure_type=(structure_type or "beam").lower(), limit_ratio=request.get("deflection_limit_ratio"))
     except native_structure.InstabilityError as e:
         return json.dumps({"status": "fail", "analysis_method": "native", "message": str(e),
                            "stability": e.report, "hint": "view='buckling' draws the buckling mode."}), None
@@ -2767,13 +3284,13 @@ def _native_view(request: dict, guids, required: bool, asset_spec=None, floor_sp
     draw, reports = structure_study.draw_message(request, result, span)
     report, floor_report, combos = reports["asset_loads"], reports["floor_loads"], reports["combinations"]
     conn_report, stab_report, buckling = reports["connections"], reports["stability"], reports["buckling"]
-    code_report = reports["design_code"]
+    code_report, verdict = reports["design_code"], reports["verdict"]
     out = _bridge_call(draw, 60.0)
     try:
         parsed = json.loads(out)
     except Exception:
         return out, None
-    if isinstance(parsed, dict) and parsed.get("status") in ("pass", "fail"):
+    if isinstance(parsed, dict) and parsed.get("status") in ("pass", "fail", "indicative"):
         _VIEW_ENGINE = "native"
         parsed["warnings"] = result["warnings"]
         if report is not None:
@@ -2788,9 +3305,9 @@ def _native_view(request: dict, guids, required: bool, asset_spec=None, floor_sp
             parsed["stability"] = stab_report
         if code_report:
             parsed["design_code"] = code_report
-        if reports.get("indicative") and parsed.get("status") == "pass":
-            parsed["status"] = "indicative"                 # the bridge judged utilization; there is no capacity check
-            parsed["passed"] = None
+        if verdict:
+            _apply_verdict(parsed, verdict)                 # the native checks decide, not the bridge's legend
+        _VIEW_VERDICT = verdict
         if buckling:
             # a mode shape has no magnitude: the bridge's deflection-limit verdict is meaningless here
             parsed["buckling"] = buckling
@@ -2802,6 +3319,65 @@ def _native_view(request: dict, guids, required: bool, asset_spec=None, floor_sp
         # a bridge without structure_draw: fall back to the Karamba overlay
         return None, "This bridge version cannot draw native results (update almondbridge)."
     return json.dumps(parsed), None
+
+
+def _run_result_label(run: dict) -> str:
+    status = run.get("status") or ("pass" if run["passed"] else "fail")
+    return {"pass": "PASS", "fail": "FAIL", "indicative": "INDICATIVE"}.get(status, status.upper())
+
+
+def _run_setting_lines(run: dict) -> list[str]:
+    """Report bullets for the loads and design settings a run was made with."""
+    st = run.get("settings") or {}
+    members = f"- input: {run['member_count']} member(s)"
+    objects = run.get("object_count") or run["member_count"]
+    if objects != run["member_count"]:
+        members += f" from {objects} object(s)"
+    if st.get("support_points"):
+        members += f", {st['support_points']} support point(s)"
+    lines = [members + f", material {run['material']}"]
+    if not st:
+        lines.append(f"- loads: {run['load_kn']:.1f} kN (other settings were not recorded for this older run)")
+        return lines
+    loads = [f"point load {run['load_kn']:.1f} kN"]
+    imposed, dead = st.get("floor_load_kn_m2") or 0.0, st.get("floor_dead_kn_m2") or 0.0
+    if imposed or dead:
+        floor = f"floor {imposed:g} kN/m2 imposed + {dead:g} kN/m2 dead"
+        if "floor_load_kn" in st:
+            floor += f" ({st['floor_load_kn']:.1f} kN over {st.get('floor_area_m2', 0.0):.1f} m2)"
+        loads.append(floor)
+    if st.get("asset_loads"):
+        if "asset_load_kn" in st:
+            loads.append(f"asset loads {st['asset_load_kn']:.1f} kN from {st.get('asset_loads_applied', 0)} placement(s)")
+        else:
+            loads.append("asset loads requested")
+    loads.append("self weight" if st.get("self_weight", True) else "no self weight")
+    lines.append("- loads: " + ", ".join(loads))
+    if st.get("applied_by") == "native":
+        code = st.get("design_code_name") or st.get("design_code", "eurocode")
+        design = f"- design: {code}, basis {st.get('design_basis', 'en1990')}"
+        if st.get("uls_expression"):
+            design += f", ULS {st['uls_expression']}"
+        if st.get("deflection_limit_ratio"):
+            design += f", deflection limit span/{st['deflection_limit_ratio']:g}"
+        if st.get("design_code_unverified"):
+            design += f" (unverified values: {', '.join(st['design_code_unverified'])})"
+        lines.append(design)
+        conn = f"- connections: {st.get('connections', 'rigid')}"
+        if st.get("pinned_ends"):
+            conn += f" ({st['pinned_ends']} pinned member end(s))"
+        conn += f"; supports {st.get('support_mode', 'fixed' if st.get('fixed_supports', True) else 'pinned')}"
+        lines.append(conn)
+        stab = f"- stability: {st.get('stability', 'auto')}"
+        if st.get("stability_method"):
+            stab += f", {st['stability_method']}"
+        if st.get("min_alpha_cr") is not None:
+            stab += f" (min alpha_cr {st['min_alpha_cr']:.2f})"
+        lines.append(stab)
+    else:
+        lines.append("- design: Karamba route: unfactored G + Q, deflection limit L/250, material yield strength; "
+                     "floor and asset loads, design code, connections and stability options are not applied")
+    return lines
 
 
 def _render_validation_report(runs: list[dict]) -> str:
@@ -2816,18 +3392,32 @@ def _render_validation_report(runs: list[dict]) -> str:
         "",
         "## How a run works",
         "",
-        "`validate_structure(guids, structure_type, load_kn, material)` sends the",
-        "referenced Rhino geometry to the bridge, which extracts member axes and",
-        "tries three analysis pathways in strict order of confidence:",
+        "`validate_structure` reads the referenced Rhino geometry through the bridge",
+        "and analyses it on one of two routes (each run below names its method):",
         "",
-        "1. **api** — direct Karamba 3.1 solve (real FEA), confidence *high*;",
-        "2. **template** — audited capsule GHX definition, confidence *medium*;",
-        "3. **rule_based** — span/slenderness heuristics (UDL `w = load/span`,",
-        "   `5wL^4/384EI`), confidence *low*. An estimate, not FEA.",
+        "- **native**: Almond's built-in linear-elastic 3D frame solver, the default",
+        "  for line models (beams, columns, trusses, frames). Deflection is checked at",
+        "  SLS against span/limit and members at ULS (EN 1993-1-1 checks), with the",
+        "  load factors, ULS expression and deflection limit of the run's design code",
+        "  profile (Eurocode recommended values: L/250). Steel runs get a pass/fail at",
+        "  confidence *high*. Concrete, timber and aluminium runs are **indicative**:",
+        "  forces, deflection and stability are computed, but member capacity is not",
+        "  checked to that material's code, so there is no pass/fail (confidence",
+        "  *low*); a deflection or stability failure still fails the run.",
+        "- **Karamba**: shells, gridshells and membranes, or engine=\"karamba\". It",
+        "  tries three pathways in strict order of confidence:",
+        "  1. **api**: direct Karamba 3.1 solve (real FEA), confidence *high*;",
+        "  2. **template**: audited capsule GHX definition, confidence *medium*;",
+        "  3. **rule_based**: span/slenderness heuristics (UDL `w = load/span`,",
+        "     `5wL^4/384EI`), confidence *low*. An estimate, not FEA.",
         "",
-        "Pass criteria: max deflection within **L/250** of the detected span, and",
-        "material utilization below yield (default S235 steel, fy = 235 MPa).",
-        "The applied load defaults to **10 kN** unless load_kn is given.",
+        "  Karamba runs check unfactored loads: deflection within **L/250** of the",
+        "  detected span and utilization below the material's yield strength (S235,",
+        "  fy = 235 MPa, for plain \"Steel\").",
+        "",
+        "Each run's loads, design code, connections and stability are listed under",
+        "Run details. *members* counts structural members; support points and other",
+        "objects passed in are not counted as members.",
         "",
         "## Runs",
         "",
@@ -2841,18 +3431,19 @@ def _render_validation_report(runs: list[dict]) -> str:
             f"| {run['confidence']} | {run['span_m']:.1f} "
             f"| {run['max_deflection_mm']:.2f} | {run['deflection_limit_mm']:.1f} "
             f"| {run['utilization_ratio']:.2f} | {run['reactions_kn']:.2f} "
-            f"| {run['member_count']} | {'PASS' if run['passed'] else 'FAIL'} |"
+            f"| {run['member_count']} | {_run_result_label(run)} |"
         )
     lines.append("")
     lines.append("## Run details")
     for run in runs:
+        label = _run_result_label(run)
+        if label == "INDICATIVE":
+            label = "INDICATIVE, no pass/fail"
         lines += [
             "",
-            f"### Run {run['id']} — {run['structure_type']}, "
-            f"{run['analysis_method']} ({'PASS' if run['passed'] else 'FAIL'})",
+            f"### Run {run['id']} — {run['structure_type']}, {run['analysis_method']} ({label})",
             "",
-            f"- input: {run['member_count']} object(s), load {run['load_kn']:.1f} kN, "
-            f"material {run['material']}",
+            *_run_setting_lines(run),
             f"- verdict: {run['verdict']}",
         ]
         if run["warnings"]:
@@ -2862,13 +3453,17 @@ def _render_validation_report(runs: list[dict]) -> str:
         "",
         "## Reading the numbers",
         "",
-        "- Only **api** runs are finite element analysis; reactions_kn is",
-        "  populated on the api path only and should equal the applied load",
-        "  plus self-weight (equilibrium).",
-        "- Known gaps in karambaCommon 3.1.60519 (issue #6): api-mode",
-        "  max_deflection and per-element utilization may read 0.0 due to",
-        "  signature drift — trust reactions and stability diagnostics;",
-        "  cross-check deflection against the rule_based estimate.",
+        "- native and **api** runs are finite element analysis. reactions_kn should",
+        "  equal the applied load plus self-weight (equilibrium); on the Karamba route",
+        "  it is populated on the api path only.",
+        "- INDICATIVE runs report utilization against the characteristic strength,",
+        "  without material factors, for comparison only: have the members designed",
+        "  to the material's own code.",
+        "- Karamba **api** runs only: karambaCommon 3.1.60519 (issue #6) may",
+        "  read max_deflection and per-element utilization as 0.0 due to",
+        "  signature drift; trust reactions and stability diagnostics and",
+        "  cross-check deflection against the rule_based estimate. This does",
+        "  not affect native runs.",
         "- rule_based results are labeled LOW CONFIDENCE for a reason: treat",
         "  them as sanity checks, not engineering.",
         "",
@@ -2877,14 +3472,49 @@ def _render_validation_report(runs: list[dict]) -> str:
 
 
 @mcp.tool()
+def set_support_type(guids: list[str], support: str = "") -> str:
+    """
+    Sets the support type of Rhino support points for the structural check.
+
+    Supports are the Rhino point objects included with the structure when calling validate_structure or
+    visualize_structure. This writes the type as almond:support user text on each point (undoable in
+    Rhino); points without one take the run's default (fixed_supports: fixed, or pinned).
+
+    support: "fixed" (all six), "pinned" (translations), "roller" (vertical only: slides in plan),
+    "roller-x" / "roller-y" (vertical + the other horizontal: slides along x / y), "spring" with
+    stiffnesses, all in global axes. Springs: kx ky kz in kN/m, rx ry rz in kNm/rad, and a sprung
+    direction is no longer rigid, e.g. "spring kz=50000" (soil), "fixed rx=8000 ry=8000" (semi-rigid
+    base), "roller-x kz=5000" (elastic bearing). "" or "default" removes the type.
+
+    The native engine applies every type; the Karamba route holds sprung directions rigid. A support
+    point part-way along a member splits the member there. Results report support_types and each
+    support's reactions (a spring's reaction is its force on the structure).
+    """
+    spec = (support or "").strip()
+    if not guids:
+        return json.dumps({"status": "error", "message": "Give the GUIDs of the Rhino point objects to set."})
+    if spec.lower() in ("", "default"):
+        spec = ""
+    else:
+        try:
+            spec = native_structure.parse_support(spec)[2]
+        except ValueError as exc:
+            return json.dumps({"status": "error", "message": f"Support '{support}' not understood ({exc}). Types: fixed, "
+                               "pinned, roller, roller-x, roller-y, spring; springs kx ky kz (kN/m), rx ry rz (kNm/rad)."})
+    return _bridge_call({"type": "set_support", "guids": list(guids), "spec": spec}, 30.0)
+
+
+@mcp.tool()
 def export_structural_report(path: str = "", limit: int = 50) -> str:
     """
     Renders the persisted validate_structure history to a Markdown report.
 
-    Every successful validate_structure call is recorded in the local state
-    database (inputs, analysis method, confidence, numbers, warnings). This
-    tool writes them to a .md file, newest first, with an explanation of the
-    analysis pathways and pass criteria.
+    Every validate_structure call that returns pass, fail or indicative is
+    recorded in the local state database (inputs, loads and design settings,
+    analysis method, confidence, numbers, warnings). This tool writes them to a
+    .md file, newest first, with an explanation of the analysis routes and pass
+    criteria. Indicative runs (native concrete, timber, aluminium) are labelled
+    INDICATIVE: they carry no pass/fail.
 
     Args:
         path: Output file path. Default:
@@ -3074,8 +3704,28 @@ public class Script
             + ",\\"width\\":" + ((after.Max.X - after.Min.X) * toMM).ToString("F1")
             + ",\\"depth\\":" + ((after.Max.Y - after.Min.Y) * toMM).ToString("F1")
             + ",\\"height\\":" + ((after.Max.Z - after.Min.Z) * toMM).ToString("F1") + "}}");
+
+        // 6. drop the layers the import created (e.g. <asset_id>_root) once
+        //    the move has emptied them; children before parents
+        var newLayers = new List<Layer>();
+        foreach (string s in new string[] {{ {", ".join('"%s"' % g for g in contract.get("_imported_layer_ids", []))} }})
+        {{
+            int index = doc.Layers.FindId(new Guid(s))?.Index ?? -1;
+            if (index >= 0 && index != layerIndex) newLayers.Add(doc.Layers[index]);
+        }}
+        var inUse = new ObjectEnumeratorSettings {{ HiddenObjects = true, LockedObjects = true, IncludeLights = true }};
+        foreach (var l in newLayers.OrderByDescending(x => x.FullPath.Split(new[] {{ "::" }}, StringSplitOptions.None).Length))
+        {{
+            if (l.IsDeleted || l.GetChildren() != null) continue;
+            inUse.LayerIndexFilter = l.Index;
+            if (doc.Objects.GetObjectList(inUse).Any()) continue;
+            doc.Layers.Delete(l.Index, true);
+        }}
+
         doc.Views.Redraw();
-        return imported.Select(o => o.Id).ToList();
+        // ids are already known to the caller; a non-empty return makes
+        // older bridges draw a scale dimension on the current layer
+        return new List<Guid>();
     }}
 }}
 """
@@ -3246,6 +3896,15 @@ def import_asset_contract(
     return json.dumps(_receive_contract(contract, x_mm, y_mm, z_mm, rotation_degrees, layer))
 
 
+def _read_guid_lines(path: Path) -> list[str]:
+    """GUID strings a bridge script wrote one per line; [] if absent."""
+    try:
+        lines = path.read_text(encoding="utf-8").splitlines()
+    except OSError:
+        return []
+    return [line.strip() for line in lines if line.strip()]
+
+
 def _receive_contract(contract: dict, x_mm: float, y_mm: float, z_mm: float,
                       rotation_degrees: float, layer: str) -> dict:
     """Import a loaded contract's GLB into Rhino, restore materials and
@@ -3263,14 +3922,25 @@ public class Script
     public static List<Guid> Run(RhinoDoc doc)
     {
         var before = new HashSet<Guid>(doc.Objects.Select(o => o.Id));
+        var layersBefore = new HashSet<Guid>(doc.Layers.Where(l => !l.IsDeleted).Select(l => l.Id));
         RhinoApp.RunScript("_-Import \\"%s\\" _Enter", false);
         var added = doc.Objects.Where(o => !before.Contains(o.Id)).Select(o => o.Id).ToList();
-        File.WriteAllLines(Path.Combine(Path.GetTempPath(), "almond_imported.txt"),
-            added.Select(g => g.ToString()));
-        return added;
+        var addedLayers = doc.Layers.Where(l => !l.IsDeleted && !layersBefore.Contains(l.Id))
+            .Select(l => l.Id).ToList();
+        File.WriteAllLines(@"%s", added.Select(g => g.ToString()));
+        File.WriteAllLines(@"%s", addedLayers.Select(g => g.ToString()));
+        // Ids travel in the files: a non-empty return makes older bridges
+        // draw a scale dimension on the current layer.
+        return new List<Guid>();
     }
 }
-""" % contract["_resolved_file"].replace("\\", "\\\\")
+"""
+    # Python picks the paths, so both processes need not share one %TEMP%.
+    stem = Path(tempfile.gettempdir()) / f"almond_import_{uuid.uuid4().hex}"
+    objects_file = stem.with_suffix(".objects.txt")
+    layers_file = stem.with_suffix(".layers.txt")
+    import_script = import_script % (contract["_resolved_file"].replace("\\", "\\\\"),
+                                     objects_file, layers_file)
     try:
         result = json.loads(_send_and_receive(
             json.dumps({"type": "execute", "script": import_script}).encode("utf-8"),
@@ -3281,7 +3951,10 @@ public class Script
         return {"status": "error", "message": f"Import failed: {exc}"}
     if result.get("status") != "success":
         return result
-    imported = result.get("guids") or []
+    imported = _read_guid_lines(objects_file)
+    contract["_imported_layer_ids"] = _read_guid_lines(layers_file)
+    for path in (objects_file, layers_file):
+        path.unlink(missing_ok=True)
     if not imported:
         return {"status": "error",
                            "message": "Rhino imported no objects from the GLB."}
@@ -3355,20 +4028,15 @@ def place_generated_asset(
     if not asset:
         return json.dumps({"status": "error",
                            "message": f"Unknown generated asset_id: {asset_id}"})
-    if not asset.get("file_available"):
-        return json.dumps({"status": "error",
-                           "message": f"Model file missing for {asset_id}; run "
-                                      "almond-mcp fetch-assets to download it."})
     values = [x_mm, y_mm, z_mm, rotation_degrees]
     if not all(isinstance(v, (int, float)) and math.isfinite(v) for v in values):
         return json.dumps({"status": "error", "message": "Placement values must be finite numbers."})
     contract_rel = str(asset.get("contract_file") or "").strip()
     if not contract_rel:
         return json.dumps({"status": "error", "message": f"{asset_id} has no contract_file."})
-    library_root = Path(GENERATED_LIBRARY_DIR).resolve()
-    contract_path = (library_root / contract_rel).resolve()
     try:
-        contract_path.relative_to(library_root)
+        # First placement on a PyPI install downloads the GLB + contract (sha256-verified).
+        contract_path = model_store.ensure_generated_files(asset, GENERATED_LIBRARY_DIR)["contract"]
         contract = exchange.load_contract(contract_path)
     except Exception as exc:
         return json.dumps({"status": "error", "message": str(exc)})
@@ -3523,6 +4191,7 @@ def run_gh_definition(
         })
 
     if not manifest.get("audited"):
+        audit_note = (manifest.get("audit") or {}).get("note") or ""
         return json.dumps({
             "status": "error",
             "message": (
@@ -3530,6 +4199,7 @@ def run_gh_definition(
                 "ALMOND_IN_*/ALMOND_OUT_* harness params, so run_gh_definition refuses to "
                 "execute it. It remains available as retrieval context (get_logic_by_id). "
                 "See capsules/AUTHORING.md for how to harness and audit the definition."
+                + (f" Audit note: {audit_note}" if audit_note else "")
             ),
         })
 
@@ -3813,6 +4483,11 @@ def repository_asset_resource(asset_id: str) -> str:
     record = repository.records.get(asset_id)
     if not record:
         raise ValueError("Unknown repository asset ID")
+    if record["kind"] == "model" and not record.get("local", True):
+        try:  # local_files promises paths on disk: fetch the model + contract now
+            repository.ensure(record["model"])
+        except OSError as exc:
+            record["download_error"] = str(exc)
     # HTTP URLs are relative to `almond-mcp library`; provide resolved locations
     # for MCP clients that do not have a browser server running.
     urls = {record["model"], record["preview"], record["contract"], record.get("generation_image")}
@@ -3821,7 +4496,10 @@ def repository_asset_resource(asset_id: str) -> str:
         for view in record["drawing"]["views"]:
             urls.update([view["svg"], view["dxf"]])
         urls.update(sheet["svg"] for sheet in record["drawing"]["sheets"])
-    record["local_files"] = {url: str(repository.files[url][1]) for url in urls if url in repository.files}
+    record["local_files"] = {url: str(repository.files[url][1]) for url in urls
+                             if url in repository.files and repository.files[url][1].is_file()}
+    record["local"] = all(repository.files[u][1].is_file() for u in (record["model"], record["contract"])
+                          if u in repository.files)
     return json.dumps(record)
 
 

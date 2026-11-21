@@ -15,6 +15,11 @@ from typing import Any
 # Assets dropped from their manifest but still placed in a recorded scene.
 RETIRED_LIBRARY_ID = "retired"
 
+# Slack (mm) for validate_scene: a flush placement can land a hair outside its
+# room or inside a neighbour through rotation round-off (sin 180 deg != 0), and
+# the R*Tree stores float32 bounds rounded outward.
+SCENE_TOLERANCE_MM = 0.5
+
 
 def _utc_now() -> str:
     return datetime.now(timezone.utc).isoformat()
@@ -96,6 +101,13 @@ class AlmondStore:
                     revision INTEGER NOT NULL DEFAULT 0,
                     created_at TEXT NOT NULL,
                     updated_at TEXT NOT NULL
+                );
+
+                CREATE TABLE IF NOT EXISTS metadata_snapshots (
+                    snapshot_id TEXT PRIMARY KEY,
+                    name TEXT NOT NULL,
+                    inventory_json TEXT NOT NULL,
+                    created_at TEXT NOT NULL
                 );
 
                 CREATE TABLE IF NOT EXISTS rooms (
@@ -226,6 +238,17 @@ class AlmondStore:
                 connection.execute(
                     "ALTER TABLE assets ADD COLUMN library_id TEXT NOT NULL DEFAULT 'ikea'"
                 )
+            run_columns = {
+                row["name"]
+                for row in connection.execute("PRAGMA table_info(validation_runs)")
+            }
+            for column, ddl in (
+                ("status", "TEXT NOT NULL DEFAULT ''"),
+                ("object_count", "INTEGER NOT NULL DEFAULT 0"),
+                ("settings_json", "TEXT NOT NULL DEFAULT '{}'"),
+            ):
+                if column not in run_columns:
+                    connection.execute(f"ALTER TABLE validation_runs ADD COLUMN {column} {ddl}")
             connection.execute(
                 """
                 CREATE INDEX IF NOT EXISTS idx_assets_library_category
@@ -963,9 +986,21 @@ class AlmondStore:
         request: dict[str, Any],
         result: dict[str, Any],
         guids: list[str],
+        settings: dict[str, Any] | None = None,
     ) -> int:
-        """Persists one validate_structure run for later report export."""
+        """Persists one validate_structure run for later report export.
+
+        member_count counts the structural members the analysis reported
+        (support points and other non-member objects excluded); object_count
+        is every GUID passed in. settings holds the run options that change
+        the result (floor loads, design code, connections, stability...)."""
         results = result.get("results") or {}
+        members = {
+            g
+            for entry in results.get("per_element_utilization") or []
+            if isinstance(entry, dict)
+            for g in entry.get("source_guids") or []
+        }
         with self._connect() as connection:
             cursor = connection.execute(
                 """
@@ -974,15 +1009,16 @@ class AlmondStore:
                     analysis_method, confidence, passed, span_m,
                     max_deflection_mm, deflection_limit_mm, utilization_ratio,
                     max_stress_mpa, yield_stress_mpa, reactions_kn,
-                    verdict, warnings_json, guids_json
-                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    verdict, warnings_json, guids_json,
+                    status, object_count, settings_json
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """,
                 (
                     _utc_now(),
                     str(request.get("structure_type", "beam")),
                     str(request.get("material", "Steel")),
                     float(request.get("load_kn", 10.0)),
-                    len(guids),
+                    len(members) if members else len(guids),
                     str(results.get("analysis_method", "unknown")),
                     str(result.get("confidence", "unknown")),
                     1 if result.get("passed") else 0,
@@ -996,6 +1032,9 @@ class AlmondStore:
                     str(result.get("verdict", "")),
                     _json(result.get("warnings") or []),
                     _json(list(guids)),
+                    str(result.get("status", "")),
+                    len(guids),
+                    _json(settings or {}),
                 ),
             )
             return int(cursor.lastrowid)
@@ -1010,7 +1049,10 @@ class AlmondStore:
         runs = []
         for row in rows:
             run = {key: row[key] for key in row.keys()}
-            run["passed"] = bool(run["passed"])
+            run["status"] = run["status"] or ("pass" if run["passed"] else "fail")
+            run["passed"] = None if run["status"] == "indicative" else bool(run["passed"])
+            run["object_count"] = run["object_count"] or len(json.loads(run["guids_json"] or "[]"))
+            run["settings"] = json.loads(run.pop("settings_json") or "{}")
             run["warnings"] = json.loads(run.pop("warnings_json") or "[]")
             run["guids"] = json.loads(run.pop("guids_json") or "[]")
             runs.append(run)
@@ -1057,6 +1099,34 @@ class AlmondStore:
             "revision": revision,
         }
 
+    def capture_metadata_snapshot(self, name: str, inventory: dict[str, Any]) -> dict[str, Any]:
+        """Append an immutable local baseline; never alter Rhino or an existing snapshot."""
+        from .scene_audit import validate_inventory
+        validate_inventory(inventory)
+        if inventory['missing_ids']:
+            raise ValueError('Cannot capture a baseline with missing Rhino objects')
+        if not isinstance(name, str) or not name.strip() or len(name) > 200:
+            raise ValueError('Snapshot name must contain 1 to 200 characters')
+        snapshot_id = 'metadata-' + uuid.uuid4().hex
+        created_at = _utc_now()
+        encoded = json.dumps(inventory, ensure_ascii=False, allow_nan=False)
+        with self._connect() as connection:
+            connection.execute(
+                'INSERT INTO metadata_snapshots(snapshot_id,name,inventory_json,created_at) VALUES(?,?,?,?)',
+                (snapshot_id, name.strip(), encoded, created_at),
+            )
+        return {'snapshot_id':snapshot_id,'name':name.strip(),'created_at':created_at,
+                'object_count':len(inventory['objects']),'document_key':inventory['document_key']}
+
+    def get_metadata_snapshot(self, snapshot_id: str) -> dict[str, Any] | None:
+        """Return a detached baseline. Audit callers cannot update the persisted record."""
+        with self._connect() as connection:
+            row = connection.execute('SELECT * FROM metadata_snapshots WHERE snapshot_id=?',(snapshot_id,)).fetchone()
+        if row is None:
+            return None
+        return {'snapshot_id':row['snapshot_id'],'name':row['name'],'created_at':row['created_at'],
+                'inventory':json.loads(row['inventory_json'])}
+
     def scene_instances(self, scene_id: str) -> list[dict[str, Any]]:
         """Every instance of a scene with its world bounding box (mm), for structural loads."""
         with self._connect() as conn:
@@ -1085,35 +1155,35 @@ class AlmondStore:
                     ib.asset_id AS asset_b
                 FROM instance_rtree ra
                 JOIN instance_rtree rb ON ra.instance_rowid < rb.instance_rowid
-                    AND ra.min_x < rb.max_x AND ra.max_x > rb.min_x
-                    AND ra.min_y < rb.max_y AND ra.max_y > rb.min_y
-                    AND ra.min_z < rb.max_z AND ra.max_z > rb.min_z
+                    AND ra.min_x < rb.max_x - :tol AND ra.max_x > rb.min_x + :tol
+                    AND ra.min_y < rb.max_y - :tol AND ra.max_y > rb.min_y + :tol
+                    AND ra.min_z < rb.max_z - :tol AND ra.max_z > rb.min_z + :tol
                 JOIN instances ia ON ia.id = ra.instance_rowid
                 JOIN instances ib ON ib.id = rb.instance_rowid
-                WHERE ia.scene_id = ? AND ib.scene_id = ?
+                WHERE ia.scene_id = :scene AND ib.scene_id = :scene
                 ORDER BY ia.instance_id, ib.instance_id
-                LIMIT ?
+                LIMIT :limit
                 """,
-                (scene_id, scene_id, limit),
+                {"scene": scene_id, "limit": limit, "tol": SCENE_TOLERANCE_MM},
             ).fetchall()
             outside_rows = connection.execute(
                 """
                 SELECT i.instance_id, i.room_id,
-                    i.min_x < r.min_x OR i.max_x > r.max_x AS out_x,
-                    i.min_y < r.min_y OR i.max_y > r.max_y AS out_y,
-                    i.min_z < r.min_z OR i.max_z > r.max_z AS out_z
+                    i.min_x < r.min_x - :tol OR i.max_x > r.max_x + :tol AS out_x,
+                    i.min_y < r.min_y - :tol OR i.max_y > r.max_y + :tol AS out_y,
+                    i.min_z < r.min_z - :tol OR i.max_z > r.max_z + :tol AS out_z
                 FROM instances i
                 JOIN rooms r ON r.room_id = i.room_id
-                WHERE i.scene_id = ?
+                WHERE i.scene_id = :scene
                   AND (
-                    i.min_x < r.min_x OR i.max_x > r.max_x OR
-                    i.min_y < r.min_y OR i.max_y > r.max_y OR
-                    i.min_z < r.min_z OR i.max_z > r.max_z
+                    i.min_x < r.min_x - :tol OR i.max_x > r.max_x + :tol OR
+                    i.min_y < r.min_y - :tol OR i.max_y > r.max_y + :tol OR
+                    i.min_z < r.min_z - :tol OR i.max_z > r.max_z + :tol
                   )
                 ORDER BY i.instance_id
-                LIMIT ?
+                LIMIT :limit
                 """,
-                (scene_id, limit),
+                {"scene": scene_id, "limit": limit, "tol": SCENE_TOLERANCE_MM},
             ).fetchall()
         collisions = [
             {
@@ -1143,6 +1213,7 @@ class AlmondStore:
             "collisions": collisions,
             "outside_room": outside,
             "method": "rtree_world_aabb_broad_phase",
+            "tolerance_mm": SCENE_TOLERANCE_MM,
         }
 
     def _record_revision(

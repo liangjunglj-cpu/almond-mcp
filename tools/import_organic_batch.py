@@ -1,4 +1,5 @@
-"""Import reviewed organic batch derivatives and exact, sanitized request evidence."""
+"""Import reviewed batch derivatives (organic Meshy batches, or external image + Meshy batches such as
+Ginkgo props) with exact, sanitized request evidence."""
 from datetime import datetime, timezone
 import hashlib
 import json
@@ -14,48 +15,182 @@ def write(path, value):
     path.write_text(json.dumps(value,indent=2)+'\n',encoding='utf-8')
 
 
+def catalogue_brief(batch, asset, mesh_tag):
+    variant=asset['variant']+'; '+batch['variant_suffix'] if 'variant_suffix' in batch else 'Organic form; detailed geometry edition'
+    tags=(asset['tags']+['detailed',mesh_tag,batch['batch_id']]) if 'tags' in asset else ['organic','detailed','meshy',batch['batch_id'],asset['product'].lower()]
+    brief={'asset_id':asset['asset_id'],'category':asset['category'],'product':asset['product'],
+           'variant':variant,
+           'dimensions_mm':{'width':asset['width_hint_mm'],'depth':asset['depth_hint_mm'],'height':asset['height_mm']},
+           'render_material_id':asset['material'],'prompt':asset['prompt'],
+           'tags':tags,
+           'drawing_roles':['interior_perspective','exterior_perspective','axonometric'],
+           'geometry_mode':'3d_entourage','support_plane':asset.get('support_plane','floor'),
+           'placement_priority':asset.get('placement_priority','accessory'),'lod':'high',
+           'recipe_override':batch.get('recipe_override','captured_organic_batch')}
+    if 'mount_height_mm' in asset:
+        brief['mount_height_mm']=asset['mount_height_mm']
+    return brief
+
+
+def import_text_to_3d(batch, asset, mesh, q, prepared, raw, evidence_dir, library, manifest, catalogue, provenance):
+    """Meshy text-to-3D (preview + refine): no image stage, so no input image is retained or linked.
+    The refine download (GLB, or OBJ geometry) is hashed and is the source of the prepared derivative."""
+    aid=asset['asset_id'];preview=json.loads((raw/(aid+'.preview.json')).read_text(encoding='utf-8'))
+    assert batch['route']=='meshy_text_to_3d' and not (raw/(aid+'.image.json')).exists()
+    assert preview['tool']=='meshy_text_to_3d' and mesh['tool']=='meshy_text_to_3d_refine'
+    assert preview['task_id']==asset['preview_task_id']==mesh['request']['preview_task_id'] and mesh['task_id']==asset['mesh_task_id']
+    assert preview['request']['prompt']==asset['prompt'] and mesh['input_link']=='preview_task_id'
+    assert hashlib.sha256((raw/mesh['output_file']).read_bytes()).hexdigest()==mesh['output_sha256']==q['source_sha256']
+    if q['quality']['nonmanifold_edges_excluding_boundary']:
+        raise ValueError('Review nonmanifold geometry before import: '+aid)
+    evidence={'batch_id':batch['batch_id'],'route':'meshy_text_to_3d','preview':preview,'mesh':mesh,'derivation':q,
+              'input_image_file':None,
+              'external_reference_status':batch['external_reference_status'],'external_reference_ids':[],
+              'dimension_basis':batch['dimension_basis'],
+              'reference_review':asset['reference_review'],'rights':batch['rights'],
+              'origin':{'project':batch['origin']['project'],'pass':batch['origin']['pass'],
+                        'source_name':asset.get('ginkgo_name'),'records':batch['origin']['records']}}
+    write(evidence_dir/(aid+'.json'),evidence)
+    brief=catalogue_brief(batch,asset,'meshy')
+    # A refine request may name no ai_model (provider default); the chain then records that in provider_model.
+    mesh_model=mesh['request'].get('ai_model') or mesh['provider_model']
+    history={'generation_route':'meshy_text_to_3d','preview_task_id':preview['task_id'],'preview_model':preview['request']['ai_model'],
+             'mesh_provider':'meshy','mesh_task_id':mesh['task_id'],'mesh_model':mesh_model,
+             'generated_at':mesh['submitted_at'][:10],'captured_generation':evidence}
+    record=normalise(brief,prepared,library/'models',load_material_colours(),{aid:history})
+    parameters=record['geometry_source']['parameters']
+    # normalise() writes image-stage keys; this route has none, so they are replaced by the preview task.
+    for key in ('image_task_id','image_model'):
+        assert parameters.pop(key) is None
+    parameters.update(generation_route='meshy_text_to_3d',preview_task_id=preview['task_id'],
+                      preview_model=preview['request']['ai_model'],captured_generation=evidence)
+    record['license_note']=evidence['rights']
+    contract_path=library/record['contract_file'];contract=json.loads(contract_path.read_text(encoding='utf-8'))
+    enrich_asset(record,contract,library/record['file'],contract_path)
+    manifest['assets'].append(record);catalogue['assets'].append(brief);provenance['assets'][aid]=history
+    print(aid,record['triangle_count'],record['dimensions_mm'])
+
+
+def import_procedural(batch, asset, mesh, q, prepared, raw, evidence_dir, library, manifest, catalogue, provenance):
+    """Route 'procedural_script': a Blender script in the owner's project built the piece and exported it as FBX.
+    No provider, prompt, image or task ID exists. The retained script text, the kit record and the FBX hash are the
+    evidence; the prepared GLB is derived from the hashed FBX (quality.json records the edits)."""
+    aid=asset['asset_id'];staged=json.loads((raw/'procedural.json').read_text(encoding='utf-8'))
+    assert batch['route']=='procedural_script' and asset.get('prompt') is None
+    assert not any((raw/(aid+suffix)).exists() for suffix in ('.image.json','.preview.json','.png'))
+    assert mesh['tool']=='blender_procedural_script' and mesh['source_name']==asset['source_name']
+    assert mesh['generator_script']==asset['generator_script'] and mesh['kit_record']==asset['kit_record']
+    assert hashlib.sha256((raw/mesh['output_file']).read_bytes()).hexdigest()==mesh['output_sha256']==asset['source_sha256']==q['source_sha256']
+    assert q['source_format']=='fbx'
+    if q['quality']['nonmanifold_edges_excluding_boundary']:
+        raise ValueError('Review nonmanifold geometry before import: '+aid)
+    script=staged['scripts'][asset['generator_script']];kit=staged['kit_records'][asset['kit_record']]
+    assert script['sha256']==mesh['generator_script_sha256']
+    retained={}
+    for name,entry in (('script',script),('kit_record',kit)):
+        kept=raw/'evidence'/entry['retained_as']
+        assert hashlib.sha256(kept.read_bytes()).hexdigest()==entry['retained_sha256']
+        shutil.copyfile(kept,evidence_dir/entry['retained_as'])
+        retained[name]='batches/'+batch['batch_id']+'/'+entry['retained_as']
+    evidence={'batch_id':batch['batch_id'],'route':'procedural_script',
+              'generator':{'script':{'path':asset['generator_script'],**script,'retained_file':retained['script']},
+                           'kit_record':{'path':asset['kit_record'],**kit,'retained_file':retained['kit_record']}},
+              'mesh':mesh,'derivation':q,'edits':asset.get('edits',[]),
+              'input_image_file':None,
+              'external_reference_status':batch['external_reference_status'],
+              'external_reference_ids':batch.get('external_reference_ids',[]),
+              'dimension_basis':batch['dimension_basis'],
+              'reference_review':asset['reference_review'],'rights':batch['rights'],
+              'origin':{'project':batch['origin']['project'],'pass':batch['origin']['pass'],
+                        'source_name':asset['source_name'],'records':batch['origin']['records']}}
+    write(evidence_dir/(aid+'.json'),evidence)
+    brief=catalogue_brief(batch,asset,'procedural')
+    brief.update(prompt=None,lod='low',tags=asset['tags']+['procedural','low-poly',batch['batch_id']])
+    history={'generation_route':'procedural_script','generator_script':asset['generator_script'],
+             'generator_script_sha256':script['sha256'],'source_file':asset['source_file'],
+             'source_sha256':mesh['output_sha256'],'generated_at':mesh['output_file_modified_at'][:10],
+             'captured_generation':evidence}
+    record=normalise(brief,prepared,library/'models',load_material_colours(),{aid:history})
+    parameters=record['geometry_source']['parameters']
+    # normalise() writes provider keys (image and mesh tasks/models); this route has none, so they are dropped.
+    for key in ('image_task_id','image_model','mesh_task_id','mesh_model'):
+        assert parameters.pop(key) is None
+    parameters.update({key:history[key] for key in ('generation_route','generator_script','generator_script_sha256',
+                                                    'source_file','source_sha256')},captured_generation=evidence)
+    record['geometry_source']['generator']='procedural_script'
+    record['license_note']=evidence['rights']
+    contract_path=library/record['contract_file'];contract=json.loads(contract_path.read_text(encoding='utf-8'))
+    contract['source_app']='blender'
+    enrich_asset(record,contract,library/record['file'],contract_path)
+    manifest['assets'].append(record);catalogue['assets'].append(brief);provenance['assets'][aid]=history
+    print(aid,record['triangle_count'],record['dimensions_mm'])
+
+
 def main():
-    batch_file=Path(sys.argv[1]);batch=json.loads(batch_file.read_text())
+    batch_file=Path(sys.argv[1]);batch=json.loads(batch_file.read_text(encoding='utf-8'))
     library=REPO/'GeneratedAssetfiles';raw=library/'raw'/batch['batch_id']
     evidence_dir=library/'batches'/batch['batch_id'];evidence_dir.mkdir(exist_ok=True)
-    manifest=json.loads((library/'manifest.json').read_text())
-    catalogue=json.loads((library/'catalogue.json').read_text())
-    provenance=json.loads((library/'provenance.json').read_text())
-    quality={r['asset_id']:r for r in json.loads((raw/'prepared/quality.json').read_text())}
+    manifest=json.loads((library/'manifest.json').read_text(encoding='utf-8'))
+    catalogue=json.loads((library/'catalogue.json').read_text(encoding='utf-8'))
+    provenance=json.loads((library/'provenance.json').read_text(encoding='utf-8'))
+    quality={r['asset_id']:r for r in json.loads((raw/'prepared/quality.json').read_text(encoding='utf-8'))}
     selected = [a for a in batch['assets'] if a['asset_id'] in batch['release_assets']]
     if {a['asset_id'] for a in selected} & {a['asset_id'] for a in manifest['assets']}:
         raise ValueError('Batch already imported; refusing replacement')
+    text_to_3d=batch.get('route')=='meshy_text_to_3d'
     for asset in selected:
-        aid=asset['asset_id'];image=json.loads((raw/(aid+'.image.json')).read_text());mesh=json.loads((raw/(aid+'.mesh.json')).read_text())
+        aid=asset['asset_id'];mesh=json.loads((raw/(aid+'.mesh.json')).read_text(encoding='utf-8'))
         q=quality[aid];prepared=raw/'prepared'/(aid+'.glb')
         assert hashlib.sha256(prepared.read_bytes()).hexdigest()==q['prepared_sha256']
+        if text_to_3d:
+            import_text_to_3d(batch,asset,mesh,q,prepared,raw,evidence_dir,library,manifest,catalogue,provenance)
+            continue
+        if batch.get('route')=='procedural_script':
+            import_procedural(batch,asset,mesh,q,prepared,raw,evidence_dir,library,manifest,catalogue,provenance)
+            continue
+        image=json.loads((raw/(aid+'.image.json')).read_text(encoding='utf-8'))
         assert hashlib.sha256((raw/(aid+'.glb')).read_bytes()).hexdigest()==mesh['output_sha256']==q['source_sha256']
-        assert hashlib.sha256((raw/(aid+'.png')).read_bytes()).hexdigest()==image['output_sha256']
+        upload=mesh.get('uploaded_input')
+        if upload:
+            # The mesh stage received a locally edited copy of the generated image: retain both, linked by hash.
+            assert upload['derived_from_sha256']==image['output_sha256']==hashlib.sha256((raw/image['output_file']).read_bytes()).hexdigest()
+            assert hashlib.sha256((raw/(aid+'.png')).read_bytes()).hexdigest()==upload['sha256']==mesh['input_image_sha256']
+            shutil.copyfile(raw/image['output_file'],evidence_dir/image['output_file'])
+        else:
+            assert hashlib.sha256((raw/(aid+'.png')).read_bytes()).hexdigest()==image['output_sha256']
         if q['quality']['nonmanifold_edges_excluding_boundary']:
             raise ValueError('Review nonmanifold geometry before import: '+aid)
         shutil.copyfile(raw/(aid+'.png'),evidence_dir/(aid+'.png'))
         evidence={'batch_id':batch['batch_id'],'image':image,'mesh':mesh,'derivation':q,
                   'input_image_file':'batches/'+batch['batch_id']+'/'+aid+'.png',
                   'external_reference_status':batch['external_reference_status'],'external_reference_ids':[],
-                  'dimension_basis':'Authored nominal height for architectural studies; width and depth measured after uniform normalization. Not a physical survey.',
+                  'dimension_basis':batch.get('dimension_basis','Authored nominal height for architectural studies; width and depth measured after uniform normalization. Not a physical survey.'),
                   'reference_review':asset.get('reference_review','Reference image visually reviewed for neutral architectural use.'),
-                  'rights':'Generated for the Almond library using the owner-configured Meshy account; public pack distribution authorized by owner. CC BY 4.0. API balance verified; subscription contract not independently audited.'}
+                  'rights':batch.get('rights','Generated for the Almond library using the owner-configured Meshy account; public pack distribution authorized by owner. CC BY 4.0. API balance verified; subscription contract not independently audited.')}
+        if 'origin' in batch:
+            evidence['origin']={'project':batch['origin']['project'],'pass':batch['origin']['pass'],
+                                'source_name':asset.get('ginkgo_name'),'records':batch['origin']['records']}
         write(evidence_dir/(aid+'.json'),evidence)
-        brief={'asset_id':aid,'category':asset['category'],'product':asset['product'],
-               'variant':'Organic form; detailed geometry edition',
-               'dimensions_mm':{'width':asset['width_hint_mm'],'depth':asset['depth_hint_mm'],'height':asset['height_mm']},
-               'render_material_id':asset['material'],'prompt':asset['prompt'],
-               'tags':['organic','detailed','meshy',batch['batch_id'],asset['product'].lower()],
-               'drawing_roles':['interior_perspective','exterior_perspective','axonometric'],
-               'geometry_mode':'3d_entourage','support_plane':'floor','placement_priority':'accessory','lod':'high',
-               'recipe_override':'captured_organic_batch'}
-        history={'image_provider':'meshy','image_task_id':image['task_id'],'image_model':image['request']['ai_model'],
-                 'mesh_provider':'meshy','mesh_task_id':mesh['task_id'],'mesh_model':mesh['request']['ai_model'],
-                 'generated_at':mesh['submitted_at'][:10],'captured_generation':evidence}
+        # Mesh stage: Meshy, or Tripo run through Higgsfield generate_3d (request carries 'model', not 'ai_model').
+        tripo=mesh.get('provider','meshy')!='meshy'
+        mesh_model=mesh['request']['model'] if tripo else mesh['request']['ai_model']
+        brief=catalogue_brief(batch,asset,'tripo' if tripo else 'meshy')
+        if batch.get('image_provider','meshy')=='meshy':
+            history={'image_provider':'meshy','image_task_id':image['task_id'],'image_model':image['request']['ai_model']}
+        else:
+            # External image stage (e.g. Higgsfield), uploaded to Meshy as a file: the link is the image hash.
+            if mesh.get('input_image_sha256')!=(upload['sha256'] if upload else image['output_sha256']):
+                raise ValueError('Mesh input image differs from the retained reference image: '+aid)
+            history={'image_provider':batch['image_provider'],'image_job_id':image['task_id'],'image_model':image['request']['model']}
+        history.update({'mesh_provider':'higgsfield (Tripo)' if tripo else 'meshy','mesh_task_id':mesh['task_id'],'mesh_model':mesh_model,
+                        'generated_at':mesh['submitted_at'][:10],'captured_generation':evidence})
         record=normalise(brief,prepared,library/'models',load_material_colours(),{aid:history})
         record['geometry_source']['parameters']['captured_generation']=evidence
         record['license_note']=evidence['rights']
-        contract_path=library/record['contract_file'];contract=json.loads(contract_path.read_text())
+        contract_path=library/record['contract_file'];contract=json.loads(contract_path.read_text(encoding='utf-8'))
+        if tripo:
+            record['geometry_source']['generator']='tripo'
+            contract['source_app']='tripo'
         enrich_asset(record,contract,library/record['file'],contract_path)
         manifest['assets'].append(record);catalogue['assets'].append(brief);provenance['assets'][aid]=history
         print(aid,record['triangle_count'],record['dimensions_mm'])

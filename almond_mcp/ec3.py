@@ -12,19 +12,57 @@ Per member, for each analysed combination:
   Class 1/2 sections and only when plastic design is requested), resultant moment for CHS;
 - flexural buckling about both axes, 6.3.1, curves from Table 6.2: hollow sections cold-formed
   (EN 10219) -> c, hot-finished (EN 10210) -> a (a0 for fy >= 460); rolled I by h/b and tf;
-- compression + bending, 6.3.3 eq. (6.61)/(6.62) with Annex B interaction factors for members not
-  susceptible to torsional deformation (hollow sections; I-sections with lateral restraint assumed),
-  equivalent moment factors Cm from Table B.3 (linear diagrams 0.6 + 0.4 psi >= 0.4; members with
-  transverse load take the table's upper bound 1.0).
-Not checked: lateral-torsional buckling, shear (6.2.6), torsion, local bow imperfections in the
-global analysis, aluminium to EN 1999 (aluminium members use these steel rules, flagged)."""
+- lateral-torsional buckling of I-sections, 6.3.2.1-6.3.2.2: M_b,Rd = chi_LT W_y fy / gamma_M1 over each
+  segment between lateral restraints (``ltb_segments``: the member's joints, with pieces of one straight
+  beam that meet nobody else merged), M_cr from a numerical eigen analysis of the segment under its own
+  moment diagram with gravity loads on the top flange (``ltb.critical_moment``), chi_LT by the general
+  case 6.3.2.2 with Table 6.4 curves (rolled: a for h/b <= 2, b above); hollow sections are not
+  susceptible; ``lateral_restraint="continuous"`` (a deck holds the compression flange) skips it;
+- compression + bending, 6.3.3 eq. (6.61)/(6.62) with Annex B interaction factors: Table B.1 for members
+  not susceptible to torsional deformation (hollow sections; I-sections held laterally), Table B.2 with
+  chi_LT and C_mLT for unrestrained I-sections; equivalent moment factors Cm from Table B.3, read from
+  the member's own moment diagram: end moments Mh and psi Mh, mid-span moment Ms, and the transverse
+  load on the member (none, uniform or concentrated) from the change of slope between its stations
+  (``moment_diagram``); Cm >= 0.4. A member with a free end (a cantilever) buckles in a sway mode:
+  Cm = 0.9 (Table B.3 note). Frame sway is in the global second-order analysis (5.2.2(3)b), so other
+  members take the non-sway rows. Diagrams the table does not draw (a concentrated moment inside the
+  member, a peak away from both the ends and mid-span) take its upper bound 1.0;
+- shear, 6.2.6: V_pl,Rd = A_v (fy / sqrt 3) / gamma_M0 along both local axes (CHS: the resultant),
+  shear areas from 6.2.6(3) (``shear_areas``), eta = 1.0 (the 6.2.6(3) Note's conservative value);
+  webs with hw/tw > 72 epsilon / eta (6.2.6(6)) are flagged as outside these checks (shear buckling,
+  EN 1993-1-5, is not applied);
+- bending and shear, 6.2.8: where V_Ed > 0.5 V_pl,Rd at a station, the bending resistance there uses
+  the reduced yield strength (1 - rho) fy on the shear area, rho = (2 V_Ed / V_pl,Rd - 1)^2: eq. (6.30)
+  for I-sections about the major axis (and its elastic counterpart), the whole modulus otherwise;
+- local bow imperfections e0/L by buckling curve (Table 5.1, elastic analysis), applied as equivalent
+  member loads (Figure 5.4) where 5.3.2(6) requires them (``bow_imperfection``, used by the native
+  analysis when alpha_cr < 10).
+Not checked: torsion, aluminium to EN 1999 (aluminium members use these steel rules, flagged)."""
 from __future__ import annotations
 
 import math
 
 import numpy as np
 
+from . import frame_solver as fs
+from . import ltb as ltb_solver
+
 ALPHA = {"a0": 0.13, "a": 0.21, "b": 0.34, "c": 0.49, "d": 0.76}
+# Table 5.1, bow imperfection e0/L = 1/value for elastic global analysis
+BOW_ELASTIC = {"a0": 350, "a": 300, "b": 250, "c": 200, "d": 150}
+# 6.2.6(3) Note: eta (EN 1993-1-5 5.1) may conservatively be taken as 1.0; the recommended 1.2 for
+# steels up to S460 is a Nationally Determined Parameter and is not applied
+ETA = 1.0
+LATERAL_RESTRAINT = ("joints", "continuous")
+
+
+def ltb_curve(section) -> str:
+    """Table 6.4 (general case, 6.3.2.2): rolled I-sections a for h/b <= 2, b above; anything else d.
+    Almond's I-sections are treated as rolled, as in the Table 6.2 flexural buckling curves."""
+    if section.shape == "i":
+        h, b = section.dims_mm[:2]
+        return "a" if h / b <= 2 else "b"
+    return "d"
 FABRICATION = ("cold_formed", "hot_finished")
 STEEL_FAMILIES = ("steel", "aluminium")
 
@@ -100,40 +138,235 @@ def classify(section, fy: float, N: np.ndarray, My: np.ndarray, Mz: np.ndarray) 
     return None
 
 
-def equivalent_moment_factor(t: np.ndarray, M: np.ndarray) -> float:
-    """Table B.3: linear diagrams 0.6 + 0.4 psi >= 0.4; any transverse load (curved diagram) -> 1.0,
-    the table's upper bound."""
+def shear_areas(section, eta: float = ETA) -> tuple[float, float]:
+    """6.2.6(3) shear areas (m2) for shear along local y and along local z (the depth).
+
+    I/H (no root radii, so r = 0): load parallel to the web A - 2 b tf + (tw + 2r) tf >= eta hw tw (a),
+    parallel to the flanges A - hw tw (e); RHS of uniform thickness: A h / (b + h) along the depth,
+    A b / (b + h) along the width (f); CHS: 2 A / pi (g); solid rectangle (plates and solid bars): A (h)."""
+    A = section.A
+    if section.shape == "chs":
+        return 2 * A / math.pi, 2 * A / math.pi
+    if section.shape == "rhs":
+        h, b, _ = section.dims_mm
+        return A * b / (b + h), A * h / (b + h)
+    if section.shape == "i":
+        h, b, tw, tf = (v / 1000 for v in section.dims_mm)
+        hw = h - 2 * tf
+        return A - hw * tw, max(A - 2 * b * tf + tw * tf, eta * hw * tw)
+    return A, A
+
+
+def web_slenderness(section) -> float | None:
+    """hw / tw of the plates that carry shear (the worse one for RHS); None for CHS and solid sections."""
+    if section.shape == "i":
+        h, _, tw, tf = section.dims_mm
+        return (h - 2 * tf) / tw
+    if section.shape == "rhs":
+        h, b, t = section.dims_mm
+        return (max(h, b) - 2 * t) / t
+    return None
+
+
+def shear_buckling(section, fy: float, eta: float = ETA) -> bool:
+    """6.2.6(6): webs without intermediate stiffeners with hw/tw > 72 epsilon / eta need EN 1993-1-5."""
+    r = web_slenderness(section)
+    return r is not None and r > 72 * epsilon(fy) / eta
+
+
+def shear_rho(v_ed: np.ndarray, v_pl: float) -> np.ndarray:
+    """6.2.8(3): rho = (2 V_Ed / V_pl,Rd - 1)^2 where V_Ed > 0.5 V_pl,Rd, else 0 (capped at 1)."""
+    r = np.abs(np.asarray(v_ed, float)) / v_pl
+    return np.where(r > 0.5, np.minimum((2 * r - 1) ** 2, 1.0), 0.0)
+
+
+def _reduced_moduli(section, Wy: float, Wz: float, use_plastic: bool, rho_y, rho_z):
+    """6.2.8: moduli with (1 - rho) fy on the shear area. rho_z (shear along the depth) reduces the
+    major-axis modulus Wy, rho_y the minor-axis Wz. I-sections about the major axis: eq. (6.30)
+    W_pl,y - rho A_w^2 / (4 tw), A_w = hw tw (elastic: the web's share tw hw^3 / (6 h)); every other
+    case reduces the whole modulus, which is on the safe side (the shear area is most of it)."""
+    if section.shape == "i":
+        h, _, tw, tf = (v / 1000 for v in section.dims_mm)
+        hw = h - 2 * tf
+        web = hw ** 2 * tw / 4 if use_plastic else tw * hw ** 3 / (6 * h)
+        return np.maximum(Wy - rho_z * web, 0.0), Wz * (1 - rho_y)
+    return Wy * (1 - rho_z), Wz * (1 - rho_y)
+
+
+def bow_imperfection(curve: str, length: float) -> float:
+    """Table 5.1 (elastic analysis): design bow imperfection e0 = L / {a0 350, a 300, b 250, c 200, d 150}."""
+    return length / BOW_ELASTIC[curve]
+
+
+def bow_required(section, fy: float, E: float, length: float, n_ed: float, axis: str) -> tuple[bool, float, float]:
+    """5.3.2(6) second condition for one buckling axis ("y" or "z"): lambda_bar > 0.5 sqrt(A fy / N_Ed),
+    lambda_bar in-plane for the member hinged at its ends (L_cr = L). Returns (required, lambda_bar, limit)."""
+    if n_ed <= 0:
+        return False, 0.0, math.inf
+    inertia = section.Iy if axis == "y" else section.Iz
+    lam = math.sqrt(section.A * fy / (math.pi ** 2 * E * inertia / length ** 2))
+    limit = 0.5 * math.sqrt(section.A * fy / n_ed)
+    return lam > limit, lam, limit
+
+
+JUMP_TOL = 0.02          # a step in M under 2 % of the peak moment is not a concentrated moment
+NOISE = 1e-6             # transverse load below 1e-6 of the peak moment's worth is round-off: no load
+SWAY_CM = 0.9            # Table B.3 note: members with a sway buckling mode
+
+
+def moment_diagram(t: np.ndarray, M: np.ndarray) -> dict:
+    """What Table B.3 needs from a member's moment diagram, read from its stations alone.
+
+    ``t`` (0..1 along the member, ascending) and ``M`` are the stations of the member's analysis
+    elements in order; a station repeated at the same t is a joint between two elements. Between
+    stations the change of slope is transverse load: spread evenly over the stations it is a
+    distributed load, standing out at single stations it is a point load (a load at a joint, a
+    member framing in, the kink of a curved member's chords under axial force). A step in M at a
+    joint is a concentrated moment, which Table B.3 does not cover.
+
+    Returns mh (the larger end moment), psi (other end / mh), ms (moment at mid-span), peak, load
+    ("none", "uniform" or "concentrated") and jump (a concentrated moment inside the member)."""
+    t, M = np.asarray(t, float), np.asarray(M, float)
     peak = float(np.max(np.abs(M))) if len(M) else 0.0
-    if peak < 1e-9:
-        return 1.0
-    m0, m1 = float(M[0]), float(M[-1])
-    linear = m0 + (m1 - m0) * t
-    if float(np.max(np.abs(M - linear))) > 0.02 * peak:
-        return 1.0
+    m0, m1 = (float(M[0]), float(M[-1])) if len(M) else (0.0, 0.0)
     mh, mo = (m0, m1) if abs(m0) >= abs(m1) else (m1, m0)
-    psi = mo / mh if abs(mh) > 1e-12 else 1.0
-    return max(0.4, 0.6 + 0.4 * psi)
+    out = {"mh": mh, "psi": mo / mh if abs(mh) > 1e-12 * max(peak, 1.0) else 1.0, "ms": 0.0, "peak": peak,
+           "load": "none", "jump": False}
+    if peak < 1e-9 or len(M) < 2:
+        return out
+    dt, dM = np.diff(t), np.diff(M)
+    joint = dt <= 1e-9
+    out["jump"] = bool(np.any(np.abs(dM[joint]) > JUMP_TOL * peak))
+    keep = np.concatenate([[True], ~joint])                   # one station per position (equal unless a jump)
+    tu, Mu = t[keep], M[keep]
+    out["ms"] = float(np.interp(0.5, tu, Mu))
+    if len(tu) < 3:
+        return out
+    h = np.diff(tu)
+    slope = np.diff(Mu) / h
+    kink = np.abs(np.diff(slope))                              # transverse load at each interior station (t units)
+    width = 0.5 * (h[:-1] + h[1:])
+    spread = float(np.median(kink / width)) if len(kink) >= 3 else 0.0
+    even = np.minimum(kink, spread * width)
+    point = kink - even
+    distributed, concentrated = float(np.sum(even)), float(np.sum(point))
+    # moment each would put at mid-span of a simple span: q/8 for a distributed load, P/4 for a point load
+    effect_q, effect_p = distributed / 8.0, concentrated / 4.0
+    if effect_q + effect_p <= NOISE * peak:                   # rows 2/3 meet row 1 as the load goes to zero,
+        return out                                            # so no threshold beyond round-off is needed
+    points = int(np.sum(point > 0.1 * concentrated)) if concentrated > 0 else 0
+    out["load"] = "concentrated" if effect_q <= 0.05 * effect_p and points <= 2 else "uniform"
+    return out
+
+
+def table_b3(mh: float, psi: float, ms: float, load: str) -> float:
+    """EN 1993-1-1 Table B.3 Cm (non-sway). Row 1 (load "none"): linear diagram, Mh and psi Mh at the
+    ends. Rows 2 and 3 (uniform or concentrated transverse load): the end moments with the mid-span
+    moment Ms, alpha_s = Ms/Mh when |Ms| < |Mh| and alpha_h = Mh/Ms otherwise. Cm >= 0.4."""
+    if load == "none":
+        return max(0.4, 0.6 + 0.4 * psi)
+    uniform = load != "concentrated"                          # anything but clear point loads: the higher column
+    if abs(ms) < abs(mh):                                     # row 2: the end moment governs
+        a = ms / mh
+        if a >= 0:
+            cm = 0.2 + 0.8 * a
+        elif psi >= 0:
+            cm = 0.1 - 0.8 * a if uniform else -0.8 * a
+        else:
+            cm = 0.1 * (1 - psi) - 0.8 * a if uniform else -0.2 * psi - 0.8 * a
+        return max(0.4, cm)
+    a = mh / ms if abs(ms) > 0 else 0.0                       # row 3: the span moment governs
+    if a < 0 and psi < 0:
+        a *= 1 + 2 * psi
+    return max(0.4, 0.95 + 0.05 * a if uniform else 0.90 + 0.10 * a)
+
+
+def moment_factor(t: np.ndarray, M: np.ndarray, sway: bool = False) -> tuple[float, str]:
+    """Cm about one axis and the Table B.3 case it came from."""
+    d = moment_diagram(t, M)
+    if d["peak"] < 1e-9:
+        return 1.0, "no moment"
+    if sway:
+        return SWAY_CM, "sway buckling mode (free end)"
+    if d["jump"]:
+        return 1.0, "concentrated moment in the span: outside Table B.3, upper bound"
+    if d["load"] != "none" and max(abs(d["mh"]), abs(d["ms"])) < 0.4 * d["peak"]:
+        return 1.0, "peak away from the ends and mid-span: outside Table B.3, upper bound"
+    cm = table_b3(d["mh"], d["psi"], d["ms"], d["load"])
+    psi = f", psi = {d['psi']:.2f}" if abs(d["mh"]) > 1e-9 * d["peak"] else ""
+    if d["load"] == "none":
+        return cm, f"linear{psi}"
+    if abs(d["ms"]) < abs(d["mh"]):
+        return cm, f"{d['load']} load, alpha_s = {d['ms'] / d['mh']:.2f}{psi}"
+    return cm, f"{d['load']} load, alpha_h = {d['mh'] / d['ms']:.2f}{psi}"
+
+
+def equivalent_moment_factor(t: np.ndarray, M: np.ndarray, sway: bool = False) -> float:
+    """Table B.3 equivalent uniform moment factor of one moment diagram (see ``moment_factor``)."""
+    return moment_factor(t, M, sway)[0]
 
 
 def member_check(section, material, length: float, t: np.ndarray, N: np.ndarray, My: np.ndarray, Mz: np.ndarray,
                  gamma_m0: float = 1.0, gamma_m1: float = 1.0, plastic: bool = False,
-                 fabrication: str = "cold_formed") -> dict:
+                 fabrication: str = "cold_formed", Vy: np.ndarray | None = None, Vz: np.ndarray | None = None,
+                 ltb: dict | None = None, sway: bool = False) -> dict:
     """Utilization and the working of one steel member: stations ordered along the member
-    (t in 0..1), forces N (tension +), My, Mz in kN and kNm."""
+    (t in 0..1; a repeated t is a joint between analysis elements), forces N (tension +), My, Mz in kN and kNm, shears Vy, Vz in kN (optional: without
+    them the shear checks are skipped). ``ltb``: the member's lateral-torsional buckling segment,
+    {"m_cr", "m_ed" (the segment's largest |My|), "cm_lt", "length", "ends", "zg"}; None for members
+    not susceptible (hollow sections, or held laterally), which keep Annex B Table B.1.
+    ``sway``: the member buckles in a sway mode (a free end), Cm = 0.9."""
     fy, E, s = material.fy, material.E, section
     cls = classify(s, fy, N, My, Mz)
     use_plastic = bool(plastic) and cls is not None and cls <= 2
     Wy, Wz = (s.Wpl_y, s.Wpl_z) if use_plastic else (s.Wel_y, s.Wel_z)
-    if s.shape == "chs":
-        m_cs = np.hypot(My, Mz) / (Wy * fy / gamma_m0)
-    else:
-        m_cs = np.abs(My) / (Wy * fy / gamma_m0) + np.abs(Mz) / (Wz * fy / gamma_m0)
+    shear = None
+    if Vy is not None and Vz is not None:
+        av_y, av_z = shear_areas(s)
+        vpl_y, vpl_z = (a * fy / math.sqrt(3) / gamma_m0 for a in (av_y, av_z))
+        Vy, Vz = np.abs(np.asarray(Vy, float)), np.abs(np.asarray(Vz, float))
+        if s.shape == "chs":                                    # resultant shear on a round tube
+            v_res = np.hypot(Vy, Vz)
+            ratio = v_res / vpl_z
+            rho_y = rho_z = shear_rho(v_res, vpl_z)
+        else:
+            ratio = np.maximum(Vy / vpl_y, Vz / vpl_z)
+            rho_y, rho_z = shear_rho(Vy, vpl_y), shear_rho(Vz, vpl_z)
+        Wy, Wz = _reduced_moduli(s, Wy, Wz, use_plastic, rho_y, rho_z)
+        shear = {"shear": float(np.max(ratio)), "shear_area_y_m2": av_y, "shear_area_z_m2": av_z,
+                 "v_pl_rd_y_kn": vpl_y, "v_pl_rd_z_kn": vpl_z, "v_ed_y_kn": float(np.max(Vy)),
+                 "v_ed_z_kn": float(np.max(Vz)), "rho": float(np.max(np.maximum(rho_y, rho_z))),
+                 "hw_tw": web_slenderness(s), "shear_buckling_limit": 72 * epsilon(fy) / ETA,
+                 "shear_buckling": shear_buckling(s, fy)}
+    with np.errstate(divide="ignore", invalid="ignore"):
+        if s.shape == "chs":
+            m_cs = _ratio(np.hypot(My, Mz), Wy * fy / gamma_m0)
+        else:
+            m_cs = _ratio(np.abs(My), Wy * fy / gamma_m0) + _ratio(np.abs(Mz), Wz * fy / gamma_m0)
     cross = float(np.max(np.abs(N) / (s.A * fy / gamma_m0) + m_cs))
     sig = np.abs(N) / s.A + (np.hypot(My, Mz) / s.Wel_y if s.shape == "chs"
                              else np.abs(My) / s.Wel_y + np.abs(Mz) / s.Wel_z)
     out = {"class": cls, "moduli": "plastic" if use_plastic else "elastic", "cross_section": cross,
            "max_stress_mpa": float(np.max(sig)) / 1000.0, "length_cr_m": length, "fabrication": fabrication}
     util, check = cross, "cross-section"
+    if shear is not None:
+        out.update(shear)
+        if shear["shear"] > util:
+            util, check = shear["shear"], "shear 6.2.6"
+    chi_lt = 1.0
+    if ltb is not None:
+        w_lt = s.Wpl_y if use_plastic else s.Wel_y                           # 6.3.2.2(1): W_y by class
+        m_cr = ltb["m_cr"]
+        lam_lt = math.sqrt(w_lt * fy / m_cr) if math.isfinite(m_cr) and m_cr > 0 else 0.0
+        curve_lt = ltb_curve(s)
+        chi_lt = chi(lam_lt, curve_lt)
+        m_b_rd = chi_lt * w_lt * fy / gamma_m1
+        ltb_util = ltb["m_ed"] / m_b_rd
+        out.update({"ltb": ltb_util, "m_cr_knm": m_cr if math.isfinite(m_cr) else None, "lambda_lt": lam_lt,
+                    "chi_lt": chi_lt, "curve_lt": curve_lt, "m_b_rd_knm": m_b_rd, "cm_lt": ltb["cm_lt"],
+                    "length_lt_m": ltb["length"], "ltb_ends": list(ltb["ends"]), "ltb_load_height_m": ltb["zg"]})
+        if ltb_util > util:
+            util, check = ltb_util, "LTB 6.3.2"
     ned = float(max(0.0, -np.min(N)))
     if ned > 0:
         cy, cz = buckling_curves(s, fy, fabrication)
@@ -142,7 +375,7 @@ def member_check(section, material, length: float, t: np.ndarray, N: np.ndarray,
         lam_z = math.sqrt(nrk / (math.pi ** 2 * E * s.Iz / length ** 2))
         chi_y, chi_z = chi(lam_y, cy), chi(lam_z, cz)
         n_y, n_z = ned / (chi_y * nrk / gamma_m1), ned / (chi_z * nrk / gamma_m1)
-        cm_y, cm_z = equivalent_moment_factor(t, My), equivalent_moment_factor(t, Mz)
+        (cm_y, basis_y), (cm_z, basis_z) = moment_factor(t, My, sway), moment_factor(t, Mz, sway)
         if use_plastic:
             kyy = cm_y * min(1 + (lam_y - 0.2) * n_y, 1 + 0.8 * n_y)
             kzz = (cm_z * min(1 + (2 * lam_z - 0.6) * n_z, 1 + 1.4 * n_z) if s.shape == "i"
@@ -152,20 +385,37 @@ def member_check(section, material, length: float, t: np.ndarray, N: np.ndarray,
             kyy = cm_y * min(1 + 0.6 * lam_y * n_y, 1 + 0.6 * n_y)
             kzz = cm_z * min(1 + 0.6 * lam_z * n_z, 1 + 0.6 * n_z)
             kyz, kzy = kzz, 0.8 * kyy
-        my_r, mz_r = Wy * fy / gamma_m1, Wz * fy / gamma_m1
+        if ltb is not None:                                    # Table B.2: susceptible to torsional deformation
+            d = ltb["cm_lt"] - 0.25
+            if use_plastic:
+                kzy = (min(0.6 + lam_z, 1 - 0.1 * lam_z * n_z / d) if lam_z < 0.4
+                       else max(1 - 0.1 * lam_z * n_z / d, 1 - 0.1 * n_z / d))
+            else:
+                kzy = max(1 - 0.05 * lam_z * n_z / d, 1 - 0.05 * n_z / d)
+        Wy, Wz = (s.Wpl_y, s.Wpl_z) if use_plastic else (s.Wel_y, s.Wel_z)    # member checks: unreduced (6.3.3)
+        my_r, mz_r = chi_lt * Wy * fy / gamma_m1, Wz * fy / gamma_m1
         my_ed, mz_ed = float(np.max(np.abs(My))), float(np.max(np.abs(Mz)))
         eq61 = n_y + kyy * my_ed / my_r + kyz * mz_ed / mz_r
         eq62 = n_z + kzy * my_ed / my_r + kzz * mz_ed / mz_r
         out.update({"curve_y": cy, "curve_z": cz, "lambda_y": lam_y, "lambda_z": lam_z, "chi_y": chi_y,
-                    "chi_z": chi_z, "cm_y": cm_y, "cm_z": cm_z, "kyy": kyy, "kzz": kzz, "kyz": kyz, "kzy": kzy,
+                    "chi_z": chi_z, "cm_y": cm_y, "cm_z": cm_z, "cm_y_basis": basis_y, "cm_z_basis": basis_z,
+                    "kyy": kyy, "kzz": kzz, "kyz": kyz, "kzy": kzy,
                     "eq_6_61": eq61, "eq_6_62": eq62, "buckling": max(eq61, eq62),
                     "slenderness": max(lam_y, lam_z), "chi": min(chi_y, chi_z)})
         if max(eq61, eq62) > util:
             util, check = max(eq61, eq62), "buckling 6.61" if eq61 >= eq62 else "buckling 6.62"
     if cls == 4:
         check = "class 4 (slender) - not covered"
+    elif shear is not None and shear["shear_buckling"]:
+        check = "shear buckling (EN 1993-1-5) - not covered"
     out["governing_check"] = check
     return {"utilization": util, "detail": out}
+
+
+def _ratio(m: np.ndarray, resistance) -> np.ndarray:
+    """M / M_Rd per station; a resistance reduced to zero by shear fails wherever there is moment."""
+    r = np.broadcast_to(np.asarray(resistance, float), np.shape(m))
+    return np.where(r > 0, np.divide(m, np.where(r > 0, r, 1.0)), np.where(m > 1e-12, np.inf, 0.0))
 
 
 def groups(frame) -> dict:
@@ -176,11 +426,177 @@ def groups(frame) -> dict:
     return out
 
 
+def _supported(frame, n) -> bool:
+    return any(frame.supports.get(n, ())) or any(v > 0 for v in frame.springs.get(n, ()))
+
+
+def ltb_segments(frame, member_groups: dict) -> list[dict]:
+    """Segments between lateral restraints for lateral-torsional buckling, of the members susceptible to it
+    (steel I-sections, not truss bars). A segment is a member, or several members of one straight beam
+    meeting at a node that nothing else touches and that is not supported (a polyline drawn with an
+    intermediate point is still one unrestrained beam). Its ends are "fork" where the node is supported or
+    another member frames in, else "free"; a segment with one free end is a cantilever, its other end the
+    "root". Segments free at both ends are left out."""
+    X = np.asarray(frame.nodes, float)
+    owner = {i: g for g, idx in member_groups.items() for i in idx}
+    at: dict = {}
+    for i, e in enumerate(frame.elements):
+        at.setdefault(e.n1, set()).add(i)
+        at.setdefault(e.n2, set()).add(i)
+
+    def ends_of(idx):
+        nodes = sorted({n for i in idx for n in (frame.elements[i].n1, frame.elements[i].n2)})
+        return max(((a, b) for a in nodes for b in nodes), key=lambda ab: float(np.linalg.norm(X[ab[0]] - X[ab[1]])))
+
+    keys = [g for g, idx in member_groups.items()
+            if all(frame.elements[i].section.shape == "i" and not frame.elements[i].truss
+                   and frame.elements[i].material.family in STEEL_FAMILIES for i in idx)]
+    ends = {g: ends_of(member_groups[g]) for g in keys}
+    parent = {g: g for g in keys}
+
+    def find(g):
+        while parent[g] != g:
+            parent[g] = parent[parent[g]]
+            g = parent[g]
+        return g
+
+    for g in keys:
+        for n in ends[g]:
+            touching = at.get(n, set())
+            if _supported(frame, n) or len(touching) != 2:
+                continue
+            others = {owner[j] for j in touching} - {g}
+            if len(others) != 1:
+                continue
+            h = others.pop()
+            if h not in parent or n not in ends[h]:
+                continue
+            ig, ih = (next(j for j in touching if owner[j] == k) for k in (g, h))
+            if frame.elements[ig].section != frame.elements[ih].section:
+                continue
+            dg = X[ends[g][1] if ends[g][0] == n else ends[g][0]] - X[n]
+            dh = X[ends[h][1] if ends[h][0] == n else ends[h][0]] - X[n]
+            if float(dg @ dh) / (np.linalg.norm(dg) * np.linalg.norm(dh)) < -0.9995:
+                parent[find(g)] = find(h)
+    chains: dict = {}
+    for g in keys:
+        chains.setdefault(find(g), []).append(g)
+    out = []
+    for gs in chains.values():
+        els = [i for g in gs for i in member_groups[g]]
+        A, B = ends_of(els)
+        own = set(els)
+        kind = ["fork" if _supported(frame, n) or at.get(n, set()) - own else "free" for n in (A, B)]
+        if kind == ["free", "free"]:
+            continue
+        if "free" in kind:
+            kind = ["root" if k == "fork" else k for k in kind]
+        out.append({"groups": gs, "elements": els, "A": A, "B": B, "ends": tuple(kind),
+                    "length": float(np.linalg.norm(X[B] - X[A]))})
+    return out
+
+
+def segment_ltb(frame, result, seg: dict) -> dict:
+    """M_cr of one segment under one analysed combination: the segment's own moment diagram, its member
+    loads and the combination's nodal loads, gravity (local -z) loads on the top flange for members within
+    45 degrees of horizontal (shear centre otherwise)."""
+    X = np.asarray(frame.nodes, float)
+    A, B = X[seg["A"]], X[seg["B"]]
+    L = seg["length"]
+    u = (B - A) / L
+    e0 = frame.elements[seg["elements"][0]]
+    R, _ = fs.local_axes(X[e0.n1], X[e0.n2], e0.ref)
+    pieces, t_all, m_all = [], [], []
+    for i in seg["elements"]:
+        er, el = result.elements[i], frame.elements[i]
+        s = (er.stations - A) @ u
+        order = np.argsort(s, kind="stable")
+        wa, wb = er.w_local if er.w_local is not None else (np.zeros(3), np.zeros(3))
+        s1, s2 = float((X[el.n1] - A) @ u), float((X[el.n2] - A) @ u)
+        q1, q2 = -float(wa[2]), -float(wb[2])
+        if s1 > s2:
+            s1, s2, q1, q2 = s2, s1, q2, q1
+        pieces.append({"s0": s1, "s1": s2, "s": s[order], "M": np.asarray(er.My)[order], "q0": q1, "q1": q2})
+        t_all.append(s / L)
+        m_all.append(np.asarray(er.My))
+    combo = getattr(result, "combination", None) or {}
+    nodes = {n for i in seg["elements"] for n in (frame.elements[i].n1, frame.elements[i].n2)}
+    points = []
+    for n in nodes:
+        F = sum((float(f) * np.asarray(frame.nodal_loads[(n, c)], float) for c, f in combo.items()
+                 if (n, c) in frame.nodal_loads), np.zeros(6))
+        P = -float(R[2] @ F[:3])
+        if abs(P) > 1e-12:
+            points.append((float((X[n] - A) @ u), P))
+    s_ = e0.section
+    zg = s_.dims_mm[0] / 2000 if abs(u[2]) < math.sqrt(0.5) else 0.0
+    res = ltb_solver.critical_moment(e0.material.E, e0.material.G, s_.Iz, s_.J, s_.Iw, pieces, points, seg["ends"], zg)
+    t = np.concatenate(t_all)
+    order = np.argsort(t, kind="stable")
+    res.update({"cm_lt": equivalent_moment_factor(t[order], np.concatenate(m_all)[order]), "length": L,
+                "ends": seg["ends"], "zg": zg})
+    return res
+
+
+def _member_moments(frame, idx: list, ers: list, A: np.ndarray, B: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
+    """My, Mz at every station of a member's elements, in one set of axes. A member drawn as one straight
+    line has them already; the chords of a curved member each report moments in their own turned axes,
+    which would put false kinks into the moment diagram (and Cm = 1.0 from Table B.3): those are turned
+    into the axes of the member's chord A -> B."""
+    from .frame_solver import local_axes
+    e0 = frame.elements[idx[0]]
+    frames = [local_axes(frame.nodes[frame.elements[i].n1], frame.nodes[frame.elements[i].n2],
+                         frame.elements[i].ref)[0] for i in idx]
+    if all(np.allclose(R, frames[0], atol=1e-9) for R in frames[1:]):
+        return np.concatenate([er.My for er in ers]), np.concatenate([er.Mz for er in ers])
+    Rg = local_axes(A, B, e0.ref)[0]
+    out = []
+    for R, er in zip(frames, ers):
+        local = np.stack([np.full(len(er.My), float(er.T)), er.My, er.Mz], axis=1)
+        out.append(local @ R @ Rg.T)                    # local -> global -> member axes (row vectors)
+    M = np.vstack(out)
+    return M[:, 1], M[:, 2]
+
+
+def free_end(frame, idx: list, touching: dict | None = None) -> bool:
+    """Does the member (its analysis elements ``idx``) have an end that nothing holds: no support
+    or spring that restrains a translation, and no other element attached (a cantilever's tip)?"""
+    if touching is None:
+        touching = _touching(frame)
+    own = [n for i in idx for n in (frame.elements[i].n1, frame.elements[i].n2)]
+    for n in {n for n in own if own.count(n) == 1}:
+        held = any(frame.supports.get(n, (False,) * 6)[:3]) or any(k > 0 for k in frame.springs.get(n, (0.0,) * 6)[:3])
+        if not held and touching.get(n, 0) <= own.count(n):
+            return True
+    return False
+
+
+def _touching(frame) -> dict:
+    out: dict = {}
+    for e in frame.elements:
+        for n in (e.n1, e.n2):
+            out[n] = out.get(n, 0) + 1
+    return out
+
+
 def apply(frame, result, member_groups: dict | None = None, plastic: bool = False,
-          fabrication: str = "cold_formed") -> None:
-    """Replace the element-level checks of steel members in ``result`` by member checks (in place)."""
+          fabrication: str = "cold_formed", lateral_restraint: str = "joints") -> None:
+    """Replace the element-level checks of steel members in ``result`` by member checks (in place).
+    ``lateral_restraint``: "joints" (I-section beams unrestrained between their joints: LTB checked) or
+    "continuous" (a deck or bracing holds the compression flange: no LTB)."""
+    if lateral_restraint not in LATERAL_RESTRAINT:
+        raise ValueError("lateral_restraint must be 'joints' or 'continuous'.")
     gm0, gm1 = getattr(frame, "gamma_m", (1.0, 1.0))
-    for idx in (member_groups or groups(frame)).values():
+    touching = _touching(frame)
+    member_groups = member_groups or groups(frame)
+    lt_of: dict = {}
+    if lateral_restraint == "joints":
+        for seg in ltb_segments(frame, member_groups):
+            res = segment_ltb(frame, result, seg)
+            for g in seg["groups"]:
+                lt_of[g] = {"m_cr": res["m_cr"], "m_ed": res["m_max"], "cm_lt": res["cm_lt"],
+                            "length": res["length"], "ends": res["ends"], "zg": res["zg"]}
+    for g, idx in member_groups.items():
         e0 = frame.elements[idx[0]]
         if e0.material.family not in STEEL_FAMILIES:
             continue
@@ -194,9 +610,14 @@ def apply(frame, result, member_groups: dict | None = None, plastic: bool = Fals
         t = np.clip((pts - A) @ chord / L ** 2, 0.0, 1.0)
         order = np.argsort(t, kind="stable")
         N = np.concatenate([er.N for er in ers])[order]
-        My = np.concatenate([er.My for er in ers])[order]
-        Mz = np.concatenate([er.Mz for er in ers])[order]
-        res = member_check(e0.section, e0.material, L, t[order], N, My, Mz, gm0, gm1, plastic, fabrication)
+        My, Mz = _member_moments(frame, idx, ers, A, B)     # a curved member's chords: in the member's axes
+        My, Mz = My[order], Mz[order]
+        Vy = Vz = None                                      # shear stays in each piece's own axes (the section's)
+        if all(getattr(er, "Vy", None) is not None and getattr(er, "Vz", None) is not None for er in ers):
+            Vy = np.concatenate([er.Vy for er in ers])[order]
+            Vz = np.concatenate([er.Vz for er in ers])[order]
+        res = member_check(e0.section, e0.material, L, t[order], N, My, Mz, gm0, gm1, plastic, fabrication, Vy, Vz,
+                           lt_of.get(g), sway=free_end(frame, idx, touching))
         for er in ers:
             er.utilization = res["utilization"]
             er.util_detail = dict(res["detail"])

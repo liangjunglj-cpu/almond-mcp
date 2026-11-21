@@ -1,0 +1,225 @@
+{
+  "batch_id": "y2k-twofronts-2026-09",
+  "route": "meshy_text_to_3d",
+  "purpose": "Y2K retro-futurist street props and speculative vehicles generated for the owner's Project Y2K ('Two Fronts') Neon Front scene on 2026-09-06 (Meshy test rounds 1 and 2, run from a Ginkgo session into runs/twofronts), re-derived as Almond library geometry.",
+  "origin": {
+    "project": "Project Y2K ('Two Fronts'), the owner's game project (private); generated from a Ginkgo session",
+    "pass": "runs/twofronts",
+    "pass_date": "2026-09-06",
+    "pass_records": [
+      "runs/twofronts/meshy/README.md",
+      "ProjectY2K: docs/MESHY_NOTES.md",
+      "ProjectY2K: twofronts/world/place_assets.py"
+    ],
+    "records": [
+      "runs/twofronts/meshy/README.md and ProjectY2K docs/MESHY_NOTES.md (task ledger, rounds 1 and 2)",
+      "ProjectY2K: twofronts/world/place_assets.py (scene target heights)",
+      "ProjectY2K: twofronts/meshy/models/<prop>/model.obj (byte-identical to the Ginkgo downloads, SHA-256 checked 2026-11-20)",
+      "Claude Code session transcript b7a7d8b6-56a0-48d3-ac67-77626f9af289 (the tool calls that submitted the previews and refines and downloaded the OBJs)"
+    ],
+    "excluded": {
+      "pod_building (Meshy 01a0744d-5d0d / 01a0744f-710d)": "Building-scale model; outside the approved scope",
+      "pistol (01a0744d-7a2c / 01a0744f-8731)": "Weapon; outside the approved scope",
+      "vesper, kohaku and their _lp/_rig derivatives": "Operatives (characters); excluded by the owner",
+      "*_lp remeshes, model_merged.obj, Ginkgo refset_0923b/0924 20k GLB conversions, SM_GK61_* FBX": "Derivatives of the same refine downloads"
+    }
+  },
+  "text_to_3d_settings": {
+    "preview": {
+      "ai_model": "meshy-6",
+      "auto_size": true,
+      "origin_at": "bottom",
+      "target_formats": [
+        "glb",
+        "obj",
+        "fbx"
+      ]
+    },
+    "refine": {
+      "ai_model": "meshy-6",
+      "enable_pbr": true,
+      "texture_prompt": "per prop, in each request"
+    },
+    "download": "OBJ with texture maps (meshy_download_model format obj); the OBJ geometry is the library source"
+  },
+  "strip_source_materials": true,
+  "external_reference_ids": [],
+  "external_reference_status": "Text prompts only: no image was given to any stage.",
+  "variant_suffix": "generated Y2K prop; detailed geometry edition",
+  "dimension_basis": "Heights are the target heights at which Project Y2K's Neon Front scene placed each prop (twofronts/world/place_assets.py: planter pod 1.1 m, vending machine 2.4 m, kiosk 2.6 m, holo sign 3.4 m, hover scooter 1.2 m, hover car 1.6 m); Meshy's OBJ units are arbitrary, so each mesh was scaled uniformly to that height and its width and depth measured after scaling. Y2K's later ginkgo_props_v061 pass used 1.9 m for the vending machine and 1.78 m for the scooter. Speculative designs; not a physical survey.",
+  "rights": "Meshy-6 text-to-3D preview and refine on the owner's Meshy account on 2026-09-06 (the same account, by the account ID in the result URLs, as the library's other Meshy batches). This was the account's first recorded use (MESHY_NOTES: balance 3,320 credits, no prior tasks). Whether the account was on a paid plan on 2026-09-06 is unknown: neither MESHY_NOTES, the Ginkgo README nor session b7a7d8b6 records the plan, and paid status is not asserted here; the owner should confirm it. Text prompts only. Owner approved release in the Almond library under CC BY 4.0 on 2026-11-20 (\"increase the range of models, from the ones i used for my project y2k games, (except for the operatives and bosses)\"). Provider textures are not distributed.",
+  "estimated_credits": "0 for this import (generation already paid: 20 Meshy credits per preview, 10 per refine)",
+  "repair_nonmanifold": true,
+  "assets": [
+    {
+      "asset_id": "gen-planter-pod-capsule-1",
+      "ginkgo_name": "planter",
+      "product": "Planter pod",
+      "variant": "Y2K glossy bowl planter on a chrome ring base with a stylised round-leaf plant",
+      "category": "site_furniture",
+      "material": "polycarbonate-opal",
+      "height_mm": 1100,
+      "width_hint_mm": 703,
+      "depth_hint_mm": 773,
+      "target_triangles": 50000,
+      "support_plane": "ground",
+      "placement_priority": "movable",
+      "tags": [
+        "planter",
+        "plant",
+        "street furniture",
+        "y2k",
+        "retro-futurist",
+        "sci-fi"
+      ],
+      "prompt": "Y2K futurist planter pod, a glossy white bowl-shaped capsule planter on a chrome ring base with a translucent cyan glass rim, holding a stylised round-leafed plant with glossy pale green leaves and small magenta glowing berries, rounded soft forms, clean single street prop, no text",
+      "preview_task_id": "01a07473-abad-7565-b9b9-ba3995a65c71",
+      "mesh_task_id": "01a07476-f3a8-7346-b6de-13758c9b6f10",
+      "refine_texture_prompt": "glossy white bowl planter, mirror chrome ring base, translucent cyan glass rim, glossy pale green round leaves, small magenta glowing berries, clean Y2K finish",
+      "reference_review": "Reviewed on 2026-11-20: text-to-3D has no input image. The library geometry was checked in its archive preview (640 px) and in untextured front, side, back and three-quarter views (rendered 900 px, viewed at 450 px) The prompt asks for no text or letters. Meshy's texture atlases for this route are fragmented per triangle and are not distributed. No lettering, logos or brand marks in the geometry."
+    },
+    {
+      "asset_id": "gen-vending-machine-capsule-1",
+      "ginkgo_name": "vending",
+      "product": "Vending machine",
+      "variant": "Y2K rounded capsule vending machine with a bubble window of drink capsules, unbranded",
+      "category": "site_furniture",
+      "material": "polycarbonate-opal",
+      "height_mm": 2400,
+      "width_hint_mm": 972,
+      "depth_hint_mm": 973,
+      "target_triangles": 50000,
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "tags": [
+        "vending",
+        "capsule",
+        "street furniture",
+        "y2k",
+        "retro-futurist",
+        "sci-fi"
+      ],
+      "prompt": "Y2K futurist vending machine, a tall rounded glossy white capsule-shaped vending machine with a large translucent cyan bubble window showing rows of small colorful pill-shaped drink capsules inside, chrome seam rings, a magenta glowing dispensing slot, chrome feet, rounded soft forms, clean single street prop, no text, no letters",
+      "preview_task_id": "01a07473-b8e0-74b6-9ea4-8ef33d3a620e",
+      "mesh_task_id": "01a07476-48e0-7585-952c-e9e5b3fb537c",
+      "refine_texture_prompt": "glossy white capsule body, translucent cyan bubble window with colorful pill-shaped drink capsules inside, mirror chrome rings and feet, magenta glowing slot, clean Y2K finish",
+      "reference_review": "Reviewed on 2026-11-20: text-to-3D has no input image. The library geometry was checked in its archive preview (640 px) and in untextured front, side, back and three-quarter views (rendered 900 px, viewed at 450 px) The prompt asks for no text or letters. Meshy's texture atlases for this route are fragmented per triangle and are not distributed. No lettering, logos or brand marks in the geometry."
+    },
+    {
+      "asset_id": "gen-kiosk-pod-1",
+      "ginkgo_name": "kiosk",
+      "product": "Kiosk pod",
+      "variant": "Y2K egg-shaped street kiosk with a porthole serving window on a pedestal base",
+      "category": "site_furniture",
+      "material": "polycarbonate-opal",
+      "height_mm": 2600,
+      "width_hint_mm": 1376,
+      "depth_hint_mm": 1467,
+      "target_triangles": 40000,
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "tags": [
+        "kiosk",
+        "vending",
+        "pod",
+        "y2k",
+        "retro-futurist",
+        "sci-fi"
+      ],
+      "prompt": "Y2K futurist street vending pod kiosk: a glossy white egg-shaped capsule kiosk with a chrome seam ring around its equator, a large magenta translucent glass porthole serving window on the front, a chrome bubble pedestal base, a small cyan glass sphere holo-sign on a thin chrome stalk on top, rounded edges everywhere, clean single object, no people, no text",
+      "preview_task_id": "01a0744d-693b-76bc-8908-2dc845a69944",
+      "mesh_task_id": "01a0744f-7c05-75ea-a522-1ef91eed3537",
+      "refine_texture_prompt": "glossy white egg-shell plastic, mirror chrome ring and pedestal, translucent magenta glass serving window, cyan glass holo sphere, clean Y2K futurist finish",
+      "reference_review": "Reviewed on 2026-11-20: text-to-3D has no input image. The library geometry was checked in its archive preview (640 px) and in untextured front, side, back and three-quarter views (rendered 900 px, viewed at 450 px) The prompt asks for no text or letters. Meshy's texture atlases for this route are fragmented per triangle and are not distributed. No logos or brand marks. The porthole panel carries a few small raised symbols with no legible letters. The back has two arched recesses above a round knob that read loosely as a face; not a likeness of any character. The prompt's cyan sphere on a stalk did not appear."
+    },
+    {
+      "asset_id": "gen-holo-sign-pod-1",
+      "ginkgo_name": "holosign",
+      "product": "Holo sign pod",
+      "variant": "Y2K sphere sign on a slim stalk with a ring, its disc face bearing raised 'Y2K' lettering",
+      "category": "site_furniture",
+      "material": "aluminium-anodized",
+      "height_mm": 3400,
+      "width_hint_mm": 1680,
+      "depth_hint_mm": 1412,
+      "target_triangles": 40000,
+      "support_plane": "ground",
+      "placement_priority": "fixed",
+      "tags": [
+        "sign",
+        "signage",
+        "y2k",
+        "retro-futurist",
+        "sci-fi",
+        "lettering"
+      ],
+      "prompt": "Y2K futurist holographic sign pod, a chrome sphere on a slim chrome stalk with a flat translucent magenta glass disc floating above it like a screen, small cyan glowing ring at the base, glossy white accent panels, rounded soft forms, clean single street prop, no text, no letters",
+      "preview_task_id": "01a07473-9d0f-74c1-bc21-fbc2c7012389",
+      "mesh_task_id": "01a07476-3d50-73f8-a665-71fc376f70d2",
+      "refine_texture_prompt": "mirror chrome sphere and stalk, translucent magenta glass disc, cyan glowing ring, glossy white accent panels, clean Y2K finish",
+      "reference_review": "Reviewed on 2026-11-20: text-to-3D has no input image. The library geometry was checked in its archive preview (640 px) and in untextured front, side, back and three-quarter views (rendered 900 px, viewed at 450 px) The prompt asks for no text or letters. Meshy's texture atlases for this route are fragmented per triangle and are not distributed. The disc face carries large raised 'Y2K' lettering in the geometry although the prompt asked for no text or letters. 'Y2K' is a generic name for the era and style, not a brand mark; no logos or other lettering. Flagged for the owner."
+    },
+    {
+      "asset_id": "gen-hover-scooter-1",
+      "ginkgo_name": "scooter",
+      "product": "Hover scooter",
+      "variant": "Speculative Y2K bubble scooter with a ball front wheel and a small rear wheel",
+      "category": "vehicle",
+      "material": "polycarbonate-opal",
+      "height_mm": 1200,
+      "width_hint_mm": 1281,
+      "depth_hint_mm": 969,
+      "target_triangles": 50000,
+      "support_plane": "ground",
+      "placement_priority": "movable",
+      "tags": [
+        "scooter",
+        "vehicle",
+        "y2k",
+        "retro-futurist",
+        "sci-fi"
+      ],
+      "prompt": "Y2K futurist hover scooter, a glossy white bubble-shaped body with chrome trim, translucent cyan windshield bubble, chrome handlebars, no wheels but a rounded chrome hover skirt underneath, magenta glowing tail light, small chrome star charms hanging from the handlebar, rounded soft forms, clean single vehicle prop, no rider, no text",
+      "preview_task_id": "01a07473-8370-736e-8a90-2911b9c0214b",
+      "mesh_task_id": "01a07475-5b74-743f-beff-58466225fd90",
+      "refine_texture_prompt": "glossy pearlescent white plastic body, mirror chrome trim and hover skirt, translucent cyan bubble windshield, magenta glowing tail light, clean Y2K toy-like finish",
+      "reference_review": "Reviewed on 2026-11-20: text-to-3D has no input image. The library geometry was checked in its archive preview (640 px) and in untextured front, side, back and three-quarter views (rendered 900 px, viewed at 450 px) The prompt asks for no text or letters. Meshy's texture atlases for this route are fragmented per triangle and are not distributed. No lettering, logos or brand marks in the geometry. Meshy added a ball front wheel and a small rear wheel although the prompt asked for no wheels, and the bubble windscreen has holes in its top; recorded as generated."
+    },
+    {
+      "asset_id": "gen-hover-car-bubble-1",
+      "ginkgo_name": "hovercar",
+      "product": "Hover car",
+      "variant": "Speculative Y2K egg-shaped two-seat bubble car on a hover skirt, no wheels",
+      "category": "vehicle",
+      "material": "polycarbonate-opal",
+      "height_mm": 1600,
+      "width_hint_mm": 2826,
+      "depth_hint_mm": 2111,
+      "target_triangles": 60000,
+      "support_plane": "ground",
+      "placement_priority": "movable",
+      "tags": [
+        "car",
+        "hover car",
+        "bubble car",
+        "vehicle",
+        "y2k",
+        "retro-futurist",
+        "sci-fi"
+      ],
+      "prompt": "Y2K futurist bubble hover car, a glossy pearlescent white egg-shaped two-seat car with a large translucent cyan bubble canopy, chrome bumpers and chrome seam rings, no wheels, a rounded chrome hover skirt, magenta glowing light strips, rounded soft forms everywhere, clean single vehicle prop, no people, no text",
+      "preview_task_id": "01a07473-90c1-7768-888e-b09208fb0006",
+      "mesh_task_id": "01a07476-3233-715b-bb09-3495a1bf25c8",
+      "refine_texture_prompt": "glossy pearlescent white egg-shaped body, translucent cyan bubble canopy, mirror chrome bumpers and seam rings, magenta glowing light strips, clean Y2K toy-like finish",
+      "reference_review": "Reviewed on 2026-11-20: text-to-3D has no input image. The library geometry was checked in its archive preview (640 px) and in untextured front, side, back and three-quarter views (rendered 900 px, viewed at 450 px) The prompt asks for no text or letters. Meshy's texture atlases for this route are fragmented per triangle and are not distributed. No lettering, logos or brand marks in the geometry."
+    }
+  ],
+  "release_assets": [
+    "gen-planter-pod-capsule-1",
+    "gen-vending-machine-capsule-1",
+    "gen-kiosk-pod-1",
+    "gen-holo-sign-pod-1",
+    "gen-hover-scooter-1",
+    "gen-hover-car-bubble-1"
+  ]
+}
