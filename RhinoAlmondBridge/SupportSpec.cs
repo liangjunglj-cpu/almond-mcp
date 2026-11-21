@@ -2,6 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using Rhino;
 using Rhino.DocObjects;
 using Rhino.Geometry;
 
@@ -85,6 +88,64 @@ namespace RhinoAlmondBridge
             var type = words[0].ToLowerInvariant();
             label = string.Join(" ", new[] { type == "pin" ? "pinned" : type }.Concat(springs));
             return true;
+        }
+
+        /// <summary>
+        /// Write <paramref name="spec"/> as almond:support on a Rhino point object (undoable); empty or "default"
+        /// clears it. Returns the normalised label, or null when cleared. Throws for a bad object or spec.
+        /// </summary>
+        public static string Write(RhinoDoc doc, Guid id, string spec)
+        {
+            var obj = doc?.Objects.FindId(id);
+            if (obj == null || !(obj.Geometry is Point))
+                throw new InvalidOperationException($"{id} is not a Rhino point object: supports are point objects.");
+            spec = (spec ?? "").Trim();
+            bool clear = spec.Length == 0 || spec.Equals("default", StringComparison.OrdinalIgnoreCase);
+            string label = null;
+            if (!clear)
+            {
+                bool[] r, k;
+                string error;
+                if (!TryParse(spec, out r, out k, out label, out error))
+                    throw new InvalidOperationException($"Support '{spec}' not understood ({error}). Types: fixed, pinned, roller, " +
+                        "roller-x, roller-y, spring kz=...; springs kx ky kz (kN/m), rx ry rz (kNm/rad).");
+            }
+            var attrs = obj.Attributes.Duplicate();
+            foreach (var key in Keys) attrs.DeleteUserString(key);
+            if (!clear) attrs.SetUserString(Keys[0], label);
+            doc.Objects.ModifyAttributes(obj, attrs, true);
+            return label;
+        }
+
+        /// <summary>Bridge message <c>set_support</c>: {"guids": [...], "spec": "roller-x"} -> per-point outcome.</summary>
+        public static string HandleSet(JObject jobj)
+        {
+            var doc = RhinoDoc.ActiveDoc;
+            if (doc == null)
+                return JsonConvert.SerializeObject(new { status = "error", message = "No active Rhino document." });
+            var guids = jobj["guids"]?.ToObject<List<string>>() ?? new List<string>();
+            string spec = (string)jobj["spec"] ?? "";
+            var updated = new List<object>();
+            var errors = new List<string>();
+            uint undo = doc.BeginUndoRecord("Almond support type");
+            try
+            {
+                foreach (var g in guids)
+                {
+                    Guid id;
+                    if (!Guid.TryParse(g, out id)) { errors.Add($"'{g}' is not a GUID."); continue; }
+                    try { updated.Add(new { guid = g, support = Write(doc, id, spec) ?? "default" }); }
+                    catch (Exception ex) { errors.Add(ex.Message); }
+                }
+            }
+            finally { doc.EndUndoRecord(undo); }
+            doc.Views.Redraw();
+            return JsonConvert.SerializeObject(new
+            {
+                status = errors.Count == 0 ? "ok" : updated.Count > 0 ? "partial" : "error",
+                updated,
+                errors,
+            });
         }
 
         /// <summary>The overlay glyph family of a support label: fixed, pinned, roller or spring.</summary>

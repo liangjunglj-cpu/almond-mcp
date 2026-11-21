@@ -51,3 +51,43 @@ export function projectPoint(p, view = 'axon') {
   if (view === 'top') return [p[0], -p[1]];
   return [(p[0]-p[1])*.8660254, (p[0]+p[1])*.5-p[2]];
 }
+
+// Support types (almond:support on a Rhino support point). The native engine's parse_support is the reference.
+export const SUPPORT_TYPES = ['fixed', 'pinned', 'roller', 'roller-x', 'roller-y', 'spring'];
+const SPRING_KEYS = ['kx', 'ky', 'kz', 'rx', 'ry', 'rz'];
+// "roller-x kz=5000" -> {type:'roller-x', springs:'kz=5000'}; no text -> the default
+export function splitSupportSpec(spec) {
+  const words = String(spec ?? '').trim().toLowerCase().split(/[\s,]+/).filter(Boolean);
+  if (!words.length) return {type: '', springs: ''};
+  const type = words[0] === 'pin' ? 'pinned' : words[0];
+  return {type: SUPPORT_TYPES.includes(type) ? type : words[0], springs: words.slice(1).join(' ')};
+}
+// The text to write: '' (default) or "<type> [k=v ...]"; null when the springs are not k=v pairs with known keys.
+export function supportSpec(type, springs) {
+  const parts = String(springs ?? '').trim().toLowerCase().replace(/:/g, '=').split(/[\s,]+/).filter(Boolean);
+  if (!type) return parts.length ? null : '';
+  if (!parts.every(p => { const [k, v, ...rest] = p.split('='); return !rest.length && SPRING_KEYS.includes(k) && v !== '' && Number(v) >= 0; }))
+    return null;
+  if (type === 'spring' && !parts.some(p => Number(p.split('=')[1]) > 0)) return null;
+  return [type, ...parts].join(' ');
+}
+// Symbol family for a support label (same rule as the Rhino overlay): fixed, pinned, roller or spring.
+export function supportGlyph(label, fallbackFixed = true) {
+  const t = String(label ?? '').trim().toLowerCase();
+  if (!t) return fallbackFixed ? 'fixed' : 'pinned';
+  if (t.startsWith('spring') || t.includes('=')) return 'spring';
+  if (t.startsWith('roller')) return 'roller';
+  return t.startsWith('fixed') ? 'fixed' : 'pinned';
+}
+// SVG markup of a support symbol under the point (x, y) of the panel diagram.
+export function supportSymbol(glyph, x, y, colour = 'var(--diagram-support,#237963)') {
+  const r = v => Math.round(v * 10) / 10;
+  if (glyph === 'fixed')
+    return '<path d="M ' + r(x - 7) + ' ' + r(y + 3) + ' h 14 v 7 h -14 Z" fill="' + colour + '"/>';
+  if (glyph === 'spring')
+    return '<path d="M ' + r(x) + ' ' + r(y + 2) + ' l 5 2 l -10 3 l 10 3 l -10 3 l 5 2 M ' + r(x - 7) + ' ' + r(y + 16) + ' h 14" fill="none" stroke="' + colour + '" stroke-width="1.6"/>';
+  const tri = '<path d="M ' + r(x) + ' ' + r(y + 2) + ' l -7 11 h 14 Z" fill="none" stroke="' + colour + '" stroke-width="2"/>';
+  if (glyph === 'roller')
+    return tri + '<circle cx="' + r(x - 4) + '" cy="' + r(y + 15.5) + '" r="2" fill="' + colour + '"/><circle cx="' + r(x + 4) + '" cy="' + r(y + 15.5) + '" r="2" fill="' + colour + '"/>';
+  return tri;
+}

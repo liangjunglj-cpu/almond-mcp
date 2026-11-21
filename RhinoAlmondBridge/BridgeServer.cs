@@ -315,6 +315,9 @@ namespace RhinoAlmondBridge
                     case "structure_model":
                         return StructureModelExport.Handle(jobj);
 
+                    case "set_support":
+                        return SupportSpec.HandleSet(jobj);
+
                     case "structure_draw":
                         return StructureView.HandleDraw(jobj);
 

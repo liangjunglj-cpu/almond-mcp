@@ -1,4 +1,5 @@
-import {finite,metricState,utilizationFor,utilizationColour,projectPoint,engineLabel,stabilityState} from './analysis-view.mjs';
+import {finite,metricState,utilizationFor,utilizationColour,projectPoint,engineLabel,stabilityState,
+  SUPPORT_TYPES,splitSupportSpec,supportSpec,supportGlyph,supportSymbol} from './analysis-view.mjs';
 const el=id=>document.getElementById(id);
 const token=new URLSearchParams(location.search).get('bridge')||'';
 const native=/^[a-f0-9]{32}$/.test(token) && new URLSearchParams(location.search).get('panel')==='1';
@@ -26,6 +27,9 @@ const settings=()=>{
 const SHELL_NOTE='The native engine analyses line members: select only the centre-line curves and support points, or switch the engine to Karamba3D for shells.';
 const HINTS=[
   [/shell element/i,SHELL_NOTE],
+  [/^Springs:|type for springs|support '.*' not understood|not a Rhino point object/i,
+   'Supports tab: pick a type, then springs as key=value pairs in global axes, e.g. kz=50000 (soil) or rx=8000 ry=8000 (semi-rigid base).'],
+  [/support point is not in the current study/i,'Model tab: Use Rhino selection again, including the support points.'],
   [/at most 200/i,'Join short segments into continuous curves (Almond splits them at every crossing), or check part of the structure.'],
   [/library blocks/i,'Select the structural centre lines and support points, not furniture blocks.'],
   [/finish the current rhino command|rhino was busy/i,'Press Esc in Rhino to end the running command, then try again.'],
@@ -143,6 +147,42 @@ function request(action) {
     action==='capture'?'Select structural geometry in Rhino…':action==='status'?'Checking engines…':'Working in Rhino…','busy');
   location.href='/almond-action/'+token+'/karamba/'+action+'?data='+encodeURIComponent(JSON.stringify(input));
 }
+// Write one support point's type to Rhino (almond:support user text); Rhino answers with the refreshed model.
+function setSupport(guid,spec){
+  if(!native||busy)return;
+  busy=true;pending='set_support';controls();
+  message('Setting the support type in Rhino…','busy');
+  location.href='/almond-action/'+token+'/karamba/set_support?data='+encodeURIComponent(JSON.stringify({guid,spec}));
+}
+function renderSupports(){
+  const list=model?.supports||[],body=el('support-table').tBodies[0];
+  el('support-list').hidden=!list.length;el('support-empty').hidden=!!list.length;
+  const dflt=el('support-restraint').value==='fixed'?'Fixed':'Pinned';
+  body.replaceChildren(...list.map((sp,i)=>{
+    const tr=document.createElement('tr'),cur=splitSupportSpec(sp.spec);
+    const pos=document.createElement('td');pos.textContent=(sp.point||[]).map(v=>Number(v).toFixed(2)).join(', ');
+    const type=document.createElement('select');type.dataset.support='type';type.setAttribute('aria-label','Support '+(i+1)+' type');
+    type.append(new Option('Default ('+dflt+')',''),...SUPPORT_TYPES.map(t=>new Option(t,t)));
+    if(cur.type&&!SUPPORT_TYPES.includes(cur.type))type.append(new Option(cur.type+' (not understood)',cur.type));
+    type.value=cur.type;
+    const springs=document.createElement('input');springs.dataset.support='springs';springs.value=cur.springs;
+    springs.placeholder=cur.type==='spring'?'kz=50000':'—';springs.setAttribute('aria-label','Support '+(i+1)+' springs');
+    const send=()=>{
+      const spec=supportSpec(type.value,springs.value);
+      springs.setAttribute('aria-invalid',spec===null?'true':'false');
+      if(spec===null){message(type.value?'Springs: use kx ky kz (kN/m) or rx ry rz (kNm/rad), e.g. kz=50000. A spring support needs one.':
+        'Choose a type for springs: a spring, or a restraint such as fixed rx=8000.','error');return;}
+      if(el('analysis-status').dataset.state==='error'&&/^Springs:|type for springs/.test(el('analysis-message').textContent))
+        message('Support entry fixed.','ok');
+      if(spec!==(sp.spec||'').trim().toLowerCase())setSupport(sp.guid,spec);
+    };
+    type.addEventListener('change',()=>{if(type.value==='spring'&&!springs.value.trim()){springs.placeholder='kz=50000';springs.focus();return;}send();});
+    springs.addEventListener('change',send);
+    const td=c=>{const n=document.createElement('td');n.append(c);return n;};
+    const num=document.createElement('td');num.textContent=String(i+1);
+    tr.append(num,pos,td(type),td(springs));return tr;
+  }));
+}
 document.querySelectorAll('[data-analysis]').forEach(b=>{if(b.dataset.analysis!=='analyze')b.addEventListener('click',()=>request(b.dataset.analysis));});
 el('analysis-form').addEventListener('submit',e=>{e.preventDefault();request('analyze');});
 el('analysis-code').addEventListener('change',codeControls);
@@ -153,6 +193,7 @@ el('analysis-engine').addEventListener('change',()=>{
 });
 el('analysis-form').addEventListener('input',event=>{
   if(!event.target.closest('#analysis-settings')||event.target.closest('[data-analysis-view]'))return;   // diagram toggles only redraw
+  if(event.target.closest('[data-support]'))return;                       // support types are written to Rhino, not settings
   dirty=!!report;el('section-fields').hidden=!el('section-override').checked;
   el('analysis-stale').hidden=!dirty;
   if(dirty)message('Inputs changed. Run analysis again to update the results.','warn');
@@ -172,6 +213,7 @@ function readiness(){
   const loads=Number(el('analysis-load').value)>0||el('self-weight').checked||
     (nativeEngine&&(Number(el('floor-imposed').value)>0||Number(el('floor-dead').value)>0||el('asset-loads').checked));
   const anchors=model?.anchors?.length||0,points=el('support-source').value==='points';
+  const typed=(model?.supports||[]).filter(s=>(s.spec||'').trim()).length;
   const down=/unavailable|not installed/i.test(n);
   const shells=nativeEngine&&model?.shells>0;           // captured, but the native engine refuses shells: say so before Run
   return [
@@ -181,7 +223,8 @@ function readiness(){
      tip:!model?'Model tab: select in Rhino, then Use Rhino selection':shells?SHELL_NOTE:model.beams+' beams · '+model.shells+' shells'},
     {key:'loads',tab:'loads',label:'Loads',state:loads?'ok':'need',tip:loads?'Loads set':'Loads tab: add a load or self-weight'},
     {key:'supports',tab:'supports',label:'Supports',state:points&&model&&!anchors?'need':'ok',
-     tip:points&&model&&!anchors?'Supports tab: select support points, or allow the lowest nodes':(anchors?anchors+' support points':'Lowest nodes')}];
+     tip:points&&model&&!anchors?'Supports tab: select support points, or allow the lowest nodes':
+       (anchors?anchors+' support points'+(typed?' · '+typed+' with their own type':''):'Lowest nodes')}];
 }
 function renderReadiness(){
   const items=readiness();
@@ -212,6 +255,11 @@ window.almondAnalysisReceive = payload => {
     if(answered==='capture')captureNote(payload.message,payload.kind==='error');
     if(payload.stale && report){dirty=true;el('analysis-stale').hidden=false;}
     message(payload.message,payload.kind==='error'?'error':'ok');controls();draw();return;
+  }
+  if(payload.kind==='supports'){
+    model=payload.model;
+    if(report){dirty=true;el('analysis-stale').hidden=false;message(payload.message+' Run analysis again to update the results.','warn');}
+    else message(payload.message,'ok');
   }
   if(payload.kind==='status'){
     engineState.karamba=payload.available?'Karamba detected':'Karamba not installed';
@@ -306,13 +354,15 @@ function draw() {
   const source=model||example,view=el('analysis-view').value,m=report?.result?.results||{};
   const solved=report&&!dirty&&['api','native'].includes(m.analysis_method)&&Array.isArray(m.support_points_m);
   const input=report&&!dirty?report.settings:settings();
-  let supports=[],loads=[];
+  let supports=[],loads=[],labels=new Map();
   const segments=source.segments||[],all=segments.flatMap(s=>[s.a,s.b]).concat((source.shell_outlines||[]).flat());
-  if(solved){supports=m.support_points_m||[];loads=m.loaded_points_m||[];}
+  if(solved){supports=m.support_points_m||[];loads=m.loaded_points_m||[];
+    (m.support_types||[]).forEach((t,i)=>{if(supports[i])labels.set(supports[i].join(','),t);});}
   else if(all.length){
     const low=Math.min(...all.map(p=>p[2]));
     supports=input.explicit_supports?(source.anchors||[]):(source.anchors?.length?source.anchors:all.filter(p=>Math.abs(p[2]-low)<1e-6));
     if(input.load_kn>0) loads=all.filter(p=>!supports.some(s=>s.every((v,k)=>Math.abs(v-p[k])<1e-6)));
+    (source.supports||[]).forEach(s=>{if(s.point&&s.spec)labels.set(s.point.join(','),s.spec);});
   }
   const points=all.concat(supports,loads).map(p=>projectPoint(p,view)).filter(Boolean);
   if(!points.length){el('analysis-diagram').innerHTML='<text x="20" y="50">No drawable member geometry.</text>';return;}
@@ -330,8 +380,8 @@ function draw() {
   }
   const unique=ps=>[...new Map(ps.map(p=>[p.join(','),p])).values()];
   if(el('toggle-supports').checked)unique(supports).forEach(p=>{const q=xy(p);if(!q)return;const [x,y]=q;
-    svg.push(input.fixed_rotations?'<path d="M '+(x-7)+' '+(y+3)+' h 14 v 7 h -14 Z" fill="var(--diagram-support,#237963)"/>':
-      '<path d="M '+x+' '+(y+2)+' l -7 11 h 14 Z" fill="none" stroke="var(--diagram-support,#237963)" stroke-width="2"/>');
+    const label=labels.get(p.join(','));
+    svg.push('<g>'+supportSymbol(supportGlyph(label,input.fixed_rotations),x,y)+'<title>'+esc(label||(input.fixed_rotations?'fixed':'pinned')+' (default)')+'</title></g>');
   });
   if(el('toggle-loads').checked)unique(loads).slice(0,80).forEach(p=>{const q=xy(p);if(!q)return;const [x,y]=q;
     svg.push('<path d="M '+x+' '+(y-27)+' v 22 m -4 -5 l 4 5 l 4 -5" fill="none" stroke="var(--diagram-load,#df432c)" stroke-width="2"/>');
@@ -342,8 +392,10 @@ function draw() {
     'Selection preview · support and load locations are provisional until solved';
   const extra=input.engine==='native'&&(input.floor_imposed_kn_m2||input.floor_dead_kn_m2)?' · Floor '+(input.floor_imposed_kn_m2+input.floor_dead_kn_m2)+' kN/m²':'';
   el('diagram-load-note').textContent='Total imposed load '+input.load_kn+' kN ↓'+extra+(input.asset_loads?' · Placed models':'')+
-    ' · Self-weight '+(input.self_weight?'on':'off')+' · '+(input.fixed_rotations?'Fixed':'Pinned')+' supports';
+    ' · Self-weight '+(input.self_weight?'on':'off')+' · '+(labels.size?labels.size+' typed supports, default '+
+      (input.fixed_rotations?'fixed':'pinned'):(input.fixed_rotations?'Fixed':'Pinned')+' supports');
   el('result-legend').hidden=!el('toggle-utilization').checked||!report||dirty;
+  renderSupports();
 }
 try{const saved=localStorage.getItem('almond-structure-engine');if(saved==='karamba'||saved==='native')el('analysis-engine').value=saved;}catch{}
 engineControls();codeControls();
