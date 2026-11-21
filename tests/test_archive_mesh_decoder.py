@@ -18,7 +18,7 @@ pytestmark = pytest.mark.skipif(not HOST, reason="Build ArchiveHost and set ALMO
 
 @pytest.mark.parametrize("path", sorted((ROOT / "GeneratedAssetfiles/models").glob("*.glb")), ids=lambda p: p.stem)
 def test_native_decoder_preserves_every_triangle_in_mm_and_normals(path):
-    result = subprocess.run([HOST, "--mesh", str(path), path.stem], capture_output=True, text=True, check=True)
+    result = subprocess.run([HOST, "--mesh", str(path), path.stem], capture_output=True, text=True, encoding="utf-8", check=True)
     decoded = json.loads(result.stdout)
     expected = load_triangles(path, "mm", "y")
     actual = np.concatenate([
@@ -64,5 +64,5 @@ def test_native_decoder_rejects_unsupported_or_malformed_assets(tmp_path, fault)
         blob = blob[:-1]
     file = tmp_path / "bad.glb"
     file.write_bytes(blob)
-    result = subprocess.run([HOST, "--mesh", str(file), original.stem], capture_output=True, text=True)
+    result = subprocess.run([HOST, "--mesh", str(file), original.stem], capture_output=True, text=True, encoding="utf-8")
     assert result.returncode != 0
