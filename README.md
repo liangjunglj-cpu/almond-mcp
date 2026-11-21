@@ -1,56 +1,10 @@
 # Almond MCP for Rhino
 
-**0.7.0-rc.2 — structural analysis pre-release.** The Structure workspace now runs
-Almond's own 3D frame solver: floor and placed-model loads, EN 1990 combinations,
-rigid/simple joints, stability (αcr, sway imperfections, P-Δ), EN 1993-1-1 member
-checks, per-curve sections (`almond:section`) and the **Almond Results** panel for
-every member, support and combination. Concrete, timber and aluminium are indicative.
-Start with the [Structure workspace tutorial](docs/structural-tutorial.md); release
-notes and the pre-release checklist are in [docs/release-0.7.md](docs/release-0.7.md).
-Install from Rhino's Package Manager with **Include pre-releases** ticked; the
-stable release remains 0.6.0.
-
-**0.6.0 — Almond workspace release.** Run **Almond** in Rhino
-for a dockable Neo Swiss menu with **Models** and **Structural Validation**.
-**AlmondLibrary** opens models directly; **AlmondStructure** (or **AlmondKaramba**)
-opens the analysis workspace. Models retain compact tiles, Light/Original detail and
-shared-block viewport placement. The structural workspace runs Almond's built-in
-native solver (no Karamba needed: floor and placed-model loads, EN 1990
-combinations, rigid/simple connections, stability, a live viewport overlay) or,
-optionally, Karamba3D; both add selection capture, explicit assumptions,
-support/load diagram toggles, mapped utilization and an exportable result record.
-See [docs/native-solver.md](docs/native-solver.md#in-the-almond-panel).
-
-The active IKEA catalogue, source links and four supplier-specific MCP tools
-are retired. Existing local downloads and historical scene records are retained.
-Karamba and the generated model/source libraries remain available.
-See the [Rhino quickstart](docs/rhino-archive-quickstart.md) and
-[release infrastructure](docs/release-0.6.md). Viewport dragging was confirmed
-by the user on rc.6. Stable 0.6.0 passed its Rhino smoke test and is published
-on Rhino Package Manager (`almondbridge`) and PyPI (`almond-mcp`).
-
-Run
-`almond-mcp library --open` for the local Neo Swiss interface: 47 Meshy models,
-7 drawing elements, linked SVG/DXF views, downloads, and source evidence in
-one searchable catalogue. The same index is exposed through the MCP tool
-`search_asset_repository` and `almond://repository/{asset_id}` resources.
-See the [Object Archive guide](docs/object-archive-0.6-rc3.md).
-
-All 50 generated
-models now carry embedded asset passports and ship with the Python package,
-including their sidecar contracts and previews. New MCP tools recommend assets
-with reasons and check rotated clearance envelopes before placement. See
-[the release guide](docs/semantic-assets-0.6.md) for the workflow, packaging,
-verification and remaining Rhino integration checks. The
-[drafting update](docs/drafting-0.6-rc2.md) adds a ten-model SVG/DXF pilot,
-custom GLB drawing generation, source discovery and drawing revision checks.
-
 <p align="center"><img src="assets/almond-icon.svg" width="120" alt="Almond"></p>
 
-Almond exposes Rhino 8 and a semantic design layer as MCP tools: curated
-furniture/drawing/diagram libraries with spatial contracts, audited Karamba
-capsules, structured retrieval (SQLite FTS5 + R-tree scene ledger), script
-execution over a TCP bridge, and publishing into Chestnut.
+Almond lets an AI assistant such as Claude work in Rhino 8 with you: it places
+furniture and other 3D models at their real sizes, checks whether a structure
+will stand up, and studies sunlight and climate on your design.
 
 ## What Almond is
 
@@ -96,6 +50,97 @@ Two pieces work together:
 - **`almondbridge`** (a Rhino 8 plugin, on the Rhino Package Manager) —
   listens on `127.0.0.1:5000` (local only) inside Rhino and executes what
   the server sends. Starts automatically with Rhino.
+
+## What's new
+
+### 0.8.0 (in preparation)
+
+- **Structural reference library.** Twelve benchmarked building typologies (moment
+  frame, braced tower, Pratt truss, portal, warehouse, space grid, arch, L-bracket,
+  canopy, diagrid, Vierendeel girder, a frame on six support types) as parametric
+  line models: `list_structural_references`, `get_structural_reference`,
+  `analyze_structural_reference` (solved with their benchmark loads, no Rhino needed,
+  compared with the textbook closed form where one exists) and
+  `place_structural_reference` (drawn in Rhino with section, release and support user
+  text, ready for `validate_structure`). See
+  [StructuralReferences/README.md](StructuralReferences/README.md).
+- **Native solver.** Support types per support point (fixed, pinned, rollers, springs
+  and the horizontal-only `lateral-x` / `lateral-y`), the release words `bar` and
+  `hinged`, and explicit G/Q loads carried in the model. Fixes from a typology stress
+  test (false mechanisms, dropped floor bays, tower deflection failures), with the
+  typologies checked against closed forms in CI and cross-checked against OpenSees.
+  The Rhino bridge does not yet read `almond:support` or export loads, so drawn
+  geometry still uses anchor points and `load_kn` / floor loads.
+- **Parametric teaching library (Grasshopper).** Ten openly licensed architectural
+  definitions by other authors (facades, a shell roof, towers, terrain, paving),
+  annotated to read left to right, with their upstream logic and licences unchanged:
+  `list_parametric_definitions`, `get_parametric_definition`,
+  `open_parametric_definition`. The shell roof also ships as a harnessed capsule,
+  not yet audited. See [ParametricLibrary/README.md](ParametricLibrary/README.md).
+- **Environmental analysis.** A native engine on EPW weather files: climate summary
+  and sun path, annual daylight (sDA, ASE, UDI, EN 17037), daylight factor, solar
+  radiation, ISO 13790 thermal zones and comfort, plus user-defined rooms, layered
+  constructions and envelope code packs. In Rhino it is the Almond panel's
+  **Environment** workspace (Site, Rooms, Constructions, Study, Results). See
+  [docs/environmental-analysis.md](docs/environmental-analysis.md).
+- **Scene metadata audit (pilot).** `capture_scene_metadata_snapshot` records chosen
+  Rhino objects as a local baseline; `audit_scene_metadata` reports what was deleted,
+  moved, resized or had its Almond user text changed since, and
+  `show_scene_metadata_issues` marks them temporarily in the viewport. Read-only on
+  the model. See [docs/scene-metadata-audit.md](docs/scene-metadata-audit.md).
+- **Bridge security.** The bridge accepts only requests that carry the current Rhino
+  session's token (`%LOCALAPPDATA%\Almond\bridge.token`), with explicit request types
+  and size and read limits. Update `almond-mcp` and `almondbridge` together: an older
+  server gets `unauthorized` from a newer bridge.
+- **Undo after a failed script.** A script that fails and is rolled back no longer
+  leaves Rhino's Undo stuck (issue #35).
+
+### Earlier releases
+
+**0.7.0-rc.2 — structural analysis pre-release.** The Structure workspace now runs
+Almond's own 3D frame solver: floor and placed-model loads, EN 1990 combinations,
+rigid/simple joints, stability (αcr, sway imperfections, P-Δ), EN 1993-1-1 member
+checks, per-curve sections (`almond:section`) and the **Almond Results** panel for
+every member, support and combination. Concrete, timber and aluminium are indicative.
+Start with the [Structure workspace tutorial](docs/structural-tutorial.md); release
+notes and the pre-release checklist are in [docs/release-0.7.md](docs/release-0.7.md).
+Install from Rhino's Package Manager with **Include pre-releases** ticked; the
+stable release remains 0.6.0.
+
+**0.6.0 — Almond workspace release.** Run **Almond** in Rhino
+for a dockable Neo Swiss menu with **Models** and **Structural Validation**.
+**AlmondLibrary** opens models directly; **AlmondStructure** (or **AlmondKaramba**)
+opens the analysis workspace. Models retain compact tiles, Light/Original detail and
+shared-block viewport placement. The structural workspace runs Almond's built-in
+native solver (no Karamba needed: floor and placed-model loads, EN 1990
+combinations, rigid/simple connections, stability, a live viewport overlay) or,
+optionally, Karamba3D; both add selection capture, explicit assumptions,
+support/load diagram toggles, mapped utilization and an exportable result record.
+See [docs/native-solver.md](docs/native-solver.md#in-the-almond-panel).
+
+The active IKEA catalogue, source links and four supplier-specific MCP tools
+are retired. Existing local downloads and historical scene records are retained.
+Karamba and the generated model/source libraries remain available.
+See the [Rhino quickstart](docs/rhino-archive-quickstart.md) and
+[release infrastructure](docs/release-0.6.md). Viewport dragging was confirmed
+by the user on rc.6. Stable 0.6.0 passed its Rhino smoke test and is published
+on Rhino Package Manager (`almondbridge`) and PyPI (`almond-mcp`).
+
+Run
+`almond-mcp library --open` for the local Neo Swiss interface: 47 Meshy models,
+7 drawing elements, linked SVG/DXF views, downloads, and source evidence in
+one searchable catalogue. The same index is exposed through the MCP tool
+`search_asset_repository` and `almond://repository/{asset_id}` resources.
+See the [Object Archive guide](docs/object-archive-0.6-rc3.md).
+
+All 50 generated
+models now carry embedded asset passports and ship with the Python package,
+including their sidecar contracts and previews. New MCP tools recommend assets
+with reasons and check rotated clearance envelopes before placement. See
+[the release guide](docs/semantic-assets-0.6.md) for the workflow, packaging,
+verification and remaining Rhino integration checks. The
+[drafting update](docs/drafting-0.6-rc2.md) adds a ten-model SVG/DXF pilot,
+custom GLB drawing generation, source discovery and drawing revision checks.
 
 ## Setting up with an AI assistant?
 
