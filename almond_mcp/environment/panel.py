@@ -293,15 +293,18 @@ def run(req: dict) -> dict:
                                         {"epw_path": req["epw_path"], "units_to_m": units, "export_csv": bool(panel_s.get("export_csv"))},
                                         envelope_pack=req.get("envelope_pack", ""), pack_options=req.get("pack_options"),
                                         cooling=bool(panel_s.get("cooling", True)), setpoints=sp or None)
+        # Cooled rooms sit at their cooling setpoint, so hours above 26 degC would count the setpoint itself:
+        # map hours above 28 degC when cooling is on, above 26 degC for free-running rooms.
+        limit = 28 if bool(panel_s.get("cooling", True)) else 26
         values, open_rooms = {}, {}
         for r in res["rooms"]:
             if r["method"] == "semi_outdoor":
                 open_rooms[r["room"]] = r["comfort"]["set_c"]["mean_occupied"]
             else:
-                values[r["room"]] = r["thermal"]["hours_above_26c_occupied"]
+                values[r["room"]] = r["thermal"][f"hours_above_{limit}c_occupied"]
         top = max(values.values()) if values else 1
         vrange = (0.0, max(100.0, float(top)))
-        unit, title = "h", "Hours above 26 °C (occupied)"
+        unit, title = "h", f"Hours above {limit} °C (occupied)"
         rs, encs, _, _ = studies.prepare_rooms(data)
         plan = diagrams.room_plan(_room_outlines(rs, encs), title, values or None, unit, vrange, "heat")
         b = res.get("building") or {}
@@ -310,7 +313,7 @@ def run(req: dict) -> dict:
             tiles += [(f"{b['heating_kwh_m2']:.0f}", "heating", "kWh/m²"), (f"{b['cooling_kwh_m2']:.0f}", "cooling", "kWh/m²")]
             if b.get("lighting_kwh_m2") is not None:
                 tiles.append((f"{b['lighting_kwh_m2']:.0f}", "lighting", "kWh/m²"))
-            tiles.append((f"{max(values.values()):.0f}", "max h > 26 °C", ""))
+            tiles.append((f"{max(values.values()):.0f}", f"max h > {limit} °C", ""))
         if open_rooms:
             tiles.append((f"{np.mean(list(open_rooms.values())):.1f}", "open rooms SET*", "°C"))
         draw = _draw_rooms(rs, values, unit, title, vrange, "heat", units)

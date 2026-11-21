@@ -172,3 +172,15 @@ def test_daylight_runs_are_room_studies_the_panel_can_show_and_compare(temperate
     cmp = _panel({"action": "compare", "cases": [{"name": "ID0", "run_id": a["result"]["run_id"]},
                                                  {"name": "ID1", "run_id": b["result"]["run_id"]}]})
     assert cmp["study"] == "rooms_daylight" and [r["case"] for r in cmp["rows"]] == ["ID0", "ID1"]
+
+
+def test_cooled_rooms_report_hours_above_28_not_their_setpoint(temperate):
+    """A cooled room sits at its cooling set-point, so hours above 26 degC would count the set-point itself
+    (a tropical tutorial room read 8760 of 8760 h). Cooled runs map and headline hours above 28 degC;
+    free-running runs keep 26 degC."""
+    cooled = _run(temperate.source_path, "thermal")
+    assert "max h &gt; 28" in cooled["tiles_svg"].lower()
+    assert "h > 28 degC" in cooled["result"]["headline"] and "h > 26 degC" not in cooled["result"]["headline"]
+    free = _run(temperate.source_path, "thermal", cooling=False)
+    assert "h > 26 degC" in free["result"]["headline"]
+    assert "max h &gt; 26" in free["tiles_svg"].lower()

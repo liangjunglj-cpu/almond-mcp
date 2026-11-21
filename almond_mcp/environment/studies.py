@@ -963,8 +963,11 @@ def run_rooms_thermal(data: dict, weather, settings: thermal.Settings, label: st
             heads.append(f"{e['room']}: open, SET* mean {e['comfort']['set_c']['mean_occupied']} degC")
         else:
             t = e["thermal"]
+            # A cooled room is held near its cooling setpoint, so hours above 26 degC would count the setpoint
+            # itself: report hours above 28 degC when cooling is on, above 26 degC for free-running rooms.
+            limit = 28 if cooling else 26
             heads.append(f"{e['room']}: heating {t['heating_kwh_m2']} / cooling {t['cooling_kwh_m2']} kWh/m2, "
-                         f"{t['hours_above_26c_occupied']} h > 26 degC")
+                         f"{t[f'hours_above_{limit}c_occupied']} h > {limit} degC")
     result["headline"] = "; ".join(heads)
     result["timing_s"] = round(time.time() - t0, 2)
     run_dir = save_run(run_id, result, None, arrays)
