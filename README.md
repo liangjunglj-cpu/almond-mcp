@@ -53,7 +53,7 @@ Two pieces work together:
 
 ## What's new
 
-### 0.8.0 (in preparation)
+### 0.8.0
 
 > **Structural Validation (native engine) is stable from 0.8.0; Climate, Rooms & Comfort
 > (environmental analysis) and the Karamba route are in beta (BETA).** The beta tools, panel workspace and
