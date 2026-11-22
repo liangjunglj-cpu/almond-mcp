@@ -103,7 +103,7 @@ namespace RhinoAlmondBridge
                     Engine(new JObject { ["action"] = "run_dir", ["run_id"] = input["run_id"] }, "notice", reply => {
                         string dir = (string)reply["run_dir"] ?? "";
                         if (!Directory.Exists(dir)) { Send("error", "The run folder is gone."); return; }
-                        System.Diagnostics.Process.Start("explorer.exe", "\"" + dir + "\"");
+                        AlmondPlatform.OpenFolder(dir);
                         Send("notice", "Opened " + dir);
                     }); return true;
             }
@@ -314,7 +314,7 @@ namespace RhinoAlmondBridge
 
         private static string Temp(string ext)
         {
-            string dir = Path.Combine(System.Environment.GetFolderPath(System.Environment.SpecialFolder.LocalApplicationData), "Almond", "environment", "panel");
+            string dir = Path.Combine(AlmondPlatform.UserDataDir, "environment", "panel");
             Directory.CreateDirectory(dir);
             return Path.Combine(dir, Guid.NewGuid().ToString("N") + ext);
         }

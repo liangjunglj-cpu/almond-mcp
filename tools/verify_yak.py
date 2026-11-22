@@ -3,6 +3,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path, PurePosixPath
+import re
 import sys
 import zipfile
 import xml.etree.ElementTree as ET
@@ -11,16 +12,29 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from almond_mcp import __version__
 
-RUNTIME = {"RhinoAlmondBridge.rhp", "Microsoft.CodeAnalysis.CSharp.dll", "Microsoft.CodeAnalysis.dll",
-           "Newtonsoft.Json.dll", "System.Buffers.dll", "System.Collections.Immutable.dll", "System.Memory.dll",
-           "System.Numerics.Vectors.dll", "System.Reflection.Metadata.dll", "System.Runtime.CompilerServices.Unsafe.dll",
-           "System.Text.Encoding.CodePages.dll", "System.Threading.Tasks.Extensions.dll"}
+# Exact runtime files per Yak platform. Windows ships the net48 build with the .NET Framework polyfills Roslyn
+# needs; macOS ships the net7.0 build, whose runtime already contains them.
+RUNTIME_WIN = {"RhinoAlmondBridge.rhp", "Microsoft.CodeAnalysis.CSharp.dll", "Microsoft.CodeAnalysis.dll",
+               "Newtonsoft.Json.dll", "System.Buffers.dll", "System.Collections.Immutable.dll", "System.Memory.dll",
+               "System.Numerics.Vectors.dll", "System.Reflection.Metadata.dll",
+               "System.Runtime.CompilerServices.Unsafe.dll", "System.Text.Encoding.CodePages.dll",
+               "System.Threading.Tasks.Extensions.dll"}
+RUNTIME_MAC = {"RhinoAlmondBridge.rhp", "Microsoft.CodeAnalysis.CSharp.dll", "Microsoft.CodeAnalysis.dll",
+               "Newtonsoft.Json.dll"}
+PLATFORMS = {
+    # platform tag: (runtime files, TargetFrameworkAttribute the plug-in must be compiled for)
+    "win": (RUNTIME_WIN, b".NETFramework,Version=v4.8"),
+    "mac": (RUNTIME_MAC, b".NETCoreApp,Version=v7.0"),
+}
 
 
 def verify(path):
     version = ET.parse(ROOT/"RhinoAlmondBridge/RhinoAlmondBridge.csproj").findtext("PropertyGroup/Version")
-    if path.name != f"almondbridge-{version}-rh8_0-win.yak":
+    match = re.fullmatch(rf"almondbridge-{re.escape(version)}-rh8_0-(win|mac)\.yak", path.name)
+    if not match:
         raise ValueError("Incorrect Yak version or Rhino/platform compatibility tag")
+    platform = match.group(1)
+    runtime, framework = PLATFORMS[platform]
     with zipfile.ZipFile(path) as archive:
         names = archive.namelist()
         if len(names) != len(set(names)):
@@ -29,15 +43,17 @@ def verify(path):
             p = PurePosixPath(name)
             if p.is_absolute() or ".." in p.parts or "\\" in name:
                 raise ValueError(f"Unsafe member: {name}")
-            if p.suffix.lower() in {".rhp", ".dll"} and name not in RUNTIME:
+            if p.suffix.lower() in {".rhp", ".dll"} and name not in runtime:
                 raise ValueError(f"Unexpected executable: {name}")
             if p.suffix.lower() in {".skp", ".3dm", ".gh", ".ghx", ".gha", ".sqlite3", ".exe", ".py", ".ps1"}:
                 raise ValueError(f"Forbidden member: {name}")
             if "/files/drawing/" in name or "/raw/" in name:
                 raise ValueError(f"Community or raw model included: {name}")
-        for name in RUNTIME | {"manifest.yml", "LICENSE", "THIRD-PARTY-NOTICES.md", "GETTING-STARTED.md", "archive/ATTRIBUTION.txt", "archive/ui/vendor/LICENSE", "archive/ui/vendor/THIRD-PARTY-LICENSES.txt"}:
+        for name in runtime | {"manifest.yml", "LICENSE", "THIRD-PARTY-NOTICES.md", "GETTING-STARTED.md", "archive/ATTRIBUTION.txt", "archive/ui/vendor/LICENSE", "archive/ui/vendor/THIRD-PARTY-LICENSES.txt"}:
             if name not in names:
                 raise ValueError(f"Missing package file: {name}")
+        if framework not in archive.read("RhinoAlmondBridge.rhp"):
+            raise ValueError(f"RhinoAlmondBridge.rhp is not the {framework.decode()} build the {platform} package needs")
         manifest = archive.read("manifest.yml").decode("utf-8-sig")
         if f"version: {version}" not in manifest or "name: almondbridge" not in manifest:
             raise ValueError("Yak manifest version/name mismatch")
@@ -95,7 +111,8 @@ def verify(path):
                     payload = archive.read(str(PurePosixPath(drawing_path).parent / filename))
                     if hashlib.sha256(payload).hexdigest().upper() != expected:
                         raise ValueError("Drawing package is stale or incomplete")
-    return {"status":"success", "yak":path.name,"bridge_version":version,"archive_version":__version__,
+    return {"status":"success", "yak":path.name,"platform":platform,"target_framework":framework.decode(),
+            "bridge_version":version,"archive_version":__version__,
             "counts":counts,"routes_checked":len(bundle["routes"]),"sha256":hashlib.sha256(path.read_bytes()).hexdigest(),
             "size_mb":round(path.stat().st_size/1e6,2), "rhino_in_process_smoke":"pending"}
 

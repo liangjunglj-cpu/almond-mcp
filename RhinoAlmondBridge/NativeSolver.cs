@@ -52,7 +52,7 @@ namespace RhinoAlmondBridge
             string uvx = FindUvx();
             if (uvx == null)
             {
-                reason = "uv is not installed (the Almond MCP server needs it too): winget install astral-sh.uv, then restart Rhino.";
+                reason = "uv is not installed (the Almond MCP server needs it too): " + AlmondPlatform.InstallUvHint + ", then restart Rhino.";
                 return null;
             }
             string package = PackageFor(PluginVersion);
@@ -77,16 +77,29 @@ namespace RhinoAlmondBridge
         {
             var dirs = (Environment.GetEnvironmentVariable("PATH") ?? "").Split(Path.PathSeparator).ToList();
             string home = Environment.GetFolderPath(Environment.SpecialFolder.UserProfile);
-            string local = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
             dirs.Add(Path.Combine(home, ".local", "bin"));
             dirs.Add(Path.Combine(home, ".cargo", "bin"));
-            dirs.Add(Path.Combine(local, "Microsoft", "WinGet", "Links"));
+            string executable;
+            if (AlmondPlatform.IsWindows)
+            {
+                string local = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
+                dirs.Add(Path.Combine(local, "Microsoft", "WinGet", "Links"));
+                executable = "uvx.exe";
+            }
+            else
+            {
+                // A Rhino started from the Dock or Finder inherits launchd's minimal PATH (/usr/bin:/bin:...), so
+                // look where Homebrew (Apple silicon, then Intel) and the standalone uv installer put uvx.
+                dirs.Add("/opt/homebrew/bin");
+                dirs.Add("/usr/local/bin");
+                executable = "uvx";
+            }
             foreach (var d in dirs)
             {
                 if (string.IsNullOrWhiteSpace(d)) continue;
                 try
                 {
-                    string candidate = Path.Combine(d.Trim().Trim('"'), "uvx.exe");
+                    string candidate = Path.Combine(d.Trim().Trim('"'), executable);
                     if (File.Exists(candidate)) return candidate;
                 }
                 catch (ArgumentException) { }
@@ -124,7 +137,7 @@ namespace RhinoAlmondBridge
             info.EnvironmentVariables["PYTHONUTF8"] = "1";
             // uv trusts only its bundled certificates by default. Behind security software or a proxy that inspects HTTPS
             // (common in offices) the first-run download then fails with "invalid peer certificate: UnknownIssuer".
-            // Use the Windows certificate store instead, unless the user has chosen a setting of their own.
+            // Use the system certificate store (Windows store, macOS Keychain) instead, unless the user has chosen a setting of their own.
             // UV_SYSTEM_CERTS is uv's current name; UV_NATIVE_TLS (deprecated) keeps older uv versions working.
             if (!info.EnvironmentVariables.ContainsKey("UV_NATIVE_TLS") && !info.EnvironmentVariables.ContainsKey("UV_SYSTEM_CERTS"))
             {

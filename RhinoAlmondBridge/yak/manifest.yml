@@ -34,7 +34,10 @@ description: >
 
   The MCP bridge listens on 127.0.0.1:5000. For AI workflows, install uv and
   register uvx --from almond-mcp==0.8.0 almond-mcp with your MCP client.
-  Windows only; supports Rhino 8.0 and later Rhino 8 service releases.
+  Supports Rhino 8.0 and later Rhino 8 service releases on Windows. The macOS
+  build is experimental: Models, placement, the panels and the native solver
+  run there, but the Karamba3D path is Windows only, and dragging a thumbnail
+  into a viewport becomes a pick of the insertion point.
 url: https://github.com/liangjunglj-cpu/almond-mcp
 icon: icon.png
 keywords:

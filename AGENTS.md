@@ -55,6 +55,33 @@ You are setting up **Almond MCP** — this specific project, not a generic
    `fetch-assets` verifies checksums. Do not attempt to automate the
    downloads or source the files from anywhere else.
 
+## Install steps (macOS, Rhino 8 for Mac) — experimental
+
+The macOS package (`almondbridge-<version>-rh8_0-mac.yak`) is built but not
+yet tested on a Mac or published. If the Package Manager on a Mac shows no
+`almondbridge`, the macOS package is not published yet: say so to the user.
+Do not substitute another product, and do not upgrade Rhino.
+
+1. **Verify Rhino 8 for Mac exists** (do not install/upgrade it yourself):
+   `test -d "/Applications/Rhino 8.app" && echo ok`
+2. **Install the bridge:** `_PackageManager` in Rhino → search `almondbridge`
+   (headless: `"/Applications/Rhino 8.app/Contents/Resources/bin/yak" install almondbridge`).
+3. **Install uv if missing** (`command -v uv` to check): `brew install uv`
+4. **Register the MCP server** — command `uvx`, args `["almond-mcp"]`:
+   - Claude Desktop: add under `mcpServers` in
+     `~/Library/Application Support/Claude/claude_desktop_config.json`:
+     `"Almond": { "command": "uvx", "args": ["almond-mcp"] }`. If Claude
+     reports `spawn uvx ENOENT`, use the absolute path from `which uvx`.
+   - Claude Code / Codex CLI: same commands as on Windows.
+5. **Start (or restart) Rhino 8.** `AlmondMCPStatus` confirms the bridge. The
+   session token is `~/Library/Application Support/Almond/bridge.token`.
+6. **Verify:** `uvx almond-mcp doctor`. If the bridge is not listening on
+   5000, ask the user to turn off AirPlay Receiver (System Settings → General
+   → AirDrop & Handoff), which uses port 5000 on macOS 12+.
+7. Same asset hand-over as step 7 above. Karamba3D is Windows only; on macOS
+   `validate_structure` solves line models with the native solver and falls
+   back to the template or rule-based estimate for shells.
+
 ## Troubleshooting
 
 | Symptom | Cause / fix |

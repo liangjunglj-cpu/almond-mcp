@@ -54,11 +54,18 @@ try {
     } finally { Pop-Location; $env:ALMOND_MODEL_BASE_URL = $previousModelBase }
     & (Join-Path $repo "tools/build_yak.ps1") -PythonExecutable $python -YakExecutable $YakExecutable
     [xml]$project = Get-Content -LiteralPath (Join-Path $repo "RhinoAlmondBridge/RhinoAlmondBridge.csproj")
-    $bridgeVersion = $project.Project.PropertyGroup.Version
+    # The csproj has several PropertyGroups; take the one Version (otherwise PowerShell joins an array into the name).
+    $bridgeVersion = @($project.Project.PropertyGroup | ForEach-Object { $_.Version } | Where-Object { $_ })[0]
     $yakName = "almondbridge-$bridgeVersion-rh8_0-win.yak"
     Copy-Item -LiteralPath (Join-Path $repo "dist/yak/$yakName") -Destination $output
     & $python tools/verify_yak.py (Join-Path $output $yakName) --report (Join-Path $output "yak-verification.json")
     if ($LASTEXITCODE -ne 0) { throw "Final Yak check failed." }
+    # The macOS distribution of the same version (net7.0 build). Built and verified here, but it has not been
+    # tested in Rhino for Mac until docs/macos-test-checklist.md is signed off: do not push it before then.
+    $macYakName = "almondbridge-$bridgeVersion-rh8_0-mac.yak"
+    Copy-Item -LiteralPath (Join-Path $repo "dist/yak/$macYakName") -Destination $output
+    & $python tools/verify_yak.py (Join-Path $output $macYakName) --report (Join-Path $output "yak-verification-mac.json")
+    if ($LASTEXITCODE -ne 0) { throw "Final macOS Yak check failed." }
     Copy-Item -LiteralPath (Join-Path $repo "docs/rhino-archive-quickstart.md") -Destination $output
     Copy-Item -LiteralPath (Join-Path $repo "docs/food4rhino-listing.md") -Destination $output
     $zip = Join-Path $output "almondbridge-$bridgeVersion-food4rhino.zip"
@@ -73,6 +80,7 @@ try {
     $checksums | Set-Content -LiteralPath (Join-Path $output "SHA256SUMS.txt") -Encoding ascii
     Write-Host "Prepared release artifacts: $output"
     Write-Host "Pending: Rhino in-process smoke test and explicit publication. Nothing has been uploaded."
+    Write-Host "macOS: $macYakName is built but untested in Rhino for Mac; push it only after docs/macos-test-checklist.md passes."
     # PyPI gets the wheel only: the sdist carries the models plus the generation evidence and is over
     # PyPI's 100 MB file limit. It goes to the GitHub release with the Yak, SHA256SUMS.txt and the
     # model files, which wheel installs download on first use (almond_mcp/model_store.py).
