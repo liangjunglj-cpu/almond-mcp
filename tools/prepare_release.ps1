@@ -54,7 +54,8 @@ try {
     } finally { Pop-Location; $env:ALMOND_MODEL_BASE_URL = $previousModelBase }
     & (Join-Path $repo "tools/build_yak.ps1") -PythonExecutable $python -YakExecutable $YakExecutable
     [xml]$project = Get-Content -LiteralPath (Join-Path $repo "RhinoAlmondBridge/RhinoAlmondBridge.csproj")
-    $bridgeVersion = $project.Project.PropertyGroup.Version
+    # The csproj has several PropertyGroups; take the one Version (otherwise PowerShell joins an array into the name).
+    $bridgeVersion = @($project.Project.PropertyGroup | ForEach-Object { $_.Version } | Where-Object { $_ })[0]
     $yakName = "almondbridge-$bridgeVersion-rh8_0-win.yak"
     Copy-Item -LiteralPath (Join-Path $repo "dist/yak/$yakName") -Destination $output
     & $python tools/verify_yak.py (Join-Path $output $yakName) --report (Join-Path $output "yak-verification.json")
